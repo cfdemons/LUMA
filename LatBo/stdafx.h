@@ -5,11 +5,16 @@
 
 #pragma once
 
-#include "targetver.h"
+// Check OS is Windows or not
+#ifdef _WIN32
 
-#include <stdio.h>
+#include "targetver.h"
 #include <tchar.h>
 
+#else // Compiling with gcc through Code::Blocks on Linux
 
+#include <stdlib.h> // Includes exit() function
 
-// TODO: reference additional headers your program requires here
+#endif
+
+#include <stdio.h>

@@ -1,6 +1,6 @@
 // LatBo.cpp : Defines the entry point for the console application.
 
-/*	
+/*
 	**************************************************************************************************************
 	**************************************************************************************************************
 	**																											**
@@ -12,11 +12,11 @@
 
 #include "stdafx.h"
 #include "LBM_definitions.h"	// Definitions file
-#include "LBM_globalvars.h"			// Global variable references
+#include "LBM_globalvars.h"		// Global variable references
 
 using namespace std;	// Use the standard namespace
 
-// Entry point
+// Entry point (Compiling in VS on Windows)
 int _tmain( )
 {
 	/*
@@ -34,12 +34,12 @@ int _tmain( )
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 	const int totalloops = (int)(T/deltat);		// Total number of loops to be performed (computed)
 
-	
+
 
 	/* ***************************************************************************************************************
 	*********************************************** LEVEL 0 INITIALISE ***********************************************
 	*************************************************************************************************************** */
-	
+
 	// Time step
 	Grids[0].dt = deltat;
 
@@ -57,7 +57,7 @@ int _tmain( )
 		cout << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions" << endl;
 		exit(EXIT_FAILURE);
 	}
-#else 
+#else
 	// 2D so need square lattice cells
 	if ( (Lx/N) != (Ly/M) ) {
 		cout << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions" << endl;
@@ -118,8 +118,8 @@ int _tmain( )
 		}
 	}
 	Grids[0].feq = Grids[0].f; // Make feq = feq too
-		
-	
+
+
 	// Relaxation frequency on L0
 	// Assign relaxation frequency corrected for grid and time step size
 	Grids[0].omega = 1 / ( (nu / (Grids[0].dt*pow(cs,2)) ) + .5 );
@@ -132,7 +132,7 @@ int _tmain( )
 	if (Nref != 0) {
 
 		LBM_init_multi();
-		
+
 	}
 
 	cout << "Initialisation Complete..." << endl;
@@ -150,7 +150,7 @@ int _tmain( )
 	/* ***************************************************************************************************************
 	********************************************** LBM PROCEDURE *****************************************************
 	*************************************************************************************************************** */
-	
+
 	// LBM
 	do {
 
@@ -170,7 +170,7 @@ int _tmain( )
 		// Increment counters
 		t++;
 		tval += Grids[0].dt;
-       
+
 	} while (tval < T);
 
 
@@ -184,3 +184,13 @@ int _tmain( )
 	return 0;
 }
 
+// Entry point (compiling in Code::Blocks on Linux)
+#ifndef _WIN32
+int main()
+{
+
+    _tmain();
+
+    return 0;
+}
+#endif

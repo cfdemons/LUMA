@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "LBM_definitions.h"
-#include "LBM_globalvars.h"
+#include "definitions.h"
+#include "globalvars.h"
 // File containing global variable initialisations
 
 using namespace std; // Standard namespace in use

@@ -11,8 +11,9 @@
 */
 
 #include "stdafx.h"
-#include "LBM_definitions.h"	// Definitions file
-#include "LBM_globalvars.h"		// Global variable references
+#include "definitions.h"	// Definitions file
+#include "globalvars.h"		// Global variable references
+#include "ensightGold.h"	// EnsightGold writer
 
 using namespace std;	// Use the standard namespace
 

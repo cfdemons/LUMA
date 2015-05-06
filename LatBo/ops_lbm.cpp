@@ -3,8 +3,8 @@ streaming and macroscopic calulcation.
 */
 
 #include "stdafx.h"
-#include "LBM_definitions.h"
-#include "LBM_globalvars.h"
+#include "definitions.h"
+#include "globalvars.h"
 
 using namespace std;
 

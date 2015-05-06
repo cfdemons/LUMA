@@ -3,7 +3,7 @@ mapping of positions or indices.
 */
 
 #include "stdafx.h"
-#include "LBM_globalvars.h"
+#include "globalvars.h"
 
 using namespace std;
 

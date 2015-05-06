@@ -5,7 +5,7 @@ In future, we could turn this into its own class with the functions as methods.
 #include "stdafx.h"
 #include <vector>		// Dynamic array
 #include <sstream>		// String stream package
-#include "LBM_definitions.h"
+#include "definitions.h"
 
 using namespace std;
 

@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include <fstream>
-#include "LBM_globalvars.h"
+#include "globalvars.h"
 
 using namespace std;
 

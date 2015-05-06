@@ -24,10 +24,13 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LBM_definitions.h">
+    <ClInclude Include="definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LBM_globalvars.h">
+    <ClInclude Include="globalvars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ensightGold.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ops_boundary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ensightGold.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

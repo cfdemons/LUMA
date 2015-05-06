@@ -79,12 +79,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LBM_definitions.h" />
-    <ClInclude Include="LBM_globalvars.h" />
+    <ClInclude Include="definitions.h" />
+    <ClInclude Include="ensightGold.h" />
+    <ClInclude Include="globalvars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ensightGold.cpp" />
     <ClCompile Include="init_grids.cpp" />
     <ClCompile Include="ops_boundary.cpp" />
     <ClCompile Include="ops_io.cpp" />

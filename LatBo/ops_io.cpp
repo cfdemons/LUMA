@@ -29,7 +29,7 @@ void lbm_write3(int r, int t) {
 	K_str = int2str((int)K);
 	ex_str = int2str(Ref_endX);
 	Nref_str = int2str(Nref);
-	FNameG = string("Grids")
+	FNameG = string("./Output/Grids")
 			+ string("D") +  int2str(dims)
 			+ string("x") + N_str 
 			+ string("y") + M_str 

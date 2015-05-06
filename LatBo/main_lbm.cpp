@@ -34,6 +34,8 @@ int _tmain( )
 	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 	const int totalloops = (int)(T/deltat);		// Total number of loops to be performed (computed)
+	int fileNum = 0;		// Output file number (1 per timestep)
+	EnsightGold writer;		// Ensight writer object
 
 
 
@@ -141,10 +143,12 @@ int _tmain( )
 	cout << "Initialising LBM time-stepping..." << endl;
 
 	// Write out
+#ifdef TEXTOUT
 	cout << "Writing Output to <Grids.out>..." << endl;
 	for (int r = 0; r <= Nref; r++) {
 		lbm_write3(r,t);
 	}
+#endif
 
 
 
@@ -172,6 +176,19 @@ int _tmain( )
 		t++;
 		tval += Grids[0].dt;
 
+
+		// Write out
+		std::cout << "Writing out to EnSight file" << endl;
+		fileNum++;
+		writer.genVec(fileNum,0);
+		writer.genScal(fileNum,0);
+#ifdef TEXTOUT
+		cout << "Writing out to <Grids.out>..." << endl;
+		for (int r = 0; r <= Nref; r++) {
+			lbm_write3(r,t);
+		}
+#endif
+
 	} while (tval < T);
 
 
@@ -179,7 +196,9 @@ int _tmain( )
 	*********************************************** POST PROCESS *****************************************************
 	*************************************************************************************************************** */
 
-	// None added yet
+	// End of loop write out
+	writer.genCase(T, 1);
+	writer.genGeo(0);
 
 
 	return 0;

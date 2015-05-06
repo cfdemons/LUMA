@@ -34,7 +34,7 @@ void LBM_init_vel ( int r ) {
 			for (int k = 0; k < K_lim; k++) {
 
 
-				// Only a 2D expression used here for now...
+				// Taylor-Green -- only 2D for now...
 				int idx = idxmap(i,j,k,0,M_lim,K_lim,dims);
 				Grids[r].u[idx] = -vecnorm(u_in) * 
 					cos(k1*Grids[r].XPos[i]) * sin(k2*Grids[r].YPos[j]);
@@ -42,6 +42,10 @@ void LBM_init_vel ( int r ) {
 				idx = idxmap(i,j,k,1,M_lim,K_lim,dims);
 				Grids[r].u[idx] = vecnorm(u_in) * 
 					(k1/k2) * sin(k1*Grids[r].XPos[i]) * cos(k2*Grids[r].YPos[j]);
+#if (dims == 3)
+				idx = idxmap(i,j,k,2,M_lim,K_lim,dims);
+				Grids[r].u[idx] = vecnorm(u_in);
+#endif
 			}
 		}
 	}
@@ -76,7 +80,7 @@ void LBM_init_rho ( int r ) {
 
 				int idx = idxmap(i,j,k,M_lim,K_lim);
 
-				// Only a 2D expression used here for now...
+				// Taylor-Green -- only 2D for now...
 				Grids[r].rho[idx] = rho_in - 
 					(1/pow(cs,2)) * .25 * pow(vecnorm(u_in),2) * 
 					(cos(2*k1*Grids[r].XPos[i])+cos(2*k2*Grids[r].YPos[j]));

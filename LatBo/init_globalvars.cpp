@@ -13,9 +13,9 @@ using namespace std; // Standard namespace in use
 	// D3Q19 (defined as in Mawson 2013 thesis but with last column as the rest particle)
 	const int c[3][nVels] =
 		{
-			{1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 0, 0, 0, 0, 1, -1, -1, 1, 0},
-			{0, 0, 1, -1, 0, 0, 1, -1, -1, 1, 1, -1, 1, -1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, -1, -1, 1, 1, -1, 1, -1, 0}
+			{1,	-1,  0,  0,  0,  0,  1, -1,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  0},
+			{0,  0,  1, -1,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0,  0,  0,  0,  0},
+			{0,  0,  0,  0,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0}
 		};
 
 #else
@@ -23,9 +23,9 @@ using namespace std; // Standard namespace in use
 	// D2Q9 (anticlockwise numbering with 9th paricle as the rest particle)
 	const int c[3][nVels] =
 		{
-			{1, 1, 0, -1, -1, -1, 0, 1, 0},
-			{0, 1, 1, 1, 0, -1, -1,-1, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0}
+			{1,  1,  0, -1, -1, -1,  0,  1,  0},
+			{0,  1,  1,  1,  0, -1, -1, -1,  0},
+			{0,  0,  0,  0,  0,  0,  0,  0,  0}
 		};
 
 #endif

@@ -20,7 +20,7 @@
 ***************************************************************************************************************
 */
 #define PI 3.14159265358979323846
-#define TEXTOUT
+//#define TEXTOUT
 #define ENSIGHTGOLD
 
 /*	
@@ -28,7 +28,7 @@
 ********************************************** Time data ******************************************************
 ***************************************************************************************************************
 */
-#define T 10		// End time of simulation
+#define T 50		// End time of simulation
 #define deltat 1	// Time step size
 
 /*	
@@ -37,15 +37,15 @@
 ***************************************************************************************************************
 */
 #define dims 3	// Number of dimensions to the problem
-#define N 10	// Number of x lattice sites
-#define M 10	// Number of y lattice sites
-#define K 6	// Number of z lattice sites
+#define N 32	// Number of x lattice sites
+#define M 32	// Number of y lattice sites
+#define K 32	// Number of z lattice sites
 #define a_x 0	// Start of domain-x
-#define b_x 10	// End of domain-x
+#define b_x 32	// End of domain-x
 #define a_y 0	// Start of domain-y
-#define b_y 10	// End of domain-y
+#define b_y 32	// End of domain-y
 #define a_z 0	// Start of domain-z
-#define b_z 6	// End of domain-z
+#define b_z 32	// End of domain-z
 
 /*	
 ***************************************************************************************************************
@@ -67,17 +67,29 @@
 ***************************************************************************************************************
 */
 #define NumLev 1		// Levels of refinement
-#define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
+#define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Lattice indices for refined region on level L0 start numbering at 0
-static size_t RefXstart[NumReg]		= {1, 5};
-static size_t RefXend[NumReg]		= {4, 8};
-static size_t RefYstart[NumReg]		= {1, 5};
-static size_t RefYend[NumReg]		= {4, 8};
-// If doing 2D, these can be arbitrary values
-static size_t RefZstart[NumReg]		= {1, 1};
-static size_t RefZend[NumReg]		= {4, 4};
+
+	#if NumReg == 2 // Inlcuded for testing purposes so I don't have to keep re-commenting bits
+	static size_t RefXstart[NumReg]		= {1, 5};
+	static size_t RefXend[NumReg]		= {4, 8};
+	static size_t RefYstart[NumReg]		= {1, 5};
+	static size_t RefYend[NumReg]		= {4, 8};
+	// If doing 2D, these can be arbitrary values
+	static size_t RefZstart[NumReg]		= {1, 1};
+	static size_t RefZend[NumReg]		= {4, 4};
+
+	#elif NumReg == 1
+	static size_t RefXstart[NumReg]		= {1};
+	static size_t RefXend[NumReg]		= {4};
+	static size_t RefYstart[NumReg]		= {1};
+	static size_t RefYend[NumReg]		= {4};
+	static size_t RefZstart[NumReg]		= {1};
+	static size_t RefZend[NumReg]		= {4};
+	#endif
+
 #endif
 
 /*	

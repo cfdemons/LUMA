@@ -12,8 +12,7 @@ using namespace std;
 // Routine to generate the case file
 void GridObj::genCase(int nsteps, int saveEvery)
 {
-
-
+	
 	// Create file stream
 	ofstream fout;
 	
@@ -39,11 +38,11 @@ void GridObj::genCase(int nsteps, int saveEvery)
 	sprintf_s(fileName, (char*)"rho.*****.sca");
 	fout << "scalar per element: 1 density  " << fileName << endl;
 
-	// Time section (required for transient cases)
+	// Time section
 	fout << "TIME" << endl;
 	fout << "time set: 1" << endl;
 	fout << "number of steps: " << nsteps << endl;	
-	fout << "filename start number: 00001" << endl;
+	fout << "filename start number: 00000" << endl;
 	fout << "filename increment: 1" << endl;
 	fout << "time values: ";
 	// Put in the time values
@@ -64,43 +63,45 @@ void GridObj::genGeo( )
 {
 
 	// Open file stream
+	ofstream fout;
+
 	char fileName[50];
-	sprintf_s(fileName, (char*)"./Output/geom.geo");
-	ofstream fout(fileName, ios::out|ios::binary);
+	char buf[80]; // Character buffer
+	sprintf_s(fileName,(char*)"./Output/geom.geo");
+	
+	if (level == 0) fout.open(fileName, ios::out);
+	else fout.open(fileName, ios::out|ios::app); // Append
 
-	// Output format
-	char buf[80] ;
-	sprintf_s(buf, (char*)"C Binary");
-	fout.write(buf, 80);
+	// Only write the following header the first time round
+	if (level == 0) {
+		// Output format not required for ASCII out
+			
+		// Description line 1
+		fout << "desc1";
 	
-	// Description line 1
-	sprintf_s(buf, (char*)"desc1" );
-	fout.write(buf, 80 );
+		// Description line 2
+		fout << "\ndesc2";
 	
-	// Description line 2
-	sprintf_s(buf, (char*)"desc2");
-	fout.write(buf, 80);
-	
-	// Tell it to assign node IDs for me
-	sprintf_s(buf, (char*)"node id assign");
-	fout.write(buf, 80);
+		// Tell it to assign node IDs for me
+		fout << "\nnode id assign";
 
-	// Tell it to assign element IDs for me
-	sprintf_s(buf, (char*)"element id assign");
-	fout.write(buf, 80);
+		// Tell it to assign element IDs for me
+		fout << "\nelement id assign";
+	}
 	
-	// Grid drawn as a part
-	sprintf_s(buf, (char*)"part");
-	fout.write(buf, 80);
-	int partNum = 1;
-	// Use reinterpret_cast to convert integrer to character
-	fout.write(reinterpret_cast<char*>(&partNum), sizeof(int));
-	sprintf_s(buf, (char*)"part desc");
-	fout.write(buf, 80);
-
+	// Part header
+	sprintf_s(buf, (char*)"\npart");
+	fout << buf;
+	// Unique part ID based on region and level
+	int gridNum = level + region_number*NumLev;
+	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+	string buffer_str = "\nDesc: Grid Level = " + to_string(level) + 
+							" Region = " + to_string(region_number);
+	fout << buffer_str;
+	
 	// Dimensions of the grid
-	sprintf_s(buf, (char*)"block uniform"); // Uniform grid
-	fout.write(buf, 80);
+	sprintf_s(buf, (char*)"\nblock uniform"); // Uniform grid
+	fout << buf;
 	int ni = XPos.size()+1;
 	int nj = YPos.size()+1;
 #if (dims == 3)
@@ -109,25 +110,32 @@ void GridObj::genGeo( )
 	int nk = 1;
 #endif
 
-	fout.write(reinterpret_cast<char*>(&ni), sizeof(int));
-	fout.write(reinterpret_cast<char*>(&nj), sizeof(int));
-	fout.write(reinterpret_cast<char*>(&nk), sizeof(int));
+	// Print grid size (3 numbers on same line)
+	sprintf_s(buf, "\n%10d ", ni); fout << buf;
+	sprintf_s(buf, "%10d ", nj); fout << buf;
+	sprintf_s(buf, "%10d", nk); fout << buf;
 
+	// Origin location
+	float x_orig = (float)XPos[0], y_orig = (float)YPos[0], z_orig = (float)ZPos[0];
 
-	// Origin location -- will be specific to a given grid
-	float x_orig = 0.0, y_orig = 0.0, z_orig = 0.0;
-
-	fout.write(reinterpret_cast<char*>(&x_orig), sizeof(float));
-	fout.write(reinterpret_cast<char*>(&y_orig), sizeof(float));
-	fout.write(reinterpret_cast<char*>(&z_orig), sizeof(float));
+	sprintf_s(buf, "\n%12.5e", (float)x_orig); fout << buf;
+	sprintf_s(buf, "\n%12.5e", (float)y_orig); fout << buf;
+	sprintf_s(buf, "\n%12.5e", (float)z_orig); fout << buf;
 
 	float x_delta = (float)dx, y_delta = (float)dy, z_delta = (float)dz;
 
-	fout.write(reinterpret_cast<char*>(&x_delta), sizeof(float));
-	fout.write(reinterpret_cast<char*>(&y_delta), sizeof(float));
-	fout.write(reinterpret_cast<char*>(&z_delta), sizeof(float));
+	sprintf_s(buf, "\n%12.5e", (float)x_delta); fout << buf;
+	sprintf_s(buf, "\n%12.5e", (float)y_delta); fout << buf;
+	sprintf_s(buf, "\n%12.5e", (float)z_delta); fout << buf;
 
 	fout.close();
+
+	// Now do the rest of the grids
+	if (NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].genGeo();
+		}
+	}
 
 }
 
@@ -137,75 +145,83 @@ void GridObj::genVec(int fileNum)
 {
 
 	// Open file stream
+	ofstream fout;
 	char fileName[50] ;
+	char buf[80]; // Character buffer
 	sprintf_s(fileName, (char*)"./Output/velocity.%05d.vec", fileNum);
 
-	ofstream fout;
-	fout.open(fileName, ios::out|ios::binary);
+	if (level == 0) fout.open(fileName, ios::out);
+	else fout.open(fileName, ios::out|ios::app); // Append
 
-	// Descriprion line
-	char buf[80];
-	sprintf_s(buf, (char*)"required description");
-	fout.write(buf, 80);
+	if (level == 0) {
+		// Description line
+		sprintf_s(buf, (char*)"required description");
+		fout << buf;
+	}
 	
 	// Part header
-	sprintf_s(buf, (char*)"part");
-	fout.write(buf,80);
-	int partNum = 1;
-	fout.write(reinterpret_cast<char*>(&partNum), sizeof(int));
-	sprintf_s(buf, (char*)"block");
-	fout.write(buf, 80);
+	sprintf_s(buf, (char*)"\npart");
+	fout << buf;
+
+	int gridNum = level + region_number*NumLev;
+	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+	
+	sprintf_s(buf, (char*)"\nblock");
+	fout << buf;
 
 	// Data for part
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	int c;
-	for (int i = 0; i < N_lim; i++) {
+	int ct;
+	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
+			for (int i = 0; i < N_lim; i++) {
 				int dir = 0;
-				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float ux = (float)u[c];
-				fout.write(reinterpret_cast<char*>(&ux), sizeof(float));
+				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
+				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
 			}
 		}
 	}
 
-	for (int i = 0; i < N_lim; i++) {
+	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
+			for (int i = 0; i < N_lim; i++) {
 				int dir = 1;
-				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float uy = (float)u[c];
-				fout.write(reinterpret_cast<char*>(&uy), sizeof(float));
+				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
+				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
 			}
 		}
 	}
 
 #if (dims == 3)
-	for (int i = 0; i < N_lim; i++) {
+	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
+			for (int i = 0; i < N_lim; i++) {
 				int dir = 2;
-				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float uz = (float)u[c];
-				fout.write(reinterpret_cast<char*>(&uz), sizeof(float));
+				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
+				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
 			}
 		}
 	}
 #else
-	for (int i = 0; i < N_lim; i++) {
+	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-				float uz = 0.0;
-				fout.write(reinterpret_cast<char*>(&uz), sizeof(float));
+			for (int i = 0; i < N_lim; i++) {
+				sprintf_s(buf, "\n%12.5e", 0.0); fout << buf;
 			}
 		}
 	}
 #endif
 
 	fout.close();
+
+	// Now do the rest of the grids
+	if (NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].genVec(fileNum);
+		}
+	}
 
 }
 
@@ -215,40 +231,51 @@ void GridObj::genScal(int fileNum)
 {
 
 	// File stream
+	ofstream fout;
 	char fileName[50];
+	char buf[80];
 	sprintf_s(fileName, (char*)"./Output/rho.%05d.sca", fileNum);
 
-	ofstream fout;
-	fout.open(fileName, ios::out|ios::binary);
+	if (level == 0 ) fout.open(fileName, ios::out);
+	else fout.open(fileName, ios::out|ios::app);
 
-	// Description
-	char buf[80];
-	sprintf_s(buf, (char*)"required description");
-	fout.write(buf, 80);
+	if (level == 0) {
+		// Description
+		sprintf_s(buf, (char*)"required description");
+		fout << buf;
+	}
 	
 	// Part header
-	sprintf_s(buf, (char*)"part");
-	fout.write(buf, 80);
-	int partNum = 1;
-	fout.write(reinterpret_cast<char*>(&partNum), sizeof(int));
-	sprintf_s(buf, (char*)"block");
-	fout.write(buf, 80);
+	sprintf_s(buf, (char*)"\npart");
+	fout << buf;
+
+	int gridNum = level + region_number*NumLev;
+	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+
+	sprintf_s(buf, (char*)"\nblock");
+	fout << buf;
 
 	// Data
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	int c;
-	for (int i = 0; i < N_lim; i++) {
+	int ct;
+	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-				c = idxmap(i,j,k,M_lim,K_lim);
-				float rho_out = (float)rho[c];
-				fout.write(reinterpret_cast<char*>(&rho_out), sizeof(float));
+			for (int i = 0; i < N_lim; i++) {
+				ct = idxmap(i,j,k,M_lim,K_lim);
+				sprintf_s(buf, "\n%12.5e", (float)rho[ct]); fout << buf;
 			}
 		}
 	}
 
 	fout.close();
+
+	// Now do the rest of the grids
+	if (NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].genScal(fileNum);
+		}
+	}
 
 }

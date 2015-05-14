@@ -133,42 +133,44 @@ void GridObj::LBM_init_grid( ) {
 	YInd = onespace( 0, M-1 );
 	ZInd = onespace( 0, K-1 );
 
-    // Checks to make sure grid size is suitable
+    // Checks to make sure grid size is suitable for refinement
+	if (NumLev != 0) {
 #if (dims == 3)
-	for (int reg = 0; reg < NumReg; reg++) {
-		// Check grid is big enough to allow embedded refinement of factor 2
-		if (	(
-				RefXend[reg]-RefXstart[reg]+1 < 3 || 
-				RefYend[reg]-RefYstart[reg]+1 < 3 || 
-				RefZend[reg]-RefZstart[reg]+1 < 3
-				) || (
-				(
-				RefXend[reg]-RefXstart[reg]+1 == 3 ||
-				RefYend[reg]-RefYstart[reg]+1 == 3 ||
-				RefZend[reg]-RefZstart[reg]+1 == 3
-				) && NumLev > 1 )
-			) {
-			cout << "Refined region is too small to support refinement" << endl;
-			exit(EXIT_FAILURE);
+		for (int reg = 0; reg < NumReg; reg++) {
+			// Check grid is big enough to allow embedded refinement of factor 2
+			if (	(
+					RefXend[reg]-RefXstart[reg]+1 < 3 || 
+					RefYend[reg]-RefYstart[reg]+1 < 3 || 
+					RefZend[reg]-RefZstart[reg]+1 < 3
+					) || (
+					(
+					RefXend[reg]-RefXstart[reg]+1 == 3 ||
+					RefYend[reg]-RefYstart[reg]+1 == 3 ||
+					RefZend[reg]-RefZstart[reg]+1 == 3
+					) && NumLev > 1 )
+				) {
+				cout << "Refined region is too small to support refinement" << endl;
+				exit(EXIT_FAILURE);
+			}
 		}
-	}
 #else
-	for (int reg = 0; reg < NumReg; reg++) {
-		// Check grid is big enough to allow embedded refinement of factor 2
-		if (	(
-				RefXend[reg]-RefXstart[reg]+1 < 3 || 
-				RefYend[reg]-RefYstart[reg]+1 < 3
-				) || (
-				(
-				RefXend[reg]-RefXstart[reg]+1 == 3 ||
-				RefYend[reg]-RefYstart[reg]+1 == 3
-				) && NumLev > 1 )
-			) {
-			cout << "Refined region is too small to support refinement" << endl;
-			exit(EXIT_FAILURE);
+		for (int reg = 0; reg < NumReg; reg++) {
+			// Check grid is big enough to allow embedded refinement of factor 2
+			if (	(
+					RefXend[reg]-RefXstart[reg]+1 < 3 || 
+					RefYend[reg]-RefYstart[reg]+1 < 3
+					) || (
+					(
+					RefXend[reg]-RefXstart[reg]+1 == 3 ||
+					RefYend[reg]-RefYstart[reg]+1 == 3
+					) && NumLev > 1 )
+				) {
+				cout << "Refined region is too small to support refinement" << endl;
+				exit(EXIT_FAILURE);
+			}
 		}
-	}
 #endif
+	}
 
     // Checks passed so continue...
 	// L0 lattice site coordinates
@@ -259,9 +261,9 @@ void GridObj::LBM_init_grid( ) {
 
 #else // 2D CASE
 			// Add TL to lower labels
-			for (int i = RefXstart[reg]; i <= RefXend[reg]; i++) {
-				for (int j = RefYstart[reg]; j <= RefYend[reg]; j++) {
-					int k = 0;
+			for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
+				for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
+					size_t k = 0;
 
 						int idx = idxmap(i,j,k,M,K);
 						LatTyp[idx] = 4;
@@ -270,9 +272,9 @@ void GridObj::LBM_init_grid( ) {
 			}
 
 			// Add refined labels
-			for (int i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
-				for (int j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
-					int k = 0;
+			for (size_t i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
+				for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
+					size_t k = 0;
 
 						int idx = idxmap(i,j,k,M,K);
 						LatTyp[idx] = 2;

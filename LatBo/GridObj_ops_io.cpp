@@ -9,8 +9,6 @@
 
 using namespace std;
 
-string int2str(int number); // Forward declaration for int2str
-
 
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
@@ -27,17 +25,17 @@ void GridObj::lbm_write3(int t) {
 
 	// Construct File Name
 	string FNameG, N_str, M_str, K_str, ex_str, NumLev_str, NumReg_str;
-	N_str = int2str((int)N);
-	M_str = int2str((int)M);
-	K_str = int2str((int)K);
-	NumLev_str = int2str(NumLev);
-	if (NumLev == 0) ex_str = int2str(0);
-	else ex_str = int2str(RefXend[0]) + string("_") + int2str(RefYend[0]) + string("_") + int2str(RefZend[0]);
-	if (NumLev == 0) NumReg_str = int2str(0);
-	else NumReg_str = int2str(NumReg);
+	N_str = to_string((int)N);
+	M_str = to_string((int)M);
+	K_str = to_string((int)K);
+	NumLev_str = to_string(NumLev);
+	if (NumLev == 0) ex_str = to_string(0);
+	else ex_str = to_string(RefXend[0]) + string("_") + to_string(RefYend[0]) + string("_") + to_string(RefZend[0]);
+	if (NumLev == 0) NumReg_str = to_string(0);
+	else NumReg_str = to_string(NumReg);
 	// Build string
 	FNameG = string("./Output/Grids")
-			+ string("D") +  int2str(dims)
+			+ string("D") +  to_string(dims)
 			+ string("x") + N_str 
 			+ string("y") + M_str 
 			+ string("z") + K_str 
@@ -73,17 +71,17 @@ void GridObj::lbm_write3(int t) {
 				}
 			}
 			// Print time step
-			string t_str = int2str(t);
+			string t_str = to_string(t);
 			gridoutput << "Time Step = " << t << endl;
 			gridoutput << "-------------------------------------------------------------------------------------" << endl;
 		}
 
 		// Print Grid Level
-		string r_str = int2str(level);
+		string r_str = to_string(level);
 		gridoutput << "Grid Level = " << r_str << endl;
 
 		// Print region number
-		string reg_str = int2str(region_number);
+		string reg_str = to_string(region_number);
 		gridoutput << "Region number = " << reg_str << endl;
 		
 		// Now print omega

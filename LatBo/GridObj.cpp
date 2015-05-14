@@ -28,7 +28,7 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
-	std::cout << "Constructing Grid level " << int2str(level)  << std::endl;
+	std::cout << "Constructing Grid level " << level  << std::endl;
 	this->LBM_init_grid(); // Call L0 initialiser
 
 }
@@ -42,7 +42,7 @@ GridObj::GridObj(int level, int RegionNumber)
 	this->level = level;
 	this->region_number = RegionNumber;
 	
-	std::cout << "Constructing Grid level " << int2str(level) << ", region #" << int2str(RegionNumber) << std::endl;
+	std::cout << "Constructing Grid level " << level << ", region #" << RegionNumber << std::endl;
 
 }
 

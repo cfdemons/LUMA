@@ -9,6 +9,5 @@ double vecnorm(double vec[2]);										// Function: vecnorm + 3 overloads
 double vecnorm(double val1, double val2);
 double vecnorm(double val1, double val2, double val3);
 double vecnorm(double vec[3]);
-std::string int2str(int number);									// Function: int2str
 
 #endif

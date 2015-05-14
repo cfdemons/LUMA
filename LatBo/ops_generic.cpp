@@ -96,16 +96,3 @@ double vecnorm( double vec[] )
 }
 
 // ***************************************************************************************************
-
-// Function to convert an integer to a string
-string int2str(int number) {
-	
-	// Create a stringstream
-	stringstream ss;
-
-	// Add number to the stream
-	ss << number;
-
-	// Return a string with the contents of the stream
-	return ss.str();
-}

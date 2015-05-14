@@ -48,6 +48,3 @@ using namespace std; // Standard namespace in use
 
 // Lattice sound speed
 const double cs = 1.0 / sqrt(3.0);
-
-// Array of GridData structures for each grid level
-GridData Grids[Nref+1];

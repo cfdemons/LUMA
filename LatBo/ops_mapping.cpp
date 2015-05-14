@@ -40,36 +40,6 @@ int idxmap (int i, int j, int j_max) {
 
 // ***************************************************************************************************
 
-// Routine to map the position of a coarse grid site to a corresponding fine site on the level below
-double posmapref (double coarse_pos, int fine_level, char direction, char plusminus) {
-
-	// Mapping routine assuming refinement level of 2.
-	// Returns the position in the level 0 reference frame of the first
-	// element of the corresponding pair of 2 nodes in the adjacent finer grid.
-
-	// Spacing
-	double spacing;
-	if (direction == 'x') {
-		spacing = Grids[fine_level].dx/2;
-	} else if (direction == 'y') {
-		spacing = Grids[fine_level].dy/2;
-	} else if (direction == 'z') {
-		spacing = Grids[fine_level].dz/2;
-	}
-
-	// Position
-	double fine_pos;
-	if (plusminus == '+') {
-		fine_pos = coarse_pos + spacing;
-	} else if (plusminus == '-') {
-		fine_pos = coarse_pos - spacing;
-	}
-
-	return fine_pos;
-}
-
-// ***************************************************************************************************
-
 // Routine to map the index of a coarse grid site to a corresponding fine site on the level below
 vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 

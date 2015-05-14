@@ -3,15 +3,17 @@
 #include <iostream>
 #include <iomanip>
 
-#include "ensightGold.h"
 #include "definitions.h"
 #include "globalvars.h"
+#include "GridObj.h"
 
 using namespace std;
 
 // Routine to generate the case file
-void EnsightGold::genCase(int nsteps, int saveEvery)
+void GridObj::genCase(int nsteps, int saveEvery)
 {
+
+
 	// Create file stream
 	ofstream fout;
 	
@@ -52,13 +54,15 @@ void EnsightGold::genCase(int nsteps, int saveEvery)
 	fout << endl ;
 
 	fout.close() ;
+
 }
 
 
 
 // Routine to generate the geometry file
-void EnsightGold::genGeo(int r)
+void GridObj::genGeo( )
 {
+
 	// Open file stream
 	char fileName[50];
 	sprintf_s(fileName, (char*)"./Output/geom.geo");
@@ -85,7 +89,7 @@ void EnsightGold::genGeo(int r)
 	sprintf_s(buf, (char*)"element id assign");
 	fout.write(buf, 80);
 	
-	// Necessary lines but do not apply to LBM data
+	// Grid drawn as a part
 	sprintf_s(buf, (char*)"part");
 	fout.write(buf, 80);
 	int partNum = 1;
@@ -97,10 +101,10 @@ void EnsightGold::genGeo(int r)
 	// Dimensions of the grid
 	sprintf_s(buf, (char*)"block uniform"); // Uniform grid
 	fout.write(buf, 80);
-	int ni = Grids[r].XPos.size()+1;
-	int nj = Grids[r].YPos.size()+1;
+	int ni = XPos.size()+1;
+	int nj = YPos.size()+1;
 #if (dims == 3)
-	int nk = Grids[r].ZPos.size()+1;
+	int nk = ZPos.size()+1;
 #else
 	int nk = 1;
 #endif
@@ -117,7 +121,7 @@ void EnsightGold::genGeo(int r)
 	fout.write(reinterpret_cast<char*>(&y_orig), sizeof(float));
 	fout.write(reinterpret_cast<char*>(&z_orig), sizeof(float));
 
-	float x_delta = (float)Grids[r].dx, y_delta = (float)Grids[r].dy, z_delta = (float)Grids[r].dz;
+	float x_delta = (float)dx, y_delta = (float)dy, z_delta = (float)dz;
 
 	fout.write(reinterpret_cast<char*>(&x_delta), sizeof(float));
 	fout.write(reinterpret_cast<char*>(&y_delta), sizeof(float));
@@ -129,8 +133,9 @@ void EnsightGold::genGeo(int r)
 
 
 // Routine to generate the vectors file
-void EnsightGold::genVec(int fileNum, int r)
+void GridObj::genVec(int fileNum)
 {
+
 	// Open file stream
 	char fileName[50] ;
 	sprintf_s(fileName, (char*)"./Output/velocity.%05d.vec", fileNum);
@@ -152,16 +157,16 @@ void EnsightGold::genVec(int fileNum, int r)
 	fout.write(buf, 80);
 
 	// Data for part
-	int N_lim = Grids[r].XPos.size();
-	int M_lim = Grids[r].YPos.size();
-	int K_lim = Grids[r].ZPos.size();
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
 	int c;
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				int dir = 0;
 				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float ux = (float)Grids[r].u[c];
+				float ux = (float)u[c];
 				fout.write(reinterpret_cast<char*>(&ux), sizeof(float));
 			}
 		}
@@ -172,7 +177,7 @@ void EnsightGold::genVec(int fileNum, int r)
 			for (int k = 0; k < K_lim; k++) {
 				int dir = 1;
 				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float uy = (float)Grids[r].u[c];
+				float uy = (float)u[c];
 				fout.write(reinterpret_cast<char*>(&uy), sizeof(float));
 			}
 		}
@@ -184,7 +189,7 @@ void EnsightGold::genVec(int fileNum, int r)
 			for (int k = 0; k < K_lim; k++) {
 				int dir = 2;
 				c = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				float uz = (float)Grids[r].u[c];
+				float uz = (float)u[c];
 				fout.write(reinterpret_cast<char*>(&uz), sizeof(float));
 			}
 		}
@@ -206,8 +211,9 @@ void EnsightGold::genVec(int fileNum, int r)
 
 
 // Routine to generate the scalars file
-void EnsightGold::genScal(int fileNum, int r)
+void GridObj::genScal(int fileNum)
 {
+
 	// File stream
 	char fileName[50];
 	sprintf_s(fileName, (char*)"./Output/rho.%05d.sca", fileNum);
@@ -229,16 +235,16 @@ void EnsightGold::genScal(int fileNum, int r)
 	fout.write(buf, 80);
 
 	// Data
-	int N_lim = Grids[r].XPos.size();
-	int M_lim = Grids[r].YPos.size();
-	int K_lim = Grids[r].ZPos.size();
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
 	int c;
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				c = idxmap(i,j,k,M_lim,K_lim);
-				float rho = (float)Grids[r].rho[c];
-				fout.write(reinterpret_cast<char*>(&rho), sizeof(float));
+				float rho_out = (float)rho[c];
+				fout.write(reinterpret_cast<char*>(&rho_out), sizeof(float));
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 // Header guard
-#ifndef HEADERLBM_H
-#define HEADERLBM_H
+#ifndef LBM_DEFINITIONS_H
+#define LBM_DEFINITIONS_H
 
 // Declarations here
 #include <time.h>		// Timing functionality
@@ -11,43 +11,8 @@
 #include <math.h>		// Mathematics
 #include <string>		// String template access
 
-// Forward declaration of functions
-
-// Generic functions
-std::vector<int> onespace(int min, int max);						// Function: onespace
-std::vector<double> linspace(double min, double max, int n);		// Function: linspace
-double vecnorm(double vec[2]);										// Function: vecnorm + 3 overloads
-double vecnorm(double val1, double val2);
-double vecnorm(double val1, double val2, double val3);
-double vecnorm(double vec[3]);
-std::string int2str(int number);									// Function: int2str
-void lbm_write3(int r, int t);										// Function: lbm_write
-
-// Mapping functions
-int idxmap (int i, int j, int k, int vel, int M, int K, int nVels);	// Function: idxmap + 2 overloads
-int idxmap (int i, int j, int vel, int M, int nVels);
-int idxmap (int i, int j, int M);
-double posmapref (double coarse_pos, int fine_level, char direction, char plusminus);
-																	// Function: posmapref
-std::vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start);
-																	// Function: indmapref
-
-// Initialisation functions
-void LBM_init_vel(int r);		// Function: LBM_init_vel
-void LBM_init_rho(int r);		// Function: LBM_init_rho
-void LBM_init_multi();			// Function: LBM_init_multi
-
-// LBM operations
-void LBM_multi(int r);							// Function: LBM_multi
-void LBM_collide(int r, bool core_flag);		// Function: LBM_collide + 1 overload
-double LBM_collide(int i, int j, int k, int v, int r);
-void LBM_stream(int r);							// Function: LBM_stream
-void LBM_macro(int r);							// Function: LBM_macro
-void LBM_boundary (int r, int bc_type_flag);	// Function: LBM_boundary
-
-// Multi-grid operations
-void LBM_explode(int r);			// Function: LBM_explode
-void LBM_coalesce(int r);			// Function: LBM_coalesce
+#include "ops_generic.h"
+#include "ops_mapping.h"
 
 /*	
 ***************************************************************************************************************
@@ -55,14 +20,15 @@ void LBM_coalesce(int r);			// Function: LBM_coalesce
 ***************************************************************************************************************
 */
 #define PI 3.14159265358979323846
-//#define TEXTOUT
+#define TEXTOUT
+#define ENSIGHTGOLD
 
 /*	
 ***************************************************************************************************************
 ********************************************** Time data ******************************************************
 ***************************************************************************************************************
 */
-#define T 50		// End time of simulation
+#define T 10		// End time of simulation
 #define deltat 1	// Time step size
 
 /*	
@@ -70,16 +36,16 @@ void LBM_coalesce(int r);			// Function: LBM_coalesce
 ******************************************* Domain dimensions *************************************************
 ***************************************************************************************************************
 */
-#define dims 2	// Number of dimensions to the problem
-#define N 32	// Number of x lattice sites
-#define M 32	// Number of y lattice sites
-#define K 32	// Number of z lattice sites
+#define dims 3	// Number of dimensions to the problem
+#define N 10	// Number of x lattice sites
+#define M 10	// Number of y lattice sites
+#define K 6	// Number of z lattice sites
 #define a_x 0	// Start of domain-x
-#define b_x 32	// End of domain-x
+#define b_x 10	// End of domain-x
 #define a_y 0	// Start of domain-y
-#define b_y 32	// End of domain-y
+#define b_y 10	// End of domain-y
 #define a_z 0	// Start of domain-z
-#define b_z 32	// End of domain-z
+#define b_z 6	// End of domain-z
 
 /*	
 ***************************************************************************************************************
@@ -100,14 +66,19 @@ void LBM_coalesce(int r);			// Function: LBM_coalesce
 ******************************************** Multi-grid data **************************************************
 ***************************************************************************************************************
 */
-#define Nref 0		// Levels of refinement
+#define NumLev 1		// Levels of refinement
+#define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
+
+#if NumLev != 0
 // Lattice indices for refined region on level L0 start numbering at 0
-#define Ref_startX 1
-#define Ref_endX 4
-#define Ref_startY 1
-#define Ref_endY 5
-#define Ref_startZ 1
-#define Ref_endZ 6
+static size_t RefXstart[NumReg]		= {1, 5};
+static size_t RefXend[NumReg]		= {4, 8};
+static size_t RefYstart[NumReg]		= {1, 5};
+static size_t RefYend[NumReg]		= {4, 8};
+// If doing 2D, these can be arbitrary values
+static size_t RefZstart[NumReg]		= {1, 1};
+static size_t RefZend[NumReg]		= {4, 4};
+#endif
 
 /*	
 ***************************************************************************************************************
@@ -121,6 +92,7 @@ void LBM_coalesce(int r);			// Function: LBM_coalesce
 #else
 	#define nVels 9		// Use D2Q9
 	
+	// Set Z limits for 2D
 	#undef a_z
 	#define a_z 0
 
@@ -129,15 +101,19 @@ void LBM_coalesce(int r);			// Function: LBM_coalesce
 
 	#undef K
 	#define K 1
-
-	#undef Ref_startZ
-	#define Ref_startZ 1
-
-	#undef Ref_endZ
-	#define Ref_endZ 1
 #endif
 
-
+#if NumLev == 0
+// Set region info to default as no refinement
+#undef NumReg
+#define NumReg 1
+static size_t RefXstart[NumReg]		= {0};
+static size_t RefXend[NumReg]		= {0};
+static size_t RefYstart[NumReg]		= {0};
+static size_t RefYend[NumReg]		= {0};
+static size_t RefZstart[NumReg]		= {0};
+static size_t RefZend[NumReg]		= {0};
+#endif
 
 
 #endif

@@ -80,20 +80,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.h" />
-    <ClInclude Include="ensightGold.h" />
     <ClInclude Include="globalvars.h" />
+    <ClInclude Include="GridObj.h" />
+    <ClInclude Include="ops_generic.h" />
+    <ClInclude Include="ops_mapping.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ensightGold.cpp" />
-    <ClCompile Include="init_grids.cpp" />
-    <ClCompile Include="ops_boundary.cpp" />
-    <ClCompile Include="ops_io.cpp" />
+    <ClCompile Include="GridObj_ensightgold.cpp" />
+    <ClCompile Include="GridObj.cpp" />
+    <ClCompile Include="GridObj_init_grids.cpp" />
+    <ClCompile Include="GridObj_ops_boundary.cpp" />
+    <ClCompile Include="GridObj_ops_io.cpp" />
     <ClCompile Include="main_lbm.cpp" />
     <ClCompile Include="init_globalvars.cpp" />
     <ClCompile Include="ops_generic.cpp" />
-    <ClCompile Include="ops_lbm.cpp" />
+    <ClCompile Include="GridObj_ops_lbm.cpp" />
     <ClCompile Include="ops_mapping.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -30,7 +30,13 @@
     <ClInclude Include="globalvars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ensightGold.h">
+    <ClInclude Include="GridObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ops_generic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ops_mapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,15 +45,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ops_generic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="init_grids.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ops_io.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ops_lbm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ops_mapping.cpp">
@@ -59,10 +56,22 @@
     <ClCompile Include="main_lbm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ops_boundary.cpp">
+    <ClCompile Include="GridObj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ensightGold.cpp">
+    <ClCompile Include="GridObj_init_grids.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridObj_ops_lbm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridObj_ops_boundary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridObj_ops_io.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridObj_ensightgold.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

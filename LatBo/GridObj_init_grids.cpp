@@ -17,14 +17,6 @@ void GridObj::LBM_init_vel ( ) {
 	// Max velocity
 	double u_in[3] = {u_0x, u_0y, u_0z};
 	
-	// Wave numbers
-	double Lx = b_x - a_x;
-	double Ly = b_y - a_y;
-	double Lz = b_z - a_z;
-	double k1 = 2*PI*kn / Lx;
-	double k2 = 2*PI*km / Ly;
-	double k3 = 2*PI*kk / Lz;
-
 	// Get grid sizes
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
@@ -34,22 +26,26 @@ void GridObj::LBM_init_vel ( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 
-
-				// Taylor-Green -- only 2D for now...
-				int idx = idxmap(i,j,k,0,M_lim,K_lim,dims);
-				u[idx] = -vecnorm(u_in) * 
-					cos(k1*XPos[i]) * sin(k2*YPos[j]);
-
-				idx = idxmap(i,j,k,1,M_lim,K_lim,dims);
-				u[idx] = vecnorm(u_in) * 
-					(k1/k2) * sin(k1*XPos[i]) * cos(k2*YPos[j]);
+				int idx = idxmap(i,j,k,M_lim,K_lim);
+				int idx_x = idxmap(i,j,k,0,M_lim,K_lim,dims);
+				int idx_y = idxmap(i,j,k,1,M_lim,K_lim,dims);
+				int idx_z = idxmap(i,j,k,2,M_lim,K_lim,dims);
+				
+				// Uniform flow
+				u[idx_x] = u_in[0];
+				u[idx_y] = u_in[1];
 #if (dims == 3)
-				idx = idxmap(i,j,k,2,M_lim,K_lim,dims);
-				u[idx] = 0.0;
+				u[idx_z] = u_in[2];
 #endif
+
 			}
 		}
 	}
+
+#ifdef SOLID_ON
+	// Perform solid site reset of velocity
+	solidSiteReset();
+#endif
 
 }
 
@@ -71,23 +67,59 @@ void GridObj::LBM_init_rho ( ) {
 				// Max velocity
 				double u_in[3] = {u_0x, u_0y, u_0z};
 
-				// Wave numbers
-				double Lx = b_x - a_x;
-				double Ly = b_y - a_y;
-				double Lz = b_z - a_z;
-				double k1 = 2*PI*kn / Lx;
-				double k2 = 2*PI*km / Ly;
-				double k3 = 2*PI*kk / Lz;
-
 				int idx = idxmap(i,j,k,M_lim,K_lim);
 
-				// Taylor-Green -- only 2D for now...
-				rho[idx] = rho_in - 
-					(1/pow(cs,2)) * .25 * pow(vecnorm(u_in),2) * 
-					(cos(2*k1*XPos[i])+cos(2*k2*YPos[j]));
+				// Uniform Density
+				rho[idx] = rho_in;
 			}
 		}
 	}
+
+}
+
+// ***************************************************************************************************
+
+// Initialise wall labels method (L0 only)
+void GridObj::LBM_init_wall_lab ( ) {
+
+	int i, idx;
+
+#ifdef SOLID_ON
+	for (int i = obj_x_min; i <= obj_x_max; i++) {
+		for (int j = obj_y_min; j <= obj_y_max; j++) {
+			for (int k = obj_z_min; k <= obj_z_max; k++) {
+
+				idx = idxmap(i,j,k,M,K);
+				LatTyp[idx] = 0;
+
+			}
+		}
+	}
+#endif
+
+#ifdef INLET_ON
+	i = 0;
+	for (int j = 0; j < M; j++) {
+		for (int k = 0; k < K; k++) {
+
+			idx = idxmap(i,j,k,M,K);
+			LatTyp[idx] = 7;
+
+		}
+	}
+#endif
+
+#ifdef OUTLET_ON
+	i = N-1;
+	for (int j = 0; j < M; j++) {
+		for (int k = 0; k < K; k++) {
+
+			idx = idxmap(i,j,k,M,K);
+			LatTyp[idx] = 8;
+
+		}
+	}
+#endif
 
 }
 
@@ -97,9 +129,6 @@ void GridObj::LBM_init_rho ( ) {
 // Initialise level 0 grid method
 void GridObj::LBM_init_grid( ) {
 
-	// Time step
-	dt = deltat;
-
 	// Store spacing
 	double Lx = b_x - a_x;
 	double Ly = b_y - a_y;
@@ -107,6 +136,9 @@ void GridObj::LBM_init_grid( ) {
 	dx = 2*(Lx/(2*N));
 	dy = 2*(Ly/(2*M));
 	dz = 2*(Lz/(2*K));
+
+	// Time step = grid spacing
+	dt = dx;
 
 	
 	// Checks to make sure grid cell dimensions are suitable
@@ -128,7 +160,7 @@ void GridObj::LBM_init_grid( ) {
 
 
 	// Checks passed so continue...
-	// Indices on L0
+	// NODE NUMBERS on L0
 	XInd = onespace( 0, N-1 );
 	YInd = onespace( 0, M-1 );
 	ZInd = onespace( 0, K-1 );
@@ -173,40 +205,14 @@ void GridObj::LBM_init_grid( ) {
 	}
 
     // Checks passed so continue...
-	// L0 lattice site coordinates
+	// L0 lattice site POSITION VECTORS
 	XPos = linspace( a_x + dx/2, b_x - dx/2, N );
 	YPos = linspace( a_y + dy/2, b_y - dy/2, M );
 	ZPos = linspace( a_z + dz/2, b_z - dz/2, K );
 
 
-	// Initialise L0 macroscopic quantities
-	// Velocity field
-	u.resize( N*M*K*dims );
-	LBM_init_vel();
-
-	// Density field
-	rho.resize( N*M*K );
-	LBM_init_rho();
-
-	// Initialise L0 matrices (f, feq) and typing matrix
-	f.resize( N*M*K*nVels );
-	feq.resize( N*M*K*nVels );
+	// Define TYPING MATRICES
 	LatTyp.resize( N*M*K );
-
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			for (int k = 0; k < K; k++) {
-				for (int v = 0; v < nVels; v++) {
-
-					// Initialise f to feq
-					int idx  = idxmap(i,j,k,v,M,K,nVels);
-					f[idx] = LBM_collide( i, j, k, v );
-
-				}
-			}
-		}
-	}
-	feq = f; // Make feq = feq too
 
 	// Typing defined as follows:
 	/*
@@ -229,6 +235,12 @@ void GridObj::LBM_init_grid( ) {
 		}
 	}
 
+
+	// Add object-specific labels
+	LBM_init_wall_lab();
+
+
+	// Correct labelling if lower level exists
 	if (NumLev > 0) {
 
 		// Correct L0
@@ -288,11 +300,49 @@ void GridObj::LBM_init_grid( ) {
 
 	}
 
+
+	// Initialise L0 MACROSCOPIC quantities
+	// Velocity field
+	u.resize( N*M*K*dims );
+	LBM_init_vel();
+
+	// Density field
+	rho.resize( N*M*K );
+	LBM_init_rho();
+
+
+	// Initialise L0 POPULATION matrices (f, feq)
+	f.resize( N*M*K*nVels );
+	feq.resize( N*M*K*nVels );
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			for (int k = 0; k < K; k++) {
+				for (int v = 0; v < nVels; v++) {
+
+					// Initialise f to feq
+					int idx  = idxmap(i,j,k,v,M,K,nVels);
+					f[idx] = LBM_collide( i, j, k, v );
+
+				}
+			}
+		}
+	}
+	feq = f; // Make feq = feq too
+
+	
 	// Relaxation frequency on L0
 	// Assign relaxation frequency corrected for grid and time step size
 	omega = 1 / ( (nu / (dt*pow(cs,2)) ) + .5 );
 
 	cout << "L0 relaxation time = " << (1/omega) << endl;
+
+#ifdef SOLID_ON
+	// Reynolds Number (object height as length)
+	Re = vecnorm(u_0x,u_0y,u_0z) * (YPos[obj_y_max]-YPos[obj_y_min]) / nu;
+#else
+	Re = 0;
+#endif
 
 }
 	

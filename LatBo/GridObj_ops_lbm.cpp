@@ -48,6 +48,10 @@ void GridObj::LBM_multi ( ) {
 
 			}
 
+			// Apply boundary conditions
+			LBM_boundary(2);
+			LBM_boundary(0);
+
 			// Stream
 			LBM_stream();
 			
@@ -61,14 +65,15 @@ void GridObj::LBM_multi ( ) {
 
 		} else {
 
+			// Apply boundary conditions
+			LBM_boundary(2);
+			LBM_boundary(0);
+
 			// Stream
 			LBM_stream();
 			
 
 		}
-
-		// Apply boundary conditions
-		LBM_boundary(0);
 
 		// Update macroscopic quantities
 		LBM_macro();
@@ -376,6 +381,11 @@ void GridObj::LBM_macro( ) {
 			}
 		}
 	}
+
+#ifdef SOLID_ON
+	// Do a solid site reset of velocity
+	solidSiteReset();
+#endif
 
 }
 

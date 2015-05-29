@@ -41,7 +41,6 @@ int _tmain( )
 	clock_t t_start, t_end; // Wall clock variables
 	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
-	const int totalloops = (int)(T/deltat);		// Total number of loops to be performed (computed)
 	int fileNum = 0;		// Output file number (1 per timestep)
 
 
@@ -52,6 +51,9 @@ int _tmain( )
 
 	// Create grid level 0 and let constructor initialise
 	GridObj Grids(0);
+
+	// Number of loops based on L0 time step
+	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)
 
 
 	/* ***************************************************************************************************************
@@ -86,6 +88,9 @@ int _tmain( )
 #endif
 
 	cout << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
+
+	// Reynolds Number
+	cout << "Reynolds Number = " << Grids.Re << endl;
 
 
 
@@ -135,10 +140,9 @@ int _tmain( )
 
 	// End of loop write out
 #ifdef ENSIGHTGOLD
-	Grids.genCase(T, 1);
+	Grids.genCase(totalloops);
 	Grids.genGeo();
 #endif
-
 
 	return 0;
 }

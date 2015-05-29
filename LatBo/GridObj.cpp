@@ -123,4 +123,4 @@ bool GridObj::isWithin (size_t i, size_t j, size_t k, int RegionNumber) {
 
 
 // ***************************************************************************************************
-// Other methods are in their own files prefixed GridObj_
+// Other member methods are in their own files prefixed GridObj_

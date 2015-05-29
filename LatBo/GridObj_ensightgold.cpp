@@ -10,7 +10,7 @@
 using namespace std;
 
 // Routine to generate the case file
-void GridObj::genCase(int nsteps, int saveEvery)
+void GridObj::genCase(int nsteps)
 {
 	
 	// Create file stream
@@ -30,13 +30,13 @@ void GridObj::genCase(int nsteps, int saveEvery)
 	fout << "GEOMETRY" << endl ;
 	fout << "model: " << fileName << endl;
 	
-	// Varible section
+	// Variable section
 	// Only velocity (vector) and density (scalar) exported
 	fout << "VARIABLE" << endl;
 	sprintf_s(fileName, (char*)"velocity.*****.vec");
-	fout << "vector per element: 1 velocity " << fileName << endl;
+	fout << "vector per node: 1 velocity " << fileName << endl;
 	sprintf_s(fileName, (char*)"rho.*****.sca");
-	fout << "scalar per element: 1 density  " << fileName << endl;
+	fout << "scalar per node: 1 density  " << fileName << endl;
 
 	// Time section
 	fout << "TIME" << endl;
@@ -47,7 +47,7 @@ void GridObj::genCase(int nsteps, int saveEvery)
 	fout << "time values: ";
 	// Put in the time values
 	for( int i = 0; i < nsteps; i++ ) {
-		fout << 1+i*saveEvery << endl;
+		fout << 0 + i*dt << endl;
 	}
 
 	fout << endl ;
@@ -100,12 +100,12 @@ void GridObj::genGeo( )
 	fout << buffer_str;
 	
 	// Dimensions of the grid
-	sprintf_s(buf, (char*)"\nblock uniform"); // Uniform grid
+	sprintf_s(buf, (char*)"\nblock uniform iblanked"); // Uniform grid with blanking
 	fout << buf;
-	int ni = XPos.size()+1;
-	int nj = YPos.size()+1;
+	int ni = XPos.size();
+	int nj = YPos.size();
 #if (dims == 3)
-	int nk = ZPos.size()+1;
+	int nk = ZPos.size();
 #else
 	int nk = 1;
 #endif
@@ -122,11 +122,30 @@ void GridObj::genGeo( )
 	sprintf_s(buf, "\n%12.5e", (float)y_orig); fout << buf;
 	sprintf_s(buf, "\n%12.5e", (float)z_orig); fout << buf;
 
+	// Grid spacing
 	float x_delta = (float)dx, y_delta = (float)dy, z_delta = (float)dz;
 
 	sprintf_s(buf, "\n%12.5e", (float)x_delta); fout << buf;
 	sprintf_s(buf, "\n%12.5e", (float)y_delta); fout << buf;
 	sprintf_s(buf, "\n%12.5e", (float)z_delta); fout << buf;
+
+	// Node blanking flags
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
+	int ct;
+	for (int k = 0; k < K_lim; k++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int i = 0; i < N_lim; i++) {
+				ct = idxmap(i,j,k,M_lim,K_lim);
+				if (LatTyp[ct] == 1 || LatTyp[ct] == 4) {
+					sprintf_s(buf, "\n%10d", 1); fout << buf;
+				} else { 
+					sprintf_s(buf, "\n%10d", 0); fout << buf;
+				}
+			}
+		}
+	}
 
 	fout.close();
 

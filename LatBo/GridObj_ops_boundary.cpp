@@ -3,15 +3,20 @@
 #include "stdafx.h"
 #include "GridObj.h"
 #include <vector>
+#include "ops_mapping.h"
+#include "definitions.h"
+#include "globalvars.h"
+
+size_t getOpposite(size_t direction);
 
 // ***************************************************************************************************
 /*
 	Boundary condition application routine
 	Supply an integer r indicating from which level the algorithm is to be executed plus a flag to specify
 	which type of condition should be applied.
-	0 == apply all simultaneously
-	1 == apply solid site
-	2 == apply inlet and outlet
+	0 == apply solid site (bounceback)
+	1 == apply solid site (Zou-He)
+	2 == apply inlet and outlet (Zou-He & extrapolation)
 
 	Boundary label types are:
 	0 == solid site (no-slip)
@@ -19,11 +24,11 @@
 	8 == outlet site
 */
 void GridObj::LBM_boundary (int bc_type_flag) {
-/*
+
 	// Get grid sizes
-	size_t N_lim = Grids[r].XPos.size();
-	size_t M_lim = Grids[r].YPos.size();
-	size_t K_lim = Grids[r].ZPos.size();
+	size_t N_lim = XPos.size();
+	size_t M_lim = YPos.size();
+	size_t K_lim = ZPos.size();
 
 	// Loop over grid, identify BC required & apply BC
 	for (size_t i = 0; i < N_lim; i++) {
@@ -35,70 +40,143 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 				// Get index for current site
 				size_t idx = idxmap(i,j,k,M_lim,K_lim);
-*/
+
+
 				/*	******************************************************************************************
-					*************************************** ZOU - HE *****************************************
-					***********************************  for solid sites *************************************
+					************************************** BOUNCEBACK ****************************************
+					*********************************** for solid sites **************************************
 					******************************************************************************************
 				*/
-    /*
-				if (Grids[r].LatTyp[idx] == 0 && (bc_type_flag == 1 || bc_type_flag == 0)) {
-					
-					// Look at each direction (excluding rest particle)
-					for (size_t v = 0; v < nVels-1; v++) {
+    
+				if (LatTyp[idx] == 0 && bc_type_flag == 0) {
 
-						size_t idx_v = idxmap(i,j,k,v,M_lim,N_lim,nVels);
+					// For each direction
+					for (size_t v = 0; v < nVels; v++) {
 
-						// Compute destination coordinates for stream (periodicity applied)
-						size_t dest_x = (i+c[0][v] + N_lim) % N_lim;
-						size_t dest_y = (j+c[1][v] + M_lim) % M_lim;
-						size_t dest_z = (k+c[2][v] + K_lim) % K_lim;
-						size_t idx_dest = idxmap(dest_x,dest_y,dest_z,M_lim,K_lim);
-						
-						// If destination not another solid site, population needs correcting
-						if (Grids[r].LatTyp[idx_dest] != 0) {
+						// Identify where it streams to
+						size_t src_x = i+c[0][v];
+						size_t src_y = j+c[1][v];
+						size_t src_z = k+c[2][v];
 
-							// Log that this direction needs adjustment
-							missing_pops.push_back(v);
+						// Get index for this adjacent site
+						size_t src_idx = idxmap(src_x,src_y,src_z,M_lim,K_lim);
 
+						// If this site is off-grid or another boundary site then retain current value 
+						if (	(src_x >= N_lim || src_x < 0) ||
+								(src_y >= M_lim || src_y < 0) ||
+								(src_z >= K_lim || src_z < 0) ||
+								(LatTyp[src_idx] == 0 || LatTyp[src_idx] == 7 || LatTyp[src_idx] == 8) ) {
+
+						// If site is fluid site then need to apply reverse
+						} else if (LatTyp[src_idx] == 1 || LatTyp[src_idx] == 2) {
+
+							// Get reverse direction
+							size_t v_rev = getOpposite(v);
+
+							// Compute flattened indices
+							size_t src_idx_rev = idxmap(src_x,src_y,src_z,v_rev,M_lim,K_lim,nVels);
+							size_t idx_f = idxmap(i,j,k,v,M_lim,K_lim,nVels);
+
+							// Assign reverse velocity to current site
+							f[idx_f] = f[src_idx_rev];
+							
 						}
-
 					}
 
-					// Based on population availability, decide where wall is and apply suitable Zou-He
-					// calculation to fill in or correct missing populations
-					applyZouHe(missing_pops, Grids[r].LatTyp[idx]);
 
-*/
 				/*	******************************************************************************************
 					*************************************** ZOU - HE *****************************************
 					*********************************** for inlet sites **************************************
 					******************************************************************************************
 				*/
-    /*
-				} else if (Grids[r].LatTyp[idx] == 7 && (bc_type_flag == 2 || bc_type_flag == 0)) {
+    
+				} else if (LatTyp[idx] == 7 && bc_type_flag == 2) {
 
+					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
 
-					// DO SOMETHING
-    */
+					// Apply inlet Zou-He
+					applyZouHe(LatTyp[idx], i, j, k, M_lim, K_lim);
+    
+
 				/*	******************************************************************************************
 					************************************* EXTRAPOLATION **************************************
 					************************************ for outlet sites ************************************
 					******************************************************************************************
 				*/
-    /*
-				} else if (Grids[r].LatTyp[idx] == 8 && (bc_type_flag == 2 || bc_type_flag == 0)) {
+    
+				} else if (LatTyp[idx] == 8 && bc_type_flag == 2) {
 
-					// DO SOMETHING
+					// !! FOR NOW ASSUME THIS IS RIGHT HAND WALL !!
+#if dims == 3
+
+					// In 3D, extrapolate populations [1 7 9 15 16]
+					for (size_t v = 1; v < 17; v++) {
+                
+						// Make all this generic in future release
+						if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
+
+							size_t idx3 = idxmap(i,j,k,v,M_lim,K_lim,nVels);
+							size_t idx2 = idxmap(i-1,j,k,v,M_lim,K_lim,nVels);
+							size_t idx1 = idxmap(i-2,j,k,v,M_lim,K_lim,nVels);
+
+							float y2 = (float)f[idx2];
+							float y1 = (float)f[idx1];
+							float x1 = 0.0;
+							float x2 = (float)dx;
+							float x3 = 2 * x2;
+                
+							float lin_m = (y2 - y1) / (x2 - x1);
+							float lin_c = y1;
+                
+							f[idx3] = lin_m * x3 + lin_c;
+						}
+					}
+
+#else
+					// In 2D, extrapolate populations [3 4 5]
+					for (size_t v = 3; v < 6; v++) {
+                
+						size_t idx3 = idxmap(i,j,k,v,M_lim,K_lim,nVels);
+						size_t idx2 = idxmap(i-1,j,k,v,M_lim,K_lim,nVels);
+						size_t idx1 = idxmap(i-2,j,k,v,M_lim,K_lim,nVels);
+
+						float y2 = (float)f[idx2];
+						float y1 = (float)f[idx1];
+						float x1 = 0.0;
+						float x2 = (float)dx;
+						float x3 = 2 * x2;
+                
+						float lin_m = (y2 - y1) / (x2 - x1);
+						float lin_c = y1;
+                
+						f[idx3] = lin_m * x3 + lin_c;
+					}
+#endif
+                
+
+
+				/*	******************************************************************************************
+					*************************************** ZOU - HE *****************************************
+					***********************************  for solid sites *************************************
+					******************************************************************************************
+				*/
+    
+				} else if (LatTyp[idx] == 0 && bc_type_flag == 1) {
+
+					// IMPLEMENT THIS LATER AS NOT TRIVIAL -- SEE MARK'S CODE AND HARTING & HECHT PAPER + ERRATA
 
 				}
-    */
+
+			}
+		}
+	}
+    
 }
 
 // ***************************************************************************************************
 
 // Routine to apply Zou-He boundary conditions
-void applyZouHe( std::vector<size_t> missing_pops, int label ) {
+void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 	/* Zou-He velocity boundary condition computed from the following equations
 	rho = sum ( fi )
@@ -107,73 +185,125 @@ void applyZouHe( std::vector<size_t> missing_pops, int label ) {
 	rho*uz = sum( fi * czi )
 	(fi - feq)_in = (fi - feq)_out ------ normal to wall
 	
-	.... more for 3D
+	+ transverse momentum corrections for 3D.
 
 	3 populations (2D) or 5 populations (3D) will be unknown for the boundary site
 	*/
 
-/*
-	// Get wall identification
-	unsigned wall_type;
-	wall_type = whichwall(missing_pops);
-
-	// Set velocity vector based on label
-	if (label == 0) {
-		double u_wall[3] = {0.0, 0.0, 0.0};
-	} else if (label == 7) {
-		double u_wall[3] = {u_0x, u_0y, u_0z};
+	// Get indices for directions
+	std::vector<size_t> idx;
+	for (size_t n = 0; n < nVels; n++) {
+		idx.push_back(idxmap(i,j,k,n,M_lim,K_lim,nVels));
 	}
-	
-	// Apply appropriate BCs -- switch might be slow depending on compiler options
-	switch (wall_type)
-	{
-	case 1: // Left Wall
+
+#if dims == 3
+
+	/*	Implement using equations
+		rho_in = sum( fi )
+		rho_in * ux = (f0 + f6 + f8 + f14 + f17) - (f1 + f7 + f9 + f15 + f16)
+		rho_in * uy = (f2 + f6 + f9 + f10 + f12) - (f3 + f7 + f8 + f11 + f13)
+		rho_in * uz = (f4 + f10 + f13 + f14 + f16) - (f5 + f11 + f12 + f15 + f17)
+		f0 - feq0 = f1 - feq1 (equilibrium normal to boundary)
+
+		Plus transverse momentum corrections (Hecht & Harting)
+	*/
+	            
+	// Find density on wall corresponding to given velocity
+    double rho_w = (1.0 / (1.0 - u_0x)) * ( (
+        f[idx[18]] + f[idx[2]] + f[idx[3]] + f[idx[4]] + f[idx[5]] + f[idx[10]] + f[idx[11]] + f[idx[12]] + f[idx[13]] 
+		) + 2.0 * (
+        f[idx[1]] + f[idx[7]] + f[idx[9]] + f[idx[15]] + f[idx[16]]
+		) );
+
+	// Find f0
+	f[idx[0]] = f[idx[1]] + (1.0/3.0) * rho_w * u_0x;
+
+	// Compute transverse momentum corrections
+	double Nxy = 0.5 * ( f[idx[2]] + f[idx[10]] + f[idx[12]] - ( f[idx[3]] + f[idx[11]] + f[idx[13]] ) ) - (1.0/3.0) * rho_w * u_0y;
+	double Nxz = 0.5 * ( f[idx[4]] + f[idx[10]] + f[idx[13]] - ( f[idx[5]] + f[idx[11]] + f[idx[12]] ) ) - (1.0/3.0) * rho_w * u_0z;
+
+	// Compute f6, f9, f14 and f18
+	f[idx[6]] = f[idx[7]] + (2.0 * w[7] / pow(cs,2)) * rho_w * (u_0x + u_0y) - Nxy;
+	f[idx[8]] = f[idx[9]] + (2.0 * w[9] / pow(cs,2)) * rho_w * (u_0x - u_0y) + Nxy;
+	f[idx[14]] = f[idx[15]] + (2.0 * w[15] / pow(cs,2)) * rho_w * (u_0x + u_0z) - Nxz;
+	f[idx[17]] = f[idx[16]] + (2.0 * w[16] / pow(cs,2)) * rho_w * (u_0x - u_0z) + Nxz;
 
 
+#else
 
+	// 2D Zou-He for a left hand inlet
 
+	// Implement using 4 equations
+    // rho_in = sum( fi )
+    // rho_in * ux = (f0 + f1 + f7) - (f3 + f4 + f5)
+    // rho_in * uy = (f1 + f2 + f3) - (f5 + f6 + f7)
+    // f0 - feq0 = f4 - feq4 (equilibrium normal to boundary)
 
-		
-		break;
+    // Find density on wall corresponding to given velocity
+    double rho_w = (1.0 / (1.0 - u_0x)) * 
+		( f[idx[8]] + f[idx[2]] + f[idx[6]] + 
+			2.0 * (
+			f[idx[3]] + f[idx[4]] + f[idx[5]]
+		) );
+            
+    // Find f0 using equations above
+    f[idx[0]] = f[idx[4]] + (2.0/3.0) * rho_w * u_0x;
+            
+    // Find f1 using equations above
+    f[idx[1]] = 0.5 * ( (rho_w * u_0x) - 
+        (f[idx[0]] + f[idx[2]]) + f[idx[4]] + 2.0*f[idx[5]] + f[idx[6]] );
+            
+    // Find f7 using equations above
+    f[idx[7]] = 0.5 * ( (rho_w * u_0x) - 
+        (f[idx[0]] + f[idx[6]]) + f[idx[2]] + 2.0*f[idx[3]] + f[idx[4]] );
 
-	case 2: // Right Wall
+#endif
 
-		
-		break;
-
-	case 3: // Top Wall
-
-		
-		break;
-
-	case 4: // Bottom Wall
-
-		
-		break;
-
-	case 5: // Front Wall
-
-		
-		break;
-
-	case 6: // Back Wall
-
-		
-		break;
-
-	// What do we do about corners?
-
-	}
-*/
 }
+
 
 // ***************************************************************************************************
 
-// Routine to compute the opposite direction fo the one supplied based on D2Q9 or D3Q19 numbering
-int getOpposite(int direction) {
-    /*
+// Routine to apply Zou-He boundary conditions
+void GridObj::solidSiteReset( ) {
 
-	int direction_opposite;
+	// Get grid sizes
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
+
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
+
+				int idx = idxmap(i,j,k,M_lim,K_lim);
+				int idx_x = idxmap(i,j,k,0,M_lim,K_lim,dims);
+				int idx_y = idxmap(i,j,k,1,M_lim,K_lim,dims);
+				int idx_z = idxmap(i,j,k,2,M_lim,K_lim,dims);
+				
+				// Reset solid site velocities to zero
+				if (LatTyp[idx] == 0) {
+					
+					u[idx_x] = 0.0;
+					u[idx_y] = 0.0;
+#if (dims == 3)
+					u[idx_z] = 0.0;
+#endif
+				}
+
+			}
+		}
+	}
+
+}
+
+
+// ***************************************************************************************************
+// ***************************************************************************************************
+// Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
+size_t getOpposite(size_t direction) {
+
+	size_t direction_opposite;
 
 	// If rest particle then opposite is simply itself
 	if (direction == nVels-1) {
@@ -182,28 +312,35 @@ int getOpposite(int direction) {
 
 	} else if (dims == 3) {
 		
-		// Using D3Q19
-		direction_opposite = direction + 1;
+		// Using D3Q19 numbering
+		/*	If direction is even, then opposite is direction+1.
+			If direction is odd, then opposite is direction-1.
+			e.g. direction 0 (+x direction) has opposite 1 (-x direction) :: +1
+			however, direction 1 has opposite 0 :: -1
+			Hence we can add (-1 ^ direction) so it alternates between +/-1
+		*/
+
+		direction_opposite = direction + (int)pow(-1,direction);
 
 	} else {
 
-		// Using D2Q9
-		direction_opposite = (direction + 4 % 8);
+		// Using D2Q9 numbering
+		direction_opposite = ( (direction + 4) % 8);
 	}
 
 	return direction_opposite;
-    */
-    return 0;
 
 }
 
 // ***************************************************************************************************
 
 // Routine to identify which wall the boundary site sits in based on missing populations
-unsigned whichwall( std::vector<size_t> pops ) {
+unsigned int whichwall( std::vector<size_t> mispops ) {
+
+	// IMPLEMENT LATER...
 
 	// Declare unsigned integer type
-	unsigned wall_type = 0;
+	unsigned int wall_type = 0;
 
 	/*
 	Key:
@@ -223,97 +360,5 @@ unsigned whichwall( std::vector<size_t> pops ) {
 
 	return wall_type;
 }
-
-/*
-
-
-
-
-
-            
-            
-                    
-                    // Incoming direction from source
-                    kopp = 1 + mod(k+3,8);
-                    
-            
-        % INLET CONDITIONS
-        elseif Grid(r+1).LatTyp(j,i) == 7 && type_flag == 2
-            
-            % Implement using 4 equations Zou-He
-            % rho_in = sum( fi )
-            % rho_in * ux = (f1 + f2 + f8) - (f4 + f5 + f6)
-            % rho_in * uy = (f2 + f3 + f4) - (f6 + f7 + f8)
-            % f1 - feq1 = f5 - feq5 (equilibrium normal to boundary)
-            
-            % Compute desired u at the inlet site
-            [ux,uy] = InletVel(Grid(r+1).YPos(j),u_in,nu,rho_in,r);
-         
-            % Find density on wall corresponding to given velocity
-            rho_w = (1 / (1 - ux)) * (...
-                Grid(r+1).f(j,i,9) + ...
-                Grid(r+1).f(j,i,3) + ...
-                Grid(r+1).f(j,i,7) + ...
-                2 * (...
-                Grid(r+1).f(j,i,4) + ...
-                Grid(r+1).f(j,i,5) + ...
-                Grid(r+1).f(j,i,6)...
-            ) );
-            
-            % Find f1 using equations above
-            Grid(r+1).f(j,i,1) = Grid(r+1).f(j,i,5) + (2/3) * rho_w * ux;
-            
-            % Find f2 using equations above
-            Grid(r+1).f(j,i,2) = 0.5 * ( (rho_w * ux) - ...
-                (Grid(r+1).f(j,i,1) + Grid(r+1).f(j,i,3)) + ...
-                Grid(r+1).f(j,i,5) + ...
-                2*Grid(r+1).f(j,i,6) + ...
-                Grid(r+1).f(j,i,7) );
-            
-            % Find f8 using equations above
-            Grid(r+1).f(j,i,8) = 0.5 * ( (rho_w * ux) - ...
-                (Grid(r+1).f(j,i,1) + Grid(r+1).f(j,i,7)) + ...
-                Grid(r+1).f(j,i,3) + ...
-                2*Grid(r+1).f(j,i,4) + ...
-                Grid(r+1).f(j,i,5) );
-            
-            
-        % OUTLET CONDITIONS
-        elseif Grid(r+1).LatTyp(j,i) == 8 && type_flag == 2
-            
-%             % OPTION1: Use second order polynomial extrapolation
-%             for k =  [4 5 6]
-%                 
-%                 Grid(r+1).f(j,i,k) = 2 * Grid(r+1).f(j,i-1,k) - Grid(r+1).f(j,i-2,k);
-%                 
-%             end
-            
-            
-            % OPTION 2: Use linear extrapolation (more stable than OPT 1)
-            for k =  [4 5 6]
-                
-                y2 = Grid(r+1).f(j,i-1,k);
-                y1 = Grid(r+1).f(j,i-2,k);
-                x1 = 0;
-                x2 = Grid(r+1).dx;
-                x3 = 2*x2;
-                
-                lin_m = (y2 - y1) / (x2 - x1);
-                lin_c = y1;
-                
-                Grid(r+1).f(j,i,k) = lin_m * x3 + lin_c;
-                
-            end            
-            
-        end
-        
-    end
-end
-
-end
-
-	
-
-    */
 
 // ***************************************************************************************************

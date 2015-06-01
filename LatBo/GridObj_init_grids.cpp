@@ -25,17 +25,12 @@ void GridObj::LBM_init_vel ( ) {
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
-
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				int idx_x = idxmap(i,j,k,0,M_lim,K_lim,dims);
-				int idx_y = idxmap(i,j,k,1,M_lim,K_lim,dims);
-				int idx_z = idxmap(i,j,k,2,M_lim,K_lim,dims);
 				
 				// Uniform flow
-				u[idx_x] = u_in[0];
-				u[idx_y] = u_in[1];
+				u(i,j,k,0,M_lim,K_lim,dims) = u_in[0];
+				u(i,j,k,1,M_lim,K_lim,dims) = u_in[1];
 #if (dims == 3)
-				u[idx_z] = u_in[2];
+				u(i,j,k,2,M_lim,K_lim,dims) = u_in[2];
 #endif
 
 			}
@@ -67,10 +62,8 @@ void GridObj::LBM_init_rho ( ) {
 				// Max velocity
 				double u_in[3] = {u_0x, u_0y, u_0z};
 
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-
 				// Uniform Density
-				rho[idx] = rho_in;
+				rho(i,j,k,M_lim,K_lim) = rho_in;
 			}
 		}
 	}
@@ -82,15 +75,14 @@ void GridObj::LBM_init_rho ( ) {
 // Initialise wall labels method (L0 only)
 void GridObj::LBM_init_wall_lab ( ) {
 
-	int i, idx;
+	int i;
 
 #ifdef SOLID_ON
 	for (int i = obj_x_min; i <= obj_x_max; i++) {
 		for (int j = obj_y_min; j <= obj_y_max; j++) {
 			for (int k = obj_z_min; k <= obj_z_max; k++) {
 
-				idx = idxmap(i,j,k,M,K);
-				LatTyp[idx] = 0;
+				LatTyp(i,j,k,M,K) = 0;
 
 			}
 		}
@@ -102,8 +94,7 @@ void GridObj::LBM_init_wall_lab ( ) {
 	for (int j = 0; j < M; j++) {
 		for (int k = 0; k < K; k++) {
 
-			idx = idxmap(i,j,k,M,K);
-			LatTyp[idx] = 7;
+			LatTyp(i,j,k,M,K) = 7;
 
 		}
 	}
@@ -114,8 +105,7 @@ void GridObj::LBM_init_wall_lab ( ) {
 	for (int j = 0; j < M; j++) {
 		for (int k = 0; k < K; k++) {
 
-			idx = idxmap(i,j,k,M,K);
-			LatTyp[idx] = 8;
+			LatTyp(i,j,k,M,K) = 8;
 
 		}
 	}
@@ -228,8 +218,7 @@ void GridObj::LBM_init_grid( ) {
 		for (int j = 0; j < M; j++) {
 			for (int k = 0; k < K; k++) {
 				
-				int idx = idxmap(i,j,k,M,K);
-				LatTyp[idx] = 1;
+				LatTyp(i,j,k,M,K) = 1;
 
 			}
 		}
@@ -252,8 +241,7 @@ void GridObj::LBM_init_grid( ) {
 				for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
 					for (size_t k = RefZstart[reg]; k <= RefZend[reg]; k++) {
 
-						int idx = idxmap(i,j,k,M,K);
-						LatTyp[idx] = 4;
+						LatTyp(i,j,k,M,K) = 4;
 
 					}
 				}
@@ -264,8 +252,7 @@ void GridObj::LBM_init_grid( ) {
 				for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
 					for (size_t k = RefZstart[reg]+1; k <= RefZend[reg]-1; k++) {
 
-						int idx = idxmap(i,j,k,M,K);
-						LatTyp[idx] = 2;
+						LatTyp(i,j,k,M,K) = 2;
 
 					}
 				}
@@ -277,8 +264,7 @@ void GridObj::LBM_init_grid( ) {
 				for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
 					size_t k = 0;
 
-						int idx = idxmap(i,j,k,M,K);
-						LatTyp[idx] = 4;
+						LatTyp(i,j,k,M,K) = 4;
 
 				}
 			}
@@ -288,8 +274,7 @@ void GridObj::LBM_init_grid( ) {
 				for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
 					size_t k = 0;
 
-						int idx = idxmap(i,j,k,M,K);
-						LatTyp[idx] = 2;
+						LatTyp(i,j,k,M,K) = 2;
 
 				}
 			}
@@ -321,8 +306,7 @@ void GridObj::LBM_init_grid( ) {
 				for (int v = 0; v < nVels; v++) {
 
 					// Initialise f to feq
-					int idx  = idxmap(i,j,k,v,M,K,nVels);
-					f[idx] = LBM_collide( i, j, k, v );
+					f(i,j,k,v,M,K,nVels) = LBM_collide( i, j, k, v );
 
 				}
 			}
@@ -383,8 +367,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 		for (size_t j = 0; j != M_lim; ++j) {
 			for (size_t k = 0; k != K_lim; ++k) {
 
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				LatTyp[idx] = 3;
+				LatTyp(i,j,k,M_lim,K_lim) = 3;
 
 			}
 		}
@@ -398,8 +381,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 2; j != M_lim-2; ++j) {
 				for (size_t k = 2; k != K_lim-2; ++k) {
 				
-					int idx = idxmap(i,j,k,M_lim,K_lim);
-					LatTyp[idx] = 4;
+					LatTyp(i,j,k,M_lim,K_lim) = 4;
 
 				}
 			}
@@ -411,8 +393,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 3; j != M_lim-3; ++j) {
 				for (size_t k = 3; k != K_lim-3; ++k) {
 
-					int idx = idxmap(i,j,k,M_lim,K_lim);
-					LatTyp[idx] = 2;
+					LatTyp(i,j,k,M_lim,K_lim) = 2;
 
 				}
 			}
@@ -424,8 +405,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 2; j != M_lim-2; ++j) {
 				for (size_t k = 2; k != K_lim-2; ++k) {
 
-					int idx = idxmap(i,j,k,M_lim,K_lim);
-					LatTyp[idx] = 1;
+					LatTyp(i,j,k,M_lim,K_lim) = 1;
 
 				}
 			}
@@ -439,8 +419,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 		for (size_t j = 0; j != M_lim; ++j) {
 			size_t k = 0;
 
-			int idx = idxmap(i,j,k,M_lim,K_lim);
-			LatTyp[idx] = 3;
+			LatTyp(i,j,k,M_lim,K_lim) = 3;
 
 		}
 	}
@@ -453,8 +432,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 2; j != M_lim-2; ++j) {
 				size_t k = 0;
 				
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				LatTyp[idx] = 4;
+				LatTyp(i,j,k,M_lim,K_lim) = 4;
 					
 			}
 		}
@@ -465,8 +443,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 3; j != M_lim-3; ++j) {
 				size_t k = 0;
 
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				LatTyp[idx] = 2;
+				LatTyp(i,j,k,M_lim,K_lim) = 2;
 
 			}
 		}
@@ -477,8 +454,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 			for (size_t j = 2; j != M_lim-2; ++j) {
 				size_t k = 0;
 
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				LatTyp[idx] = 1;
+				LatTyp(i,j,k,M_lim,K_lim) = 1;
 
 			}
 		}
@@ -526,8 +502,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 				for (int v = 0; v < nVels; v++) {
 					
 					// Initialise f to feq
-					int idx  = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-					f[idx] = LBM_collide( i, j, k, v );
+					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
 
 				}
 			}

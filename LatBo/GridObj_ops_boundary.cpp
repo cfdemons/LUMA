@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "GridObj.h"
 #include <vector>
-#include "ops_mapping.h"
 #include "definitions.h"
 #include "globalvars.h"
 
@@ -34,12 +33,6 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 	for (size_t i = 0; i < N_lim; i++) {
 		for (size_t j = 0; j < M_lim; j++) {
 			for (size_t k = 0; k < K_lim; k++) {
-				
-				// Declare vector to store missing populations
-				std::vector<size_t> missing_pops;
-
-				// Get index for current site
-				size_t idx = idxmap(i,j,k,M_lim,K_lim);
 
 
 				/*	******************************************************************************************
@@ -48,7 +41,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************
 				*/
     
-				if (LatTyp[idx] == 0 && bc_type_flag == 0) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == 0 && bc_type_flag == 0) {
 
 					// For each direction
 					for (size_t v = 0; v < nVels; v++) {
@@ -58,27 +51,24 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						size_t src_y = j+c[1][v];
 						size_t src_z = k+c[2][v];
 
-						// Get index for this adjacent site
-						size_t src_idx = idxmap(src_x,src_y,src_z,M_lim,K_lim);
-
 						// If this site is off-grid or another boundary site then retain current value 
 						if (	(src_x >= N_lim || src_x < 0) ||
 								(src_y >= M_lim || src_y < 0) ||
 								(src_z >= K_lim || src_z < 0) ||
-								(LatTyp[src_idx] == 0 || LatTyp[src_idx] == 7 || LatTyp[src_idx] == 8) ) {
+								(
+								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 0 || 
+								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 7 || 
+								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 8) 
+								) {
 
 						// If site is fluid site then need to apply reverse
-						} else if (LatTyp[src_idx] == 1 || LatTyp[src_idx] == 2) {
+						} else if (LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 1 || LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 2) {
 
 							// Get reverse direction
 							size_t v_rev = getOpposite(v);
-
-							// Compute flattened indices
-							size_t src_idx_rev = idxmap(src_x,src_y,src_z,v_rev,M_lim,K_lim,nVels);
-							size_t idx_f = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-
+							
 							// Assign reverse velocity to current site
-							f[idx_f] = f[src_idx_rev];
+							f(i,j,k,v,M_lim,K_lim,nVels) = f(src_x,src_y,src_z,v_rev,M_lim,K_lim,nVels);
 							
 						}
 					}
@@ -90,12 +80,12 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************
 				*/
     
-				} else if (LatTyp[idx] == 7 && bc_type_flag == 2) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 && bc_type_flag == 2) {
 
 					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
 
 					// Apply inlet Zou-He
-					applyZouHe(LatTyp[idx], i, j, k, M_lim, K_lim);
+					applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
     
 
 				/*	******************************************************************************************
@@ -104,7 +94,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************
 				*/
     
-				} else if (LatTyp[idx] == 8 && bc_type_flag == 2) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 8 && bc_type_flag == 2) {
 
 					// !! FOR NOW ASSUME THIS IS RIGHT HAND WALL !!
 #if dims == 3
@@ -115,12 +105,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						// Make all this generic in future release
 						if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
 
-							size_t idx3 = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-							size_t idx2 = idxmap(i-1,j,k,v,M_lim,K_lim,nVels);
-							size_t idx1 = idxmap(i-2,j,k,v,M_lim,K_lim,nVels);
-
-							float y2 = (float)f[idx2];
-							float y1 = (float)f[idx1];
+							float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
+							float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
 							float x1 = 0.0;
 							float x2 = (float)dx;
 							float x3 = 2 * x2;
@@ -128,7 +114,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 							float lin_m = (y2 - y1) / (x2 - x1);
 							float lin_c = y1;
                 
-							f[idx3] = lin_m * x3 + lin_c;
+							f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
 						}
 					}
 
@@ -136,12 +122,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// In 2D, extrapolate populations [3 4 5]
 					for (size_t v = 3; v < 6; v++) {
                 
-						size_t idx3 = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-						size_t idx2 = idxmap(i-1,j,k,v,M_lim,K_lim,nVels);
-						size_t idx1 = idxmap(i-2,j,k,v,M_lim,K_lim,nVels);
-
-						float y2 = (float)f[idx2];
-						float y1 = (float)f[idx1];
+						float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
+						float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
 						float x1 = 0.0;
 						float x2 = (float)dx;
 						float x3 = 2 * x2;
@@ -149,7 +131,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						float lin_m = (y2 - y1) / (x2 - x1);
 						float lin_c = y1;
                 
-						f[idx3] = lin_m * x3 + lin_c;
+						f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
 					}
 #endif
                 
@@ -161,7 +143,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************
 				*/
     
-				} else if (LatTyp[idx] == 0 && bc_type_flag == 1) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 && bc_type_flag == 1) {
 
 					// IMPLEMENT THIS LATER AS NOT TRIVIAL -- SEE MARK'S CODE AND HARTING & HECHT PAPER + ERRATA
 
@@ -190,10 +172,10 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 	3 populations (2D) or 5 populations (3D) will be unknown for the boundary site
 	*/
 
-	// Get indices for directions
-	std::vector<size_t> idx;
+	// Get references for f values to make the following a bit neater and easier to read
+	ivector<double> ftmp;
 	for (size_t n = 0; n < nVels; n++) {
-		idx.push_back(idxmap(i,j,k,n,M_lim,K_lim,nVels));
+		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
 	}
 
 #if dims == 3
@@ -210,23 +192,23 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 	            
 	// Find density on wall corresponding to given velocity
     double rho_w = (1.0 / (1.0 - u_0x)) * ( (
-        f[idx[18]] + f[idx[2]] + f[idx[3]] + f[idx[4]] + f[idx[5]] + f[idx[10]] + f[idx[11]] + f[idx[12]] + f[idx[13]] 
+        ftmp[18] + ftmp[2] + ftmp[3] + ftmp[4] + ftmp[5] + ftmp[10] + ftmp[11] + ftmp[12] + ftmp[13] 
 		) + 2.0 * (
-        f[idx[1]] + f[idx[7]] + f[idx[9]] + f[idx[15]] + f[idx[16]]
+        ftmp[1] + ftmp[7] + ftmp[9] + ftmp[15] + ftmp[16]
 		) );
 
 	// Find f0
-	f[idx[0]] = f[idx[1]] + (1.0/3.0) * rho_w * u_0x;
+	ftmp[0] = ftmp[1] + (1.0/3.0) * rho_w * u_0x;
 
 	// Compute transverse momentum corrections
-	double Nxy = 0.5 * ( f[idx[2]] + f[idx[10]] + f[idx[12]] - ( f[idx[3]] + f[idx[11]] + f[idx[13]] ) ) - (1.0/3.0) * rho_w * u_0y;
-	double Nxz = 0.5 * ( f[idx[4]] + f[idx[10]] + f[idx[13]] - ( f[idx[5]] + f[idx[11]] + f[idx[12]] ) ) - (1.0/3.0) * rho_w * u_0z;
+	double Nxy = 0.5 * ( ftmp[2] + ftmp[10] + ftmp[12] - ( ftmp[3] + ftmp[11] + ftmp[13] ) ) - (1.0/3.0) * rho_w * u_0y;
+	double Nxz = 0.5 * ( ftmp[4] + ftmp[10] + ftmp[13] - ( ftmp[5] + ftmp[11] + ftmp[12] ) ) - (1.0/3.0) * rho_w * u_0z;
 
 	// Compute f6, f9, f14 and f18
-	f[idx[6]] = f[idx[7]] + (2.0 * w[7] / pow(cs,2)) * rho_w * (u_0x + u_0y) - Nxy;
-	f[idx[8]] = f[idx[9]] + (2.0 * w[9] / pow(cs,2)) * rho_w * (u_0x - u_0y) + Nxy;
-	f[idx[14]] = f[idx[15]] + (2.0 * w[15] / pow(cs,2)) * rho_w * (u_0x + u_0z) - Nxz;
-	f[idx[17]] = f[idx[16]] + (2.0 * w[16] / pow(cs,2)) * rho_w * (u_0x - u_0z) + Nxz;
+	ftmp[6] = ftmp[7] + (2.0 * w[7] / pow(cs,2)) * rho_w * (u_0x + u_0y) - Nxy;
+	ftmp[8] = ftmp[9] + (2.0 * w[9] / pow(cs,2)) * rho_w * (u_0x - u_0y) + Nxy;
+	ftmp[14] = ftmp[15] + (2.0 * w[15] / pow(cs,2)) * rho_w * (u_0x + u_0z) - Nxz;
+	ftmp[17] = ftmp[16] + (2.0 * w[16] / pow(cs,2)) * rho_w * (u_0x - u_0z) + Nxz;
 
 
 #else
@@ -241,21 +223,21 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 
     // Find density on wall corresponding to given velocity
     double rho_w = (1.0 / (1.0 - u_0x)) * 
-		( f[idx[8]] + f[idx[2]] + f[idx[6]] + 
+		( ftmp[8] + ftmp[2] + ftmp[6] + 
 			2.0 * (
-			f[idx[3]] + f[idx[4]] + f[idx[5]]
+			ftmp[3] + ftmp[4] + ftmp[5]
 		) );
             
     // Find f0 using equations above
-    f[idx[0]] = f[idx[4]] + (2.0/3.0) * rho_w * u_0x;
+    ftmp[0] = ftmp[4] + (2.0/3.0) * rho_w * u_0x;
             
     // Find f1 using equations above
-    f[idx[1]] = 0.5 * ( (rho_w * u_0x) - 
-        (f[idx[0]] + f[idx[2]]) + f[idx[4]] + 2.0*f[idx[5]] + f[idx[6]] );
+    ftmp[1] = 0.5 * ( (rho_w * u_0x) - 
+        (ftmp[0] + ftmp[2]) + ftmp[4] + 2.0*ftmp[5] + ftmp[6] );
             
     // Find f7 using equations above
-    f[idx[7]] = 0.5 * ( (rho_w * u_0x) - 
-        (f[idx[0]] + f[idx[6]]) + f[idx[2]] + 2.0*f[idx[3]] + f[idx[4]] );
+    ftmp[7] = 0.5 * ( (rho_w * u_0x) - 
+        (ftmp[0] + ftmp[6]) + ftmp[2] + 2.0*ftmp[3] + ftmp[4] );
 
 #endif
 
@@ -275,19 +257,14 @@ void GridObj::solidSiteReset( ) {
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
-
-				int idx = idxmap(i,j,k,M_lim,K_lim);
-				int idx_x = idxmap(i,j,k,0,M_lim,K_lim,dims);
-				int idx_y = idxmap(i,j,k,1,M_lim,K_lim,dims);
-				int idx_z = idxmap(i,j,k,2,M_lim,K_lim,dims);
 				
 				// Reset solid site velocities to zero
-				if (LatTyp[idx] == 0) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
 					
-					u[idx_x] = 0.0;
-					u[idx_y] = 0.0;
+					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
 #if (dims == 3)
-					u[idx_z] = 0.0;
+					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 				}
 

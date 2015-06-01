@@ -86,6 +86,10 @@ int _tmain( )
 	cout << "Writing Output to <Grids.out>..." << endl;
 	Grids.lbm_write3(t);
 #endif
+#ifdef VTK_WRITER
+	std::cout << "Writing out to VTK file" << endl;
+	Grids.vtk_writer(t, 0.0);
+#endif
 
 	cout << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
 
@@ -129,6 +133,10 @@ int _tmain( )
 #ifdef TEXTOUT
 		cout << "Writing out to <Grids.out>..." << endl;
 		Grids.lbm_write3(t);
+#endif
+#ifdef VTK_WRITER
+	std::cout << "Writing out to VTK file" << endl;
+	Grids.vtk_writer(t, tval);
 #endif
 
 	} while (tval < T);

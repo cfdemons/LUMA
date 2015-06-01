@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "ivector.h"
 
 // Base class
 class GridObj
@@ -22,7 +23,7 @@ public:
 	
 private :
 
-	// Subgrid array (size = NumReg)
+	// 1D subgrid array (size = NumReg)
 	std::vector<GridObj> subGrid;
 	
 	// Start and end indices of corresponding coarse level (unsigned integers)
@@ -40,14 +41,14 @@ private :
 
 	// Vector nodal properties
 	// Flattened 4D arrays (i,j,k,vel)
-	std::vector<double> f;
-	std::vector<double> feq;
-	std::vector<double> u;
+	ivector<double> f;
+	ivector<double> feq;
+	ivector<double> u;
 
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
-	std::vector<double> rho;
-	std::vector<int> LatTyp;
+	ivector<double> rho;
+	ivector<int> LatTyp;
 
 	// Grid scalars
 	double omega;
@@ -57,12 +58,12 @@ private :
 	int level;
 	int region_number;
 
-	// Time step
-public :
-	double dt;
 
-	// Reynolds number
-	double Re;
+	// Public data members
+public :
+
+	double dt;	// Time step
+	double Re;	// Reynolds number
 
 	/*	
 	***************************************************************************************************************
@@ -109,6 +110,8 @@ public :
 	void genGeo();					// Generate geometry file
 	void genVec(int fileNum);		// Generate vectors file
 	void genScal(int fileNum);		// Generate scalars file
+	// VTK writer methods
+	void vtk_writer(int t, double tval);
 
 	
 };

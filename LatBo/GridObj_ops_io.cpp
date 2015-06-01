@@ -126,9 +126,8 @@ void GridObj::lbm_write3(int t) {
 				gridoutput << "\n";
 				for (size_t i = 0; i < N_lim; i++) {
 
-					// Index
-					int idx = idxmap(i,j,k,M_lim,K_lim);
-					gridoutput << LatTyp[idx] << "\t";
+					// Output
+					gridoutput << LatTyp(i,j,k,M_lim,K_lim) << "\t";
 
 				}
 			}
@@ -150,9 +149,8 @@ void GridObj::lbm_write3(int t) {
 					gridoutput << "\n";
 					for (size_t i = 0; i < N_lim; i++) {
 
-						// Index
-						int idx = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-						gridoutput << f[idx] << "\t";
+						// Output
+						gridoutput << f(i,j,k,v,M_lim,K_lim,nVels) << "\t";
 
 					}
 				}
@@ -174,9 +172,8 @@ void GridObj::lbm_write3(int t) {
 					gridoutput << "\n";
 					for (size_t i = 0; i < N_lim; i++) {
 
-						// Index
-						int idx = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-						gridoutput << feq[idx] << "\t";
+						// Output
+						gridoutput << feq(i,j,k,v,M_lim,K_lim,nVels) << "\t";
 
 					}
 				}
@@ -198,9 +195,8 @@ void GridObj::lbm_write3(int t) {
 					gridoutput << "\n";
 					for (size_t i = 0; i < N_lim; i++) {
 
-						// Index
-						int idx = idxmap(i,j,k,n,M_lim,K_lim,dims);
-						gridoutput << u[idx] << "\t";
+						// Output
+						gridoutput << u(i,j,k,n,M_lim,K_lim,dims) << "\t";
 
 					}
 				}
@@ -217,9 +213,8 @@ void GridObj::lbm_write3(int t) {
 				gridoutput << "\n";
 				for (size_t i = 0; i < N_lim; i++) {
 
-					// Index
-					int idx = idxmap(i,j,k,M_lim,K_lim);
-					gridoutput << rho[idx] << "\t";
+					// Output
+					gridoutput << rho(i,j,k,M_lim,K_lim) << "\t";
 
 				}
 			}

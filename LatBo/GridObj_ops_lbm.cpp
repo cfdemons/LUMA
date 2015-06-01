@@ -6,6 +6,7 @@ streaming and macroscopic calulcation.
 #include "GridObj.h"
 #include "definitions.h"
 #include "globalvars.h"
+#include "ivector.h"
 
 using namespace std;
 
@@ -128,7 +129,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 
 	// Create temporary lattice to prevent overwriting useful populations and initialise with same values as
 	// pre-collision f grid.
-	vector<double> f_new;
+	ivector<double> f_new;
 	f_new.resize( f.size() );
 	// Initialise with current f values
 	f_new = f;
@@ -139,12 +140,8 @@ void GridObj::LBM_collide( bool core_flag ) {
 		for (int j = j_low; j < j_high; j++) {
 			for (int k = k_low; k < k_high; k++) {
 
-				// Get index
-				int idx_ijk = idxmap(i,j,k,M_lim,K_lim);
-
-
 				// Ignore refined sites
-				if (LatTyp[idx_ijk] == 2) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 					// Do nothing as taken care of on lower level grid
 
 				} else {
@@ -152,14 +149,11 @@ void GridObj::LBM_collide( bool core_flag ) {
 
 					for (int v = 0; v < nVels; v++) {
 						
-						// Get index
-						int idx_f = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-						
 						// Get feq value by calling overload of collision function
-						feq[idx_f] = LBM_collide( i, j, k, v );						
+						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );						
 						
 						// Recompute distribution function f
-						f_new[idx_f] = (-omega * (f[idx_f] - feq[idx_f]) ) + f[idx_f];
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = (-omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) ) + f(i,j,k,v,M_lim,K_lim,nVels);
 						
 					}
 
@@ -196,14 +190,9 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 	
 	// Compute the parts of the expansion for feq
 
-		// 3D case -- IF CONTIGUOUS ONLY NEED 1 INDEX AND USE POINTER ARITHMETIC?
-		int idx0 = idxmap(i,j,k,0,M_lim,K_lim,dims);
-		int idx1 = idxmap(i,j,k,1,M_lim,K_lim,dims);
-		int idx2 = idxmap(i,j,k,2,M_lim,K_lim,dims);
-
 #if (dims == 3)
 		// Compute c_ia * u_a which is actually the dot product of c and u
-		A = (c[0][v] * u[idx0]) + (c[1][v] * u[idx1]) + (c[2][v] * u[idx2]);
+		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,dims)) + (c[2][v] * u(i,j,k,2,M_lim,K_lim,dims));
 
 		/*
 		Compute second term in the expansion
@@ -212,25 +201,24 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 		+ 2c_x c_y u_x u_y + 2c_x c_z u_x u_z + 2c_y c_z u_y u_z
 		*/
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u[idx0],2) + 
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u[idx1],2) +
-			(pow(c[2][v],2) - pow(cs,2)) * pow(u[idx2],2) +
-			2 * c[0][v]*c[1][v] * u[idx0] * u[idx1] + 
-			2 * c[0][v]*c[2][v] * u[idx0] * u[idx2] + 
-			2 * c[1][v]*c[2][v] * u[idx1] * u[idx2];
+		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) + 
+			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
+			(pow(c[2][v],2) - pow(cs,2)) * pow(u(i,j,k,2,M_lim,K_lim,dims),2) +
+			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims) + 
+			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims) + 
+			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims);
 #else
 		// 2D versions of the above
-		A = (c[0][v] * u[idx0]) + (c[1][v] * u[idx1]);
+		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,dims));
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u[idx0],2) + 
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u[idx1],2) +
-			2 * c[0][v]*c[1][v] * u[idx0] * u[idx1];
+		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) + 
+			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
+			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims);
 #endif
 	
 	
 	// Compute f^eq
-	int idx_ijk = idxmap(i,j,k,M_lim,K_lim);
-	feq = rho[idx_ijk] * w[v] * (1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))));
+	feq = rho(i,j,k,M_lim,K_lim) * w[v] * (1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))));
 
 	return feq;
 
@@ -250,7 +238,7 @@ void GridObj::LBM_stream( ) {
 	int dest_x, dest_y, dest_z;
 
 	// Create temporary lattice of zeros to prevent overwriting useful populations
-	vector<double> f_new( f.size(), 0.0 );
+	ivector<double> f_new( f.size(), 0.0 );
 
 	// Stream one lattice site at a time
 	for (int i = 0; i < N_lim; i++) {
@@ -259,11 +247,8 @@ void GridObj::LBM_stream( ) {
 
 				for (int v = 0; v < nVels; v++) {
 
-					// Get index
-					int idx_ijk = idxmap(i,j,k,M_lim,K_lim);
-
 					// If fine site then do not stream in any direction
-					if (LatTyp[idx_ijk] == 2) {
+					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 						break;
 					}
 
@@ -280,9 +265,6 @@ void GridObj::LBM_stream( ) {
 						dest_z = k+c[2][v];
 					}
 
-					// Get destination index
-					int idx_dest = idxmap(dest_x,dest_y,dest_z,M_lim,K_lim);
-
 					// If destination off-grid, do not stream
 					if (	(dest_x >= N_lim || dest_x < 0) ||
 							(dest_y >= M_lim || dest_y < 0) ||
@@ -293,19 +275,15 @@ void GridObj::LBM_stream( ) {
 					} else {
 
 						// Check destination site type and decide whether to stream or not
-						if ( (LatTyp[idx_dest] == 2) || // Fine -- ignore
-							( (LatTyp[idx_dest] == 4) && (LatTyp[idx_ijk] == 4) ) // TL lower level to TL lower level -- done on lower grid stream so ignore.
+						if ( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Fine -- ignore
+							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) && (LatTyp(i,j,k,M_lim,K_lim) == 4) ) // TL lower level to TL lower level -- done on lower grid stream so ignore.
 							) {
 														
 					
 						} else {
 
-							// Get index
-							int idx_destv = idxmap(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
-							int idx_ijkv = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-
 							// Stream population
-							f_new[idx_destv] = f[idx_ijkv];
+							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 
 						}
 
@@ -345,37 +323,26 @@ void GridObj::LBM_macro( ) {
 				// Reset temporary variables
 				rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
 
-				// Get index
-				int idx_rho = idxmap(i,j,k,M_lim,K_lim);
-
 				for (int v = 0; v < nVels; v++) {
 
-					// Get index
-					int idx_f = idxmap(i,j,k,v,M_lim,K_lim,nVels);
-
 					// Sum up to find momentum
-					fux_temp += c[0][v] * f[idx_f];
-					fuy_temp += c[1][v] * f[idx_f];
-					fuz_temp += c[2][v] * f[idx_f];
+					fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+					fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+					fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 
 					// Sum up to find density
-					rho_temp += f[idx_f];
+					rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
 
 				}
 
 				// Assign density
-				rho[idx_rho] = rho_temp;
-
-				// Get index
-				int idx_ux = idxmap(i,j,k,0,M_lim,K_lim,dims);
-				int idx_uy = idxmap(i,j,k,1,M_lim,K_lim,dims);
-				int idx_uz = idxmap(i,j,k,2,M_lim,K_lim,dims);
+				rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 				// Assign velocity
-				u[idx_ux] = fux_temp / rho_temp;
-				u[idx_uy] = fuy_temp / rho_temp;
+				u(i,j,k,0,M_lim,K_lim,dims) = fux_temp / rho_temp;
+				u(i,j,k,1,M_lim,K_lim,dims) = fuy_temp / rho_temp;
 #if (dims == 3)
-				u[idx_uz] = fuz_temp / rho_temp;
+				u(i,j,k,2,M_lim,K_lim,dims) = fuz_temp / rho_temp;
 #endif
 
 			}
@@ -409,10 +376,8 @@ void GridObj::LBM_explode( int RegionNumber ) {
 		for (size_t j = subGrid[RegionNumber].CoarseLimsY[0]; j <= subGrid[RegionNumber].CoarseLimsY[1]; j++) {
 			for (size_t k = subGrid[RegionNumber].CoarseLimsZ[0]; k <= subGrid[RegionNumber].CoarseLimsZ[1]; k++) {
 
-				int idx_coarse = idxmap(i,j,k,M_coarse,K_coarse);
-
 				// If TL to lower level and point belongs to region then partitioning required
-				if (LatTyp[idx_coarse] == 4) {
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
 
 					// Lookup indices for lower level
 					x_start = subGrid[RegionNumber].CoarseLimsX[0];
@@ -429,47 +394,30 @@ void GridObj::LBM_explode( int RegionNumber ) {
 					for (int v = 0; v < nVels; v++) {
 
 						// Get coarse site value
-						int idx_coarsef = idxmap(i,j,k,v,M_coarse,K_coarse,nVels);
-						double coarse_f = f[idx_coarsef];
+						double coarse_f = f(i,j,k,v,M_coarse,K_coarse,nVels);
 
 #if (dims == 3)
 						// 3D Case -- cube of 8 cells
-							
-						// Flatten indices for each cell in the cube
-						int idx1 = idxmap(fi,	fj,		fk,		v,M_fine,K_fine,nVels);
-						int idx2 = idxmap(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels);
-						int idx3 = idxmap(fi,	fj+1,	fk,		v,M_fine,K_fine,nVels);
-						int idx4 = idxmap(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels);
-						int idx5 = idxmap(fi,	fj,		fk+1,	v,M_fine,K_fine,nVels);
-						int idx6 = idxmap(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels);
-						int idx7 = idxmap(fi,	fj+1,	fk+1,	v,M_fine,K_fine,nVels);
-						int idx8 = idxmap(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels);
-							
+			
 						// Copy coarse to fine
-						subGrid[RegionNumber].f[idx1] = coarse_f;
-						subGrid[RegionNumber].f[idx2] = coarse_f;
-						subGrid[RegionNumber].f[idx3] = coarse_f;
-						subGrid[RegionNumber].f[idx4] = coarse_f;
-						subGrid[RegionNumber].f[idx5] = coarse_f;
-						subGrid[RegionNumber].f[idx6] = coarse_f;
-						subGrid[RegionNumber].f[idx7] = coarse_f;
-						subGrid[RegionNumber].f[idx8] = coarse_f;
+						subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
 
 #else
 
 						// 2D Case -- square of 4 cells
-
-						// Flatten indices
-						int idx1 = idxmap(fi,	fj,		v,M_fine,nVels);
-						int idx2 = idxmap(fi+1,	fj,		v,M_fine,nVels);
-						int idx3 = idxmap(fi,	fj+1,	v,M_fine,nVels);
-						int idx4 = idxmap(fi+1,	fj+1,	v,M_fine,nVels);
 							
 						// Copy coarse to fine
-						subGrid[RegionNumber].f[idx1] = coarse_f;
-						subGrid[RegionNumber].f[idx2] = coarse_f;
-						subGrid[RegionNumber].f[idx3] = coarse_f;
-						subGrid[RegionNumber].f[idx4] = coarse_f;
+						subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels)		= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels)		= coarse_f;
+						subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels)		= coarse_f;
+						subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels)		= coarse_f;
 
 #endif
 					}
@@ -503,10 +451,8 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 		for (size_t j = subGrid[RegionNumber].CoarseLimsY[0]; j <= subGrid[RegionNumber].CoarseLimsY[1]; j++) {
 			for (size_t k = subGrid[RegionNumber].CoarseLimsZ[0]; k <= subGrid[RegionNumber].CoarseLimsZ[1]; k++) {
 
-				int idx_coarse = idxmap(i,j,k,M_coarse,K_coarse);
-
 				// If TL to lower level then fetch values from lower level
-				if (LatTyp[idx_coarse] == 4) {
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
 
 					// Lookup indices for lower level
 					x_start = subGrid[RegionNumber].CoarseLimsX[0];
@@ -522,53 +468,34 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 					// Loop over directions
 					for (int v = 0; v < nVels; v++) {
 
-						// Get coarse site index
-						int idx_coarsef = idxmap(i,j,k,v,M_coarse,K_coarse,nVels);
-
 						// Check to see if f value is missing on coarse level
-						if (f[idx_coarsef] == 0) {
+						if (f(i,j,k,v,M_coarse,K_coarse,nVels) == 0) {
 																										
 #if (dims == 3)
 							// 3D Case -- cube of 8 cells
 							
-							// Flatten indices for each cell in the cube
-							int idx1 = idxmap(fi,	fj,		fk,		v,M_fine,K_fine,nVels);
-							int idx2 = idxmap(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels);
-							int idx3 = idxmap(fi,	fj+1,	fk,		v,M_fine,K_fine,nVels);
-							int idx4 = idxmap(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels);
-							int idx5 = idxmap(fi,	fj,		fk+1,	v,M_fine,K_fine,nVels);
-							int idx6 = idxmap(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels);
-							int idx7 = idxmap(fi,	fj+1,	fk+1,	v,M_fine,K_fine,nVels);
-							int idx8 = idxmap(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels);
-							
 							// Average the values
-							f[idx_coarsef] = (
-								subGrid[RegionNumber].f[idx1] + 
-								subGrid[RegionNumber].f[idx2] + 
-								subGrid[RegionNumber].f[idx3] + 
-								subGrid[RegionNumber].f[idx4] +
-								subGrid[RegionNumber].f[idx5] + 
-								subGrid[RegionNumber].f[idx6] + 
-								subGrid[RegionNumber].f[idx7] + 
-								subGrid[RegionNumber].f[idx8]
+							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
+								subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels) +
+								subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)
 								) / pow(2, dims);
 
 #else
 
 							// 2D Case -- square of 4 cells
-
-							// Flatten indices
-							int idx1 = idxmap(fi,	fj,		v,M_fine,nVels);
-							int idx2 = idxmap(fi+1,	fj,		v,M_fine,nVels);
-							int idx3 = idxmap(fi,	fj+1,	v,M_fine,nVels);
-							int idx4 = idxmap(fi+1,	fj+1,	v,M_fine,nVels);
 							
 							// Average the values
-							f[idx_coarsef] = (
-								subGrid[RegionNumber].f[idx1] + 
-								subGrid[RegionNumber].f[idx2] + 
-								subGrid[RegionNumber].f[idx3] + 
-								subGrid[RegionNumber].f[idx4] 
+							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
+								subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels) + 
+								subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels) + 
+								subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels) 
 								) / pow(2, dims);
 
 #endif

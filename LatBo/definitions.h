@@ -11,8 +11,7 @@
 #include <math.h>		// Mathematics
 #include <string>		// String template access
 
-#include "ops_generic.h"
-#include "ops_mapping.h"
+#include "ops_generic.h"	// Forward declarations of generic functions
 
 /*	
 ***************************************************************************************************************
@@ -21,7 +20,8 @@
 */
 #define PI 3.14159265358979323846
 //#define TEXTOUT
-#define ENSIGHTGOLD
+//#define ENSIGHTGOLD
+#define VTK_WRITER
 
 /*	
 ***************************************************************************************************************
@@ -35,7 +35,7 @@
 ******************************************* Domain dimensions *************************************************
 ***************************************************************************************************************
 */
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 96		// Number of x lattice sites
 #define M 48		// Number of y lattice sites
 #define K 48		// Number of z lattice sites
@@ -86,7 +86,7 @@
 ***************************************************************************************************************
 */
 #define NumLev 0		// Levels of refinement
-#define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
+#define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Lattice indices for refined region on level L0 start numbering at 0

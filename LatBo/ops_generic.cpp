@@ -1,5 +1,6 @@
-/* This file contains all the generic functions for use in the main routine.
-In future, we could turn this into its own class with the functions as methods.
+/*
+	This file contains all the generic functions for use in the main routine.
+	In future, we could turn this into its own class with the functions as methods.
 */
 
 #include "stdafx.h"
@@ -95,4 +96,19 @@ double vecnorm( double vec[] )
 	return result;
 }
 
+// ***************************************************************************************************
+
+// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
+vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
+
+	// Initialise result
+	vector<int> fine_ind;
+	
+	// Map indices
+	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
+	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
+	fine_ind.insert(fine_ind.begin() + 2, 2*(coarse_k - z_start + 1) - 2 );
+
+	return fine_ind;
+}
 // ***************************************************************************************************

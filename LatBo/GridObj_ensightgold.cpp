@@ -130,15 +130,10 @@ void GridObj::genGeo( )
 	sprintf_s(buf, "\n%12.5e", (float)z_delta); fout << buf;
 
 	// Node blanking flags
-	int N_lim = XPos.size();
-	int M_lim = YPos.size();
-	int K_lim = ZPos.size();
-	int ct;
-	for (int k = 0; k < K_lim; k++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int i = 0; i < N_lim; i++) {
-				ct = idxmap(i,j,k,M_lim,K_lim);
-				if (LatTyp[ct] == 1 || LatTyp[ct] == 4) {
+	for (int k = 0; k < nk; k++) {
+		for (int j = 0; j < nj; j++) {
+			for (int i = 0; i < ni; i++) {
+				if (LatTyp(i,j,k,nj,nk) == 1 || LatTyp(i,j,k,nj,nk) == 4) {
 					sprintf_s(buf, "\n%10d", 1); fout << buf;
 				} else { 
 					sprintf_s(buf, "\n%10d", 0); fout << buf;
@@ -192,13 +187,12 @@ void GridObj::genVec(int fileNum)
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	int ct;
+
 	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 0;
-				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
+				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -207,8 +201,7 @@ void GridObj::genVec(int fileNum)
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 1;
-				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
+				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -218,8 +211,7 @@ void GridObj::genVec(int fileNum)
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 2;
-				ct = idxmap(i,j,k,dir,M_lim,K_lim,dims);
-				sprintf_s(buf, "\n%12.5e", (float)u[ct]); fout << buf;
+				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -278,12 +270,11 @@ void GridObj::genScal(int fileNum)
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	int ct;
+
 	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
-				ct = idxmap(i,j,k,M_lim,K_lim);
-				sprintf_s(buf, "\n%12.5e", (float)rho[ct]); fout << buf;
+				sprintf_s(buf, "\n%12.5e", (float)rho(i,j,k,M_lim,K_lim)); fout << buf;
 			}
 		}
 	}

@@ -9,5 +9,6 @@ double vecnorm(double vec[2]);										// Function: vecnorm + 3 overloads
 double vecnorm(double val1, double val2);
 double vecnorm(double val1, double val2, double val3);
 double vecnorm(double vec[3]);
+std::vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: indmapref
 
 #endif

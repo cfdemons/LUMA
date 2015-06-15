@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GridObj">
+    <Position X="0.75" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>EAoCRxACIAIAAiBAASCY4koAlIUIAAgRABcBgCCsBAA=</HashCode>
+      <FileName>GridObj.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IB_body">
+    <Position X="3.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAABIIAAgAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>IB_body.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IB_marker">
+    <Position X="6.25" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAFAAEAAAJJAAIAAAgAAAAAAAAAAABAA=</HashCode>
+      <FileName>IB_marker.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ivector&lt;GenTyp&gt;">
+    <Position X="3.5" Y="3.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAEAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ivector.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

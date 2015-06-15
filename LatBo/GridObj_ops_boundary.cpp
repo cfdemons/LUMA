@@ -173,6 +173,7 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 	*/
 
 	// Get references for f values to make the following a bit neater and easier to read
+	// but does make it a lot slower to execute
 	ivector<double> ftmp;
 	for (size_t n = 0; n < nVels; n++) {
 		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
@@ -240,6 +241,11 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
         (ftmp[0] + ftmp[6]) + ftmp[2] + 2.0*ftmp[3] + ftmp[4] );
 
 #endif
+
+	// Apply new f values to grid
+	for (size_t n = 0; n < nVels; n++) {
+		f(i,j,k,n,M_lim,K_lim,nVels) = ftmp[n];
+	}
 
 }
 

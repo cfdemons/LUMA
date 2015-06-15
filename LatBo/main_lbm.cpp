@@ -53,7 +53,8 @@ int _tmain( )
 	GridObj Grids(0);
 
 	// Number of loops based on L0 time step
-	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)
+	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)#
+	cout << "Number of time steps = " << totalloops << endl;
 
 
 	/* ***************************************************************************************************************
@@ -73,21 +74,42 @@ int _tmain( )
 
 
 	/* ***************************************************************************************************************
+	********************************************* IBM INITIALISE *****************************************************
+	*************************************************************************************************************** */
+
+#ifdef IBM_ON
+	
+	cout << "Initialising IBM..." << endl;
+
+	// Build a body -- type == 1 is a rectangle/cuboid, type == 2 is a circle/sphere
+#if defined INSERT_RECTANGLE_CUBOID
+	Grids.build_body(1);
+#elif defined INSERT_CIRCLE_SPHERE
+	Grids.build_body(2);
+#endif
+
+	// Initialise the body (compute support etc.)
+	Grids.ibm_initialise();
+
+#endif
+
+
+	/* ***************************************************************************************************************
 	******************************************* CLOSE INITIALISATION *************************************************
 	*************************************************************************************************************** */
 
 	// Write out t = 0
 #ifdef ENSIGHTGOLD
-	std::cout << "Writing out to EnSight file" << endl;
+	cout << "Writing out to EnSight file..." << endl;
 	Grids.genVec(fileNum);
 	Grids.genScal(fileNum);
 #endif
 #ifdef TEXTOUT
 	cout << "Writing Output to <Grids.out>..." << endl;
-	Grids.lbm_write3(t);
+	Grids.LBM_textout(t);
 #endif
 #ifdef VTK_WRITER
-	std::cout << "Writing out to VTK file" << endl;
+	std::cout << "Writing out to VTK file..." << endl;
 	Grids.vtk_writer(t, 0.0);
 #endif
 
@@ -105,18 +127,22 @@ int _tmain( )
 	// LBM
 	do {
 
-		cout << "\n///////////////// Time Step " << t+1 << " /////////////////";
+		cout << "\n///////////////// Time Step " << t+1 << " /////////////////" << endl;
 
 		// Start the clock
 		t_start = clock();
 
 		// Call LBM kernel from L0
-		Grids.LBM_multi();
+#ifdef IBM_ON
+		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
+#else
+		Grids.LBM_multi(false);	// Just called once as no IBM
+#endif
 
 		// Print Time of loop
 		t_end = clock();
 		clock_t secs = t_end - t_start;
-		printf("\nLast time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
+		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
 		// Increment counters
 		t++;
@@ -132,7 +158,7 @@ int _tmain( )
 #endif
 #ifdef TEXTOUT
 		cout << "Writing out to <Grids.out>..." << endl;
-		Grids.lbm_write3(t);
+		Grids.LBM_textout(t);
 #endif
 #ifdef VTK_WRITER
 	std::cout << "Writing out to VTK file" << endl;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GridObj.h"
 #include "definitions.h"
+#include <vector>
 
 // ***************************************************************************************************
 // Default Constructor
@@ -9,7 +10,7 @@ GridObj::GridObj(void)
 }
 
 // ***************************************************************************************************
-// Deafult Destructor
+// Default Destructor
 GridObj::~GridObj(void)
 {
 }
@@ -34,7 +35,6 @@ GridObj::GridObj(int level)
 }
 
 // ***************************************************************************************************
-
 // Overload constructor for sub grid
 GridObj::GridObj(int level, int RegionNumber)
 {
@@ -89,38 +89,42 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 }
 
 // ***************************************************************************************************
-bool GridObj::isEdge (size_t i, size_t j, size_t k, int RegionNumber) {
+// Method to call body building routine for IBM
+void GridObj::build_body(int type) {
 
-	bool edgetest;
-	
-	// Test for edge of grid
-	if (i == subGrid[RegionNumber].CoarseLimsX[1] && 
-		j == subGrid[RegionNumber].CoarseLimsY[1] && 
-		k == subGrid[RegionNumber].CoarseLimsZ[1])
-		edgetest = true;
+	// Declarations
+	std::vector<double> dimensions, centrepoint;
 
-	else edgetest = false;
+	if (type == 1) {	// Build a rectangle/cuboid
 
-	return edgetest;
+		// Dimensions
+		dimensions.push_back(ibb_w);
+		dimensions.push_back(ibb_l);
+		dimensions.push_back(ibb_d);
+		centrepoint.push_back(ibb_x);
+		centrepoint.push_back(ibb_y);
+		centrepoint.push_back(ibb_z);
+
+		// Build
+		iBody.makeBody(dimensions,centrepoint,false);
+
+	} else if (type == 2) { // Build a circle/sphere
+
+		// Dimensions
+		centrepoint.push_back(ibb_x);
+		centrepoint.push_back(ibb_y);
+		centrepoint.push_back(ibb_z);
+
+		// Find number of points to make body
+		int numpoints = (int)ceil(pow(Lspace,dims));
+
+		// Build
+		iBody.makeBody(ibb_r,centrepoint,false);
+
+	}
+
 }
 
 // ***************************************************************************************************
-bool GridObj::isWithin (size_t i, size_t j, size_t k, int RegionNumber) {
-
-	bool intest;
-	
-	// Test for edge of grid
-	if (	( i >= subGrid[RegionNumber].CoarseLimsX[0] && i <= subGrid[RegionNumber].CoarseLimsX[1] ) &&
-			( j >= subGrid[RegionNumber].CoarseLimsY[0] && j <= subGrid[RegionNumber].CoarseLimsX[1] ) &&
-			( k >= subGrid[RegionNumber].CoarseLimsZ[0] && k <= subGrid[RegionNumber].CoarseLimsX[1] )
-			)
-		intest = true;
-
-	else intest = false;
-
-	return intest;
-}
-
-
 // ***************************************************************************************************
 // Other member methods are in their own files prefixed GridObj_

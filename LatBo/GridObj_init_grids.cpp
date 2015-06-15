@@ -37,7 +37,7 @@ void GridObj::LBM_init_vel ( ) {
 		}
 	}
 
-#ifdef SOLID_ON
+#if defined SOLID_ON || defined WALLS_ON
 	// Perform solid site reset of velocity
 	solidSiteReset();
 #endif
@@ -59,9 +59,6 @@ void GridObj::LBM_init_rho ( ) {
 		for (int j = 0; j < M_lim; j++) {		
 			for (int k = 0; k < K_lim; k++) {
 
-				// Max velocity
-				double u_in[3] = {u_0x, u_0y, u_0z};
-
 				// Uniform Density
 				rho(i,j,k,M_lim,K_lim) = rho_in;
 			}
@@ -72,15 +69,17 @@ void GridObj::LBM_init_rho ( ) {
 
 // ***************************************************************************************************
 
-// Initialise wall labels method (L0 only)
+// Initialise wall and object labels method (L0 only)
 void GridObj::LBM_init_wall_lab ( ) {
 
-	int i;
+#if defined SOLID_ON || defined WALLS_ON || defined INLET_ON || defined OUTLET_ON
+	int i, j, k;
+#endif
 
 #ifdef SOLID_ON
-	for (int i = obj_x_min; i <= obj_x_max; i++) {
-		for (int j = obj_y_min; j <= obj_y_max; j++) {
-			for (int k = obj_z_min; k <= obj_z_max; k++) {
+	for (i = obj_x_min; i <= obj_x_max; i++) {
+		for (j = obj_y_min; j <= obj_y_max; j++) {
+			for (k = obj_z_min; k <= obj_z_max; k++) {
 
 				LatTyp(i,j,k,M,K) = 0;
 
@@ -90,9 +89,11 @@ void GridObj::LBM_init_wall_lab ( ) {
 #endif
 
 #ifdef INLET_ON
+	// Left hand face only
+
 	i = 0;
-	for (int j = 0; j < M; j++) {
-		for (int k = 0; k < K; k++) {
+	for (j = 0; j < M; j++) {
+		for (k = 0; k < K; k++) {
 
 			LatTyp(i,j,k,M,K) = 7;
 
@@ -101,11 +102,59 @@ void GridObj::LBM_init_wall_lab ( ) {
 #endif
 
 #ifdef OUTLET_ON
+	// Right hand face only
+
 	i = N-1;
-	for (int j = 0; j < M; j++) {
-		for (int k = 0; k < K; k++) {
+	for (j = 0; j < M; j++) {
+		for (k = 0; k < K; k++) {
 
 			LatTyp(i,j,k,M,K) = 8;
+
+		}
+	}
+#endif
+
+#ifdef WALLS_ON
+	// Front, Back, Top, Bottom only
+
+#if (dims == 3)
+	// Front
+	k = 0;
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < M; j++) {
+
+			LatTyp(i,j,k,M,K) = 0;
+
+		}
+	}
+
+	// Back
+	k = K-1;
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < M; j++) {
+
+			LatTyp(i,j,k,M,K) = 0;
+
+		}
+	}
+#endif
+
+	// Top
+	j = 0;
+	for (i = 0; i < N; i++) {
+		for (k = 0; k < K; k++) {
+
+			LatTyp(i,j,k,M,K) = 0;
+
+		}
+	}
+
+	// Bottom
+	j = M-1;
+	for (i = 0; i < N; i++) {
+		for (k = 0; k < K; k++) {
+
+			LatTyp(i,j,k,M,K) = 0;
 
 		}
 	}
@@ -119,7 +168,7 @@ void GridObj::LBM_init_wall_lab ( ) {
 // Initialise level 0 grid method
 void GridObj::LBM_init_grid( ) {
 
-	// Store spacing
+	// Store physical spacing
 	double Lx = b_x - a_x;
 	double Ly = b_y - a_y;
 	double Lz = b_z - a_z;
@@ -127,22 +176,23 @@ void GridObj::LBM_init_grid( ) {
 	dy = 2*(Ly/(2*M));
 	dz = 2*(Lz/(2*K));
 
-	// Time step = grid spacing
+	// Time step = grid spacing to give lattice speed of unity
 	dt = dx;
-
 	
 	// Checks to make sure grid cell dimensions are suitable
 #if (dims == 3)
 	// Check that lattice volumes are cubes in 3D
 	if ( (Lx/N) != (Ly/M) || (Lx/N) != (Lz/K) ) {
-		cout << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions" << endl;
+		cout << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions. Exiting." << endl;
+		system("pause");
 		exit(EXIT_FAILURE);
 	}
 	
 #else
 	// 2D so need square lattice cells
 	if ( (Lx/N) != (Ly/M) ) {
-		cout << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions" << endl;
+		cout << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions. Exiting." << endl;
+		system("pause");
 		exit(EXIT_FAILURE);
 	}
 
@@ -171,7 +221,8 @@ void GridObj::LBM_init_grid( ) {
 					RefZend[reg]-RefZstart[reg]+1 == 3
 					) && NumLev > 1 )
 				) {
-				cout << "Refined region is too small to support refinement" << endl;
+				cout << "Refined region is too small to support refinement. Exiting." << endl;
+				system("pause");
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -187,7 +238,8 @@ void GridObj::LBM_init_grid( ) {
 					RefYend[reg]-RefYstart[reg]+1 == 3
 					) && NumLev > 1 )
 				) {
-				cout << "Refined region is too small to support refinement" << endl;
+				cout << "Refined region is too small to support refinement. Exiting." << endl;
+				system("pause");
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -295,6 +347,16 @@ void GridObj::LBM_init_grid( ) {
 	rho.resize( N*M*K );
 	LBM_init_rho();
 
+	// Cartesian force vector
+	for (int i = 0; i < N*M*K*dims; i++) {
+		force_xyz.push_back(0.0);
+	}
+
+	// Lattice force vector
+	for (int i = 0; i < N*M*K*nVels; i++) {
+		force_i.push_back(0.0);
+	}
+
 
 	// Initialise L0 POPULATION matrices (f, feq)
 	f.resize( N*M*K*nVels );
@@ -314,19 +376,18 @@ void GridObj::LBM_init_grid( ) {
 	}
 	feq = f; // Make feq = feq too
 
-	
+
 	// Relaxation frequency on L0
-	// Assign relaxation frequency corrected for grid and time step size
-	omega = 1 / ( (nu / (dt*pow(cs,2)) ) + .5 );
+	// Assign relaxation frequency using lattice viscosity
+	omega = 1 / ( (nu / pow(cs,2) ) + .5 );
+
+	// Used this before -- might be wrong
+	// omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dx,2)) ) + .5 );
 
 	cout << "L0 relaxation time = " << (1/omega) << endl;
 
-#ifdef SOLID_ON
-	// Reynolds Number (object height as length)
-	Re = vecnorm(u_0x,u_0y,u_0z) * (YPos[obj_y_max]-YPos[obj_y_min]) / nu;
-#else
-	Re = 0;
-#endif
+	// Compute Reynolds Number -- might be wrong
+	Re = vecnorm(u_0x,u_0y,u_0z) * dx / nu;
 
 }
 	
@@ -483,12 +544,24 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	// Resize
 	u.resize(N_lim * M_lim * K_lim * dims);
 	rho.resize(N_lim * M_lim * K_lim);
+	force_xyz.resize(N_lim * M_lim * K_lim * dims);
+	force_i.resize(N_lim * M_lim * K_lim * nVels);
 
 	// Velocity
 	LBM_init_vel( );
 
 	// Density
 	LBM_init_rho( );
+
+	// Cartesian force vector
+	for (int i = 0; i < N*M*K*dims; i++) {
+		force_xyz[i] = 0.0;
+	}
+
+	// Lattice force vector
+	for (int i = 0; i < N*M*K*nVels; i++) {
+		force_i[i] = 0.0;
+	}
 
 
 	// Generate POPULATION MATRICES for lower levels
@@ -510,6 +583,6 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	}
 	feq = f; // Set feq to feq
 
-	// Compute relaxation time
+	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/omega_coarse - .5) *2) + .5);
 }

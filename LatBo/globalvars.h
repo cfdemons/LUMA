@@ -6,8 +6,8 @@
 #include "definitions.h"
  
 // Global variable references
-extern const int c[3][nVels];
-extern const double w[nVels];
-extern const double cs;
+extern const int c[3][nVels];	// Lattice velocities
+extern const double w[nVels];	// Weights
+extern const double cs;			// Lattice sound speed for SRT BGK
  
 #endif

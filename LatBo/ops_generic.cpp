@@ -96,6 +96,20 @@ double vecnorm( double vec[] )
 	return result;
 }
 
+// Supplied as a std::vector (as reference just in case vector is big)
+double vecnorm( std::vector<double>& vec )
+{
+	double result = 0.0;
+	
+	for (size_t d = 0; d < vec.size(); d++) {
+
+		result += pow(vec[d],2);
+
+	}
+
+	return sqrt(result);
+}
+
 // ***************************************************************************************************
 
 // Routine to map the index of a coarse grid site to a corresponding fine site on the level below
@@ -112,3 +126,44 @@ vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int 
 	return fine_ind;
 }
 // ***************************************************************************************************
+
+// Dot Product
+double dotprod(std::vector<double> vec1, std::vector<double> vec2) {
+
+	// Declare scalar answer
+    double answer = 0.0;
+
+	// Do dot product
+    for (size_t i = 0; i < vec1.size(); i++) {
+        answer += vec1[i] * vec2[i];
+    }
+
+	// Return answer
+    return answer;
+}
+
+// ***************************************************************************************************
+
+// Multiplies matrix A by vector x.
+vector<double> matrix_multiply(vector< vector<double> >& A, vector<double>& x) {
+
+	// Check to makes sure dimensions are correct
+	if (A[0].size() != x.size()) {
+		cout << "Dimension mismatch -- cannot proceed. Exiting." << endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
+	// Initialise answer
+	vector<double> product (x.size(), 0.0);
+
+	// Do multiplication
+    for (size_t row = 0; row < A.size(); row++) {
+        for (size_t col = 0; col < x.size(); col++) {
+            // Multiply the row of A by the column of B to get the row, column of product.
+			product[row] += A[row][col] * x[col];
+		}
+	}
+
+	return product;
+}

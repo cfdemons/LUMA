@@ -12,7 +12,7 @@ using namespace std;
 
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
-void GridObj::lbm_write3(int t) {
+void GridObj::LBM_textout(int t) {
 
 	// Get limits for current level
 	size_t N_lim = XPos.size();
@@ -231,7 +231,7 @@ void GridObj::lbm_write3(int t) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].lbm_write3(t);
+				subGrid[reg].LBM_textout(t);
 
 			}
 		}

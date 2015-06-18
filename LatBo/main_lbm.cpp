@@ -116,7 +116,7 @@ int _tmain( )
 	cout << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
 
 	// Reynolds Number
-	cout << "Reynolds Number = " << Grids.Re << endl;
+	cout << "Target Reynolds Number = " << Re << endl;
 
 
 

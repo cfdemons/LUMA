@@ -176,7 +176,7 @@ void GridObj::LBM_init_grid( ) {
 	dy = 2*(Ly/(2*M));
 	dz = 2*(Lz/(2*K));
 
-	// Time step = grid spacing to give lattice speed of unity
+	// Physical time step = physical grid spacing?
 	dt = dx;
 	
 	// Checks to make sure grid cell dimensions are suitable
@@ -376,18 +376,30 @@ void GridObj::LBM_init_grid( ) {
 	}
 	feq = f; // Make feq = feq too
 
+	// Initialise OTHER parameters
+
+	// Compute kinematic viscosity based on target Reynolds number
+#if defined IBM_ON && defined INSERT_CIRCLE_SPHERE
+	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
+	nu = (ibb_r*2 / dx) * u_0x / Re;
+#elif defined IBM_ON && defined INSERT_RECTANGLE_CUBOID
+	// If IBM rectangle use y-dimension (in lattice units)
+	nu = (ibb_l / dx) * u_0x / Re;
+#else
+	// If no object then use domain height (in lattice units)
+	nu = M * u_0x / Re;
+#endif
+
+	cout << "Lattice viscosity = " << nu << endl;
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
 	omega = 1 / ( (nu / pow(cs,2) ) + .5 );
 
-	// Used this before -- might be wrong
+	// Above is valid for L0 only -- general expression is
 	// omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dx,2)) ) + .5 );
 
 	cout << "L0 relaxation time = " << (1/omega) << endl;
-
-	// Compute Reynolds Number -- might be wrong
-	Re = vecnorm(u_0x,u_0y,u_0z) * dx / nu;
 
 }
 	

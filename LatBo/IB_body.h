@@ -22,7 +22,7 @@ protected:
 	*/
 
 	std::vector<IB_marker> markers;		// Array of particles which make up the body
-	double spacing;	// Spacing of the Lagrnage markers
+	double spacing;	// Spacing of the Lagrange markers in physical units
 	
 	/*	
 	***************************************************************************************************************

@@ -35,7 +35,7 @@
 ********************************************** Time data ******************************************************
 ***************************************************************************************************************
 */
-#define T 50		// End time of simulation (seconds)
+#define T 60		// End time of simulation (seconds)
 
 /*	
 ***************************************************************************************************************
@@ -43,15 +43,16 @@
 ***************************************************************************************************************
 */
 #define dims 2		// Number of dimensions to the problem
-#define N 250		// Number of x lattice sites
-#define M 50		// Number of y lattice sites
+#define N 600		// Number of x lattice sites
+#define M 200		// Number of y lattice sites
 #define K 50		// Number of z lattice sites
-#define a_x 0		// Start of domain-x
+// Physical dimensions
+#define a_x -5		// Start of domain-x
 #define b_x 10		// End of domain-x
-#define a_y 0		// Start of domain-y
-#define b_y 2		// End of domain-y
-#define a_z 0		// Start of domain-z
-#define b_z 2		// End of domain-z
+#define a_y -2.5	// Start of domain-y
+#define b_y 2.5		// End of domain-y
+#define a_z -2.5		// Start of domain-z
+#define b_z 2.5		// End of domain-z
 
 /*	
 ***************************************************************************************************************
@@ -60,16 +61,17 @@
 */
 
 //#define IBM_ON		// Turn on IBM
-//#define IBM_DEBUG	// Write IBM body data out to text files
+#define IBM_DEBUG	// Write IBM body data out to text files
 
 #define Lspace 25	// Number of Lagrange points (approximately)
 
-#define ibb_x 1.5		// x Position of body centre
-#define ibb_y 1.0		// y Position of body centre
-#define ibb_z 1.0		// z Position of body centre
+// Physical dimensions of IB body
+#define ibb_x 0		// x Position of body centre
+#define ibb_y 0		// y Position of body centre
+#define ibb_z 0		// z Position of body centre
 #define ibb_w .5		// width (x) of IB body
-#define ibb_l .25		// length (y) of IB body
-#define ibb_d .25		// depth (z) of IB body
+#define ibb_l .5		// length (y) of IB body
+#define ibb_d .5		// depth (z) of IB body
 #define ibb_r .5		// radius of IB body
 
 #define INSERT_CIRCLE_SPHERE
@@ -86,7 +88,9 @@
 #define INLET_ON		// Turn on inlet boundary (assumed left-hand wall for now)
 #define OUTLET_ON		// Turn on outlet boundary (assumed right-hand wall for now)
 
-#ifdef SOLID_ON				// Labelling routine only allows for squares at the minute
+#ifdef SOLID_ON
+// Labelling routine only allows for squares at the minute
+// Specified in lattice units (by index)
 #define obj_x_min 40		// Index of start of object/wall in x-direction
 #define obj_x_max 50		// Index of end of object/wall in x-direction
 #define obj_y_min 20		// Index of start of object/wall in y-direction
@@ -102,12 +106,13 @@
 ***************************************************************************************************************
 */
 
-// Lattice units
-#define u_0x 0.1	// Initial x-velocity
+// Data in lattice units
+#define u_0x 0.06	// Initial x-velocity
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define nu .02		// Kinematic viscosity (constant across all grid levels)
+#define Re 100		// Desired Reynolds number
+// nu computed based on above selections
 
 
 /*	

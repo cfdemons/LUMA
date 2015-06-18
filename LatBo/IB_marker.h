@@ -27,7 +27,7 @@ protected:
 	*/
 	
 	// General vectors
-	std::vector<double> position;		// Position vector of Largange marker location
+	std::vector<double> position;		// Position vector of Largange marker location in physical units
 	std::vector<double> fluid_vel;		// Fluid velocity interpolated from lattice nodes
 	std::vector<double> desired_vel;	// Desired velocity
 	std::vector<double> force_xyz;		// Restorative force vector on marker
@@ -43,8 +43,8 @@ protected:
 	// Scalars
 	bool flex_rigid;		// false == rigid/fixed; true == flexible/moving
 	double epsilon;			// Scaling parameter
-	double local_area;		// Area associated with support node (same for all points if from same grid and regularly spaced like LBM)
-	double dilation;		// Dilation parameter (same in all directions for uniform Eulerian grid)
+	double local_area;		// Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like LBM)
+	double dilation;		// Dilation parameter in lattice units (same in all directions for uniform Eulerian grid)
 
 
 public:

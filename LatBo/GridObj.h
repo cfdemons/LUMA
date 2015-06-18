@@ -55,9 +55,7 @@ private :
 
 	// Grid scalars
 	double omega;
-	double dx;
-	double dy;
-	double dz;
+	double dx, dy, dz;	// Physical spacing
 	int level;
 	int region_number;
 
@@ -69,7 +67,7 @@ private :
 public :
 
 	double dt;	// Time step
-	double Re;	// Reynolds number
+	double nu;	// Kinematic viscosity (in lattice units)
 
 	/*	
 	***************************************************************************************************************

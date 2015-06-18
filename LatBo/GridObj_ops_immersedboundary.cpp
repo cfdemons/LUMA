@@ -58,6 +58,7 @@ void GridObj::ibm_initialise() {
 
 // ***************************************************************************************************
 // Method to evaluate delta kernel at supplied location
+// Both radius and dilation are expected in lattice units
 double GridObj::ibm_deltakernel(double radius, double dilation) {
 
 	double mag_r, value;
@@ -90,7 +91,7 @@ void GridObj::ibm_findsupport(unsigned int m) {
 #endif
 
 	// Following (Pinelli et al. 2010, JCP) we find closest node
-	r_min = abs(b_x-a_x);	// Initial minimum distance taken from problem geometry
+	r_min = abs(b_x-a_x) / dx;	// Initial minimum distance (in lu) taken from problem geometry
 
 	// Loop over the grid to find closest node first
 	for (size_t i = 0; i < XPos.size(); i++) {
@@ -102,12 +103,12 @@ void GridObj::ibm_findsupport(unsigned int m) {
 				radius = vecnorm( XPos[i]-iBody.markers[m].position[0], 
 							YPos[j]-iBody.markers[m].position[1],
 							ZPos[k]-iBody.markers[m].position[2]
-						);
+						) / dx;
 #else
 				// Find r = sqrt(x^2 + y^2)
 				radius = vecnorm ( XPos[i]-iBody.markers[m].position[0],
 							YPos[j]-iBody.markers[m].position[1]
-						);
+						) / dx;
 				
 #endif
 				if (radius < r_min) {
@@ -125,11 +126,12 @@ void GridObj::ibm_findsupport(unsigned int m) {
 
 	// Define limits of support region (only have to do one since latice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
-	double h_plus = std::max( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) );
-	double h_minus = std::min( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) );
+	double h_plus = std::max( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) ) /dx;
+	double h_minus = std::min( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) ) /dx;
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
-	iBody.markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus + (1.0/9.0) * dx;
+	iBody.markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus 
+		+ ( (1.0/9.0) * (1 / pow(2,level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
 	// Test to see if required support nodes are available
 #if (dims == 3)
@@ -156,9 +158,9 @@ void GridObj::ibm_findsupport(unsigned int m) {
 		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
 			for (size_t k = knear - 5; k <= knear + 5; k++) {
 
-				if (	( abs(XPos[inear] - XPos[i]) < 1.5*iBody.markers[m].dilation ) &&
-						( abs(YPos[jnear] - YPos[j]) < 1.5*iBody.markers[m].dilation ) &&
-						( abs(ZPos[knear] - ZPos[k]) < 1.5*iBody.markers[m].dilation )
+				if (	( abs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
+						( abs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation ) &&
+						( abs(ZPos[knear] - ZPos[k])/dx < 1.5*iBody.markers[m].dilation )
 					) {
 						
 						// Lies within support region so store information
@@ -166,13 +168,14 @@ void GridObj::ibm_findsupport(unsigned int m) {
 						iBody.markers[m].supp_j.push_back(j);
 						iBody.markers[m].supp_k.push_back(k);
 
-						// Store normalised area of support region (actually a volume)
-						iBody.markers[m].local_area = (dx*dy*dz) / ( pow(iBody.markers[m].dilation,3) );
+						// Store normalised area of support region (actually a volume) computed
+						// from the local grid spacing in lattice units (dx = 1 / 2^level = 1 on L0)
+						iBody.markers[m].local_area = pow( 1 / pow(2,level) ,3) ;
 
 						// Store delta function value
-						dist_x = XPos[i]-iBody.markers[m].position[0];
-						dist_y = YPos[j]-iBody.markers[m].position[1];
-						dist_z = ZPos[k]-iBody.markers[m].position[2];
+						dist_x = (XPos[i]-iBody.markers[m].position[0]) / dx;
+						dist_y = (YPos[j]-iBody.markers[m].position[1]) / dx;
+						dist_z = (ZPos[k]-iBody.markers[m].position[2]) / dx;
 
 						delta_x = ibm_deltakernel(dist_x, iBody.markers[m].dilation);
 						delta_y = ibm_deltakernel(dist_y, iBody.markers[m].dilation);
@@ -205,8 +208,8 @@ void GridObj::ibm_findsupport(unsigned int m) {
 		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
 			size_t k = 0;
 
-			if (	( abs(XPos[inear] - XPos[i]) < 1.5*iBody.markers[m].dilation ) &&
-					( abs(YPos[jnear] - YPos[j]) < 1.5*iBody.markers[m].dilation )
+			if (	( abs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
+					( abs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation )
 				) {
 						
 					// Lies within support region so store information
@@ -214,12 +217,12 @@ void GridObj::ibm_findsupport(unsigned int m) {
 					iBody.markers[m].supp_j.push_back(j);
 					iBody.markers[m].supp_k.push_back(k);
 
-					// Store normalised area of support region
-					iBody.markers[m].local_area = (dx*dy) / ( pow(iBody.markers[m].dilation,2) );
+					// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
+					iBody.markers[m].local_area = pow( 1 / pow(2,level) ,2) ;
 
 					// Store delta function value
-					dist_x = XPos[i]-iBody.markers[m].position[0];
-					dist_y = YPos[j]-iBody.markers[m].position[1];
+					dist_x = (XPos[i]-iBody.markers[m].position[0]) / dx;
+					dist_y = (YPos[j]-iBody.markers[m].position[1]) / dx;
 
 					delta_x = ibm_deltakernel(dist_x, iBody.markers[m].dilation);
 					delta_y = ibm_deltakernel(dist_y, iBody.markers[m].dilation);
@@ -308,7 +311,7 @@ void GridObj::ibm_spread() {
 			for (size_t dir = 0; dir < dims; dir++) {
 				// Add contribution of current marker to support node using delta values computed when support was computed
 				force_xyz(iBody.markers[m].supp_i[i], iBody.markers[m].supp_j[i], iBody.markers[m].supp_k[i], dir, M_lim, K_lim, dims) +=
-					iBody.markers[m].deltaval[i] * iBody.markers[m].force_xyz[dir] * iBody.markers[m].epsilon * iBody.spacing;
+					iBody.markers[m].deltaval[i] * iBody.markers[m].force_xyz[dir] * iBody.markers[m].epsilon * (iBody.spacing/dx);
 			
 			}
 		}
@@ -346,19 +349,19 @@ void GridObj::ibm_findepsilon() {
 
 				Delta_I = iBody.markers[I].deltaval[s];
 #if (dims == 3)
-				Delta_J =	ibm_deltakernel( iBody.markers[J].position[0] - XPos[iBody.markers[I].supp_i[s]], iBody.markers[J].dilation ) *
-							ibm_deltakernel( iBody.markers[J].position[1] - YPos[iBody.markers[I].supp_j[s]], iBody.markers[J].dilation ) *
-							ibm_deltakernel( iBody.markers[J].position[2] - ZPos[iBody.markers[I].supp_k[s]], iBody.markers[J].dilation );
+				Delta_J =	ibm_deltakernel( (iBody.markers[J].position[0] - XPos[iBody.markers[I].supp_i[s]])/dx, iBody.markers[J].dilation ) *
+							ibm_deltakernel( (iBody.markers[J].position[1] - YPos[iBody.markers[I].supp_j[s]])/dx, iBody.markers[J].dilation ) *
+							ibm_deltakernel( (iBody.markers[J].position[2] - ZPos[iBody.markers[I].supp_k[s]])/dx, iBody.markers[J].dilation );
 #else
-				Delta_J =	ibm_deltakernel( iBody.markers[J].position[0] - XPos[iBody.markers[I].supp_i[s]], iBody.markers[J].dilation ) *
-							ibm_deltakernel( iBody.markers[J].position[1] - YPos[iBody.markers[I].supp_j[s]], iBody.markers[J].dilation );
+				Delta_J =	ibm_deltakernel( (iBody.markers[J].position[0] - XPos[iBody.markers[I].supp_i[s]])/dx, iBody.markers[J].dilation ) *
+							ibm_deltakernel( (iBody.markers[J].position[1] - YPos[iBody.markers[I].supp_j[s]])/dx, iBody.markers[J].dilation );
 #endif
 				// Multiply by local area (or volume in 3D)
 				A[I][J] += Delta_I * Delta_J * iBody.markers[I].local_area;
 			}
 
-			// Multiply by arc length between markers
-			A[I][J] = A[I][J] * iBody.spacing;
+			// Multiply by arc length between markers in lattice units
+			A[I][J] = A[I][J] * (iBody.spacing/dx);
 
 		}
 

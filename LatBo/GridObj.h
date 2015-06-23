@@ -54,7 +54,6 @@ private :
 	ivector<int> LatTyp;
 
 	// Grid scalars
-	double omega;
 	double dx, dy, dz;	// Physical spacing
 	int level;
 	int region_number;
@@ -66,8 +65,9 @@ private :
 	// Public data members
 public :
 
-	double dt;	// Time step
-	double nu;	// Kinematic viscosity (in lattice units)
+	double dt;		// Physical time step size
+	double nu;		// Kinematic viscosity (in lattice units)
+	double omega;	// Relaxation frequency
 
 	/*	
 	***************************************************************************************************************

@@ -30,6 +30,7 @@ IB_marker::IB_marker(double xPos, double yPos, double zPos, bool flex_rigid) {
 
 	// Resize vectors
 	this->fluid_vel.resize(dims);
+	this->force_xyz.resize(dims);
 
 }
 

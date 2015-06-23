@@ -25,7 +25,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// Limit to level 0 immersed body for now
 	if (level == 0 && IBM_flag == true) {
 
-		cout << "Prediction step..." << endl;
+		std::cout << "Prediction step..." << std::endl;
 
 		// Store lattice data
 		f_ibm_initial = f;
@@ -35,6 +35,11 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		// Reset lattice and Cartesian force vectors at each site
 		LBM_forcegrid(true);
 	}
+#else
+
+	// If not using IBM then just reset the force vectors
+	LBM_forcegrid(true);
+
 #endif
 
 	// Execute kernel as normal...
@@ -129,14 +134,15 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 		// Spread force back to lattice (Cartesian vector)
 		ibm_spread();
-
+		
 		// Restore data to start of time step
 		f = f_ibm_initial;
 		u = u_ibm_initial;
 		rho = rho_ibm_initial;
 
 		// Relaunch kernel with IBM flag set to false (corrector step)
-		cout << "Correction step..." << endl;
+		// Corrector step does not reset force vectors but uses newly computed vector instead.
+		std::cout << "Correction step..." << std::endl;
 		LBM_multi(false);
 
 	}
@@ -179,42 +185,44 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 	*/
 	
-	// Get grid sizes
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
+	if (reset_flag) {
 
-	// Declarations
-	double lambda_v;
+		// Reset lattice force vectors on every grid site
+		std::fill(force_i.begin(), force_i.end(), 0.0);
+		
+		// Reset Cartesian force vector on every grid site
+		std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
 
-	// Loop over grid and overwrite forces for each direction
-	for (size_t i = 0; i < N_lim; i++) {
-		for (size_t j = 0; j < M_lim; j++) {
-			for (size_t k = 0; k < K_lim; k++) {
-				for (size_t v = 0; v < nVels; v++) {
+	} else {
+	// Else, compute forces
+	
+		// Get grid sizes
+		size_t N_lim = XPos.size();
+		size_t M_lim = YPos.size();
+		size_t K_lim = ZPos.size();
 
-					// Only apply to non-solid sites
-					if (LatTyp(i,j,k,M_lim,K_lim) != 0) {
+		// Declarations
+		double lambda_v;
 
-						if (reset_flag) {
+		// Loop over grid and overwrite forces for each direction
+		for (size_t i = 0; i < N_lim; i++) {
+			for (size_t j = 0; j < M_lim; j++) {
+				for (size_t k = 0; k < K_lim; k++) {
 
-							// Reset lattice force vectors
-							force_i(i,j,k,v,M_lim,K_lim,nVels) = 0.0;
+#ifdef GRAVITY_ON
+					// Add gravity (-y direction) to any IBM forces currently stored
+					force_xyz(i,j,k,1,M_lim,K_lim,dims) -= rho(i,j,k,M_lim,K_lim) * grav_force;
+#endif
 
-							// Reset Cartesian force vector
-							for (unsigned int d = 0; d < dims; d++) {
-								force_xyz(i,j,k,d,M_lim,K_lim,dims) = 0.0;
-							}
+					// Now compute force_i components from Cartesian force vector
+					for (size_t v = 0; v < nVels; v++) {
 
-						} else {
-							// Else, compute forces
+						// Only apply to non-solid sites
+						if (LatTyp(i,j,k,M_lim,K_lim) != 0) {
 
 							// Reset beta_v
 							double beta_v = 0.0;
-#ifdef GRAVITY_ON
-							// Add gravity (-y direction) to any IBM forces currently stored
-							force_xyz(i,j,k,1,M_lim,K_lim,dims) -= rho(i,j,k,M_lim,K_lim) * acc_g;
-#endif
+
 							// Compute the lattice forces based on Guo's forcing scheme
 							lambda_v = (1 - 0.5 * omega) * ( w[v] / pow(cs,2) );
 
@@ -226,10 +234,11 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 							// Compute force using shorthand sum described above
 							for (unsigned int d = 0; d < dims; d++) {
-								force_i(i,j,k,v,M_lim,K_lim,nVels) += force_xyz(i,j,k,d,M_lim,K_lim,dims) * (c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,dims));
+								force_i(i,j,k,v,M_lim,K_lim,nVels) += force_xyz(i,j,k,d,M_lim,K_lim,dims) * 
+									(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,dims));
 							}
 
-							// Mulitply by lambda_v
+							// Multiply by lambda_v
 							force_i(i,j,k,v,M_lim,K_lim,nVels) = force_i(i,j,k,v,M_lim,K_lim,nVels) * lambda_v;
 
 						}
@@ -239,9 +248,10 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 				}
 			}
 		}
+
+		
 	}
 	
-
 }
 
 
@@ -488,10 +498,12 @@ void GridObj::LBM_macro( ) {
 				// Assign density
 				rho(i,j,k,M_lim,K_lim) = rho_temp;
 
-				// Add forces to momentum
-				fux_temp += (dt/2) * force_xyz[0];
-				fuy_temp += (dt/2) * force_xyz[1];
-				fuz_temp += (dt/2) * force_xyz[2];
+				// Add forces to momentum (time step * 0.5 * force)
+				fux_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+				fuy_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+#if (dims == 3)
+				fuz_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+#endif
 
 				// Assign velocity
 				u(i,j,k,0,M_lim,K_lim,dims) = fux_temp / rho_temp;

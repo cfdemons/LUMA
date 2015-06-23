@@ -34,6 +34,10 @@ int _tmain( )
 	}
 #endif
 
+	// Create a log file
+	std::ofstream logfile;
+	logfile.open("./Output/log.out", std::ios::out);
+
 	// Fix output format
 	cout.precision(4);
 
@@ -54,8 +58,9 @@ int _tmain( )
 
 	// Number of loops based on L0 time step
 	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)#
-	cout << "Number of time steps = " << totalloops << endl;
-
+	logfile << "Number of time steps = " << totalloops << endl;
+	logfile << "Lattice viscosity = " << Grids.nu << endl;
+	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
 
 	/* ***************************************************************************************************************
 	**************************************** REFINED LEVELS INITIALISE ***********************************************
@@ -79,7 +84,7 @@ int _tmain( )
 
 #ifdef IBM_ON
 	
-	cout << "Initialising IBM..." << endl;
+	logfile << "Initialising IBM..." << endl;
 
 	// Build a body -- type == 1 is a rectangle/cuboid, type == 2 is a circle/sphere
 #if defined INSERT_RECTANGLE_CUBOID
@@ -100,24 +105,23 @@ int _tmain( )
 
 	// Write out t = 0
 #ifdef ENSIGHTGOLD
-	cout << "Writing out to EnSight file..." << endl;
+	logfile << "Writing out to EnSight file..." << endl;
 	Grids.genVec(fileNum);
 	Grids.genScal(fileNum);
 #endif
 #ifdef TEXTOUT
-	cout << "Writing Output to <Grids.out>..." << endl;
+	logfile << "Writing Output to <Grids.out>..." << endl;
 	Grids.LBM_textout(t);
 #endif
 #ifdef VTK_WRITER
-	std::cout << "Writing out to VTK file..." << endl;
+	logfile << "Writing out to VTK file..." << endl;
 	Grids.vtk_writer(t, 0.0);
 #endif
 
-	cout << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
+	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
 
 	// Reynolds Number
-	cout << "Target Reynolds Number = " << Re << endl;
-
+	logfile << "Reynolds Number = " << Re << endl;
 
 
 	/* ***************************************************************************************************************
@@ -127,7 +131,7 @@ int _tmain( )
 	// LBM
 	do {
 
-		cout << "\n///////////////// Time Step " << t+1 << " /////////////////" << endl;
+		cout << "\n------ Time Step " << t+1 << " of " << totalloops << " ------" << endl;
 
 		// Start the clock
 		t_start = clock();
@@ -150,20 +154,22 @@ int _tmain( )
 
 
 		// Write out
+		if (t % out_every == 0) {
 #ifdef ENSIGHTGOLD
-		std::cout << "Writing out to EnSight file" << endl;
+		logfile << "Writing out to EnSight file" << endl;
 		fileNum++;
 		Grids.genVec(fileNum);
 		Grids.genScal(fileNum);
 #endif
 #ifdef TEXTOUT
-		cout << "Writing out to <Grids.out>..." << endl;
+		logfile << "Writing out to <Grids.out>..." << endl;
 		Grids.LBM_textout(t);
 #endif
 #ifdef VTK_WRITER
-	std::cout << "Writing out to VTK file" << endl;
+	logfile << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
 #endif
+		}
 
 	} while (tval < T);
 
@@ -177,6 +183,9 @@ int _tmain( )
 	Grids.genCase(totalloops);
 	Grids.genGeo();
 #endif
+
+	// Close log file
+	logfile.close();
 
 	return 0;
 }

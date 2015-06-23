@@ -133,6 +133,7 @@ void GridObj::ibm_findsupport(unsigned int m) {
 	iBody.markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus 
 		+ ( (1.0/9.0) * (1 / pow(2,level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
+	
 	// Test to see if required support nodes are available
 #if (dims == 3)
 
@@ -158,9 +159,10 @@ void GridObj::ibm_findsupport(unsigned int m) {
 		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
 			for (size_t k = knear - 5; k <= knear + 5; k++) {
 
-				if (	( abs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
-						( abs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation ) &&
-						( abs(ZPos[knear] - ZPos[k])/dx < 1.5*iBody.markers[m].dilation )
+				// Find distance between Lagrange marker and possible support node and decide whether in cage or not
+				if (	( fabs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
+						( fabs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation ) &&
+						( fabs(ZPos[knear] - ZPos[k])/dx < 1.5*iBody.markers[m].dilation )
 					) {
 						
 						// Lies within support region so store information
@@ -172,11 +174,12 @@ void GridObj::ibm_findsupport(unsigned int m) {
 						// from the local grid spacing in lattice units (dx = 1 / 2^level = 1 on L0)
 						iBody.markers[m].local_area = pow( 1 / pow(2,level) ,3) ;
 
-						// Store delta function value
+						// Distance between Lagrange marker and support node in lattice units
 						dist_x = (XPos[i]-iBody.markers[m].position[0]) / dx;
-						dist_y = (YPos[j]-iBody.markers[m].position[1]) / dx;
-						dist_z = (ZPos[k]-iBody.markers[m].position[2]) / dx;
+						dist_y = (YPos[j]-iBody.markers[m].position[1]) / dy;
+						dist_z = (ZPos[k]-iBody.markers[m].position[2]) / dz;
 
+						// Store delta function value
 						delta_x = ibm_deltakernel(dist_x, iBody.markers[m].dilation);
 						delta_y = ibm_deltakernel(dist_y, iBody.markers[m].dilation);
 						delta_z = ibm_deltakernel(dist_z, iBody.markers[m].dilation);
@@ -208,8 +211,9 @@ void GridObj::ibm_findsupport(unsigned int m) {
 		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
 			size_t k = 0;
 
-			if (	( abs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
-					( abs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation )
+			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
+			if (	( fabs(XPos[inear] - XPos[i])/dx < 1.5*iBody.markers[m].dilation ) &&
+					( fabs(YPos[jnear] - YPos[j])/dx < 1.5*iBody.markers[m].dilation )
 				) {
 						
 					// Lies within support region so store information
@@ -220,10 +224,11 @@ void GridObj::ibm_findsupport(unsigned int m) {
 					// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
 					iBody.markers[m].local_area = pow( 1 / pow(2,level) ,2) ;
 
-					// Store delta function value
+					//  Distance between Lagrange marker and support node in lattice units
 					dist_x = (XPos[i]-iBody.markers[m].position[0]) / dx;
-					dist_y = (YPos[j]-iBody.markers[m].position[1]) / dx;
+					dist_y = (YPos[j]-iBody.markers[m].position[1]) / dy;
 
+					// Store delta function value
 					delta_x = ibm_deltakernel(dist_x, iBody.markers[m].dilation);
 					delta_y = ibm_deltakernel(dist_y, iBody.markers[m].dilation);
 
@@ -233,7 +238,6 @@ void GridObj::ibm_findsupport(unsigned int m) {
 		}
 	}
 #endif
-
 }
 
 // ***************************************************************************************************
@@ -247,10 +251,8 @@ void GridObj::ibm_interpol() {
 	// For each marker
 	for (size_t m = 0; m < iBody.markers.size(); m++) {
 		
-		// Reset the values
-			for (unsigned int dir = 0; dir < dims; dir++) {
-				iBody.markers[m].fluid_vel[dir] = 0.0;
-			}
+		// Reset the values of interpolated velocity
+		std::fill(iBody.markers[m].fluid_vel.begin(), iBody.markers[m].fluid_vel.end(), 0.0);
 
 		// Loop over support nodes
 		for (size_t i = 0; i < iBody.markers[m].deltaval.size(); i++) {
@@ -262,7 +264,7 @@ void GridObj::ibm_interpol() {
 				// for that support node and sum to get interpolated velocity.
 
 #if (dims == 3)
-				iBody.markers[m].fluid_vel[dir] += u(	iBody.markers[m].supp_i[i],
+			iBody.markers[m].fluid_vel[dir] += u(	iBody.markers[m].supp_i[i],
 													iBody.markers[m].supp_j[i],
 													iBody.markers[m].supp_k[i],
 													dir,
@@ -288,8 +290,9 @@ void GridObj::ibm_computeforce() {
 	// Loop over markers
 	for (size_t m = 0; m < iBody.markers.size(); m++) {
 		for (unsigned int dir = 0; dir < dims; dir++) {
-			// Compute restorative force
-			iBody.markers[m].force_xyz.push_back( (iBody.markers[m].desired_vel[dir] - iBody.markers[m].fluid_vel[dir]) / dt );
+			// Compute restorative force (in lattice units)
+			iBody.markers[m].force_xyz[dir] = (iBody.markers[m].desired_vel[dir] - iBody.markers[m].fluid_vel[dir]) / 
+				1 / pow(2,level);	// Time step in lattice units dt = 1 / 2^level = dx
 		}
 	}
 
@@ -309,7 +312,7 @@ void GridObj::ibm_spread() {
 			size_t K_lim = ZPos.size();
 			
 			for (size_t dir = 0; dir < dims; dir++) {
-				// Add contribution of current marker to support node using delta values computed when support was computed
+				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
 				force_xyz(iBody.markers[m].supp_i[i], iBody.markers[m].supp_j[i], iBody.markers[m].supp_k[i], dir, M_lim, K_lim, dims) +=
 					iBody.markers[m].deltaval[i] * iBody.markers[m].force_xyz[dir] * iBody.markers[m].epsilon * (iBody.spacing/dx);
 			

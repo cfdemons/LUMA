@@ -41,13 +41,13 @@ void GridObj::genCase(int nsteps)
 	// Time section
 	fout << "TIME" << endl;
 	fout << "time set: 1" << endl;
-	fout << "number of steps: " << nsteps << endl;	
+	fout << "number of steps: " << nsteps / out_every << endl;	
 	fout << "filename start number: 00000" << endl;
 	fout << "filename increment: 1" << endl;
 	fout << "time values: ";
 	// Put in the time values
-	for( int i = 0; i < nsteps; i++ ) {
-		fout << 0 + i*dt << endl;
+	for( int i = 0; i < nsteps / out_every; i++ ) {
+		fout << 0 + i*dt*out_every << endl;
 	}
 
 	fout << endl ;

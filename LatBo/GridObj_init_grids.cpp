@@ -26,12 +26,17 @@ void GridObj::LBM_init_vel ( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				
-				// Uniform flow
-				u(i,j,k,0,M_lim,K_lim,dims) = u_in[0];
-				u(i,j,k,1,M_lim,K_lim,dims) = u_in[1];
-#if (dims == 3)
-				u(i,j,k,2,M_lim,K_lim,dims) = u_in[2];
+				
+				for (size_t d = 0; d < dims; d++) {
+#ifdef NO_FLOW
+					// No flow case
+					u(i,j,k,d,M_lim,K_lim,dims) = 0.0;
+#else
+					// Normal initialise
+					u(i,j,k,d,M_lim,K_lim,dims) = u_in[d];
 #endif
+
+				}
 
 			}
 		}
@@ -266,15 +271,7 @@ void GridObj::LBM_init_grid( ) {
 	*/
 
 	// Label as coarse site
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			for (int k = 0; k < K; k++) {
-				
-				LatTyp(i,j,k,M,K) = 1;
-
-			}
-		}
-	}
+	std::fill(LatTyp.begin(), LatTyp.end(), 1);
 
 
 	// Add object-specific labels
@@ -385,6 +382,9 @@ void GridObj::LBM_init_grid( ) {
 #elif defined IBM_ON && defined INSERT_RECTANGLE_CUBOID
 	// If IBM rectangle use y-dimension (in lattice units)
 	nu = (ibb_l / dx) * u_0x / Re;
+#elif defined SOLID_ON
+	// Use object height
+	nu = (obj_y_max - obj_y_min) * u_0x / Re;
 #else
 	// If no object then use domain height (in lattice units)
 	nu = M * u_0x / Re;

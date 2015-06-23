@@ -3,6 +3,7 @@
 #include "definitions.h"
 #include "ops_generic.h"
 #include <math.h>
+#include "GridObj.h"
 
 // ***************************************************************************************************
 // Default constructor and destructor
@@ -32,8 +33,8 @@ void IB_body::makeBody(double radius, std::vector<double> centre, bool flex_rigi
 	// Following code for point generation on unit sphere actually seeds
 	// using Fibonacci sphere technique. Code is not my own but works.
 	double inc = PI * (3 - sqrt(5));
-    double off = 2.0 / (float)Lspace ;
-    for (unsigned int k = 0; k < Lspace; k++) { 
+    double off = 2.0 / (float)num_markers ;
+    for (unsigned int k = 0; k < num_markers; k++) { 
         double y = k * off - 1 + (off / 2); 
         double r = sqrt(1 - y*y); 
         double phi = k * inc;
@@ -53,7 +54,7 @@ void IB_body::makeBody(double radius, std::vector<double> centre, bool flex_rigi
 	
 #else
 	// Circle -- find theta
-	std::vector<double> theta = linspace(0, 2*PI - (2*PI / Lspace), Lspace);
+	std::vector<double> theta = linspace(0, 2*PI - (2*PI / num_markers), num_markers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -76,12 +77,17 @@ void IB_body::makeBody(double radius, std::vector<double> centre, bool flex_rigi
 // Method to build a cuboid/rectangle
 void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> centre, bool flex_rigid) {
 	
+	// Shorter variable names for convenience
+	double wid = width_length_depth[0];
+	double len = width_length_depth[1];
+	double dep = width_length_depth[2];
+
 #if (dims == 3)
 
 	// Cube //
 
 	// Check side lengths to make sure we can ensure points on the corners
-	if (fmod(ibb_w,ibb_l) != 0 && fmod(ibb_l,ibb_w) != 0 && fmod(ibb_l,ibb_d) != 0 && fmod(ibb_d,ibb_l) != 0) {
+	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {
 			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			system("pause");
 			exit(EXIT_FAILURE);
@@ -90,67 +96,105 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	// Get ratio of sides and degree of point refinement
 	int side_ratio_1, side_ratio_2;
 	double smallest_side;
-	if (ibb_w > ibb_l) {
-		if (ibb_d > ibb_l) { // Length is smallest
-			smallest_side = ibb_l;
-			side_ratio_1 = (int)(ibb_w / ibb_l);
-			side_ratio_2 = (int)(ibb_d / ibb_l);
+	if (wid > len) {
+		if (dep > len) { // Length is smallest
+			smallest_side = len;
+			side_ratio_1 = (int)(wid / len);
+			side_ratio_2 = (int)(dep / len);
 		} else { // Depth is smallest
-			smallest_side = ibb_d;
-			side_ratio_1 = (int)(ibb_w / ibb_d);
-			side_ratio_2 = (int)(ibb_l / ibb_d);
+			smallest_side = dep;
+			side_ratio_1 = (int)(wid / dep);
+			side_ratio_2 = (int)(len / dep);
 		}
-	} else if (ibb_d > ibb_w) { // Width is smallest
-		smallest_side = ibb_w;
-		side_ratio_1 = (int)(ibb_l / ibb_w);
-		side_ratio_2 = (int)(ibb_d / ibb_w);
+	} else if (dep > wid) { // Width is smallest
+		smallest_side = wid;
+		side_ratio_1 = (int)(len / wid);
+		side_ratio_2 = (int)(dep / wid);
 	} else { // Depth is smallest
-		smallest_side = ibb_d;
-		side_ratio_1 = (int)(ibb_w / ibb_d);
-		side_ratio_2 = (int)(ibb_l / ibb_d);
+		smallest_side = dep;
+		side_ratio_1 = (int)(wid / dep);
+		side_ratio_2 = (int)(len / dep);
 	}
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
-	int ref = (int)floor( log( (Lspace + 4) / (4 * (1+side_ratio_1+side_ratio_2)) ) / log(2) );
+	// Since we have points on the faces as well as the edges we have a quadratic expression to be solved to
+	// find the level of refinement required to get the nearest number of points to num_markers.
+	int ref;
 
+	int a = 2*side_ratio_1 + 2*side_ratio_1 + 2*side_ratio_1*side_ratio_2;
+	int b = 4 + 4*side_ratio_1 + 4*side_ratio_2;
+	int c = 8-num_markers;
 	
+	double P = (-b + sqrt(pow(b,2) - (4*a*c)) )/(2*a) + 1;
+		
+	ref = (int)ceil( log( P ) / log(2) );
+		
 
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(8 + (4 * (pow(2,1) -1) ) + 
-		(4 * ( (side_ratio_1 * pow(2,1)) -1) ) + (4 * ( (side_ratio_2 * pow(2,1)) -1) ) );
+		unsigned int advisory_num_points = (unsigned int)(8 + 
+			(4 * (pow(2,1) -1) ) + 
+			(4 * ( (side_ratio_1 * pow(2,1)) -1) ) + 
+			(4 * ( (side_ratio_2 * pow(2,1)) -1) ) +
+			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1) )) + 
+			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) + 
+			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
+		);
 		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
-	unsigned int num_points = (unsigned int)(8 + (4 * (pow(2,ref) -1) ) + 
-		(4 * ( (side_ratio_1 * pow(2,ref)) -1) ) + (4 * ( (side_ratio_2 * pow(2,ref)) -1) ) );
+	unsigned int num_points = (unsigned int)(8 + 
+			(4 * (pow(2,ref) -1) ) + 
+			(4 * ( (side_ratio_1 * pow(2,ref)) -1) ) + 
+			(4 * ( (side_ratio_2 * pow(2,ref)) -1) ) +
+			(2 * ( (pow(2,ref) -1)*side_ratio_1 * (pow(2,ref) -1) )) + 
+			(2 * ( (pow(2,ref) -1)*side_ratio_2 * (pow(2,ref) -1) )) + 
+			(2 * ( (pow(2,ref) -1)*side_ratio_1 * (pow(2,ref) -1)*side_ratio_2 ))
+		);
 
 	// Spacing from smallest side
 	spacing = smallest_side / pow(2,ref);
-	for (double x = centre[0]-width_length_depth[0]/2; x <= centre[0]+width_length_depth[0]/2; x+=spacing) {
-		for (double y = centre[1]-width_length_depth[1]/2; y <= centre[1]+width_length_depth[1]/2; y+=spacing) {
-			for (double z = centre[2]-width_length_depth[2]/2; z <= centre[2]+width_length_depth[2]/2; z+=spacing) {
+	
+	// Start locations of point generator
+	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, start_z = centre[2]-dep/2, x, y, z;
+	
+	// Number of points in each direction
+	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1, np_z = (unsigned int)(dep / spacing)+1;
 
-				// Only add if on surface so check to see if interior point
-				if (	(x > centre[0]-width_length_depth[0]/2 && x < centre[0]+width_length_depth[0]/2) &&
-						(y > centre[1]-width_length_depth[1]/2 && y < centre[1]+width_length_depth[1]/2) &&
-						(z > centre[2]-width_length_depth[2]/2 && z < centre[2]+width_length_depth[2]/2)	) {
-				} else {
+	// Loop over matrix of points
+	for (unsigned int i = 0; i < np_x; i++) {
+		for (unsigned int j = 0; j < np_y; j++) {
+			for (unsigned int k = 0; k < np_z; k++) {
+
+				// x, y and z positions
+				x = start_x + i*spacing;
+				y = start_y + j*spacing;
+				z = start_z + k*spacing;
+
+				// Only add the marker if the point is on an edge
+				if (	(i == 0 || i == np_x - 1) ||
+						(j == 0 || j == np_y - 1) ||
+						(k == 0 || k == np_z - 1)
+					) {
+
 					addMarker(x,y,z,flex_rigid);
+
 				}
+
 			}
 		}
 	}
+
 	
 #else
 	// Square //
 
 	// Check side lengths to make sure we can ensure points on the corners
-	if ((fmod(ibb_w,ibb_l) != 0) && (fmod(ibb_l,ibb_w) != 0)) {
+	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
 			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			system("pause");
 			exit(EXIT_FAILURE);
@@ -158,19 +202,20 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	
 	// Get ratio of sides and degree of point refinement
 	int side_ratio;
-	if (ibb_w > ibb_l) { // Length is shortest
-		side_ratio = (int)(ibb_w / ibb_l);
+	if (wid > len) { // Length is shortest
+		side_ratio = (int)(wid / len);
 	} else { // Width is shortest
-		side_ratio = (int)(ibb_l / ibb_w);
+		side_ratio = (int)(len / wid);
 	}
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
-	int ref = (int)floor( log( Lspace / (2 * (1+side_ratio)) ) / log(2) );
+	// Double the number of points to be used as can be rounded down to only a relatively small number
+	int ref = (int)ceil( log( num_markers / (2 * (1+side_ratio)) ) / log(2) );
 
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
+		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
@@ -180,21 +225,44 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	unsigned int num_points = (unsigned int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
 
 	// Find spacing of nodes
-	spacing = (2 * (ibb_w + ibb_l) ) / num_points;
-	for (double x = centre[0]-width_length_depth[0]/2; x <= centre[0]+width_length_depth[0]/2; x+=spacing) {
-		for (double y = centre[1]-width_length_depth[1]/2; y <= centre[1]+width_length_depth[1]/2; y+=spacing) {
-			double z = (b_z - a_z)/2;
-			// Only add if on surface so check to see if interior point
-			if (	(x > centre[0]-width_length_depth[0]/2 && x < centre[0]+width_length_depth[0]/2) &&
-					(y > centre[1]-width_length_depth[1]/2 && y < centre[1]+width_length_depth[1]/2)	) {
+	spacing = (2 * (wid + len) ) / num_points;
 
-			} else {
+	// Start locations of point generator
+	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, x, y, z;
+	
+	// Number of points in each direction
+	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1;
+
+	// Loop over matrix of points
+	for (unsigned int i = 0; i < np_x; i++) {
+		for (unsigned int j = 0; j < np_y; j++) {
+			// 2D specification of z
+			z = (b_z - a_z)/2;
+
+			// x and y positions
+			x = start_x + i*spacing;
+			y = start_y + j*spacing;
+
+			// Only add the marker if the point is on an edge
+			if (	(i == 0 || i == np_x - 1) ||
+					(j == 0 || j == np_y - 1)
+				) {
+
 				addMarker(x,y,z,flex_rigid);
-			}
+
+			}				
+
 		}
 	}
 
 #endif
+
+	// Just in case anything goes wrong here...
+	if (markers.size() != num_points) {
+		std::cout << "Body is not closed. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
 
 }
 

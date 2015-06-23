@@ -24,7 +24,7 @@
 //#define TEXTOUT
 //#define ENSIGHTGOLD
 #define VTK_WRITER
-#define out_every 50	// How many timesteps before output
+#define out_every 50			// How many timesteps before output
 
 // Gravity (acts in -y direction)
 //#define GRAVITY_ON
@@ -48,9 +48,9 @@
 ***************************************************************************************************************
 */
 #define dims 2		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 100			// Number of z lattice sites
+#define N 600		// Number of x lattice sites
+#define M 200		// Number of y lattice sites
+#define K 200			// Number of z lattice sites
 // Physical dimensions
 #define a_x 0		// Start of domain-x
 #define b_x 3		// End of domain-x
@@ -68,19 +68,20 @@
 #define IBM_ON			// Turn on IBM
 //#define IBM_DEBUG		// Write IBM body data out to text files
 
-#define Lspace 62	// Number of Lagrange points (approximately)
+#define num_markers 100	// Number of Lagrange points (approximately)
 
 // Physical dimensions of IB body
 #define ibb_x 1.5		// x Position of body centre
 #define ibb_y .5		// y Position of body centre
 #define ibb_z .5		// z Position of body centre
-#define ibb_w .5		// width (x) of IB body
-#define ibb_l .5		// length (y) of IB body
-#define ibb_d .5		// depth (z) of IB body
+#define ibb_w .2		// width (x) of IB body
+#define ibb_l .2		// length (y) of IB body
+#define ibb_d .2		// depth (z) of IB body
 #define ibb_r .1		// radius of IB body
 
-#define INSERT_CIRCLE_SPHERE
+//#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
+#define INSERT_BOTH
 
 /*	
 ***************************************************************************************************************
@@ -112,11 +113,11 @@
 */
 
 // Data in lattice units
-#define u_0x 0.06	// Initial x-velocity
+#define u_0x 0.1	// Initial x-velocity
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 100		// Desired Reynolds number
+#define Re 200		// Desired Reynolds number
 // nu computed based on above selections
 
 
@@ -196,6 +197,5 @@ static size_t RefYend[NumReg]		= {0};
 static size_t RefZstart[NumReg]		= {0};
 static size_t RefZend[NumReg]		= {0};
 #endif
-
 
 #endif

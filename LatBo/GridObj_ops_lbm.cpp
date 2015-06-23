@@ -123,17 +123,22 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef IBM_ON
 	if (level == 0 && IBM_flag == true) {
 
-		// Interpolate velocity
-		ibm_interpol();
-
-		// Compute restorative force
-		ibm_computeforce();
-
-		// Reset force vectors
+		// Reset force vectors on grid in preparation for spreading step
 		LBM_forcegrid(true);
 
-		// Spread force back to lattice (Cartesian vector)
-		ibm_spread();
+		// Loop over array of IB_bodies and perform IB operations
+		for (size_t ib = 0; ib < iBody.size(); ib++) {
+
+			// Interpolate velocity
+			ibm_interpol(ib);
+
+			// Compute restorative force
+			ibm_computeforce(ib);
+
+			// Spread force back to lattice (Cartesian vector)
+			ibm_spread(ib);
+
+		}
 		
 		// Restore data to start of time step
 		f = f_ibm_initial;

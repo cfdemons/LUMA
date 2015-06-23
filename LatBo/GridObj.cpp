@@ -95,6 +95,9 @@ void GridObj::build_body(int type) {
 	// Declarations
 	std::vector<double> dimensions, centrepoint;
 
+	// Increase the iBody array by single IB_body object
+	iBody.emplace_back();
+
 	if (type == 1) {	// Build a rectangle/cuboid
 
 		// Dimensions
@@ -106,7 +109,7 @@ void GridObj::build_body(int type) {
 		centrepoint.push_back(ibb_z);
 
 		// Build
-		iBody.makeBody(dimensions,centrepoint,false);
+		iBody[iBody.size()-1].makeBody(dimensions,centrepoint,false);
 
 	} else if (type == 2) { // Build a circle/sphere
 
@@ -115,11 +118,32 @@ void GridObj::build_body(int type) {
 		centrepoint.push_back(ibb_y);
 		centrepoint.push_back(ibb_z);
 
-		// Find number of points to make body
-		int numpoints = (int)ceil(pow(Lspace,dims));
-
 		// Build
-		iBody.makeBody(ibb_r,centrepoint,false);
+		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false);
+
+	} else if (type == 3) {
+
+		// Build both with custom dimensions
+		// Dimensions
+		centrepoint.push_back( 2*(double)(b_x-a_x)/5 );
+		centrepoint.push_back( 2*(double)(b_y - a_y)/5 );
+		centrepoint.push_back(ibb_z);
+		dimensions.push_back(ibb_w);
+		dimensions.push_back(ibb_l);
+		dimensions.push_back(ibb_d);
+
+		// Build circle first
+		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false);
+		
+		// Grow vector
+		iBody.emplace_back();
+
+		// Build rectangle
+		centrepoint[0] = 3*(double)(b_x - a_x)/5;
+		centrepoint[1] = 3*(double)(b_y - a_y)/5;
+		centrepoint[2] = ibb_z;
+		iBody[iBody.size()-1].makeBody(dimensions,centrepoint,false);
+
 
 	}
 

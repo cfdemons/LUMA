@@ -1,0 +1,60 @@
+function [] = nBodyPlot(dx, nb)
+% Plots nb iBodies and their supports. Physical spacing dx allows distances
+% to be converted to lattice units.
+
+close all
+
+% Plotting flags
+cols = {'r', 'k', 'b', 'g', 'm','c'};
+style = {'rx','-ko','b.','gs','md','c*'};
+
+for n = 1:nb
+    
+    % Read body coordinates
+    Body = dlmread(['IBbody_' num2str(n-1) '.out'],'\t',1,0);
+    
+    if (n == 1)
+        subplot(1,2,1);
+    end
+    
+    % Plot just the markers
+    for i = 1:size(Body,1)
+        plot3(Body(i,1), Body(i,2), Body(i,3), [cell2mat(cols(mod(i,length(cols))+1)) '^'],'MarkerSize',10)
+        hold on
+    end
+    if all(Body(1,3) == Body(:,3)) % If 2D then look top down
+        view(2)
+    end
+    axis equal
+    grid on
+    
+end
+
+
+for n = 1:nb
+
+    % Read body coordinates
+    Body = dlmread(['IBbody_' num2str(n-1) '.out'],'\t',1,0);
+
+    % Loop over markers and read in support
+    for i = 0:size(Body,1)-1
+        eval(['Supp_' num2str(i) ' = dlmread(''Supp_' num2str(n-1) ...
+            '_' num2str(i) '.out'',''\t'',1,0);'])
+    end
+
+    % Plot markers and support
+    if (n == 1)
+        subplot(1,2,2);
+    end
+    for i = 1:size(Body,1)
+        plot3(Body(i,1)/dx, Body(i,2)/dx, Body(i,3)/dx, [cell2mat(cols(mod(i,length(cols))+1)) '^'],'MarkerSize',10)
+        if all(Body(1,3) == Body(:,3)) % If 2D then look top down
+            view(2)
+        end
+        grid on
+        hold on
+        eval(['plot3(Supp_' num2str(i-1) '(:,1)/dx, Supp_' num2str(i-1) '(:,2)/dx, Supp_' num2str(i-1) '(:,3)/dx,'''...
+            cell2mat(style(mod(i,length(style))+1)) ''',''MarkerSize'',10)'])    
+    end
+    axis equal
+end

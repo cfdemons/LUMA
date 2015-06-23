@@ -59,7 +59,7 @@ private :
 	int region_number;
 
 	// IBM objects
-	IB_body iBody;	// Admit single immersed body for the moment
+	std::vector<IB_body> iBody;		// Array of immersed boundary bodies
 
 
 	// Public data members
@@ -116,11 +116,11 @@ public :
 	void build_body(int type);								// Build a new pre-fab body
 	void ibm_initialise();									// Initialise a built immersed body
 	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
-	void ibm_interpol();									// Interpolation of velocity field
-	void ibm_spread();										// Spreading of restoring force
-	void ibm_findsupport(unsigned int m);					// Populates support information for the m-th marker of a body
-	void ibm_computeforce();								// Compute restorative force at each marker in a body
-	void ibm_findepsilon();									// Method to find epsilon weighting parameter
+	void ibm_interpol(unsigned int ib);						// Interpolation of velocity field onto markers of ib-th body
+	void ibm_spread(unsigned int ib);						// Spreading of restoring force from ib-th body to grid
+	void ibm_findsupport(unsigned int ib, unsigned int m);	// Populates support information for the m-th marker of ib-th body
+	void ibm_computeforce(unsigned int ib);					// Compute restorative force at each marker in ib-th body
+	void ibm_findepsilon(unsigned int ib);					// Method to find epsilon weighting parameter for ib-th body
 	// Biconjugate gradient stablised method for solving asymmetric linear system required by finding epsilon
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon, 
 						   double tolerance, unsigned int maxiterations);

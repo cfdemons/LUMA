@@ -46,6 +46,10 @@ int _tmain( )
 	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 	int fileNum = 0;		// Output file number (1 per timestep)
+	// Output start time
+	time_t curr_time = time(NULL); char time_str[26];	// Current system date/time and string buffer
+	ctime_s(time_str, sizeof(time_str), &curr_time);	// Format as string
+    logfile << "Simulation started at " << time_str;	// Write start time to log
 
 
 
@@ -86,14 +90,19 @@ int _tmain( )
 	
 	logfile << "Initialising IBM..." << endl;
 
-	// Build a body -- type == 1 is a rectangle/cuboid, type == 2 is a circle/sphere
+	// Build a body -- 
+	//		type == 1 is a rectangle/cuboid,
+	//		type == 2 is a circle/sphere,
+	//		type == 3 is a multi-body test case featuring both
 #if defined INSERT_RECTANGLE_CUBOID
 	Grids.build_body(1);
 #elif defined INSERT_CIRCLE_SPHERE
 	Grids.build_body(2);
+#elif defined INSERT_BOTH
+	Grids.build_body(3);
 #endif
 
-	// Initialise the body (compute support etc.)
+	// Initialise the bodies (compute support etc.)
 	Grids.ibm_initialise();
 
 #endif
@@ -156,17 +165,17 @@ int _tmain( )
 		// Write out
 		if (t % out_every == 0) {
 #ifdef ENSIGHTGOLD
-		logfile << "Writing out to EnSight file" << endl;
+		std::cout << "Writing out to EnSight file" << endl;
 		fileNum++;
 		Grids.genVec(fileNum);
 		Grids.genScal(fileNum);
 #endif
 #ifdef TEXTOUT
-		logfile << "Writing out to <Grids.out>..." << endl;
+		std::cout << "Writing out to <Grids.out>..." << endl;
 		Grids.LBM_textout(t);
 #endif
 #ifdef VTK_WRITER
-	logfile << "Writing out to VTK file" << endl;
+	std::cout << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
 #endif
 		}

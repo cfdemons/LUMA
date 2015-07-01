@@ -22,7 +22,14 @@ protected:
 	*/
 
 	std::vector<IB_marker> markers;		// Array of particles which make up the body
-	double spacing;	// Spacing of the Lagrange markers in physical units
+	double spacing;		// Spacing of the Lagrange markers in physical units
+	bool flex_rigid;	// Set flag for flexibility: false == rigid body; true == flexible filament
+
+	// Flexible filament properties
+	double delta_rho;			// Difference in density between fluid and solid in lattice units
+	double flexural_rigidity;	// Young's modulus E * Second moment of area I
+	std::vector<double> tension;		// Tension between the current marker and its neighbour
+
 	
 	/*	
 	***************************************************************************************************************
@@ -37,6 +44,8 @@ public:
 	// Prefab body building methods
 	void makeBody(double radius, std::vector<double> centre, bool flex_rigid);		// Method to construct sphere/circle
 	void makeBody(std::vector<double> width_length_depth, std::vector<double> centre, bool flex_rigid);		// Method to construct cuboid/rectangle
+	void makeBody(std::vector<double> start_point, std::vector<double> end_point, 
+		std::vector<int> BCs, bool flex_rigid);		// Method to construct filament
 
 };
 

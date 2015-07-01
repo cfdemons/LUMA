@@ -90,15 +90,15 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 
 // ***************************************************************************************************
 // Method to call body building routine for IBM
-void GridObj::build_body(int type) {
+void GridObj::build_body(int body_type) {
 
 	// Declarations
-	std::vector<double> dimensions, centrepoint;
+	std::vector<double> dimensions, centrepoint, start_position, end_position;
 
 	// Increase the iBody array by single IB_body object
 	iBody.emplace_back();
 
-	if (type == 1) {	// Build a rectangle/cuboid
+	if (body_type == 1) {	// Build a rectangle/cuboid
 
 		// Dimensions
 		dimensions.push_back(ibb_w);
@@ -111,7 +111,7 @@ void GridObj::build_body(int type) {
 		// Build
 		iBody[iBody.size()-1].makeBody(dimensions,centrepoint,false);
 
-	} else if (type == 2) { // Build a circle/sphere
+	} else if (body_type == 2) {	// Build a circle/sphere
 
 		// Dimensions
 		centrepoint.push_back(ibb_x);
@@ -121,9 +121,8 @@ void GridObj::build_body(int type) {
 		// Build
 		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false);
 
-	} else if (type == 3) {
+	} else if (body_type == 3) {	// Build both with custom dimensions
 
-		// Build both with custom dimensions
 		// Dimensions
 		centrepoint.push_back( 2*(double)(b_x-a_x)/5 );
 		centrepoint.push_back( 2*(double)(b_y - a_y)/5 );
@@ -143,6 +142,41 @@ void GridObj::build_body(int type) {
 		centrepoint[1] = 3*(double)(b_y - a_y)/5;
 		centrepoint[2] = ibb_z;
 		iBody[iBody.size()-1].makeBody(dimensions,centrepoint,false);
+
+
+	} else if (body_type == 4) {	// Build flexible filament
+
+		// End points******* MODIFIED FOR TESTING BY ADDING dx/2
+		start_position.push_back(ibb_start_x+dx/2);
+		start_position.push_back(ibb_start_y+dx/2);
+		end_position.push_back(ibb_end_x+dx/2);
+		end_position.push_back(ibb_end_y+dx/2);
+#if (dims == 3)
+		start_position.push_back(ibb_start_z+dx/2);
+		end_position.push_back(ibb_end_z+dx/2);
+#else
+		start_position.push_back(0.0);
+		end_position.push_back(0.0);
+#endif
+
+		// Pack BC info
+		std::vector<int> BCs;
+		BCs.push_back(start_BC);
+		BCs.push_back(end_BC);
+
+		// Build body
+		iBody[iBody.size()-1].makeBody(start_position, end_position, BCs, true);
+
+		
+	} else if (body_type == 5) {	// Build flexible plate
+
+
+		// Build using the rectangle body building method??
+
+
+		// Correct boundary conditions
+
+
 
 
 	}

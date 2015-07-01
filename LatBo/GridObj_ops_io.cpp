@@ -9,7 +9,7 @@
 
 using namespace std;
 
-
+// ***************************************************************************************************
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
 void GridObj::LBM_textout(int t) {
@@ -247,3 +247,33 @@ void GridObj::LBM_textout(int t) {
 	}
 
 }
+
+
+// ***************************************************************************************************
+// Routine to write out the coordinates of a jacowire filament at a given time step
+void GridObj::getJacPos(unsigned int timestep) {	
+
+	for (size_t ib = 0; ib < iBody.size(); ib++) {
+		if (iBody[ib].flex_rigid == true) {
+
+				// Open file for given time step
+				std::ofstream jout;
+				jout.open("./Output/Jac_" + to_string(ib) + "_position_" + to_string(timestep) + ".out", std::ios::out);
+				jout << "x" + to_string(timestep) + ", y" + to_string(timestep) + ", z" << std::endl;
+	
+				// Write out position
+				for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+#if (dims == 3)
+					jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << iBody[ib].markers[i].position[2] << std::endl;
+#else
+					jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << 0.0 << std::endl;
+#endif
+				}
+				jout.close();
+
+		}
+	}
+
+}
+
+// ***************************************************************************************************

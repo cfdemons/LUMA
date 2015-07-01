@@ -37,7 +37,7 @@ void GridObj::ibm_initialise() {
 				if (dims == 3) {
 					suppout << XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
 				} else {
-					suppout << XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << ZPos[0] << std::endl;
+					suppout << XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
 				}
 			}
 			suppout.close();
@@ -189,7 +189,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 						delta_y = ibm_deltakernel(dist_y, iBody[ib].markers[m].dilation);
 						delta_z = ibm_deltakernel(dist_z, iBody[ib].markers[m].dilation);
 
-						iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y );
+						iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y * delta_z );
 
 				}
 			}
@@ -265,7 +265,7 @@ void GridObj::ibm_interpol(unsigned int ib) {
 			// Loop over directions x y z
 			for (unsigned int dir = 0; dir < dims; dir++) {
 
-				// Read given velocity compoonent from support node, multiply by delta function
+				// Read given velocity component from support node, multiply by delta function
 				// for that support node and sum to get interpolated velocity.
 
 #if (dims == 3)
@@ -399,11 +399,9 @@ void GridObj::ibm_findepsilon(unsigned int ib) {
 	// Solve system //
 	//////////////////
 		
-	// Using existing 2D and 3D code as a guide...
-
 	// Settings
     double tolerance = 1e-5;
-	unsigned int maxiterations = 10000;
+	unsigned int maxiterations = 5000;
 	double minimum_residual_achieved;
     
     // Biconjugate gradient stabilised method for solving asymmetric linear systems
@@ -411,6 +409,7 @@ void GridObj::ibm_findepsilon(unsigned int ib) {
 
 	// Now assign epsilon to the markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		
 		iBody[ib].markers[m].epsilon = epsilon[m];
 	}
 

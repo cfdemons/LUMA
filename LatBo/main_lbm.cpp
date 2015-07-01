@@ -62,7 +62,12 @@ int _tmain( )
 
 	// Number of loops based on L0 time step
 	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)#
+	
+	
+	// Log file information
+	logfile << "Grid size = " << N << "x" << M << "x" << K << endl;
 	logfile << "Number of time steps = " << totalloops << endl;
+	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
 	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
 
@@ -91,21 +96,30 @@ int _tmain( )
 	logfile << "Initialising IBM..." << endl;
 
 	// Build a body -- 
-	//		type == 1 is a rectangle/cuboid,
-	//		type == 2 is a circle/sphere,
-	//		type == 3 is a multi-body test case featuring both
+	//		body_type == 1 is a rectangle/cuboid,
+	//		body_type == 2 is a circle/sphere,
+	//		body_type == 3 is a multi-body test case featuring both the above
+	//		body_type == 4 is a single inextensible flexible filament
+	//		body_type == 5 is a plate flexible in 2D
 #if defined INSERT_RECTANGLE_CUBOID
 	Grids.build_body(1);
 #elif defined INSERT_CIRCLE_SPHERE
 	Grids.build_body(2);
 #elif defined INSERT_BOTH
 	Grids.build_body(3);
+#elif defined INSERT_FILAMENT
+	Grids.build_body(4);
+#elif defined INSERT_PLATE
+	Grids.build_body(5);	// NOT YET IMPLEMENTED...
 #endif
 
 	// Initialise the bodies (compute support etc.)
 	Grids.ibm_initialise();
 
 #endif
+
+	// Log file output
+	logfile << "Number of IBM markers = " << num_markers << endl;
 
 
 	/* ***************************************************************************************************************
@@ -141,7 +155,7 @@ int _tmain( )
 	do {
 
 		cout << "\n------ Time Step " << t+1 << " of " << totalloops << " ------" << endl;
-
+		
 		// Start the clock
 		t_start = clock();
 
@@ -161,7 +175,7 @@ int _tmain( )
 		t++;
 		tval += Grids.dt;
 
-
+		
 		// Write out
 		if (t % out_every == 0) {
 #ifdef ENSIGHTGOLD
@@ -177,6 +191,10 @@ int _tmain( )
 #ifdef VTK_WRITER
 	std::cout << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
+#endif
+#if defined INSERT_FILAMENT && defined IBM_ON && defined FILAMENT_TRACE
+	std::cout << "Writing out filament position" << endl;
+	Grids.getJacPos(t);
 #endif
 		}
 
@@ -194,6 +212,9 @@ int _tmain( )
 #endif
 
 	// Close log file
+	curr_time = time(NULL);								// Current system date/time and string buffer
+	ctime_s(time_str, sizeof(time_str), &curr_time);	// Format as string
+	logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 
 	return 0;

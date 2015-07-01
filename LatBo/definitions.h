@@ -13,51 +13,72 @@
 
 #include "ops_generic.h"	// Forward declarations of generic functions
 
+
 /*	
 ***************************************************************************************************************
 ************************************** Global configuration data **********************************************
 ***************************************************************************************************************
 */
+
 #define PI 3.14159265358979323846
 
 // Output Options
+#define out_every 50			// How many timesteps before output
+
 //#define TEXTOUT
 //#define ENSIGHTGOLD
 #define VTK_WRITER
-#define out_every 50			// How many timesteps before output
 
-// Gravity (acts in -y direction)
+// Gravity (acts in +x direction)
 //#define GRAVITY_ON
-
 // Expression for the gravity force
 #define grav_force ( 3 * vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 
+
 /*	
 ***************************************************************************************************************
 ********************************************** Time data ******************************************************
 ***************************************************************************************************************
 */
-#define T 100		// End time of simulation (seconds)
+
+#define T 120		// End time of simulation (seconds)
 
 /*	
 ***************************************************************************************************************
 ******************************************* Domain dimensions *************************************************
 ***************************************************************************************************************
 */
+
 #define dims 2		// Number of dimensions to the problem
-#define N 600		// Number of x lattice sites
-#define M 200		// Number of y lattice sites
-#define K 200			// Number of z lattice sites
+#define N 300		// Number of x lattice sites
+#define M 100		// Number of y lattice sites
+#define K 50		// Number of z lattice sites
 // Physical dimensions
 #define a_x 0		// Start of domain-x
 #define b_x 3		// End of domain-x
-#define a_y 0	// Start of domain-y
+#define a_y 0		// Start of domain-y
 #define b_y 1		// End of domain-y
-#define a_z 0	// Start of domain-z
+#define a_z 0		// Start of domain-z
 #define b_z 1		// End of domain-z
+
+
+/*	
+***************************************************************************************************************
+*********************************************** Fluid data ****************************************************
+***************************************************************************************************************
+*/
+
+// Data in lattice units
+#define u_0x 0.06	// Initial x-velocity
+#define u_0y 0		// Initial y-velocity
+#define u_0z 0		// Initial z-velocity
+#define rho_in 1	// Initial density
+#define Re 100		// Desired Reynolds number
+// nu computed based on above selections
+
 
 /*	
 ***************************************************************************************************************
@@ -67,10 +88,11 @@
 
 #define IBM_ON			// Turn on IBM
 //#define IBM_DEBUG		// Write IBM body data out to text files
+//#define FILAMENT_TRACE	// Write out jacowire filament position
 
-#define num_markers 100	// Number of Lagrange points (approximately)
+#define num_markers 30	// Number of Lagrange points (approximately)
 
-// Physical dimensions of IB body
+// Physical dimensions of rigid IB body or flexible plate
 #define ibb_x 1.5		// x Position of body centre
 #define ibb_y .5		// y Position of body centre
 #define ibb_z .5		// z Position of body centre
@@ -79,9 +101,29 @@
 #define ibb_d .2		// depth (z) of IB body
 #define ibb_r .1		// radius of IB body
 
+// Physical dimensions of flexible IB filament
+#define ibb_start_x 1.5		// start x position of the filament
+#define ibb_start_y .5		// start y position of the filament
+#define ibb_start_z .5		// start z position of the filament
+#define ibb_end_x 1.7		// end x position of the filame
+#define ibb_end_y .3		// end y position of the filament
+#define ibb_end_z .5		// end z position of the filament (for now needs to be the same as the start position as only 2D dynamics implemented)
+
+// Boundary conditions of flexible filament or flexible plate
+#define start_BC 0			// Type of boundary condition at filament start: 0 == simply supported; 1 = free
+#define end_BC 1			// Type of boundary condition at filament end: 0 == simply supported; 1 = free
+
+// Mechanical properties of filament
+#define ibb_delta_rho 10	// Difference in density (lattice units) between solid and fluid
+#define ibb_EI .0001			// Flexural rigidity (lattice units) of filament
+
+// Switches for inserting certain bodies
 //#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
-#define INSERT_BOTH
+//#define INSERT_BOTH
+#define INSERT_FILAMENT
+//#define INSERT_PLATE					// ********NOT IMPLEMETED YET....
+
 
 /*	
 ***************************************************************************************************************
@@ -108,24 +150,10 @@
 
 /*	
 ***************************************************************************************************************
-*********************************************** Fluid data ****************************************************
-***************************************************************************************************************
-*/
-
-// Data in lattice units
-#define u_0x 0.1	// Initial x-velocity
-#define u_0y 0		// Initial y-velocity
-#define u_0z 0		// Initial z-velocity
-#define rho_in 1	// Initial density
-#define Re 200		// Desired Reynolds number
-// nu computed based on above selections
-
-
-/*	
-***************************************************************************************************************
 ******************************************** Multi-grid data **************************************************
 ***************************************************************************************************************
 */
+
 #define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
@@ -151,6 +179,7 @@
 	#endif
 
 #endif
+
 
 /*	
 ***************************************************************************************************************

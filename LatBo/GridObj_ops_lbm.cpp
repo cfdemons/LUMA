@@ -150,6 +150,36 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		std::cout << "Correction step..." << std::endl;
 		LBM_multi(false);
 
+		// Launch structural solver to compute new locations of flexible markers in flexible bodies
+		for (size_t ib = 0; ib < iBody.size(); ib++) {
+			if (iBody[ib].flex_rigid == true) {
+
+				// Do jacowire calculation
+				ibm_jacowire(ib);
+
+				// Recompute support for new marker positions
+				std::cout << "Recomputing support..." << std::endl;
+				for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+					
+					// Erase support vectors
+					// Note:	Fixing the number of support sites to 9 negates 
+					//			the need to erase the vectors and will improve speed.
+					iBody[ib].markers[m].supp_i.clear();
+					iBody[ib].markers[m].supp_j.clear();
+					iBody[ib].markers[m].supp_k.clear();
+					iBody[ib].markers[m].deltaval.clear();
+					
+					// Recompute support
+					ibm_findsupport(ib, m);
+				}
+
+				// Recompute epsilon
+				ibm_findepsilon(ib);
+				
+
+			}
+		}
+
 	}
 #endif
 
@@ -215,8 +245,8 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 				for (size_t k = 0; k < K_lim; k++) {
 
 #ifdef GRAVITY_ON
-					// Add gravity (-y direction) to any IBM forces currently stored
-					force_xyz(i,j,k,1,M_lim,K_lim,dims) -= rho(i,j,k,M_lim,K_lim) * grav_force;
+					// Add gravity (+x direction) to any IBM forces currently stored
+					force_xyz(i,j,k,0,M_lim,K_lim,dims) += rho(i,j,k,M_lim,K_lim) * grav_force;
 #endif
 
 					// Now compute force_i components from Cartesian force vector
@@ -503,11 +533,11 @@ void GridObj::LBM_macro( ) {
 				// Assign density
 				rho(i,j,k,M_lim,K_lim) = rho_temp;
 
-				// Add forces to momentum (time step * 0.5 * force)
-				fux_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
-				fuy_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+				// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
+				fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+				fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
 #if (dims == 3)
-				fuz_temp += (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+				fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
 #endif
 
 				// Assign velocity

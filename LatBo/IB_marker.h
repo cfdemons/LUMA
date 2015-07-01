@@ -31,6 +31,7 @@ protected:
 	std::vector<double> fluid_vel;		// Fluid velocity interpolated from lattice nodes
 	std::vector<double> desired_vel;	// Desired velocity
 	std::vector<double> force_xyz;		// Restorative force vector on marker
+	std::vector<double> position_old;	// Used for filaments: Vector containing the physical coordinates (x,y,z) of the marker at t-1
 	
 	// Vector of indices for the Eulerian nodes considered to be in support of marker
 	std::vector<unsigned int> supp_i;

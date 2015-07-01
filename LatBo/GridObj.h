@@ -103,6 +103,7 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
+	void getJacPos(unsigned int t);	// Write out jacowire filament position to a text file
 	void LBM_textout(int t);		// Writes out the contents of the class as well as any subgrids to a text file
 	// EnsightGold methods
 	void genCase(int nsteps);		// Generate case file
@@ -113,7 +114,7 @@ public :
 	void vtk_writer(int t, double tval);
 
 	// IBM methods
-	void build_body(int type);								// Build a new pre-fab body
+	void build_body(int body_type);							// Build a new pre-fab body
 	void ibm_initialise();									// Initialise a built immersed body
 	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
 	void ibm_interpol(unsigned int ib);						// Interpolation of velocity field onto markers of ib-th body
@@ -124,6 +125,15 @@ public :
 	// Biconjugate gradient stablised method for solving asymmetric linear system required by finding epsilon
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon, 
 						   double tolerance, unsigned int maxiterations);
+
+	// Flexible methods
+	void ibm_jacowire(unsigned int ib);			// Computes the tension and position of a 2D inextensible, flexible iBody filament
+	// Methods to solve the Jacobian system
+	void ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+	unsigned long indx[], double b[]);
+	void ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+	unsigned long indx[], double *d);
+
 
 
 	

@@ -12,6 +12,7 @@
 #include <string>		// String template access
 
 #include "ops_generic.h"	// Forward declarations of generic functions
+#include <omp.h>		// Enable OpenMP 2.0
 
 
 /*	
@@ -23,7 +24,7 @@
 #define PI 3.14159265358979323846
 
 // Output Options
-#define out_every 50			// How many timesteps before output
+#define out_every 1			// How many timesteps before output
 
 //#define TEXTOUT
 //#define ENSIGHTGOLD
@@ -44,7 +45,7 @@
 ***************************************************************************************************************
 */
 
-#define T 120		// End time of simulation (seconds)
+#define T 10		// End time of simulation (seconds)
 
 /*	
 ***************************************************************************************************************
@@ -52,9 +53,9 @@
 ***************************************************************************************************************
 */
 
-#define dims 2		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
+#define dims 3		// Number of dimensions to the problem
+#define N 150		// Number of x lattice sites
+#define M 50		// Number of y lattice sites
 #define K 50		// Number of z lattice sites
 // Physical dimensions
 #define a_x 0		// Start of domain-x
@@ -76,7 +77,7 @@
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 100		// Desired Reynolds number
+#define Re 50		// Desired Reynolds number
 // nu computed based on above selections
 
 
@@ -88,9 +89,10 @@
 
 #define IBM_ON			// Turn on IBM
 //#define IBM_DEBUG		// Write IBM body data out to text files
-//#define FILAMENT_TRACE	// Write out jacowire filament position
+#define IBBODY_TRACER	// Write out IBbody positions
 
-#define num_markers 30	// Number of Lagrange points (approximately)
+#define num_markers 5		// Number of Lagrange points (approximately)
+#define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
 #define ibb_x 1.5		// x Position of body centre
@@ -98,31 +100,33 @@
 #define ibb_z .5		// z Position of body centre
 #define ibb_w .2		// width (x) of IB body
 #define ibb_l .2		// length (y) of IB body
-#define ibb_d .2		// depth (z) of IB body
+#define ibb_d .4		// depth (z) of IB body
 #define ibb_r .1		// radius of IB body
 
 // Physical dimensions of flexible IB filament
+#define ibb_length 0.2		// length of filament
 #define ibb_start_x 1.5		// start x position of the filament
 #define ibb_start_y .5		// start y position of the filament
 #define ibb_start_z .5		// start z position of the filament
-#define ibb_end_x 1.7		// end x position of the filame
-#define ibb_end_y .3		// end y position of the filament
-#define ibb_end_z .5		// end z position of the filament (for now needs to be the same as the start position as only 2D dynamics implemented)
+
+// Angles of filament or plate
+#define ibb_angle_vert 30	// Inclination of filament in xy plane
+#define ibb_angle_horz 0	// Inclination of filament in xz plane
 
 // Boundary conditions of flexible filament or flexible plate
-#define start_BC 0			// Type of boundary condition at filament start: 0 == simply supported; 1 = free
-#define end_BC 1			// Type of boundary condition at filament end: 0 == simply supported; 1 = free
+#define start_BC 0			// Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
+#define end_BC 1			// Type of boundary condition at filament end:		0 == free; 1 = simply supported; 2 == clamped
 
 // Mechanical properties of filament
 #define ibb_delta_rho 10	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI .0001			// Flexural rigidity (lattice units) of filament
+#define ibb_EI .001			// Flexural rigidity (lattice units) of filament
 
-// Switches for inserting certain bodies
+// Switches for inserting certain bodies (enable only one at once!)
 //#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
-#define INSERT_FILAMENT
-//#define INSERT_PLATE					// ********NOT IMPLEMETED YET....
+//#define INSERT_FILAMENT
+#define INSERT_FILARRAY
 
 
 /*	
@@ -131,7 +135,7 @@
 ***************************************************************************************************************
 */
 
-//#define SOLID_ON		// Turn on solid object (bounce-back)
+//#define SOLID_ON		// Turn on solid object (bounce-back) specified below
 #define WALLS_ON		// Turn on top, bottom, front, and back no-slip walls
 #define INLET_ON		// Turn on inlet boundary (assumed left-hand wall for now)
 #define OUTLET_ON		// Turn on outlet boundary (assumed right-hand wall for now)

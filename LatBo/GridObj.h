@@ -103,8 +103,8 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void getJacPos(unsigned int t);	// Write out jacowire filament position to a text file
-	void LBM_textout(int t);		// Writes out the contents of the class as well as any subgrids to a text file
+	void writeBodPos(unsigned int t);	// Write out IB_body positions to text files
+	void LBM_textout(int t);			// Writes out the contents of the class as well as any subgrids to a text file
 	// EnsightGold methods
 	void genCase(int nsteps);		// Generate case file
 	void genGeo();					// Generate geometry file
@@ -127,7 +127,9 @@ public :
 						   double tolerance, unsigned int maxiterations);
 
 	// Flexible methods
-	void ibm_jacowire(unsigned int ib);			// Computes the tension and position of a 2D inextensible, flexible iBody filament
+	void ibm_jacowire(unsigned int ib);				// Computes the tension and position of a 2D inextensible, flexible iBody filament
+	void ibm_positionalupdate( unsigned int ib );	// Updates the position of deformable body markers + overload
+	void ibm_positionalupdate( int group );
 	// Methods to solve the Jacobian system
 	void ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double b[]);

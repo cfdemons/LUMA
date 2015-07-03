@@ -6,8 +6,12 @@
 #include "GridObj.h"
 
 // ***************************************************************************************************
-// Default constructor and destructor
-IB_body::IB_body(void) { }
+// Constructor and destructor
+IB_body::IB_body(void) {
+
+	this->groupID = 0;	// Default ID
+
+}
 IB_body::~IB_body(void) { }
 
 // ***************************************************************************************************
@@ -21,10 +25,19 @@ void IB_body::addMarker(double x, double y, double z, bool flex_rigid) {
 
 // ***************************************************************************************************
 // Method to build a sphere / circle
-void IB_body::makeBody(double radius, std::vector<double> centre, bool flex_rigid) {
+void IB_body::makeBody(double radius, std::vector<double> centre,
+					   bool flex_rigid, bool deform, unsigned int group) {
 
 	// Designate body as beiong flexible or rigid
 	this->flex_rigid = flex_rigid;
+
+	// Designate deformable flag and groupID
+	if (flex_rigid) {
+		this->deformable = true;	// A flexible body must be deformable by definition
+	} else {
+		this->deformable = deform;
+	}
+	this->groupID = group;
 
 	// Work out circumference
 	double circum = 2 * PI * radius;
@@ -78,10 +91,19 @@ void IB_body::makeBody(double radius, std::vector<double> centre, bool flex_rigi
 
 // ***************************************************************************************************
 // Method to build a cuboid/rectangle
-void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> centre, bool flex_rigid) {
+void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> centre,
+					   bool flex_rigid, bool deform, unsigned int group) {
 	
 	// Designate body as being flexible or rigid
 	this->flex_rigid = flex_rigid;
+
+	// Designate deformable flag and groupID
+	if (flex_rigid) {
+		this->deformable = true;	// A flexible body must be deformable by definition
+	} else {
+		this->deformable = deform;
+	}
+	this->groupID = group;
 
 	// Shorter variable names for convenience
 	double wid = width_length_depth[0];
@@ -274,10 +296,28 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 // ***************************************************************************************************
 // Method to build a flexible filament
-void IB_body::makeBody(std::vector<double> start_point, std::vector<double> end_point, std::vector<int> BCs, bool flex_rigid) {
+void IB_body::makeBody(std::vector<double> start_point, double fil_length, std::vector<double> angles,
+					   std::vector<int> BCs, bool flex_rigid, bool deform, unsigned int group) {
+
+
+	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
+	if ( BCs[0] != 0  && BCs[1] == 0 ) {
+		std::cout << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
 
 	// Designate the body as being flexible or rigid
 	this->flex_rigid = flex_rigid;
+
+	// Designate deformable flag and groupID
+	if (flex_rigid) {
+		this->deformable = true;	// A flexible body must be deformable by definition
+	} else {
+		this->deformable = deform;
+	}
+	this->groupID = group;
 
 	// Assign delta_rho and flexural rigidity
 	this->delta_rho = ibb_delta_rho;
@@ -286,26 +326,12 @@ void IB_body::makeBody(std::vector<double> start_point, std::vector<double> end_
 	// Create zero tension vector for filament
 	std::fill(tension.begin(), tension.end(), 0.0);
 
-	// Find physical length of filament
-	std::vector<double> L_vector;
-	L_vector.push_back(end_point[0]-start_point[0]);
-	L_vector.push_back(end_point[1]-start_point[1]);
-	L_vector.push_back(end_point[2]-start_point[2]);
-	double L = vecnorm(L_vector);
-
-	// Compute angles of filament (in vertical and horizontal planes)
-	double body_angle_h, body_angle_v;
-	
-	// Take into account if the filament is perpendicular to X axis
-	if (L_vector[0] == 0) { body_angle_h = PI / 2; }
-	else { body_angle_h = atan( L_vector[2] / L_vector[0] ); }
-
-	// Take into account if the filament is perpendicular to Y axis
-	if (vecnorm(L_vector[0],L_vector[2]) == 0) { body_angle_v = PI / 2; }
-	else { body_angle_v = atan( L_vector[1] / vecnorm(L_vector[0],L_vector[2]) ); }
+	// Get angles
+	double body_angle_v = angles[0];
+	double body_angle_h = angles[1];
 
 	// Compute spacing
-	spacing = L / (num_markers - 1);				// Physical spacing between markers
+	spacing = fil_length / (num_markers - 1);		// Physical spacing between markers
 	double spacing_h = spacing*cos(body_angle_v);	// Local spacing projected onto the horizontal plane
 
 	// Add all markers
@@ -329,10 +355,10 @@ void IB_body::makeBody(std::vector<double> start_point, std::vector<double> end_
 	std::fill(tension.begin(), tension.end(), 0.0);
 
 	// Correct for endpoint boundary conditions if necessary
-	if (BCs[0] == 0) {
+	if (BCs[0] != 0) {
 		markers[0].flex_rigid = false;
 	}
-	if (BCs[1] == 0) {
+	if (BCs[1] != 0) {
 		markers[markers.size()-1].flex_rigid = false;
 	}
 	

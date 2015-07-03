@@ -4,6 +4,7 @@
 #include "ops_generic.h"
 
 
+
 // ***************************************************************************************************
 // Method to initialise array of IB_bodies
 void GridObj::ibm_initialise() {
@@ -116,6 +117,14 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 						) / dx;
 				
 #endif
+				// Check that radius is valid otherwise jacowire must have failed
+				if ( _finite(radius) == false ) {
+					std::cout << "Jacowire calculation of new position has failed. Exiting." << std::endl;
+					system("pause");
+					exit(EXIT_FAILURE);					
+				}
+
+
 				if (radius < r_min) {
 					r_min = radius;	// This node is closer than the last one so update criterion
 					// Store nearest node position

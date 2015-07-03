@@ -429,3 +429,94 @@ void GridObj::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned 
 /* (C) Copr. 1986-92 Numerical Recipes Software ?421.1-9. */
 
 // **************************************************************************************** //
+// Routine to update the position of deformable bodies
+void GridObj::ibm_positionalupdate( unsigned int ib ) {
+
+	// If a flexible body then launch structural solver to find new positions
+	if (iBody[ib].flex_rigid) {
+
+		// Do jacowire calculation
+		ibm_jacowire(ib);
+
+	} else {	// Body is deformable but not flexible so positional update comes from 
+				// external forcing
+
+		
+		// Call some routine for external forcing here...
+
+
+	}
+
+	// Recompute support for new marker positions
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+					
+		// Erase support vectors
+		// Note:	Fixing the number of support sites to 9 negates 
+		//			the need to erase the vectors and will improve speed.
+		iBody[ib].markers[m].supp_i.clear();
+		iBody[ib].markers[m].supp_j.clear();
+		iBody[ib].markers[m].supp_k.clear();
+		iBody[ib].markers[m].deltaval.clear();
+					
+		// Recompute support
+		ibm_findsupport(ib, m);
+	}
+
+
+
+}
+// **************************************************************************************** //
+
+// Overloaded function to update position of body in a group using the position of the flexible
+// body in the group. Must be called after all previous positional update routines have been called.
+void GridObj::ibm_positionalupdate( int group ) {
+
+	// Find flexible body in group and store index
+	unsigned int ib_flex;
+	for (size_t i = 0; i < iBody.size(); i++) {
+
+		if (iBody[i].flex_rigid && iBody[i].groupID == group) {
+			ib_flex = i;
+			break;
+		}
+
+	}
+
+	// Loop over bodies in group
+	for (size_t ib = 0; ib < iBody.size(); ib++) {
+
+		// If body is deformable but not flexible give it a positional update from flexible
+		if (iBody[ib].groupID == group && 
+			iBody[ib].deformable && 
+			iBody[ib].flex_rigid == false) {
+
+			// Copy the position vectors of flexible markers in x and y directions
+			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+
+				for (size_t d = 0; d < 2; d++) {
+					iBody[ib].markers[m].position_old[d] = iBody[ib].markers[m].position[d];
+					iBody[ib].markers[m].position[d] = iBody[ib_flex].markers[m].position[d];
+				}
+
+			}
+
+			// Recompute support for new marker positions
+			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+					
+				// Erase support vectors
+				// Note:	Fixing the number of support sites to 9 negates 
+				//			the need to erase the vectors and will improve speed.
+				iBody[ib].markers[m].supp_i.clear();
+				iBody[ib].markers[m].supp_j.clear();
+				iBody[ib].markers[m].supp_k.clear();
+				iBody[ib].markers[m].deltaval.clear();
+					
+				// Recompute support
+				ibm_findsupport(ib, m);
+			}
+		}
+	}
+
+
+}
+// **************************************************************************************** //

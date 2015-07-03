@@ -22,9 +22,8 @@ for n = 1:nb
         plot3(Body(i,1)/dx, Body(i,2)/dx, Body(i,3)/dx, [cell2mat(cols(mod(i,length(cols))+1)) '^'],'MarkerSize',10)
         hold on
     end
-    if all(Body(1,3) == Body(:,3)) % If 2D then look top down
-        view(2)
-    end
+    view(3)
+    axis tight
     axis equal
     grid on
     
@@ -48,13 +47,12 @@ for n = 1:nb
     end
     for i = 1:size(Body,1)
         plot3(Body(i,1)/dx, Body(i,2)/dx, Body(i,3)/dx, [cell2mat(cols(mod(i,length(cols))+1)) '^'],'MarkerSize',10)
-        if all(Body(1,3) == Body(:,3)) % If 2D then look top down
-            view(2)
-        end
         grid on
         hold on
         eval(['plot3(Supp_' num2str(i-1) '(:,1)/dx, Supp_' num2str(i-1) '(:,2)/dx, Supp_' num2str(i-1) '(:,3)/dx,'''...
             cell2mat(style(mod(i,length(style))+1)) ''',''MarkerSize'',10)'])    
     end
+    view(3)
+    axis tight
     axis equal
 end

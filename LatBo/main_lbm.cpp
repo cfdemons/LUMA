@@ -100,7 +100,8 @@ int _tmain( )
 	//		body_type == 2 is a circle/sphere,
 	//		body_type == 3 is a multi-body test case featuring both the above
 	//		body_type == 4 is a single inextensible flexible filament
-	//		body_type == 5 is a plate flexible in 2D
+	//		body_type == 5 is an array of flexible filaments
+	//		body_type == 6 is the case for the DSFD 2015 conference
 #if defined INSERT_RECTANGLE_CUBOID
 	Grids.build_body(1);
 #elif defined INSERT_CIRCLE_SPHERE
@@ -109,17 +110,16 @@ int _tmain( )
 	Grids.build_body(3);
 #elif defined INSERT_FILAMENT
 	Grids.build_body(4);
-#elif defined INSERT_PLATE
-	Grids.build_body(5);	// NOT YET IMPLEMENTED...
+#elif defined INSERT_FILARRAY
+	Grids.build_body(5);
+#elif defined CONFERENCE_TEST_CASE
+	Grids.build_body(6);	// NOT YET IMPLEMENTED...
 #endif
 
 	// Initialise the bodies (compute support etc.)
 	Grids.ibm_initialise();
 
 #endif
-
-	// Log file output
-	logfile << "Number of IBM markers = " << num_markers << endl;
 
 
 	/* ***************************************************************************************************************
@@ -192,9 +192,9 @@ int _tmain( )
 	std::cout << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
 #endif
-#if defined INSERT_FILAMENT && defined IBM_ON && defined FILAMENT_TRACE
+#if (defined INSERT_FILAMENT || defined INSERT_FILARRAY) && defined IBM_ON && defined IBBODY_TRACER
 	std::cout << "Writing out filament position" << endl;
-	Grids.getJacPos(t);
+	Grids.writeBodPos(t);
 #endif
 		}
 

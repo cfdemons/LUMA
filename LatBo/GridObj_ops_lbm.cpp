@@ -150,35 +150,27 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		std::cout << "Correction step..." << std::endl;
 		LBM_multi(false);
 
-		// Launch structural solver to compute new locations of flexible markers in flexible bodies
+		// Loop over bodies launching positional update  if deformable to compute new locations of markers
+		std::cout << "Relocating markers as required..." << std::endl;
 		for (size_t ib = 0; ib < iBody.size(); ib++) {
-			if (iBody[ib].flex_rigid == true) {
+			
+			// If body is deformable it needs a positional update
+			if (iBody[ib].deformable) {
 
-				// Do jacowire calculation
-				ibm_jacowire(ib);
-
-				// Recompute support for new marker positions
-				std::cout << "Recomputing support..." << std::endl;
-				for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-					
-					// Erase support vectors
-					// Note:	Fixing the number of support sites to 9 negates 
-					//			the need to erase the vectors and will improve speed.
-					iBody[ib].markers[m].supp_i.clear();
-					iBody[ib].markers[m].supp_j.clear();
-					iBody[ib].markers[m].supp_k.clear();
-					iBody[ib].markers[m].deltaval.clear();
-					
-					// Recompute support
-					ibm_findsupport(ib, m);
-				}
+				// Call structural or forced positional update and recompute support
+				ibm_positionalupdate(ib);
 
 				// Recompute epsilon
-				ibm_findepsilon(ib);
-				
+				ibm_findepsilon(ib);				
 
 			}
 		}
+
+#if defined INSERT_FILARRAY
+		// Special bit for filament-based plates where flexible centreline is used to update position of others in group
+		std::cout << "Filament-based plate positional update..." << std::endl;
+		ibm_positionalupdate(999);
+#endif
 
 	}
 #endif

@@ -21,13 +21,15 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	std::vector<IB_marker> markers;		// Array of particles which make up the body
-	double spacing;		// Spacing of the Lagrange markers in physical units
-	bool flex_rigid;	// Set flag for flexibility: false == rigid body; true == flexible filament
+	std::vector<IB_marker> markers;		// Array of Lagrange markers which make up the body
+	double spacing;						// Spacing of the Lagrange markers in physical units
+	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
+	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
+	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
 
-	// Flexible filament properties
-	double delta_rho;			// Difference in density between fluid and solid in lattice units
-	double flexural_rigidity;	// Young's modulus E * Second moment of area I
+	// Flexible body properties
+	double delta_rho;					// Difference in density between fluid and solid in lattice units
+	double flexural_rigidity;			// Young's modulus E * Second moment of area I
 	std::vector<double> tension;		// Tension between the current marker and its neighbour
 
 	
@@ -41,11 +43,18 @@ public:
 	// Add Lagrange marker to the body
 	void addMarker(double x, double y, double z, bool flex_rigid);
 
-	// Prefab body building methods
-	void makeBody(double radius, std::vector<double> centre, bool flex_rigid);		// Method to construct sphere/circle
-	void makeBody(std::vector<double> width_length_depth, std::vector<double> centre, bool flex_rigid);		// Method to construct cuboid/rectangle
-	void makeBody(std::vector<double> start_point, std::vector<double> end_point, 
-		std::vector<int> BCs, bool flex_rigid);		// Method to construct filament
+
+	//////////////////////////////////
+	// Prefab body building methods //
+	//////////////////////////////////
+
+	// Method to construct sphere/circle
+	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);		
+	// Method to construct cuboid/rectangle
+	void makeBody(std::vector<double> width_length_depth, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);		
+	// Method to construct filament
+	void makeBody(std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs, 
+		bool flex_rigid, bool moving, unsigned int group);		
 
 };
 

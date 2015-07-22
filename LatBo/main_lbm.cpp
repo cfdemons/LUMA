@@ -70,6 +70,9 @@ int _tmain( )
 	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
 	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
+	logfile << "Lattice inlet velocity " << vecnorm(u_0x,u_0y,u_0z) << std::endl;
+	// Reynolds Number
+	logfile << "Reynolds Number = " << Re << endl;
 
 	/* ***************************************************************************************************************
 	**************************************** REFINED LEVELS INITIALISE ***********************************************
@@ -95,29 +98,59 @@ int _tmain( )
 	
 	logfile << "Initialising IBM..." << endl;
 
-	// Build a body -- 
-	//		body_type == 1 is a rectangle/cuboid,
-	//		body_type == 2 is a circle/sphere,
-	//		body_type == 3 is a multi-body test case featuring both the above
-	//		body_type == 4 is a single inextensible flexible filament
-	//		body_type == 5 is an array of flexible filaments
-	//		body_type == 6 is the case for the DSFD 2015 conference
+	// Build a body
+	//		body_type == 1 is a rectangle/cuboid with rigid IBM,
+	//		body_type == 2 is a circle/sphere with rigid IBM,
+	//		body_type == 3 is a multi-body test case featuring both the above with rigid IBM
+	//		body_type == 4 is a single inextensible flexible filament with Jacowire IBM
+	//		body_type == 5 is an array of flexible filaments with Jacowire IBM
+	//		body_type == 6 is a plate in 2D with rigid IBM
+	//		body_type == 7 is the same as the previous case but with a Jacowire flexible flap added to the trailing edge
+	//		body_type == 8 is a plate in 3D with rigid IBM
+	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
+
 #if defined INSERT_RECTANGLE_CUBOID
-	Grids.build_body(1);
+	Grids.ibm_build_body(1);
+	logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
+
 #elif defined INSERT_CIRCLE_SPHERE
-	Grids.build_body(2);
+	Grids.ibm_build_body(2);
+	logfile << "Case: Circle/Sphere using IBM" << std::endl;
+
 #elif defined INSERT_BOTH
-	Grids.build_body(3);
+	Grids.ibm_build_body(3);
+	logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
+
 #elif defined INSERT_FILAMENT
-	Grids.build_body(4);
+	Grids.ibm_build_body(4);
+	logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
+
 #elif defined INSERT_FILARRAY
-	Grids.build_body(5);
-#elif defined CONFERENCE_TEST_CASE
-	Grids.build_body(6);	// NOT YET IMPLEMENTED...
+	Grids.ibm_build_body(5);
+	logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
+
+#elif defined _2D_RIGID_PLATE_IBM
+	Grids.ibm_build_body(6);
+	logfile << "Case: 2D rigid plate using IBM" << std::endl;
+
+#elif defined _2D_PLATE_WITH_FLAP
+	Grids.ibm_build_body(7);
+	logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
+
+#elif defined _3D_RIGID_PLATE_IBM
+	Grids.ibm_build_body(8);
+	logfile << "Case: 3D rigid plate using IBM" << std::endl;
+
+#elif defined _3D_PLATE_WITH_FLAP
+	Grids.ibm_build_body(9);
+	logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
+
 #endif
 
 	// Initialise the bodies (compute support etc.)
 	Grids.ibm_initialise();
+
+	logfile << "Number of markers requested = " << num_markers << std::endl;
 
 #endif
 
@@ -129,12 +162,12 @@ int _tmain( )
 	// Write out t = 0
 #ifdef ENSIGHTGOLD
 	logfile << "Writing out to EnSight file..." << endl;
-	Grids.genVec(fileNum);
-	Grids.genScal(fileNum);
+	Grids.ensight_gen_vector(fileNum);
+	Grids.ensight_gen_scalar(fileNum);
 #endif
 #ifdef TEXTOUT
 	logfile << "Writing Output to <Grids.out>..." << endl;
-	Grids.LBM_textout(t);
+	Grids.io_textout(t);
 #endif
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
@@ -142,9 +175,6 @@ int _tmain( )
 #endif
 
 	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
-
-	// Reynolds Number
-	logfile << "Reynolds Number = " << Re << endl;
 
 
 	/* ***************************************************************************************************************
@@ -181,23 +211,33 @@ int _tmain( )
 #ifdef ENSIGHTGOLD
 		std::cout << "Writing out to EnSight file" << endl;
 		fileNum++;
-		Grids.genVec(fileNum);
-		Grids.genScal(fileNum);
+		Grids.ensight_gen_vector(fileNum);
+		Grids.ensight_gen_scalar(fileNum);
 #endif
 #ifdef TEXTOUT
-		std::cout << "Writing out to <Grids.out>..." << endl;
-		Grids.LBM_textout(t);
+		std::cout << "Writing out to <Grids.out>" << endl;
+		Grids.io_textout(t);
 #endif
 #ifdef VTK_WRITER
 	std::cout << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
 #endif
-#if (defined INSERT_FILAMENT || defined INSERT_FILARRAY) && defined IBM_ON && defined IBBODY_TRACER
-	std::cout << "Writing out filament position" << endl;
-	Grids.writeBodPos(t);
+#if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
+	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
+	&& defined IBM_ON && defined IBBODY_TRACER
+	std::cout << "Writing out flexible body position" << endl;
+	Grids.io_write_body_pos(t);
 #endif
+#if defined LD_OUT && defined IBM_ON
+	std::cout << "Writing out flexible body lift and drag" << endl;
+	Grids.io_write_lift_drag(t);
+#endif
+
 		}
 
+
+
+	// Loop End
 	} while (tval < T);
 
 
@@ -207,8 +247,8 @@ int _tmain( )
 
 	// End of loop write out
 #ifdef ENSIGHTGOLD
-	Grids.genCase(totalloops);
-	Grids.genGeo();
+	Grids.ensight_gen_case(totalloops);
+	Grids.ensight_gen_geometry();
 #endif
 
 	// Close log file

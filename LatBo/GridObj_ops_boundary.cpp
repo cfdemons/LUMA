@@ -29,6 +29,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 	size_t M_lim = YPos.size();
 	size_t K_lim = ZPos.size();
 
+
 	// Loop over grid, identify BC required & apply BC
 	for (size_t i = 0; i < N_lim; i++) {
 		for (size_t j = 0; j < M_lim; j++) {
@@ -85,7 +86,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
 
 					// Apply inlet Zou-He
-					applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+					bc_applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
     
 
 				/*	******************************************************************************************
@@ -145,7 +146,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
     
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 && bc_type_flag == 1) {
 
-					// IMPLEMENT THIS LATER AS NOT TRIVIAL -- SEE MARK'S CODE AND HARTING & HECHT PAPER + ERRATA
+					// IMPLEMENT THIS LATER AS NOT TRIVIAL -- SEE HARTING & HECHT PAPER + ERRATA
 
 				}
 
@@ -158,7 +159,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 // ***************************************************************************************************
 
 // Routine to apply Zou-He boundary conditions
-void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
+void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 	/* Zou-He velocity boundary condition computed from the following equations
 	rho = sum ( fi )
@@ -252,14 +253,16 @@ void GridObj::applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 // ***************************************************************************************************
 
-// Routine to apply Zou-He boundary conditions
-void GridObj::solidSiteReset( ) {
+// Routine to reset the velocity at solid sites to zero
+void GridObj::bc_solid_site_reset( ) {
 
 	// Get grid sizes
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 
+
+	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {

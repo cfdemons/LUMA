@@ -1,7 +1,10 @@
+/* This file defines the constructors and methods for the immersed boundary body object.
+*/
+
 #include "stdafx.h"
 #include "IB_body.h"
 #include "definitions.h"
-#include "ops_generic.h"
+#include "generic_ops.h"
 #include <math.h>
 #include "GridObj.h"
 
@@ -24,7 +27,7 @@ void IB_body::addMarker(double x, double y, double z, bool flex_rigid) {
 }
 
 // ***************************************************************************************************
-// Method to build a sphere / circle
+// Method to seed markers for a sphere / circle
 void IB_body::makeBody(double radius, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
 
@@ -90,8 +93,8 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 }
 
 // ***************************************************************************************************
-// Method to build a cuboid/rectangle
-void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> centre,
+// Method to seed markers for a cuboid/rectangle
+void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
 	
 	// Designate body as being flexible or rigid
@@ -188,7 +191,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	spacing = smallest_side / pow(2,ref);
 	
 	// Start locations of point generator
-	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, start_z = centre[2]-dep/2, x, y, z;
+	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, start_z = centre[2]-dep/2, x, y, z, xdash, ydash, zdash;
 	
 	// Number of points in each direction
 	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1, np_z = (unsigned int)(dep / spacing)+1;
@@ -209,7 +212,15 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 						(k == 0 || k == np_z - 1)
 					) {
 
-					addMarker(x,y,z,flex_rigid);
+					// Transform x y and z based on rotation
+					xdash = (x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180))*cos(angles[1] * PI / 180)
+						- z*sin(angles[1] * PI / 180);
+					ydash = y*cos(angles[0] * PI / 180) + x*sin(angles[0] * PI / 180);
+					zdash = (x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180))*sin(angles[1] * PI / 180)
+						+ z*cos(angles[1] * PI / 180);
+
+					// Add marker
+					addMarker(xdash,ydash,zdash,flex_rigid);
 
 				}
 
@@ -256,7 +267,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	spacing = (2 * (wid + len) ) / num_points;
 
 	// Start locations of point generator
-	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, x, y, z;
+	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, x, y, z, xdash, ydash, zdash;
 	
 	// Number of points in each direction
 	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1;
@@ -276,7 +287,13 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 					(j == 0 || j == np_y - 1)
 				) {
 
-				addMarker(x,y,z,flex_rigid);
+				// Transform x y and z based on rotation
+				xdash = x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180);
+				ydash = x*sin(angles[0] * PI / 180) + y*cos(angles[0] * PI / 180);
+				zdash = z;
+
+				// Add marker
+				addMarker(xdash,ydash,zdash,flex_rigid);
 
 			}				
 
@@ -295,18 +312,20 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 }
 
 // ***************************************************************************************************
-// Method to build a flexible filament
-void IB_body::makeBody(std::vector<double> start_point, double fil_length, std::vector<double> angles,
+// Method to seed markers for a flexible filament
+void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
 					   std::vector<int> BCs, bool flex_rigid, bool deform, unsigned int group) {
 
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
-	if ( BCs[0] != 0  && BCs[1] == 0 ) {
+	if ( BCs[1] != 0  || BCs[0] == 0 ) {
 		std::cout << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
 
+	// Designate BCs
+	this->BCs = BCs;
 
 	// Designate the body as being flexible or rigid
 	this->flex_rigid = flex_rigid;
@@ -331,20 +350,20 @@ void IB_body::makeBody(std::vector<double> start_point, double fil_length, std::
 	double body_angle_h = angles[1];
 
 	// Compute spacing
-	spacing = fil_length / (num_markers - 1);		// Physical spacing between markers
-	double spacing_h = spacing*cos(body_angle_v);	// Local spacing projected onto the horizontal plane
+	spacing = fil_length / (nummarkers - 1);		// Physical spacing between markers
+	double spacing_h = spacing*cos(body_angle_v * PI / 180);	// Local spacing projected onto the horizontal plane
 
 	// Add all markers
-	for (size_t i = 0; i < num_markers; i++) {
-		addMarker(	start_point[0] + i*spacing_h*cos(body_angle_h),
-					start_point[1] + i*spacing*sin(body_angle_v),
-					start_point[2] + i*spacing_h*sin(body_angle_h),
+	for (size_t i = 0; i < nummarkers; i++) {
+		addMarker(	start_point[0] + i*spacing_h*cos(body_angle_h * PI / 180),
+					start_point[1] + i*spacing*sin(body_angle_v * PI / 180),
+					start_point[2] + i*spacing_h*sin(body_angle_h * PI / 180),
 					true);
 	}
 
 
 	// Add dynamic positions in physical units
-	for (size_t i = 0; i < num_markers; i++) {
+	for (size_t i = 0; i < nummarkers; i++) {
 		markers[i].position_old.push_back(markers[i].position[0]);
 		markers[i].position_old.push_back(markers[i].position[1]);
 		markers[i].position_old.push_back(markers[i].position[2]);
@@ -354,13 +373,115 @@ void IB_body::makeBody(std::vector<double> start_point, double fil_length, std::
 	tension.resize(markers.size());
 	std::fill(tension.begin(), tension.end(), 0.0);
 
-	// Correct for endpoint boundary conditions if necessary
-	if (BCs[0] != 0) {
-		markers[0].flex_rigid = false;
-	}
-	if (BCs[1] != 0) {
-		markers[markers.size()-1].flex_rigid = false;
-	}
 	
 }
+// ***************************************************************************************************
+// Method to seed markers for a 3D plate inclined from the xz plane
+double IB_body::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre, 
+	bool flex_rigid, bool deform, unsigned int group, bool plate) {
+
+	// Exit if called in 2D
+	if ( dims == 2 ) {
+		std::cout << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
+	// Designate body as being flexible or rigid
+	this->flex_rigid = flex_rigid;
+
+	// Designate deformable flag and groupID
+	if (flex_rigid) {
+		this->deformable = true;	// A flexible body must be deformable by definition
+	} else {
+		this->deformable = deform;
+	}
+	this->groupID = group;
+
+	// Assign delta_rho and flexural rigidity
+	this->delta_rho = ibb_delta_rho;
+	this->flexural_rigidity = ibb_EI;
+
+	// Shorter variable names for convenience
+	double len_z, len_x;
+	len_z = width_length[1];
+	len_x = width_length[0];
+
+	// Square //
+
+	// Check side lengths to make sure we can ensure points on the corners
+	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
+			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
+			system("pause");
+			exit(EXIT_FAILURE);
+		}
+	
+	// Get ratio of sides and degree of point refinement
+	int side_ratio;
+	if (len_z > len_x) { // x length is shortest
+		side_ratio = (int)(len_z / len_x);
+	} else { // z length is shortest
+		side_ratio = (int)(len_x / len_z);
+	}
+
+	// The following is derived by inspection of the problem and ensures a point on each corner of the body
+	// Double the number of points to be used as can be rounded down to only a relatively small number
+	int ref = (int)ceil( log( 2*num_markers / (2 * (1+side_ratio)) ) / log(2) );
+
+	// Check to see if enough points
+	if (ref == 0) {
+		// Advisory of number of points
+		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
+		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
+	// Number of points required to get uniform distribution and points on corners
+	unsigned int num_points = (unsigned int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
+
+	// Find spacing of nodes
+	spacing = (2 * (len_z + len_x) ) / num_points;
+
+	// Start locations of point generator (bottom corner)
+	double start_z = centre[2]-len_z/2, 
+		start_x = centre[0] - (len_x/2)*cos(angle * PI / 180), 
+		start_y = centre[1] - (len_x/2)*sin(angle * PI / 180), 
+		x, y, z;
+	
+	// Number of points in each direction
+	unsigned int np_x = (unsigned int)(len_x / spacing)+1, np_z = (unsigned int)(len_z / spacing)+1;
+
+	// Loop over matrix of points
+	for (unsigned int i = 0; i < np_x; i++) {
+		for (unsigned int j = 0; j < np_z; j++) {
+
+			// x and y positions
+			x = start_x + (i*spacing*cos(angle * PI / 180));
+			y = start_y + (i*spacing*sin(angle * PI / 180));
+			z = start_z + (j*spacing);
+
+			// Add marker
+			addMarker(x,y,z,flex_rigid);
+			
+
+		}
+	}
+
+	// Add dynamic positions in physical units
+	for (size_t i = 0; i < np_x*np_z; i++) {
+		markers[i].position_old.push_back(markers[i].position[0]);
+		markers[i].position_old.push_back(markers[i].position[1]);
+		markers[i].position_old.push_back(markers[i].position[2]);
+	}
+
+	// Assign initial tension as zero
+	tension.resize(markers.size());
+	std::fill(tension.begin(), tension.end(), 0.0);
+
+	return spacing;
+
+
+}
+
 // ***************************************************************************************************

@@ -3,14 +3,14 @@
   <Class Name="GridObj">
     <Position X="0.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>EAICRzACIIIIAKBAASCY5koAloUIAQhTADcBgCCsFAA=</HashCode>
+      <HashCode>EAICRzAmIAIIAKAAASAYZk4AloUIAAhTBLYBgCCuFAA=</HashCode>
       <FileName>GridObj.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="IB_body">
     <Position X="3.5" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAIAAAAIAAAAAYAABAIAAiAAAAAQAAAAAAAAMA=</HashCode>
+      <HashCode>ABAAAAAIAAAAIAAIAAYAABAIAAiAAAAAQAAAAAAAAMA=</HashCode>
       <FileName>IB_body.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -22,7 +22,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ivector&lt;GenTyp&gt;">
-    <Position X="3.5" Y="5" Width="2.5" />
+    <Position X="3.5" Y="4.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAEAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ivector.h</FileName>

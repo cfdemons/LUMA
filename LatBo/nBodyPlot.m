@@ -1,6 +1,8 @@
 function [] = nBodyPlot(dx, nb)
-% Plots nb iBodies and their supports. Physical spacing dx allows distances
-% to be converted to lattice units.
+% Plots nb iBodies and their supports.
+% nBodyPlot(dx, nb, d)
+% Physical spacing dx allows distances to be converted to lattice units.
+% d is the number of dimensions
 
 close all
 
@@ -14,6 +16,7 @@ for n = 1:nb
     Body = dlmread(['./Output/IBbody_' num2str(n-1) '.out'],'\t',1,0);
     
     if (n == 1)
+        figure
         subplot(1,2,1);
     end
     
@@ -22,7 +25,7 @@ for n = 1:nb
         plot3(Body(i,1)/dx, Body(i,2)/dx, Body(i,3)/dx, [cell2mat(cols(mod(i,length(cols))+1)) '^'],'MarkerSize',10)
         hold on
     end
-    view(3)
+    view(d)
     axis tight
     axis equal
     grid on
@@ -52,7 +55,7 @@ for n = 1:nb
         eval(['plot3(Supp_' num2str(i-1) '(:,1)/dx, Supp_' num2str(i-1) '(:,2)/dx, Supp_' num2str(i-1) '(:,3)/dx,'''...
             cell2mat(style(mod(i,length(style))+1)) ''',''MarkerSize'',10)'])    
     end
-    view(3)
+    view(d)
     axis tight
     axis equal
 end

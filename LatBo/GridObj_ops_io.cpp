@@ -12,7 +12,7 @@ using namespace std;
 // ***************************************************************************************************
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
-void GridObj::LBM_textout(int t) {
+void GridObj::io_textout(int t) {
 
 	// Get limits for current level
 	size_t N_lim = XPos.size();
@@ -231,7 +231,7 @@ void GridObj::LBM_textout(int t) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].LBM_textout(t);
+				subGrid[reg].io_textout(t);
 
 			}
 		}
@@ -251,7 +251,7 @@ void GridObj::LBM_textout(int t) {
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::writeBodPos(unsigned int timestep) {	
+void GridObj::io_write_body_pos(unsigned int timestep) {	
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 		
@@ -269,6 +269,37 @@ void GridObj::writeBodPos(unsigned int timestep) {
 				jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << 0.0 << std::endl;
 #endif
 			}
+			jout.close();
+
+	}
+
+}
+
+
+// ***************************************************************************************************
+// Routine to write out the coordinates of IBbodies at a given time step
+void GridObj::io_write_lift_drag(unsigned int timestep) {	
+
+	for (size_t ib = 0; ib < iBody.size(); ib++) {
+		
+
+			// Open file for given time step
+			std::ofstream jout;
+			jout.open("./Output/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + ".out", std::ios::out);
+			jout << "L" + to_string(timestep) + ", D" + to_string(timestep) << std::endl;
+
+			// Sum variables
+			double Lsum = 0.0, Dsum = 0.0;
+
+			// Compute lift and drag
+			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+				jout << iBody[ib].markers[i].force_xyz[0] << ", " << iBody[ib].markers[i].force_xyz[1] << std::endl;
+				Lsum += iBody[ib].markers[i].force_xyz[0];
+				Dsum += iBody[ib].markers[i].force_xyz[1];
+			}
+
+			jout << "Totals = " << std::endl;
+			jout << Lsum << ", " << Dsum << std::endl;
 			jout.close();
 
 	}

@@ -1,8 +1,10 @@
-function [] = BodyMovie(bod, n, out)
+function [] = BodyMovie(bod, n, out, d)
 % Generate animation of IBbody marker movement.
+% BodyMovie(bod, n, out, d)
 % bod is the number of bodies. n is the number of timesteps to be
 % included in the movie. out is how timesteps were performed before writing
 % out (see defintions.h).
+% d is the number of dimensions of the problem
 
 % Create movie object
 Vid = VideoWriter('./Output/BodyMovie.avi');
@@ -36,8 +38,8 @@ for c = 1:n+1
         for b = 0:bod-1
             eval(['plot3(xy' num2str(b) '(:,1), xy' num2str(b) '(:,2), xy' num2str(b) '(:,3),''^'');'])
         end
-        axis([1.4 2 .1 .9 .1 .9]);
-        view(3)
+        axis([2.0 3.5 0.0 1.0 0.0 1.0]);
+        view(d)
         grid
         
         % Add frame to movie

@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "GridObj.h"
 #include "definitions.h"
-#include "ops_generic.h"
+#include "generic_ops.h"
+#include <cmath>
 
 
 
@@ -96,6 +97,17 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	double dist_z, delta_z;	// Extras for 3D
 #endif
 
+
+#ifdef CHEAP_NEAREST_NODE_DETECTION
+	inear = floor( iBody[ib].markers[m].position[0]/dx );
+	jnear = floor( iBody[ib].markers[m].position[1]/dy );
+
+#if (dims == 3)
+	knear = floor( iBody[ib].markers[m].position[2]/dz );
+#endif
+
+
+#else
 	// Following (Pinelli et al. 2010, JCP) we find closest node
 	r_min = abs(b_x-a_x) / dx;	// Initial minimum distance (in lu) taken from problem geometry
 
@@ -137,6 +149,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 			}
 		}
 	}
+#endif
 
 	// Define limits of support region (only have to do one since latice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
@@ -151,17 +164,17 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	// Test to see if required support nodes are available
 #if (dims == 3)
 
-	if ( (int)inear - 5 < 0 || inear + 5 > XPos.size() ) {
+	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
 		std::cout << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	
-	} else if ( (int)jnear - 5 < 0 || jnear + 5 > YPos.size() ) {
+	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
 		std::cout << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 		
-	} else if ( (int)knear - 5 < 0 || knear + 5 > ZPos.size() ) {
+	} else if ( (int)knear - 5 < 0 || knear + 5 >= ZPos.size() ) {
 		std::cout << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
@@ -208,12 +221,12 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 #else
 
 	// 2D check support region
-	if ( (int)inear - 5 < 0 || inear + 5 > XPos.size() ) {
+	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
 		std::cout << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	
-	} else if ( (int)jnear - 5 < 0 || jnear + 5 > YPos.size() ) {
+	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
 		std::cout << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
@@ -262,6 +275,7 @@ void GridObj::ibm_interpol(unsigned int ib) {
 	size_t M_lim = YPos.size();
 	size_t K_lim = ZPos.size();
 	
+
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		
@@ -355,6 +369,7 @@ void GridObj::ibm_findepsilon(unsigned int ib) {
 	// Initialise 2D std vector with zeros
 	std::vector< std::vector<double> > A (iBody[ib].markers.size(), std::vector<double>(iBody[ib].markers.size(), 0.0) );
 
+
 	// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
 	for (size_t I = 0; I < iBody[ib].markers.size(); I++) {
 
@@ -409,8 +424,8 @@ void GridObj::ibm_findepsilon(unsigned int ib) {
 	//////////////////
 		
 	// Settings
-    double tolerance = 1e-5;
-	unsigned int maxiterations = 5000;
+    double tolerance = 1.0e-4;
+	unsigned int maxiterations = 2500;
 	double minimum_residual_achieved;
     
     // Biconjugate gradient stabilised method for solving asymmetric linear systems
@@ -528,7 +543,10 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 
 		if (i == maxiterations-1) {
 			// Warn that max iterations hit
-			std::cout << "Max iterations hit -- values of epsilon might not be converged!" << std::endl;
+			std::cout << "Max iterations hit -- values of epsilon might not be converged. Try adjusting the number of Lagrange markers or the grid resolution to adjust support overlap. Setting Epsilon to 2." << std::endl;
+			for (size_t j = 0; j < nls; j++) {
+				epsilon[j] = 2;
+			}
 		}
 	}
 

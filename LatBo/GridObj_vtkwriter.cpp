@@ -1,3 +1,6 @@
+/* This file contains the routines necessary to write out to a vtk file
+*/
+
 #include "stdafx.h"
 #include <sstream>
 #include <iomanip>

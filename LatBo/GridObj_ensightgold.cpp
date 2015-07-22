@@ -10,7 +10,7 @@
 using namespace std;
 
 // Routine to generate the case file
-void GridObj::genCase(int nsteps)
+void GridObj::ensight_gen_case(int nsteps)
 {
 	
 	// Create file stream
@@ -59,7 +59,7 @@ void GridObj::genCase(int nsteps)
 
 
 // Routine to generate the geometry file
-void GridObj::genGeo( )
+void GridObj::ensight_gen_geometry( )
 {
 
 	// Open file stream
@@ -147,7 +147,7 @@ void GridObj::genGeo( )
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].genGeo();
+			subGrid[reg].ensight_gen_geometry();
 		}
 	}
 
@@ -155,7 +155,7 @@ void GridObj::genGeo( )
 
 
 // Routine to generate the vectors file
-void GridObj::genVec(int fileNum)
+void GridObj::ensight_gen_vector(int fileNum)
 {
 
 	// Open file stream
@@ -230,7 +230,7 @@ void GridObj::genVec(int fileNum)
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].genVec(fileNum);
+			subGrid[reg].ensight_gen_vector(fileNum);
 		}
 	}
 
@@ -238,7 +238,7 @@ void GridObj::genVec(int fileNum)
 
 
 // Routine to generate the scalars file
-void GridObj::genScal(int fileNum)
+void GridObj::ensight_gen_scalar(int fileNum)
 {
 
 	// File stream
@@ -284,7 +284,7 @@ void GridObj::genScal(int fileNum)
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].genScal(fileNum);
+			subGrid[reg].ensight_gen_scalar(fileNum);
 		}
 	}
 

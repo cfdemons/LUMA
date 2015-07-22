@@ -158,10 +158,12 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			if (iBody[ib].deformable) {
 
 				// Call structural or forced positional update and recompute support
-				ibm_positionalupdate(ib);
+				ibm_position_update(ib);
 
+#ifndef STOP_EPSILON_RECOMPUTE
 				// Recompute epsilon
-				ibm_findepsilon(ib);				
+				ibm_findepsilon(ib);
+#endif
 
 			}
 		}
@@ -169,7 +171,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if defined INSERT_FILARRAY
 		// Special bit for filament-based plates where flexible centreline is used to update position of others in group
 		std::cout << "Filament-based plate positional update..." << std::endl;
-		ibm_positionalupdate(999);
+		ibm_position_update_grp(999);
 #endif
 
 	}
@@ -321,6 +323,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 	// pre-collision f grid. Initialise with current f values.
 	ivector<double> f_new( f );
 
+
 	// Loop over lattice sites
 	for (int i = i_low; i < i_high; i++) {
 		for (int j = j_low; j < j_high; j++) {
@@ -427,6 +430,7 @@ void GridObj::LBM_stream( ) {
 	// Create temporary lattice of zeros to prevent overwriting useful populations
 	ivector<double> f_new( f.size(), 0.0 );
 
+
 	// Stream one lattice site at a time
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
@@ -435,9 +439,15 @@ void GridObj::LBM_stream( ) {
 				for (int v = 0; v < nVels; v++) {
 
 					// If fine site then do not stream in any direction
-					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+					if ( LatTyp(i,j,k,M_lim,K_lim) == 2) {
 						break;
 					}
+
+					// If site is do-nothing inlet then copy value
+					if (LatTyp(i,j,k,M_lim,K_lim) == 9) {
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);						
+					}
+
 
 					// Only apply periodic BCs on coarsest level
 					if (level == 0) {
@@ -445,12 +455,14 @@ void GridObj::LBM_stream( ) {
 						dest_x = (i+c[0][v] + N_lim) % N_lim;
 						dest_y = (j+c[1][v] + M_lim) % M_lim;
 						dest_z = (k+c[2][v] + K_lim) % K_lim;
+
 					} else {
 						// No periodic BCs
 						dest_x = i+c[0][v];
 						dest_y = j+c[1][v];
 						dest_z = k+c[2][v];
 					}
+
 
 					// If destination off-grid, do not stream
 					if (	(dest_x >= N_lim || dest_x < 0) ||
@@ -463,9 +475,11 @@ void GridObj::LBM_stream( ) {
 
 						// Check destination site type and decide whether to stream or not
 						if ( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Fine -- ignore
-							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) && (LatTyp(i,j,k,M_lim,K_lim) == 4) ) // TL lower level to TL lower level -- done on lower grid stream so ignore.
+							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) && (LatTyp(i,j,k,M_lim,K_lim) == 4) ) || // TL lower level to TL lower level -- done on lower grid stream so ignore.
+							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 9) // Do-nothing inlet site so do not overwrite
 							) {
-														
+
+							// Do nothing														
 					
 						} else {
 
@@ -502,50 +516,65 @@ void GridObj::LBM_macro( ) {
 	double fuy_temp = 0;
 	double fuz_temp = 0;
 
+
 	// Loop over lattice
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 
-				// Reset temporary variables
-				rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
+				if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 
-				for (int v = 0; v < nVels; v++) {
+					// Refined site so set both density and velocity to zero
+					rho(i,j,k,M_lim,K_lim) = 0;
+					u(i,j,k,0,M_lim,K_lim,dims) = 0;
+					u(i,j,k,1,M_lim,K_lim,dims) = 0;
+#if (dims == 3)
+					u(i,j,k,2,M_lim,K_lim,dims) = 0;
+#endif
 
-					// Sum up to find momentum
-					fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-					fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-					fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+				} else {
 
-					// Sum up to find density
-					rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
+					// Reset temporary variables
+					rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
+
+					for (int v = 0; v < nVels; v++) {
+
+						// Sum up to find momentum
+						fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+						fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+						fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+
+						// Sum up to find density
+						rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
+
+					}
+
+					// Assign density
+					rho(i,j,k,M_lim,K_lim) = rho_temp;
+
+					// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
+					fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+					fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+#if (dims == 3)
+					fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+#endif
+
+					// Assign velocity
+					u(i,j,k,0,M_lim,K_lim,dims) = fux_temp / rho_temp;
+					u(i,j,k,1,M_lim,K_lim,dims) = fuy_temp / rho_temp;
+#if (dims == 3)
+					u(i,j,k,2,M_lim,K_lim,dims) = fuz_temp / rho_temp;
+#endif
 
 				}
-
-				// Assign density
-				rho(i,j,k,M_lim,K_lim) = rho_temp;
-
-				// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-				fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
-				fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
-#if (dims == 3)
-				fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
-#endif
-
-				// Assign velocity
-				u(i,j,k,0,M_lim,K_lim,dims) = fux_temp / rho_temp;
-				u(i,j,k,1,M_lim,K_lim,dims) = fuy_temp / rho_temp;
-#if (dims == 3)
-				u(i,j,k,2,M_lim,K_lim,dims) = fuz_temp / rho_temp;
-#endif
 
 			}
 		}
 	}
 
-#ifdef SOLID_ON
+#ifdef SOLID_BLOCK_ON
 	// Do a solid site reset of velocity
-	solidSiteReset();
+	bc_solid_site_reset();
 #endif
 
 }
@@ -564,6 +593,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 	int N_coarse = XPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
+
 
 	// Loop over coarse grid (just region of interest)
 	for (size_t i = subGrid[RegionNumber].CoarseLimsX[0]; i <= subGrid[RegionNumber].CoarseLimsX[1]; i++) {
@@ -639,6 +669,7 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 	int N_coarse = XPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
+
 
 	// Loop over coarse grid (only region of interest)
 	for (size_t i = subGrid[RegionNumber].CoarseLimsX[0]; i <= subGrid[RegionNumber].CoarseLimsX[1]; i++) {

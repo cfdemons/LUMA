@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GridObj.h"
-#include "ops_generic.h"
+#include "generic_ops.h"
 #include "definitions.h"
 
 
@@ -16,7 +16,7 @@ It needs completely rewriting to generalise.
 void GridObj::ibm_jacowire( unsigned int ib ) {
 
     ///////// Initialisation /////////    
-    double tolerance = 1.0e-9;		// Tolerance of iterative solver
+    double tolerance = 1.0e-4;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
 	unsigned int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
@@ -154,7 +154,22 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
     G[ii + 1] = EI * (xstar[i - 2] - 4 * xstar[i - 1] + 6 * xstar[i] - 4 * xsp1 + xsp2) / ds_sqrd - ds_sqrd * (Fx[i + 1] + Froude) - beta * xstar[i];
     G[ii + 2] = EI * (ystar[i - 2] - 4 * ystar[i - 1] + 6 * ystar[i] - 4 * ysp1 + ysp2) / ds_sqrd - ds_sqrd * Fy[i + 1] - beta * ystar[i];
 
-    // Newton Loop
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out G vector
+		std::ofstream Gout;
+		Gout.open("./Output/Gvector_" + std::to_string(ib) + ".out", std::ios::app);
+		Gout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
+			Gout << G[i] << std::endl;
+		}
+		Gout.close();
+#endif
+
+	// ******************* //
+    // *** Newton Loop *** //
+	// ******************* //
+
     size_t iter = 0;
     while (residual > tolerance && iter < max_terations) {
         iter++;
@@ -281,6 +296,27 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	Using the output from the above we update the marker positions and desired velocities
 	*/
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out res vector
+		std::ofstream resout;
+		resout.open("./Output/res_vector_" + std::to_string(ib) + ".out", std::ios::app);
+		resout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
+			resout << res[i] << std::endl;
+		}
+		resout.close();
+#endif
+
+
+	// Clamped boundary condition
+	if (iBody[ib].BCs[0] == 2) {
+
+		// Apply clamped BC to first flexible marker
+		x[0] = x0 + ds_nondim * cos(0.0 * PI / 180.0);
+		y[0] = y0 + ds_nondim * sin(0.0 * PI / 180.0);
+
+	}
+
 	// After the Newton iteration has completed markers are updated from the temporary vectors used in the loop
     for (i = 0; i < iBody[ib].markers.size(); i++) {
         // Initial physical position (time = t) becomes t-1 position
@@ -293,7 +329,6 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 			iBody[ib].markers[i].position[1] = (y[i-1] * length_lu * dy) + iBody[ib].markers[0].position[1];
 		}
     }
-
 
 	// Desired velocity (in lattice units) on the makers is computed using a first order estimate based on position change
     for (i = 0; i < iBody[ib].markers.size(); i++) {
@@ -430,7 +465,7 @@ void GridObj::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned 
 
 // **************************************************************************************** //
 // Routine to update the position of deformable bodies
-void GridObj::ibm_positionalupdate( unsigned int ib ) {
+void GridObj::ibm_position_update( unsigned int ib ) {
 
 	// If a flexible body then launch structural solver to find new positions
 	if (iBody[ib].flex_rigid) {
@@ -463,13 +498,13 @@ void GridObj::ibm_positionalupdate( unsigned int ib ) {
 	}
 
 
-
 }
 // **************************************************************************************** //
 
 // Overloaded function to update position of body in a group using the position of the flexible
 // body in the group. Must be called after all previous positional update routines have been called.
-void GridObj::ibm_positionalupdate( int group ) {
+// group_update flag is only there to ensure the overload is defined.
+void GridObj::ibm_position_update_grp( unsigned int group ) {
 
 	// Find flexible body in group and store index
 	unsigned int ib_flex;

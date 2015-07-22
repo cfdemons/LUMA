@@ -1,4 +1,4 @@
-/* This file contains the routines necessary to initialise the macroscopic quantities.
+/* This file contains the routines necessary to initialise the macroscopic quantities and the grids and labels.
 */
 
 #include "stdafx.h"
@@ -22,6 +22,8 @@ void GridObj::LBM_init_vel ( ) {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 
+
+	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
@@ -42,9 +44,9 @@ void GridObj::LBM_init_vel ( ) {
 		}
 	}
 
-#if defined SOLID_ON || defined WALLS_ON
+#if defined SOLID_BLOCK_ON || defined WALLS_ON || defined WALLS_ON_2D
 	// Perform solid site reset of velocity
-	solidSiteReset();
+	bc_solid_site_reset();
 #endif
 
 }
@@ -60,6 +62,7 @@ void GridObj::LBM_init_rho ( ) {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 
+	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {		
 			for (int k = 0; k < K_lim; k++) {
@@ -77,11 +80,27 @@ void GridObj::LBM_init_rho ( ) {
 // Initialise wall and object labels method (L0 only)
 void GridObj::LBM_init_wall_lab ( ) {
 
-#if defined SOLID_ON || defined WALLS_ON || defined INLET_ON || defined OUTLET_ON
+	// Typing defined as follows:
+	/*
+	0 == boundary site
+	1 == coarse site
+	2 == fine/refined site
+	3 == TL to upper (coarser) level
+	4 == TL to lower (finer) level
+	5 == Undefined
+	6 == Undefined
+	7 == Zou-He Inlet
+	8 == Extrapolation Outlet
+	9 == Do-nothing Inlet
+	*/
+
+#if defined SOLID_BLOCK_ON || defined WALLS_ON || defined INLET_ON || defined OUTLET_ON || defined WALLS_ON_2D
 	int i, j, k;
 #endif
 
-#ifdef SOLID_ON
+#ifdef SOLID_BLOCK_ON
+
+	// Loop over object definition
 	for (i = obj_x_min; i <= obj_x_max; i++) {
 		for (j = obj_y_min; j <= obj_y_max; j++) {
 			for (k = obj_z_min; k <= obj_z_max; k++) {
@@ -100,7 +119,14 @@ void GridObj::LBM_init_wall_lab ( ) {
 	for (j = 0; j < M; j++) {
 		for (k = 0; k < K; k++) {
 
+#ifndef INLET_DO_NOTHING
+			// Regular inlet site (Zou-He)
 			LatTyp(i,j,k,M,K) = 7;
+
+#elif defined INLET_DO_NOTHING
+			// Do nothing inlet label
+			LatTyp(i,j,k,M,K) = 9;
+#endif
 
 		}
 	}
@@ -120,8 +146,7 @@ void GridObj::LBM_init_wall_lab ( ) {
 #endif
 
 #ifdef WALLS_ON
-	// Front, Back, Top, Bottom only
-
+#ifndef WALLS_ON_2D
 #if (dims == 3)
 	// Front
 	k = 0;
@@ -143,7 +168,10 @@ void GridObj::LBM_init_wall_lab ( ) {
 		}
 	}
 #endif
+#endif
+#endif
 
+#ifdef WALLS_ON || WALLS_ON_2D
 	// Top
 	j = 0;
 	for (i = 0; i < N; i++) {
@@ -268,6 +296,11 @@ void GridObj::LBM_init_grid( ) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
+	5 == Undefined
+	6 == Undefined
+	7 == Zou-He Inlet
+	8 == Extrapolation Outlet
+	9 == Do-nothing Inlet
 	*/
 
 	// Label as coarse site
@@ -345,20 +378,19 @@ void GridObj::LBM_init_grid( ) {
 	LBM_init_rho();
 
 	// Cartesian force vector
-	for (int i = 0; i < N*M*K*dims; i++) {
-		force_xyz.push_back(0.0);
-	}
+	force_xyz.resize(N*M*K*dims, 0.0);
 
 	// Lattice force vector
-	for (int i = 0; i < N*M*K*nVels; i++) {
-		force_i.push_back(0.0);
-	}
+	force_i.resize(N*M*K*nVels, 0.0);
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
 	f.resize( N*M*K*nVels );
 	feq.resize( N*M*K*nVels );
 
+
+
+	// Loop over grid
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			for (int k = 0; k < K; k++) {
@@ -382,7 +414,7 @@ void GridObj::LBM_init_grid( ) {
 #elif defined IBM_ON && defined INSERT_RECTANGLE_CUBOID
 	// If IBM rectangle use y-dimension (in lattice units)
 	nu = (ibb_l / dx) * u_0x / Re;
-#elif defined SOLID_ON
+#elif defined SOLID_BLOCK_ON
 	// Use object height
 	nu = (obj_y_max - obj_y_min) * u_0x / Re;
 #else
@@ -390,7 +422,7 @@ void GridObj::LBM_init_grid( ) {
 	nu = M * u_0x / Re;
 #endif
 
-	cout << "Lattice viscosity = " << nu << endl;
+	std::cout << "Lattice viscosity = " << nu << std::endl;
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
@@ -399,7 +431,7 @@ void GridObj::LBM_init_grid( ) {
 	// Above is valid for L0 only -- general expression is
 	// omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dx,2)) ) + .5 );
 
-	cout << "L0 relaxation time = " << (1/omega) << endl;
+	std::cout << "L0 relaxation time = " << (1/omega) << std::endl;
 
 }
 	
@@ -426,6 +458,21 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 
 
 	// Generate TYPING MATRICES
+
+	// Typing defined as follows:
+	/*
+	0 == boundary site
+	1 == coarse site
+	2 == fine/refined site
+	3 == TL to upper (coarser) level
+	4 == TL to lower (finer) level
+	5 == Undefined
+	6 == Undefined
+	7 == Zou-He Inlet
+	8 == Extrapolation Outlet
+	9 == Do-nothing Inlet
+	*/
+
 	// Get grid sizes
 	size_t N_lim = XInd.size();
 	size_t M_lim = YInd.size();
@@ -435,6 +482,8 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	LatTyp.resize( YInd.size() * XInd.size() * ZInd.size() );
 
 #if (dims == 3)
+
+
 	// Start with TL from level above
 	for (size_t i = 0; i != N_lim; ++i) {
 		for (size_t j = 0; j != M_lim; ++j) {
@@ -448,6 +497,7 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 
 	// Check if lower grids exist
 	if (NumLev > level) {
+
 
 		// Add TL for next level down
 		for (size_t i = 2; i != N_lim-2; ++i) {
@@ -473,6 +523,8 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 		}
 
 	} else {
+
+
 		// Reached lowest level so label rest as coarse
 		for (size_t i = 2; i != N_lim-2; ++i) {
 			for (size_t j = 2; j != M_lim-2; ++j) {
@@ -566,12 +618,12 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	LBM_init_rho( );
 
 	// Cartesian force vector
-	for (int i = 0; i < N*M*K*dims; i++) {
+	for (int i = 0; i < N_lim*M_lim*K_lim*dims; i++) {
 		force_xyz[i] = 0.0;
 	}
 
 	// Lattice force vector
-	for (int i = 0; i < N*M*K*nVels; i++) {
+	for (int i = 0; i < N_lim*M_lim*K_lim*nVels; i++) {
 		force_i[i] = 0.0;
 	}
 
@@ -580,7 +632,9 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	// Resize
 	f.resize(N_lim * M_lim * K_lim * nVels);
 	feq.resize(N_lim * M_lim * K_lim * nVels);
-			
+	
+
+	// Loop over grid
 	for (size_t i = 0; i != N_lim; ++i) {
 		for (size_t j = 0; j != M_lim; ++j) {
 			for (size_t k = 0; k != K_lim; ++k) {
@@ -598,3 +652,4 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/omega_coarse - .5) *2) + .5);
 }
+// ***************************************************************************************************

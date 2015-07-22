@@ -1,3 +1,6 @@
+/* Class defintion for the GridObj class
+*/
+
 #pragma once
 
 #include <vector>
@@ -94,8 +97,8 @@ public :
 	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or reset vectors if flag is true)
 	
 	// Boundary operations
-	void applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Zou-He procedure
-	void solidSiteReset();	// Reset all the solid site velocities to zero
+	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Zou-He procedure
+	void bc_solid_site_reset();	// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
@@ -103,18 +106,19 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void writeBodPos(unsigned int t);	// Write out IB_body positions to text files
-	void LBM_textout(int t);			// Writes out the contents of the class as well as any subgrids to a text file
+	void io_write_body_pos(unsigned int t);	// Write out IB_body positions to text files
+	void io_write_lift_drag(unsigned int t);		// Write out IB_body lift and drag
+	void io_textout(int t);			// Writes out the contents of the class as well as any subgrids to a text file
 	// EnsightGold methods
-	void genCase(int nsteps);		// Generate case file
-	void genGeo();					// Generate geometry file
-	void genVec(int fileNum);		// Generate vectors file
-	void genScal(int fileNum);		// Generate scalars file
+	void ensight_gen_case(int nsteps);		// Generate case file
+	void ensight_gen_geometry();					// Generate geometry file
+	void ensight_gen_vector(int fileNum);		// Generate vectors file
+	void ensight_gen_scalar(int fileNum);		// Generate scalars file
 	// VTK writer methods
 	void vtk_writer(int t, double tval);
 
 	// IBM methods
-	void build_body(int body_type);							// Build a new pre-fab body
+	void ibm_build_body(int body_type);							// Build a new pre-fab body
 	void ibm_initialise();									// Initialise a built immersed body
 	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
 	void ibm_interpol(unsigned int ib);						// Interpolation of velocity field onto markers of ib-th body
@@ -128,8 +132,8 @@ public :
 
 	// Flexible methods
 	void ibm_jacowire(unsigned int ib);				// Computes the tension and position of a 2D inextensible, flexible iBody filament
-	void ibm_positionalupdate( unsigned int ib );	// Updates the position of deformable body markers + overload
-	void ibm_positionalupdate( int group );
+	void ibm_position_update( unsigned int ib );	// Updates the position of deformable body markers
+	void ibm_position_update_grp( unsigned int group );	// Updates the positions of deformable bodies in a group using on the flexible group member
 	// Methods to solve the Jacobian system
 	void ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double b[]);

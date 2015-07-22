@@ -171,7 +171,7 @@ void GridObj::LBM_init_wall_lab ( ) {
 #endif
 #endif
 
-#ifdef WALLS_ON || WALLS_ON_2D
+#if defined WALLS_ON || defined WALLS_ON_2D
 	// Top
 	j = 0;
 	for (i = 0; i < N; i++) {
@@ -240,6 +240,7 @@ void GridObj::LBM_init_grid( ) {
 
     // Checks to make sure grid size is suitable for refinement
 	if (NumLev != 0) {
+
 #if (dims == 3)
 		for (int reg = 0; reg < NumReg; reg++) {
 			// Check grid is big enough to allow embedded refinement of factor 2
@@ -618,12 +619,12 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	LBM_init_rho( );
 
 	// Cartesian force vector
-	for (int i = 0; i < N_lim*M_lim*K_lim*dims; i++) {
+	for (unsigned int i = 0; i < N_lim*M_lim*K_lim*dims; i++) {
 		force_xyz[i] = 0.0;
 	}
 
 	// Lattice force vector
-	for (int i = 0; i < N_lim*M_lim*K_lim*nVels; i++) {
+	for (unsigned int i = 0; i < N_lim*M_lim*K_lim*nVels; i++) {
 		force_i[i] = 0.0;
 	}
 

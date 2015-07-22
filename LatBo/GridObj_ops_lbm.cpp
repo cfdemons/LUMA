@@ -374,7 +374,6 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 	double feq, A, B;
 
 	// Other declarations
-	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 	
@@ -587,13 +586,12 @@ void GridObj::LBM_explode( int RegionNumber ) {
 
 	// Declarations
 	int y_start, x_start, z_start;
-	int N_fine = subGrid[RegionNumber].YPos.size();
 	int M_fine = subGrid[RegionNumber].YPos.size();
-	int K_fine = subGrid[RegionNumber].ZPos.size();
-	int N_coarse = XPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
-
+#if (dims == 3)
+	int K_fine = subGrid[RegionNumber].ZPos.size();	
+#endif
 
 	// Loop over coarse grid (just region of interest)
 	for (size_t i = subGrid[RegionNumber].CoarseLimsX[0]; i <= subGrid[RegionNumber].CoarseLimsX[1]; i++) {
@@ -612,7 +610,9 @@ void GridObj::LBM_explode( int RegionNumber ) {
 					vector<int> idx_fine = indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
+#if (dims == 3)
 					int fk = idx_fine[2];
+#endif
 
 					// Update fine grid values according to Rohde et al.
 					for (int v = 0; v < nVels; v++) {
@@ -663,12 +663,12 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 	// Declarations
 	int y_start, x_start, z_start;
-	int N_fine = subGrid[RegionNumber].YPos.size();
 	int M_fine = subGrid[RegionNumber].YPos.size();
-	int K_fine = subGrid[RegionNumber].ZPos.size();
-	int N_coarse = XPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
+#if (dims == 3)
+	int K_fine = subGrid[RegionNumber].ZPos.size();
+#endif
 
 
 	// Loop over coarse grid (only region of interest)
@@ -688,7 +688,9 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 					vector<int> idx_fine = indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
+#if (dims == 3)
 					int fk = idx_fine[2];
+#endif
 
 					// Loop over directions
 					for (int v = 0; v < nVels; v++) {

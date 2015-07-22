@@ -38,11 +38,11 @@
 #define PI 3.14159265358979323846
 
 // Output Options
-#define out_every 150			// How many timesteps before output
+#define out_every 10			// How many timesteps before output
 
 //#define TEXTOUT
-//#define ENSIGHTGOLD
-#define VTK_WRITER
+#define ENSIGHTGOLD
+//#define VTK_WRITER
 
 // Gravity (acts in +x direction)
 //#define GRAVITY_ON
@@ -59,7 +59,7 @@
 ***************************************************************************************************************
 */
 
-#define T 5000		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 1		// End time of simulation (if each time step increments by physical dt = dx)
 
 /*	
 ***************************************************************************************************************
@@ -69,9 +69,9 @@
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 960		// Number of x lattice sites
-#define M 320		// Number of y lattice sites
-#define K 20		// Number of z lattice sites
+#define N 600		// Number of x lattice sites
+#define M 200		// Number of y lattice sites
+#define K 100		// Number of z lattice sites
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
@@ -93,7 +93,7 @@
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 200		// Desired Reynolds number
+#define Re 100		// Desired Reynolds number
 // nu computed based on above selections
 
 
@@ -107,7 +107,7 @@
 //#define IBM_ON						// Turn on IBM
 #define IBM_DEBUG						// Write IBM body and matrix data out to text files
 #define IBBODY_TRACER					// Write out IBbody positions
-//#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
+#define LD_OUT							// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 #define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
@@ -171,10 +171,10 @@
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 300		// Index of start of object/wall in x-direction
-#define obj_x_max 310		// Index of end of object/wall in x-direction
-#define obj_y_min 125		// Index of start of object/wall in y-direction
-#define obj_y_max 195		// Index of end of object/wall in y-direction
+#define obj_x_min 200		// Index of start of object/wall in x-direction
+#define obj_x_max 300		// Index of end of object/wall in x-direction
+#define obj_y_min 80		// Index of start of object/wall in y-direction
+#define obj_y_max 125		// Index of end of object/wall in y-direction
 #define obj_z_min 15		// Index of start of object/wall in z-direction
 #define obj_z_max 30		// Index of end of object/wall in z-direction
 #endif
@@ -186,7 +186,7 @@
 ***************************************************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

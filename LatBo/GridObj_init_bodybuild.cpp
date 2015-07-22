@@ -114,7 +114,6 @@ void GridObj::ibm_build_body(int body_type) {
 		// =========================== Build array of flexible filaments ===========================  //
 
 		std::vector<double> width_length, centrepoint, angles;
-		unsigned int group = 999;
 
 
 		// If 2D, just build a filament
@@ -124,6 +123,7 @@ void GridObj::ibm_build_body(int body_type) {
 		ibm_build_body(4);	// Call add again but as a filament
 #else
 		// In 3D, build an array of filaments
+		unsigned int group = 999;
 
 		// Centre point
 		centrepoint.push_back(ibb_x);
@@ -254,7 +254,7 @@ void GridObj::ibm_build_body(int body_type) {
 		angles.push_back(-ibb_angle_vert);
 
 		// Build using plate flag
-		double lspace = iBody[iBody.size()-1].makeBody(dimensions,-ibb_angle_vert,centrepoint,false,false,iBody.size()-1,true);
+		iBody[iBody.size()-1].makeBody(dimensions,-ibb_angle_vert,centrepoint,false,false,iBody.size()-1,true);
 
 	} else if (body_type == 9) {
 		// =========================== Build 3D rigid plate + flexible flap ===========================  //
@@ -311,7 +311,7 @@ void GridObj::ibm_build_body(int body_type) {
 		start_point[1] = start_y;
 
 		// Loop
-		for (int i = 0; i < lengthwise_fils; i++ ) {
+		for (unsigned int i = 0; i < lengthwise_fils; i++ ) {
 
 			// Increase the iBody array by single IB_body object
 			iBody.emplace_back();

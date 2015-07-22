@@ -125,7 +125,7 @@ public :
 	void ibm_spread(unsigned int ib);						// Spreading of restoring force from ib-th body to grid
 	void ibm_findsupport(unsigned int ib, unsigned int m);	// Populates support information for the m-th marker of ib-th body
 	void ibm_computeforce(unsigned int ib);					// Compute restorative force at each marker in ib-th body
-	void ibm_findepsilon(unsigned int ib);					// Method to find epsilon weighting parameter for ib-th body
+	double ibm_findepsilon(unsigned int ib);				// Method to find epsilon weighting parameter for ib-th body
 	// Biconjugate gradient stablised method for solving asymmetric linear system required by finding epsilon
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon, 
 						   double tolerance, unsigned int maxiterations);

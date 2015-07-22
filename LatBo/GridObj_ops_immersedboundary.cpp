@@ -90,11 +90,12 @@ double GridObj::ibm_deltakernel(double radius, double dilation) {
 void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 	// Declarations
-	size_t inear, jnear, knear;		// Nearest node indices
-	double r_min, radius;			// Minimum radius limit and actual radius from centre of kernel
+	size_t inear, jnear;						// Nearest node indices
 	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
 #if (dims == 3)
-	double dist_z, delta_z;	// Extras for 3D
+	// Extras for 3D
+	double dist_z, delta_z;	
+	size_t knear;
 #endif
 
 
@@ -108,6 +109,10 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 
 #else
+
+	// Declarations
+	double r_min, radius;			// Minimum radius limit and actual radius from centre of kernel
+
 	// Following (Pinelli et al. 2010, JCP) we find closest node
 	r_min = abs(b_x-a_x) / dx;	// Initial minimum distance (in lu) taken from problem geometry
 
@@ -273,7 +278,9 @@ void GridObj::ibm_interpol(unsigned int ib) {
 
 	// Get grid sizes
 	size_t M_lim = YPos.size();
+#if (dims == 3)
 	size_t K_lim = ZPos.size();
+#endif
 	
 
 	// For each marker
@@ -352,7 +359,7 @@ void GridObj::ibm_spread(unsigned int ib) {
 
 // ***************************************************************************************************
 // Method to find epsilon
-void GridObj::ibm_findepsilon(unsigned int ib) {
+double GridObj::ibm_findepsilon(unsigned int ib) {
 
 	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
@@ -436,6 +443,8 @@ void GridObj::ibm_findepsilon(unsigned int ib) {
 		
 		iBody[ib].markers[m].epsilon = epsilon[m];
 	}
+
+	return minimum_residual_achieved;
 
 }
 

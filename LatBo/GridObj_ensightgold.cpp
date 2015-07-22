@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <fstream>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 
@@ -16,27 +16,28 @@ void GridObj::ensight_gen_case(int nsteps)
 	// Create file stream
 	ofstream fout;
 	
-	char fileName[50];
-	sprintf_s(fileName, (char*)"./Output/LBM.case");
+	// Create stringstream
+	stringstream fileName;
+	fileName.str("./Output/LBM.case");
 
-	fout.open(fileName);
+	fout.open( fileName.str().c_str() );
 
 	// Format section
 	fout << "FORMAT" << endl;
 	fout << "type: ensight gold" <<endl;
 
 	// Geometry section
-	sprintf_s(fileName, (char*)"geom.geo");
+	fileName.str("geom.geo");
 	fout << "GEOMETRY" << endl ;
-	fout << "model: " << fileName << endl;
+	fout << "model: " << fileName.str().c_str() << endl;
 	
 	// Variable section
 	// Only velocity (vector) and density (scalar) exported
 	fout << "VARIABLE" << endl;
-	sprintf_s(fileName, (char*)"velocity.*****.vec");
-	fout << "vector per node: 1 velocity " << fileName << endl;
-	sprintf_s(fileName, (char*)"rho.*****.sca");
-	fout << "scalar per node: 1 density  " << fileName << endl;
+	fileName.str("velocity.*****.vec");
+	fout << "vector per node: 1 velocity " << fileName.str().c_str() << endl;
+	fileName.str("rho.*****.sca");
+	fout << "scalar per node: 1 density  " << fileName.str().c_str() << endl;
 
 	// Time section
 	fout << "TIME" << endl;
@@ -67,7 +68,7 @@ void GridObj::ensight_gen_geometry( )
 
 	char fileName[50];
 	char buf[80]; // Character buffer
-	sprintf_s(fileName,(char*)"./Output/geom.geo");
+	sprintf(fileName,(char*)"./Output/geom.geo");
 	
 	if (level == 0) fout.open(fileName, ios::out);
 	else fout.open(fileName, ios::out|ios::app); // Append
@@ -90,17 +91,17 @@ void GridObj::ensight_gen_geometry( )
 	}
 	
 	// Part header
-	sprintf_s(buf, (char*)"\npart");
+	sprintf(buf, (char*)"\npart");
 	fout << buf;
 	// Unique part ID based on region and level
 	int gridNum = level + region_number*NumLev;
-	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+	sprintf(buf, "\n%10d", gridNum); fout << buf;
 	string buffer_str = "\nDesc: Grid Level = " + to_string(level) + 
 							" Region = " + to_string(region_number);
 	fout << buffer_str;
 	
 	// Dimensions of the grid
-	sprintf_s(buf, (char*)"\nblock uniform iblanked"); // Uniform grid with blanking
+	sprintf(buf, (char*)"\nblock uniform iblanked"); // Uniform grid with blanking
 	fout << buf;
 	int ni = XPos.size();
 	int nj = YPos.size();
@@ -111,32 +112,32 @@ void GridObj::ensight_gen_geometry( )
 #endif
 
 	// Print grid size (3 numbers on same line)
-	sprintf_s(buf, "\n%10d ", ni); fout << buf;
-	sprintf_s(buf, "%10d ", nj); fout << buf;
-	sprintf_s(buf, "%10d", nk); fout << buf;
+	sprintf(buf, "\n%10d ", ni); fout << buf;
+	sprintf(buf, "%10d ", nj); fout << buf;
+	sprintf(buf, "%10d", nk); fout << buf;
 
 	// Origin location
 	float x_orig = (float)XPos[0], y_orig = (float)YPos[0], z_orig = (float)ZPos[0];
 
-	sprintf_s(buf, "\n%12.5e", (float)x_orig); fout << buf;
-	sprintf_s(buf, "\n%12.5e", (float)y_orig); fout << buf;
-	sprintf_s(buf, "\n%12.5e", (float)z_orig); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)x_orig); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)y_orig); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)z_orig); fout << buf;
 
 	// Grid spacing
 	float x_delta = (float)dx, y_delta = (float)dy, z_delta = (float)dz;
 
-	sprintf_s(buf, "\n%12.5e", (float)x_delta); fout << buf;
-	sprintf_s(buf, "\n%12.5e", (float)y_delta); fout << buf;
-	sprintf_s(buf, "\n%12.5e", (float)z_delta); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)x_delta); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)y_delta); fout << buf;
+	sprintf(buf, "\n%12.5e", (float)z_delta); fout << buf;
 
 	// Node blanking flags
 	for (int k = 0; k < nk; k++) {
 		for (int j = 0; j < nj; j++) {
 			for (int i = 0; i < ni; i++) {
 				if (LatTyp(i,j,k,nj,nk) == 1 || LatTyp(i,j,k,nj,nk) == 4) {
-					sprintf_s(buf, "\n%10d", 1); fout << buf;
+					sprintf(buf, "\n%10d", 1); fout << buf;
 				} else { 
-					sprintf_s(buf, "\n%10d", 0); fout << buf;
+					sprintf(buf, "\n%10d", 0); fout << buf;
 				}
 			}
 		}
@@ -162,25 +163,25 @@ void GridObj::ensight_gen_vector(int fileNum)
 	ofstream fout;
 	char fileName[50] ;
 	char buf[80]; // Character buffer
-	sprintf_s(fileName, (char*)"./Output/velocity.%05d.vec", fileNum);
+	sprintf(fileName, (char*)"./Output/velocity.%05d.vec", fileNum);
 
 	if (level == 0) fout.open(fileName, ios::out);
 	else fout.open(fileName, ios::out|ios::app); // Append
 
 	if (level == 0) {
 		// Description line
-		sprintf_s(buf, (char*)"required description");
+		sprintf(buf, (char*)"required description");
 		fout << buf;
 	}
 	
 	// Part header
-	sprintf_s(buf, (char*)"\npart");
+	sprintf(buf, (char*)"\npart");
 	fout << buf;
 
 	int gridNum = level + region_number*NumLev;
-	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+	sprintf(buf, "\n%10d", gridNum); fout << buf;
 	
-	sprintf_s(buf, (char*)"\nblock");
+	sprintf(buf, (char*)"\nblock");
 	fout << buf;
 
 	// Data for part
@@ -192,7 +193,7 @@ void GridObj::ensight_gen_vector(int fileNum)
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 0;
-				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
+				sprintf(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -201,7 +202,7 @@ void GridObj::ensight_gen_vector(int fileNum)
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 1;
-				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
+				sprintf(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -211,7 +212,7 @@ void GridObj::ensight_gen_vector(int fileNum)
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
 				int dir = 2;
-				sprintf_s(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
+				sprintf(buf, "\n%12.5e", (float)u(i,j,k,dir,M_lim,K_lim,dims)); fout << buf;
 			}
 		}
 	}
@@ -219,7 +220,7 @@ void GridObj::ensight_gen_vector(int fileNum)
 	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
-				sprintf_s(buf, "\n%12.5e", 0.0); fout << buf;
+				sprintf(buf, "\n%12.5e", 0.0); fout << buf;
 			}
 		}
 	}
@@ -245,25 +246,25 @@ void GridObj::ensight_gen_scalar(int fileNum)
 	ofstream fout;
 	char fileName[50];
 	char buf[80];
-	sprintf_s(fileName, (char*)"./Output/rho.%05d.sca", fileNum);
+	sprintf(fileName, (char*)"./Output/rho.%05d.sca", fileNum);
 
 	if (level == 0 ) fout.open(fileName, ios::out);
 	else fout.open(fileName, ios::out|ios::app);
 
 	if (level == 0) {
 		// Description
-		sprintf_s(buf, (char*)"required description");
+		sprintf(buf, (char*)"required description");
 		fout << buf;
 	}
 	
 	// Part header
-	sprintf_s(buf, (char*)"\npart");
+	sprintf(buf, (char*)"\npart");
 	fout << buf;
 
 	int gridNum = level + region_number*NumLev;
-	sprintf_s(buf, "\n%10d", gridNum); fout << buf;
+	sprintf(buf, "\n%10d", gridNum); fout << buf;
 
-	sprintf_s(buf, (char*)"\nblock");
+	sprintf(buf, (char*)"\nblock");
 	fout << buf;
 
 	// Data
@@ -274,7 +275,7 @@ void GridObj::ensight_gen_scalar(int fileNum)
 	for (int k = 0; k < K_lim; k++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int i = 0; i < N_lim; i++) {
-				sprintf_s(buf, "\n%12.5e", (float)rho(i,j,k,M_lim,K_lim)); fout << buf;
+				sprintf(buf, "\n%12.5e", (float)rho(i,j,k,M_lim,K_lim)); fout << buf;
 			}
 		}
 	}

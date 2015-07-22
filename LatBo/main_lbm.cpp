@@ -45,10 +45,10 @@ int _tmain( )
 	clock_t t_start, t_end; // Wall clock variables
 	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
-	int fileNum = 0;		// Output file number (1 per timestep)
+
 	// Output start time
-	time_t curr_time = time(NULL); char time_str[26];	// Current system date/time and string buffer
-	ctime_s(time_str, sizeof(time_str), &curr_time);	// Format as string
+	time_t curr_time = time(NULL);	// Current system date/time
+	char* time_str = ctime(&curr_time);	// Format as string
     logfile << "Simulation started at " << time_str;	// Write start time to log
 
 
@@ -161,6 +161,7 @@ int _tmain( )
 
 	// Write out t = 0
 #ifdef ENSIGHTGOLD
+	int fileNum = 0;		// Output file number (1 per timestep)
 	logfile << "Writing out to EnSight file..." << endl;
 	Grids.ensight_gen_vector(fileNum);
 	Grids.ensight_gen_scalar(fileNum);
@@ -252,8 +253,8 @@ int _tmain( )
 #endif
 
 	// Close log file
-	curr_time = time(NULL);								// Current system date/time and string buffer
-	ctime_s(time_str, sizeof(time_str), &curr_time);	// Format as string
+	curr_time = time(NULL);			// Current system date/time and string buffer
+	time_str = ctime(&curr_time);	// Format as string
 	logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 

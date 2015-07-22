@@ -51,7 +51,7 @@ public:
 
 	// Define overloaded operator() for different array index flattening
 	// 4D array index
-	GenTyp& operator() (size_t i, size_t j, size_t k, size_t v, size_t j_max, size_t k_max, size_t v_max) {
+	inline GenTyp& operator() (size_t i, size_t j, size_t k, size_t v, size_t j_max, size_t k_max, size_t v_max) {
 
 		// Loop over vel then k then j then i
 		unsigned int idx = v + (k*v_max) + (j*v_max*k_max) + (i*v_max*k_max*j_max);
@@ -61,7 +61,7 @@ public:
 	}
 
 	// 3D array index
-	GenTyp& operator() (size_t i, size_t j, size_t k, size_t j_max, size_t k_max) {
+	inline GenTyp& operator() (size_t i, size_t j, size_t k, size_t j_max, size_t k_max) {
 
 		// Loop over k then j then i
 		unsigned int idx = k + (j*k_max) + (i*k_max*j_max);
@@ -71,7 +71,7 @@ public:
 	}
 
 	// 2D array index
-	GenTyp& operator() (size_t i, size_t j, size_t j_max) {
+	inline GenTyp& operator() (size_t i, size_t j, size_t j_max) {
 
 		// Loop over j then i
 		unsigned int idx = j + (i*j_max);

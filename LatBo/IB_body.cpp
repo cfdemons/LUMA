@@ -42,9 +42,6 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	}
 	this->groupID = group;
 
-	// Work out circumference
-	double circum = 2 * PI * radius;
-
 #if (dims == 3)
 
 	// Sphere //
@@ -111,11 +108,12 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	// Shorter variable names for convenience
 	double wid = width_length_depth[0];
 	double len = width_length_depth[1];
-	double dep = width_length_depth[2];
 
 #if (dims == 3)
 
 	// Cube //
+
+	double dep = width_length_depth[2];
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {

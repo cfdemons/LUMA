@@ -120,19 +120,23 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					}
 
 #else
-					// In 2D, extrapolate populations [3 4 5]
-					for (size_t v = 3; v < 6; v++) {
+					// In 2D, extrapolate populations [7 1 5]
+					for (size_t v = 1; v < 8; v++) {
+
+						if (v == 7 || v == 1 || v == 5) {
                 
-						float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
-						float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
-						float x1 = 0.0;
-						float x2 = (float)dx;
-						float x3 = 2 * x2;
+							float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
+							float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
+							float x1 = 0.0;
+							float x2 = (float)dx;
+							float x3 = 2 * x2;
                 
-						float lin_m = (y2 - y1) / (x2 - x1);
-						float lin_c = y1;
+							float lin_m = (y2 - y1) / (x2 - x1);
+							float lin_c = y1;
                 
-						f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+							f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+
+						}
 					}
 #endif
                 
@@ -219,27 +223,27 @@ void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim
 
 	// Implement using 4 equations
     // rho_in = sum( fi )
-    // rho_in * ux = (f0 + f1 + f7) - (f3 + f4 + f5)
-    // rho_in * uy = (f1 + f2 + f3) - (f5 + f6 + f7)
-    // f0 - feq0 = f4 - feq4 (equilibrium normal to boundary)
+    // rho_in * ux = (f6 + f0 + f4) - (f7 + f1 + f5)
+    // rho_in * uy = (f4 + f2 + f7) - (f5 + f3 + f6)
+    // f0 - feq0 = f1 - feq1 (equilibrium normal to boundary)
 
     // Find density on wall corresponding to given velocity
     double rho_w = (1.0 / (1.0 - u_0x)) * 
-		( ftmp[8] + ftmp[2] + ftmp[6] + 
+		( ftmp[8] + ftmp[2] + ftmp[3] + 
 			2.0 * (
-			ftmp[3] + ftmp[4] + ftmp[5]
+			ftmp[7] + ftmp[1] + ftmp[5]
 		) );
             
     // Find f0 using equations above
-    ftmp[0] = ftmp[4] + (2.0/3.0) * rho_w * u_0x;
+    ftmp[0] = ftmp[1] + (2.0/3.0) * rho_w * u_0x;
             
-    // Find f1 using equations above
-    ftmp[1] = 0.5 * ( (rho_w * u_0x) - 
-        (ftmp[0] + ftmp[2]) + ftmp[4] + 2.0*ftmp[5] + ftmp[6] );
+    // Find f4 using equations above
+    ftmp[4] = 0.5 * ( (rho_w * u_0x) - 
+        (ftmp[0] + ftmp[2]) + ftmp[1] + 2.0*ftmp[5] + ftmp[3] );
             
-    // Find f7 using equations above
-    ftmp[7] = 0.5 * ( (rho_w * u_0x) - 
-        (ftmp[0] + ftmp[6]) + ftmp[2] + 2.0*ftmp[3] + ftmp[4] );
+    // Find f6 using equations above
+    ftmp[6] = 0.5 * ( (rho_w * u_0x) - 
+        (ftmp[0] + ftmp[3]) + ftmp[2] + 2.0*ftmp[7] + ftmp[1] );
 
 #endif
 
@@ -296,22 +300,17 @@ size_t getOpposite(size_t direction) {
 		
 		direction_opposite = direction;
 
-	} else if (dims == 3) {
+	} else {
 		
-		// Using D3Q19 numbering
 		/*	If direction is even, then opposite is direction+1.
 			If direction is odd, then opposite is direction-1.
-			e.g. direction 0 (+x direction) has opposite 1 (-x direction) :: +1
-			however, direction 1 has opposite 0 :: -1
+			e.g. direction 0 (+x direction) has opposite 1 (-x direction) --> +1
+			however, direction 1 has opposite 0 --> -1
 			Hence we can add (-1 ^ direction) so it alternates between +/-1
 		*/
 
 		direction_opposite = direction + (int)pow(-1,direction);
 
-	} else {
-
-		// Using D2Q9 numbering
-		direction_opposite = ( (direction + 4) % 8);
 	}
 
 	return direction_opposite;
@@ -319,32 +318,4 @@ size_t getOpposite(size_t direction) {
 }
 
 // ***************************************************************************************************
-
-// Routine to identify which wall the boundary site sits in based on missing populations
-unsigned int whichwall( std::vector<size_t> mispops ) {
-
-	// IMPLEMENT LATER...
-
-	// Declare unsigned integer type
-	unsigned int wall_type = 0;
-
-	/*
-	Key:
-	1 == Left
-	2 == Right
-	3 == Top
-	4 == Bottom
-	5 == Front
-	6 == Back
-
-	Produces an error when called if the boundary condition has not been implemented yet
-	*/
-
-	// Expecting 3 missing populations (2D) or 5 (3D)
-	// Knowledge of normal population will tell us which boundary it is.
-
-
-	return wall_type;
-}
-
 // ***************************************************************************************************

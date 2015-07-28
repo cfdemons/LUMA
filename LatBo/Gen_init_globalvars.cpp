@@ -20,11 +20,11 @@ using namespace std; // Standard namespace in use
 
 #else
 
-	// D2Q9 (anticlockwise numbering with 9th paricle as the rest particle)
+	// D2Q9
 	const int c[3][nVels] =
 		{
-			{1,  1,  0, -1, -1, -1,  0,  1,  0},
-			{0,  1,  1,  1,  0, -1, -1, -1,  0},
+			{1,	-1,  0,  0,  1, -1,  1, -1,  0},
+			{0,  0,  1, -1,  1, -1, -1,  1,  0},
 			{0,  0,  0,  0,  0,  0,  0,  0,  0}
 		};
 
@@ -42,7 +42,7 @@ using namespace std; // Standard namespace in use
 #else
 
 	const double w[nVels] = 
-		{1.0/9.0, 1.0/36.0, 1.0/9.0, 1.0/36.0, 1.0/9.0, 1.0/36.0, 1.0/9.0, 1.0/36.0, 4.0/9.0};
+		{1.0/9.0, 1.0/9.0, 1.0/9.0, 1.0/9.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 4.0/9.0};
 	
 #endif
 

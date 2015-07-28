@@ -13,7 +13,7 @@ style = {'rx','-ko','b.','gs','md','c*'};
 for n = 1:nb
     
     % Read body coordinates
-    Body = dlmread(['./Output/IBbody_' num2str(n-1) '.out'],'\t',1,0);
+    Body = dlmread(['../Output/IBbody_' num2str(n-1) '.out'],'\t',1,0);
     
     if (n == 1)
         figure
@@ -40,7 +40,7 @@ for n = 1:nb
 
     % Loop over markers and read in support
     for i = 0:size(Body,1)-1
-        eval(['Supp_' num2str(i) ' = dlmread(''./Output/Supp_' num2str(n-1) ...
+        eval(['Supp_' num2str(i) ' = dlmread(''../Output/Supp_' num2str(n-1) ...
             '_' num2str(i) '.out'',''\t'',1,0);'])
     end
 

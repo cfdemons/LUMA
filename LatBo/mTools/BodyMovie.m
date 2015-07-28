@@ -7,7 +7,7 @@ function [] = BodyMovie(bod, n, out, d)
 % d is the number of dimensions of the problem
 
 % Create movie object
-Vid = VideoWriter('./Output/BodyMovie.avi');
+Vid = VideoWriter('../Output/BodyMovie.avi');
 % Vid.FrameRate = 25;
 open(Vid);
 exit_flag = false;
@@ -21,7 +21,7 @@ for c = 1:n+1
         
         for b = 0:bod-1
             try % If simulation crashes still allows movie to be built up to that point
-            eval(['xy' num2str(b) ' = csvread(''./Output/Body_' num2str(b)... 
+            eval(['xy' num2str(b) ' = csvread(''../Output/Body_' num2str(b)... 
                 '_position_' num2str(c) '.out'',1,0);']) % Read in values
             catch
                 exit_flag = true;

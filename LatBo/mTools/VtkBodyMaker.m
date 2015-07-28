@@ -17,7 +17,7 @@ for c = 1:n+1
         
         for b = 0:bod-1
             try % If simulation crashes still allows movie to be built up to that point
-            eval(['xyz' num2str(b) ' = csvread(''./Output/Body_' num2str(b)... 
+            eval(['xyz' num2str(b) ' = csvread(''../Output/Body_' num2str(b)... 
                 '_position_' num2str(c) '.out'',1,0);']) % Read in values ignoring first line
             catch
                 exit_flag = true;
@@ -31,7 +31,7 @@ for c = 1:n+1
         
         for b = 0:bod-1
             % Create a vtk file with required header
-            [fID, status] = fopen(['./Output/Body_' num2str(b) ...
+            [fID, status] = fopen(['../Output/Body_' num2str(b) ...
                 '_vtk_' num2str(c) '.vtk'],'w');
             fprintf(fID,'# vtk DataFile Version 3.0\n');
             fprintf(fID,'IBbody position\n');

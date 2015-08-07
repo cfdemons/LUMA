@@ -14,4 +14,6 @@ To start working on a feature:
 
 Any questions feel free to contact me, Adrian.
 
+## CONTACT ##
+
 Adrian Harwood (adrian.harwood@manchester.ac.uk)

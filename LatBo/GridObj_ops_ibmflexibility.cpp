@@ -20,14 +20,14 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
     double residual = 100;			// Set to arbitrary large number to being with
 	unsigned int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
-	size_t i;						// Iterator
 	size_t n = iBody[ib].markers.size() - 1;	// Number of markers - 1
+	size_t i = 0;								// Iterator
 	double EI = iBody[ib].flexural_rigidity;	// Flexural rigidity
 
 	// Special variables for the Numerical Recipe code
 	unsigned long *indx;
 		indx = new unsigned long[3 * iBody[ib].markers.size()];
-	int m1 = 3, m2 = 3;
+	unsigned int m1 = 3, m2 = 3;
 	double **AA, **AL, *d, *res;
 		AA = new double*[3 * iBody[ib].markers.size()+1];
 		AL = new double*[3 * iBody[ib].markers.size()];
@@ -160,11 +160,13 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 		std::ofstream Gout;
 		Gout.open("./Output/Gvector_" + std::to_string(ib) + ".out", std::ios::app);
 		Gout << "\nNEW TIME STEP" << std::endl;
-		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
+		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			Gout << G[i] << std::endl;
 		}
 		Gout.close();
 #endif
+
+
 
 	// ******************* //
     // *** Newton Loop *** //
@@ -201,10 +203,10 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         }
         for (i = 0; i <= 3 * n + 1; ++i) {
             indx[i] = 0;
-            for (int j = 0; j < m1 + m2 + 2; ++j) {
+            for (size_t j = 0; j < m1 + m2 + 2; ++j) {
                 AA[i][j] = 0.0;
             }
-            for (int j = 0; j < m1 + 1; ++j) {
+            for (size_t j = 0; j < m1 + 1; ++j) {
                 AL[i][j] = 0.0;
             }
         }
@@ -231,7 +233,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         AA[4][7] = iBody[ib].tension[1]; //J[3][6]=Tsol[1]; 
         //
         ii = 1;
-        for (i = 1; i < n - 1; ++i) {
+        for (size_t i = 1; i < n - 1; ++i) {
             ii = ii + 3;
             // inextensibility     
             AA[ii + 1][2] = 2 * (x[i] - x[i + 1]); //J[ii][ii-2]=2*(x[i]-x[i+1]);
@@ -273,7 +275,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 		// Iteration update 
         Tension0 = Tension0 - res[1];
         ii = 2;
-        for (i = 0; i < n; ++i) {
+        for (size_t i = 0; i < n; ++i) {
             iBody[ib].tension[i] -= res[ii];
             x[i] -= res[ii + 1];
             y[i] -= res[ii + 2];

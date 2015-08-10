@@ -22,7 +22,7 @@
 #include <iomanip>			// Output precision control
 #include <math.h>			// Mathematics
 #include <string>			// String template access
-#include <omp.h>			// Enable OpenMP 3.0 if using Intel C++ compiler or 2.0 if using Visual C++ compiler
+#include <omp.h>			// Enable OpenMP 3.0 if using Intel C++ compiler 14.0, 2.0 if using Visual C++ compiler 11, 4.0 if using GCC 4.9+. 
 #include "generic_ops.h"	// Forward declarations of generic functions
 
 
@@ -38,16 +38,17 @@
 #define PI 3.14159265358979323846
 
 // Output Options
-#define out_every 10			// How many timesteps before output
+#define out_every 100			// How many timesteps before output
 
 //#define TEXTOUT
-#define ENSIGHTGOLD
-//#define VTK_WRITER
+//#define ENSIGHTGOLD
+#define VTK_WRITER
 
 // Gravity (acts in +x direction)
 //#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force ( 3 * vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
+#define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
@@ -59,7 +60,7 @@
 ***************************************************************************************************************
 */
 
-#define T 1		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 500		// End time of simulation (if each time step increments by physical dt = dx)
 
 /*	
 ***************************************************************************************************************
@@ -69,9 +70,9 @@
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 600		// Number of x lattice sites
-#define M 200		// Number of y lattice sites
-#define K 100		// Number of z lattice sites
+#define N 300		// Number of x lattice sites
+#define M 100		// Number of y lattice sites
+#define K 50		// Number of z lattice sites
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
@@ -93,7 +94,7 @@
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 100		// Desired Reynolds number
+#define Re 150		// Desired Reynolds number
 // nu computed based on above selections
 
 
@@ -162,20 +163,21 @@
 
 // Switches
 #define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls
+//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+//#define WALLS_ON_2D			// Limit no-slip walls to top and bottom no-slip walls
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 200		// Index of start of object/wall in x-direction
-#define obj_x_max 300		// Index of end of object/wall in x-direction
-#define obj_y_min 80		// Index of start of object/wall in y-direction
-#define obj_y_max 125		// Index of end of object/wall in y-direction
-#define obj_z_min 15		// Index of start of object/wall in z-direction
+#define obj_x_min 80		// Index of start of object/wall in x-direction
+#define obj_x_max 120		// Index of end of object/wall in x-direction
+#define obj_y_min 40		// Index of start of object/wall in y-direction
+#define obj_y_max 60		// Index of end of object/wall in y-direction
+#define obj_z_min 20		// Index of start of object/wall in z-direction
 #define obj_z_max 30		// Index of end of object/wall in z-direction
 #endif
 

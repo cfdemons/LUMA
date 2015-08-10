@@ -17,8 +17,8 @@
 
 using namespace std;	// Use the standard namespace
 
-// Entry point (Compiling in VS on Windows)
-int _tmain( )
+// Entry point
+int main( )
 {
 	/*
 	***************************************************************************************************************
@@ -260,14 +260,3 @@ int _tmain( )
 
 	return 0;
 }
-
-// Entry point (compiling in Code::Blocks on Linux)
-#ifndef _WIN32
-int main()
-{
-
-    _tmain();
-
-    return 0;
-}
-#endif

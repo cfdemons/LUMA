@@ -89,9 +89,8 @@ void GridObj::LBM_init_wall_lab ( ) {
 	4 == TL to lower (finer) level
 	5 == Undefined
 	6 == Undefined
-	7 == Zou-He Inlet
-	8 == Extrapolation Outlet
-	9 == Do-nothing Inlet
+	7 == Inlet
+	8 == Outlet
 	*/
 
 #if defined SOLID_BLOCK_ON || defined WALLS_ON || defined INLET_ON || defined OUTLET_ON || defined WALLS_ON_2D
@@ -115,18 +114,20 @@ void GridObj::LBM_init_wall_lab ( ) {
 #ifdef INLET_ON
 	// Left hand face only
 
+	// Check for potential singularity in BC
+	if (u_0x == 1) {
+		// Singularity so exit
+		std::cout << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
 	i = 0;
 	for (j = 0; j < M; j++) {
 		for (k = 0; k < K; k++) {
 
-#ifndef INLET_DO_NOTHING
-			// Regular inlet site (Zou-He)
+			// Inlet site
 			LatTyp(i,j,k,M,K) = 7;
-
-#elif defined INLET_DO_NOTHING
-			// Do nothing inlet label
-			LatTyp(i,j,k,M,K) = 9;
-#endif
 
 		}
 	}
@@ -145,9 +146,8 @@ void GridObj::LBM_init_wall_lab ( ) {
 	}
 #endif
 
-#ifdef WALLS_ON
-#ifndef WALLS_ON_2D
-#if (dims == 3)
+#if defined WALLS_ON && !defined WALLS_ON_2D && (dims == 3)
+
 	// Front
 	k = 0;
 	for (i = 0; i < N; i++) {
@@ -167,11 +167,10 @@ void GridObj::LBM_init_wall_lab ( ) {
 
 		}
 	}
-#endif
-#endif
+
 #endif
 
-#if defined WALLS_ON || defined WALLS_ON_2D
+#if defined WALLS_ON && defined WALLS_ON_2D
 	// Top
 	j = 0;
 	for (i = 0; i < N; i++) {
@@ -299,9 +298,8 @@ void GridObj::LBM_init_grid( ) {
 	4 == TL to lower (finer) level
 	5 == Undefined
 	6 == Undefined
-	7 == Zou-He Inlet
-	8 == Extrapolation Outlet
-	9 == Do-nothing Inlet
+	7 == Inlet
+	8 == Outlet
 	*/
 
 	// Label as coarse site
@@ -469,9 +467,8 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 	4 == TL to lower (finer) level
 	5 == Undefined
 	6 == Undefined
-	7 == Zou-He Inlet
-	8 == Extrapolation Outlet
-	9 == Do-nothing Inlet
+	7 == Inlet
+	8 == Outlet
 	*/
 
 	// Get grid sizes

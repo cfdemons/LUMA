@@ -42,11 +42,20 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 #endif
 
-	// Execute kernel as normal...
+	
+	/////////////////////////////////
+	// Execute kernel as normal... //
+	/////////////////////////////////
+
 
 	// Loop twice on refined levels as refinement ratio per level is 2
 	int count = 1;
 	do {
+
+		// Apply boundary conditions (regularised must be applied before collision)
+#if (defined INLET_ON && defined INLET_REGULARISED)
+		LBM_boundary(2);
+#endif
 
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
 		LBM_forcegrid(false);
@@ -79,8 +88,12 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 			// Apply boundary conditions
-			LBM_boundary(2);	// Inlet/Outlet
-			LBM_boundary(0);	// Bounce-back (walls and solids)
+#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
+			LBM_boundary(2);	// Inlet (Zou-He)
+#endif
+#if (defined SOLID_ON || defined WALLS_ON)
+			LBM_boundary(1);	// Bounce-back (walls and solids)
+#endif
 
 			// Stream
 			LBM_stream();
@@ -95,13 +108,23 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		} else {
 
 			// Apply boundary conditions
-			LBM_boundary(2);	// Inlet/Outlet
-			LBM_boundary(0);	// Bounce-back (walls and solids)
+#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
+			LBM_boundary(2);	// Inlet (Zou-He)
+#endif
+#if (defined SOLID_ON || defined WALLS_ON)
+			LBM_boundary(1);	// Bounce-back (walls and solids)
+#endif
 
 			// Stream
 			LBM_stream();
 			
 		}
+
+
+		// Apply boundary conditions
+#ifdef OUTLET_ON
+		LBM_boundary(3);	// Outlet
+#endif
 
 		// Update macroscopic quantities
 		LBM_macro();
@@ -117,7 +140,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	} while (count < 3);
 
 
-	// On completion of kernel...
+	////////////////////////////////
+	// On completion of kernel... //
+	////////////////////////////////
 
 	// Execute IBM procedure using newly computed predicted data
 #ifdef IBM_ON
@@ -239,8 +264,8 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 				for (size_t k = 0; k < K_lim; k++) {
 
 #ifdef GRAVITY_ON
-					// Add gravity (+x direction) to any IBM forces currently stored
-					force_xyz(i,j,k,0,M_lim,K_lim,dims) += rho(i,j,k,M_lim,K_lim) * grav_force;
+					// Add gravity to any IBM forces currently stored
+					force_xyz(i,j,k,grav_direction,M_lim,K_lim,dims) += rho(i,j,k,M_lim,K_lim) * grav_force;
 #endif
 
 					// Now compute force_i components from Cartesian force vector
@@ -342,7 +367,8 @@ void GridObj::LBM_collide( bool core_flag ) {
 						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );						
 						
 						// Recompute distribution function f
-						f_new(i,j,k,v,M_lim,K_lim,nVels) = (-omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) ) + f(i,j,k,v,M_lim,K_lim,nVels)
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) ) 
+															+ f(i,j,k,v,M_lim,K_lim,nVels)
 															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
 						
 					}
@@ -407,7 +433,7 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 	
 	
 	// Compute f^eq
-	feq = rho(i,j,k,M_lim,K_lim) * w[v] * (1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))));
+	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))) );
 
 	return feq;
 
@@ -443,9 +469,11 @@ void GridObj::LBM_stream( ) {
 					}
 
 					// If site is do-nothing inlet then copy value
-					if (LatTyp(i,j,k,M_lim,K_lim) == 9) {
+#if (defined INLET_ON && defined INLET_DO_NOTHING)
+					if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);						
 					}
+#endif
 
 
 					// Only apply periodic BCs on coarsest level
@@ -473,12 +501,18 @@ void GridObj::LBM_stream( ) {
 					} else {
 
 						// Check destination site type and decide whether to stream or not
-						if ( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Fine -- ignore
-							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) && (LatTyp(i,j,k,M_lim,K_lim) == 4) ) || // TL lower level to TL lower level -- done on lower grid stream so ignore.
-							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 9) // Do-nothing inlet site so do not overwrite
+						if ( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Fine site -- ignore
+							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) 
+								&& (LatTyp(i,j,k,M_lim,K_lim) == 4) ) // TL lower level to TL lower level -- done on lower grid stream so ignore.
 							) {
 
-							// Do nothing														
+							// Do nothing
+
+#if (defined INLET_ON && defined INLET_DO_NOTHING)
+						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) { // Do-nothing inlet site so do not overwrite
+
+							// Do nothing
+#endif
 					
 						} else {
 

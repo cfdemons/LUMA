@@ -97,7 +97,9 @@ public :
 	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or reset vectors if flag is true)
 	
 	// Boundary operations
-	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Zou-He procedure
+	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Zou-He BC
+	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);		// Application of Regaulrised BC
+	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Extrapolation BC
 	void bc_solid_site_reset();	// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
@@ -106,19 +108,19 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void io_write_body_pos(unsigned int t);	// Write out IB_body positions to text files
+	void io_write_body_pos(unsigned int t);			// Write out IB_body positions to text files
 	void io_write_lift_drag(unsigned int t);		// Write out IB_body lift and drag
-	void io_textout(int t);			// Writes out the contents of the class as well as any subgrids to a text file
+	void io_textout(int t);							// Writes out the contents of the class as well as any subgrids to a text file
 	// EnsightGold methods
-	void ensight_gen_case(int nsteps);		// Generate case file
-	void ensight_gen_geometry();					// Generate geometry file
+	void ensight_gen_case(int nsteps);			// Generate case file
+	void ensight_gen_geometry();				// Generate geometry file
 	void ensight_gen_vector(int fileNum);		// Generate vectors file
 	void ensight_gen_scalar(int fileNum);		// Generate scalars file
 	// VTK writer methods
 	void vtk_writer(int t, double tval);
 
 	// IBM methods
-	void ibm_build_body(int body_type);							// Build a new pre-fab body
+	void ibm_build_body(int body_type);						// Build a new pre-fab body
 	void ibm_initialise();									// Initialise a built immersed body
 	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
 	void ibm_interpol(unsigned int ib);						// Interpolation of velocity field onto markers of ib-th body
@@ -139,8 +141,6 @@ public :
 	unsigned long indx[], double b[]);
 	void ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double *d);
-
-
 
 	
 };

@@ -104,7 +104,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	jnear = (unsigned int)floor( iBody[ib].markers[m].position[1]/dy );
 
 #if (dims == 3)
-	knear = floor( iBody[ib].markers[m].position[2]/dz );
+	knear = (unsigned int)floor( iBody[ib].markers[m].position[2]/dz );
 #endif
 
 

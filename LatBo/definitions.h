@@ -38,7 +38,7 @@
 #define PI 3.14159265358979323846
 
 // Output Options
-#define out_every 100			// How many timesteps before output
+#define out_every 10			// How many timesteps before output
 
 //#define TEXTOUT
 //#define ENSIGHTGOLD
@@ -53,6 +53,9 @@
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 
+// LBM configuration
+#define USE_MRT
+
 
 /*	
 ***************************************************************************************************************
@@ -60,7 +63,7 @@
 ***************************************************************************************************************
 */
 
-#define T 500		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 200		// End time of simulation (if each time step increments by physical dt = dx)
 
 /*	
 ***************************************************************************************************************
@@ -70,9 +73,9 @@
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 50		// Number of z lattice sites
+#define N 150		// Number of x lattice sites
+#define M 50		// Number of y lattice sites
+#define K 25		// Number of z lattice sites
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
@@ -94,7 +97,7 @@
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 150		// Desired Reynolds number
+#define Re 600		// Desired Reynolds number
 // nu computed based on above selections
 
 
@@ -173,12 +176,12 @@
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 80		// Index of start of object/wall in x-direction
-#define obj_x_max 120		// Index of end of object/wall in x-direction
-#define obj_y_min 40		// Index of start of object/wall in y-direction
-#define obj_y_max 60		// Index of end of object/wall in y-direction
-#define obj_z_min 20		// Index of start of object/wall in z-direction
-#define obj_z_max 30		// Index of end of object/wall in z-direction
+#define obj_x_min 40		// Index of start of object/wall in x-direction
+#define obj_x_max 60		// Index of end of object/wall in x-direction
+#define obj_y_min 20		// Index of start of object/wall in y-direction
+#define obj_y_max 30		// Index of end of object/wall in y-direction
+#define obj_z_min 10		// Index of start of object/wall in z-direction
+#define obj_z_max 15		// Index of end of object/wall in z-direction
 #endif
 
 

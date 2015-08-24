@@ -71,6 +71,7 @@ public :
 	double dt;		// Physical time step size
 	double nu;		// Kinematic viscosity (in lattice units)
 	double omega;	// Relaxation frequency
+	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 
 	/*	
 	***************************************************************************************************************
@@ -84,13 +85,15 @@ public :
 	void LBM_init_vel();		// Initialise the velocity field
 	void LBM_init_rho();		// Initialise the density field
 	void LBM_init_grid();		// Initialise top level grid with a velocity and denstiy field
-	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ, double dx0, double omega_coarse);	// Initialise subgrid with all quantities
+	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ, 
+		double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse);	// Initialise subgrid with all quantities
 	void LBM_init_wall_lab();		// Initialise labels for objects and walls
 
 	// LBM operations
 	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel
 	void LBM_collide(bool core_flag);			// Apply collision + 1 overload
 	double LBM_collide(int i, int j, int k, int v);
+	void LBM_mrt_collide(ivector<double>& f_new, int i, int j, int k);	// MRT collision operation
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities
 	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions

@@ -167,3 +167,5 @@ vector<double> matrix_multiply(vector< vector<double> >& A, vector<double>& x) {
 
 	return product;
 }
+
+// ***************************************************************************************************

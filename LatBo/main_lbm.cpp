@@ -14,35 +14,70 @@
 #include "definitions.h"	// Definitions file
 #include "globalvars.h"		// Global variable references
 #include "GridObj.h"		// Grid class
+#include "MPI_manager.h"	// MPI manager class
 
 using namespace std;	// Use the standard namespace
 
 // Entry point
-int main( )
+int main( int argc, char* argv[] )
 {
 	/*
 	***************************************************************************************************************
-	********************************************* GENERAL INITIALISE **********************************************
+	*********************************************** MPI INITIALISE ************************************************
 	***************************************************************************************************************
 	*/
+#ifdef BUILD_FOR_MPI
 
+	// Filename for verbose write out
+#ifdef MPI_VERBOSE
+	string filename;
+#endif
+
+	// Usual initialise
+	MPI_Init( &argc, &argv );
+
+#endif
+
+	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
 #if (dims != 3)
-	// Reset the refined region z-limits if only 2D
 	for (int i = 0; i < NumReg; i++) {
 		RefZstart[i] = 0;
 		RefZend[i] = 0;
 	}
 #endif
 
+#ifdef BUILD_FOR_MPI
+	// Create MPI_manager object
+	MPI_manager mpim;
+
+	// Initialise the topology
+	mpim.mpi_init();
+
+	// Decompose the domain
+	mpim.mpi_gridbuild();
+#endif
+
+	/*
+	***************************************************************************************************************
+	********************************************* GENERAL INITIALISE **********************************************
+	***************************************************************************************************************
+	*/
+
 	// Create a log file
 	std::ofstream logfile;
-	logfile.open("./Output/log.out", std::ios::out);
+	string fNameRank;
+#ifdef BUILD_FOR_MPI
+	fNameRank = to_string(mpim.my_rank);
+#else
+	fNameRank = to_string(0);
+#endif
+	logfile.open("./Output/log_rank" + fNameRank + ".out", std::ios::out);
 
 	// Fix output format
 	cout.precision(4);
 
 	// Timing variables
-	clock_t t_start, t_end; // Wall clock variables
+	clock_t t_start, t_end, secs; // Wall clock variables
 	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 
@@ -57,8 +92,14 @@ int main( )
 	*********************************************** LEVEL 0 INITIALISE ***********************************************
 	*************************************************************************************************************** */
 
-	// Create grid level 0 and let constructor initialise
+	// Create the grid object (level = 0)
+#ifdef BUILD_FOR_MPI
+	// Call MPI constructor
+	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos);
+#else
+	// Call basic wrapper constructor
 	GridObj Grids(0);
+#endif
 
 	// Number of loops based on L0 time step
 	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)#
@@ -66,6 +107,14 @@ int main( )
 	
 	// Log file information
 	logfile << "Grid size = " << N << "x" << M << "x" << K << endl;
+#ifdef BUILD_FOR_MPI
+	logfile << "MPI size = " << Xcores << "x" << Ycores << "x" << Zcores << endl;
+	logfile << "Coordinates on rank " << Grids.my_rank << " are (";
+		for (size_t d = 0; d < dims; d++) {
+			logfile << "\t" << mpim.MPI_coords[d];
+		}
+		logfile << "\t)" << std::endl;
+#endif
 	logfile << "Number of time steps = " << totalloops << endl;
 	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
@@ -83,8 +132,42 @@ int main( )
 		// Loop over number of regions and add subgrids to Grids
 		for (int reg = 0; reg < NumReg; reg++) {
 
+#ifdef BUILD_FOR_MPI
+			/* Check to make sure the refined region lies completely on this rank's L0 grid:
+			 * Check	1) starts on this rank &&
+			 *			2) ends on this rank
+			 */
+
+#if (dims == 3)
+			// 3D check
+			if ( ( (int)RefXstart[reg] > mpim.global_edge_ind[0][mpim.my_rank] && (int)RefXend[reg] < mpim.global_edge_ind[1][mpim.my_rank] ) &&
+				 ( (int)RefYstart[reg] > mpim.global_edge_ind[2][mpim.my_rank] && (int)RefYend[reg] < mpim.global_edge_ind[3][mpim.my_rank] ) && 
+				 ( (int)RefZstart[reg] > mpim.global_edge_ind[4][mpim.my_rank] && (int)RefZend[reg] < mpim.global_edge_ind[5][mpim.my_rank] ) ) {
+
+					// Add the subgrid and let constructor initialise
+					Grids.LBM_addSubGrid(reg);
+
+			}
+#else
+			// 2D check
+			if ( ( (int)RefXstart[reg] > mpim.global_edge_ind[0][mpim.my_rank] && (int)RefXend[reg] < mpim.global_edge_ind[1][mpim.my_rank] ) &&
+				 ( (int)RefYstart[reg] > mpim.global_edge_ind[2][mpim.my_rank] && (int)RefYend[reg] < mpim.global_edge_ind[3][mpim.my_rank] ) ) {
+
+					// Add the subgrid and let constructor initialise
+					Grids.LBM_addSubGrid(reg);
+
+			}
+
+#endif
+
+
+
+#else
+			// No check required
 			// Add the subgrid and let constructor initialise
 			Grids.LBM_addSubGrid(reg);
+
+#endif
 		}
 
 	}
@@ -158,14 +241,8 @@ int main( )
 	/* ***************************************************************************************************************
 	******************************************* CLOSE INITIALISATION *************************************************
 	*************************************************************************************************************** */
-
+	
 	// Write out t = 0
-#ifdef ENSIGHTGOLD
-	int fileNum = 0;		// Output file number (1 per timestep)
-	logfile << "Writing out to EnSight file..." << endl;
-	Grids.ensight_gen_vector(fileNum);
-	Grids.ensight_gen_scalar(fileNum);
-#endif
 #ifdef TEXTOUT
 	logfile << "Writing Output to <Grids.out>..." << endl;
 	Grids.io_textout(t);
@@ -174,15 +251,13 @@ int main( )
 	logfile << "Writing out to VTK file..." << endl;
 	Grids.vtk_writer(t, 0.0);
 #endif
-
+	
 	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
 
 
 	/* ***************************************************************************************************************
 	********************************************** LBM PROCEDURE *****************************************************
 	*************************************************************************************************************** */
-
-	// LBM
 	do {
 
 		cout << "\n------ Time Step " << t+1 << " of " << totalloops << " ------" << endl;
@@ -190,7 +265,9 @@ int main( )
 		// Start the clock
 		t_start = clock();
 
-		// Call LBM kernel from L0
+		///////////////////////
+		// Launch LBM Kernel //
+		///////////////////////
 #ifdef IBM_ON
 		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
 #else
@@ -199,7 +276,7 @@ int main( )
 
 		// Print Time of loop
 		t_end = clock();
-		clock_t secs = t_end - t_start;
+		secs = t_end - t_start;
 		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
 		// Increment counters
@@ -207,13 +284,12 @@ int main( )
 		tval += Grids.dt;
 
 		
-		// Write out
+		///////////////
+		// Write Out //
+		///////////////
 		if (t % out_every == 0) {
-#ifdef ENSIGHTGOLD
-		std::cout << "Writing out to EnSight file" << endl;
-		fileNum++;
-		Grids.ensight_gen_vector(fileNum);
-		Grids.ensight_gen_scalar(fileNum);
+#ifdef BUILD_FOR_MPI
+			MPI_Barrier(mpim.my_comm);
 #endif
 #ifdef TEXTOUT
 		std::cout << "Writing out to <Grids.out>" << endl;
@@ -236,7 +312,73 @@ int main( )
 
 		}
 
+#ifdef BUILD_FOR_MPI
+		///////////////////////
+		// MPI Communication //
+		///////////////////////
+		// Start the clock
+		t_start = clock();
 
+		// Loop over directions in Cartesian topology
+		for (int dir = 0; dir < MPI_dir; dir++) {
+
+			////////////////////////
+			// Buffer Information //
+			////////////////////////
+
+			MPI_Barrier(mpim.my_comm);
+			// Pass direction and Grids by reference
+			mpim.mpi_buffer_pack( dir, Grids );
+
+			//////////////////////
+			// Send Information //
+			//////////////////////
+
+			// Find opposite direction (neighbour it receives from)
+			unsigned int opp_dir;
+			// Opposite of even directions is +1, odd is -1 based on MPI_cartlab
+			if ( (dir + 2) % 2 == 0) {
+				opp_dir = dir + 1;
+			} else {
+				opp_dir = dir - 1;
+			}
+
+			MPI_Barrier(mpim.my_comm);
+
+			// Send info to neighbour while receiving from other neighbour
+			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], 999, 
+				mpim.neighbour_rank[opp_dir], 999, mpim.my_comm, &mpim.stat);
+
+#ifdef MPI_VERBOSE
+			// Write out buffer
+			MPI_Barrier(mpim.my_comm);
+			filename = "./Output/Buffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			mpim.writeout_buf(filename);
+#endif
+
+			//////////////////////////////
+			// Copy from buffer to grid //
+			//////////////////////////////
+
+			MPI_Barrier(mpim.my_comm);
+			// Pass direction and Grids by reference
+			mpim.mpi_buffer_unpack( dir, Grids );
+
+
+		}
+
+		// Print Time of MPI comms
+		t_end = clock();
+		secs = t_end - t_start;
+		printf("MPI overhead took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
+
+#ifdef TEXTOUT
+		MPI_Barrier(mpim.my_comm);
+		std::cout << "Writing out to <Grids.out>" << endl;
+		Grids.io_textout(999999999);
+#endif
+
+#endif
 
 	// Loop End
 	} while (tval < T);
@@ -246,17 +388,17 @@ int main( )
 	*********************************************** POST PROCESS *****************************************************
 	*************************************************************************************************************** */
 
-	// End of loop write out
-#ifdef ENSIGHTGOLD
-	Grids.ensight_gen_case(totalloops);
-	Grids.ensight_gen_geometry();
-#endif
 
 	// Close log file
 	curr_time = time(NULL);			// Current system date/time and string buffer
 	time_str = ctime(&curr_time);	// Format as string
 	logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
+
+#ifdef BUILD_FOR_MPI
+	// Finalise MPI
+	MPI_Finalize();
+#endif
 
 	return 0;
 }

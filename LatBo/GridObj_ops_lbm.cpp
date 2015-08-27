@@ -17,13 +17,13 @@ using namespace std;
 // IBM_flag dictates whether we need the predictor step or not
 void GridObj::LBM_multi ( bool IBM_flag ) {
 
+	// Copy distributions prior to IBM predictive step
+#ifdef IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
 	ivector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
 
 	// If IBM on and predictive loop flag true then store initial data and reset forces
-#ifdef IBM_ON
-	// Limit to level 0 immersed body for now
-	if (level == 0 && IBM_flag == true) {
+	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
 
 		std::cout << "Prediction step..." << std::endl;
 
@@ -565,9 +565,33 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,dims) = 0;
 #endif
 
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
+
+					// Solid site so compute density but set velocity to zero
+					rho_temp = 0;
+
+					for (int v = 0; v < nVels; v++) {
+
+						// Sum up to find density
+						rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
+
+					}
+
+					// Assign density
+					rho(i,j,k,M_lim,K_lim) = rho_temp;
+
+		
+					// Set velocity to zero
+					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
+#if (dims == 3)
+					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
+#endif
+
+
 				} else {
 
-					// Reset temporary variables
+					// Any other of type of site compute both density and velocity from populations
 					rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
 
 					for (int v = 0; v < nVels; v++) {
@@ -605,10 +629,92 @@ void GridObj::LBM_macro( ) {
 		}
 	}
 
-#ifdef SOLID_BLOCK_ON
-	// Do a solid site reset of velocity
-	bc_solid_site_reset();
+}
+
+
+// ***************************************************************************************************
+
+// Overload of macroscopic quantity calculation to allow it to be applied to a single site
+void GridObj::LBM_macro( int i, int j, int k ) {
+
+	// Declarations
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
+	double rho_temp = 0;
+	double fux_temp = 0;
+	double fuy_temp = 0;
+	double fuz_temp = 0;
+
+
+	if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+
+		// Refined site so set both density and velocity to zero
+		rho(i,j,k,M_lim,K_lim) = 0;
+		u(i,j,k,0,M_lim,K_lim,dims) = 0;
+		u(i,j,k,1,M_lim,K_lim,dims) = 0;
+#if (dims == 3)
+		u(i,j,k,2,M_lim,K_lim,dims) = 0;
 #endif
+
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
+
+		// Solid site so compute density but set velocity to zero
+		rho_temp = 0;
+
+		for (int v = 0; v < nVels; v++) {
+
+			// Sum up to find density
+			rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
+
+		}
+
+		// Assign density
+		rho(i,j,k,M_lim,K_lim) = rho_temp;
+
+		
+		// Set velocity to zero
+		u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
+		u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
+#if (dims == 3)
+		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
+#endif
+		
+	} else {
+
+		// Any other of type of site compute both density and velocity from populations
+		rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
+
+		for (int v = 0; v < nVels; v++) {
+
+			// Sum up to find momentum
+			fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+			fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+			fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+
+			// Sum up to find density
+			rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
+
+		}
+
+		// Assign density
+		rho(i,j,k,M_lim,K_lim) = rho_temp;
+
+		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
+		fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+		fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+#if (dims == 3)
+		fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+#endif
+
+		// Assign velocity
+		u(i,j,k,0,M_lim,K_lim,dims) = fux_temp / rho_temp;
+		u(i,j,k,1,M_lim,K_lim,dims) = fuy_temp / rho_temp;
+#if (dims == 3)
+		u(i,j,k,2,M_lim,K_lim,dims) = fuz_temp / rho_temp;
+#endif
+
+	}
 
 }
 

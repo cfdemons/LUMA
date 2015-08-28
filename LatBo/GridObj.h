@@ -11,11 +11,18 @@
 class GridObj
 {
 
+	// Allow MPI_manager objects to access Grid information
+	friend class MPI_manager;
+
 public:
 
 	GridObj( ); // Default constructor
-	GridObj(int level); // Constructor with level
-	GridObj(int level, int RegionNumber); // Sub grid constructor
+	GridObj(int level); // Basic grid constructor
+	GridObj(int level, int RegionNumber, int rank); // MPI sub grid constructor with level, region and rank
+	// MPI L0 constructor with level, rank, local size and global edges
+	GridObj(int level, int rank, std::vector<unsigned int> local_size, 
+		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+		std::vector< std::vector<double> > GlobalLimsPos);
 	~GridObj( ); // Default destructor
 
 
@@ -30,7 +37,8 @@ private :
 	// 1D subgrid array (size = NumReg)
 	std::vector<GridObj> subGrid;
 	
-	// Start and end indices of corresponding coarse level (unsigned integers)
+	// Start and end indices of corresponding coarse level
+	// When using MPI these values are local to a particular coarse grid
 	size_t CoarseLimsX[2];
 	size_t CoarseLimsY[2];
 	size_t CoarseLimsZ[2];
@@ -72,7 +80,8 @@ public :
 	double nu;		// Kinematic viscosity (in lattice units)
 	double omega;	// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
-
+	int my_rank;	// MPI rank
+	
 	/*	
 	***************************************************************************************************************
 	********************************************* Member Methods **************************************************
@@ -84,20 +93,25 @@ public :
 	// Initialisation functions
 	void LBM_init_vel();		// Initialise the velocity field
 	void LBM_init_rho();		// Initialise the density field
-	void LBM_init_grid();		// Initialise top level grid with a velocity and denstiy field
+	void LBM_init_grid();		// Non-MPI wrapper for initialiser
+	void LBM_init_grid(std::vector<unsigned int> local_size, 
+		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ, 
 		double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse);	// Initialise subgrid with all quantities
-	void LBM_init_wall_lab();		// Initialise labels for objects and walls
+	void LBM_init_bound_lab();		// Initialise labels for objects and walls
+	void LBM_init_refined_lab();	// Initialise labels for refined regions
 
 	// LBM operations
 	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel
-	void LBM_collide(bool core_flag);			// Apply collision + 1 overload
+	void LBM_collide(bool core_flag);			// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_mrt_collide(ivector<double>& f_new, int i, int j, int k);	// MRT collision operation
 	void LBM_stream();							// Stream populations
-	void LBM_macro();							// Compute macroscopic quantities
+	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
+	void LBM_macro(int i, int j, int k);
 	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
-	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or reset vectors if flag is true)
+	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
 	
 	// Boundary operations
 	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Zou-He BC
@@ -114,11 +128,6 @@ public :
 	void io_write_body_pos(unsigned int t);			// Write out IB_body positions to text files
 	void io_write_lift_drag(unsigned int t);		// Write out IB_body lift and drag
 	void io_textout(int t);							// Writes out the contents of the class as well as any subgrids to a text file
-	// EnsightGold methods
-	void ensight_gen_case(int nsteps);			// Generate case file
-	void ensight_gen_geometry();				// Generate geometry file
-	void ensight_gen_vector(int fileNum);		// Generate vectors file
-	void ensight_gen_scalar(int fileNum);		// Generate scalars file
 	// VTK writer methods
 	void vtk_writer(int t, double tval);
 

@@ -16,7 +16,7 @@ void GridObj::ibm_initialise() {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out marker coordinates
 		std::ofstream bodyout;
-		bodyout.open("./Output/IBbody_" + std::to_string(ib) + ".out");
+		bodyout.open("./Output/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out");
 		bodyout << "x\ty\tz" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << std::endl;
@@ -33,7 +33,7 @@ void GridObj::ibm_initialise() {
 		// DEBUG -- write out support coordinates
 		std::ofstream suppout;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open("./Output/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + ".out");
+			suppout.open("./Output/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(my_rank) + ".out");
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
 				if (dims == 3) {
@@ -52,7 +52,7 @@ void GridObj::ibm_initialise() {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out epsilon values
 		std::ofstream epout;
-		epout.open("./Output/Epsilon_" + std::to_string(ib) + ".out");
+		epout.open("./Output/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out");
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			epout << iBody[ib].markers[m].epsilon << std::endl;
 		}
@@ -410,7 +410,7 @@ double GridObj::ibm_findepsilon(unsigned int ib) {
 #ifdef IBM_DEBUG
 	// DEBUG -- write out A
 	std::ofstream Aout;
-	Aout.open("./Output/Amatrix_" + std::to_string(ib) + ".out");
+	Aout.open("./Output/Amatrix_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out");
 	for (size_t i = 0; i < A.size(); i++) {
 		Aout << "\n";
 		for (size_t j = 0; j < A.size(); j++) {

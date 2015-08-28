@@ -118,48 +118,68 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 // Routine to apply Extrapolation outlet boundary condition
 void GridObj:: bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim) {
 
+	/* When using MPI, an outlet may appear at an edge of the grid which 
+	 * is not the right-hand edge. As a remedy to this we first check
+	 * whether the extrapolation has access to the values. If it does not
+	 * the extrapolation is not performed. Although this will result in 
+	 * the boundary condition not being applied to the outlet on one of 
+	 * the MPI ranks, this outlet will be overwritten during MPI comms.
+	 * Furthermore, the erroneous values will likely stream to an inlet 
+	 * or other boundary site where the incoming values are assumed 
+	 * unknown and are overwritten by the boundary condition at this site.
+	 * Therefore, the impact of not updating these sites is anticipated to
+	 * be zero.
+	 */
+
+	if (i-1 < 0 || i-2 < 0) {
+
+		// Cannot update the outlet using extrapolation
+
+	} else {
+
 #if dims == 3
 
-	// In 3D, extrapolate populations [1 7 9 15 16]
-	for (size_t v = 1; v < 17; v++) {
+		// In 3D, extrapolate populations [1 7 9 15 16]
+		for (size_t v = 1; v < 17; v++) {
                 
-		// Make all this generic in future release
-		if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
+			// Make all this generic in future release
+			if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
 
-			float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
-			float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
-			float x1 = 0.0;
-			float x2 = (float)dx;
-			float x3 = 2 * x2;
+				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
+				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
+				float x1 = 0.0;
+				float x2 = (float)dx;
+				float x3 = 2 * x2;
                 
-			float lin_m = (y2 - y1) / (x2 - x1);
-			float lin_c = y1;
+				float lin_m = (y2 - y1) / (x2 - x1);
+				float lin_c = y1;
                 
-			f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+				f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+			}
 		}
-	}
 
 #else
-	// In 2D, extrapolate populations [7 1 5]
-	for (size_t v = 1; v < 8; v++) {
+		// In 2D, extrapolate populations [7 1 5]
+		for (size_t v = 1; v < 8; v++) {
 
-		if (v == 7 || v == 1 || v == 5) {
+			if (v == 7 || v == 1 || v == 5) {
                 
-			float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
-			float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
-			float x1 = 0.0;
-			float x2 = (float)dx;
-			float x3 = 2 * x2;
+				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
+				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
+				float x1 = 0.0;
+				float x2 = (float)dx;
+				float x3 = 2 * x2;
                 
-			float lin_m = (y2 - y1) / (x2 - x1);
-			float lin_c = y1;
+				float lin_m = (y2 - y1) / (x2 - x1);
+				float lin_c = y1;
                 
-			f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+				f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
 
+			}
 		}
-	}
 #endif
 
+	}
 
 }
 
@@ -301,15 +321,15 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 	Syz = ftmp[10] + ftmp[11] - ftmp[12] - ftmp[13];
 
 	// Compute regularised off-equilibrium components, overwriting ftmp as we have finished with it
-	for (unsigned int i = 0; i < nVels; i++) {
+	for (unsigned int v = 0; v < nVels; v++) {
 
-		ftmp[i] = (w[i] / (2*pow(cs,4))) * (
-			( (pow(c[0][i],2) - pow(cs,2)) * Sxx ) + 
-			( (pow(c[1][i],2) - pow(cs,2)) * Syy ) +
-			( (pow(c[2][i],2) - pow(cs,2)) * Szz ) +
-			( 2*c[0][i]*c[1][i]*Sxy ) +
-			( 2*c[0][i]*c[2][i]*Sxz ) +
-			( 2*c[1][i]*c[2][i]*Syz )
+		ftmp[v] = (w[v] / (2*pow(cs,4))) * (
+			( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
+			( (pow(c[1][v],2) - pow(cs,2)) * Syy ) +
+			( (pow(c[2][v],2) - pow(cs,2)) * Szz ) +
+			( 2*c[0][v]*c[1][v]*Sxy ) +
+			( 2*c[0][v]*c[2][v]*Sxz ) +
+			( 2*c[1][v]*c[2][v]*Syz )
 			);
 
 	}
@@ -329,12 +349,12 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 	Syy = ftmp[2] + ftmp[3] + 2*(ftmp[5] + ftmp[7]) - rho_wall*( (1.0/3.0) - (1.0/3.0)*u_0x );
 
 	// Compute regularised off-equilibrium components, overwriting ftmp as we have finished with it
-	for (unsigned int i = 0; i < nVels; i++) {
+	for (unsigned int v = 0; v < nVels; v++) {
 
-		ftmp[i] = (w[i] / (2*pow(cs,4))) * (
-			( (pow(c[0][i],2) - pow(cs,2)) * Sxx ) + 
-			( 2*c[0][i]*c[1][i]*Sxy ) +
-			( (pow(c[1][i],2) - pow(cs,2)) * Syy )
+		ftmp[v] = (w[v] / (2*pow(cs,4))) * (
+			( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
+			( 2*c[0][v]*c[1][v]*Sxy ) +
+			( (pow(c[1][v],2) - pow(cs,2)) * Syy )
 			);
 
 	}

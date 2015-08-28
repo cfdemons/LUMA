@@ -78,7 +78,7 @@ void GridObj::LBM_init_rho ( ) {
 // ***************************************************************************************************
 
 // Initialise wall and object labels method (L0 only)
-void GridObj::LBM_init_wall_lab ( ) {
+void GridObj::LBM_init_bound_lab ( ) {
 
 	// Typing defined as follows:
 	/*
@@ -92,6 +92,11 @@ void GridObj::LBM_init_wall_lab ( ) {
 	7 == Inlet
 	8 == Outlet
 	*/
+
+	// Get grid sizes
+	int N_lim = XPos.size();
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
 
 #if defined SOLID_BLOCK_ON || defined WALLS_ON || defined INLET_ON || defined OUTLET_ON || defined WALLS_ON_2D
 	int i, j, k;
@@ -112,7 +117,33 @@ void GridObj::LBM_init_wall_lab ( ) {
 		for (j = obj_y_min; j <= obj_y_max; j++) {
 			for (k = obj_z_min; k <= obj_z_max; k++) {
 
-				LatTyp(i,j,k,M,K) = 0;
+#ifdef BUILD_FOR_MPI
+				int local_i, local_j, local_k;
+
+				// Only label if the site is on current rank (allow for periodicity)
+#if (dims == 3)
+				if( i <= XInd[XInd.size()-2] + 1 && i >= XInd[1] - 1 &&
+					j <= YInd[YInd.size()-2] + 1 && j >= YInd[1] - 1 &&
+					k <= ZInd[ZInd.size()-2] + 1 && k >= ZInd[1] - 1 ) {
+#else
+				if( i <= XInd[XInd.size()-2] + 1 && i >= XInd[1] - 1 &&
+					j <= YInd[YInd.size()-2] + 1 && j >= YInd[1] - 1 ) {
+#endif
+						
+						// Map global indices to local indices
+						local_i = i - XInd[1] + 1;
+						local_j = j - YInd[1] + 1;
+#if (dims == 3)
+						local_k = k - ZInd[1] + 1;
+#else
+						local_k = k;
+#endif
+
+						LatTyp(local_i,local_j,local_k,M_lim,K_lim) = 0;
+				}
+#else
+				LatTyp(i,j,k,M_lim,K_lim) = 0;
+#endif
 
 			}
 		}
@@ -130,12 +161,20 @@ void GridObj::LBM_init_wall_lab ( ) {
 		exit(EXIT_FAILURE);
 	}
 
-	i = 0;
-	for (j = 0; j < M; j++) {
-		for (k = 0; k < K; k++) {
+	// Search index vector to see if left hand wall on this rank
+	for (i = 0; i < N_lim; i++ ) {
+		if (XInd[i] == 0) {		// Wall found
 
-			// Inlet site
-			LatTyp(i,j,k,M,K) = 7;
+			// Label inlet
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
+
+					// Inlet site
+					LatTyp(i,j,k,M_lim,K_lim) = 7;
+
+				}
+			}
+			break;
 
 		}
 	}
@@ -144,11 +183,19 @@ void GridObj::LBM_init_wall_lab ( ) {
 #ifdef OUTLET_ON
 	// Right hand face only
 
-	i = N-1;
-	for (j = 0; j < M; j++) {
-		for (k = 0; k < K; k++) {
+	// Search index vector to see if right hand wall on this rank
+	for (i = 0; i < N_lim; i++ ) {
+		if (XInd[i] == N-1) {		// Wall found
 
-			LatTyp(i,j,k,M,K) = 8;
+			// Label outlet
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
+
+					LatTyp(i,j,k,M_lim,K_lim) = 8;
+
+				}
+			}
+			break;
 
 		}
 	}
@@ -156,45 +203,73 @@ void GridObj::LBM_init_wall_lab ( ) {
 
 #if defined WALLS_ON && !defined WALLS_ON_2D && (dims == 3)
 
-	// Front
-	k = 0;
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < M; j++) {
+	// Search index vector to see if FRONT wall on this rank
+	for (k = 0; k < K_lim; k++ ) {
+		if (ZInd[k] == 0) {		// Wall found
 
-			LatTyp(i,j,k,M,K) = 0;
+			// Label wall
+			for (i = 0; i < N_lim; i++) {
+				for (j = 0; j < M_lim; j++) {
+
+					LatTyp(i,j,k,M_lim,K_lim) = 0;
+
+				}
+			}
+			break;
 
 		}
 	}
 
-	// Back
-	k = K-1;
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < M; j++) {
+	// Search index vector to see if BACK wall on this rank
+	for (k = 0; k < K_lim; k++ ) {
+		if (ZInd[k] == K-1) {		// Wall found
 
-			LatTyp(i,j,k,M,K) = 0;
+			// Label wall
+			for (i = 0; i < N_lim; i++) {
+				for (j = 0; j < M_lim; j++) {
+
+					LatTyp(i,j,k,M_lim,K_lim) = 0;
+
+				}
+			}
+			break;
 
 		}
 	}
 
 #endif
 
-#if defined WALLS_ON && defined WALLS_ON_2D
-	// Top
-	j = 0;
-	for (i = 0; i < N; i++) {
-		for (k = 0; k < K; k++) {
+#if defined WALLS_ON
+	// Search index vector to see if TOP wall on this rank
+	for (j = 0; j < M_lim; j++ ) {
+		if (YInd[j] == 0) {		// Wall found
 
-			LatTyp(i,j,k,M,K) = 0;
+			// Label wall
+			for (i = 0; i < N_lim; i++) {
+				for (k = 0; k < K_lim; k++) {
+
+					LatTyp(i,j,k,M_lim,K_lim) = 0;
+
+				}
+			}
+			break;
 
 		}
 	}
 
-	// Bottom
-	j = M-1;
-	for (i = 0; i < N; i++) {
-		for (k = 0; k < K; k++) {
+	// Search index vector to see if BOTTOM wall on this rank
+	for (j = 0; j < M_lim; j++ ) {
+		if (YInd[j] == M-1) {		// Wall found
 
-			LatTyp(i,j,k,M,K) = 0;
+			// Label wall
+			for (i = 0; i < N_lim; i++) {
+				for (k = 0; k < K_lim; k++) {
+
+					LatTyp(i,j,k,M_lim,K_lim) = 0;
+
+				}
+			}
+			break;
 
 		}
 	}
@@ -202,13 +277,180 @@ void GridObj::LBM_init_wall_lab ( ) {
 
 }
 
+// ***************************************************************************************************
+
+// Initialise refined labels method (L0 only)
+void GridObj::LBM_init_refined_lab ( ) {
+
+	// Typing defined as follows:
+	/*
+	0 == boundary site
+	1 == coarse site
+	2 == fine/refined site
+	3 == TL to upper (coarser) level
+	4 == TL to lower (finer) level
+	5 == Undefined
+	6 == Undefined
+	7 == Inlet
+	8 == Outlet
+	*/
+
+	// Get local grid sizes (includes overlap)
+	size_t N_lim = XPos.size();
+	size_t M_lim = YPos.size();
+	size_t K_lim = ZPos.size();
+
+	// Correct L0
+	for(int reg = 0; reg < NumReg; reg++) {
+
+#if (dims == 3)
+		// Add TL to lower labels
+		for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
+			for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
+				for (size_t k = RefZstart[reg]; k <= RefZend[reg]; k++) {
+
+#ifdef BUILD_FOR_MPI
+					int local_i, local_j, local_k;
+
+					// Only label if the site is on current rank (allow for periodicity)
+					if( (int)i <= XInd[XInd.size()-2] + 1 && (int)i >= XInd[1] - 1 &&
+						(int)j <= YInd[YInd.size()-2] + 1 && (int)j >= YInd[1] - 1 &&
+						(int)k <= ZInd[ZInd.size()-2] + 1 && (int)k >= ZInd[1] - 1 ) {
+						
+							// Map global indices to local indices
+							local_i = i - XInd[1] + 1;
+							local_j = j - YInd[1] + 1;
+							local_k = k - ZInd[1] + 1;
+
+							LatTyp(local_i,local_j,local_k,M_lim,K_lim) = 4;
+					}
+#else
+					LatTyp(i,j,k,M_lim,K_lim) = 4;
+#endif
+
+				}
+			}
+		}
+
+		// Add refined labels
+		for (size_t i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
+			for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
+				for (size_t k = RefZstart[reg]+1; k <= RefZend[reg]-1; k++) {
+
+#ifdef BUILD_FOR_MPI
+					int local_i, local_j, local_k;
+
+					// Only label if the site is on current rank (allow for periodicity)
+					if( (int)i <= XInd[XInd.size()-2] + 1 && (int)i >= XInd[1] - 1 &&
+						(int)j <= YInd[YInd.size()-2] + 1 && (int)j >= YInd[1] - 1 &&
+						(int)k <= ZInd[ZInd.size()-2] + 1 && (int)k >= ZInd[1] - 1 ) {
+						
+							// Map global indices to local indices
+							local_i = i - XInd[1] + 1;
+							local_j = j - YInd[1] + 1;
+							local_k = k - ZInd[1] + 1;
+
+							LatTyp(local_i,local_j,local_k,M_lim,K_lim) = 2;
+					}
+#else
+					LatTyp(i,j,k,M_lim,K_lim) = 2;
+#endif
+
+				}
+			}
+		}
+
+#else // 2D CASE
+		// Add TL to lower labels
+		for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
+			for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
+				size_t k = 0;
+
+#ifdef BUILD_FOR_MPI
+					int local_i, local_j;
+
+					// Only label if the site is on current rank (allow for periodicity)
+					if( (int)i <= XInd[XInd.size()-2] + 1 && (int)i >= XInd[1] - 1 &&
+						(int)j <= YInd[YInd.size()-2] + 1 && (int)j >= YInd[1] - 1 ) {
+						
+							// Map global indices to local indices
+							local_i = i - XInd[1] + 1;
+							local_j = j - YInd[1] + 1;
+
+							LatTyp(local_i,local_j,k,M_lim,K_lim) = 4;
+					}
+#else
+					LatTyp(i,j,k,M_lim,K_lim) = 4;
+#endif
+
+			}
+		}
+
+		// Add refined labels
+		for (size_t i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
+			for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
+				size_t k = 0;
+
+#ifdef BUILD_FOR_MPI
+					int local_i, local_j;
+
+					// Only label if the site is on current rank (allow for periodicity)
+					if( (int)i <= XInd[XInd.size()-2] + 1 && (int)i >= XInd[1] - 1 &&
+						(int)j <= YInd[YInd.size()-2] + 1 && (int)j >= YInd[1] - 1 ) {
+						
+							// Map global indices to local indices
+							local_i = i - XInd[1] + 1;
+							local_j = j - YInd[1] + 1;
+
+							LatTyp(local_i,local_j,k,M_lim,K_lim) = 2;
+					}
+#else
+					LatTyp(i,j,k,M_lim,K_lim) = 2;
+#endif
+
+			}
+		}
+
+#endif
+
+	}
+
+}
+
+// ***************************************************************************************************
+
+// Non-MPI initialise level 0 grid wrapper
+void GridObj::LBM_init_grid( ) {
+
+	// Set local size to total grid size
+	std::vector<unsigned int> local_size;
+	local_size.push_back(N);
+	local_size.push_back(M);
+	local_size.push_back(K);
+
+	// Set default value for these MPI-specific settings
+	std::vector< std::vector<unsigned int> > GlobalLimsInd;
+	GlobalLimsInd.resize(1, std::vector<unsigned int>(1) );
+	GlobalLimsInd[0][0] = 0;
+	std::vector< std::vector<double> > GlobalLimsPos;
+	GlobalLimsPos.resize(1, std::vector<double>(1) );
+	GlobalLimsPos[0][0] = 0.0;
+
+	// Call general initialiser
+	LBM_init_grid( local_size, GlobalLimsInd, GlobalLimsPos );
+
+}
+
 
 // ***************************************************************************************************
 
 // Initialise level 0 grid method
-void GridObj::LBM_init_grid( ) {
-
-	// Store physical spacing
+void GridObj::LBM_init_grid( std::vector<unsigned int> local_size, 
+							std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+							std::vector< std::vector<double> > GlobalLimsPos ) {
+	
+	// Store physical spacing (All L0 grids are the same spacing)
+	// Global dimensions
 	double Lx = b_x - a_x;
 	double Ly = b_y - a_y;
 	double Lz = b_z - a_z;
@@ -219,7 +461,12 @@ void GridObj::LBM_init_grid( ) {
 	// Physical time step = physical grid spacing?
 	dt = dx;
 	
-	// Checks to make sure grid cell dimensions are suitable
+
+
+	////////////////////////////
+	// Check input parameters //
+	////////////////////////////
+
 #if (dims == 3)
 	// Check that lattice volumes are cubes in 3D
 	if ( (Lx/N) != (Ly/M) || (Lx/N) != (Lz/K) ) {
@@ -237,13 +484,6 @@ void GridObj::LBM_init_grid( ) {
 	}
 
 #endif
-
-
-	// Checks passed so continue...
-	// NODE NUMBERS on L0
-	XInd = onespace( 0, N-1 );
-	YInd = onespace( 0, M-1 );
-	ZInd = onespace( 0, K-1 );
 
     // Checks to make sure grid size is suitable for refinement
 	if (NumLev != 0) {
@@ -287,15 +527,83 @@ void GridObj::LBM_init_grid( ) {
 #endif
 	}
 
-    // Checks passed so continue...
+
+    ///////////////////
+	// Checks passed //
+	///////////////////
+
+	// Get local grid sizes (includes overlap)
+	size_t N_lim = local_size[0];
+	size_t M_lim = local_size[1];
+#if (dims == 3)
+	size_t K_lim = local_size[2];
+#else
+	size_t K_lim = 1;
+#endif
+	
+
+	// NODE NUMBERS on L0
+	/* When using MPI:
+	 * Node numbers should be specified in the global system.
+	 * The overlapping sites have the same number as an index
+	 * on its overlapping grid. The setup assumes periodicity
+	 * on all edges, even where the edge of the domain is a 
+	 * boundary.
+	 */
+#ifdef BUILD_FOR_MPI	
+
+	// Build index vectors
+	XInd = onespace( (int)GlobalLimsInd[0][my_rank], (int)GlobalLimsInd[1][my_rank] - 1 );
+	YInd = onespace( (int)GlobalLimsInd[2][my_rank], (int)GlobalLimsInd[3][my_rank] - 1 );
+	ZInd = onespace( (int)GlobalLimsInd[4][my_rank], (int)GlobalLimsInd[5][my_rank] - 1 );
+
+	// Add overlap indices to both ends of the vector taking into account periodicity
+	XInd.insert( XInd.begin(), (XInd[0]-1 + N) % N ); XInd.insert( XInd.end(), (XInd[XInd.size()-1]+1 + N) % N );
+	YInd.insert( YInd.begin(), (YInd[0]-1 + M) % M ); YInd.insert( YInd.end(), (YInd[YInd.size()-1]+1 + M) % M );
+#if (dims == 3)
+	ZInd.insert( ZInd.begin(), (ZInd[0]-1 + K) % K ); ZInd.insert( ZInd.end(), (ZInd[ZInd.size()-1]+1 + K) % K );
+#endif
+
+#else
+	// When not builiding for MPI indices are straightforward
+	XInd = onespace( 0, N-1 );
+	YInd = onespace( 0, M-1 );
+	ZInd = onespace( 0, K-1 );
+#endif
+
+
+
 	// L0 lattice site POSITION VECTORS
+	/* When using MPI:
+	 * As with the indices, the overlap is assume periodic
+	 * in all directions.
+	 */
+
+#ifdef BUILD_FOR_MPI
+
+	// Create position vectors excluding overlap
+	XPos = linspace( GlobalLimsPos[0][my_rank] + dx/2, GlobalLimsPos[1][my_rank] - dx/2, N_lim-2 );
+	YPos = linspace( GlobalLimsPos[2][my_rank] + dy/2, GlobalLimsPos[3][my_rank] - dy/2, M_lim-2 );
+	ZPos = linspace( GlobalLimsPos[4][my_rank] + dz/2, GlobalLimsPos[5][my_rank] - dz/2, K_lim-2 );
+
+	// Add overlap sites taking into account periodicity
+	XPos.insert( XPos.begin(), fmod(XPos[0]-dx + Lx, Lx) ); XPos.insert( XPos.end(), fmod(XPos[XPos.size()-1]+dx + Lx, Lx) );
+	YPos.insert( YPos.begin(), fmod(YPos[0]-dy + Ly, Ly) ); YPos.insert( YPos.end(), fmod(YPos[YPos.size()-1]+dy + Ly, Ly) );
+#if (dims == 3)
+	ZPos.insert( ZPos.begin(), fmod(ZPos[0]-dz + Lz, Ly) ); ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size()-1]+dz + Lz, Lz) );
+#endif
+
+#else
+	// When not builiding for MPI positions are straightforward
 	XPos = linspace( a_x + dx/2, b_x - dx/2, N );
 	YPos = linspace( a_y + dy/2, b_y - dy/2, M );
 	ZPos = linspace( a_z + dz/2, b_z - dz/2, K );
+#endif
 
+	
 
 	// Define TYPING MATRICES
-	LatTyp.resize( N*M*K );
+	LatTyp.resize( N_lim*M_lim*K_lim );
 
 	// Typing defined as follows:
 	/*
@@ -313,98 +621,46 @@ void GridObj::LBM_init_grid( ) {
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
 
+	// Add boundary-specific labels
+	LBM_init_bound_lab();
 
-	// Add object-specific labels
-	LBM_init_wall_lab();
-
-
-	// Correct labelling if lower level exists
+	// Refined region labelling
 	if (NumLev > 0) {
-
-		// Correct L0
-		for(int reg = 0; reg < NumReg; reg++) {
-
-#if (dims == 3)
-			// Add TL to lower labels
-			for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
-				for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
-					for (size_t k = RefZstart[reg]; k <= RefZend[reg]; k++) {
-
-						LatTyp(i,j,k,M,K) = 4;
-
-					}
-				}
-			}
-
-			// Add refined labels
-			for (size_t i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
-				for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
-					for (size_t k = RefZstart[reg]+1; k <= RefZend[reg]-1; k++) {
-
-						LatTyp(i,j,k,M,K) = 2;
-
-					}
-				}
-			}
-
-#else // 2D CASE
-			// Add TL to lower labels
-			for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
-				for (size_t j = RefYstart[reg]; j <= RefYend[reg]; j++) {
-					size_t k = 0;
-
-						LatTyp(i,j,k,M,K) = 4;
-
-				}
-			}
-
-			// Add refined labels
-			for (size_t i = RefXstart[reg]+1; i <= RefXend[reg]-1; i++) {
-				for (size_t j = RefYstart[reg]+1; j <= RefYend[reg]-1; j++) {
-					size_t k = 0;
-
-						LatTyp(i,j,k,M,K) = 2;
-
-				}
-			}
-
-#endif
-
-		}
-
+		LBM_init_refined_lab();
 	}
 
+	
 
 	// Initialise L0 MACROSCOPIC quantities
 	// Velocity field
-	u.resize( N*M*K*dims );
+	u.resize( N_lim*M_lim*K_lim*dims );
 	LBM_init_vel();
 
 	// Density field
-	rho.resize( N*M*K );
+	rho.resize( N_lim*M_lim*K_lim );
 	LBM_init_rho();
 
 	// Cartesian force vector
-	force_xyz.resize(N*M*K*dims, 0.0);
+	force_xyz.resize(N_lim*M_lim*K_lim*dims, 0.0);
 
 	// Lattice force vector
-	force_i.resize(N*M*K*nVels, 0.0);
+	force_i.resize(N_lim*M_lim*K_lim*nVels, 0.0);
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
-	f.resize( N*M*K*nVels );
-	feq.resize( N*M*K*nVels );
+	f.resize( N_lim*M_lim*K_lim*nVels );
+	feq.resize( N_lim*M_lim*K_lim*nVels );
 
 
 
 	// Loop over grid
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			for (int k = 0; k < K; k++) {
-				for (int v = 0; v < nVels; v++) {
+	for (size_t i = 0; i < N_lim; i++) {
+		for (size_t j = 0; j < M_lim; j++) {
+			for (size_t k = 0; k < K_lim; k++) {
+				for (size_t v = 0; v < nVels; v++) {
 
 					// Initialise f to feq
-					f(i,j,k,v,M,K,nVels) = LBM_collide( i, j, k, v );
+					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
 
 				}
 			}
@@ -412,8 +668,8 @@ void GridObj::LBM_init_grid( ) {
 	}
 	feq = f; // Make feq = feq too
 
-	// Initialise OTHER parameters
 
+	// Initialise OTHER parameters
 	// Compute kinematic viscosity based on target Reynolds number
 #if defined IBM_ON && defined INSERT_CIRCLE_SPHERE
 	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
@@ -429,17 +685,12 @@ void GridObj::LBM_init_grid( ) {
 	nu = M * u_0x / Re;
 #endif
 
-	std::cout << "Lattice viscosity = " << nu << std::endl;
-
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
 	omega = 1 / ( (nu / pow(cs,2) ) + .5 );
 
 	// Above is valid for L0 only -- general expression is
 	// omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dx,2)) ) + .5 );
-
-	std::cout << "L0 relaxation time = " << (1/omega) << std::endl;
-
 
 #if (defined USE_MRT && dims == 3)
 
@@ -477,7 +728,6 @@ void GridObj::LBM_init_grid( ) {
 	mrt_omega.push_back(omega);	// s8
 	
 #endif
-
 
 }
 	

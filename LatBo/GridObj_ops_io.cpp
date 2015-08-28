@@ -24,7 +24,7 @@ void GridObj::io_textout(int t) {
 	gridoutput.precision(4);
 
 	// Construct File Name
-	string FNameG, N_str, M_str, K_str, ex_str, NumLev_str, NumReg_str;
+	string FNameG, N_str, M_str, K_str, ex_str, NumLev_str, NumReg_str, mpirank;
 	N_str = to_string((int)N);
 	M_str = to_string((int)M);
 	K_str = to_string((int)K);
@@ -33,6 +33,7 @@ void GridObj::io_textout(int t) {
 	else ex_str = to_string(RefXend[0]) + string("_") + to_string(RefYend[0]) + string("_") + to_string(RefZend[0]);
 	if (NumLev == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(NumReg);
+	mpirank = to_string(my_rank);
 	// Build string
 	FNameG = string("./Output/Grids")
 			+ string("D") +  to_string(dims)
@@ -42,6 +43,7 @@ void GridObj::io_textout(int t) {
 			+ string("Lev") + NumLev_str 
 			+ string("Reg") + NumReg_str 
 			+ string("P") + ex_str 
+			+ string("Rnk") + mpirank
 			+ string(".out");
 	// Get character pointer
 	const char* FNameG_c = FNameG.c_str();
@@ -61,13 +63,14 @@ void GridObj::io_textout(int t) {
 			// Print L0 Grid Size header
 			gridoutput << "L0 Grid Size = " << N << " x " << M << " x " << K << endl;
 			// If refined levels exist, print refinement ratio
-			if (NumLev != 0) {
+			if (subGrid.size() != 0) {
+				gridoutput << "Grid is refined." << endl;
 				// Get size of regions
-				for (int reg = 0; reg < NumReg; reg++) {
+				for (size_t reg = 0; reg < subGrid.size(); reg++) {
 					int finex = subGrid[reg].CoarseLimsX[1] - subGrid[reg].CoarseLimsX[0] + 1;
 					int finey = subGrid[reg].CoarseLimsY[1] - subGrid[reg].CoarseLimsY[0] + 1;
 					int finez = subGrid[reg].CoarseLimsZ[1] - subGrid[reg].CoarseLimsZ[0] + 1;
-					gridoutput << "Region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez)*100) / (N*M*K) << "%" << endl;
+					gridoutput << "Local region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez)*100) / (N*M*K) << "%" << endl;
 				}
 			}
 			// Print time step
@@ -86,7 +89,7 @@ void GridObj::io_textout(int t) {
 		
 		// Now print omega
 		gridoutput << "Omega = " << omega << endl;
-
+		
 		// Index Vectors
 		gridoutput << "X Index: ";
 		for (size_t i = 0; i < N_lim; i++) {
@@ -230,7 +233,7 @@ void GridObj::io_textout(int t) {
 		size_t regions = subGrid.size();
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
-
+				
 				subGrid[reg].io_textout(t);
 
 			}
@@ -258,7 +261,7 @@ void GridObj::io_write_body_pos(unsigned int timestep) {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open("./Output/Body_" + to_string(ib) + "_position_" + to_string(timestep) + ".out", std::ios::out);
+			jout.open("./Output/Body_" + to_string(ib) + "_position_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
 			jout << "x" + to_string(timestep) + ", y" + to_string(timestep) + ", z" << std::endl;
 	
 			// Write out position
@@ -285,7 +288,7 @@ void GridObj::io_write_lift_drag(unsigned int timestep) {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open("./Output/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + ".out", std::ios::out);
+			jout.open("./Output/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
 			jout << "L" + to_string(timestep) + ", D" + to_string(timestep) << std::endl;
 
 			// Sum variables

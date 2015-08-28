@@ -6,6 +6,7 @@
 #include "definitions.h"
 #include "globalvars.h"
 
+// Forward declaration of getOpposite local routine
 size_t getOpposite(size_t direction);
 
 // ***************************************************************************************************

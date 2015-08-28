@@ -99,6 +99,14 @@ void GridObj::LBM_init_wall_lab ( ) {
 
 #ifdef SOLID_BLOCK_ON
 
+	// Check solid block inside domain
+	if (obj_x_max > N || obj_x_min < 0 || obj_y_max > M || obj_y_min < 0 || obj_z_max > K || obj_z_min < 0) {
+		// Block outside domain
+		std::cout << "Block is placed outside the domain. Exiting." << std::endl;
+		system("pause");
+		exit(EXIT_FAILURE);
+	}
+
 	// Loop over object definition
 	for (i = obj_x_min; i <= obj_x_max; i++) {
 		for (j = obj_y_min; j <= obj_y_max; j++) {
@@ -432,6 +440,45 @@ void GridObj::LBM_init_grid( ) {
 
 	std::cout << "L0 relaxation time = " << (1/omega) << std::endl;
 
+
+#if (defined USE_MRT && dims == 3)
+
+	// MRT relaxation times (D3Q19)
+	mrt_omega.push_back(1.0);	// s0
+	mrt_omega.push_back(1.19);	// s1
+	mrt_omega.push_back(1.4);	// s2
+	mrt_omega.push_back(1.0);	// s3
+	mrt_omega.push_back(1.2);	// s4
+	mrt_omega.push_back(1.0);	// s5
+	mrt_omega.push_back(1.2);	// s6
+	mrt_omega.push_back(1.0);	// s7
+	mrt_omega.push_back(1.2);	// s8
+	mrt_omega.push_back(omega);	// s9
+	mrt_omega.push_back(1.4);	// s10
+	mrt_omega.push_back(omega);	// s11
+	mrt_omega.push_back(1.4);	// s12
+	mrt_omega.push_back(omega);	// s13
+	mrt_omega.push_back(omega);	// s14
+	mrt_omega.push_back(omega);	// s15
+	mrt_omega.push_back(1.98);	// s16
+	mrt_omega.push_back(1.98);	// s17
+	mrt_omega.push_back(1.98);	// s18
+
+#elif defined USE_MRT
+	// MRT relaxation times (D2Q9)
+	mrt_omega.push_back(1.0);	// s0
+	mrt_omega.push_back(1.4);	// s1
+	mrt_omega.push_back(1.4);	// s2
+	mrt_omega.push_back(1.0);	// s3
+	mrt_omega.push_back(1.2);	// s4
+	mrt_omega.push_back(1.0);	// s5
+	mrt_omega.push_back(1.2);	// s6
+	mrt_omega.push_back(omega);	// s7
+	mrt_omega.push_back(omega);	// s8
+	
+#endif
+
+
 }
 	
 
@@ -440,7 +487,8 @@ void GridObj::LBM_init_grid( ) {
 
 // Method to initialise the quantities for a refined subgrid
 // Assumes a volumetric setup here. Position of top left site is passed as is spacing and the relaxation frequency.
-void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, double dx0, double omega_coarse) {
+void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
+								double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse) {
 
 	// Generate NODE NUMBERS
 	XInd = onespace(0, (int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) );
@@ -649,5 +697,15 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ, 
 
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/omega_coarse - .5) *2) + .5);
+
+#ifdef USE_MRT
+	
+	// MRT relaxation times on the finer grid related to coarse in same way
+	for (size_t i = 0; i < nVels; i++) {
+		mrt_omega.push_back( 1 / ( ( (1/mrt_omega_coarse[i] - .5) *2) + .5) );
+	}
+
+#endif
+
 }
 // ***************************************************************************************************

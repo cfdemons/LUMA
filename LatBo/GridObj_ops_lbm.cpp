@@ -17,6 +17,10 @@ using namespace std;
 // IBM_flag dictates whether we need the predictor step or not
 void GridObj::LBM_multi ( bool IBM_flag ) {
 
+	///////////////////////////////
+	// IBM pre-kernel processing //
+	///////////////////////////////
+
 	// Local stores used to hold info prior to IBM predictive step
 	ivector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
 
@@ -42,10 +46,11 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 #endif
 
+
 	
-	/////////////////////////////////
-	// Execute kernel as normal... //
-	/////////////////////////////////
+	////////////////
+	// LBM kernel //
+	////////////////
 
 
 	// Loop twice on refined levels as refinement ratio per level is 2
@@ -120,7 +125,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			
 		}
 
-
 		// Apply boundary conditions
 #ifdef OUTLET_ON
 		LBM_boundary(3);	// Outlet
@@ -140,8 +144,10 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	} while (count < 3);
 
 
+
+
 	////////////////////////////////
-	// On completion of kernel... //
+	// IBM post-kernel processing //
 	////////////////////////////////
 
 	// Execute IBM procedure using newly computed predicted data
@@ -361,10 +367,15 @@ void GridObj::LBM_collide( bool core_flag ) {
 				} else {
 
 
+#ifdef USE_MRT
+					// Call MRT collision for given lattice site
+					LBM_mrt_collide( f_new, i, j, k);
+#else
+					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
 						
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );						
+						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
 						
 						// Recompute distribution function f
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) ) 
@@ -372,6 +383,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
 						
 					}
+#endif
 
 				}
 
@@ -384,6 +396,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 
 }
 
+// ***************************************************************************************************
 
 // Overload of collision function to allow calculation of feq only for initialisation
 double GridObj::LBM_collide( int i, int j, int k, int v ) {
@@ -439,6 +452,92 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
 }
 
+
+// ***************************************************************************************************
+
+// MRT collision procedure for site (i,j,k).
+void GridObj::LBM_mrt_collide( ivector<double>& f_new, int i, int j, int k ) {
+#ifdef USE_MRT
+
+	// Size declarations
+	int M_lim = YPos.size();
+	int K_lim = ZPos.size();
+
+	// Temporary vectors
+	std::vector<double> m;					// Vector of moments
+	m.resize(nVels);
+	std::fill(m.begin(), m.end(), 0.0);		// Set to zero
+	std::vector<double> meq( m );			// Vector of equilibrium moments
+
+	// Loop over directions and update equilibrium function
+	for (int v = 0; v < nVels; v++) {
+						
+		// Get feq value by calling overload of collision function
+		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
+
+	}
+
+
+	/* Compute the moment vectors using forward transformation to moment space
+	 *
+	 * m_p = M_pq f_q
+	 * m_eq_p = M_pq f_eq_q
+	 * 
+	 */
+
+	// Do a matrix * vector operation
+	for (int p = 0; p < nVels; p++) {
+		for (int q = 0; q < nVels; q++) {
+
+			m[p] += mMRT[p][q] * f(i,j,k,q,M_lim,K_lim,nVels);
+			meq[p] += mMRT[p][q] * feq(i,j,k,q,M_lim,K_lim,nVels);
+
+		}
+	}
+
+
+	/* Perform the collision in moment space for a component q
+	 *
+	 * m_new_q = m_q - s_q(m_q - m_eq_q)
+	 *
+	 * where s_q is the relaxation rate for component q.
+	 *
+	 */
+
+	// Overwrite old moments
+	double mtmp;
+	for (int q = 0; q < nVels; q++) {
+
+		mtmp = m[q] - mrt_omega[q] * (m[q] - meq[q]);
+		m[q] = mtmp;
+
+	}
+
+
+
+	/* Get populations from the moments by transforming back to velocity space
+	 *
+	 * f_i_new = M^-1_ij * m_new_j
+	 *
+	 */
+
+	double ftmp;
+	// Do a matrix * vector operation
+	for (int p = 0; p < nVels; p++) {
+		ftmp = 0.0;
+
+		for (int q = 0; q < nVels; q++) {
+
+			ftmp += mInvMRT[p][q] * m[q];
+
+		}
+
+		f_new(i,j,k,p,M_lim,K_lim,nVels) = ftmp;
+
+	}
+
+#endif
+}
 
 // ***************************************************************************************************
 

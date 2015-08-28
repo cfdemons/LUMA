@@ -75,13 +75,13 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	this->subGrid[subGrid.size()-1].LBM_init_subgrid(	this->XPos[ subGrid[subGrid.size()-1].CoarseLimsX[0] ],
 														this->YPos[ subGrid[subGrid.size()-1].CoarseLimsY[0] ],
 														this->ZPos[ subGrid[subGrid.size()-1].CoarseLimsZ[0] ],
-														this->dx, this->omega	);
+														this->dx, this->omega, this->mrt_omega	);
 #else
 
     this->subGrid[subGrid.size()-1].LBM_init_subgrid(	this->XPos[ subGrid[subGrid.size()-1].CoarseLimsX[0] ],
 														this->YPos[ subGrid[subGrid.size()-1].CoarseLimsY[0] ],
 														0.0,
-														this->dx, this->omega	);
+														this->dx, this->omega, this->mrt_omega	);
 #endif
 
 	// Add another subgrid beneath the one just created if necessary

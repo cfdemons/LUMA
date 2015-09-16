@@ -6,6 +6,9 @@
 #include <vector>
 #include "ivector.h"
 #include "IB_body.h"
+#include "GridUtils.h"
+#include <iostream>
+#include <fstream>
 
 // Base class
 class GridObj
@@ -17,12 +20,13 @@ class GridObj
 public:
 
 	GridObj( ); // Default constructor
-	GridObj(int level); // Basic grid constructor
-	GridObj(int level, int RegionNumber, int rank); // MPI sub grid constructor with level, region and rank
+	GridObj(int level, std::ofstream* logfile); // Basic grid constructor
+	GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
 	// MPI L0 constructor with level, rank, local size and global edges
 	GridObj(int level, int rank, std::vector<unsigned int> local_size, 
 		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
-		std::vector< std::vector<double> > GlobalLimsPos);
+		std::vector< std::vector<double> > GlobalLimsPos,
+		std::ofstream* logfile);
 	~GridObj( ); // Default destructor
 
 
@@ -81,6 +85,7 @@ public :
 	double omega;	// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 	int my_rank;	// MPI rank
+	GridUtils gUtils;	// Utility class
 	
 	/*	
 	***************************************************************************************************************

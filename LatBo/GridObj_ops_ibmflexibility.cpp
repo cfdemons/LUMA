@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "GridObj.h"
-#include "generic_ops.h"
 #include "definitions.h"
 
 
@@ -44,7 +43,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = vecnorm(iBody[ib].markers[iBody[ib].markers.size()-1].position[0] - iBody[ib].markers[0].position[0],
+	double length_lu = gUtils.vecnorm(iBody[ib].markers[iBody[ib].markers.size()-1].position[0] - iBody[ib].markers[0].position[0],
 		iBody[ib].markers[iBody[ib].markers.size()-1].position[1] - iBody[ib].markers[0].position[1],
 		iBody[ib].markers[iBody[ib].markers.size()-1].position[2] - iBody[ib].markers[0].position[2]) / dx;
 
@@ -55,13 +54,13 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = pow(vecnorm(u_0x,u_0y,u_0z),2) / grav_force * length_lu
+	Froude = pow(gUtils.vecnorm(u_0x,u_0y,u_0z),2) / grav_force * length_lu
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / vecnorm(u_0x,u_0y,u_0z)) ), 2);
+	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / gUtils.vecnorm(u_0x,u_0y,u_0z)) ), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -80,7 +79,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(vecnorm(u_0x,u_0y,u_0z), 2);
+	double Fref = iBody[ib].delta_rho * pow(gUtils.vecnorm(u_0x,u_0y,u_0z), 2);
 	for (i = 0; i < Fx.size(); i++) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );

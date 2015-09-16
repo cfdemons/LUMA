@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "GridObj.h"
 #include "definitions.h"
-#include "generic_ops.h"
 #include <cmath>
 
 
@@ -136,8 +135,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 #endif
 				// Check that radius is valid otherwise jacowire must have failed
 				if ( _finite(radius) == false ) {
-					std::cout << "Jacowire calculation of new position has failed. Exiting." << std::endl;
-					system("pause");
+					*gUtils.logfile << "Jacowire calculation of new position has failed. Exiting." << std::endl;
 					exit(EXIT_FAILURE);					
 				}
 
@@ -170,18 +168,15 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 #if (dims == 3)
 
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
-		std::cout << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
-		std::cout << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 		
 	} else if ( (int)knear - 5 < 0 || knear + 5 >= ZPos.size() ) {
-		std::cout << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -227,13 +222,11 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 	// 2D check support region
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
-		std::cout << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
-		std::cout << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 		
 	}
@@ -471,7 +464,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 	std::vector<double> bic_r, bic_v, bic_p, bic_rhat;    
 	
 	// Step 1: Use initial guess to compute r vector
-	std::vector<double> bic_Ax = matrix_multiply(Amatrix,epsilon);
+	std::vector<double> bic_Ax = gUtils.matrix_multiply(Amatrix,epsilon);
 	for (size_t i = 0; i < nls; i++) {
 		bic_r.push_back(bVector[i] - bic_Ax[i]);
 	}
@@ -494,7 +487,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 	for (unsigned int i = 1; i < maxiterations; i++) {
 
 		// Step 5a: Compute new rho
-		bic_rho[1] = dotprod(bic_rhat, bic_r);
+		bic_rho[1] = gUtils.dotprod(bic_rhat, bic_r);
 
 		// Step 5b: Compute beta
 		bic_beta = (bic_rho[1] / bic_rho[0]) * (bic_alpha / bic_omega);
@@ -505,10 +498,10 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 		}
 
 		// Step 5d: Compute new v vector
-		bic_v = matrix_multiply(Amatrix,bic_p);
+		bic_v = gUtils.matrix_multiply(Amatrix,bic_p);
 
 		// Step 5e: Compute alpha
-		bic_alpha = bic_rho[1] / dotprod(bic_rhat, bic_v);
+		bic_alpha = bic_rho[1] / gUtils.dotprod(bic_rhat, bic_v);
 		// bic_rho is not used again so copy last element back ready for next iteration
 		bic_rho[0] = bic_rho[1];
 		
@@ -518,10 +511,10 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 		}
 
 		// Step 5g: Compute t vector
-		bic_t = matrix_multiply(Amatrix,bic_s);
+		bic_t = gUtils.matrix_multiply(Amatrix,bic_s);
 
 		// Step 5h: Compute new omega
-		bic_omega = dotprod(bic_t, bic_s) / dotprod(bic_t, bic_t);
+		bic_omega = gUtils.dotprod(bic_t, bic_s) / gUtils.dotprod(bic_t, bic_t);
 
 		// Step 5i: Update epsilon
 		for (size_t j = 0; j < nls; j++) {
@@ -534,7 +527,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 		}
 
 		// Step 5k: Check residual and store epsilon if best so far
-		res_current = sqrt(dotprod(bic_r, bic_r));
+		res_current = sqrt(gUtils.dotprod(bic_r, bic_r));
 		if ( res_current < res_min) {
 			res_min = res_current;	// Note best residual
 			for (size_t j = 0; j < nls; j++) {
@@ -552,7 +545,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 
 		if (i == maxiterations-1) {
 			// Warn that max iterations hit
-			std::cout << "Max iterations hit -- values of epsilon might not be converged. Try adjusting the number of Lagrange markers or the grid resolution to adjust support overlap. Setting Epsilon to 2." << std::endl;
+			*gUtils.logfile << "Max iterations hit -- values of epsilon might not be converged. Try adjusting the number of Lagrange markers or the grid resolution to adjust support overlap. Setting Epsilon to 2." << std::endl;
 			for (size_t j = 0; j < nls; j++) {
 				epsilon[j] = 2;
 			}

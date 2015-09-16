@@ -23,7 +23,6 @@
 #include <math.h>			// Mathematics
 #include <string>			// String template access
 #include <mpi.h>			// Enable MPI (MSMPI on Windows)
-#include "generic_ops.h"	// Forward declarations of generic functions
 
 
 
@@ -49,15 +48,22 @@
 // Gravity (acts in +x direction)
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force ( 3 * vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
+#define grav_force ( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 
 // LBM configuration
-#define USE_MRT
+//#define USE_MRT
 
+#if (dims == 3)
+// MRT relaxation times (D3Q19)
+#define mrt_relax {1.0, 1.19, 1.4, 1.0, 1.2, 1.0, 1.2, 1.0, 1.2, omega, 1.4, omega, 1.4, omega, omega, omega, 1.98, 1.98, 1.98}
+#else
+// MRT relaxation times (D2Q9)
+#define mrt_relax {1.0, 1.4, 1.4, 1.0, 1.2, 1.0, 1.2, omega, omega}
+#endif
 
 /*	
 ***************************************************************************************************************
@@ -66,7 +72,7 @@
 */
 
 
-#define T 200		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 100		// End time of simulation (if each time step increments by physical dt = dx)
 
 /*	
 ***************************************************************************************************************
@@ -75,24 +81,24 @@
 */
 
 // MPI Data
-#define Xcores 2
+#define Xcores 4
 #define Ycores 2
-#define Zcores 2	// This gets set to 1 later if doing a 2D problem
+#define Zcores 3	// This gets set to 1 later if doing a 2D problem
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 100		// Number of z lattice sites
+#define N 200		// Number of x lattice sites
+#define M 50		// Number of y lattice sites
+#define K 50		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 6.0		// End of domain-x
+#define b_x 4.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 2.0		// End of domain-y
+#define b_y 1.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 2.0		// End of domain-z
+#define b_z 1.0		// End of domain-z
 
 
 /*	
@@ -102,7 +108,7 @@
 */
 
 // Data in lattice units
-#define u_0x 0.05	// Initial x-velocity
+#define u_0x 0.06	// Initial x-velocity
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
@@ -175,13 +181,14 @@
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 //#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
-#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition
+#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 //#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+//#define PERIODIC_BOUNDARIES	// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
@@ -201,17 +208,17 @@
 ***************************************************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
 #define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Global lattice indices for refined region on level L0 start numbering at 0
 
 	#if NumReg == 2 // Included for testing purposes so I don't have to keep re-commenting bits
-	static size_t RefXstart[NumReg]		= {40, 160};
-	static size_t RefXend[NumReg]		= {60, 180};
-	static size_t RefYstart[NumReg]		= {60, 20};
-	static size_t RefYend[NumReg]		= {80, 40};
+	static size_t RefXstart[NumReg]		= {70, 160};
+	static size_t RefXend[NumReg]		= {90, 180};
+	static size_t RefYstart[NumReg]		= {30, 10};
+	static size_t RefYend[NumReg]		= {40, 20};
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumReg]		= {24, 24};
 	static size_t RefZend[NumReg]		= {36, 36};

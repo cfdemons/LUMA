@@ -30,7 +30,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// If IBM on and predictive loop flag true then store initial data and reset forces
 	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
 
-		std::cout << "Prediction step..." << std::endl;
+		*gUtils.logfile << "Prediction step..." << std::endl;
 
 		// Store lattice data
 		f_ibm_initial = f;
@@ -59,7 +59,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	do {
 
 		// Apply boundary conditions (regularised must be applied before collision)
-#if (defined INLET_ON && defined INLET_REGULARISED)
+#if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
 		LBM_boundary(2);
 #endif
 
@@ -78,6 +78,11 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_collide(true);
 
 		}
+
+
+		////////////////////
+		// Refined levels //
+		////////////////////
 
 		// Check if lower level exists
 		if (NumLev > level) {
@@ -100,7 +105,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined SOLID_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
-
+			
 			// Stream
 			LBM_stream();
 			
@@ -111,6 +116,11 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 			}
 			
+
+			///////////////////////
+			// No refined levels //
+			///////////////////////
+
 		} else {
 
 			// Apply boundary conditions
@@ -120,11 +130,16 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined SOLID_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
-
+			
 			// Stream
 			LBM_stream();
 			
 		}
+
+
+		//////////////
+		// Continue //
+		//////////////
 
 		// Apply boundary conditions
 #ifdef OUTLET_ON
@@ -179,11 +194,11 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 		// Relaunch kernel with IBM flag set to false (corrector step)
 		// Corrector step does not reset force vectors but uses newly computed vector instead.
-		std::cout << "Correction step..." << std::endl;
+		*gUtils.logfile << "Correction step..." << std::endl;
 		LBM_multi(false);
 
 		// Loop over bodies launching positional update  if deformable to compute new locations of markers
-		std::cout << "Relocating markers as required..." << std::endl;
+		*gUtils.logfile << "Relocating markers as required..." << std::endl;
 		for (size_t ib = 0; ib < iBody.size(); ib++) {
 			
 			// If body is deformable it needs a positional update
@@ -202,7 +217,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 #if defined INSERT_FILARRAY
 		// Special bit for filament-based plates where flexible centreline is used to update position of others in group
-		std::cout << "Filament-based plate positional update..." << std::endl;
+		*gUtils.logfile << "Filament-based plate positional update..." << std::endl;
 		ibm_position_update_grp(999);
 #endif
 
@@ -551,9 +566,10 @@ void GridObj::LBM_stream( ) {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 	int dest_x, dest_y, dest_z;
+	unsigned int v_opp;
 
 	// Create temporary lattice of zeros to prevent overwriting useful populations
-	ivector<double> f_new( f.size(), 0.0 );
+	ivector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
 	// Stream one lattice site at a time
@@ -563,56 +579,127 @@ void GridObj::LBM_stream( ) {
 
 				for (int v = 0; v < nVels; v++) {
 
+					/////////////////////////
+					// Preliminary Options //
+					/////////////////////////
+
 					// If fine site then do not stream in any direction
-					if ( LatTyp(i,j,k,M_lim,K_lim) == 2) {
+					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 						break;
 					}
 
-					// If site is do-nothing inlet then copy value
+					// If site is do-nothing inlet then copy value (i.e. apply do-nothing inlet)
 #if (defined INLET_ON && defined INLET_DO_NOTHING)
 					if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);						
 					}
 #endif
 
+					/////////////////////////
+					// Streaming procedure //
+					/////////////////////////
 
-					// Only apply periodic BCs on coarsest level
-					if (level == 0) {
-						// Compute destination coordinates
-						dest_x = (i+c[0][v] + N_lim) % N_lim;
-						dest_y = (j+c[1][v] + M_lim) % M_lim;
-						dest_z = (k+c[2][v] + K_lim) % K_lim;
-
-					} else {
-						// No periodic BCs
-						dest_x = i+c[0][v];
-						dest_y = j+c[1][v];
-						dest_z = k+c[2][v];
-					}
+					// Compute destination site
+					dest_x = i+c[0][v];
+					dest_y = j+c[1][v];
+					dest_z = k+c[2][v];
 
 
-					// If destination off-grid, do not stream
+					/** If destination off-grid then ask whether periodic boundaries in use
+					 * and if so then check it is a coarse site. If it is then compute periodic 
+					 * destination and check destination site to see if it is a coarse fluid site.
+					 * If true then stream, if not then error. If it is not a coarse site
+					 * then retain the incoming value at the site as it will never receive an update.
+					 */
+					
 					if (	(dest_x >= N_lim || dest_x < 0) ||
 							(dest_y >= M_lim || dest_y < 0) ||
 							(dest_z >= K_lim || dest_z < 0)
 						) {
-						// Do nothing
-				
+
+#ifdef PERIODIC_BOUNDARIES
+
+							// Only apply periodic BCs on coarsest level and if coarse site
+							if (level == 0 && LatTyp(i,j,k,M_lim,K_lim) == 1) {
+									
+								// Compute destination site indices
+								dest_x = (i+c[0][v] + N_lim) % N_lim;
+								dest_y = (j+c[1][v] + M_lim) % M_lim;
+								dest_z = (k+c[2][v] + K_lim) % K_lim;
+
+								// Check destination is also fluid
+								if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) {
+
+									// Stream
+									f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+
+								} else {
+
+									*gUtils.logfile << "Error: Trying to periodically stream fluid to non-fluid site. Exiting." << std::endl;
+									exit(EXIT_FAILURE);
+
+								}
+						
+							} else {
+
+								// Proceed as we would if not using periodic boundaries as site is not fluid
+								v_opp = gUtils.getOpposite(v);
+								f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
+
+							}
+#else
+
+							// As destination is off-grid, incoming population will not be updated
+							// Find incoming direction and retain
+							v_opp = gUtils.getOpposite(v);
+							f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
+#endif
+							
+
+					/* If it is not off-grid then filter out unwanted streaming operations
+					 * by checking the source-destination pairings and retaining those values
+					 * that you do not want to be overwritten by streaming
+					 */
 					} else {
 
-						// Check destination site type and decide whether to stream or not
-						if ( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Fine site -- ignore
-							( (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) 
-								&& (LatTyp(i,j,k,M_lim,K_lim) == 4) ) // TL lower level to TL lower level -- done on lower grid stream so ignore.
-							) {
-
-							// Do nothing
-
-#if (defined INLET_ON && defined INLET_DO_NOTHING)
-						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) { // Do-nothing inlet site so do not overwrite
-
-							// Do nothing
+						// Set update exclusions
+						if (
+							
+							// Common exclusions
+							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Coarse-Fine -- ignore as don't update fine sites
+							(
+								(LatTyp(i,j,k,M_lim,K_lim) == 4) &&
+								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) // TL2lower-TL2lower -- done on lower grid stream so ignore.
+							)
+							
+#ifdef BUILD_FOR_MPI
+							// Explicit MPI exlcusions to avoid periodicity
+							||
+							(
+								(LatTyp(i,j,k,M_lim,K_lim) == 7) &&
+								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 8) // Inlet-Outlet -- prevent periodicity on MPI.
+							) ||
+							(
+								(LatTyp(i,j,k,M_lim,K_lim) == 8) &&
+								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) // Outlet-Inlet -- prevent periodicity on MPI.
+							) ||
+							(
+								(LatTyp(i,j,k,M_lim,K_lim) == 0) &&
+								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0) // Solid-Solid -- prevent periodicity on MPI.
+							)
 #endif
+
+							// Exclusion specific to do-nothing inlet
+#if (defined INLET_ON && defined INLET_DO_NOTHING)
+							// If destination is a do-nothing inlet then do not overwrite
+							|| (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7)
+#endif										
+						
+						   ) {
+
+							   // Retain value at destination (do not update)
+							   f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
+
 					
 						} else {
 
@@ -624,6 +711,7 @@ void GridObj::LBM_stream( ) {
 					}
 
 				}
+
 
 			}
 		}
@@ -667,21 +755,9 @@ void GridObj::LBM_macro( ) {
 
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
 
-					// Solid site so compute density but set velocity to zero
-					rho_temp = 0;
-
-					for (int v = 0; v < nVels; v++) {
-
-						// Sum up to find density
-						rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
-
-					}
-
-					// Assign density
-					rho(i,j,k,M_lim,K_lim) = rho_temp;
-
-		
-					// Set velocity to zero
+					
+					// Solid site so do not update density but set velocity to zero
+					rho(i,j,k,M_lim,K_lim) = 1.0;
 					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
 					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
 #if (dims == 3)
@@ -847,7 +923,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = gUtils.indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
 #if (dims == 3)
@@ -925,7 +1001,7 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = gUtils.indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
 #if (dims == 3)

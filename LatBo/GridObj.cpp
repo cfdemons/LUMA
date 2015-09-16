@@ -2,8 +2,8 @@
 */
 
 #include "stdafx.h"
-#include "GridObj.h"
 #include "definitions.h"
+#include "GridObj.h"
 #include <vector>
 
 // ***************************************************************************************************
@@ -20,7 +20,7 @@ GridObj::~GridObj(void)
 
 // ***************************************************************************************************
 // Constructor for top level grid
-GridObj::GridObj(int level)
+GridObj::GridObj(int level, std::ofstream* logfile)
 {
 	// Default rank
 	this->my_rank = 0;
@@ -35,7 +35,10 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
-	std::cout << "Constructing Grid level " << level  << std::endl;
+	// Logfile assign
+	gUtils = GridUtils();
+
+	*logfile << "Constructing Grid level " << level  << std::endl;
 	this->LBM_init_grid(); // Call L0 non-MPI initialiser
 
 }
@@ -44,7 +47,8 @@ GridObj::GridObj(int level)
 // MPI constructor for level 0 with grid level, rank, local grid size and its global edges
 GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size, 
 				 std::vector< std::vector<unsigned int> > GlobalLimsInd, 
-				 std::vector< std::vector<double> > GlobalLimsPos)
+				 std::vector< std::vector<double> > GlobalLimsPos,
+				 std::ofstream* logfile)
 {
 	this->level = level;
     this->region_number = 0;
@@ -56,7 +60,10 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 		this->CoarseLimsZ[i] = 0;
 	}
 
-	std::cout << "Building Grid level " << level << " on rank " << my_rank << std::endl;
+	// Logfile assign
+	this->gUtils.setLogFile(logfile);
+
+	*logfile << "Building Grid level " << level << " on rank " << my_rank << std::endl;
 
 	LBM_init_grid( local_size, GlobalLimsInd, GlobalLimsPos ); // Run initialisation routine
 
@@ -64,13 +71,16 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 
 // ***************************************************************************************************
 // Overload constructor for MPI sub grid
-GridObj::GridObj(int level, int RegionNumber, int rank)
+GridObj::GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile)
 {
 	this->level = level;
     this->region_number = RegionNumber;
 	this->my_rank = rank;
 
-	std::cout << "Building Grid level " << level << ", region " << region_number << ", on rank " << my_rank << std::endl;
+	// Logfile assign
+	this->gUtils.setLogFile(logfile);
+
+	*logfile << "Building Grid level " << level << ", region " << region_number << ", on rank " << my_rank << std::endl;
 
 }
 
@@ -78,7 +88,7 @@ GridObj::GridObj(int level, int RegionNumber, int rank)
 // Method to generate a subgrid
 void GridObj::LBM_addSubGrid(int RegionNumber) {
 
-	subGrid.emplace_back( this->level + 1, RegionNumber, this->my_rank);
+	subGrid.emplace_back( this->level + 1, RegionNumber, this->my_rank, this->gUtils.logfile);
 	
 	// Update limits as cannot be done through the constructor since
 	// we cannot pass more than 5 arguments to emplace_back()

@@ -95,10 +95,10 @@ int main( int argc, char* argv[] )
 	// Create the grid object (level = 0)
 #ifdef BUILD_FOR_MPI
 	// Call MPI constructor
-	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos);
+	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos, &logfile);
 #else
 	// Call basic wrapper constructor
-	GridObj Grids(0);
+	GridObj Grids(0, &logfile);
 #endif
 
 	// Number of loops based on L0 time step
@@ -119,9 +119,10 @@ int main( int argc, char* argv[] )
 	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
 	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
-	logfile << "Lattice inlet velocity " << vecnorm(u_0x,u_0y,u_0z) << std::endl;
+	logfile << "Lattice inlet velocity " << Grids.gUtils.vecnorm(u_0x,u_0y,u_0z) << std::endl;
 	// Reynolds Number
 	logfile << "Reynolds Number = " << Re << endl;
+
 
 	/* ***************************************************************************************************************
 	**************************************** REFINED LEVELS INITIALISE ***********************************************
@@ -292,21 +293,21 @@ int main( int argc, char* argv[] )
 			MPI_Barrier(mpim.my_comm);
 #endif
 #ifdef TEXTOUT
-		std::cout << "Writing out to <Grids.out>" << endl;
+		logfile << "Writing out to <Grids.out>" << endl;
 		Grids.io_textout(t);
 #endif
 #ifdef VTK_WRITER
-	std::cout << "Writing out to VTK file" << endl;
+	logfile << "Writing out to VTK file" << endl;
 	Grids.vtk_writer(t, tval);
 #endif
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
 	&& defined IBM_ON && defined IBBODY_TRACER
-	std::cout << "Writing out flexible body position" << endl;
+	logfile << "Writing out flexible body position" << endl;
 	Grids.io_write_body_pos(t);
 #endif
 #if defined LD_OUT && defined IBM_ON
-	std::cout << "Writing out flexible body lift and drag" << endl;
+	logfile << "Writing out flexible body lift and drag" << endl;
 	Grids.io_write_lift_drag(t);
 #endif
 
@@ -374,7 +375,7 @@ int main( int argc, char* argv[] )
 
 #ifdef TEXTOUT
 		MPI_Barrier(mpim.my_comm);
-		std::cout << "Writing out to <Grids.out>" << endl;
+		logfile << "Writing out to <Grids.out>" << endl;
 		Grids.io_textout(999999999);
 #endif
 

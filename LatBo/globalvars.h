@@ -11,7 +11,7 @@ extern const double w[nVels];				// Weights
 extern const double cs;						// Lattice sound speed for lattice
 #ifdef USE_MRT
 extern const int mMRT[nVels][nVels];		// MRT transformation matrix
-extern const float mInvMRT[nVels][nVels];	// Inverse of MRT transformation matrix
+extern const double mInvMRT[nVels][nVels];	// Inverse of MRT transformation matrix
 #endif
  
 #endif

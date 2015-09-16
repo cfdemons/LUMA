@@ -4,18 +4,22 @@
 #include "stdafx.h"
 #include "IB_body.h"
 #include "definitions.h"
-#include "generic_ops.h"
 #include <math.h>
 #include "GridObj.h"
 
 // ***************************************************************************************************
 // Constructor and destructor
-IB_body::IB_body(void) {
+IB_body::IB_body() { }
+IB_body::~IB_body(void) { }
+
+// Utility class passed by reference
+IB_body::IB_body(GridUtils& g) {
 
 	this->groupID = 0;	// Default ID
+	this->gUtils = g;	// Assign reference to utility class passed from parent GridObj
 
 }
-IB_body::~IB_body(void) { }
+
 
 // ***************************************************************************************************
 // Method to add marker
@@ -64,13 +68,13 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	for (unsigned int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
-	spacing = vecnorm( diff );
+	spacing = gUtils.vecnorm( diff );
 
 	
 	
 #else
 	// Circle -- find theta
-	std::vector<double> theta = linspace(0, 2*PI - (2*PI / num_markers), num_markers);
+	std::vector<double> theta = gUtils.linspace(0, 2*PI - (2*PI / num_markers), num_markers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -84,7 +88,7 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	for (unsigned int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
-	spacing = vecnorm( diff );
+	spacing = gUtils.vecnorm( diff );
 #endif
 
 }
@@ -117,8 +121,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {
-			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			system("pause");
+			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	
@@ -170,8 +173,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) + 
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
-		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -232,8 +234,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
-			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			system("pause");
+			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	
@@ -253,8 +254,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	if (ref == 0) {
 		// Advisory of number of points
 		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -302,8 +302,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 	// Just in case anything goes wrong here...
 	if (markers.size() != num_points) {
-		std::cout << "Body is not closed. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "Body is not closed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -317,8 +316,7 @@ void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point,
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
-		std::cout << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -380,8 +378,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 
 	// Exit if called in 2D
 	if ( dims == 2 ) {
-		std::cout << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -409,8 +406,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
-			std::cout << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			system("pause");
+			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	
@@ -430,8 +426,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 	if (ref == 0) {
 		// Advisory of number of points
 		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		system("pause");
+		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 

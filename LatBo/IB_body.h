@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "IB_marker.h"
+#include "GridUtils.h"
 
 class IB_body {
 
@@ -9,8 +10,9 @@ class IB_body {
 	friend class GridObj;
 
 public:
-	// Default constructor and destructor
-	IB_body(void);
+	// Constructor and destructor
+	IB_body::IB_body();
+	IB_body(GridUtils&);	// Custom constructor which passes utility class
 	~IB_body(void);
 
 protected:
@@ -26,12 +28,13 @@ protected:
 	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
 	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
 	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
+	GridUtils gUtils;					// Reference to parent GridObj's utility class
 
 	// Flexible body properties
 	double delta_rho;					// Difference in density between fluid and solid in lattice units
 	double flexural_rigidity;			// Young's modulus E * Second moment of area I
 	std::vector<double> tension;		// Tension between the current marker and its neighbour
-	std::vector<int> BCs;			// BCs type flags (flexible bodies)
+	std::vector<int> BCs;				// BCs type flags (flexible bodies)
 
 	
 	/*	

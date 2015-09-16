@@ -14,7 +14,8 @@ void GridObj::ibm_build_body(int body_type) {
 	std::vector<double> dimensions, centrepoint, start_position, end_position;
 
 	// Increase the iBody array by single IB_body object
-	iBody.emplace_back();
+	iBody.emplace_back(gUtils);
+
 
 	if (body_type == 1) {
 		// =========================== Build a rectangle/cuboid ===========================  //
@@ -39,6 +40,7 @@ void GridObj::ibm_build_body(int body_type) {
 		// Build
 		iBody[iBody.size()-1].makeBody(dimensions,angles,centrepoint,false,ibb_deform,iBody.size()-1);
 
+
 	} else if (body_type == 2) {
 		// =========================== Build a circle/sphere ===========================  //
 
@@ -49,6 +51,7 @@ void GridObj::ibm_build_body(int body_type) {
 
 		// Build
 		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false,ibb_deform,iBody.size()-1);
+
 
 	} else if (body_type == 3) {
 		// =========================== Build both with custom dimensions ===========================  //
@@ -65,7 +68,7 @@ void GridObj::ibm_build_body(int body_type) {
 		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false,ibb_deform,iBody.size()-1);
 		
 		// Grow vector
-		iBody.emplace_back();
+		iBody.emplace_back(gUtils);
 
 		// Angle vector
 		std::vector<double> angles;
@@ -169,7 +172,7 @@ void GridObj::ibm_build_body(int body_type) {
 
 			if (i != 0) {
 				// Increase the iBody array by single IB_body object when not on first loop
-				iBody.emplace_back();
+				iBody.emplace_back(gUtils);
 			}
 
 			// Build filament with fixed group ID making centre filament flexible
@@ -207,6 +210,7 @@ void GridObj::ibm_build_body(int body_type) {
 		// Build body as rigid filament
 		iBody[iBody.size()-1].makeBody(num_markers, start_position, ibb_length, angles, BCs, false, false, iBody.size()-1);
 
+
 	} else if (body_type == 7) {
 		// =========================== Build 2D rigid plate + flexible flap ===========================  //
 	
@@ -231,7 +235,7 @@ void GridObj::ibm_build_body(int body_type) {
 		iBody[iBody.size()-1].makeBody(num_markers-1, start_position, ibb_length - lspace, angles, BCs, false, false, iBody.size()-1);
 
 		// Add flap of half the length (slightly lower resolution)
-		iBody.emplace_back();
+		iBody.emplace_back(gUtils);
 		angles[0] = 0.0;
 		start_position[0] = ( ibb_start_x - (ibb_length/2)*cos(-ibb_angle_vert * PI / 180) ) + (ibb_length)*cos(-ibb_angle_vert * PI / 180);
 		start_position[1] = ( ibb_start_y - (ibb_length/2)*sin(-ibb_angle_vert * PI / 180) ) + (ibb_length)*sin(-ibb_angle_vert * PI / 180);
@@ -255,6 +259,7 @@ void GridObj::ibm_build_body(int body_type) {
 
 		// Build using plate flag
 		iBody[iBody.size()-1].makeBody(dimensions,-ibb_angle_vert,centrepoint,false,false,iBody.size()-1,true);
+
 
 	} else if (body_type == 9) {
 		// =========================== Build 3D rigid plate + flexible flap ===========================  //
@@ -314,7 +319,7 @@ void GridObj::ibm_build_body(int body_type) {
 		for (unsigned int i = 0; i < lengthwise_fils; i++ ) {
 
 			// Increase the iBody array by single IB_body object
-			iBody.emplace_back();
+			iBody.emplace_back(gUtils);
 
 			// Start point in z
 			start_point[2] = start_z + i*lspace;

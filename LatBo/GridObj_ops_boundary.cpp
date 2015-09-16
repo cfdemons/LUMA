@@ -6,8 +6,6 @@
 #include "definitions.h"
 #include "globalvars.h"
 
-// Forward declaration of getOpposite local routine
-size_t getOpposite(size_t direction);
 
 // ***************************************************************************************************
 /*
@@ -52,21 +50,18 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						size_t src_y = j+c[1][v];
 						size_t src_z = k+c[2][v];
 
-						// If this site is off-grid or another boundary site then retain current value 
+						// If this site is off-grid then cannot update
 						if (	(src_x >= N_lim || src_x < 0) ||
 								(src_y >= M_lim || src_y < 0) ||
-								(src_z >= K_lim || src_z < 0) ||
-								(
-								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 0 || 
-								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 7 || 
-								LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 8) 
-								) {
+								(src_z >= K_lim || src_z < 0)
+						   ) {
+							   // Do nothing
 
 						// If site is fluid site then need to apply reverse
 						} else if (LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 1 || LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 2) {
 
 							// Get reverse direction
-							size_t v_rev = getOpposite(v);
+							size_t v_rev = gUtils.getOpposite(v);
 							
 							// Assign reverse velocity to current site
 							f(i,j,k,v,M_lim,K_lim,nVels) = f(src_x,src_y,src_z,v_rev,M_lim,K_lim,nVels);
@@ -145,6 +140,7 @@ void GridObj:: bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, 
 			// Make all this generic in future release
 			if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
 
+				/*
 				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
 				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
 				float x1 = 0.0;
@@ -155,6 +151,11 @@ void GridObj:: bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, 
 				float lin_c = y1;
                 
 				f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+				*/
+
+				// Just copy value for now as the linear extrapolation doesn't work
+				f(i,j,k,v,M_lim,K_lim,nVels) = f(i-1,j,k,v,M_lim,K_lim,nVels);
+
 			}
 		}
 
@@ -164,6 +165,7 @@ void GridObj:: bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, 
 
 			if (v == 7 || v == 1 || v == 5) {
                 
+				/*
 				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,nVels);
 				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,nVels);
 				float x1 = 0.0;
@@ -174,6 +176,10 @@ void GridObj:: bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, 
 				float lin_c = y1;
                 
 				f(i,j,k,v,M_lim,K_lim,nVels) = lin_m * x3 + lin_c;
+				*/
+
+				// Just copy value for now as the linear extrapolation doesn't work
+				f(i,j,k,v,M_lim,K_lim,nVels) = f(i-1,j,k,v,M_lim,K_lim,nVels);
 
 			}
 		}
@@ -412,35 +418,6 @@ void GridObj::bc_solid_site_reset( ) {
 
 }
 
-
-// ***************************************************************************************************
-// ***************************************************************************************************
-// Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
-size_t getOpposite(size_t direction) {
-
-	size_t direction_opposite;
-
-	// If rest particle then opposite is simply itself
-	if (direction == nVels-1) {
-		
-		direction_opposite = direction;
-
-	} else {
-		
-		/*	If direction is even, then opposite is direction+1.
-			If direction is odd, then opposite is direction-1.
-			e.g. direction 0 (+x direction) has opposite 1 (-x direction) --> +1
-			however, direction 1 has opposite 0 --> -1
-			Hence we can add (-1 ^ direction) so it alternates between +/-1
-		*/
-
-		direction_opposite = direction + (int)pow(-1,direction);
-
-	}
-
-	return direction_opposite;
-
-}
 
 // ***************************************************************************************************
 // ***************************************************************************************************

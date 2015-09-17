@@ -26,7 +26,7 @@ MPI libraries are required in order to compile the code. The steps to installing
 6) Change the C compiler to **mpicc** and the C++ compiler and dynamic linker to **mpicxx**. Press OK.  
 7) Go to *Project -> Build Options* and make sure the **Selected Compiler** is set to the one you just created. Note that you have to do this for each individual target you are working on (e.g. Debug, Release). Press OK.  
 8) You will likely receive a warning message recommending to rebuild the project as the compiler has been changed. To rebuild go to *Build -> Rebuild*. Note that to compile in serial you can comment out the **BUILD_FOR_MPI** flag in the **definitions.h** header file.  
-9) To run the program open up a terminal and navigate to the directory containing the executable. If the program was compiled in serial then the **./LatBo** command will work. However, if it was compiled for parallel execution then use: **mpirun -np N ./LatBo** where N is the number of processes (cores) that you want to use.  
+9) To run the program open up a terminal and navigate to the directory containing the executable. If the program was compiled in serial then the **./LatBo** command will work. However, if it was compiled for parallel execution then use: **mpirun -np N ./LatBo** where N is the number of processes (cores) that you want to use. Note that the number you select for N must match the number of cores you defined during compile time in the **definitions.h** file.
 
 There is probably a way to execute in parallel directly from Codeblocks, when a solution for this is found it will be posted up here. Any questions or issues then contact Joe.
 

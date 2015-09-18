@@ -635,8 +635,9 @@ void GridObj::LBM_stream( ) {
 
 								} else {
 
-									*gUtils.logfile << "Error: Trying to periodically stream fluid to non-fluid site. Exiting." << std::endl;
-									exit(EXIT_FAILURE);
+									// Proceed as we would if not using periodic boundaries as destination site is not fluid
+									v_opp = gUtils.getOpposite(v);
+									f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
 
 								}
 						

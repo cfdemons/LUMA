@@ -301,6 +301,42 @@ void GridObj::LBM_init_refined_lab ( ) {
 	// Correct L0
 	for(int reg = 0; reg < NumReg; reg++) {
 
+
+		// Check that whole refined region exists on a single rank (and not on overlap)
+		if	(
+				// X starts on rank but finishes outside rank
+				( ((int)RefXstart[reg] >= XInd[1] && (int)RefXstart[reg] <= XInd[XInd.size()-2]) && ((int)RefXend[reg] > XInd[XInd.size()-2]) )
+			||	
+				// X ends on rank but starts outside rank
+				( ((int)RefXend[reg] >= XInd[1] && (int)RefXend[reg] <= XInd[XInd.size()-2]) && ((int)RefXstart[reg] < XInd[1]) )
+
+			||
+
+				// Y starts on rank but finishes outside rank
+				( ((int)RefYstart[reg] >= YInd[1] && (int)RefYstart[reg] <= YInd[YInd.size()-2]) && ((int)RefYend[reg] > YInd[YInd.size()-2]) )
+			||	
+				// Y ends on rank but starts outside rank
+				( ((int)RefYend[reg] >= YInd[1] && (int)RefYend[reg] <= YInd[YInd.size()-2]) && ((int)RefYstart[reg] < YInd[1]) )
+#if (dims == 3)
+			||
+
+				// Z starts on rank but finishes outside rank
+				( ((int)RefZstart[reg] >= ZInd[1] && (int)RefZstart[reg] <= ZInd[ZInd.size()-2]) && ((int)RefZend[reg] > ZInd[ZInd.size()-2]) )
+			||	
+				// Z ends on rank but starts outside rank
+				( ((int)RefZend[reg] >= ZInd[1] && (int)RefZend[reg] <= ZInd[ZInd.size()-2]) && ((int)RefZstart[reg] < ZInd[1]) )
+#endif
+			) {
+
+				// Throw an error
+				*gUtils.logfile << "Error: Refined region starts and ends on different ranks. Exiting." << std::endl;
+				exit(EXIT_FAILURE);
+		}
+
+
+
+		// Check passed...so label
+
 #if (dims == 3)
 		// Add TL to lower labels
 		for (size_t i = RefXstart[reg]; i <= RefXend[reg]; i++) {
@@ -357,6 +393,9 @@ void GridObj::LBM_init_refined_lab ( ) {
 				}
 			}
 		}
+
+
+
 
 #else // 2D CASE
 		// Add TL to lower labels
@@ -619,7 +658,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	LBM_init_bound_lab();
 
 	// Refined region labelling
-	if (NumLev > 0) {
+	if (NumLev != 0) {
 		LBM_init_refined_lab();
 	}
 

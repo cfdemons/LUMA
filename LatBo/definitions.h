@@ -43,7 +43,7 @@
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
-//#define MPI_VERBOSE
+#define MPI_VERBOSE
 
 // Gravity (acts in +x direction)
 //#define GRAVITY_ON
@@ -83,15 +83,17 @@
 // MPI Data
 #define Xcores 2
 #define Ycores 2
-#define Zcores 1	// Set to 1 if doing a 2D problem
+#define Zcores 2	// Set to 1 if doing a 2D problem
 
-#define USE_CUSTOM_MPI_SIZES
+//#define USE_CUSTOM_MPI_SIZES
 
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
-static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 350, 350};
-static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 130, 20, 130};
+#ifdef USE_CUSTOM_MPI_SIZES
+static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
+static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
 // The following can be arbitrary if doing a 2D problem
-static size_t zRankSize[Xcores*Ycores*Zcores]		= {25, 25, 25, 25};//, 25, 25, 25, 25};
+static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
+#endif
 
 
 // Lattice properties (in lattice units)

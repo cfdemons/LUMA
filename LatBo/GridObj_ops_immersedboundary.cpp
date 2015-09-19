@@ -135,6 +135,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 #endif
 				// Check that radius is valid otherwise jacowire must have failed
 				if ( _finite(radius) == false ) {
+					std::cout << "Error: See Log File" << std::endl;
 					*gUtils.logfile << "Jacowire calculation of new position has failed. Exiting." << std::endl;
 					exit(EXIT_FAILURE);					
 				}
@@ -168,14 +169,17 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 #if (dims == 3)
 
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 		
 	} else if ( (int)knear - 5 < 0 || knear + 5 >= ZPos.size() ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -222,10 +226,12 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 	// 2D check support region
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 		

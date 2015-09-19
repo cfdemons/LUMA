@@ -119,6 +119,17 @@ void MPI_manager::mpi_init( ) {
 		}
 		logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 
+#ifdef USE_CUSTOM_MPI_SIZES
+	// If using custom sizes, user must set the Zcores to 1
+	if (dims == 2 && Zcores != 1) {
+		std::cout << "Error: See Log File" << std::endl;
+		logout << "Error: Zcores must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
+		logout.close();
+		MPI_Finalize();
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 		logout.close();
 #endif
 
@@ -150,9 +161,11 @@ void MPI_manager::mpi_gridbuild( ) {
 
 		} else if ( global_dims[d] % MPI_dims[d] != 0 ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
-			if (my_rank == 0) { // Only print out once
-				std::cout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
-			}
+			std::ofstream logout;
+			logout.open( "./Output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			std::cout << "Error: See Log File" << std::endl;
+			logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
+			logout.close();
 			MPI_Finalize();
 			exit(EXIT_FAILURE);
 
@@ -289,6 +302,7 @@ void MPI_manager::mpi_gridbuild( ) {
 	for (size_t d = 0; d < dims; d++) {
 		logout << "\t" << local_size[d];
 	}
+	logout << "\t)" << std::endl;
 
 	logout << "Limits of the grid are " <<
 		global_edge_ind[0][my_rank] << "-" << global_edge_ind[1][my_rank] << 
@@ -297,12 +311,98 @@ void MPI_manager::mpi_gridbuild( ) {
 		"), (" << global_edge_pos[0][my_rank] << "-" << global_edge_pos[1][my_rank] << 
 		", " << global_edge_pos[2][my_rank] << "-" << global_edge_pos[3][my_rank] << 
 		", " << global_edge_pos[4][my_rank] << "-" << global_edge_pos[5][my_rank] << 
-		")";
-
-
-	logout << "\t)" << std::endl;
+		")" << std:: endl;
+	
 	logout.close();
 #endif
+
+
+	// Check my grid size dimensions with the neighbours to make sure it all lines up
+#ifdef USE_CUSTOM_MPI_SIZES
+
+	// 3D check
+#if (dims == 3)
+	if ( (	zRankSize[neighbour_rank[0]] != local_size[2]-2 || zRankSize[neighbour_rank[1]] != local_size[2]-2 ||
+			yRankSize[neighbour_rank[0]] != local_size[1]-2 || yRankSize[neighbour_rank[1]] != local_size[1]-2
+		 ) || (
+			zRankSize[neighbour_rank[4]] != local_size[2]-2 || zRankSize[neighbour_rank[5]] != local_size[2]-2 ||
+			xRankSize[neighbour_rank[4]] != local_size[0]-2 || xRankSize[neighbour_rank[5]] != local_size[0]-2
+		 ) || (
+			xRankSize[neighbour_rank[8]] != local_size[0]-2 || xRankSize[neighbour_rank[9]] != local_size[0]-2 ||
+			yRankSize[neighbour_rank[8]] != local_size[1]-2 || yRankSize[neighbour_rank[9]] != local_size[1]-2
+		 )
+		) {
+
+			std::ofstream logout;
+			logout.open( "./Output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			std::cout << "Error: See Log File" << std::endl;
+			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
+
+			// Tell user size it should be
+			logout <<
+				" Z (left/right): " <<
+				zRankSize[neighbour_rank[0]] << " needed " << local_size[2]-2 << ", " <<
+				zRankSize[neighbour_rank[1]] << " needed " << local_size[2]-2 << ", " <<
+				" Z (up/down): " <<
+				zRankSize[neighbour_rank[4]] << " needed " << local_size[2]-2 << ", " << 
+				zRankSize[neighbour_rank[5]] << " needed " << local_size[2]-2 << ", " <<
+				" Y (left/right): " <<
+				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " << 
+				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
+				" Y (front/back): " <<
+				yRankSize[neighbour_rank[8]] << " needed " << local_size[1]-2 << ", " <<
+				yRankSize[neighbour_rank[9]] << " needed " << local_size[1]-2 << ", " <<
+				" X (up/down): " <<
+				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2 << ", " << 
+				" X (front/back): " <<
+				xRankSize[neighbour_rank[8]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[9]] << " needed " << local_size[0]-2;
+
+			logout.close();
+			MPI_Finalize();
+			exit(EXIT_FAILURE);
+
+		 }
+
+#else
+
+	// 2D check
+	if ( (	yRankSize[neighbour_rank[0]] != local_size[1]-2 || yRankSize[neighbour_rank[1]] != local_size[1]-2
+		 ) || (
+			xRankSize[neighbour_rank[4]] != local_size[0]-2 || xRankSize[neighbour_rank[5]] != local_size[0]-2
+		 )
+		) {
+
+			std::ofstream logout;
+			logout.open( "./Output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			std::cout << "Error: See Log File" << std::endl;
+			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
+
+			// Tell user size it should be
+			logout << 
+				" Y (left/right): " <<
+				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " << 
+				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
+				" X (up/down): " <<
+				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2;
+
+			logout.close();
+			MPI_Finalize();
+			exit(EXIT_FAILURE);
+
+		 }
+
+#endif
+#endif
+
+	
+
+
+
+
+
 
 }
 

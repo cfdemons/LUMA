@@ -107,6 +107,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	// Check solid block inside domain
 	if (obj_x_max > N || obj_x_min < 0 || obj_y_max > M || obj_y_min < 0 || obj_z_max > K || obj_z_min < 0) {
 		// Block outside domain
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "Block is placed outside the domain. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -155,6 +156,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	// Check for potential singularity in BC
 	if (u_0x == 1) {
 		// Singularity so exit
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -329,6 +331,7 @@ void GridObj::LBM_init_refined_lab ( ) {
 			) {
 
 				// Throw an error
+				std::cout << "Error: See Log File" << std::endl;
 				*gUtils.logfile << "Error: Refined region starts and ends on different ranks. Exiting." << std::endl;
 				exit(EXIT_FAILURE);
 		}
@@ -507,6 +510,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 #if (dims == 3)
 	// Check that lattice volumes are cubes in 3D
 	if ( (Lx/N) != (Ly/M) || (Lx/N) != (Lz/K) ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -514,6 +518,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 #else
 	// 2D so need square lattice cells
 	if ( (Lx/N) != (Ly/M) ) {
+		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -537,8 +542,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 					RefZend[reg]-RefZstart[reg]+1 == 3
 					) && NumLev > 1 )
 				) {
-				*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
-				exit(EXIT_FAILURE);
+					std::cout << "Error: See Log File" << std::endl;
+					*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
+					exit(EXIT_FAILURE);
 			}
 		}
 #else
@@ -553,8 +559,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 					RefYend[reg]-RefYstart[reg]+1 == 3
 					) && NumLev > 1 )
 				) {
-				*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
-				exit(EXIT_FAILURE);
+					std::cout << "Error: See Log File" << std::endl;
+					*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
+					exit(EXIT_FAILURE);
 			}
 		}
 #endif

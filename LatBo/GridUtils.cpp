@@ -152,7 +152,8 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != x.size()) {
-		std::cout << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
+		std::cout << "Error: See Log File" << std::endl;
+		*logfile << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}

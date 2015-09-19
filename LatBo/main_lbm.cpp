@@ -73,13 +73,6 @@ int main( int argc, char* argv[] )
 #endif
 	logfile.open("./Output/log_rank" + fNameRank + ".out", std::ios::out);
 
-#ifdef USE_CUSTOM_MPI_SIZES
-	// If using custom sizes, user must set the Zcores to 1
-	if (dims == 2 && Zcores != 1) {
-		logfile << "Error: Zcores must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
-	}
-#endif
-
 	// Fix output format
 	cout.precision(4);
 

@@ -19,7 +19,7 @@ GridObj::~GridObj(void)
 }
 
 // ***************************************************************************************************
-// Constructor for top level grid
+// Basic Constructor for top level grid
 GridObj::GridObj(int level, std::ofstream* logfile)
 {
 	// Default rank
@@ -35,10 +35,11 @@ GridObj::GridObj(int level, std::ofstream* logfile)
 		this->CoarseLimsZ[i] = 0;
 	}
 
-	// Logfile assign
-	gUtils = GridUtils();
+	// Create utility class
+	this->gUtils.setLogFile(logfile);
 
 	*logfile << "Constructing Grid level " << level  << std::endl;
+
 	this->LBM_init_grid(); // Call L0 non-MPI initialiser
 
 }

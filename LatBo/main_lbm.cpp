@@ -73,6 +73,13 @@ int main( int argc, char* argv[] )
 #endif
 	logfile.open("./Output/log_rank" + fNameRank + ".out", std::ios::out);
 
+#ifdef USE_CUSTOM_MPI_SIZES
+	// If using custom sizes, user must set the Zcores to 1
+	if (dims == 2 && Zcores != 1) {
+		logfile << "Error: Zcores must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
+	}
+#endif
+
 	// Fix output format
 	cout.precision(4);
 
@@ -133,42 +140,13 @@ int main( int argc, char* argv[] )
 		// Loop over number of regions and add subgrids to Grids
 		for (int reg = 0; reg < NumReg; reg++) {
 
-#ifdef BUILD_FOR_MPI
-			/* Check to make sure the refined region lies completely on this rank's L0 grid:
-			 * Check	1) starts on this rank &&
-			 *			2) ends on this rank
+			/* Check to make sure the refined region lies completely on this rank's L0 grid is performed
+			 * in the init_refined_lab() routine. If the code has got this far without exiting then
+			 * we are OK to add the subgrids.
 			 */
 
-#if (dims == 3)
-			// 3D check
-			if ( ( (int)RefXstart[reg] > mpim.global_edge_ind[0][mpim.my_rank] && (int)RefXend[reg] < mpim.global_edge_ind[1][mpim.my_rank] ) &&
-				 ( (int)RefYstart[reg] > mpim.global_edge_ind[2][mpim.my_rank] && (int)RefYend[reg] < mpim.global_edge_ind[3][mpim.my_rank] ) && 
-				 ( (int)RefZstart[reg] > mpim.global_edge_ind[4][mpim.my_rank] && (int)RefZend[reg] < mpim.global_edge_ind[5][mpim.my_rank] ) ) {
-
-					// Add the subgrid and let constructor initialise
-					Grids.LBM_addSubGrid(reg);
-
-			}
-#else
-			// 2D check
-			if ( ( (int)RefXstart[reg] > mpim.global_edge_ind[0][mpim.my_rank] && (int)RefXend[reg] < mpim.global_edge_ind[1][mpim.my_rank] ) &&
-				 ( (int)RefYstart[reg] > mpim.global_edge_ind[2][mpim.my_rank] && (int)RefYend[reg] < mpim.global_edge_ind[3][mpim.my_rank] ) ) {
-
-					// Add the subgrid and let constructor initialise
-					Grids.LBM_addSubGrid(reg);
-
-			}
-
-#endif
-
-
-
-#else
-			// No check required
 			// Add the subgrid and let constructor initialise
 			Grids.LBM_addSubGrid(reg);
-
-#endif
 		}
 
 	}

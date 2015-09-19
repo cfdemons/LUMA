@@ -11,13 +11,13 @@ class IB_body {
 
 public:
 	// Constructor and destructor
-	IB_body();
+	IB_body::IB_body();
 	IB_body(GridUtils&);	// Custom constructor which passes utility class
 	~IB_body(void);
 
 protected:
 
-	/*
+	/*	
 	***************************************************************************************************************
 	********************************************* Member Data *****************************************************
 	***************************************************************************************************************
@@ -36,8 +36,8 @@ protected:
 	std::vector<double> tension;		// Tension between the current marker and its neighbour
 	std::vector<int> BCs;				// BCs type flags (flexible bodies)
 
-
-	/*
+	
+	/*	
 	***************************************************************************************************************
 	********************************************* Member Methods **************************************************
 	***************************************************************************************************************
@@ -53,15 +53,15 @@ public:
 	//////////////////////////////////
 
 	// Method to construct sphere/circle
-	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);
+	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);		
 	// Method to construct cuboid/rectangle
-	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
-		bool flex_rigid, bool deform, unsigned int group);
+	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre, 
+		bool flex_rigid, bool deform, unsigned int group);		
 	// Method to construct filament
-	void makeBody(unsigned int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs,
+	void makeBody(unsigned int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs, 
 		bool flex_rigid, bool deform, unsigned int group);
 	// Method to construct a 3D plate
-	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
+	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre, 
 		bool flex_rigid, bool deform, unsigned int group, bool plate);
 
 };

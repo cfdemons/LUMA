@@ -39,7 +39,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before output
+#define out_every 100			// How many timesteps before output
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
@@ -55,7 +55,7 @@
 //#define NO_FLOW			// Initialise the domain with no flow
 
 // LBM configuration
-//#define USE_MRT
+#define USE_MRT
 
 #if (dims == 3)
 // MRT relaxation times (D3Q19)
@@ -72,7 +72,7 @@
 */
 
 
-#define T 100		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 500		// End time of simulation (if each time step increments by physical dt = dx)
 
 /*	
 ***************************************************************************************************************
@@ -81,14 +81,23 @@
 */
 
 // MPI Data
-#define Xcores 4
+#define Xcores 2
 #define Ycores 2
-#define Zcores 3	// This gets set to 1 later if doing a 2D problem
+#define Zcores 1	// Set to 1 if doing a 2D problem
+
+#define USE_CUSTOM_MPI_SIZES
+
+// MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
+static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 350, 350};
+static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 130, 20, 130};
+// The following can be arbitrary if doing a 2D problem
+static size_t zRankSize[Xcores*Ycores*Zcores]		= {25, 25, 25, 25};//, 25, 25, 25, 25};
+
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 200		// Number of x lattice sites
-#define M 50		// Number of y lattice sites
+#define N 400		// Number of x lattice sites
+#define M 150		// Number of y lattice sites
 #define K 50		// Number of z lattice sites
 
 
@@ -96,9 +105,9 @@
 #define a_x 0		// Start of domain-x
 #define b_x 4.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1.0		// End of domain-y
+#define b_y 1.5		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 1.0		// End of domain-z
+#define b_z 0.5		// End of domain-z
 
 
 /*	
@@ -112,7 +121,7 @@
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 50		// Desired Reynolds number
+#define Re 500		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -181,24 +190,24 @@
 */
 
 // Switches
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-//#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+//#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
-#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-//#define PERIODIC_BOUNDARIES	// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 80		// Index of start of object/wall in x-direction
-#define obj_x_max 120		// Index of end of object/wall in x-direction
-#define obj_y_min 40		// Index of start of object/wall in y-direction
-#define obj_y_max 60		// Index of end of object/wall in y-direction
-#define obj_z_min 40		// Index of start of object/wall in z-direction
-#define obj_z_max 60		// Index of end of object/wall in z-direction
+#define obj_x_min 60		// Index of start of object/wall in x-direction
+#define obj_x_max 80		// Index of end of object/wall in x-direction
+#define obj_y_min 65		// Index of start of object/wall in y-direction
+#define obj_y_max 85		// Index of end of object/wall in y-direction
+#define obj_z_min 10		// Index of start of object/wall in z-direction
+#define obj_z_max 20		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -208,26 +217,26 @@
 ***************************************************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
 #define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Global lattice indices for refined region on level L0 start numbering at 0
 
-	#if NumReg == 2 // Included for testing purposes so I don't have to keep re-commenting bits
+	#if NumReg == 2 // Makes it easier to set up multi-region cases
 	static size_t RefXstart[NumReg]		= {70, 160};
 	static size_t RefXend[NumReg]		= {90, 180};
-	static size_t RefYstart[NumReg]		= {30, 10};
-	static size_t RefYend[NumReg]		= {40, 20};
+	static size_t RefYstart[NumReg]		= {20, 10};
+	static size_t RefYend[NumReg]		= {30, 20};
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumReg]		= {24, 24};
 	static size_t RefZend[NumReg]		= {36, 36};
 
 	#elif NumReg == 1
-	static size_t RefXstart[NumReg]		= {64};
-	static size_t RefXend[NumReg]		= {72};
-	static size_t RefYstart[NumReg]		= {24};
-	static size_t RefYend[NumReg]		= {36};
+	static size_t RefXstart[NumReg]		= {130};
+	static size_t RefXend[NumReg]		= {350};
+	static size_t RefYstart[NumReg]		= {10};
+	static size_t RefYend[NumReg]		= {90};
 	static size_t RefZstart[NumReg]		= {24};
 	static size_t RefZend[NumReg]		= {36};
 	#endif
@@ -251,8 +260,6 @@
 	#define nVels 9		// Use D2Q9
 
 	// MPI config to 2D
-	#undef Zcores
-	#define Zcores 1
 	#define MPI_dir 8
 	
 	// Set Z limits for 2D

@@ -143,24 +143,114 @@ void MPI_manager::mpi_gridbuild( ) {
 	// Compute required local grid size
 	// Loop over dimensions
 	for (size_t d = 0; d < dims; d++) {
+
 		if (MPI_dims[d] == 1) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
+
 		} else if ( global_dims[d] % MPI_dims[d] != 0 ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
-			if (my_rank == 0) {
+			if (my_rank == 0) { // Only print out once
 				std::cout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
 			}
 			MPI_Finalize();
 			exit(EXIT_FAILURE);
+
 		} else {
+	
 			// Else, find local grid size
+#ifdef USE_CUSTOM_MPI_SIZES
+
+			// Get grids sizes from the definitions file
+			switch (d)
+			{
+			case 0:
+				local_size.push_back( xRankSize[my_rank] + 2 );
+				break;
+			case 1:
+				local_size.push_back( yRankSize[my_rank] + 2 );
+				break;
+			case 2:
+				local_size.push_back( zRankSize[my_rank] + 2 );
+				break;
+
+			default:
+				break;
+			}
+			
+
+
+#else
 			local_size.push_back( (global_dims[d]/MPI_dims[d]) + 2 ); // Simple uniform decomposition + overlap
+
+
+
+#endif
 		}
 	}
-	
-	// Find global indices of edges of grid excluding the overlap
+
+	// Find indices and positions of edges of each grid in the global coordinate space excluding the overlap
 	global_edge_ind.resize( 6, std::vector<unsigned int>(num_ranks) );
+	global_edge_pos.resize( 6, std::vector<double>(num_ranks) );
+
+
+#ifdef USE_CUSTOM_MPI_SIZES
+
+	// If using custom sizing need to cumulatively establish how far from origin
+
+	int adj_rank;
+
+	// X edges
+	global_edge_ind[1][my_rank] = 0;
+	for (int i = 0; i < MPI_coords[0] + 1; i++) {
+		// Find i-th rank
+#if (dims == 3)
+		int adj_coords[dims] = {i, MPI_coords[1], MPI_coords[2]};
+#else
+		int adj_coords[dims] = {i, MPI_coords[1]};
+#endif
+		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		// Add the number of sites on this rank to total
+		global_edge_ind[1][my_rank] += xRankSize[adj_rank];
+	}
+	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - xRankSize[my_rank];
+
+	// Y edges
+	global_edge_ind[3][my_rank] = 0;
+	for (int i = 0; i < MPI_coords[1] + 1; i++) {
+		// Find i-th rank
+#if (dims == 3)
+		int adj_coords[dims] = {MPI_coords[0], i, MPI_coords[2]};
+#else
+		int adj_coords[dims] = {MPI_coords[0], i};
+#endif
+		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		// Add the number of sites on this rank to total
+		global_edge_ind[3][my_rank] += yRankSize[adj_rank];
+	}
+	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - yRankSize[my_rank];
+
+#if (dims == 3)
+	// Z edges
+	global_edge_ind[5][my_rank] = 0;
+	for (int i = 0; i < MPI_coords[2] + 1; i++) {
+		// Find i-th rank
+		int adj_coords[dims] = {MPI_coords[0], MPI_coords[1], i};
+		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		// Add the number of sites on this rank to total
+		global_edge_ind[5][my_rank] += zRankSize[adj_rank];
+	}
+	global_edge_ind[4][my_rank] = global_edge_ind[5][my_rank] - zRankSize[my_rank];
+#else
+	global_edge_ind[5][my_rank] = 1;
+	global_edge_ind[4][my_rank] = 0;
+#endif
+	
+	
+	// Using uniform decomposition
+#else
+
+	// Find global indices of edges of grid excluding the overlap
 	global_edge_ind[1][my_rank] = (N / Xcores) * (MPI_coords[0] + 1);
 	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - (N / Xcores);
 	global_edge_ind[3][my_rank] = (M / Ycores) * (MPI_coords[1] + 1);
@@ -172,20 +262,21 @@ void MPI_manager::mpi_gridbuild( ) {
 	global_edge_ind[5][my_rank] = 1;
 	global_edge_ind[4][my_rank] = 0;
 #endif
+
+#endif
+
+
 	
-	// Find global positions of edges of grid excluding the overlap
-	global_edge_pos.resize( 6, std::vector<double>(num_ranks) );
-	global_edge_pos[1][my_rank] = (Lx / Xcores) * (MPI_coords[0] + 1);
-	global_edge_pos[0][my_rank] = global_edge_pos[1][my_rank] - (Lx / Xcores);
-	global_edge_pos[3][my_rank] = (Ly / Ycores) * (MPI_coords[1] + 1);
-	global_edge_pos[2][my_rank] = global_edge_pos[3][my_rank] - (Ly / Ycores);
-#if (dims == 3)
-	global_edge_pos[5][my_rank] = (Lz / Zcores) * (MPI_coords[2] + 1);
-	global_edge_pos[4][my_rank] = global_edge_pos[5][my_rank] - (Lz / Zcores);
-#else
+	// Find global positions of edges of grid excluding the overlap from the global indices
+	for (int d = 0; d < 6; d++) {
+		global_edge_pos[d][my_rank] = global_edge_ind[d][my_rank] * dx;
+	}
+#if (dims != 3)
 	global_edge_pos[5][my_rank] = b_z;
 	global_edge_pos[4][my_rank] = a_z;
 #endif
+
+
 
 
 	MPI_Barrier(my_comm);
@@ -198,6 +289,17 @@ void MPI_manager::mpi_gridbuild( ) {
 	for (size_t d = 0; d < dims; d++) {
 		logout << "\t" << local_size[d];
 	}
+
+	logout << "Limits of the grid are " <<
+		global_edge_ind[0][my_rank] << "-" << global_edge_ind[1][my_rank] << 
+		", " << global_edge_ind[2][my_rank] << "-" << global_edge_ind[3][my_rank] << 
+		", " << global_edge_ind[4][my_rank] << "-" << global_edge_ind[5][my_rank] << 
+		"), (" << global_edge_pos[0][my_rank] << "-" << global_edge_pos[1][my_rank] << 
+		", " << global_edge_pos[2][my_rank] << "-" << global_edge_pos[3][my_rank] << 
+		", " << global_edge_pos[4][my_rank] << "-" << global_edge_pos[5][my_rank] << 
+		")";
+
+
 	logout << "\t)" << std::endl;
 	logout.close();
 #endif

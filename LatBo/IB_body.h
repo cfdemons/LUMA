@@ -11,7 +11,7 @@ class IB_body {
 
 public:
 	// Constructor and destructor
-	IB_body::IB_body();
+	IB_body();
 	IB_body(GridUtils&);	// Custom constructor which passes utility class
 	~IB_body(void);
 

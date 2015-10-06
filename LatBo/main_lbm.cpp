@@ -78,7 +78,6 @@ int main( int argc, char* argv[] )
 
 	// Timing variables
 	clock_t t_start, t_end, secs; // Wall clock variables
-	int t = 0;				// Time step counter, initially zero
 	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 
 	// Output start time
@@ -217,11 +216,11 @@ int main( int argc, char* argv[] )
 	// Write out t = 0
 #ifdef TEXTOUT
 	logfile << "Writing Output to <Grids.out>..." << endl;
-	Grids.io_textout(t);
+	Grids.io_textout();
 #endif
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
-	Grids.vtk_writer(t, 0.0);
+	Grids.vtk_writer(0.0);
 #endif
 	
 	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
@@ -232,7 +231,7 @@ int main( int argc, char* argv[] )
 	*************************************************************************************************************** */
 	do {
 
-		cout << "\n------ Time Step " << t+1 << " of " << totalloops << " ------" << endl;
+		cout << "\n------ Time Step " << Grids.t+1 << " of " << totalloops << " ------" << endl;
 		
 		// Start the clock
 		t_start = clock();
@@ -251,35 +250,34 @@ int main( int argc, char* argv[] )
 		secs = t_end - t_start;
 		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
-		// Increment counters
-		t++;
+		// Increment physical time
 		tval += Grids.dt;
 
 		
 		///////////////
 		// Write Out //
 		///////////////
-		if (t % out_every == 0) {
+		if (Grids.t % out_every == 0) {
 #ifdef BUILD_FOR_MPI
 			MPI_Barrier(mpim.my_comm);
 #endif
 #ifdef TEXTOUT
-		logfile << "Writing out to <Grids.out>" << endl;
-		Grids.io_textout(t);
+			logfile << "Writing out to <Grids.out>" << endl;
+			Grids.io_textout();
 #endif
 #ifdef VTK_WRITER
-	logfile << "Writing out to VTK file" << endl;
-	Grids.vtk_writer(t, tval);
+			logfile << "Writing out to VTK file" << endl;
+			Grids.vtk_writer(tval);
 #endif
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
 	&& defined IBM_ON && defined IBBODY_TRACER
-	logfile << "Writing out flexible body position" << endl;
-	Grids.io_write_body_pos(t);
+			logfile << "Writing out flexible body position" << endl;
+			Grids.io_write_body_pos();
 #endif
 #if defined LD_OUT && defined IBM_ON
-	logfile << "Writing out flexible body lift and drag" << endl;
-	Grids.io_write_lift_drag(t);
+			logfile << "Writing out flexible body lift and drag" << endl;
+			Grids.io_write_lift_drag();
 #endif
 
 		}
@@ -346,8 +344,8 @@ int main( int argc, char* argv[] )
 
 #ifdef TEXTOUT
 		MPI_Barrier(mpim.my_comm);
-		logfile << "Writing out to <Grids.out>" << endl;
-		Grids.io_textout(999999999);
+		logfile << "Writing out (post-MPI) to <Grids.out>" << endl;
+		Grids.io_textout();
 #endif
 
 #endif

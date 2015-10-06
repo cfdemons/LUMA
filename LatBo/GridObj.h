@@ -19,6 +19,7 @@ class GridObj
 
 public:
 
+	// Constructors & Destructor //
 	GridObj( ); // Default constructor
 	GridObj(int level, std::ofstream* logfile); // Basic grid constructor
 	GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
@@ -70,8 +71,13 @@ private :
 
 	// Grid scalars
 	double dx, dy, dz;	// Physical spacing
-	int level;
-	int region_number;
+	int level;			// Level in embedded grid hierarchy
+	int region_number;	// ID of region at a particular level in the embedded grid hierarchy
+
+	// Time averaged statistics
+	ivector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
+	ivector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,dims)
+	ivector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*dims)
 
 	// IBM objects
 	std::vector<IB_body> iBody;		// Array of immersed boundary bodies
@@ -80,11 +86,12 @@ private :
 	// Public data members
 public :
 
-	double dt;		// Physical time step size
-	double nu;		// Kinematic viscosity (in lattice units)
-	double omega;	// Relaxation frequency
+	double dt;			// Physical time step size
+	unsigned int t;		// Number of completed iterations
+	double nu;			// Kinematic viscosity (in lattice units)
+	double omega;		// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
-	int my_rank;	// MPI rank
+	int my_rank;		// MPI rank
 	GridUtils gUtils;	// Utility class
 	
 	/*	
@@ -130,11 +137,11 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void io_write_body_pos(unsigned int t);			// Write out IB_body positions to text files
-	void io_write_lift_drag(unsigned int t);		// Write out IB_body lift and drag
-	void io_textout(int t);							// Writes out the contents of the class as well as any subgrids to a text file
+	void io_write_body_pos();			// Write out IB_body positions to text files
+	void io_write_lift_drag();			// Write out IB_body lift and drag
+	void io_textout();					// Writes out the contents of the class as well as any subgrids to a text file
 	// VTK writer methods
-	void vtk_writer(int t, double tval);
+	void vtk_writer(double tval);
 
 	// IBM methods
 	void ibm_build_body(int body_type);						// Build a new pre-fab body

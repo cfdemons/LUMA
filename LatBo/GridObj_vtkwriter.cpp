@@ -12,7 +12,7 @@
 using namespace std;
 
 // Routine to write out the vtk for time step t
-void GridObj::vtk_writer(int t, double tval)
+void GridObj::vtk_writer(double tval)
 {
 	
 	// Create file name then output file stream
@@ -88,43 +88,112 @@ void GridObj::vtk_writer(int t, double tval)
 			}
 		}
 	}
-
-	// Velocity
-	fout << "\nVECTORS Velocity " << "float";	// Name of set = Velocity, type = float
-#if (dims == 3)
+	
+	// Time-Averaged Density
+	fout << "\nSCALARS TimeAveragedDensity " << "float 1\n";	// Name of set = TimeAveragedDensity, type = float, components = 1
+	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
 	for (size_t k = startz; k < endz; k++) {
 		for (size_t j = starty; j < endy; j++) {
 			fout << "\n"; // New line for each row
 			for (size_t i = startx; i < endx; i++) {
+				fout << (float)rho_timeav(i,j,k,nj,nk) << " ";
+			}
+		}
+	}
+	
+	// Time-Averaged UiUj (dims-1 components)
+	fout << "\nSCALARS TimeAveragedUiUj " << "float " << to_string(2*dims-3) << "\n";	// Components = 2*dims-3 
+	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
+	for (size_t k = startz; k < endz; k++) {
+		for (size_t j = starty; j < endy; j++) {
+			fout << "\n"; // New line for each row
+			for (size_t i = startx; i < endx; i++) {
+
+				// Write out element 1 in 2D (u_01)
+				fout << (float)uiuj_timeav(i,j,k,1,nj,nk,(3*dims-3)) << " ";
+#if (dims == 3)
+				// Also write out element 2 and 4 in 3D (u_02 and u_12 respectively)
+				fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
+				fout << (float)uiuj_timeav(i,j,k,4,nj,nk,(3*dims-3)) << " ";
+#endif
+
+			}
+		}
+	}
+	
+	
+	// Velocity
+	fout << "\nVECTORS Velocity " << "float";	// Name of set = Velocity, type = float
+	for (size_t k = startz; k < endz; k++) {
+		for (size_t j = starty; j < endy; j++) {
+			fout << "\n"; // New line for each row
+			for (size_t i = startx; i < endx; i++) {
+
 				for (size_t dir = 0; dir < dims; dir++) {
 					fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
 				}
+
+#if (dims != 3)
+				// Need to add a z-component of zero to complete file in 2D
+				fout << 0.0 << " ";
+#endif
+
 			}
 		}
 	}
-#else
+	
+	// Time-Averaged Ui
+	fout << "\nVECTORS TimeAveragedUi " << "float";	// Name of set = TimeAveragedUi, type = float
 	for (size_t k = startz; k < endz; k++) {
 		for (size_t j = starty; j < endy; j++) {
 			fout << "\n"; // New line for each row
 			for (size_t i = startx; i < endx; i++) {
-				size_t dir = 0;
-				fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
-				dir = 1;
-				fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
-				// Set z as zero
+
+				for (size_t dir = 0; dir < dims; dir++) {
+					fout << (float)ui_timeav(i,j,k,dir,nj,nk,dims) << " ";
+				}
+
+#if (dims != 3)
+				// Need to add a z-component of zero to complete file in 2D
 				fout << 0.0 << " ";
+#endif
+
 			}
 		}
 	}
+	
+	// Time-Averaged UiUi
+	fout << "\nVECTORS TimeAveragedUiUi " << "float";
+	for (size_t k = startz; k < endz; k++) {
+		for (size_t j = starty; j < endy; j++) {
+			fout << "\n"; // New line for each row
+			for (size_t i = startx; i < endx; i++) {
+
+				// Write out element 0 in both 2D and 3D (u_00)
+				fout << (float)uiuj_timeav(i,j,k,0,nj,nk,(3*dims-3)) << " ";
+
+#if (dims == 3)
+				// Also write out elements 3 and 5 in 3D (u_11 and u_22 respectively)
+				fout << (float)uiuj_timeav(i,j,k,3,nj,nk,(3*dims-3)) << " ";
+				fout << (float)uiuj_timeav(i,j,k,5,nj,nk,(3*dims-3)) << " ";
+#else
+				// Also write out element 2 in 2D (u_11)
+				fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
+				// Need to add a z-component of zero to complete file in 2D
+				fout << 0.0 << " ";
 #endif
 
+			}
+		}
+	}
+	
 
 	fout.close();
 
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].vtk_writer(t, tval);
+			subGrid[reg].vtk_writer(tval);
 		}
 	}
 

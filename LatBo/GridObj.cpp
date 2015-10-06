@@ -22,8 +22,9 @@ GridObj::~GridObj(void)
 // Basic Constructor for top level grid
 GridObj::GridObj(int level, std::ofstream* logfile)
 {
-	// Default rank
+	// Defaults
 	this->my_rank = 0;
+	this->t = 0;
 
 	// Assign level and region number
 	this->level = level;
@@ -51,9 +52,11 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 				 std::vector< std::vector<double> > GlobalLimsPos,
 				 std::ofstream* logfile)
 {
+	// Assign
 	this->level = level;
     this->region_number = 0;
 	this->my_rank = rank;
+	this->t = 0;
 	// Set limits of refinement to zero as top level
 	for (int i = 0; i < 2; i++) {
 		this->CoarseLimsX[i] = 0;
@@ -74,9 +77,11 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 // Overload constructor for MPI sub grid
 GridObj::GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile)
 {
+	// Assign
 	this->level = level;
     this->region_number = RegionNumber;
 	this->my_rank = rank;
+	this->t = 0;
 
 	// Logfile assign
 	this->gUtils.setLogFile(logfile);

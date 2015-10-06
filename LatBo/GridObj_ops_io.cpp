@@ -12,7 +12,7 @@ using namespace std;
 // ***************************************************************************************************
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
-void GridObj::io_textout(int t) {
+void GridObj::io_textout() {
 
 	// Get limits for current level
 	size_t N_lim = XPos.size();
@@ -234,7 +234,7 @@ void GridObj::io_textout(int t) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 				
-				subGrid[reg].io_textout(t);
+				subGrid[reg].io_textout();
 
 			}
 		}
@@ -254,7 +254,10 @@ void GridObj::io_textout(int t) {
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::io_write_body_pos(unsigned int timestep) {	
+void GridObj::io_write_body_pos() {
+
+	// Get time step
+	unsigned int timestep = t;
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 		
@@ -281,7 +284,10 @@ void GridObj::io_write_body_pos(unsigned int timestep) {
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::io_write_lift_drag(unsigned int timestep) {	
+void GridObj::io_write_lift_drag() {	
+
+	// Get time step
+	unsigned int timestep = t;
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 		

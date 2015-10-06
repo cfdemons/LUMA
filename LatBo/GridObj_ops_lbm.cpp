@@ -146,16 +146,18 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_boundary(3);	// Outlet
 #endif
 
-		// Update macroscopic quantities
+		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
 		
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
 		if (level == 0) {
+			// Increment time step counter and break
+			t++;
 			break;
 		}
 
-		// Increment counter
-		count++;
+		// Increment counters
+		t++; count++;
 
 	} while (count < 3);
 
@@ -726,7 +728,7 @@ void GridObj::LBM_stream( ) {
 
 // ***************************************************************************************************
 
-// Macroscopic quantity calculation
+// Macroscopic quantity calculation and update of time-averaged quantities
 void GridObj::LBM_macro( ) {
 
 	// Declarations
@@ -737,6 +739,7 @@ void GridObj::LBM_macro( ) {
 	double fux_temp = 0;
 	double fuy_temp = 0;
 	double fuz_temp = 0;
+	double ta_temp = 0;
 
 
 	// Loop over lattice
@@ -756,7 +759,6 @@ void GridObj::LBM_macro( ) {
 
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
 
-					
 					// Solid site so do not update density but set velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 1.0;
 					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
@@ -802,6 +804,32 @@ void GridObj::LBM_macro( ) {
 
 				}
 
+				// Update time-averaged quantities thus...
+
+				// Multiply current value by completed time steps to get sum
+				ta_temp = rho_timeav(i,j,k,M_lim,K_lim) * t;
+				// Add new value
+				ta_temp += rho_temp;
+				// Divide by completed time steps + 1 to get new average
+				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (t+1);
+
+				// Repeat for other quantities
+				unsigned int ta_count = 0;
+				for (int p = 0; p < dims; p++) {
+					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,dims) * t;
+					ta_temp += u(i,j,k,p,M_lim,K_lim,dims);
+					ui_timeav(i,j,k,p,M_lim,K_lim,dims) = ta_temp / (t+1);
+					// Do necessary products
+					for (int q = p; q < dims; q++) {
+						ta_temp = uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) * t;
+						ta_temp += ( u(i,j,k,p,M_lim,K_lim,dims) * u(i,j,k,q,M_lim,K_lim,dims) );
+						uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) = ta_temp / (t+1);
+						ta_count++;
+					}
+				}
+					
+
+
 			}
 		}
 	}
@@ -811,7 +839,9 @@ void GridObj::LBM_macro( ) {
 
 // ***************************************************************************************************
 
-// Overload of macroscopic quantity calculation to allow it to be applied to a single site
+// Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by
+// the MPI unpacking routine to update the values for the next collision step. This routine does not 
+// update the time-averaged quantities.
 void GridObj::LBM_macro( int i, int j, int k ) {
 
 	// Declarations

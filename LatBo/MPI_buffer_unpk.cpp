@@ -45,7 +45,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				count++;
 
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -61,7 +61,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -83,7 +83,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				count++;
 
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -98,7 +98,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -120,7 +120,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 #else
@@ -135,7 +135,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -157,7 +157,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 #else
@@ -172,7 +172,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -194,7 +194,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				count++;
 
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -210,7 +210,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -233,7 +233,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				count++;
 
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -249,7 +249,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -272,7 +272,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 #else
@@ -287,7 +287,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -309,7 +309,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 				
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 #else
@@ -324,7 +324,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -346,7 +346,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -363,7 +363,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 					count++;
 				}
-				// Update macroscopic
+				// Update macroscopic (but not time-averaged quantities)
 				Grids.LBM_macro(i,j,k);
 			}
 		}
@@ -380,7 +380,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -396,7 +396,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -412,7 +412,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -427,7 +427,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 		
@@ -442,7 +442,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -458,7 +458,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -474,7 +474,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -489,7 +489,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -504,7 +504,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -520,7 +520,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -536,7 +536,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -551,7 +551,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -566,7 +566,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -582,7 +582,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 				count++;
 			}
-			// Update macroscopic
+			// Update macroscopic (but not time-averaged quantities)
 			Grids.LBM_macro(i,j,k);
 		}
 		break;
@@ -598,7 +598,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities) (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 
@@ -613,7 +613,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 			count++;
 		}
-		// Update macroscopic
+		// Update macroscopic (but not time-averaged quantities) (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
 

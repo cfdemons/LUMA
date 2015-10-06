@@ -498,7 +498,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	dy = 2*(Ly/(2*M));
 	dz = 2*(Lz/(2*K));
 
-	// Physical time step = physical grid spacing?
+	// Physical time step = physical grid spacing
 	dt = dx;
 	
 
@@ -675,7 +675,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	// Velocity field
 	u.resize( N_lim*M_lim*K_lim*dims );
 	LBM_init_vel();
-
+	
 	// Density field
 	rho.resize( N_lim*M_lim*K_lim );
 	LBM_init_rho();
@@ -685,6 +685,11 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 
 	// Lattice force vector
 	force_i.resize(N_lim*M_lim*K_lim*nVels, 0.0);
+
+	// Time averaged quantities
+	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
+	ui_timeav.resize(N_lim*M_lim*K_lim*dims, 0.0);
+	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*dims-3), 0.0);
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
@@ -912,27 +917,24 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ,
 	
 
 	// Assign MACROSCOPIC quantities
-	// Resize
-	u.resize(N_lim * M_lim * K_lim * dims);
-	rho.resize(N_lim * M_lim * K_lim);
-	force_xyz.resize(N_lim * M_lim * K_lim * dims);
-	force_i.resize(N_lim * M_lim * K_lim * nVels);
-
 	// Velocity
+	u.resize(N_lim * M_lim * K_lim * dims);
 	LBM_init_vel( );
 
 	// Density
+	rho.resize(N_lim * M_lim * K_lim);
 	LBM_init_rho( );
 
 	// Cartesian force vector
-	for (unsigned int i = 0; i < N_lim*M_lim*K_lim*dims; i++) {
-		force_xyz[i] = 0.0;
-	}
+	force_xyz.resize(N_lim * M_lim * K_lim * dims, 0.0);
 
 	// Lattice force vector
-	for (unsigned int i = 0; i < N_lim*M_lim*K_lim*nVels; i++) {
-		force_i[i] = 0.0;
-	}
+	force_i.resize(N_lim * M_lim * K_lim * nVels, 0.0);
+
+	// Time averaged quantities
+	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
+	ui_timeav.resize(N_lim*M_lim*K_lim*dims, 0.0);
+	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*dims-3), 0.0);
 
 
 	// Generate POPULATION MATRICES for lower levels

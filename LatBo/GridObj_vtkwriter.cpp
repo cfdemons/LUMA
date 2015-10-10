@@ -17,14 +17,14 @@ void GridObj::vtk_writer(double tval)
 	
 	// Create file name then output file stream
 	stringstream fileName;
-	fileName << "./Output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << t << ".vtk";
+	fileName << "./Output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
 	
 	ofstream fout;
 	fout.open( fileName.str().c_str() );
 
 	// Add header information
 	fout << "# vtk DataFile Version 3.0f\n";
-	fout << "LBM Output at time t = " << t << "\n";
+	fout << "LBM Output at time t = " << (int)tval << "\n";
 	fout << "ASCII\n";
 
 	// Grid information -- structured points for uniform lattice
@@ -189,7 +189,7 @@ void GridObj::vtk_writer(double tval)
 	
 
 	fout.close();
-
+	
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {

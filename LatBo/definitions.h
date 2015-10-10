@@ -36,14 +36,14 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 100			// How many timesteps before output
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
-#define MPI_VERBOSE
+//#define MPI_VERBOSE
 
 // Gravity (acts in +x direction)
 //#define GRAVITY_ON
@@ -53,9 +53,11 @@
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
+//#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
+#define restart_out_every 100
 
 // LBM configuration
-#define USE_MRT
+//#define USE_MRT
 
 #if (dims == 3)
 // MRT relaxation times (D3Q19)
@@ -72,7 +74,7 @@
 */
 
 
-#define T 500		// End time of simulation (if each time step increments by physical dt = dx)
+#define T 1000		// Number of time steps
 
 /*	
 ***************************************************************************************************************
@@ -98,18 +100,18 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 400		// Number of x lattice sites
-#define M 150		// Number of y lattice sites
-#define K 50		// Number of z lattice sites
+#define N 120		// Number of x lattice sites
+#define M 60		// Number of y lattice sites
+#define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 4.0		// End of domain-x
+#define b_x 12.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1.5		// End of domain-y
+#define b_y 6.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 0.5		// End of domain-z
+#define b_z 3.0		// End of domain-z
 
 
 /*	
@@ -123,7 +125,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 500		// Desired Reynolds number
+#define Re 250		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -136,9 +138,9 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Master IBM switches //
 //#define IBM_ON						// Turn on IBM
-#define IBM_DEBUG						// Write IBM body and matrix data out to text files
-#define IBBODY_TRACER					// Write out IBbody positions
-#define LD_OUT							// Write out lift and drag (sum x and y forces on Lagrange markers of body)
+//#define IBM_DEBUG						// Write IBM body and matrix data out to text files
+//#define IBBODY_TRACER					// Write out IBbody positions
+//#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 #define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
@@ -204,12 +206,12 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 60		// Index of start of object/wall in x-direction
-#define obj_x_max 80		// Index of end of object/wall in x-direction
-#define obj_y_min 65		// Index of start of object/wall in y-direction
-#define obj_y_max 85		// Index of end of object/wall in y-direction
-#define obj_z_min 10		// Index of start of object/wall in z-direction
-#define obj_z_max 20		// Index of end of object/wall in z-direction
+#define obj_x_min 20		// Index of start of object/wall in x-direction
+#define obj_x_max 30		// Index of end of object/wall in x-direction
+#define obj_y_min 15		// Index of start of object/wall in y-direction
+#define obj_y_max 25		// Index of end of object/wall in y-direction
+#define obj_z_min 15		// Index of start of object/wall in z-direction
+#define obj_z_max 25		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -219,28 +221,28 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 ***************************************************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
-#define NumReg 2		// Number of refined regions (can be arbitrary if NumLev = 0)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Global lattice indices for refined region on level L0 start numbering at 0
 
 	#if NumReg == 2 // Makes it easier to set up multi-region cases
-	static size_t RefXstart[NumReg]		= {70, 160};
-	static size_t RefXend[NumReg]		= {90, 180};
-	static size_t RefYstart[NumReg]		= {20, 10};
-	static size_t RefYend[NumReg]		= {30, 20};
+	static size_t RefXstart[NumReg]		= {10, 50};
+	static size_t RefXend[NumReg]		= {30, 70};
+	static size_t RefYstart[NumReg]		= {10, 40};
+	static size_t RefYend[NumReg]		= {20, 50};
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumReg]		= {24, 24};
-	static size_t RefZend[NumReg]		= {36, 36};
+	static size_t RefZstart[NumReg]		= {5, 25};
+	static size_t RefZend[NumReg]		= {15, 35};
 
 	#elif NumReg == 1
-	static size_t RefXstart[NumReg]		= {130};
-	static size_t RefXend[NumReg]		= {350};
-	static size_t RefYstart[NumReg]		= {10};
-	static size_t RefYend[NumReg]		= {90};
-	static size_t RefZstart[NumReg]		= {24};
-	static size_t RefZend[NumReg]		= {36};
+	static size_t RefXstart[NumReg]		= {10};
+	static size_t RefXend[NumReg]		= {30};
+	static size_t RefYstart[NumReg]		= {5};
+	static size_t RefYend[NumReg]		= {15};
+	static size_t RefZstart[NumReg]		= {5};
+	static size_t RefZend[NumReg]		= {15};
 	#endif
 
 #endif

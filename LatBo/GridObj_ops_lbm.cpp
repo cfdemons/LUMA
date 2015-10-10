@@ -597,21 +597,21 @@ void GridObj::LBM_stream( ) {
 					}
 #endif
 
-					/////////////////////////
-					// Streaming procedure //
-					/////////////////////////
-
-					// Compute destination site
+					// Compute destination site (no periodicity)
 					dest_x = i+c[0][v];
 					dest_y = j+c[1][v];
 					dest_z = k+c[2][v];
 
 
+					////////////////////////
+					// Off-grid streaming //
+					////////////////////////
+					
 					/** If destination off-grid then ask whether periodic boundaries in use
 					 * and if so then check it is a coarse site. If it is then compute periodic 
 					 * destination and check destination site to see if it is a coarse fluid site.
-					 * If true then stream, if not then error. If it is not a coarse site
-					 * then retain the incoming value at the site as it will never receive an update.
+					 * If true then stream. If it is not a coarse site then retain the incoming 
+					 * value at the site as it will never receive an update.
 					 */
 					
 					if (	(dest_x >= N_lim || dest_x < 0) ||
@@ -629,7 +629,7 @@ void GridObj::LBM_stream( ) {
 								dest_y = (j+c[1][v] + M_lim) % M_lim;
 								dest_z = (k+c[2][v] + K_lim) % K_lim;
 
-								// Check destination is also fluid
+								// Check destination is also a coarse site
 								if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) {
 
 									// Stream
@@ -637,7 +637,8 @@ void GridObj::LBM_stream( ) {
 
 								} else {
 
-									// Proceed as we would if not using periodic boundaries as destination site is not fluid
+									// Proceed as we would if not using periodic boundaries as destination site is not 
+									// fluid and will not stream periodically
 									v_opp = gUtils.getOpposite(v);
 									f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
 
@@ -645,7 +646,8 @@ void GridObj::LBM_stream( ) {
 						
 							} else {
 
-								// Proceed as we would if not using periodic boundaries as site is not fluid
+								// Proceed as we would if not using periodic boundaries as current site is not fluid
+								// so cannot periodically couple and wil not receive an off-grid update either
 								v_opp = gUtils.getOpposite(v);
 								f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
 
@@ -653,11 +655,15 @@ void GridObj::LBM_stream( ) {
 #else
 
 							// As destination is off-grid, incoming population will not be updated
-							// Find incoming direction and retain
+							// Find incoming direction and retain value -- could apply symmetry (free slip) here for fluid sites?
 							v_opp = gUtils.getOpposite(v);
 							f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
 #endif
 							
+
+					///////////////////////
+					// On-grid streaming //
+					///////////////////////
 
 					/* If it is not off-grid then filter out unwanted streaming operations
 					 * by checking the source-destination pairings and retaining those values
@@ -676,7 +682,7 @@ void GridObj::LBM_stream( ) {
 							)
 							
 #ifdef BUILD_FOR_MPI
-							// Explicit MPI exlcusions to avoid periodicity
+							// Explicit MPI exlcusions to avoid unwanted periodicity
 							||
 							(
 								(LatTyp(i,j,k,M_lim,K_lim) == 7) &&

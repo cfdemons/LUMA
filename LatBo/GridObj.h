@@ -71,7 +71,6 @@ private :
 
 	// Grid scalars
 	double dx, dy, dz;	// Physical spacing
-	int level;			// Level in embedded grid hierarchy
 	int region_number;	// ID of region at a particular level in the embedded grid hierarchy
 
 	// Time averaged statistics
@@ -86,6 +85,7 @@ private :
 	// Public data members
 public :
 
+	int level;			// Level in embedded grid hierarchy
 	double dt;			// Physical time step size
 	unsigned int t;		// Number of completed iterations
 	double nu;			// Kinematic viscosity (in lattice units)
@@ -137,9 +137,10 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void io_write_body_pos();			// Write out IB_body positions to text files
-	void io_write_lift_drag();			// Write out IB_body lift and drag
-	void io_textout();					// Writes out the contents of the class as well as any subgrids to a text file
+	void io_write_body_pos();				// Write out IB_body positions to text files
+	void io_write_lift_drag();				// Write out IB_body lift and drag
+	void io_textout();						// Writes out the contents of the class as well as any subgrids to a text file
+	void io_restart(bool IO_flag);			// Reads/writes data from/to the global restart file
 	// VTK writer methods
 	void vtk_writer(double tval);
 

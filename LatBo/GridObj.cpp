@@ -94,6 +94,26 @@ GridObj::GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile)
 // Method to generate a subgrid
 void GridObj::LBM_addSubGrid(int RegionNumber) {
 
+
+	/* NOTE FOR MPI:
+	 * The check to make sure the refined region lies completely on this rank's L0 grid is 
+	 * performed in the init_refined_lab() routine. If the code has got this far without exiting 
+	 * then we are OK to add the subgrids based on their starting index alone.
+	 */
+#ifdef BUILD_FOR_MPI
+
+	// Return if there is no subgrid on this L0 rank as do not need to add the object
+	if (level == 0) {
+		// If start index is not on this rank then don't add a subgrid object
+		if (	((int)RefXstart[RegionNumber] < XInd[1] || (int)RefXstart[RegionNumber] > XInd[XInd.size()-2]) 
+			||	((int)RefYstart[RegionNumber] < YInd[1] || (int)RefYstart[RegionNumber] > YInd[YInd.size()-2])
+#if (dims == 3)
+			||	((int)RefZstart[RegionNumber] < ZInd[1] || (int)RefZstart[RegionNumber] > ZInd[ZInd.size()-2])
+#endif
+		) { return; } }
+#endif
+
+	// Ok to proceed and add the subgrid
 	subGrid.emplace_back( this->level + 1, RegionNumber, this->my_rank, this->gUtils.logfile);
 	
 	// Update limits as cannot be done through the constructor since

@@ -304,7 +304,7 @@ void MPI_manager::mpi_gridbuild( ) {
 	}
 	logout << "\t)" << std::endl;
 
-	logout << "Limits of the grid are " <<
+	logout << "Limits of the grid (indices) and (position) are (" <<
 		global_edge_ind[0][my_rank] << "-" << global_edge_ind[1][my_rank] << 
 		", " << global_edge_ind[2][my_rank] << "-" << global_edge_ind[3][my_rank] << 
 		", " << global_edge_ind[4][my_rank] << "-" << global_edge_ind[5][my_rank] << 

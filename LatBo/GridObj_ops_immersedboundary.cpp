@@ -155,7 +155,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	}
 #endif
 
-	// Define limits of support region (only have to do one since latice is uniformly spaced with dx = dy = dz)
+	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
 	double h_plus = std::max( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) ) /dx;
 	double h_minus = std::min( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) ) /dx;

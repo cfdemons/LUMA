@@ -332,7 +332,7 @@ void GridObj::LBM_init_refined_lab ( ) {
 
 				// Throw an error
 				std::cout << "Error: See Log File" << std::endl;
-				*gUtils.logfile << "Error: Refined region starts and ends on different ranks. Exiting." << std::endl;
+				*gUtils.logfile << "Error: Refined region starts and ends on different ranks or is outside the grid. Exiting." << std::endl;
 				exit(EXIT_FAILURE);
 		}
 

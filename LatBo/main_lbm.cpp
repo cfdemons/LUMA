@@ -74,16 +74,29 @@ int main( int argc, char* argv[] )
 	logfile.open("./Output/log_rank" + fNameRank + ".out", std::ios::out);
 
 	// Fix output format
-	cout.precision(4);
+	cout.precision(6);
 
 	// Timing variables
 	clock_t t_start, t_end, secs; // Wall clock variables
-	double tval = 0;		// Actual value of physical time (for multi-grid do not necessarily have unit time step)
 
 	// Output start time
 	time_t curr_time = time(NULL);	// Current system date/time
 	char* time_str = ctime(&curr_time);	// Format as string
     logfile << "Simulation started at " << time_str;	// Write start time to log
+
+#ifdef BUILD_FOR_MPI
+	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
+	if (	Xcores < 2 || Ycores < 2
+#if (dims == 3)
+		|| Zcores < 2
+#endif
+		) {
+			std::cout << "Error: See Log File." << std::endl;
+			logfile << "When using MPI must use at least 2 cores in each direction. Exiting." << std::endl;
+			MPI_Finalize();
+			exit(EXIT_FAILURE);
+	}
+#endif
 
 
 
@@ -98,11 +111,7 @@ int main( int argc, char* argv[] )
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0, &logfile);
-#endif
-
-	// Number of loops based on L0 time step
-	const int totalloops = (int)(T/Grids.dt);		// Total number of loops to be performed (computed)#
-	
+#endif	
 	
 	// Log file information
 	logfile << "Grid size = " << N << "x" << M << "x" << K << endl;
@@ -114,7 +123,7 @@ int main( int argc, char* argv[] )
 		}
 		logfile << "\t)" << std::endl;
 #endif
-	logfile << "Number of time steps = " << totalloops << endl;
+	logfile << "Number of time steps = " << T << endl;
 	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
 	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
@@ -132,13 +141,9 @@ int main( int argc, char* argv[] )
 		// Loop over number of regions and add subgrids to Grids
 		for (int reg = 0; reg < NumReg; reg++) {
 
-			/* Check to make sure the refined region lies completely on this rank's L0 grid is performed
-			 * in the init_refined_lab() routine. If the code has got this far without exiting then
-			 * we are OK to add the subgrids.
-			 */
-
-			// Add the subgrid and let constructor initialise
+			// Try adding subgrids and let constructor initialise
 			Grids.LBM_addSubGrid(reg);
+
 		}
 
 	}
@@ -201,10 +206,60 @@ int main( int argc, char* argv[] )
 
 #endif
 
-	// Initialise the bodies (compute support etc.)
-	Grids.ibm_initialise();
+#if !defined RESTARTING
 
+	// Initialise the bodies (compute support etc.) using initial body positions
+	Grids.ibm_initialise();
 	logfile << "Number of markers requested = " << num_markers << std::endl;
+
+#endif
+
+#endif
+
+
+	/* ***************************************************************************************************************
+	****************************************** READ IN RESTART DATA **************************************************
+	*************************************************************************************************************** */
+
+#ifdef RESTARTING
+
+	////////////////////////
+	// Restart File Input //
+	////////////////////////
+
+	// Loop over ranks and read in information one at a time
+	unsigned int max_ranks;
+#ifdef BUILD_FOR_MPI
+	max_ranks = mpim.num_ranks;
+#else
+	max_ranks = 1;
+#endif
+
+	for (unsigned int n = 0; n < max_ranks; n++) {
+
+		// Wait for rank accessing the file and only access if this rank's turn
+#ifdef BUILD_FOR_MPI
+		MPI_Barrier(mpim.my_comm);
+
+		if (mpim.my_rank == n)
+#endif
+		{
+
+			// Read in
+			Grids.io_restart(false);
+
+		}
+
+	}
+
+	// Re-initialise IB bodies based on restart positions
+#ifdef IBM_ON
+
+	// Re-initialise the bodies (compute support etc.)
+	Grids.ibm_initialise();
+	logfile << "Reinitialising IB_bodies from restart data." << std::endl;
+
+#endif
 
 #endif
 
@@ -231,7 +286,7 @@ int main( int argc, char* argv[] )
 	*************************************************************************************************************** */
 	do {
 
-		cout << "\n------ Time Step " << Grids.t+1 << " of " << totalloops << " ------" << endl;
+		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
 		
 		// Start the clock
 		t_start = clock();
@@ -250,9 +305,6 @@ int main( int argc, char* argv[] )
 		secs = t_end - t_start;
 		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
-		// Increment physical time
-		tval += Grids.dt;
-
 		
 		///////////////
 		// Write Out //
@@ -267,7 +319,7 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef VTK_WRITER
 			logfile << "Writing out to VTK file" << endl;
-			Grids.vtk_writer(tval);
+			Grids.vtk_writer(Grids.t);
 #endif
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
@@ -282,10 +334,45 @@ int main( int argc, char* argv[] )
 
 		}
 
+
+		/////////////////////////
+		// Restart File Output //
+		/////////////////////////
+		if (Grids.t % restart_out_every == 0) {
+
+			// Loop over ranks and write out information sequentially
+			int max_ranks;
 #ifdef BUILD_FOR_MPI
+			max_ranks = mpim.num_ranks;
+#else
+			max_ranks = 1;
+#endif
+
+			for (int n = 0; n < max_ranks; n++) {
+
+				// Wait for turn and access one rank at a time
+#ifdef BUILD_FOR_MPI
+				MPI_Barrier(mpim.my_comm);
+
+				if (mpim.my_rank == n)  
+#endif
+				{
+										
+				// Write out
+				Grids.io_restart(true);
+
+				}
+
+			}
+
+		}
+
+
 		///////////////////////
 		// MPI Communication //
 		///////////////////////
+#ifdef BUILD_FOR_MPI
+		
 		// Start the clock
 		t_start = clock();
 
@@ -316,14 +403,19 @@ int main( int argc, char* argv[] )
 			MPI_Barrier(mpim.my_comm);
 
 			// Send info to neighbour while receiving from other neighbour
-			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], 999, 
-				mpim.neighbour_rank[opp_dir], 999, mpim.my_comm, &mpim.stat);
+			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], dir, 
+				mpim.neighbour_rank[opp_dir], dir, mpim.my_comm, &mpim.stat);
+
+			
 
 #ifdef MPI_VERBOSE
 			// Write out buffer
 			MPI_Barrier(mpim.my_comm);
-			filename = "./Output/Buffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			std::ofstream logout( "./Output/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
+			logout << "Direction " << dir << "; Sending to " << mpim.neighbour_rank[dir] << "; Receiving from " << mpim.neighbour_rank[opp_dir] << std::endl;
+			filename = "./Output/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
 			mpim.writeout_buf(filename);
+			logout.close();
 #endif
 
 			//////////////////////////////
@@ -343,15 +435,17 @@ int main( int argc, char* argv[] )
 		printf("MPI overhead took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
 #ifdef TEXTOUT
+	if (Grids.t % out_every == 0) {
 		MPI_Barrier(mpim.my_comm);
 		logfile << "Writing out (post-MPI) to <Grids.out>" << endl;
 		Grids.io_textout();
+	}
 #endif
 
 #endif
 
 	// Loop End
-	} while (tval < T);
+	} while (Grids.t < T);
 
 
 	/* ***************************************************************************************************************

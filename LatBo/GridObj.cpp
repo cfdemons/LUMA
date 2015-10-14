@@ -50,6 +50,7 @@ GridObj::GridObj(int level, std::ofstream* logfile)
 GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size, 
 				 std::vector< std::vector<unsigned int> > GlobalLimsInd, 
 				 std::vector< std::vector<double> > GlobalLimsPos,
+				 int my_coords[],
 				 std::ofstream* logfile)
 {
 	// Assign
@@ -68,6 +69,10 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 	this->gUtils.setLogFile(logfile);
 
 	*logfile << "Building Grid level " << level << " on rank " << my_rank << std::endl;
+	
+	// Neighbour ranks assign
+	this->gUtils.setMpiParameters(my_coords);
+
 
 	LBM_init_grid( local_size, GlobalLimsInd, GlobalLimsPos ); // Run initialisation routine
 

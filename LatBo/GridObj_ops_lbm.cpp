@@ -62,7 +62,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
 		LBM_boundary(2);
 #endif
-
+		/*DEBUG*/ //io_textout("AFTER INLET BC");
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
 		LBM_forcegrid(false);
 
@@ -78,7 +78,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_collide(true);
 
 		}
-
+		/*DEBUG*/ //io_textout("AFTER COLLIDE");
 
 		////////////////////
 		// Refined levels //
@@ -130,10 +130,10 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined SOLID_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
-			
+			/*DEBUG*/ //io_textout("AFTER SOLID BC");
 			// Stream
 			LBM_stream();
-			
+			/*DEBUG*/ //io_textout("AFTER STREAM");
 		}
 
 
@@ -145,10 +145,10 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef OUTLET_ON
 		LBM_boundary(3);	// Outlet
 #endif
-
+		/*DEBUG*/ //io_textout("AFTER OUTLET BC");
 		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
-		
+		/*DEBUG*/ //io_textout("AFTER MACRO");
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
 		if (level == 0) {
 			// Increment time step counter and break
@@ -563,6 +563,20 @@ void GridObj::LBM_mrt_collide( ivector<double>& f_new, int i, int j, int k ) {
 // Applies periodic BCs on level 0
 void GridObj::LBM_stream( ) {
 
+	/* This streaming operation obeys the following logic process:
+	 *
+	 *	1) Apply Source-based Exclusions (e.g. any fine sites does not need to be streamed)
+	 *
+	 * Then either: 
+	 *	2a) Apply Off-Grid Ops (e.g. retain incoming values if value streams off-grid or apply periodic BCs)
+	 *
+	 * Or
+	 *	2b) Apply Destination-based Exclusions (e.g. do not stream to a do-nothing inlet)
+	 *	2c) Stream value
+	 *
+	 * End
+	 */
+
 	// Declarations
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
@@ -574,6 +588,9 @@ void GridObj::LBM_stream( ) {
 	ivector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
+	// DEBUG //
+	//int count0 = 0, count1 = 0, count3 = 0, count4 = 0;
+
 	// Stream one lattice site at a time
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
@@ -581,21 +598,46 @@ void GridObj::LBM_stream( ) {
 
 				for (int v = 0; v < nVels; v++) {
 
-					/////////////////////////
-					// Preliminary Options //
-					/////////////////////////
+					// Store opposite direction
+					v_opp = gUtils.getOpposite(v);
+					
 
-					// If fine site then do not stream in any direction
+					// DEBUG //
+					//count0++;
+
+
+					/////////////////////////////////
+					// Streaming Source Exclusions //
+					/////////////////////////////////
+
+					/* This section prevents streaming operations given the type of site 
+					 * FROM which the streaming takes place regardless of the destination type.
+					 */
+
+					// Fine --> Any; do not stream in any direction
 					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 						break;
 					}
 
-					// If site is do-nothing inlet then copy value (i.e. apply do-nothing inlet)
+					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
 #if (defined INLET_ON && defined INLET_DO_NOTHING)
-					if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
-						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);						
+					else if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+						continue;
 					}
 #endif
+					
+
+					////////////////////////
+					// Off-grid streaming //
+					////////////////////////
+					
+					/* If destination off-grid then ask whether periodic boundaries in use
+					 * and if so then only stream if Coarse --> Coarse.
+					 * If not then retain the incoming value at the site as it not receive 
+					 * an update from off-grid.
+					 * If using MPI, periodic BCs are applied differently later.
+					 */
 
 					// Compute destination site (no periodicity)
 					dest_x = i+c[0][v];
@@ -603,128 +645,183 @@ void GridObj::LBM_stream( ) {
 					dest_z = k+c[2][v];
 
 
-					////////////////////////
-					// Off-grid streaming //
-					////////////////////////
-					
-					/** If destination off-grid then ask whether periodic boundaries in use
-					 * and if so then check it is a coarse site. If it is then compute periodic 
-					 * destination and check destination site to see if it is a coarse fluid site.
-					 * If true then stream. If it is not a coarse site then retain the incoming 
-					 * value at the site as it will never receive an update.
-					 */
-					
+					// If off-grid
 					if (	(dest_x >= N_lim || dest_x < 0) ||
 							(dest_y >= M_lim || dest_y < 0) ||
 							(dest_z >= K_lim || dest_z < 0)
 						) {
 
-#ifdef PERIODIC_BOUNDARIES
-
-							// Only apply periodic BCs on coarsest level and if coarse site
-							if (level == 0 && LatTyp(i,j,k,M_lim,K_lim) == 1) {
-									
-								// Compute destination site indices
-								dest_x = (i+c[0][v] + N_lim) % N_lim;
-								dest_y = (j+c[1][v] + M_lim) % M_lim;
-								dest_z = (k+c[2][v] + K_lim) % K_lim;
-
-								// Check destination is also a coarse site
-								if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) {
-
-									// Stream
-									f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
-
-								} else {
-
-									// Proceed as we would if not using periodic boundaries as destination site is not 
-									// fluid and will not stream periodically
-									v_opp = gUtils.getOpposite(v);
-									f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
-
-								}
-						
-							} else {
-
-								// Proceed as we would if not using periodic boundaries as current site is not fluid
-								// so cannot periodically couple and wil not receive an off-grid update either
-								v_opp = gUtils.getOpposite(v);
-								f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
-
-							}
-#else
-
-							// As destination is off-grid, incoming population will not be updated
-							// Find incoming direction and retain value -- could apply symmetry (free slip) here for fluid sites?
-							v_opp = gUtils.getOpposite(v);
-							f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
-#endif
 							
+							// DEBUG //
+							/*count1++;
+							*gUtils.logfile << "Stream " << i << "," << j <<
+								" to \t" << dest_x << "," << dest_y << " : \toff-grid in " <<
+								v << " direction. Count1 = " << count1 << std::endl;*/
+	
 
-					///////////////////////
-					// On-grid streaming //
-					///////////////////////
 
-					/* If it is not off-grid then filter out unwanted streaming operations
-					 * by checking the source-destination pairings and retaining those values
-					 * that you do not want to be overwritten by streaming
-					 */
+							// Apply periodic boundary conditions (non-MPI)
+#if (defined PERIODIC_BOUNDARIES  && !defined BUILD_FOR_MPI)
+							
+							// Compute destination site indices using periodicity
+							dest_x = (i+c[0][v] + N_lim) % N_lim;
+							dest_y = (j+c[1][v] + M_lim) % M_lim;
+							dest_z = (k+c[2][v] + K_lim) % K_lim;
+							
+							// Only apply periodic BCs on coarsest level and if stream is Coarse --> Coarse
+							if (
+								(level == 0) && 
+								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+							) {
+								// Stream periodically
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+								continue;
+							}
+
+#endif
+
+							// Retain incoming value and continue
+							f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
+							continue;
+
+
+
 					} else {
 
-						// Set update exclusions
+						///////////////////////
+						// On-grid streaming //
+						///////////////////////
+
+
+						/* If it is an on-grid stream and using MPI need some 
+						 * additional logic checking to make sure we prevent stream 
+						 * from an overlap site when periodic BCs are not in effect.
+						 */
+
+
+
+#ifdef BUILD_FOR_MPI
+
+						//////////////////////
+						// MPI Periodic BCs //
+						//////////////////////
+
+						// If source in overlap and destination in grid (equivalent to periodic non-MPI off-grid stream)
+						// and periodic BCs are set then allow stream
 						if (
 							
-							// Common exclusions
-							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) || // Coarse-Fine -- ignore as don't update fine sites
-							(
-								(LatTyp(i,j,k,M_lim,K_lim) == 4) &&
-								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) // TL2lower-TL2lower -- done on lower grid stream so ignore.
-							)
-							
-#ifdef BUILD_FOR_MPI
-							// Explicit MPI exlcusions to avoid unwanted periodicity
-							||
-							(
-								(LatTyp(i,j,k,M_lim,K_lim) == 7) &&
-								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 8) // Inlet-Outlet -- prevent periodicity on MPI.
-							) ||
-							(
-								(LatTyp(i,j,k,M_lim,K_lim) == 8) &&
-								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) // Outlet-Inlet -- prevent periodicity on MPI.
-							) ||
-							(
-								(LatTyp(i,j,k,M_lim,K_lim) == 0) &&
-								(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0) // Solid-Solid -- prevent periodicity on MPI.
-							)
+						(
+						
+						// Source on overlap?
+						gUtils.isOnOverlap(i,j,k,N_lim,M_lim,K_lim) 
+						
+						) && (
+
+						// Destination on-grid (not in overlap)?
+						(dest_x < N_lim-1 && dest_x > 0) &&
+						(dest_y < M_lim-1 && dest_y > 0) 
+#if (dims == 3) 
+						&& (dest_z < K_lim-1 && dest_z > 0)
 #endif
 
-							// Exclusion specific to do-nothing inlet
-#if (defined INLET_ON && defined INLET_DO_NOTHING)
-							// If destination is a do-nothing inlet then do not overwrite
-							|| (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7)
-#endif										
+						) && (
+
+						// Overlap is from a periodic rank?
+						gUtils.isOverlapPeriodic(i,j,k,N_lim,M_lim,K_lim,v_opp)
 						
-						   ) {
+						)
+						
+						) {
 
-							   // Retain value at destination (do not update)
-							   f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
+							// DEBUG //
+							/*count3++;
+							*gUtils.logfile << "Stream " << i << "," << j <<
+									" to \t" << dest_x << "," << dest_y << " : \tperiodic stream " <<
+									v << " direction. Count3 = " << count3 << std::endl;*/
 
-					
-						} else {
 
-							// Stream population
-							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+						// Either apply periodic BCs or not on those sites which stream from periodic overlap
+
+#ifdef PERIODIC_BOUNDARIES
+							if (
+								(level == 0) && 
+								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+							) {
+								// Stream periodically
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+								continue;
+
+							} else {
+								// Incoming value at the destination site should be retained as no periodic BC to be applied
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
+								continue;
+
+							}
+
+
+						}
+#else
+							
+							// If not using periodic BCs then incoming value at the destination site should be retained
+							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
+							continue;
 
 						}
 
-					}
+#endif
+#endif
+
+
+
+
+						//////////////////////////////////////
+						// Streaming Destination Exclusions //
+						//////////////////////////////////////
+
+						/* Filter out unwanted streaming operations by checking the 
+						 * source-destination pairings and retaining those values
+						 * that you do not want to be overwritten by streaming.
+						 * This section prevents streaming operations given the type of site 
+						 * TO which the streaming takes place regardless of the source type.
+						 */
+
+						// TL2lower --> TL2lower then ignore as done on lower grid stream
+						if (
+							(LatTyp(i,j,k,M_lim,K_lim) == 4) && 
+							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) 
+						) {
+							continue;
+
+						}
+
+						// Any --> Do-nothing-inlet then ignore so as not to overwrite
+#if (defined INLET_ON && defined INLET_DO_NOTHING)
+						else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) {
+							continue;
+						}
+#endif
+						
+						// DEBUG //
+						/*count4++;
+						*gUtils.logfile << "Stream " << i << "," << j <<
+								" to \t" << dest_x << "," << dest_y << " : \ton-grid stream " <<
+								v << " direction. Count4 = " << count4 << std::endl;*/
+
+
+						// Stream population
+						f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
+
+					}						
+
 
 				}
-
 
 			}
 		}
 	}
+
+	// DEBUG //
+	//*gUtils.logfile << "Counts were " << count0 << "," << count1 << "," << count3 << "," << count4 << std::endl;
 
 	// Replace old grid with new grid
 	f = f_new;
@@ -872,21 +969,8 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
 
-		// Solid site so compute density but set velocity to zero
-		rho_temp = 0;
-
-		for (int v = 0; v < nVels; v++) {
-
-			// Sum up to find density
-			rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
-
-		}
-
-		// Assign density
-		rho(i,j,k,M_lim,K_lim) = rho_temp;
-
-		
-		// Set velocity to zero
+		// Solid site so do not update density but set velocity to zero
+		rho(i,j,k,M_lim,K_lim) = 1.0;
 		u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
 		u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
 #if (dims == 3)

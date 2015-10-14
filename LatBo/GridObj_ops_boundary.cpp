@@ -42,29 +42,29 @@ void GridObj::LBM_boundary (int bc_type_flag) {
     
 				if (LatTyp(i,j,k,M_lim,K_lim) == 0 && (bc_type_flag == 0 || bc_type_flag == 1) ) {
 
-					// For each direction
-					for (size_t v = 0; v < nVels; v++) {
+					// For each outgoing direction
+					for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
 
-						// Identify where it streams to
-						size_t src_x = i+c[0][v];
-						size_t src_y = j+c[1][v];
-						size_t src_z = k+c[2][v];
+						// Identify site where the population will be streamed to
+						size_t dest_x = i+c[0][v_outgoing];
+						size_t dest_y = j+c[1][v_outgoing];
+						size_t dest_z = k+c[2][v_outgoing];
 
-						// If this site is off-grid then cannot update
-						if (	(src_x >= N_lim || src_x < 0) ||
-								(src_y >= M_lim || src_y < 0) ||
-								(src_z >= K_lim || src_z < 0)
+						// If this site is off-grid then cannot apply the BC in preparation for streaming
+						if (	(dest_x >= N_lim || dest_x < 0) ||
+								(dest_y >= M_lim || dest_y < 0) ||
+								(dest_z >= K_lim || dest_z < 0)
 						   ) {
-							   // Do nothing
+							   continue;	// Move on to next direction
 
-						// If site is fluid site then need to apply reverse
-						} else if (LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 1 || LatTyp(src_x,src_y,src_z,M_lim,K_lim) == 2) {
+						// If site is fluid site then apply BC by overwriting reverse population with expected incoming value
+						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) {
 
-							// Get reverse direction
-							size_t v_rev = gUtils.getOpposite(v);
+							// Get incoming direction
+							size_t v_incoming = gUtils.getOpposite(v_outgoing);
 							
-							// Assign reverse velocity to current site
-							f(i,j,k,v,M_lim,K_lim,nVels) = f(src_x,src_y,src_z,v_rev,M_lim,K_lim,nVels);
+							// Assign incoming population to outgoing at current site
+							f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,nVels);
 							
 						}
 					}

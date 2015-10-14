@@ -27,6 +27,7 @@ public:
 	GridObj(int level, int rank, std::vector<unsigned int> local_size, 
 		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
 		std::vector< std::vector<double> > GlobalLimsPos,
+		int my_coords[],
 		std::ofstream* logfile);
 	~GridObj( ); // Default destructor
 
@@ -85,14 +86,14 @@ private :
 	// Public data members
 public :
 
-	int level;			// Level in embedded grid hierarchy
-	double dt;			// Physical time step size
-	unsigned int t;		// Number of completed iterations
-	double nu;			// Kinematic viscosity (in lattice units)
-	double omega;		// Relaxation frequency
+	int level;						// Level in embedded grid hierarchy
+	double dt;						// Physical time step size
+	unsigned int t;					// Number of completed iterations
+	double nu;						// Kinematic viscosity (in lattice units)
+	double omega;					// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
-	int my_rank;		// MPI rank
-	GridUtils gUtils;	// Utility class
+	int my_rank;					// MPI rank
+	GridUtils gUtils;				// Utility class
 	
 	/*	
 	***************************************************************************************************************
@@ -137,10 +138,10 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void io_write_body_pos();				// Write out IB_body positions to text files
-	void io_write_lift_drag();				// Write out IB_body lift and drag
-	void io_textout();						// Writes out the contents of the class as well as any subgrids to a text file
-	void io_restart(bool IO_flag);			// Reads/writes data from/to the global restart file
+	void io_write_body_pos();					// Write out IB_body positions to text files
+	void io_write_lift_drag();					// Write out IB_body lift and drag
+	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
+	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	// VTK writer methods
 	void vtk_writer(double tval);
 

@@ -27,15 +27,15 @@ int main( int argc, char* argv[] )
 	***************************************************************************************************************
 	*/
 #ifdef BUILD_FOR_MPI
-
+	
 	// Filename for verbose write out
 #ifdef MPI_VERBOSE
 	string filename;
 #endif
-
+	
 	// Usual initialise
 	MPI_Init( &argc, &argv );
-
+	
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
@@ -62,7 +62,7 @@ int main( int argc, char* argv[] )
 	********************************************* GENERAL INITIALISE **********************************************
 	***************************************************************************************************************
 	*/
-
+	
 	// Create a log file
 	std::ofstream logfile;
 	string fNameRank;
@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
 	// Create the grid object (level = 0)
 #ifdef BUILD_FOR_MPI
 	// Call MPI constructor
-	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos, &logfile);
+	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos, mpim.MPI_coords, &logfile);
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0, &logfile);
@@ -270,8 +270,8 @@ int main( int argc, char* argv[] )
 	
 	// Write out t = 0
 #ifdef TEXTOUT
-	logfile << "Writing Output to <Grids.out>..." << endl;
-	Grids.io_textout();
+	logfile << "Writing out to <Grids.out>..." << endl;
+	Grids.io_textout("INITIALISATION");	// Do not change this tag!
 #endif
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
@@ -315,7 +315,7 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef TEXTOUT
 			logfile << "Writing out to <Grids.out>" << endl;
-			Grids.io_textout();
+			Grids.io_textout("START OF TIMESTEP");
 #endif
 #ifdef VTK_WRITER
 			logfile << "Writing out to VTK file" << endl;
@@ -437,8 +437,8 @@ int main( int argc, char* argv[] )
 #ifdef TEXTOUT
 	if (Grids.t % out_every == 0) {
 		MPI_Barrier(mpim.my_comm);
-		logfile << "Writing out (post-MPI) to <Grids.out>" << endl;
-		Grids.io_textout();
+		logfile << "Writing out to <Grids.out>" << endl;
+		Grids.io_textout("POST MPI COMMS");
 	}
 #endif
 

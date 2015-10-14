@@ -13,7 +13,7 @@ using namespace std;
 // ***************************************************************************************************
 // Writes all the contents of the class at time t and call recursviely for any subgrids.
 // Writes to text file "Grids.out" by default.
-void GridObj::io_textout() {
+void GridObj::io_textout(std::string output_tag) {
 
 	// Get limits for current level
 	size_t N_lim = XPos.size();
@@ -50,7 +50,7 @@ void GridObj::io_textout() {
 	const char* FNameG_c = FNameG.c_str();
 
 	// If new simulation then overwrite if old file exists
-	if (t == 0 && level == 0) gridoutput.open(FNameG_c, ios::out);
+	if (t == 0 && level == 0 && output_tag == "INITIALISATION") gridoutput.open(FNameG_c, ios::out);
 	else gridoutput.open(FNameG_c, ios::out |ios::app);
 
 	if ( gridoutput.is_open() ) {
@@ -59,6 +59,9 @@ void GridObj::io_textout() {
 		gridoutput << "\n-------------------------------------------------------------------------------------" << endl;
 		gridoutput << "-----------------------------------START OF OUTPUT-----------------------------------" << endl;
 		gridoutput << "-------------------------------------------------------------------------------------" << endl;
+
+		// Add tag
+		gridoutput << output_tag << std::endl;
 
 		if (level == 0) {
 			// Print L0 Grid Size header
@@ -235,7 +238,7 @@ void GridObj::io_textout() {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 				
-				subGrid[reg].io_textout();
+				subGrid[reg].io_textout(output_tag);
 
 			}
 		}

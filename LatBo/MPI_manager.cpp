@@ -23,7 +23,7 @@ MPI_manager::~MPI_manager(void)
 const int MPI_manager::MPI_cartlab[3][26] =
 	{
 		{1, -1,  1, -1,	 0,  0, -1,  1,		0,  0,		1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},
-		{0,  0,  1, -1,  1, -1,  1, -1,		0,  0,		0,  0,  1, -1,  1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1},
+		{0,  0, -1,  1, -1,  1, -1,  1,		0,  0,		0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1,  1, -1,  1, -1},
 		{0,  0,  0,  0,  0,  0,  0,  0,		1, -1,		1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}
 	};
 
@@ -84,9 +84,6 @@ void MPI_manager::mpi_init( ) {
 	// Get neighbour ID //
 	// Cyclical data transfer i.e. from 0 to 1, 1 to 2, 3 to 4 etc... so use MPI_Sendrecv
 
-	// Declare array for storing coordinates of neighbour
-	int neighbour_coords[dims];
-
 	// Loop over grid direction
 	for (int dir = 0; dir < MPI_dir; dir++) {
 
@@ -100,13 +97,15 @@ void MPI_manager::mpi_init( ) {
 #endif
 
 		// Get coordinates of neighbour (taking into account periodic structure)
+		int coord_tmp[dims];
 		for (size_t d = 0; d < dims; d++) {
-			neighbour_coords[d] = (MPI_coords[d] + MPI_cartlab[d][dir] + MPI_dims[d]) % MPI_dims[d];
+			neighbour_coords[d][dir] = (MPI_coords[d] + MPI_cartlab[d][dir] + MPI_dims[d]) % MPI_dims[d];
+			coord_tmp[d] = neighbour_coords[d][dir];	// Store single vector for getting neighbour rank
 		}		
 		
-		// Get rank of neighbour and build vector of ranks
+		// Get rank of neighbour and build vector of neighbour ranks
 		int tmp;
-		MPI_Cart_rank(my_comm, neighbour_coords, &tmp);
+		MPI_Cart_rank(my_comm, coord_tmp, &tmp);
 		neighbour_rank[dir] = tmp;
 
 		MPI_Barrier(my_comm);
@@ -115,7 +114,7 @@ void MPI_manager::mpi_init( ) {
 		// Print out current neighbour coordinates and rank
 		logout << "Neighbour of rank " << my_rank << " is (";
 		for (size_t d = 0; d < dims; d++) {
-			logout << "\t" << neighbour_coords[d];
+			logout << "\t" << neighbour_coords[d][dir];
 		}
 		logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 

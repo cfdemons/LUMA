@@ -36,7 +36,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 100			// How many timesteps before output
@@ -45,7 +45,7 @@
 #define VTK_WRITER
 //#define MPI_VERBOSE
 
-// Gravity (acts in +x direction)
+// Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force ( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
@@ -54,7 +54,7 @@
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 100
+#define restart_out_every 10000
 
 // LBM configuration
 //#define USE_MRT
@@ -85,7 +85,7 @@
 // MPI Data
 #define Xcores 2
 #define Ycores 2
-#define Zcores 2	// Set to 1 if doing a 2D problem
+#define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
 
@@ -99,7 +99,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 120		// Number of x lattice sites
 #define M 60		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
@@ -107,11 +107,11 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 12.0		// End of domain-x
+#define b_x 2.4		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 6.0		// End of domain-y
+#define b_y 1.2		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 3.0		// End of domain-z
+#define b_z 0.6		// End of domain-z
 
 
 /*	
@@ -208,10 +208,10 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 // Specified in lattice units (i.e. by index)
 #define obj_x_min 20		// Index of start of object/wall in x-direction
 #define obj_x_max 30		// Index of end of object/wall in x-direction
-#define obj_y_min 15		// Index of start of object/wall in y-direction
-#define obj_y_max 25		// Index of end of object/wall in y-direction
-#define obj_z_min 15		// Index of start of object/wall in z-direction
-#define obj_z_max 25		// Index of end of object/wall in z-direction
+#define obj_y_min 25		// Index of start of object/wall in y-direction
+#define obj_y_max 35		// Index of end of object/wall in y-direction
+#define obj_z_min 10		// Index of start of object/wall in z-direction
+#define obj_z_max 20		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -221,7 +221,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 ***************************************************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

@@ -3,7 +3,7 @@
   <Class Name="GridObj">
     <Position X="0.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>EAICRzACICIIgKBBASAYZg4Ajo0AAAhTBLYBgCCulAA=</HashCode>
+      <HashCode>EAICRzACICIIgKBBASAYZg4Ajo0AAAhTBLYBhDCutAA=</HashCode>
       <FileName>GridObj.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -15,14 +15,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="IB_marker">
-    <Position X="5.75" Y="4.5" Width="2.25" />
+    <Position X="5.75" Y="4.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAgIAAAAAEAAEAAQJJAAIAAAgAAAAAAAAAABBAA=</HashCode>
       <FileName>IB_marker.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ivector&lt;GenTyp&gt;">
-    <Position X="3.5" Y="5.75" Width="2" />
+    <Position X="3.5" Y="6" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAEAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ivector.h</FileName>
@@ -36,9 +36,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="GridUtils">
-    <Position X="3.5" Y="7.75" Width="2" />
+    <Position X="3.5" Y="8" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAIAAAAAAAAAABQAAAAAgBhAAAAAAIAAAAAAA=</HashCode>
+      <HashCode>AABAAAAAIAAAABAAAAKBQAAACAgBpAAAAAAIAIAAAAA=</HashCode>
       <FileName>GridUtils.h</FileName>
     </TypeIdentifier>
   </Class>

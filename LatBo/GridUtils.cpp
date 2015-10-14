@@ -3,9 +3,15 @@
 #include <sstream>		// String stream package
 #include <iostream>
 #include "definitions.h"
+#include "globalvars.h"
+
 
 GridUtils::GridUtils(void)
 {
+	// Initialise neighbour rank coordinates to zero by default
+	for (int d = 0; d < dims; d++) {
+		my_MPI_coords[d] = 0;
+	}
 }
 
 
@@ -210,3 +216,98 @@ size_t GridUtils::getOpposite(size_t direction) {
 }
 
 // ***************************************************************************************************
+// Function to set the neighbours rank property of the GridObj
+void GridUtils::setMpiParameters(int my_coords[]) {
+	
+	// Initialise neighbour rank array
+	for (int d = 0; d < dims; d++) {
+		my_MPI_coords[d] = my_coords[d];
+	}
+
+}
+
+// ***************************************************************************************************
+// Function to find whether a site is on the overlap region of an MPI grid
+bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsigned int N_lim, unsigned int M_lim, unsigned int K_lim) {
+
+	// Source in overlap
+	if	(
+			// Case 1: X source in overlap, Y,Z take any value
+			(
+			(i == N_lim - 1 || i == 0) && ( (j < M_lim && j >= 0)
+#if (dims == 3)
+		&&	(k < K_lim && k >= 0)
+#endif
+		)	)
+
+			// Case 2: Y source in overlap, X,Z take any value
+		||	(
+			(j == M_lim - 1 || j == 0) && ( (i < N_lim && i >= 0) 
+#if (dims == 3)						
+		&&	(k < K_lim && k >= 0)
+
+		)	)
+
+			// Case 3: Z source in overlap, Y,X take any value
+		||	(
+			(k == K_lim - 1 || k == 0) && (	(j < M_lim && j >= 0) 
+													&&	(i < N_lim && i >= 0)	)
+
+			)
+#else
+		)	)
+#endif
+
+		) {
+
+			return true;
+
+	} else {
+
+		return false;
+	}
+
+
+}
+
+// ***************************************************************************************************
+// Function to find whether the specified site is on overlap from an adjacent or periodic neighbour rank.
+// Takes in the site indices (MPI local) and the lattice direction in which to check.
+bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
+								  unsigned int N_lim, unsigned int M_lim, unsigned int K_lim, 
+								  unsigned int lattice_dir) {
+	
+	// Local declarations
+	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims], Lims[dims], Ind[dims];
+
+	// Initialise local variables
+	MPI_dims[0] = Xcores; Lims[0] = N_lim; Ind[0] = i;
+	MPI_dims[1] = Ycores; Lims[1] = M_lim; Ind[1] = j;
+#if (dims == 3)
+	MPI_dims[2] = Zcores; Lims[2] = K_lim; Ind[2] = k;
+#endif
+
+	// Loop over each Cartesian direction
+	for (int d = 0; d < dims; d++) {
+		// If on X/Y/Z-overlap
+		if (Ind[d] == Lims[d] - 1 || Ind[d] == 0) {
+
+			// Define expected MPI coordinates of neighbour rank
+			exp_MPI_coords[d] = my_MPI_coords[d] + c[d][lattice_dir];
+
+			// Define actual MPI coordinates of neighbour rank (accounting for periodicity)
+			act_MPI_coords[d] = (my_MPI_coords[d] + c[d][lattice_dir] + MPI_dims[d]) % MPI_dims[d];
+
+			// If there is a difference then rank is periodically linked to its neighbour and the overlap
+			// site is from a periodic rank so return early
+			if (exp_MPI_coords[d] != act_MPI_coords[d]) return true;
+		} 
+	}
+	
+	// Expected and actual are the same so the neighbour rank is not periodically linked and the overlap site
+	// is from an adjacent neighbour not a periodic one.
+	return false;
+
+}
+// ***************************************************************************************************
+

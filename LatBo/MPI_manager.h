@@ -26,6 +26,8 @@ public:
 	int num_ranks;							// Total number of ranks in MPI Cartesian topology
 	int MPI_coords[dims];					// Coordinates in MPI Cartesian topolgy
 	int neighbour_rank[MPI_dir];			// Neighbour rank number for each direction in Cartesian topology
+	int neighbour_coords[dims][MPI_dir];	// Coordinates in MPI topology of neighbour ranks
+
 
 	// Grid data
 	int global_dims[3];						// Dimensions of problem lattice

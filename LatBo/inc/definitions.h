@@ -48,7 +48,7 @@
 // Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force ( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(abs(b_y - a_y),2) )
+#define grav_force ( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation

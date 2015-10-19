@@ -78,6 +78,7 @@ int main( int argc, char* argv[] )
 
 	// Timing variables
 	clock_t t_start, t_end, secs; // Wall clock variables
+	double timeav_mpi_overhead = 0.0, timeav_timestep = 0.0;	// Variables for measuring performance
 
 	// Output start time
 	time_t curr_time = time(NULL);	// Current system date/time
@@ -305,6 +306,11 @@ int main( int argc, char* argv[] )
 		secs = t_end - t_start;
 		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
+		// Update average timestep time
+		timeav_timestep *= (Grids.t-1);
+		timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
+		timeav_timestep /= Grids.t;
+
 		
 		///////////////
 		// Write Out //
@@ -331,6 +337,8 @@ int main( int argc, char* argv[] )
 			logfile << "Writing out flexible body lift and drag" << endl;
 			Grids.io_write_lift_drag();
 #endif
+			// Performance data
+			logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 
 		}
 
@@ -434,6 +442,11 @@ int main( int argc, char* argv[] )
 		secs = t_end - t_start;
 		printf("MPI overhead took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
 
+		// Update average MPI overhead time
+		timeav_mpi_overhead *= (Grids.t-1);
+		timeav_mpi_overhead += ((double)secs)/CLOCKS_PER_SEC;
+		timeav_mpi_overhead /= Grids.t;
+
 #ifdef TEXTOUT
 	if (Grids.t % out_every == 0) {
 		MPI_Barrier(mpim.my_comm);
@@ -441,6 +454,12 @@ int main( int argc, char* argv[] )
 		Grids.io_textout("POST MPI COMMS");
 	}
 #endif
+
+	if (Grids.t % out_every == 0) {
+		// Performance Data
+		logfile << "MPI overhead taking an average of " << timeav_mpi_overhead*1000 << "ms" << std::endl;
+	}
+
 
 #endif
 

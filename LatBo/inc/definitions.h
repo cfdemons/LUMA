@@ -54,7 +54,7 @@
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 1000
+#define restart_out_every 10000
 
 // LBM configuration
 //#define USE_MRT
@@ -74,7 +74,7 @@
 */
 
 
-#define T 1000		// Number of time steps
+#define T 2000		// Number of time steps
 
 /*	
 ***************************************************************************************************************
@@ -99,15 +99,15 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 120		// Number of x lattice sites
-#define M 60		// Number of y lattice sites
-#define K 30		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 480		// Number of x lattice sites
+#define M 120		// Number of y lattice sites
+#define K 60		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 2.4		// End of domain-x
+#define b_x 4.8		// End of domain-x
 #define a_y 0		// Start of domain-y
 #define b_y 1.2		// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -194,7 +194,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 //#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 //#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)

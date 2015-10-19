@@ -1,11 +1,11 @@
 /* This file defines the constructors and methods for the immersed boundary body object.
 */
 
-#include "stdafx.h"
-#include "IB_body.h"
-#include "definitions.h"
+#include "../inc/stdafx.h"
+#include "../inc/IB_body.h"
+#include "../inc/definitions.h"
 #include <math.h>
-#include "GridObj.h"
+#include "../inc/GridObj.h"
 
 // ***************************************************************************************************
 // Constructor and destructor

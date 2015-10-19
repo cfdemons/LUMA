@@ -1,9 +1,9 @@
-#include "stdafx.h"
-#include "GridUtils.h"
+#include "../inc/stdafx.h"
+#include "../inc/GridUtils.h"
 #include <sstream>		// String stream package
 #include <iostream>
-#include "definitions.h"
-#include "globalvars.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
 
 
 GridUtils::GridUtils(void)

@@ -1,10 +1,10 @@
 /* This file holds all the code for applying standard LBM boundary conditions such as bounce-back, inlet and outlet. */
 
-#include "stdafx.h"
-#include "GridObj.h"
+#include "../inc/stdafx.h"
+#include "../inc/GridObj.h"
 #include <vector>
-#include "definitions.h"
-#include "globalvars.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
 
 
 // ***************************************************************************************************

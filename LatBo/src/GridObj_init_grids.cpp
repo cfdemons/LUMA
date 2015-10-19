@@ -1,10 +1,10 @@
 /* This file contains the routines necessary to initialise the macroscopic quantities and the grids and labels.
 */
 
-#include "stdafx.h"
-#include "GridObj.h"
-#include "definitions.h"
-#include "globalvars.h"
+#include "../inc/stdafx.h"
+#include "../inc/GridObj.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
 #include <math.h>
 
 using namespace std;

@@ -1,9 +1,9 @@
 /* This file contains the body building methods for GridObj which in turn call a suitable IB_body.makebody constructor.
 */
 
-#include "stdafx.h"
-#include "GridObj.h"
-#include "definitions.h"
+#include "../inc/stdafx.h"
+#include "../inc/GridObj.h"
+#include "../inc/definitions.h"
 
 
 // ***************************************************************************************************

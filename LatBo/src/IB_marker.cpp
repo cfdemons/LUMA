@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "IB_marker.h"
-#include "definitions.h"
+#include "../inc/stdafx.h"
+#include "../inc/IB_marker.h"
+#include "../inc/definitions.h"
 
 // ***************************************************************************************************
 // Default constructor and destructor

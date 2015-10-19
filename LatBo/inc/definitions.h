@@ -54,7 +54,7 @@
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 10000
+#define restart_out_every 1000
 
 // LBM configuration
 //#define USE_MRT

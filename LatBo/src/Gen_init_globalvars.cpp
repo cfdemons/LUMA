@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "definitions.h"
-#include "globalvars.h"
+#include "../inc/stdafx.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
 // File containing global variable initialisations
 
 using namespace std; // Standard namespace in use

@@ -1,9 +1,9 @@
 /* This file contains the constructors for the Grid object.
 */
 
-#include "stdafx.h"
-#include "definitions.h"
-#include "GridObj.h"
+#include "../inc/stdafx.h"
+#include "../inc/definitions.h"
+#include "../inc/GridObj.h"
 #include <vector>
 
 // ***************************************************************************************************

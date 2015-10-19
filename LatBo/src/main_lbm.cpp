@@ -10,11 +10,11 @@
 	**************************************************************************************************************
 */
 
-#include "stdafx.h"
-#include "definitions.h"	// Definitions file
-#include "globalvars.h"		// Global variable references
-#include "GridObj.h"		// Grid class
-#include "MPI_manager.h"	// MPI manager class
+#include "../inc/stdafx.h"
+#include "../inc/definitions.h"	// Definitions file
+#include "../inc/globalvars.h"		// Global variable references
+#include "../inc/GridObj.h"		// Grid class
+#include "../inc/MPI_manager.h"	// MPI manager class
 
 using namespace std;	// Use the standard namespace
 
@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
 #else
 	fNameRank = to_string(0);
 #endif
-	logfile.open("./Output/log_rank" + fNameRank + ".out", std::ios::out);
+	logfile.open("./output/log_rank" + fNameRank + ".out", std::ios::out);
 
 	// Fix output format
 	cout.precision(6);
@@ -411,9 +411,9 @@ int main( int argc, char* argv[] )
 #ifdef MPI_VERBOSE
 			// Write out buffer
 			MPI_Barrier(mpim.my_comm);
-			std::ofstream logout( "./Output/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
+			std::ofstream logout( "./output/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
 			logout << "Direction " << dir << "; Sending to " << mpim.neighbour_rank[dir] << "; Receiving from " << mpim.neighbour_rank[opp_dir] << std::endl;
-			filename = "./Output/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			filename = "./output/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
 			mpim.writeout_buf(filename);
 			logout.close();
 #endif

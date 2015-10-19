@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "../inc/stdafx.h"
 #include <mpi.h>
-#include "definitions.h"
+#include "../inc/definitions.h"
 #include <iostream>
 #include <fstream>
-#include "MPI_manager.h"
-#include "GridObj.h"
+#include "../inc/MPI_manager.h"
+#include "../inc/GridObj.h"
 
 // ********************************************************************************************************
 
@@ -19,7 +19,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( "./Output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Unpacking direction " << dir << std::endl;
 	logout.close();
 #endif

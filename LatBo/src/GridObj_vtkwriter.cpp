@@ -1,13 +1,13 @@
 /* This file contains the routines necessary to write out to a vtk file
 */
 
-#include "stdafx.h"
+#include "../inc/stdafx.h"
 #include <sstream>
 #include <iomanip>
 
-#include "definitions.h"
-#include "globalvars.h"
-#include "GridObj.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
+#include "../inc/GridObj.h"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ void GridObj::vtk_writer(double tval)
 	
 	// Create file name then output file stream
 	stringstream fileName;
-	fileName << "./Output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
+	fileName << "./output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
 	
 	ofstream fout;
 	fout.open( fileName.str().c_str() );

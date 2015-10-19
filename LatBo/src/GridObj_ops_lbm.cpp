@@ -2,11 +2,11 @@
 streaming and macroscopic calulcation.
 */
 
-#include "stdafx.h"
-#include "GridObj.h"
-#include "definitions.h"
-#include "globalvars.h"
-#include "ivector.h"
+#include "../inc/stdafx.h"
+#include "../inc/GridObj.h"
+#include "../inc/definitions.h"
+#include "../inc/globalvars.h"
+#include "../inc/ivector.h"
 
 using namespace std;
 

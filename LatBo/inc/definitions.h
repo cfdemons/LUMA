@@ -26,7 +26,7 @@
 
 
 
-/*	
+/*
 ***************************************************************************************************************
 ************************************** Global configuration data **********************************************
 ***************************************************************************************************************
@@ -36,10 +36,10 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 100			// How many timesteps before output
+#define out_every 10		// How many timesteps before output
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
@@ -52,7 +52,7 @@
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
-//#define NO_FLOW			// Initialise the domain with no flow
+#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
 #define restart_out_every 1000
 
@@ -67,25 +67,25 @@
 #define mrt_relax {1.0, 1.4, 1.4, 1.0, 1.2, 1.0, 1.2, omega, omega}
 #endif
 
-/*	
+/*
 ***************************************************************************************************************
 ********************************************** Time data ******************************************************
 ***************************************************************************************************************
 */
 
 
-#define T 1000		// Number of time steps
+#define T 10000	// Number of time steps
 
-/*	
+/*
 ***************************************************************************************************************
 ******************************************* Domain dimensions *************************************************
 ***************************************************************************************************************
 */
 
 // MPI Data
-#define Xcores 2
-#define Ycores 2
-#define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
+#define Xcores 1
+#define Ycores 1
+#define Zcores 1	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
 
@@ -99,22 +99,22 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 120		// Number of x lattice sites
-#define M 60		// Number of y lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 100		// Number of x lattice sites
+#define M 50		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 2.4		// End of domain-x
+#define b_x 100.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1.2		// End of domain-y
+#define b_y 50.0		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 0.6		// End of domain-z
 
 
-/*	
+/*
 ***************************************************************************************************************
 *********************************************** Fluid data ****************************************************
 ***************************************************************************************************************
@@ -125,23 +125,23 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 250		// Desired Reynolds number
+#define Re 1		// Desired Reynolds number
 
 // nu computed based on above selections
 
 
-/*	
+/*
 ***************************************************************************************************************
 ******************************************* Immersed Boundary *************************************************
 ***************************************************************************************************************
 */
 
 // Master IBM switches //
-//#define IBM_ON						// Turn on IBM
-//#define IBM_DEBUG						// Write IBM body and matrix data out to text files
-//#define IBBODY_TRACER					// Write out IBbody positions
+#define IBM_ON						// Turn on IBM
+#define IBM_DEBUG						// Write IBM body and matrix data out to text files
+#define IBBODY_TRACER					// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
-#define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
+//#define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
 // Switches for inserting certain bodies (enable only one at once!)
@@ -150,32 +150,32 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 //#define INSERT_BOTH
 //#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-//#define _2D_RIGID_PLATE_IBM
+#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 10		// Number of Lagrange points (approximately)
-#define ibb_deform false	// Default deformable property of body to be built
+#define num_markers 11		// Number of Lagrange points (approximately)
+#define ibb_deform true	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
-#define ibb_x 2.0		// x Position of body centre
-#define ibb_y 1.0		// y Position of body centre
-#define ibb_z 0.5		// z Position of body centre
-#define ibb_w 0.5		// width (x) of IB body
-#define ibb_l 0.25		// length (y) of IB body
-#define ibb_d 0.25		// depth (z) of IB body
-#define ibb_r .5		// radius of IB body
+#define ibb_x 50.0		// x Position of body centre
+#define ibb_y 10.0		// y Position of body centre
+#define ibb_z 0.0		// z Position of body centre
+#define ibb_w 10.0		// width (x) of IB body
+#define ibb_l 10.0		// length (y) of IB body
+#define ibb_d 0.0		// depth (z) of IB body
+#define ibb_r 5.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 0.5		// length of filament
-#define ibb_start_x 2.50	// start x position of the filament
-#define ibb_start_y 1.0		// start y position of the filament
-#define ibb_start_z 0.5		// start z position of the filament
+#define ibb_length 10.0		// length of filament
+#define ibb_start_x 50.0	// start x position of the filament
+#define ibb_start_y 25.0	// start y position of the filament
+#define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
-#define ibb_angle_vert 20	// Inclination of filament in xy plane
+#define ibb_angle_vert 90	// Inclination of filament in xy plane
 #define ibb_angle_horz 0	// Inclination of filament in xz plane
 
 // Boundary conditions of flexible filament or flexible plate
@@ -184,24 +184,24 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.5	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI .025			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 0.001			// Flexural rigidity (lattice units) of filament
 
 
-/*	
+/*
 ***************************************************************************************************************
 ********************************************** Wall data ******************************************************
 ***************************************************************************************************************
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-//#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
@@ -215,7 +215,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #endif
 
 
-/*	
+/*
 ***************************************************************************************************************
 ******************************************** Multi-grid data **************************************************
 ***************************************************************************************************************
@@ -248,7 +248,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #endif
 
 
-/*	
+/*
 ***************************************************************************************************************
 ************************************** Clean-up -- no need to edit ********************************************
 ***************************************************************************************************************
@@ -257,7 +257,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 // Set default options if using 2D
 #if dims == 3
 	#define nVels 19	// Use D3Q19
-	
+
 	#define MPI_dir 26	// 3D MPI
 
 #else
@@ -265,7 +265,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 	// MPI config to 2D
 	#define MPI_dir 8
-	
+
 	// Set Z limits for 2D
 	#undef a_z
 	#define a_z 0

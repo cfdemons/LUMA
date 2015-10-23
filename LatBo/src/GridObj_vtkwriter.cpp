@@ -14,11 +14,11 @@ using namespace std;
 // Routine to write out the vtk for time step t
 void GridObj::vtk_writer(double tval)
 {
-	
+
 	// Create file name then output file stream
 	stringstream fileName;
 	fileName << "./output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
-	
+
 	ofstream fout;
 	fout.open( fileName.str().c_str() );
 
@@ -39,7 +39,7 @@ void GridObj::vtk_writer(double tval)
 	nk = 1;
 #endif
 
-	// If using MPI correct grid size and starting and end loop 
+	// If using MPI correct grid size and starting and end loop
 	// indices to avoid writing out the outer buffers
 #ifdef BUILD_FOR_MPI
 	ni_corrected = ni - 2;
@@ -88,7 +88,7 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
+
 	// Time-Averaged Density
 	fout << "\nSCALARS TimeAveragedDensity " << "float 1\n";	// Name of set = TimeAveragedDensity, type = float, components = 1
 	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
@@ -100,9 +100,9 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
+
 	// Time-Averaged UiUj (dims-1 components)
-	fout << "\nSCALARS TimeAveragedUiUj " << "float " << to_string(2*dims-3) << "\n";	// Components = 2*dims-3 
+	fout << "\nSCALARS TimeAveragedUiUj " << "float " << to_string(2*dims-3) << "\n";	// Components = 2*dims-3
 	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
 	for (size_t k = startz; k < endz; k++) {
 		for (size_t j = starty; j < endy; j++) {
@@ -120,8 +120,8 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
-	
+
+
 	// Velocity
 	fout << "\nVECTORS Velocity " << "float";	// Name of set = Velocity, type = float
 	for (size_t k = startz; k < endz; k++) {
@@ -141,7 +141,7 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
+
 	// Time-Averaged Ui
 	fout << "\nVECTORS TimeAveragedUi " << "float";	// Name of set = TimeAveragedUi, type = float
 	for (size_t k = startz; k < endz; k++) {
@@ -161,7 +161,7 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
+
 	// Time-Averaged UiUi
 	fout << "\nVECTORS TimeAveragedUiUi " << "float";
 	for (size_t k = startz; k < endz; k++) {
@@ -186,10 +186,10 @@ void GridObj::vtk_writer(double tval)
 			}
 		}
 	}
-	
+
 
 	fout.close();
-	
+
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
@@ -199,4 +199,50 @@ void GridObj::vtk_writer(double tval)
 
 	return;
 
+}
+
+
+// ***************************************************************************************************
+// Routine to write out the vtk (position) for each IB body at time step t (current capability is for unclosed objects only)
+void GridObj::vtk_IBwriter(double tval) {
+
+    // Loop through each iBody
+    for (size_t ib = 0; ib < iBody.size(); ib++) {
+
+        // Create file name then output file stream
+        stringstream fileName;
+        fileName << "./output/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+
+        ofstream fout;
+        fout.open( fileName.str().c_str() );
+
+        // Add header information
+        fout << "# vtk DataFile Version 3.0f\n";
+        fout << "IB Output for body ID " << ib << " at time t = " << (int)tval << "\n";
+        fout << "ASCII\n";
+        fout << "DATASET POLYDATA\n";
+
+
+        // Write out the positions of each Lagrange marker
+        fout << "POINTS " << iBody[ib].markers.size() << " float\n";
+        for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+
+#if (dims == 3)
+				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << iBody[ib].markers[i].position[2] << std::endl;
+#else
+				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
+#endif
+        }
+
+
+        // Write out the connectivity of each Lagrange marker
+        size_t nLines = iBody[ib].markers.size() - 1;       // Non-closed surface only (for now)
+        fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+
+        for (size_t i = 0; i < nLines; i++) {
+            fout << 2 << " " << i << " " << i + 1 << std::endl;
+        }
+
+        fout.close();
+    }
 }

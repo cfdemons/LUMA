@@ -24,25 +24,25 @@ public:
 	GridObj(int level, std::ofstream* logfile); // Basic grid constructor
 	GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
 	// MPI L0 constructor with level, rank, local size and global edges
-	GridObj(int level, int rank, std::vector<unsigned int> local_size, 
-		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+	GridObj(int level, int rank, std::vector<unsigned int> local_size,
+		std::vector< std::vector<unsigned int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos,
 		int my_coords[],
 		std::ofstream* logfile);
 	~GridObj( ); // Default destructor
 
 
-	/*	
+	/*
 	***************************************************************************************************************
 	********************************************* Member Data *****************************************************
 	***************************************************************************************************************
 	*/
-	
+
 private :
 
 	// 1D subgrid array (size = NumReg)
 	std::vector<GridObj> subGrid;
-	
+
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
 	size_t CoarseLimsX[2];
@@ -94,8 +94,8 @@ public :
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 	int my_rank;					// MPI rank
 	GridUtils gUtils;				// Utility class
-	
-	/*	
+
+	/*
 	***************************************************************************************************************
 	********************************************* Member Methods **************************************************
 	***************************************************************************************************************
@@ -107,10 +107,10 @@ public :
 	void LBM_init_vel();		// Initialise the velocity field
 	void LBM_init_rho();		// Initialise the density field
 	void LBM_init_grid();		// Non-MPI wrapper for initialiser
-	void LBM_init_grid(std::vector<unsigned int> local_size, 
-		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+	void LBM_init_grid(std::vector<unsigned int> local_size,
+		std::vector< std::vector<unsigned int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
-	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ, 
+	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ,
 		double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse);	// Initialise subgrid with all quantities
 	void LBM_init_bound_lab();		// Initialise labels for objects and walls
 	void LBM_init_refined_lab();	// Initialise labels for refined regions
@@ -125,7 +125,7 @@ public :
 	void LBM_macro(int i, int j, int k);
 	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
 	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
-	
+
 	// Boundary operations
 	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Zou-He BC
 	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);		// Application of Regaulrised BC
@@ -142,8 +142,10 @@ public :
 	void io_write_lift_drag();					// Write out IB_body lift and drag
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
+
 	// VTK writer methods
 	void vtk_writer(double tval);
+	void vtk_IBwriter(double tval);
 
 	// IBM methods
 	void ibm_build_body(int body_type);						// Build a new pre-fab body
@@ -155,7 +157,7 @@ public :
 	void ibm_computeforce(unsigned int ib);					// Compute restorative force at each marker in ib-th body
 	double ibm_findepsilon(unsigned int ib);				// Method to find epsilon weighting parameter for ib-th body
 	// Biconjugate gradient stablised method for solving asymmetric linear system required by finding epsilon
-	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon, 
+	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon,
 						   double tolerance, unsigned int maxiterations);
 
 	// Flexible methods
@@ -168,6 +170,6 @@ public :
 	void ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double *d);
 
-	
+
 };
 

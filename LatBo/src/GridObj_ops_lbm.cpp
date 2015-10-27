@@ -21,7 +21,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// IBM pre-kernel processing //
 	///////////////////////////////
 
-	
+
 	// Copy distributions prior to IBM predictive step
 #ifdef IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
@@ -48,7 +48,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 
-	
+
 	////////////////
 	// LBM kernel //
 	////////////////
@@ -71,7 +71,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 			// Collide on whole grid
 			LBM_collide(false);
-		
+
 		} else {
 
 			// Collide on core only (excludes upper transition layer)
@@ -105,17 +105,17 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined SOLID_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
-			
+
 			// Stream
 			LBM_stream();
-			
+
 			for (size_t reg = 0; reg < regions; reg++) {
 
 				// Coalesce
 				LBM_coalesce(reg);
 
 			}
-			
+
 
 			///////////////////////
 			// No refined levels //
@@ -188,7 +188,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			ibm_spread(ib);
 
 		}
-		
+
 		// Restore data to start of time step
 		f = f_ibm_initial;
 		u = u_ibm_initial;
@@ -197,12 +197,14 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		// Relaunch kernel with IBM flag set to false (corrector step)
 		// Corrector step does not reset force vectors but uses newly computed vector instead.
 		*gUtils.logfile << "Correction step..." << std::endl;
+		t--;                // Predictor-corrector results in double time step (need to reset back 1)
 		LBM_multi(false);
+
 
 		// Loop over bodies launching positional update  if deformable to compute new locations of markers
 		*gUtils.logfile << "Relocating markers as required..." << std::endl;
 		for (size_t ib = 0; ib < iBody.size(); ib++) {
-			
+
 			// If body is deformable it needs a positional update
 			if (iBody[ib].deformable) {
 
@@ -235,8 +237,8 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 void GridObj::LBM_forcegrid(bool reset_flag) {
 
 	/* This routine computes the forces applied along each direction on the lattice
-	from Guo's 2002 scheme. The basic LBM must be modified in two ways: 1) the forces 
-	are added to the populations produced by the LBGK collision in the collision 
+	from Guo's 2002 scheme. The basic LBM must be modified in two ways: 1) the forces
+	are added to the populations produced by the LBGK collision in the collision
 	routine; 2) dt/2 * F is added to the momentum in the macroscopic calculation. This
 	has been done already in the other routines.
 
@@ -262,18 +264,18 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 	F_i = lambda_i * sum( F_d * (c_d_i (1+beta_i) - u_d )
 
 	*/
-	
+
 	if (reset_flag) {
 
 		// Reset lattice force vectors on every grid site
 		std::fill(force_i.begin(), force_i.end(), 0.0);
-		
+
 		// Reset Cartesian force vector on every grid site
 		std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
 
 	} else {
 	// Else, compute forces
-	
+
 		// Get grid sizes
 		size_t N_lim = XPos.size();
 		size_t M_lim = YPos.size();
@@ -312,7 +314,7 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 							// Compute force using shorthand sum described above
 							for (unsigned int d = 0; d < dims; d++) {
-								force_i(i,j,k,v,M_lim,K_lim,nVels) += force_xyz(i,j,k,d,M_lim,K_lim,dims) * 
+								force_i(i,j,k,v,M_lim,K_lim,nVels) += force_xyz(i,j,k,d,M_lim,K_lim,dims) *
 									(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,dims));
 							}
 
@@ -327,9 +329,9 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 			}
 		}
 
-		
+
 	}
-	
+
 }
 
 
@@ -391,15 +393,15 @@ void GridObj::LBM_collide( bool core_flag ) {
 #else
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
-						
+
 						// Get feq value by calling overload of collision function
 						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
-						
+
 						// Recompute distribution function f
-						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) ) 
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) )
 															+ f(i,j,k,v,M_lim,K_lim,nVels)
 															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
-						
+
 					}
 #endif
 
@@ -433,7 +435,7 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 	// Other declarations
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	
+
 	// Compute the parts of the expansion for feq (we now have a dot product routine so could simplify this code)
 
 #if (dims == 3)
@@ -442,27 +444,27 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
 		/*
 		Compute second term in the expansion
-		Q_iab u_a u_b = 
+		Q_iab u_a u_b =
 		(c_x^2 - cs^2)u_x^2 + (c_y^2 - cs^2)u_y^2 + (c_z^2 - cs^2)u_z^2
 		+ 2c_x c_y u_x u_y + 2c_x c_z u_x u_z + 2c_y c_z u_y u_z
 		*/
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) + 
+		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
 			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
 			(pow(c[2][v],2) - pow(cs,2)) * pow(u(i,j,k,2,M_lim,K_lim,dims),2) +
-			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims) + 
-			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims) + 
+			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims) +
+			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims) +
 			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims);
 #else
 		// 2D versions of the above
 		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,dims));
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) + 
+		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
 			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
 			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims);
 #endif
-	
-	
+
+
 	// Compute f^eq
 	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))) );
 
@@ -489,7 +491,7 @@ void GridObj::LBM_mrt_collide( ivector<double>& f_new, int i, int j, int k ) {
 
 	// Loop over directions and update equilibrium function
 	for (int v = 0; v < nVels; v++) {
-						
+
 		// Get feq value by calling overload of collision function
 		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
 
@@ -500,7 +502,7 @@ void GridObj::LBM_mrt_collide( ivector<double>& f_new, int i, int j, int k ) {
 	 *
 	 * m_p = M_pq f_q
 	 * m_eq_p = M_pq f_eq_q
-	 * 
+	 *
 	 */
 
 	// Do a matrix * vector operation
@@ -567,7 +569,7 @@ void GridObj::LBM_stream( ) {
 	 *
 	 *	1) Apply Source-based Exclusions (e.g. any fine sites does not need to be streamed)
 	 *
-	 * Then either: 
+	 * Then either:
 	 *	2a) Apply Off-Grid Ops (e.g. retain incoming values if value streams off-grid or apply periodic BCs)
 	 *
 	 * Or
@@ -600,7 +602,7 @@ void GridObj::LBM_stream( ) {
 
 					// Store opposite direction
 					v_opp = gUtils.getOpposite(v);
-					
+
 
 					// DEBUG //
 					//count0++;
@@ -610,7 +612,7 @@ void GridObj::LBM_stream( ) {
 					// Streaming Source Exclusions //
 					/////////////////////////////////
 
-					/* This section prevents streaming operations given the type of site 
+					/* This section prevents streaming operations given the type of site
 					 * FROM which the streaming takes place regardless of the destination type.
 					 */
 
@@ -626,15 +628,15 @@ void GridObj::LBM_stream( ) {
 						continue;
 					}
 #endif
-					
+
 
 					////////////////////////
 					// Off-grid streaming //
 					////////////////////////
-					
+
 					/* If destination off-grid then ask whether periodic boundaries in use
 					 * and if so then only stream if Coarse --> Coarse.
-					 * If not then retain the incoming value at the site as it not receive 
+					 * If not then retain the incoming value at the site as it not receive
 					 * an update from off-grid.
 					 * If using MPI, periodic BCs are applied differently later.
 					 */
@@ -651,26 +653,26 @@ void GridObj::LBM_stream( ) {
 							(dest_z >= K_lim || dest_z < 0)
 						) {
 
-							
+
 							// DEBUG //
 							/*count1++;
 							*gUtils.logfile << "Stream " << i << "," << j <<
 								" to \t" << dest_x << "," << dest_y << " : \toff-grid in " <<
 								v << " direction. Count1 = " << count1 << std::endl;*/
-	
+
 
 
 							// Apply periodic boundary conditions (non-MPI)
 #if (defined PERIODIC_BOUNDARIES  && !defined BUILD_FOR_MPI)
-							
+
 							// Compute destination site indices using periodicity
 							dest_x = (i+c[0][v] + N_lim) % N_lim;
 							dest_y = (j+c[1][v] + M_lim) % M_lim;
 							dest_z = (k+c[2][v] + K_lim) % K_lim;
-							
+
 							// Only apply periodic BCs on coarsest level and if stream is Coarse --> Coarse
 							if (
-								(level == 0) && 
+								(level == 0) &&
 								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
 							) {
 								// Stream periodically
@@ -693,8 +695,8 @@ void GridObj::LBM_stream( ) {
 						///////////////////////
 
 
-						/* If it is an on-grid stream and using MPI need some 
-						 * additional logic checking to make sure we prevent stream 
+						/* If it is an on-grid stream and using MPI need some
+						 * additional logic checking to make sure we prevent stream
 						 * from an overlap site when periodic BCs are not in effect.
 						 */
 
@@ -709,18 +711,18 @@ void GridObj::LBM_stream( ) {
 						// If source in overlap and destination in grid (equivalent to periodic non-MPI off-grid stream)
 						// and periodic BCs are set then allow stream
 						if (
-							
+
 						(
-						
+
 						// Source on overlap?
-						gUtils.isOnOverlap(i,j,k,N_lim,M_lim,K_lim) 
-						
+						gUtils.isOnOverlap(i,j,k,N_lim,M_lim,K_lim)
+
 						) && (
 
 						// Destination on-grid (not in overlap)?
 						(dest_x < N_lim-1 && dest_x > 0) &&
-						(dest_y < M_lim-1 && dest_y > 0) 
-#if (dims == 3) 
+						(dest_y < M_lim-1 && dest_y > 0)
+#if (dims == 3)
 						&& (dest_z < K_lim-1 && dest_z > 0)
 #endif
 
@@ -728,9 +730,9 @@ void GridObj::LBM_stream( ) {
 
 						// Overlap is from a periodic rank?
 						gUtils.isOverlapPeriodic(i,j,k,N_lim,M_lim,K_lim,v_opp)
-						
+
 						)
-						
+
 						) {
 
 							// DEBUG //
@@ -744,7 +746,7 @@ void GridObj::LBM_stream( ) {
 
 #ifdef PERIODIC_BOUNDARIES
 							if (
-								(level == 0) && 
+								(level == 0) &&
 								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
 							) {
 								// Stream periodically
@@ -761,7 +763,7 @@ void GridObj::LBM_stream( ) {
 
 						}
 #else
-							
+
 							// If not using periodic BCs then incoming value at the destination site should be retained
 							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels);
 							continue;
@@ -778,17 +780,17 @@ void GridObj::LBM_stream( ) {
 						// Streaming Destination Exclusions //
 						//////////////////////////////////////
 
-						/* Filter out unwanted streaming operations by checking the 
+						/* Filter out unwanted streaming operations by checking the
 						 * source-destination pairings and retaining those values
 						 * that you do not want to be overwritten by streaming.
-						 * This section prevents streaming operations given the type of site 
+						 * This section prevents streaming operations given the type of site
 						 * TO which the streaming takes place regardless of the source type.
 						 */
 
 						// TL2lower --> TL2lower then ignore as done on lower grid stream
 						if (
-							(LatTyp(i,j,k,M_lim,K_lim) == 4) && 
-							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4) 
+							(LatTyp(i,j,k,M_lim,K_lim) == 4) &&
+							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4)
 						) {
 							continue;
 
@@ -800,7 +802,7 @@ void GridObj::LBM_stream( ) {
 							continue;
 						}
 #endif
-						
+
 						// DEBUG //
 						/*count4++;
 						*gUtils.logfile << "Stream " << i << "," << j <<
@@ -811,7 +813,7 @@ void GridObj::LBM_stream( ) {
 						// Stream population
 						f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 
-					}						
+					}
 
 
 				}
@@ -930,7 +932,7 @@ void GridObj::LBM_macro( ) {
 						ta_count++;
 					}
 				}
-					
+
 
 
 			}
@@ -943,7 +945,7 @@ void GridObj::LBM_macro( ) {
 // ***************************************************************************************************
 
 // Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by
-// the MPI unpacking routine to update the values for the next collision step. This routine does not 
+// the MPI unpacking routine to update the values for the next collision step. This routine does not
 // update the time-averaged quantities.
 void GridObj::LBM_macro( int i, int j, int k ) {
 
@@ -976,7 +978,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 #if (dims == 3)
 		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
-		
+
 	} else {
 
 		// Any other of type of site compute both density and velocity from populations
@@ -1027,7 +1029,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
 #if (dims == 3)
-	int K_fine = subGrid[RegionNumber].ZPos.size();	
+	int K_fine = subGrid[RegionNumber].ZPos.size();
 #endif
 
 	// Loop over coarse grid (just region of interest)
@@ -1059,7 +1061,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 
 #if (dims == 3)
 						// 3D Case -- cube of 8 cells
-			
+
 						// Copy coarse to fine
 						subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
 						subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
@@ -1073,7 +1075,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 #else
 
 						// 2D Case -- square of 4 cells
-							
+
 						// Copy coarse to fine
 						subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels)		= coarse_f;
 						subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels)		= coarse_f;
@@ -1134,37 +1136,37 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 						// Check to see if f value is missing on coarse level
 						if (f(i,j,k,v,M_coarse,K_coarse,nVels) == 0) {
-																										
+
 #if (dims == 3)
 							// 3D Case -- cube of 8 cells
-							
+
 							// Average the values
 							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
-								subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels) + 
-								subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels) + 
-								subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels) +
+								subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels) +
+								subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels) +
 								subGrid[RegionNumber].f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels) + 
-								subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels) + 
-								subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels) + 
+								subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels) +
+								subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels) +
+								subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels) +
 								subGrid[RegionNumber].f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)
 								) / pow(2, dims);
 
 #else
 
 							// 2D Case -- square of 4 cells
-							
+
 							// Average the values
 							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
-								subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels) + 
-								subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels) + 
-								subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels) + 
-								subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels) 
+								subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels) +
+								subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels) +
+								subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels) +
+								subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels)
 								) / pow(2, dims);
 
 #endif
 						}
-					
+
 					}
 
 				}

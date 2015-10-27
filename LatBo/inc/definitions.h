@@ -125,7 +125,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define u_0y 0		// Initial y-velocity
 #define u_0z 0		// Initial z-velocity
 #define rho_in 1	// Initial density
-#define Re 1		// Desired Reynolds number
+#define Re 10		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -138,8 +138,8 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
-#define IBM_DEBUG						// Write IBM body and matrix data out to text files
-#define IBBODY_TRACER					// Write out IBbody positions
+//#define IBM_DEBUG						// Write IBM body and matrix data out to text files
+//#define IBBODY_TRACER					// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 //#define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation

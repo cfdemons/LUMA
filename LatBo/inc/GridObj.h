@@ -50,9 +50,11 @@ private :
 	size_t CoarseLimsZ[2];
 
 	// 1D arrays
+public :
 	std::vector<int> XInd; // Vectors of indices
 	std::vector<int> YInd;
 	std::vector<int> ZInd;
+private :
 	std::vector<double> XPos; // Vectors of positions of sites
 	std::vector<double> YPos;
 	std::vector<double> ZPos;
@@ -142,8 +144,9 @@ public :
 	void io_write_lift_drag();					// Write out IB_body lift and drag
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
-	// VTK writer methods
-	void vtk_writer(double tval);
+	void io_probe_output();						// Output routine for point probes
+	void io_vtkwriter(double tval);				// VTK writer
+	void io_tecplot(double tval);				// TecPlot write out
 
 	// IBM methods
 	void ibm_build_body(int body_type);						// Build a new pre-fab body

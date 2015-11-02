@@ -60,7 +60,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / gUtils.vecnorm(u_0x,u_0y,u_0z)) ), 2);
+	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / u_ref) ), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -79,7 +79,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(gUtils.vecnorm(u_0x,u_0y,u_0z), 2);
+	double Fref = iBody[ib].delta_rho * pow(u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );

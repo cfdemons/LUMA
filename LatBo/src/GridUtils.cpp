@@ -1,5 +1,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridUtils.h"
+#include "../inc/GridObj.h"
 #include <sstream>		// String stream package
 #include <iostream>
 #include "../inc/definitions.h"
@@ -12,6 +13,7 @@ GridUtils::GridUtils(void)
 	for (int d = 0; d < dims; d++) {
 		my_MPI_coords[d] = 0;
 	}
+
 }
 
 
@@ -180,8 +182,8 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 
 // ***************************************************************************************************
 
-// Set the log file for the utility class
-void GridUtils::setLogFile (std::ofstream* log_ref) {
+// Set the log file and grid handles for the utility class
+void GridUtils::setHandles(std::ofstream* log_ref) {
 
 	logfile = log_ref;
 
@@ -309,5 +311,42 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 	return false;
 
 }
+
+// ***************************************************************************************************
+// Function to find whether a site wiht global indices provided is on a given grid or not
+bool GridUtils::isOnThisRank(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
+
+	if (
+		// Different conditions when using MPI
+#ifdef BUILD_FOR_MPI
+		((int)i <= pGrid.XInd[pGrid.XInd.size()-2] && (int)i >= pGrid.XInd[1] ) &&
+		((int)j <= pGrid.YInd[pGrid.YInd.size()-2] && (int)j >= pGrid.YInd[1] )
+#if (dims == 3)
+		&& ((int)k <= pGrid.ZInd[pGrid.ZInd.size()-2] && (int)k >= pGrid.ZInd[1] )
+#endif
+
+#else
+
+		((int)i <= pGrid.XInd[pGrid.XInd.size()-1] && (int)i >= pGrid.XInd[1] ) &&
+		((int)j <= pGrid.YInd[pGrid.YInd.size()-1] && (int)j >= pGrid.YInd[0] )
+#if (dims == 3)
+		&& ((int)k <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)k >= pGrid.ZInd[0] )
+#endif
+
+
+#endif
+
+		) {
+
+			return true;
+
+	} else {
+
+		return false;
+	}
+
+
+}
+
 // ***************************************************************************************************
 

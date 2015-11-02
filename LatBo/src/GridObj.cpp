@@ -37,7 +37,7 @@ GridObj::GridObj(int level, std::ofstream* logfile)
 	}
 
 	// Create utility class
-	this->gUtils.setLogFile(logfile);
+	this->gUtils.setHandles(logfile);
 
 	*logfile << "Constructing Grid level " << level  << std::endl;
 
@@ -66,7 +66,7 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 	}
 
 	// Logfile assign
-	this->gUtils.setLogFile(logfile);
+	this->gUtils.setHandles(logfile);
 
 	*logfile << "Building Grid level " << level << " on rank " << my_rank << std::endl;
 	
@@ -89,7 +89,7 @@ GridObj::GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile)
 	this->t = 0;
 
 	// Logfile assign
-	this->gUtils.setLogFile(logfile);
+	this->gUtils.setHandles(logfile);
 
 	*logfile << "Building Grid level " << level << ", region " << region_number << ", on rank " << my_rank << std::endl;
 

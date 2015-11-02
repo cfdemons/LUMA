@@ -416,7 +416,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 		
 		// Counters
-		unsigned int b, m, num_bod, num_mark;
+		unsigned int b, m, num_bod = iBody.size();
 
 		// Write out the number of bodies
 		file << num_bod << std::endl;
@@ -559,13 +559,6 @@ void GridObj::io_restart(bool IO_flag) {
 			*gUtils.logfile << "Error opening IBM restart file. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-
-		// Counters
-		unsigned int b, m;
-		
-		// Read in one line of file at a time
-		std::string line_in;	// String to store line
-		std::istringstream iss;	// Buffer stream
 		
 		// Get line up to separator and put in buffer
 		std::getline(file,line_in,'/');
@@ -638,6 +631,89 @@ void GridObj::io_restart(bool IO_flag) {
 			subGrid[g].io_restart(IO_flag);
 		}
 	}
+
+
+}
+// ***************************************************************************************************
+// Custom routine for writing out point probes or other high frequency, low volume data
+void GridObj::io_probe_output() {
+
+	// Declarations
+	std::ofstream probefile;
+	unsigned int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
+	unsigned int M_lims = YInd.size(), K_lims = ZInd.size();
+
+	if (t == out_every_probe && my_rank == 0) {
+		// Overwrite existing first time through
+		probefile.open("./output/probe.out", std::ios::out);
+	} else {
+		// Append to existing
+		probefile.open("./output/probe.out", std::ios::out | std::ios::app);
+	}
+
+	// Start a new line if first rank
+	if (my_rank == 0) probefile << std::endl;
+
+
+	// Probe spacing in each direction
+	int pspace[dims];
+	pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
+	pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
+#if (dims == 3)
+	pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
+#endif
+
+	// Loop over probe points
+	for (i = 0; i < nProbes[0]; i++) {
+		i_global = xProbeLims[0] + i*pspace[0];
+
+		for (j = 0; j < nProbes[1]; j++) {
+			j_global = yProbeLims[0] + j*pspace[1];
+
+#if (dims == 3)
+			for (unsigned int k = 0; k < nProbes[2]; k++) {
+				k_global = zProbeLims[0] + k*pspace[2];
+#else
+			k_global = 0; {
+#endif
+
+				// DEBUG
+				*gUtils.logfile << "Writing probe point: " << 
+					i_global << "," << j_global << "," << k_global << 
+					std::endl;
+
+				// Is point on rank, if not move on
+				if (!gUtils.isOnThisRank(i_global,j_global,k_global,*this)) {
+					continue;
+				}
+
+				// Convert global to local if necessary
+#ifdef BUILD_FOR_MPI
+				i_local = i_global - XInd[1] + 1;
+				j_local = j_global - YInd[1] + 1;
+#if (dims == 3)
+				k_local = k_global - ZInd[1] + 1;
+#else
+				k_local = k_global;
+#endif
+
+#else
+				i_local = i_global; j_local = j_global; k_local = k_global;
+#endif
+				
+
+				// Write out value and add tab
+				for (d = 0; d < dims; d++) {
+					probefile << u(i_local,j_local,k_local,d,M_lims,K_lims,dims) << "\t";
+				}
+
+			}
+
+		}
+
+	}
+
+	probefile.close();
 
 
 }

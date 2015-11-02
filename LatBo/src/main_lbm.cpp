@@ -62,6 +62,14 @@ int main( int argc, char* argv[] )
 	********************************************* GENERAL INITIALISE **********************************************
 	***************************************************************************************************************
 	*/
+
+	// When using MPI need to loop over ranks and write out information sequentially
+	int max_ranks;
+#ifdef BUILD_FOR_MPI
+	max_ranks = mpim.num_ranks;
+#else
+	max_ranks = 1;
+#endif
 	
 	// Create a log file
 	std::ofstream logfile;
@@ -128,7 +136,7 @@ int main( int argc, char* argv[] )
 	logfile << "Physical grid spacing = " << Grids.dt << endl;
 	logfile << "Lattice viscosity = " << Grids.nu << endl;
 	logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
-	logfile << "Lattice inlet velocity " << Grids.gUtils.vecnorm(u_0x,u_0y,u_0z) << std::endl;
+	logfile << "Lattice reference velocity " << u_ref << std::endl;
 	// Reynolds Number
 	logfile << "Reynolds Number = " << Re << endl;
 
@@ -228,15 +236,7 @@ int main( int argc, char* argv[] )
 	// Restart File Input //
 	////////////////////////
 
-	// Loop over ranks and read in information one at a time
-	unsigned int max_ranks;
-#ifdef BUILD_FOR_MPI
-	max_ranks = mpim.num_ranks;
-#else
-	max_ranks = 1;
-#endif
-
-	for (unsigned int n = 0; n < max_ranks; n++) {
+	for  (int n = 0; n < max_ranks; n++) {
 
 		// Wait for rank accessing the file and only access if this rank's turn
 #ifdef BUILD_FOR_MPI
@@ -276,7 +276,21 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
-	Grids.vtk_writer(0.0);
+	Grids.io_vtkwriter(0.0);
+#endif
+#ifdef TECPLOT
+		for (int n = 0; n < max_ranks; n++) {
+			// Wait for rank accessing the file and only access if this rank's turn
+#ifdef BUILD_FOR_MPI
+			MPI_Barrier(mpim.my_comm);
+
+			if (mpim.my_rank == n)
+#endif
+			{
+				logfile << "Writing out to TecPlot file" << endl;
+				Grids.io_tecplot(Grids.t);
+			}
+		}
 #endif
 	
 	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
@@ -315,6 +329,8 @@ int main( int argc, char* argv[] )
 		///////////////
 		// Write Out //
 		///////////////
+
+		// Write out here
 		if (Grids.t % out_every == 0) {
 #ifdef BUILD_FOR_MPI
 			MPI_Barrier(mpim.my_comm);
@@ -325,7 +341,21 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef VTK_WRITER
 			logfile << "Writing out to VTK file" << endl;
-			Grids.vtk_writer(Grids.t);
+			Grids.io_vtkwriter(Grids.t);
+#endif
+#ifdef TECPLOT
+			for (int n = 0; n < max_ranks; n++) {
+				// Wait for rank accessing the file and only access if this rank's turn
+#ifdef BUILD_FOR_MPI
+				MPI_Barrier(mpim.my_comm);
+
+				if (mpim.my_rank == n)
+#endif
+				{
+					logfile << "Writing out to TecPlot file" << endl;
+					Grids.io_tecplot(Grids.t);
+				}
+			}
 #endif
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
@@ -340,21 +370,36 @@ int main( int argc, char* argv[] )
 			// Performance data
 			logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 
+		}		
+
+		// Probe output has different frequency
+#ifdef PROBE_OUTPUT
+		if (Grids.t % out_every_probe == 0) {
+
+			for (int n = 0; n < max_ranks; n++) {
+
+				// Wait for rank accessing the file and only access if this rank's turn
+#ifdef BUILD_FOR_MPI
+				MPI_Barrier(mpim.my_comm);
+				if (mpim.my_rank == n) 
+#endif
+				{
+
+					logfile << "Probe write out" << endl;
+					Grids.io_probe_output();
+
+				}
+
+			}
+
 		}
+#endif
 
 
 		/////////////////////////
 		// Restart File Output //
 		/////////////////////////
 		if (Grids.t % restart_out_every == 0) {
-
-			// Loop over ranks and write out information sequentially
-			int max_ranks;
-#ifdef BUILD_FOR_MPI
-			max_ranks = mpim.num_ranks;
-#else
-			max_ranks = 1;
-#endif
 
 			for (int n = 0; n < max_ranks; n++) {
 
@@ -382,6 +427,7 @@ int main( int argc, char* argv[] )
 #ifdef BUILD_FOR_MPI
 		
 		// Start the clock
+		MPI_Barrier(mpim.my_comm);
 		t_start = clock();
 
 		// Loop over directions in Cartesian topology
@@ -438,6 +484,7 @@ int main( int argc, char* argv[] )
 		}
 
 		// Print Time of MPI comms
+		MPI_Barrier(mpim.my_comm);
 		t_end = clock();
 		secs = t_end - t_start;
 		printf("MPI overhead took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
@@ -475,6 +522,11 @@ int main( int argc, char* argv[] )
 	// Close log file
 	curr_time = time(NULL);			// Current system date/time and string buffer
 	time_str = ctime(&curr_time);	// Format as string
+	// Performance data
+	logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
+#ifdef BUILD_FOR_MPI
+	logfile << "MPI overhead taking an average of " << timeav_mpi_overhead*1000 << "ms" << std::endl;
+#endif
 	logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 

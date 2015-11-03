@@ -100,16 +100,16 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 100		// Number of x lattice sites
-#define M 50		// Number of y lattice sites
+#define N 150		// Number of x lattice sites
+#define M 150		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 100.0		// End of domain-x
+#define b_x 150.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 50.0		// End of domain-y
+#define b_y 150.0		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 0.6		// End of domain-z
 
@@ -148,15 +148,15 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 //#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
-//#define INSERT_FILAMENT
+#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-#define _2D_RIGID_PLATE_IBM
+//#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 11		// Number of Lagrange points (approximately)
+#define num_markers 31		// Number of Lagrange points (approximately)
 #define ibb_deform true	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -169,9 +169,9 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define ibb_r 5.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 10.0		// length of filament
-#define ibb_start_x 50.0	// start x position of the filament
-#define ibb_start_y 25.0	// start y position of the filament
+#define ibb_length 30.0		// length of filament
+#define ibb_start_x 75.0	// start x position of the filament
+#define ibb_start_y 60.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate

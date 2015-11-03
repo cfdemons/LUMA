@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 	// Create the grid object (level = 0)
 #ifdef BUILD_FOR_MPI
 	// Call MPI constructor
-	GridObj Grids(0, mpim.my_rank, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos, mpim.MPI_coords, &logfile);
+	GridObj Grids(0, mpim.my_rank, mpim.num_ranks, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos, mpim.MPI_coords, &logfile);
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0, &logfile);

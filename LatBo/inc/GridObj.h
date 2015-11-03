@@ -22,9 +22,9 @@ public:
 	// Constructors & Destructor //
 	GridObj( ); // Default constructor
 	GridObj(int level, std::ofstream* logfile); // Basic grid constructor
-	GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
+	GridObj(int level, int RegionNumber, int rank, int max_ranks, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
 	// MPI L0 constructor with level, rank, local size and global edges
-	GridObj(int level, int rank, std::vector<unsigned int> local_size, 
+	GridObj(int level, int rank, int max_ranks, std::vector<unsigned int> local_size, 
 		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
 		std::vector< std::vector<double> > GlobalLimsPos,
 		int my_coords[],
@@ -58,6 +58,9 @@ private :
 	std::vector<double> XPos; // Vectors of positions of sites
 	std::vector<double> YPos;
 	std::vector<double> ZPos;
+
+	// Inlet velocity profile
+	std::vector<double> ux_in, uy_in, uz_in;
 
 	// Vector nodal properties
 	// Flattened 4D arrays (i,j,k,vel)
@@ -94,7 +97,7 @@ public :
 	double nu;						// Kinematic viscosity (in lattice units)
 	double omega;					// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
-	int my_rank;					// MPI rank
+	int my_rank, max_ranks;			// MPI rank and totla number of ranks
 	GridUtils gUtils;				// Utility class
 	
 	/*	
@@ -116,6 +119,7 @@ public :
 		double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse);	// Initialise subgrid with all quantities
 	void LBM_init_bound_lab();		// Initialise labels for objects and walls
 	void LBM_init_refined_lab();	// Initialise labels for refined regions
+	void LBM_init_getInletProfile();	// Initialise the store for inlet profile data from file
 
 	// LBM operations
 	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel

@@ -40,6 +40,7 @@ public:
 	// LBM-specific utilities
 	size_t getOpposite(size_t direction);	// Function: getOpposite
 
+
 	// MPI-related utilities
 	void setMpiParameters(int mycoords[]);	// Function: setNeighbourRanks
 	bool isOnOverlap(unsigned int i, unsigned int j, unsigned int k, 

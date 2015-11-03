@@ -24,6 +24,7 @@ GridObj::GridObj(int level, std::ofstream* logfile)
 {
 	// Defaults
 	this->my_rank = 0;
+	this->max_ranks = 1;
 	this->t = 0;
 
 	// Assign level and region number
@@ -41,13 +42,14 @@ GridObj::GridObj(int level, std::ofstream* logfile)
 
 	*logfile << "Constructing Grid level " << level  << std::endl;
 
-	this->LBM_init_grid(); // Call L0 non-MPI initialiser
+	// Call L0 non-MPI initialiser
+	this->LBM_init_grid();
 
 }
 
 // ***************************************************************************************************
 // MPI constructor for level 0 with grid level, rank, local grid size and its global edges
-GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size, 
+GridObj::GridObj(int level, int rank, int max_ranks, std::vector<unsigned int> local_size, 
 				 std::vector< std::vector<unsigned int> > GlobalLimsInd, 
 				 std::vector< std::vector<double> > GlobalLimsPos,
 				 int my_coords[],
@@ -57,6 +59,7 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 	this->level = level;
     this->region_number = 0;
 	this->my_rank = rank;
+	this->max_ranks = max_ranks;
 	this->t = 0;
 	// Set limits of refinement to zero as top level
 	for (int i = 0; i < 2; i++) {
@@ -73,19 +76,20 @@ GridObj::GridObj(int level, int rank, std::vector<unsigned int> local_size,
 	// Neighbour ranks assign
 	this->gUtils.setMpiParameters(my_coords);
 
-
-	LBM_init_grid( local_size, GlobalLimsInd, GlobalLimsPos ); // Run initialisation routine
+	// Call initialisation routine
+	LBM_init_grid( local_size, GlobalLimsInd, GlobalLimsPos ); 
 
 }
 
 // ***************************************************************************************************
 // Overload constructor for MPI sub grid
-GridObj::GridObj(int level, int RegionNumber, int rank, std::ofstream* logfile)
+GridObj::GridObj(int level, int RegionNumber, int rank, int max_ranks, std::ofstream* logfile)
 {
 	// Assign
 	this->level = level;
     this->region_number = RegionNumber;
 	this->my_rank = rank;
+	this->max_ranks = max_ranks;
 	this->t = 0;
 
 	// Logfile assign
@@ -119,7 +123,7 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 #endif
 
 	// Ok to proceed and add the subgrid
-	subGrid.emplace_back( this->level + 1, RegionNumber, this->my_rank, this->gUtils.logfile);
+	subGrid.emplace_back( this->level + 1, RegionNumber, this->my_rank, this->max_ranks, this->gUtils.logfile);
 	
 	// Update limits as cannot be done through the constructor since
 	// we cannot pass more than 5 arguments to emplace_back()

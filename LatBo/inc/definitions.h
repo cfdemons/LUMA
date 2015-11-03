@@ -36,13 +36,13 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 10			// How many timesteps before whole grid output
 // Types of output
-#define TEXTOUT
-//#define VTK_WRITER
+//#define TEXTOUT
+#define VTK_WRITER
 //#define TECPLOT
 //#define MPI_VERBOSE
 
@@ -85,7 +85,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 
-#define T 10		// Number of time steps
+#define T 10000		// Number of time steps
 
 /*	
 ***************************************************************************************************************
@@ -111,16 +111,16 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 320		// Number of x lattice sites
-#define M 32		// Number of y lattice sites
+#define N 150		// Number of x lattice sites
+#define M 60		// Number of y lattice sites
 #define K 80		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 10		// End of domain-x
+#define b_x 5		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1		// End of domain-y
+#define b_y 2		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -131,12 +131,16 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 ***************************************************************************************************************
 */
 
-// Data in lattice units
+// Fluid data in lattice units
+#define USE_INLET_PROFILE
 #define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
-#define u_max 0.06		// Max velocity of profiles
+#define u_max 0.06		// Max velocity of profile
+
+// If not using an inlet profile, specify values or expressions here
 #define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
+
 #define rho_in 1		// Initial density
 #define Re 150			// Desired Reynolds number
 
@@ -312,6 +316,16 @@ const static size_t RefYstart[NumReg]		= {0};
 const static size_t RefYend[NumReg]			= {0};
 static size_t RefZstart[NumReg]				= {0};
 static size_t RefZend[NumReg]				= {0};
+#endif
+
+// Clean up for using profiled inlet
+#ifdef USE_INLET_PROFILE
+#undef u_0x
+#define u_0x ux_in[j]
+#undef u_0y
+#define u_0y uy_in[j]
+#undef u_0z
+#define u_0z uz_in[j]
 #endif
 
 #endif

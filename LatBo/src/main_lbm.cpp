@@ -27,15 +27,15 @@ int main( int argc, char* argv[] )
 	***************************************************************************************************************
 	*/
 #ifdef BUILD_FOR_MPI
-	
+
 	// Filename for verbose write out
 #ifdef MPI_VERBOSE
 	string filename;
 #endif
-	
+
 	// Usual initialise
 	MPI_Init( &argc, &argv );
-	
+
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
@@ -62,7 +62,7 @@ int main( int argc, char* argv[] )
 	********************************************* GENERAL INITIALISE **********************************************
 	***************************************************************************************************************
 	*/
-	
+
 	// Create a log file
 	std::ofstream logfile;
 	string fNameRank;
@@ -112,8 +112,8 @@ int main( int argc, char* argv[] )
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0, &logfile);
-#endif	
-	
+#endif
+
 	// Log file information
 	logfile << "Grid size = " << N << "x" << M << "x" << K << endl;
 #ifdef BUILD_FOR_MPI
@@ -155,7 +155,7 @@ int main( int argc, char* argv[] )
 	*************************************************************************************************************** */
 
 #ifdef IBM_ON
-	
+
 	logfile << "Initialising IBM..." << endl;
 
 	// Build a body
@@ -268,7 +268,7 @@ int main( int argc, char* argv[] )
 	/* ***************************************************************************************************************
 	******************************************* CLOSE INITIALISATION *************************************************
 	*************************************************************************************************************** */
-	
+
 	// Write out t = 0
 #ifdef TEXTOUT
 	logfile << "Writing out to <Grids.out>..." << endl;
@@ -277,8 +277,11 @@ int main( int argc, char* argv[] )
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
 	Grids.vtk_writer(0.0);
+#ifdef IBM_ON
+    Grids.vtk_IBwriter(0.0);
+#endif // IBM_ON
 #endif
-	
+
 	logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
 
 
@@ -288,7 +291,7 @@ int main( int argc, char* argv[] )
 	do {
 
 		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
-		
+
 		// Start the clock
 		t_start = clock();
 
@@ -311,7 +314,7 @@ int main( int argc, char* argv[] )
 		timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
 		timeav_timestep /= Grids.t;
 
-		
+
 		///////////////
 		// Write Out //
 		///////////////
@@ -326,6 +329,9 @@ int main( int argc, char* argv[] )
 #ifdef VTK_WRITER
 			logfile << "Writing out to VTK file" << endl;
 			Grids.vtk_writer(Grids.t);
+#ifdef IBM_ON
+            Grids.vtk_IBwriter(Grids.t);
+#endif // IBM_ON
 #endif
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
@@ -362,10 +368,10 @@ int main( int argc, char* argv[] )
 #ifdef BUILD_FOR_MPI
 				MPI_Barrier(mpim.my_comm);
 
-				if (mpim.my_rank == n)  
+				if (mpim.my_rank == n)
 #endif
 				{
-										
+
 				// Write out
 				Grids.io_restart(true);
 
@@ -380,7 +386,7 @@ int main( int argc, char* argv[] )
 		// MPI Communication //
 		///////////////////////
 #ifdef BUILD_FOR_MPI
-		
+
 		// Start the clock
 		t_start = clock();
 
@@ -411,10 +417,10 @@ int main( int argc, char* argv[] )
 			MPI_Barrier(mpim.my_comm);
 
 			// Send info to neighbour while receiving from other neighbour
-			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], dir, 
+			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], dir,
 				mpim.neighbour_rank[opp_dir], dir, mpim.my_comm, &mpim.stat);
 
-			
+
 
 #ifdef MPI_VERBOSE
 			// Write out buffer

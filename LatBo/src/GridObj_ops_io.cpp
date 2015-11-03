@@ -38,12 +38,12 @@ void GridObj::io_textout(std::string output_tag) {
 	// Build string
 	FNameG = string("./output/Grids")
 			+ string("D") +  to_string(dims)
-			+ string("x") + N_str 
-			+ string("y") + M_str 
-			+ string("z") + K_str 
-			+ string("Lev") + NumLev_str 
-			+ string("Reg") + NumReg_str 
-			+ string("P") + ex_str 
+			+ string("x") + N_str
+			+ string("y") + M_str
+			+ string("z") + K_str
+			+ string("Lev") + NumLev_str
+			+ string("Reg") + NumReg_str
+			+ string("P") + ex_str
 			+ string("Rnk") + mpirank
 			+ string(".out");
 	// Get character pointer
@@ -90,10 +90,10 @@ void GridObj::io_textout(std::string output_tag) {
 		// Print region number
 		string reg_str = to_string(region_number);
 		gridoutput << "Region number = " << reg_str << endl;
-		
+
 		// Now print omega
 		gridoutput << "Omega = " << omega << endl;
-		
+
 		// Index Vectors
 		gridoutput << "X Index: ";
 		for (size_t i = 0; i < N_lim; i++) {
@@ -107,7 +107,7 @@ void GridObj::io_textout(std::string output_tag) {
 		for (size_t k = 0; k < K_lim; k++) {
 			gridoutput << ZInd[k] << "\t";
 		}
-	
+
 		// Position Vectors
 		gridoutput << "\nX Position: \t";
 		for (size_t i = 0; i < N_lim; i++) {
@@ -192,7 +192,7 @@ void GridObj::io_textout(std::string output_tag) {
 		for (size_t n = 0; n < dims; n++) {
 			// Particular component
 			gridoutput << "\nu(" << n+1 << ")";
-			
+
 			for (size_t k = 0; k < K_lim; k++) {
 				// New line with z-coordinate
 				gridoutput << "\nz = " << ZPos[k] << "\n";
@@ -237,12 +237,12 @@ void GridObj::io_textout(std::string output_tag) {
 		size_t regions = subGrid.size();
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
-				
+
 				subGrid[reg].io_textout(output_tag);
 
 			}
 		}
-		
+
 
 		// Close file
 		gridoutput.close();
@@ -264,13 +264,13 @@ void GridObj::io_write_body_pos() {
 	unsigned int timestep = t;
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
-		
+
 
 			// Open file for given time step
 			std::ofstream jout;
 			jout.open("./output/Body_" + to_string(ib) + "_position_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
 			jout << "x" + to_string(timestep) + ", y" + to_string(timestep) + ", z" << std::endl;
-	
+
 			// Write out position
 			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 #if (dims == 3)
@@ -288,13 +288,13 @@ void GridObj::io_write_body_pos() {
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::io_write_lift_drag() {	
+void GridObj::io_write_lift_drag() {
 
 	// Get time step
 	unsigned int timestep = t;
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
-		
+
 
 			// Open file for given time step
 			std::ofstream jout;
@@ -320,7 +320,7 @@ void GridObj::io_write_lift_drag() {
 }
 
 // ***************************************************************************************************
-// This routine writes/reads the current rank's data in the custom restart file format to the file 
+// This routine writes/reads the current rank's data in the custom restart file format to the file
 // whose handle is provided.
 void GridObj::io_restart(bool IO_flag) {
 
@@ -334,7 +334,7 @@ void GridObj::io_restart(bool IO_flag) {
 		///////////////////////
 		// LBM Data -- WRITE //
 		///////////////////////
-			
+
 		if (my_rank == 0 && level == 0) { // Overwrite as first to write
 			file.open("./output/restart_LBM.out", std::ios::out);
 		} else { // Append
@@ -367,7 +367,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Counters
 		unsigned int i,j,k,v;
-		
+
 		// Write out global grid indices and then the values of f, u and rho
 		for (k = minz; k < K_lim; k++) {
 			for (j = min; j < M_lim; j++) {
@@ -414,13 +414,13 @@ void GridObj::io_restart(bool IO_flag) {
 			return;
 		}
 
-		
+
 		// Counters
 		unsigned int b, m, num_bod, num_mark;
 
 		// Write out the number of bodies
 		file << num_bod << std::endl;
-		
+
 		// Loop over bodies and markers and write out the positions
 		for (b = 0; b < num_bod; b++) {
 
@@ -433,13 +433,13 @@ void GridObj::io_restart(bool IO_flag) {
 			for (m = 0; m < iBody[b].markers.size(); m++) {
 
 				// Positions of each marker
-				file	<< iBody[b].markers[m].position[0] << "\t" 
-						<< iBody[b].markers[m].position[1] << "\t" 
+				file	<< iBody[b].markers[m].position[0] << "\t"
+						<< iBody[b].markers[m].position[1] << "\t"
 						<< iBody[b].markers[m].position[2] << "\t";
 
 				// Old positions of each marker
-				file	<< iBody[b].markers[m].position_old[0] << "\t" 
-						<< iBody[b].markers[m].position_old[1] << "\t" 
+				file	<< iBody[b].markers[m].position_old[0] << "\t"
+						<< iBody[b].markers[m].position_old[1] << "\t"
 						<< iBody[b].markers[m].position_old[2] << "\t";
 
 			}
@@ -458,12 +458,12 @@ void GridObj::io_restart(bool IO_flag) {
 		// Input stream
 		std::ifstream file;
 		*gUtils.logfile << "Initialising grid level " << level << " region " << region_number << " from restart file..." << endl;
-		
+
 
 		//////////////////////
 		// LBM Data -- READ //
 		//////////////////////
-			
+
 		file.open("./output/restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
@@ -475,7 +475,7 @@ void GridObj::io_restart(bool IO_flag) {
 		unsigned int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
 		int gi, gj, gk;
 		unsigned int in_level, in_regnum;
-		
+
 		// Read in one line of file at a time
 		std::string line_in;	// String to store line
 		std::istringstream iss;	// Buffer stream
@@ -487,7 +487,7 @@ void GridObj::io_restart(bool IO_flag) {
 			iss.str(line_in);
 			iss.seekg(0); // Reset buffer position to start of buffer
 
-			// Read in level and region			
+			// Read in level and region
 			iss >> in_level >> in_regnum;
 
 			// Check level and region number
@@ -504,7 +504,7 @@ void GridObj::io_restart(bool IO_flag) {
 				if (level == 0) {
 
 					// Check whether on overlap or core of this rank
-					
+
 					// Convert global to local indices
 					if (gi == XInd[0]) { i = 0;	} else if (gi == XInd[XInd.size()-1]) { i = XInd.size()-1; } // Overlap
 					else if (gi >= XInd[1] && gi <= XInd[XInd.size()-2]) { i = gi - XInd[1] + 1; } // Core
@@ -541,7 +541,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Reached end of file so close file
 		file.close();
-		
+
 
 		//////////////////////
 		// IBM Data -- READ //
@@ -560,13 +560,6 @@ void GridObj::io_restart(bool IO_flag) {
 			exit(EXIT_FAILURE);
 		}
 
-		// Counters
-		unsigned int b, m;
-		
-		// Read in one line of file at a time
-		std::string line_in;	// String to store line
-		std::istringstream iss;	// Buffer stream
-		
 		// Get line up to separator and put in buffer
 		std::getline(file,line_in,'/');
 		iss.str(line_in);
@@ -602,7 +595,7 @@ void GridObj::io_restart(bool IO_flag) {
 			// Check number of markers the same
 			if (iBody[b].markers.size() != num_mark) {
 				std::cout << "Error: See Log File" << std::endl;
-				*gUtils.logfile << "Number of IBM markers does not match the number specified for body " << 
+				*gUtils.logfile << "Number of IBM markers does not match the number specified for body " <<
 					b << " in the restart file. Exiting." << std::endl;
 				exit(EXIT_FAILURE);
 			}
@@ -628,7 +621,7 @@ void GridObj::io_restart(bool IO_flag) {
 		file.close();
 
 #endif
-		
+
 
 	}
 

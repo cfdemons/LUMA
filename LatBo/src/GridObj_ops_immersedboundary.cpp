@@ -59,7 +59,7 @@ void GridObj::ibm_initialise() {
 #endif
 
 	}
-		
+
 }
 
 // ***************************************************************************************************
@@ -71,7 +71,7 @@ double GridObj::ibm_deltakernel(double radius, double dilation) {
 
 	// Absolute value of radius
 	mag_r = fabs(radius) / dilation;
-	
+
 	// Piecemeal function evaluation
 	if (mag_r > 1.5) {
 		value = 0.0;
@@ -93,17 +93,17 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
 #if (dims == 3)
 	// Extras for 3D
-	double dist_z, delta_z;	
+	double dist_z, delta_z;
 	size_t knear;
 #endif
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (unsigned int)floor( iBody[ib].markers[m].position[0]/dx );
-	jnear = (unsigned int)floor( iBody[ib].markers[m].position[1]/dy );
+	inear = (unsigned int)round( iBody[ib].markers[m].position[0]/dx );
+	jnear = (unsigned int)round( iBody[ib].markers[m].position[1]/dy );
 
 #if (dims == 3)
-	knear = (unsigned int)floor( iBody[ib].markers[m].position[2]/dz );
+	knear = (unsigned int)round( iBody[ib].markers[m].position[2]/dz );
 #endif
 
 
@@ -122,7 +122,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 #if (dims == 3)
 				// Find r = sqrt(x^2 + y^2 + z^2)
-				radius = vecnorm( XPos[i]-iBody[ib].markers[m].position[0], 
+				radius = vecnorm( XPos[i]-iBody[ib].markers[m].position[0],
 							YPos[j]-iBody[ib].markers[m].position[1],
 							ZPos[k]-iBody[ib].markers[m].position[2]
 						) / dx;
@@ -131,13 +131,13 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 				radius = vecnorm ( XPos[i]-iBody[ib].markers[m].position[0],
 							YPos[j]-iBody[ib].markers[m].position[1]
 						) / dx;
-				
+
 #endif
 				// Check that radius is valid otherwise jacowire must have failed
 				if ( _finite(radius) == false ) {
 					std::cout << "Error: See Log File" << std::endl;
 					*gUtils.logfile << "Jacowire calculation of new position has failed. Exiting." << std::endl;
-					exit(EXIT_FAILURE);					
+					exit(EXIT_FAILURE);
 				}
 
 
@@ -161,10 +161,10 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 	double h_minus = std::min( abs(XPos[inear + 1] - XPos[inear]), abs(XPos[inear] - XPos[inear-1]) ) /dx;
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
-	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus 
+	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
 		+ ( (1.0/9.0) * (1 / pow(2,level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
-	
+
 	// Test to see if required support nodes are available
 #if (dims == 3)
 
@@ -172,12 +172,12 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
-	
+
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
-		
+
 	} else if ( (int)knear - 5 < 0 || knear + 5 >= ZPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
@@ -195,7 +195,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 						( fabs(YPos[jnear] - YPos[j])/dx < 1.5*iBody[ib].markers[m].dilation ) &&
 						( fabs(ZPos[knear] - ZPos[k])/dx < 1.5*iBody[ib].markers[m].dilation )
 					) {
-						
+
 						// Lies within support region so store information
 						iBody[ib].markers[m].supp_i.push_back(i);
 						iBody[ib].markers[m].supp_j.push_back(j);
@@ -229,14 +229,14 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
-	
+
 	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
-		
+
 	}
-	
+
 	// 2D version to find support nodes
 	for (size_t i = inear - 5; i <= inear + 5; i++) {
 		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
@@ -246,7 +246,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 			if (	( fabs(XPos[inear] - XPos[i])/dx < 1.5*iBody[ib].markers[m].dilation ) &&
 					( fabs(YPos[jnear] - YPos[j])/dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
-						
+
 					// Lies within support region so store information
 					iBody[ib].markers[m].supp_i.push_back(i);
 					iBody[ib].markers[m].supp_j.push_back(j);
@@ -280,17 +280,17 @@ void GridObj::ibm_interpol(unsigned int ib) {
 #if (dims == 3)
 	size_t K_lim = ZPos.size();
 #endif
-	
+
 
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		
+
 		// Reset the values of interpolated velocity
 		std::fill(iBody[ib].markers[m].fluid_vel.begin(), iBody[ib].markers[m].fluid_vel.end(), 0.0);
 
 		// Loop over support nodes
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-			
+
 			// Loop over directions x y z
 			for (unsigned int dir = 0; dir < dims; dir++) {
 
@@ -325,7 +325,7 @@ void GridObj::ibm_computeforce(unsigned int ib) {
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		for (unsigned int dir = 0; dir < dims; dir++) {
 			// Compute restorative force (in lattice units)
-			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) / 
+			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
 				1 / pow(2,level);	// Time step in lattice units dt = 1 / 2^level = dx
 		}
 	}
@@ -335,7 +335,7 @@ void GridObj::ibm_computeforce(unsigned int ib) {
 // ***************************************************************************************************
 // Method to spread the restorative force back on to the fluid sites
 void GridObj::ibm_spread(unsigned int ib) {
-	
+
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		// Loop over support nodes
@@ -344,12 +344,12 @@ void GridObj::ibm_spread(unsigned int ib) {
 			// Get size of grid
 			size_t M_lim = YPos.size();
 			size_t K_lim = ZPos.size();
-			
+
 			for (size_t dir = 0; dir < dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
 				force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, dims) +=
 					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * (iBody[ib].spacing/dx);
-			
+
 			}
 		}
 	}
@@ -423,23 +423,23 @@ double GridObj::ibm_findepsilon(unsigned int ib) {
 	// Create vectors
 	std::vector<double> epsilon (iBody[ib].markers.size(), 0.0);
 	std::vector<double> bVector (iBody[ib].markers.size(), 1.0);
-	
-	
+
+
 	///////////////////
 	// Solve system //
 	//////////////////
-		
+
 	// Settings
     double tolerance = 1.0e-4;
 	unsigned int maxiterations = 2500;
 	double minimum_residual_achieved;
-    
+
     // Biconjugate gradient stabilised method for solving asymmetric linear systems
     minimum_residual_achieved = ibm_bicgstab(A, bVector, epsilon, tolerance, maxiterations);
 
 	// Now assign epsilon to the markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		
+
 		iBody[ib].markers[m].epsilon = epsilon[m];
 	}
 
@@ -456,7 +456,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 						   double tolerance, unsigned int maxiterations) {
 
 	// Declarations //
-	
+
 	// Scalars
     double bic_alpha, bic_omega, bic_beta, res_current;
 	double res_min = 100.0;		// Arbitrary selection of initial minimum residual -- deliberately big so that first loop is going to generate a epsilon vector with residual better than this.
@@ -467,8 +467,8 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 	std::vector<double> bic_s (nls, 0.0);
 	std::vector<double> bic_t (nls, 0.0);
 	std::vector<double> epsilon_best (nls, 0.0);
-	std::vector<double> bic_r, bic_v, bic_p, bic_rhat;    
-	
+	std::vector<double> bic_r, bic_v, bic_p, bic_rhat;
+
 	// Step 1: Use initial guess to compute r vector
 	std::vector<double> bic_Ax = gUtils.matrix_multiply(Amatrix,epsilon);
 	for (size_t i = 0; i < nls; i++) {
@@ -510,7 +510,7 @@ double GridObj::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::v
 		bic_alpha = bic_rho[1] / gUtils.dotprod(bic_rhat, bic_v);
 		// bic_rho is not used again so copy last element back ready for next iteration
 		bic_rho[0] = bic_rho[1];
-		
+
 		// Step 5f: Compute new s vector
 		for (size_t j = 0; j < nls; j++) {
 			bic_s[j] = bic_r[j] - (bic_alpha * bic_v[j]);

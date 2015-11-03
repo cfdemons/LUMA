@@ -12,7 +12,7 @@
 using namespace std;
 
 // Routine to write out the vtk for time step t
-void GridObj::vtk_writer(double tval)
+void GridObj::io_vtkwriter(double tval)
 {
 
 	// Create file name then output file stream
@@ -193,8 +193,8 @@ void GridObj::vtk_writer(double tval)
 	// Now do the rest of the grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].vtk_writer(tval);
-		}
+			subGrid[reg].io_vtkwriter(tval);
+		}		
 	}
 
 	return;
@@ -246,3 +246,4 @@ void GridObj::vtk_IBwriter(double tval) {
         fout.close();
     }
 }
+// ***************************************************************************************************

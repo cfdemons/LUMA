@@ -5,17 +5,135 @@
 #include "../inc/GridObj.h"
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <math.h>
 
 using namespace std;
+
+// ***************************************************************************************************
+void GridObj::LBM_init_getInletProfile() {
+
+	unsigned int i, j;
+	double y, tmp;
+	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;	
+
+	// Buffer information from file
+	std::ifstream inletfile;
+	inletfile.open("./output/inlet_profile.in", std::ios::in);
+	if (!inletfile.is_open()) {
+		// Error opening file
+		std::cout << "Error: See Log File" << std::endl;
+		*gUtils.logfile << "Cannot open inlet profile file named \"inlet_profile.in\". Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+
+	} else {
+
+		std::string line_in;	// String to store line
+		std::istringstream iss;	// Buffer stream
+
+		while( !inletfile.eof() ) {
+
+			// Get line and put in buffer
+			std::getline(inletfile,line_in,'\n');
+			iss.str(line_in);
+			iss.seekg(0); // Reset buffer position to start of buffer
+
+			// Get y position
+			iss >> tmp;
+			ybuffer.push_back(tmp);
+
+			// Get x velocity
+			iss >> tmp;
+			uxbuffer.push_back(tmp);
+
+			// Get y velocity
+			iss >> tmp;
+			uybuffer.push_back(tmp);
+
+			// Get z velocity
+			iss >> tmp;
+			uzbuffer.push_back(tmp);
+
+		}
+
+	}
+
+
+	// Resize vectors
+	ux_in.resize(YPos.size());
+	uy_in.resize(YPos.size());
+	uz_in.resize(YPos.size());
+
+	// Loop over site positions (for left hand inlet, y positions)
+	for (j = 0; j < YPos.size(); j++) {
+
+		// Get Y-position
+		y = YPos[j];
+
+		// Find values either side of desired
+		for (i = 0; i < ybuffer.size(); i++) {
+
+			// Bottom point
+			if (i == 0 && ybuffer[i] > y) {
+				
+				// Extrapolation
+				ux_in[j] = -(uxbuffer[i+1] - uxbuffer[i]) + uxbuffer[i];
+				uy_in[j] = -(uybuffer[i+1] - uybuffer[i]) + uybuffer[i];
+				uz_in[j] = -(uzbuffer[i+1] - uzbuffer[i]) + uzbuffer[i];
+				break;
+
+			// Top point
+			} else if (i == ybuffer.size()-1 && ybuffer[i] < y) {
+
+				// Extrapolation
+				ux_in[j] = (uxbuffer[i] - uxbuffer[i-1]) + uxbuffer[i];
+				uy_in[j] = (uybuffer[i] - uybuffer[i-1]) + uybuffer[i];
+				uz_in[j] = (uzbuffer[i] - uzbuffer[i-1]) + uzbuffer[i];
+				break;
+
+
+			// Any middle point
+			} else if (ybuffer[i] < y && ybuffer[i+1] > y) {
+
+				// Interpolation
+				ux_in[j] = ((uxbuffer[i+1] - uxbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uxbuffer[i];
+				uy_in[j] = ((uybuffer[i+1] - uybuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uybuffer[i];
+				uz_in[j] = ((uzbuffer[i+1] - uzbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uzbuffer[i];
+				break;
+
+			} else if (ybuffer[i] == y ) {
+
+				// Copy
+				ux_in[j] = uxbuffer[i];
+				uy_in[j] = uybuffer[i];
+				uz_in[j] = uzbuffer[i];
+				break;			
+			
+			} else {
+
+				continue;
+
+			}
+				
+				
+		}
+
+	}
+
+
+}
 
 // ***************************************************************************************************
 
 // Initialise velocity method
 void GridObj::LBM_init_vel ( ) {
 
+#if (defined NO_FLOW || defined UNIFORM_INLET)
 	// Max velocity
 	double u_in[3] = {u_0x, u_0y, u_0z};
+#endif
 	
 	// Get grid sizes
 	int N_lim = XPos.size();
@@ -30,15 +148,33 @@ void GridObj::LBM_init_vel ( ) {
 				
 				
 				for (size_t d = 0; d < dims; d++) {
+
 #ifdef NO_FLOW
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,dims) = 0.0;
-#else
-					// Normal initialise
+
+#elif defined UNIFORM_INLET
+
+					// Uniform initialise
 					u(i,j,k,d,M_lim,K_lim,dims) = u_in[d];
+
+#endif
+				}
+
+
+#if (!defined NO_FLOW && !defined UNIFORM_INLET)
+
+				// Initialise based on expressions given in input file
+				u(i,j,k,0,M_lim,K_lim,dims) = u_0x;
+				u(i,j,k,1,M_lim,K_lim,dims) = u_0y;
+#if (dims == 3)
+				u(i,j,k,2,M_lim,K_lim,dims) = u_0z;
 #endif
 
-				}
+
+#endif
+
+
 
 			}
 		}
@@ -154,7 +290,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	// Left hand face only
 
 	// Check for potential singularity in BC
-	if (u_0x == 1) {
+	if (u_max == 1 || u_ref == 1) {
 		// Singularity so exit
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
@@ -669,9 +805,24 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 		LBM_init_refined_lab();
 	}
 
-	
 
 	// Initialise L0 MACROSCOPIC quantities
+
+	// Get the inlet profile data
+#ifdef USE_INLET_PROFILE
+
+	for (int n = 0; n < max_ranks; n++) {
+
+		if (n == my_rank) {
+
+			LBM_init_getInletProfile();
+		}
+	}
+
+#else
+	ux_in = u_0x; uy_in = u_0y; uz_in = u_0z;
+#endif
+
 	// Velocity field
 	u.resize( N_lim*M_lim*K_lim*dims );
 	LBM_init_vel();
@@ -718,16 +869,16 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	// Compute kinematic viscosity based on target Reynolds number
 #if defined IBM_ON && defined INSERT_CIRCLE_SPHERE
 	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-	nu = (ibb_r*2 / dx) * u_0x / Re;
+	nu = (ibb_r*2 / dx) * u_ref / Re;
 #elif defined IBM_ON && defined INSERT_RECTANGLE_CUBOID
 	// If IBM rectangle use y-dimension (in lattice units)
-	nu = (ibb_l / dx) * u_0x / Re;
+	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use object height
-	nu = (obj_y_max - obj_y_min) * u_0x / Re;
+	nu = (obj_y_max - obj_y_min) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
-	nu = M * u_0x / Re;
+	nu = M * u_ref / Re;
 #endif
 
 	// Relaxation frequency on L0

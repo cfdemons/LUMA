@@ -22,7 +22,7 @@
 #include <iomanip>			// Output precision control
 #include <math.h>			// Mathematics
 #include <string>			// String template access
-#include <mpi.h>			// Enable MPI (MSMPI on Windows)
+#include <mpi.h>			// Enable MPI
 
 
 
@@ -39,11 +39,23 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10		// How many timesteps before output
+#define out_every 10			// How many timesteps before whole grid output
+
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
+//#define TECPLOT
 //#define MPI_VERBOSE
+
+// High frequency output options
+//#define PROBE_OUTPUT
+#define out_every_probe 250
+const static unsigned int nProbes[3] = {3, 3, 3};		// Number of probes in each direction
+// Start and End points for planes of probes
+const static int xProbeLims[2] = {90, 270};
+const static int yProbeLims[2] = {15, 45};
+const static int zProbeLims[2] = {30, 120};
+
 
 // Gravity
 //#define GRAVITY_ON
@@ -54,7 +66,7 @@
 // Initialisation
 #define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 10000
+#define restart_out_every 500000
 
 // LBM configuration
 //#define USE_MRT
@@ -73,8 +85,8 @@
 ***************************************************************************************************************
 */
 
+#define T 10000		// Number of time steps
 
-#define T 10000	// Number of time steps
 
 /*
 ***************************************************************************************************************
@@ -91,10 +103,10 @@
 
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
 #ifdef USE_CUSTOM_MPI_SIZES
-static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
-static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
+const static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
+const static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
 // The following can be arbitrary if doing a 2D problem
-static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
+const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
 #endif
 
 
@@ -107,11 +119,11 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 150.0		// End of domain-x
+#define b_x 150.0	// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 150.0		// End of domain-y
+#define b_y 150.0	// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 0.6		// End of domain-z
+#define b_z 8		// End of domain-z
 
 
 /*
@@ -120,12 +132,18 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 ***************************************************************************************************************
 */
 
-// Data in lattice units
-#define u_0x 0.06	// Initial x-velocity
-#define u_0y 0		// Initial y-velocity
-#define u_0z 0		// Initial z-velocity
-#define rho_in 1	// Initial density
-#define Re 10		// Desired Reynolds number
+// Fluid data in lattice units
+#define USE_INLET_PROFILE
+#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
+#define u_max 0.06		// Max velocity of profile
+
+// If not using an inlet profile, specify values or expressions here
+#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0y 0			// Initial y-velocity
+#define u_0z 0			// Initial z-velocity
+
+#define rho_in 1		// Initial density
+#define Re 10			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -150,7 +168,7 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 //#define INSERT_BOTH
 #define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-//#define _2D_RIGID_PLATE_IBM
+#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
@@ -200,18 +218,19 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define UNIFORM_INLET			// Make the inlet a uniform inlet
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 //#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
-#define obj_x_min 20		// Index of start of object/wall in x-direction
-#define obj_x_max 30		// Index of end of object/wall in x-direction
-#define obj_y_min 25		// Index of start of object/wall in y-direction
-#define obj_y_max 35		// Index of end of object/wall in y-direction
-#define obj_z_min 10		// Index of start of object/wall in z-direction
-#define obj_z_max 20		// Index of end of object/wall in z-direction
+#define obj_x_min 90		// Index of start of object/wall in x-direction
+#define obj_x_max 120		// Index of end of object/wall in x-direction
+#define obj_y_min 1			// Index of start of object/wall in y-direction
+#define obj_y_max 31		// Index of end of object/wall in y-direction
+#define obj_z_min 105		// Index of start of object/wall in z-direction
+#define obj_z_max 135		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -228,21 +247,21 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 // Global lattice indices for refined region on level L0 start numbering at 0
 
 	#if NumReg == 2 // Makes it easier to set up multi-region cases
-	static size_t RefXstart[NumReg]		= {10, 50};
-	static size_t RefXend[NumReg]		= {30, 70};
-	static size_t RefYstart[NumReg]		= {10, 40};
-	static size_t RefYend[NumReg]		= {20, 50};
+	const static size_t RefXstart[NumReg]	= {10, 50};
+	const static size_t RefXend[NumReg]		= {30, 70};
+	const static size_t RefYstart[NumReg]	= {10, 40};
+	const static size_t RefYend[NumReg]		= {20, 50};
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumReg]		= {5, 25};
 	static size_t RefZend[NumReg]		= {15, 35};
 
 	#elif NumReg == 1
-	static size_t RefXstart[NumReg]		= {10};
-	static size_t RefXend[NumReg]		= {30};
-	static size_t RefYstart[NumReg]		= {5};
-	static size_t RefYend[NumReg]		= {15};
-	static size_t RefZstart[NumReg]		= {5};
-	static size_t RefZend[NumReg]		= {15};
+	const static size_t RefXstart[NumReg]	= {10};
+	const static size_t RefXend[NumReg]		= {30};
+	const static size_t RefYstart[NumReg]	= {5};
+	const static size_t RefYend[NumReg]		= {15};
+	static size_t RefZstart[NumReg]			= {5};
+	static size_t RefZend[NumReg]			= {15};
 	#endif
 
 #endif
@@ -292,12 +311,22 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 // Set region info to default as no refinement
 #undef NumReg
 #define NumReg 1
-static size_t RefXstart[NumReg]		= {0};
-static size_t RefXend[NumReg]		= {0};
-static size_t RefYstart[NumReg]		= {0};
-static size_t RefYend[NumReg]		= {0};
-static size_t RefZstart[NumReg]		= {0};
-static size_t RefZend[NumReg]		= {0};
+const static size_t RefXstart[NumReg]		= {0};
+const static size_t RefXend[NumReg]			= {0};
+const static size_t RefYstart[NumReg]		= {0};
+const static size_t RefYend[NumReg]			= {0};
+static size_t RefZstart[NumReg]				= {0};
+static size_t RefZend[NumReg]				= {0};
+#endif
+
+// Clean up for using profiled inlet
+#ifdef USE_INLET_PROFILE
+#undef u_0x
+#define u_0x ux_in[j]
+#undef u_0y
+#define u_0y uy_in[j]
+#undef u_0z
+#define u_0z uz_in[j]
 #endif
 
 #endif

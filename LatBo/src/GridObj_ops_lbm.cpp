@@ -914,7 +914,7 @@ void GridObj::LBM_macro( ) {
 				// Multiply current value by completed time steps to get sum
 				ta_temp = rho_timeav(i,j,k,M_lim,K_lim) * t;
 				// Add new value
-				ta_temp += rho_temp;
+				ta_temp += rho(i,j,k,M_lim,K_lim);
 				// Divide by completed time steps + 1 to get new average
 				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (t+1);
 

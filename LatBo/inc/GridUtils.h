@@ -9,6 +9,8 @@
 #include <fstream>
 #include "definitions.h"
 
+class GridObj;
+
 class GridUtils {
 
 	// Properties //
@@ -16,7 +18,6 @@ class GridUtils {
 public:
 	std::ofstream* logfile;			// Handle to output file
 	int my_MPI_coords[dims];		// MPI topology coordinates for use in applying periodic BC
-
 	
 	// Methods //
 
@@ -39,6 +40,7 @@ public:
 	// LBM-specific utilities
 	size_t getOpposite(size_t direction);	// Function: getOpposite
 
+
 	// MPI-related utilities
 	void setMpiParameters(int mycoords[]);	// Function: setNeighbourRanks
 	bool isOnOverlap(unsigned int i, unsigned int j, unsigned int k, 
@@ -46,8 +48,9 @@ public:
 	bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
 		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim, 
 		unsigned int lattice_dir);	// Function: isOverlapPeriodic
+	bool isOnThisRank(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOnThisRank
 
-	// Logfile
-	void setLogFile(std::ofstream* logfile);
+	// Handles
+	void setHandles(std::ofstream* logfile);
 };
 

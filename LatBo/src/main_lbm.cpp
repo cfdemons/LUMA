@@ -276,9 +276,9 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef VTK_WRITER
 	logfile << "Writing out to VTK file..." << endl;
-	Grids.io_vtk_writer(0.0);
+	Grids.io_vtkwriter(0.0);
 #ifdef IBM_ON
-    Grids.vtk_IBwriter(0.0);
+    Grids.io_vtk_IBwriter(0.0);
 #endif
 #endif
 #ifdef TECPLOT
@@ -345,9 +345,9 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef VTK_WRITER
 			logfile << "Writing out to VTK file" << endl;
-			Grids.io_vtk_writer(Grids.t);
+			Grids.io_vtkwriter(Grids.t);
 #ifdef IBM_ON
-            Grids.vtk_IBwriter(Grids.t);
+            Grids.io_vtk_IBwriter(Grids.t);
 #endif
 #endif
 #ifdef TECPLOT

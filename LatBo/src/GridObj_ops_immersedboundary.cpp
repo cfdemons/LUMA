@@ -99,11 +99,11 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (unsigned int)round( iBody[ib].markers[m].position[0]/dx );
-	jnear = (unsigned int)round( iBody[ib].markers[m].position[1]/dy );
+	inear = (unsigned int)std::floor( iBody[ib].markers[m].position[0]/dx + 0.5);	// Simulates std::round
+	jnear = (unsigned int)std::floor( iBody[ib].markers[m].position[1]/dy + 0.5);
 
 #if (dims == 3)
-	knear = (unsigned int)round( iBody[ib].markers[m].position[2]/dz );
+	knear = (unsigned int)std::floor( iBody[ib].markers[m].position[2]/dz + 0.5);
 #endif
 
 

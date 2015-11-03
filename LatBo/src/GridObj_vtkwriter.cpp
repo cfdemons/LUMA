@@ -204,7 +204,7 @@ void GridObj::io_vtkwriter(double tval)
 
 // ***************************************************************************************************
 // Routine to write out the vtk (position) for each IB body at time step t (current capability is for unclosed objects only)
-void GridObj::vtk_IBwriter(double tval) {
+void GridObj::io_vtk_IBwriter(double tval) {
 
     // Loop through each iBody
     for (size_t ib = 0; ib < iBody.size(); ib++) {

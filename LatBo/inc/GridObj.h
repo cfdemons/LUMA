@@ -150,7 +150,7 @@ public :
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	void io_probe_output();						// Output routine for point probes
 	void io_vtkwriter(double tval);				// VTK writer
-	void vtk_IBwriter(double tval);				// VTK body writer
+	void io_vtk_IBwriter(double tval);				// VTK body writer
 	void io_tecplot(double tval);				// TecPlot write out
 
 	// IBM methods

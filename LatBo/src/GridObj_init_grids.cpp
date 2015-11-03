@@ -130,7 +130,7 @@ void GridObj::LBM_init_getInletProfile() {
 // Initialise velocity method
 void GridObj::LBM_init_vel ( ) {
 
-#if (defined NO_FLOW || defined UNIFORM_INLET)
+#ifdef UNIFORM_INLET
 	// Max velocity
 	double u_in[3] = {u_0x, u_0y, u_0z};
 #endif

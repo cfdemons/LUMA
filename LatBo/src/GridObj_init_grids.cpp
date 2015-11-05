@@ -164,7 +164,10 @@ void GridObj::LBM_init_vel ( ) {
 
 #if (!defined NO_FLOW && !defined UNIFORM_INLET)
 
-				// Initialise based on expressions given in input file
+				/* Input velocity is specified by individual vectors for x, y and z which 
+				 * have either been read in from an input file or defined by an expression 
+				 * given in the defintions.
+				 */
 				u(i,j,k,0,M_lim,K_lim,dims) = u_0x;
 				u(i,j,k,1,M_lim,K_lim,dims) = u_0y;
 #if (dims == 3)
@@ -818,9 +821,6 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 			LBM_init_getInletProfile();
 		}
 	}
-
-#else
-	ux_in = u_0x; uy_in = u_0y; uz_in = u_0z;
 #endif
 
 	// Velocity field

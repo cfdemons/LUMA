@@ -344,7 +344,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 	/*
 	Loop through the lattice points to compute the new distribution functions.
 	Equilibrium based on:
-	       rho * w * (1 + c_ia u_a / cs^2 + Q_iab u_a u_b / 2*cs^4
+	       rho * w * (1 + c_ia u_a / cs^2 + Q_iab u_a u_b / 2*cs^4)
 	*/
 
 	// Declarations and Grid size

@@ -63,6 +63,13 @@ int main( int argc, char* argv[] )
 	***************************************************************************************************************
 	*/
 
+	// Create output directory if it does not already exist
+#ifdef _WIN32   // Running on Windows
+    int ignore = CreateDirectory("./output", NULL);
+#else   // Running on Unix system
+    int ignore = system("mkdir -p ./output");
+#endif // _WIN32
+
 	// Create a log file
 	std::ofstream logfile;
 	string fNameRank;

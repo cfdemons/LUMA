@@ -146,9 +146,9 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Switches for inserting certain bodies (enable only one at once!)
 //#define INSERT_CIRCLE_SPHERE
-#define INSERT_RECTANGLE_CUBOID
+//#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
-//#define INSERT_FILAMENT
+#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
 //#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP

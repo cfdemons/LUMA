@@ -24,7 +24,7 @@ IB_body::IB_body(GridUtils& g) {
 // ***************************************************************************************************
 // Method to add marker
 void IB_body::addMarker(double x, double y, double z, bool flex_rigid) {
-	
+
 	// Extend array of particles by 1 and construct a new IB_marker object
 	markers.emplace_back( x, y, z, flex_rigid );
 
@@ -35,8 +35,9 @@ void IB_body::addMarker(double x, double y, double z, bool flex_rigid) {
 void IB_body::makeBody(double radius, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
 
-	// Designate body as beiong flexible or rigid
+	// Designate body as beiong flexible or rigid and a closed surface
 	this->flex_rigid = flex_rigid;
+	this->closed_surface = true;
 
 	// Designate deformable flag and groupID
 	if (flex_rigid) {
@@ -54,11 +55,11 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	// using Fibonacci sphere technique. Code is not my own but works.
 	double inc = PI * (3 - sqrt(5));
     double off = 2.0 / (float)num_markers ;
-    for (unsigned int k = 0; k < num_markers; k++) { 
-        double y = k * off - 1 + (off / 2); 
-        double r = sqrt(1 - y*y); 
+    for (unsigned int k = 0; k < num_markers; k++) {
+        double y = k * off - 1 + (off / 2);
+        double r = sqrt(1 - y*y);
         double phi = k * inc;
-		
+
 		// Add Lagrange marker to body (scale by radius)
         addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), flex_rigid);
 	}
@@ -70,8 +71,8 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	}
 	spacing = gUtils.vecnorm( diff );
 
-	
-	
+
+
 #else
 	// Circle -- find theta
 	std::vector<double> theta = gUtils.linspace(0, 2*PI - (2*PI / num_markers), num_markers);
@@ -97,9 +98,10 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 // Method to seed markers for a cuboid/rectangle
 void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
-	
-	// Designate body as being flexible or rigid
+
+	// Designate body as being flexible or rigid and a closed surface
 	this->flex_rigid = flex_rigid;
+	this->closed_surface = true;
 
 	// Designate deformable flag and groupID
 	if (flex_rigid) {
@@ -125,7 +127,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-	
+
 	// Get ratio of sides and degree of point refinement
 	int side_ratio_1, side_ratio_2;
 	double smallest_side;
@@ -157,21 +159,21 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	int a = 2*side_ratio_1 + 2*side_ratio_1 + 2*side_ratio_1*side_ratio_2;
 	int b = 4 + 4*side_ratio_1 + 4*side_ratio_2;
 	int c = 8-num_markers;
-	
+
 	double P = (-b + sqrt(pow(b,2) - (4*a*c)) )/(2*a) + 1;
-		
+
 	ref = (int)ceil( log( P ) / log(2) );
-		
+
 
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(8 + 
-			(4 * (pow(2,1) -1) ) + 
-			(4 * ( (side_ratio_1 * pow(2,1)) -1) ) + 
+		unsigned int advisory_num_points = (unsigned int)(8 +
+			(4 * (pow(2,1) -1) ) +
+			(4 * ( (side_ratio_1 * pow(2,1)) -1) ) +
 			(4 * ( (side_ratio_2 * pow(2,1)) -1) ) +
-			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1) )) + 
-			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) + 
+			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1) )) +
+			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) +
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
 		std::cout << "Error: See Log File" << std::endl;
@@ -180,21 +182,21 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	}
 
 	// Number of points required to get uniform distribution and points on corners
-	unsigned int num_points = (unsigned int)(8 + 
-			(4 * (pow(2,ref) -1) ) + 
-			(4 * ( (side_ratio_1 * pow(2,ref)) -1) ) + 
+	unsigned int num_points = (unsigned int)(8 +
+			(4 * (pow(2,ref) -1) ) +
+			(4 * ( (side_ratio_1 * pow(2,ref)) -1) ) +
 			(4 * ( (side_ratio_2 * pow(2,ref)) -1) ) +
-			(2 * ( (pow(2,ref) -1)*side_ratio_1 * (pow(2,ref) -1) )) + 
-			(2 * ( (pow(2,ref) -1)*side_ratio_2 * (pow(2,ref) -1) )) + 
+			(2 * ( (pow(2,ref) -1)*side_ratio_1 * (pow(2,ref) -1) )) +
+			(2 * ( (pow(2,ref) -1)*side_ratio_2 * (pow(2,ref) -1) )) +
 			(2 * ( (pow(2,ref) -1)*side_ratio_1 * (pow(2,ref) -1)*side_ratio_2 ))
 		);
 
 	// Spacing from smallest side
 	spacing = smallest_side / pow(2,ref);
-	
+
 	// Start locations of point generator
 	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, start_z = centre[2]-dep/2, x, y, z, xdash, ydash, zdash;
-	
+
 	// Number of points in each direction
 	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1, np_z = (unsigned int)(dep / spacing)+1;
 
@@ -230,7 +232,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 		}
 	}
 
-	
+
 #else
 	// Square //
 
@@ -240,7 +242,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-	
+
 	// Get ratio of sides and degree of point refinement
 	int side_ratio;
 	if (wid > len) { // Length is shortest
@@ -270,7 +272,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 	// Start locations of point generator
 	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, x, y, z, xdash, ydash, zdash;
-	
+
 	// Number of points in each direction
 	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1;
 
@@ -297,7 +299,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 				// Add marker
 				addMarker(xdash,ydash,zdash,flex_rigid);
 
-			}				
+			}
 
 		}
 	}
@@ -329,8 +331,9 @@ void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point,
 	// Designate BCs
 	this->BCs = BCs;
 
-	// Designate the body as being flexible or rigid
+	// Designate the body as being flexible or rigid and an open surface
 	this->flex_rigid = flex_rigid;
+	this->closed_surface = false;
 
 	// Designate deformable flag and groupID
 	if (flex_rigid) {
@@ -375,11 +378,11 @@ void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point,
 	tension.resize(markers.size());
 	std::fill(tension.begin(), tension.end(), 0.0);
 
-	
+
 }
 // ***************************************************************************************************
 // Method to seed markers for a 3D plate inclined from the xz plane
-double IB_body::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre, 
+double IB_body::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 	bool flex_rigid, bool deform, unsigned int group, bool plate) {
 
 	// Exit if called in 2D
@@ -389,8 +392,9 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 		exit(EXIT_FAILURE);
 	}
 
-	// Designate body as being flexible or rigid
+	// Designate body as being flexible or rigid and an open surface
 	this->flex_rigid = flex_rigid;
+    this->closed_surface = false;
 
 	// Designate deformable flag and groupID
 	if (flex_rigid) {
@@ -417,7 +421,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-	
+
 	// Get ratio of sides and degree of point refinement
 	int side_ratio;
 	if (len_z > len_x) { // x length is shortest
@@ -446,11 +450,11 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 	spacing = (2 * (len_z + len_x) ) / num_points;
 
 	// Start locations of point generator (bottom corner)
-	double start_z = centre[2]-len_z/2, 
-		start_x = centre[0] - (len_x/2)*cos(angle * PI / 180), 
-		start_y = centre[1] - (len_x/2)*sin(angle * PI / 180), 
+	double start_z = centre[2]-len_z/2,
+		start_x = centre[0] - (len_x/2)*cos(angle * PI / 180),
+		start_y = centre[1] - (len_x/2)*sin(angle * PI / 180),
 		x, y, z;
-	
+
 	// Number of points in each direction
 	unsigned int np_x = (unsigned int)(len_x / spacing)+1, np_z = (unsigned int)(len_z / spacing)+1;
 
@@ -465,7 +469,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 
 			// Add marker
 			addMarker(x,y,z,flex_rigid);
-			
+
 
 		}
 	}

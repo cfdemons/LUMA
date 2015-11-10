@@ -146,9 +146,9 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 
 // Switches for inserting certain bodies (enable only one at once!)
 //#define INSERT_CIRCLE_SPHERE
-//#define INSERT_RECTANGLE_CUBOID
+#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
-#define INSERT_FILAMENT
+//#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
 //#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
@@ -160,13 +160,13 @@ static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30
 #define ibb_deform true	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
-#define ibb_x 50.0		// x Position of body centre
-#define ibb_y 10.0		// y Position of body centre
+#define ibb_x 75.0		// x Position of body centre
+#define ibb_y 75.0		// y Position of body centre
 #define ibb_z 0.0		// z Position of body centre
 #define ibb_w 10.0		// width (x) of IB body
 #define ibb_l 10.0		// length (y) of IB body
 #define ibb_d 0.0		// depth (z) of IB body
-#define ibb_r 5.0		// radius of IB body
+#define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
 #define ibb_length 30.0		// length of filament

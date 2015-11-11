@@ -17,7 +17,7 @@ void GridObj::vtk_writer(double tval)
 
 	// Create file name then output file stream
 	stringstream fileName;
-	fileName << "./output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
+	fileName << timeout_str + "/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
 
 	ofstream fout;
 	fout.open( fileName.str().c_str() );
@@ -211,7 +211,7 @@ void GridObj::vtk_IBwriter(double tval) {
 
         // Create file name then output file stream
         stringstream fileName;
-        fileName << "./output/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+        fileName << timeout_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
 
         ofstream fout;
         fout.open( fileName.str().c_str() );

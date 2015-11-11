@@ -64,21 +64,25 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create output directory if it does not already exist
+    std::string command = "mkdir -p " + timeout_str;
+
 #ifdef BUILD_FOR_MPI
 #ifdef _WIN32   // Running on Windows
     if (mpim.my_rank == 0)
-        int ignore = CreateDirectory("./output", NULL);
+        int ignore = CreateDirectory(command.c_str(), NULL);
 #else   // Running on Unix system
     if (mpim.my_rank == 0)
-        int ignore = system("mkdir ./output");
+        int ignore = system(command.c_str());
 #endif // _WIN32
 #else // BUILD_FOR_MPI
 #ifdef _WIN32   // Running on Windows
-    int ignore = CreateDirectory("./output", NULL);
+    int ignore = CreateDirectory(command.c_str(), NULL);
 #else   // Running on Unix system
-    int ignore = system("mkdir ./output");
+    int ignore = system(command.c_str());
 #endif // _WIN32
 #endif // BUILD_FOR_MPI
+
+
 
 	// Create a log file
 	std::ofstream logfile;
@@ -88,7 +92,7 @@ int main( int argc, char* argv[] )
 #else
 	fNameRank = to_string(0);
 #endif
-	logfile.open("./output/log_rank" + fNameRank + ".out", std::ios::out);
+	logfile.open(timeout_str + "/log_rank" + fNameRank + ".out", std::ios::out);
 
 	// Fix output format
 	cout.precision(6);
@@ -97,7 +101,7 @@ int main( int argc, char* argv[] )
 	clock_t t_start, t_end, secs; // Wall clock variables
 
 	// Output start time
-	time_t curr_time = time(NULL);	// Current system date/time
+	//time_t curr_time = time(NULL);	// Current system date/time
 	char* time_str = ctime(&curr_time);	// Format as string
     logfile << "Simulation started at " << time_str;	// Write start time to log
 
@@ -434,9 +438,9 @@ int main( int argc, char* argv[] )
 #ifdef MPI_VERBOSE
 			// Write out buffer
 			MPI_Barrier(mpim.my_comm);
-			std::ofstream logout( "./output/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
+			std::ofstream logout( timeout_str + "/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
 			logout << "Direction " << dir << "; Sending to " << mpim.neighbour_rank[dir] << "; Receiving from " << mpim.neighbour_rank[opp_dir] << std::endl;
-			filename = "./output/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			filename = timeout_str + "/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
 			mpim.writeout_buf(filename);
 			logout.close();
 #endif

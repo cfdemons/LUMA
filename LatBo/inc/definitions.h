@@ -39,7 +39,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10		// How many timesteps before output
+#define out_every 1		// How many timesteps before output
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
@@ -74,7 +74,7 @@
 */
 
 
-#define T 10000	// Number of time steps
+#define T 20	// Number of time steps
 
 /*
 ***************************************************************************************************************

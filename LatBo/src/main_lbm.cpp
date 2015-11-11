@@ -64,11 +64,21 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create output directory if it does not already exist
+#ifdef BUILD_FOR_MPI
+#ifdef _WIN32   // Running on Windows
+    if (mpim.my_rank == 0)
+        int ignore = CreateDirectory("./output", NULL);
+#else   // Running on Unix system
+    if (mpim.my_rank == 0)
+        int ignore = system("mkdir ./output");
+#endif // _WIN32
+#else // BUILD_FOR_MPI
 #ifdef _WIN32   // Running on Windows
     int ignore = CreateDirectory("./output", NULL);
 #else   // Running on Unix system
-    int ignore = system("mkdir -p ./output");
+    int ignore = system("mkdir ./output");
 #endif // _WIN32
+#endif // BUILD_FOR_MPI
 
 	// Create a log file
 	std::ofstream logfile;

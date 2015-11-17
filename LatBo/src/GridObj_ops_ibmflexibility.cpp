@@ -157,7 +157,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
-		Gout.open(timeout_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		Gout.open(gUtils.path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
 		Gout << "\nNEW TIME STEP" << std::endl;
 		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			Gout << G[i] << std::endl;
@@ -300,7 +300,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.open(timeout_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		resout.open(gUtils.path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			resout << res[i] << std::endl;

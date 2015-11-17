@@ -1,6 +1,6 @@
 #pragma once
 
-/** GridUtils Class is a utility class to hold all the general 
+/** GridUtils Class is a utility class to hold all the general
  *  methods used by the GridObj and others
  */
 
@@ -16,8 +16,11 @@ class GridUtils {
 public:
 	std::ofstream* logfile;			// Handle to output file
 	int my_MPI_coords[dims];		// MPI topology coordinates for use in applying periodic BC
+	static void setPath(std::string str);   // Set the static path string variable
+	static std::string path_str;            // Static string representing output path
 
-	
+
+
 	// Methods //
 
 // Constructor and Destructor
@@ -41,10 +44,10 @@ public:
 
 	// MPI-related utilities
 	void setMpiParameters(int mycoords[]);	// Function: setNeighbourRanks
-	bool isOnOverlap(unsigned int i, unsigned int j, unsigned int k, 
+	bool isOnOverlap(unsigned int i, unsigned int j, unsigned int k,
 		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim);	// Function: isOnOverlap
-	bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
-		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim, 
+	bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
+		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim,
 		unsigned int lattice_dir);	// Function: isOverlapPeriodic
 
 	// Logfile

@@ -18,6 +18,8 @@
 
 using namespace std;	// Use the standard namespace
 
+std::string GridUtils::path_str;    // Static variable declaration for output directory
+
 // Entry point
 int main( int argc, char* argv[] )
 {
@@ -46,6 +48,22 @@ int main( int argc, char* argv[] )
 	}
 #endif
 
+
+
+	/*
+	***************************************************************************************************************
+	********************************************* GENERAL INITIALISE **********************************************
+	***************************************************************************************************************
+	*/
+
+    // Get the time and convert it to a serial stamp for the output directory creation
+    time_t curr_time = time(NULL);	// Current system date/time
+    struct tm* timeinfo = localtime (&curr_time);
+    char timeout_char [80];
+    strftime (timeout_char, 80, "./output_%F_%H-%M-%S", timeinfo);
+    std::string path_str (timeout_char);
+
+
 #ifdef BUILD_FOR_MPI
 	// Create MPI_manager object
 	MPI_manager mpim;
@@ -57,31 +75,26 @@ int main( int argc, char* argv[] )
 	mpim.mpi_gridbuild();
 #endif
 
-	/*
-	***************************************************************************************************************
-	********************************************* GENERAL INITIALISE **********************************************
-	***************************************************************************************************************
-	*/
+    GridUtils::setPath(path_str);   // Set static path variable for output directory
 
-	// Create output directory if it does not already exist
-    std::string command = "mkdir -p " + timeout_str;
+    // Create output directory if it does not already exist
+    std::string command = "mkdir -p " + path_str;
 
 #ifdef BUILD_FOR_MPI
 #ifdef _WIN32   // Running on Windows
     if (mpim.my_rank == 0)
-        int ignore = CreateDirectory(command.c_str(), NULL);
+        int ignore = CreateDirectory(path_str, NULL);
 #else   // Running on Unix system
     if (mpim.my_rank == 0)
         int ignore = system(command.c_str());
 #endif // _WIN32
 #else // BUILD_FOR_MPI
 #ifdef _WIN32   // Running on Windows
-    int ignore = CreateDirectory(command.c_str(), NULL);
+    int ignore = CreateDirectory(path_str, NULL);
 #else   // Running on Unix system
     int ignore = system(command.c_str());
 #endif // _WIN32
 #endif // BUILD_FOR_MPI
-
 
 
 	// Create a log file
@@ -92,7 +105,7 @@ int main( int argc, char* argv[] )
 #else
 	fNameRank = to_string(0);
 #endif
-	logfile.open(timeout_str + "/log_rank" + fNameRank + ".out", std::ios::out);
+	logfile.open(GridUtils::path_str + "/log_rank" + fNameRank + ".out", std::ios::out);
 
 	// Fix output format
 	cout.precision(6);
@@ -438,9 +451,9 @@ int main( int argc, char* argv[] )
 #ifdef MPI_VERBOSE
 			// Write out buffer
 			MPI_Barrier(mpim.my_comm);
-			std::ofstream logout( timeout_str + "/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
+			std::ofstream logout( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(mpim.my_rank) + ".out", std::ios::out | std::ios::app );
 			logout << "Direction " << dir << "; Sending to " << mpim.neighbour_rank[dir] << "; Receiving from " << mpim.neighbour_rank[opp_dir] << std::endl;
-			filename = timeout_str + "/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			filename = gUtils.path_str + "/mpiBuffer_Rank" + std::to_string(mpim.my_rank) + "_Dir" + std::to_string(dir) + ".out";
 			mpim.writeout_buf(filename);
 			logout.close();
 #endif

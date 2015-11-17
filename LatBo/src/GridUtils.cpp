@@ -14,7 +14,6 @@ GridUtils::GridUtils(void)
 	}
 }
 
-
 GridUtils::~GridUtils(void)
 {
 }
@@ -29,18 +28,18 @@ std::vector<double> GridUtils::linspace(double min, double max, int n)
 
 	// Set counter to zero
 	int count = 0;
- 
-	// Loop 
+
+	// Loop
 	for (int i = 0; i <= n-2; i++)
 	{
 		double temp = min + i*(max-min)/(floor( (double)n ) - 1); // Cast n to a double to use floor
 		result.insert(result.begin() + count, temp); // Insert element
 		count += 1;
 	}
- 
+
 	// Add last element
 	result.insert(result.begin() + count, max);
-	
+
 	// Return vector
 	return result;
 }
@@ -59,7 +58,7 @@ std::vector<int> GridUtils::onespace(int min, int max)
 		result.insert( result.begin() + i, min + i ); // Insert element
 
 	}
- 
+
 	// Return vector
 	return result;
 }
@@ -71,7 +70,7 @@ std::vector<int> GridUtils::onespace(int min, int max)
 double GridUtils::vecnorm( double val1, double val2 )
 {
 	double result;
-	
+
 	result = sqrt( pow(val1,2) + pow(val2,2) );
 
 	return result;
@@ -81,7 +80,7 @@ double GridUtils::vecnorm( double val1, double val2 )
 double GridUtils::vecnorm( double val1, double val2, double val3 )
 {
 	double result;
-	
+
 	result = sqrt( pow(val1,2) + pow(val2,2) + pow(val3,2) );
 
 	return result;
@@ -91,7 +90,7 @@ double GridUtils::vecnorm( double val1, double val2, double val3 )
 double GridUtils::vecnorm( double vec[] )
 {
 	double result;
-	
+
 #if (dims == 3)
 
 		result = sqrt( pow(vec[0],2) + pow(vec[1],2) + pow(vec[2],2) );
@@ -109,7 +108,7 @@ double GridUtils::vecnorm( double vec[] )
 double GridUtils::vecnorm( std::vector<double>& vec )
 {
 	double result = 0.0;
-	
+
 	for (size_t d = 0; d < vec.size(); d++) {
 
 		result += pow(vec[d],2);
@@ -126,7 +125,7 @@ std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, i
 
 	// Initialise result
 	std::vector<int> fine_ind;
-	
+
 	// Map indices
 	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
 	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
@@ -160,7 +159,7 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 	if (A[0].size() != x.size()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
-		system("pause");
+		int ignore = system("pause");
 		exit(EXIT_FAILURE);
 	}
 
@@ -195,11 +194,11 @@ size_t GridUtils::getOpposite(size_t direction) {
 
 	// If rest particle then opposite is simply itself
 	if (direction == nVels-1) {
-		
+
 		direction_opposite = direction;
 
 	} else {
-		
+
 		/*	If direction is even, then opposite is direction+1.
 			If direction is odd, then opposite is direction-1.
 			e.g. direction 0 (+x direction) has opposite 1 (-x direction) --> +1
@@ -218,7 +217,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 // ***************************************************************************************************
 // Function to set the neighbours rank property of the GridObj
 void GridUtils::setMpiParameters(int my_coords[]) {
-	
+
 	// Initialise neighbour rank array
 	for (int d = 0; d < dims; d++) {
 		my_MPI_coords[d] = my_coords[d];
@@ -242,15 +241,15 @@ bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsi
 
 			// Case 2: Y source in overlap, X,Z take any value
 		||	(
-			(j == M_lim - 1 || j == 0) && ( (i < N_lim && i >= 0) 
-#if (dims == 3)						
+			(j == M_lim - 1 || j == 0) && ( (i < N_lim && i >= 0)
+#if (dims == 3)
 		&&	(k < K_lim && k >= 0)
 
 		)	)
 
 			// Case 3: Z source in overlap, Y,X take any value
 		||	(
-			(k == K_lim - 1 || k == 0) && (	(j < M_lim && j >= 0) 
+			(k == K_lim - 1 || k == 0) && (	(j < M_lim && j >= 0)
 													&&	(i < N_lim && i >= 0)	)
 
 			)
@@ -273,10 +272,10 @@ bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsi
 // ***************************************************************************************************
 // Function to find whether the specified site is on overlap from an adjacent or periodic neighbour rank.
 // Takes in the site indices (MPI local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
-								  unsigned int N_lim, unsigned int M_lim, unsigned int K_lim, 
+bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
+								  unsigned int N_lim, unsigned int M_lim, unsigned int K_lim,
 								  unsigned int lattice_dir) {
-	
+
 	// Local declarations
 	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims], Lims[dims], Ind[dims];
 
@@ -301,13 +300,18 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 			// If there is a difference then rank is periodically linked to its neighbour and the overlap
 			// site is from a periodic rank so return early
 			if (exp_MPI_coords[d] != act_MPI_coords[d]) return true;
-		} 
+		}
 	}
-	
+
 	// Expected and actual are the same so the neighbour rank is not periodically linked and the overlap site
 	// is from an adjacent neighbour not a periodic one.
 	return false;
 
 }
 // ***************************************************************************************************
+// Method to set the output file path
+void GridUtils::setPath(std::string str) {
+    path_str = str;
+}
 
+// ***************************************************************************************************

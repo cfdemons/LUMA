@@ -11,7 +11,7 @@ public:
 	MPI_manager(void);
 	~MPI_manager(void);
 
-	/*	
+	/*
 	***************************************************************************************************************
 	********************************************* Member Data *****************************************************
 	***************************************************************************************************************
@@ -36,12 +36,15 @@ public:
 	std::vector< std::vector<unsigned int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number
 	// Global positions of lattice represented on this rank (excluding outer overlapping layer)
 	std::vector< std::vector<double> > global_edge_pos;	// Rows are x,y,z start and end pairs and columns are rank number
-	
+
 	// Buffer data
 	ivector<double> f_buffer;				// Resizeable buffer used for data transfer
 	MPI_Status stat;						// Status structure for Send-Receive return information
 
-	/*	
+	// Utility members
+	GridUtils gUtils;
+
+	/*
 	***************************************************************************************************************
 	********************************************* Member Methods **************************************************
 	***************************************************************************************************************

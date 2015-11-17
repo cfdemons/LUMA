@@ -19,7 +19,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( timeout_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Unpacking direction " << dir << std::endl;
 	logout.close();
 #endif

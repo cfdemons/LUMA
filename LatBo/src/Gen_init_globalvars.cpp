@@ -130,10 +130,3 @@ const double cs = 1.0 / sqrt(3.0);
 		};
 
 #endif
-
-// Get the time and convert it to a serial stamp for the output directory creation
-time_t curr_time = time(NULL);	// Current system date/time
-struct tm* timeinfo = localtime (&curr_time);
-char timeout_char [80];
-size_t ignore = strftime (timeout_char, 80, "./output_%F_%H-%M-%S", timeinfo);
-string timeout_str (timeout_char);

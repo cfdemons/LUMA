@@ -8,6 +8,7 @@
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
 
+
 using namespace std;
 
 // ***************************************************************************************************
@@ -36,7 +37,7 @@ void GridObj::io_textout(std::string output_tag) {
 	else NumReg_str = to_string(NumReg);
 	mpirank = to_string(my_rank);
 	// Build string
-	FNameG = string(timeout_str + "/Grids")
+	FNameG = string(gUtils.path_str + "/Grids")
 			+ string("D") +  to_string(dims)
 			+ string("x") + N_str
 			+ string("y") + M_str
@@ -268,7 +269,7 @@ void GridObj::io_write_body_pos() {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(timeout_str + "/Body_" + to_string(ib) + "_position_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
+			jout.open(gUtils.path_str + "/Body_" + to_string(ib) + "_position_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
 			jout << "x" + to_string(timestep) + ", y" + to_string(timestep) + ", z" << std::endl;
 
 			// Write out position
@@ -298,7 +299,7 @@ void GridObj::io_write_lift_drag() {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(timeout_str + "/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
+			jout.open(gUtils.path_str + "/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
 			jout << "L" + to_string(timestep) + ", D" + to_string(timestep) << std::endl;
 
 			// Sum variables
@@ -336,9 +337,9 @@ void GridObj::io_restart(bool IO_flag) {
 		///////////////////////
 
 		if (my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(timeout_str + "/restart_LBM.out", std::ios::out);
+			file.open(gUtils.path_str + "/restart_LBM.out", std::ios::out);
 		} else { // Append
-			file.open(timeout_str + "/restart_LBM.out", std::ios::out | std::ios::app);
+			file.open(gUtils.path_str + "/restart_LBM.out", std::ios::out | std::ios::app);
 		}
 
 		// Get grid sizes
@@ -407,9 +408,9 @@ void GridObj::io_restart(bool IO_flag) {
 #ifdef IBM_ON
 
 		if (my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(timeout_str + "/restart_IB_body.out", std::ios::out);
+			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::out);
 		} else if (level == 0) { // Append
-			file.open(timeout_str + "/restart_IB_body.out", std::ios::out | std::ios::app);
+			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::out | std::ios::app);
 		} else { // Must be a subgrid which doesn't own any IB-bodies so return
 			return;
 		}
@@ -464,7 +465,7 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open(timeout_str + "/restart_LBM.out", std::ios::in);
+		file.open(gUtils.path_str + "/restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*gUtils.logfile << "Error opening LBM restart file. Exiting." << std::endl;
@@ -551,7 +552,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Only level 0 grids can own IB-bodies
 		if (level == 0) {
-			file.open(timeout_str + "/restart_IB_body.out", std::ios::in);
+			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::in);
 		}
 
 		if (!file.is_open()) {

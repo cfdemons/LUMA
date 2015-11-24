@@ -64,6 +64,7 @@ int main( int argc, char* argv[] )
     std::string path_str (timeout_char);
 
 
+	// MPI manager creation
 #ifdef BUILD_FOR_MPI
 	// Create MPI_manager object
 	MPI_manager mpim;
@@ -75,25 +76,31 @@ int main( int argc, char* argv[] )
 	mpim.mpi_gridbuild();
 #endif
 
+
+	// Output directory creation
     GridUtils::setPath(path_str);   // Set static path variable for output directory
 
     // Create output directory if it does not already exist
     std::string command = "mkdir -p " + path_str;
 
 #ifdef BUILD_FOR_MPI
+
 #ifdef _WIN32   // Running on Windows
     if (mpim.my_rank == 0)
-        int ignore = CreateDirectory(path_str, NULL);
+        int result = CreateDirectory(path_str, NULL);
 #else   // Running on Unix system
     if (mpim.my_rank == 0)
-        int ignore = system(command.c_str());
+        int result = system(command.c_str());
 #endif // _WIN32
+
 #else // BUILD_FOR_MPI
+
 #ifdef _WIN32   // Running on Windows
-    int ignore = CreateDirectory(path_str, NULL);
+    int result = CreateDirectory((LPCWSTR)path_str.c_str(), NULL);
 #else   // Running on Unix system
-    int ignore = system(command.c_str());
+    int result = system(command.c_str());
 #endif // _WIN32
+
 #endif // BUILD_FOR_MPI
 
 

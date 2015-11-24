@@ -14,7 +14,7 @@ It needs completely rewriting to generalise.
 // Jacowire function for flexible cilia with one simply supported end and one free end
 void GridObj::ibm_jacowire( unsigned int ib ) {
 
-    ///////// Initialisation /////////    
+    ///////// Initialisation /////////
     double tolerance = 1.0e-4;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
 	unsigned int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
@@ -37,7 +37,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
     }
 	res = new double[3 * iBody[ib].markers.size()];
 
-		
+
 	// Reset tension vector
 	std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0);
 
@@ -84,8 +84,8 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
 	}
-	
-	// Normalised position (x,y,z)/L at t+1 for each marker are computed using extrapolation of the current (t) position 
+
+	// Normalised position (x,y,z)/L at t+1 for each marker are computed using extrapolation of the current (t) position
 	// and previous (t-1) position_old at neighbour node of each marker
 	std::vector<double> xstar, ystar;
 	for (i = 0; i < n; i++) {
@@ -97,7 +97,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	///////// Create vector of unknowns /////////
 	std::vector<double> G( 3*iBody[ib].markers.size(), 0.0);
 
-	
+
 
 
 
@@ -122,10 +122,10 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
     // first two Lagrangian points: Equations (10) [Resolution of the filament problem]
     G[3] = EI * (-2 * x0 + 5 * xstar[0] - 4 * xstar[1] + xstar[2]) / ds_sqrd - ds_sqrd * (Fx[1] + Froude) - beta * xstar[0];
     G[4] = EI * (-2 * y0 + 5 * ystar[0] - 4 * ystar[1] + ystar[2]) / ds_sqrd - ds_sqrd * Fy[1] - beta * ystar[0];
-    
+
     G[6] = EI * (x0 - 4 * xstar[0] + 6 * xstar[1] - 4 * xstar[2] + xstar[3]) / ds_sqrd - ds_sqrd * (Fx[2] + Froude) - beta * xstar[1];
     G[7] = EI * (y0 - 4 * ystar[0] + 6 * ystar[1] - 4 * ystar[2] + ystar[3]) / ds_sqrd - ds_sqrd * Fy[2] - beta * ystar[1];
-    
+
     // bulk of Lagrangian points
     ii = 8;
     for (i = 2; i < n - 2; ++i) {
@@ -135,14 +135,14 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         G[ii + 2] = EI * (ystar[i - 2] - 4 * ystar[i - 1] + 6 * ystar[i] - 4 * ystar[i + 1] + ystar[i + 2]) / ds_sqrd - ds_sqrd * Fy[i + 1] - beta * ystar[i];
         ii = ii + 3;
     }
-    
+
     // last but one Lagrangian point
     i = n - 2;
     double xsp2 = 2 * xstar[n - 1] - xstar[n - 2];
     double ysp2 = 2 * ystar[n - 1] - ystar[n - 2];
     G[ii + 1] = EI * (xstar[i - 2] - 4 * xstar[i - 1] + 6 * xstar[i] - 4 * xstar[i + 1] + xsp2) / ds_sqrd - ds_sqrd * (Fx[i + 1] + Froude) - beta * xstar[i];
     G[ii + 2] = EI * (ystar[i - 2] - 4 * ystar[i - 1] + 6 * ystar[i] - 4 * ystar[i + 1] + ysp2) / ds_sqrd - ds_sqrd * Fy[i + 1] - beta * ystar[i];
-    
+
     // last Lagrangian point
     ii = ii + 3;
     i = n - 1;
@@ -157,7 +157,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
-		Gout.open("./output/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		Gout.open(gUtils.path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
 		Gout << "\nNEW TIME STEP" << std::endl;
 		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			Gout << G[i] << std::endl;
@@ -180,7 +180,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         // first two Lagrangian points: Equations (11) [Resolution of the filament problem]
         res[3] = iBody[ib].tension[0] * x0 - (iBody[ib].tension[0] + iBody[ib].tension[1] + beta) * x[0] + iBody[ib].tension[1] * x[1] - G[3];
         res[4] = iBody[ib].tension[0] * y0 - (iBody[ib].tension[0] + iBody[ib].tension[1] + beta) * y[0] + iBody[ib].tension[1] * y[1] - G[4];
-        
+
         ii = 1;
         for (i = 1; i < n - 1; i++) {
             ii = ii + 3;
@@ -210,13 +210,13 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
             }
         }
 
-        //-- for jacobian matrix in a compact form (only non zeros entries) 
+        //-- for jacobian matrix in a compact form (only non zeros entries)
 
         AA[1][4] = 1.0;                 // SIMPLY SUPPORTED
         AA[1][5] = -1.0;                // SIMPLY SUPPORTED
         AA[1][6] = Fx[0] + Froude;      // SIMPLY SUPPORTED
         AA[1][7] = Fy[0];               // SIMPLY SUPPORTED
-        
+
         // non-extensibility
         AA[2][5] = 2 * (x[0] - x0); //J[1][2]=2*(x[0]-x0);
         AA[2][6] = 2 * (y[0] - y0); //J[1][3]=2*(y[0]-y0);
@@ -227,28 +227,28 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         AA[3][7] = iBody[ib].tension[1]; //J[2][5]=Tsol[1];
 
         AA[4][2] = y0 - y[0]; //J[3][1]=y0-y[0];
-        AA[4][4] = -(iBody[ib].tension[0] + iBody[ib].tension[1] + beta); //J[3][3]=-(Tsol[0]+Tsol[1]+beta); 
+        AA[4][4] = -(iBody[ib].tension[0] + iBody[ib].tension[1] + beta); //J[3][3]=-(Tsol[0]+Tsol[1]+beta);
         AA[4][5] = y[1] - y[0]; //J[3][4]=y[1]-y[0];
-        AA[4][7] = iBody[ib].tension[1]; //J[3][6]=Tsol[1]; 
+        AA[4][7] = iBody[ib].tension[1]; //J[3][6]=Tsol[1];
         //
         ii = 1;
         for (size_t i = 1; i < n - 1; ++i) {
             ii = ii + 3;
-            // inextensibility     
+            // inextensibility
             AA[ii + 1][2] = 2 * (x[i] - x[i + 1]); //J[ii][ii-2]=2*(x[i]-x[i+1]);
-            AA[ii + 1][3] = 2 * (y[i] - y[i + 1]); //J[ii][ii-1]=2*(y[i]-y[i+1]); 
-            AA[ii + 1][5] = 2 * (x[i + 1] - x[i]); //J[ii][ii+1]=2*(x[i+1]-x[i]); 
+            AA[ii + 1][3] = 2 * (y[i] - y[i + 1]); //J[ii][ii-1]=2*(y[i]-y[i+1]);
+            AA[ii + 1][5] = 2 * (x[i + 1] - x[i]); //J[ii][ii+1]=2*(x[i+1]-x[i]);
             AA[ii + 1][6] = 2 * (y[i + 1] - y[i]); //J[ii][ii+2]=2*(y[i+1]-y[i]);
-            // x-mom                                                                                                                                            
-            AA[ii + 2][1] = iBody[ib].tension[i]; //J[ii+1][ii-2]=Tsol[i]; 
+            // x-mom
+            AA[ii + 2][1] = iBody[ib].tension[i]; //J[ii+1][ii-2]=Tsol[i];
             AA[ii + 2][3] = x[i - 1] - x[i]; //J[ii+1][ii]=x[i-1]-x[i];
             AA[ii + 2][4] = -(iBody[ib].tension[i] + iBody[ib].tension[i + 1] + beta); //J[ii+1][ii+1]=-(Tsol[i]+Tsol[i+1]+beta);
-            AA[ii + 2][6] = x[i + 1] - x[i]; //J[ii+1][ii+3]=x[i+1]-x[i]; 
+            AA[ii + 2][6] = x[i + 1] - x[i]; //J[ii+1][ii+3]=x[i+1]-x[i];
             AA[ii + 2][7] = iBody[ib].tension[i + 1]; //J[ii+1][ii+4]=Tsol[i+1];
-            // y-mom                                                                                                                                            
-            AA[ii + 3][1] = iBody[ib].tension[i]; //J[ii+2][ii-1]=Tsol[i]; 
-            AA[ii + 3][2] = y[i - 1] - y[i]; //J[ii+2][ii]=y[i-1]-y[i]; 
-            AA[ii + 3][4] = -(iBody[ib].tension[i] + iBody[ib].tension[i + 1] + beta); //J[ii+2][ii+2]=-(Tsol[i]+Tsol[i+1]+beta); 
+            // y-mom
+            AA[ii + 3][1] = iBody[ib].tension[i]; //J[ii+2][ii-1]=Tsol[i];
+            AA[ii + 3][2] = y[i - 1] - y[i]; //J[ii+2][ii]=y[i-1]-y[i];
+            AA[ii + 3][4] = -(iBody[ib].tension[i] + iBody[ib].tension[i + 1] + beta); //J[ii+2][ii+2]=-(Tsol[i]+Tsol[i+1]+beta);
             AA[ii + 3][5] = y[i + 1] - y[i]; //J[ii+2][ii+3]=y[i+1]-y[i];
             AA[ii + 3][7] = iBody[ib].tension[i + 1]; //J[ii+2][ii+5]=Tsol[i+1];
         }
@@ -256,22 +256,22 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         AA[3 * n - 1][3] = 2 * (y[n - 2] - y[n - 1]); //J[3*n-2][3*n-3]=2*(y[n-2]-y[n-1]);
         AA[3 * n - 1][5] = 2 * (x[n - 1] - x[n - 2]); //J[3*n-2][3*n-1]=2*(x[n-1]-x[n-2]);
         AA[3 * n - 1][6] = 2 * (y[n - 1] - y[n - 2]); //J[3*n-2][3*n]  =2*(y[n-1]-y[n-2]);
-        AA[3 * n][1] = 2 * iBody[ib].tension[n - 1]; //J[3*n-1][3*n-4]=2*Tsol[n-1]; 
+        AA[3 * n][1] = 2 * iBody[ib].tension[n - 1]; //J[3*n-1][3*n-4]=2*Tsol[n-1];
         AA[3 * n][3] = 2 * x[n - 2] - 2 * x[n - 1]; //J[3*n-1][3*n-2]=2*x[n-2]-2*x[n-1];
-        AA[3 * n][4] = -(2 * iBody[ib].tension[n - 1] + beta); //J[3*n-1][3*n-1]=-(2*Tsol[n-1]+beta); 
+        AA[3 * n][4] = -(2 * iBody[ib].tension[n - 1] + beta); //J[3*n-1][3*n-1]=-(2*Tsol[n-1]+beta);
         AA[3 * n + 1][1] = 2 * iBody[ib].tension[n - 1]; //J[3*n][3*n-3]=2*Tsol[n-1];
         AA[3 * n + 1][2] = 2 * y[n - 2] - 2 * y[n - 1]; //J[3*n][3*n-2]=2*y[n-2]-2*y[n-1];
-        AA[3 * n + 1][4] = -(2 * iBody[ib].tension[n - 1] + beta); //J[3*n][3*n]=-(2*Tsol[n-1]+beta); 
-        //---------------------------------------------------------------------------------------- 
+        AA[3 * n + 1][4] = -(2 * iBody[ib].tension[n - 1] + beta); //J[3*n][3*n]=-(2*Tsol[n-1]+beta);
+        //----------------------------------------------------------------------------------------
 
 
-				
+
         ibm_bandec(AA, 3 * n + 1, m1, m2, AL, indx, d); // LU decomposition
         ibm_banbks(AA, 3 * n + 1, m1, m2, AL, indx, res); // solve banded problem
 
 
 
-		// Iteration update 
+		// Iteration update
         Tension0 = Tension0 - res[1];
         ii = 2;
         for (size_t i = 0; i < n; ++i) {
@@ -287,7 +287,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 
 
 	// ********************************* End of copy and paste ************************************** //
-    
+
 
 
 
@@ -300,7 +300,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.open("./output/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		resout.open(gUtils.path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			resout << res[i] << std::endl;
@@ -326,7 +326,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         // Current physical position comes from the newly computed positions
 		if (i != 0) { // New position vectors exclude the simply supported end and start from next node in so i-1
 			// Convert filament-normalised coordinates back to lu then to physical spacing then add offset of simply supported end
-			iBody[ib].markers[i].position[0] = (x[i-1] * length_lu * dx) + iBody[ib].markers[0].position[0];    
+			iBody[ib].markers[i].position[0] = (x[i-1] * length_lu * dx) + iBody[ib].markers[0].position[0];
 			iBody[ib].markers[i].position[1] = (y[i-1] * length_lu * dy) + iBody[ib].markers[0].position[1];
 		}
     }
@@ -343,7 +343,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 
 // **************************************************************************************** //
 /*
-* Given an n by n band diagonal matrix A with 
+* Given an n by n band diagonal matrix A with
 * m1 subdiagonal rows and m2 superdiagonal rows,
 * compactly stored in the array A[1..n][1..m1+m2+1] , this routine
 * constructs an LU decomposition of a rowwise permutation of A. The upper
@@ -353,7 +353,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 * pivoting; D is output as +/-1 depending on whether the number
 * of row interchanges was even or odd, respectively.
 * This routine is used in combination with ibm_banbks() to solve
-* band-diagonal sets of equations. Once the matrix A has been 
+* band-diagonal sets of equations. Once the matrix A has been
 * decomposed, any number of right-hand sides can be solved in
 * turn by repeated calls to ibm_banbks()
 * A		= array of subdiagonal and superdiagonals rows
@@ -372,7 +372,7 @@ void GridObj::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned 
 	unsigned long i,j,k,l;
 	unsigned int mm;
 	double dum;
-    
+
 	mm=m1+m2+1;
 	l=m1;
 	for (i=1;i<=m1;i++) {
@@ -405,12 +405,12 @@ void GridObj::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned 
 			a[i][mm]=0.0;
 		}
 	}
-   
+
         //gettimeofday(&t2, NULL);
         //elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
         //elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
-        //printf("bandec time %e ms\n",elapsedTime);  
- 
+        //printf("bandec time %e ms\n",elapsedTime);
+
 }
 #undef SWAP
 #undef TINY
@@ -419,7 +419,7 @@ void GridObj::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned 
 
 // **************************************************************************************** //
 /*
-* Given the arrays A, AL, and INDX as returned from ibm_bandec(), 
+* Given the arrays A, AL, and INDX as returned from ibm_bandec(),
 * and given a right-hand side vector B[1..n], solves the band diagonal
 * linear equations AX = B. The solution vector X overwrites
 * B. The other input arrays are not modified, and can be left
@@ -443,7 +443,7 @@ void GridObj::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned 
         //double elapsedTime;
 
         //gettimeofday(&t1, NULL);
-    
+
 	mm=m1+m2+1;
 	l=m1;
 	for (k=1;k<=n;k++) {
@@ -474,10 +474,10 @@ void GridObj::ibm_position_update( unsigned int ib ) {
 		// Do jacowire calculation
 		ibm_jacowire(ib);
 
-	} else {	// Body is deformable but not flexible so positional update comes from 
+	} else {	// Body is deformable but not flexible so positional update comes from
 				// external forcing
 
-		
+
 		// Call some routine for external forcing here...
 
 
@@ -485,15 +485,15 @@ void GridObj::ibm_position_update( unsigned int ib ) {
 
 	// Recompute support for new marker positions
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-					
+
 		// Erase support vectors
-		// Note:	Fixing the number of support sites to 9 negates 
+		// Note:	Fixing the number of support sites to 9 negates
 		//			the need to erase the vectors and will improve speed.
 		iBody[ib].markers[m].supp_i.clear();
 		iBody[ib].markers[m].supp_j.clear();
 		iBody[ib].markers[m].supp_k.clear();
 		iBody[ib].markers[m].deltaval.clear();
-					
+
 		// Recompute support
 		ibm_findsupport(ib, m);
 	}
@@ -522,8 +522,8 @@ void GridObj::ibm_position_update_grp( unsigned int group ) {
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 		// If body is deformable but not flexible give it a positional update from flexible
-		if (iBody[ib].groupID == group && 
-			iBody[ib].deformable && 
+		if (iBody[ib].groupID == group &&
+			iBody[ib].deformable &&
 			iBody[ib].flex_rigid == false) {
 
 			// Copy the position vectors of flexible markers in x and y directions
@@ -538,15 +538,15 @@ void GridObj::ibm_position_update_grp( unsigned int group ) {
 
 			// Recompute support for new marker positions
 			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-					
+
 				// Erase support vectors
-				// Note:	Fixing the number of support sites to 9 negates 
+				// Note:	Fixing the number of support sites to 9 negates
 				//			the need to erase the vectors and will improve speed.
 				iBody[ib].markers[m].supp_i.clear();
 				iBody[ib].markers[m].supp_j.clear();
 				iBody[ib].markers[m].supp_k.clear();
 				iBody[ib].markers[m].deltaval.clear();
-					
+
 				// Recompute support
 				ibm_findsupport(ib, m);
 			}

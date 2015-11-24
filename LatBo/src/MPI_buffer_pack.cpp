@@ -9,7 +9,7 @@
 
 void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 
-	// Imagine every grid has an inner layer with complete information post-stream 
+	// Imagine every grid has an inner layer with complete information post-stream
 	// and an outer layer with incomplete information post-stream.
 	// The inner layers need copying from one grid to the outer layer of its neighbour on
 	// the opposite side of the grid.
@@ -21,7 +21,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Buffering direction " << dir << std::endl;
 	logout.close();
 #endif
@@ -39,7 +39,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		// Resize buffer based on y-dimension
 		f_buffer.resize( (local_size[1]-2)*nVels );
 
-			
+
 		// Populate the buffer
 		i = local_size[0]-2;
 		for (j = 1; j < local_size[1]-1; j++) {
@@ -60,7 +60,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		// Resize buffer based on y-dimension and z-dimension
 		f_buffer.resize( (local_size[1]-2) * (local_size[2]-2) * nVels );
 
-			
+
 		// Populate the buffer
 		i = local_size[0]-2;
 		for (j = 1; j < local_size[1]-1; j++) {
@@ -77,7 +77,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		break;
 #endif
 
-			
+
 	case 1:
 		// Left
 #if (dims != 3)
@@ -106,7 +106,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		// Resize buffer based on y-dimension and z-dimension
 		f_buffer.resize( (local_size[1]-2) * (local_size[2]-2) * nVels );
 
-			
+
 		// Populate the buffer
 		i = 1;
 		for (j = 1; j < local_size[1]-1; j++) {
@@ -136,9 +136,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		k = 0;
 		for (v = 0; v < nVels; v++) {
 
-			f_buffer[count] 
+			f_buffer[count]
 				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
-				
+
 			count++;
 		}
 		break;
@@ -153,9 +153,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		for (k = 1; k < local_size[2]-1; k++) {
 			for (v = 0; v < nVels; v++) {
 
-				f_buffer[count] 
+				f_buffer[count]
 					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-				
+
 				count++;
 			}
 		}
@@ -175,9 +175,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		k = 0;
 		for (v = 0; v < nVels; v++) {
 
-			f_buffer[count] 
+			f_buffer[count]
 				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
-				
+
 			count++;
 		}
 		break;
@@ -192,9 +192,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		for (k = 1; k < local_size[2]-1; k++) {
 			for (v = 0; v < nVels; v++) {
 
-				f_buffer[count] 
+				f_buffer[count]
 					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-				
+
 				count++;
 			}
 		}
@@ -228,9 +228,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		// Resize buffer based on y-dimension and z-dimension
 		f_buffer.resize( (local_size[0]-2) * (local_size[2]-2) * nVels );
 
-			
+
 		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			j = 1;
 			for (k = 1; k < local_size[2]-1; k++) {
 				for (v = 0; v < nVels; v++) {
@@ -272,9 +272,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		// Resize buffer based on y-dimension and z-dimension
 		f_buffer.resize( (local_size[0]-2) * (local_size[2]-2) * nVels );
 
-			
+
 		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			j = local_size[1]-2;
 			for (k = 1; k < local_size[2]-1; k++) {
 				for (v = 0; v < nVels; v++) {
@@ -302,9 +302,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		k = 0;
 		for (v = 0; v < nVels; v++) {
 
-			f_buffer[count] 
+			f_buffer[count]
 				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
-				
+
 			count++;
 		}
 
@@ -320,9 +320,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		for (k = 1; k < local_size[2]-1; k++) {
 			for (v = 0; v < nVels; v++) {
 
-				f_buffer[count] 
+				f_buffer[count]
 					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-				
+
 				count++;
 			}
 		}
@@ -342,9 +342,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		k = 0;
 		for (v = 0; v < nVels; v++) {
 
-			f_buffer[count] 
+			f_buffer[count]
 				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
-				
+
 			count++;
 		}
 		break;
@@ -359,9 +359,9 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		for (k = 1; k < local_size[2]-1; k++) {
 			for (v = 0; v < nVels; v++) {
 
-				f_buffer[count] 
+				f_buffer[count]
 					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-				
+
 				count++;
 			}
 		}
@@ -380,7 +380,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		f_buffer.resize( (local_size[0]-2) * (local_size[1]-2) * nVels );
 
 		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			for (j = 1; j < local_size[1]-1; j++) {
 			k = local_size[2]-2;
 				for (v = 0; v < nVels; v++) {
@@ -401,7 +401,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		f_buffer.resize( (local_size[0]-2) * (local_size[1]-2) * nVels );
 
 		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			for (j = 1; j < local_size[1]-1; j++) {
 			k = 1;
 				for (v = 0; v < nVels; v++) {
@@ -492,7 +492,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 			count++;
 		}
 		break;
-		
+
 	case 14:
 		// Up-Back
 

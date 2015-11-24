@@ -9,6 +9,7 @@
 #ifdef _WIN32
 
 #include "targetver.h"
+#include <Windows.h>
 #include <tchar.h>
 
 #else // Compiling with gcc through Code::Blocks on Linux

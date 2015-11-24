@@ -5,6 +5,7 @@
 #include "../inc/definitions.h"
 #include "../inc/MPI_manager.h"
 #include "../inc/GridObj.h"
+#include "../inc/globalvars.h"
 
 
 // Constructor
@@ -36,7 +37,7 @@ void MPI_manager::mpi_init( ) {
 	int MPI_periodic[dims], MPI_reorder;
 	MPI_reorder = true;
 	MPI_dims[0] = Xcores; MPI_dims[1] = Ycores;
-	MPI_periodic[0] = true;	MPI_periodic[1] = true;	
+	MPI_periodic[0] = true;	MPI_periodic[1] = true;
 #if (dims == 3)
 	MPI_dims[2] = Zcores; MPI_periodic[2] = true;
 #endif
@@ -52,7 +53,7 @@ void MPI_manager::mpi_init( ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out );
 
 	// Write out coordinates
 	logout << "Coordinates on rank " << my_rank << " are (";
@@ -73,10 +74,10 @@ void MPI_manager::mpi_init( ) {
 #endif
 
 	MPI_Barrier(my_comm);
-	
+
 #ifdef MPI_VERBOSE
 	// State my rank
-	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "My rank is " << my_rank << ". There are " << num_ranks << " ranks." << std::endl;
 	logout.close();
 #endif
@@ -89,7 +90,7 @@ void MPI_manager::mpi_init( ) {
 
 		MPI_Barrier(my_comm);
 #ifdef MPI_VERBOSE
-		logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+		logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 
 		if (my_rank == 0) {
 			logout<< "\nDirection = " << dir << std::endl;
@@ -101,8 +102,8 @@ void MPI_manager::mpi_init( ) {
 		for (size_t d = 0; d < dims; d++) {
 			neighbour_coords[d][dir] = (MPI_coords[d] + MPI_cartlab[d][dir] + MPI_dims[d]) % MPI_dims[d];
 			coord_tmp[d] = neighbour_coords[d][dir];	// Store single vector for getting neighbour rank
-		}		
-		
+		}
+
 		// Get rank of neighbour and build vector of neighbour ranks
 		int tmp;
 		MPI_Cart_rank(my_comm, coord_tmp, &tmp);
@@ -161,7 +162,7 @@ void MPI_manager::mpi_gridbuild( ) {
 		} else if ( global_dims[d] % MPI_dims[d] != 0 ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
 			std::ofstream logout;
-			logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
 			logout.close();
@@ -169,7 +170,7 @@ void MPI_manager::mpi_gridbuild( ) {
 			exit(EXIT_FAILURE);
 
 		} else {
-	
+
 			// Else, find local grid size
 #ifdef USE_CUSTOM_MPI_SIZES
 
@@ -189,7 +190,7 @@ void MPI_manager::mpi_gridbuild( ) {
 			default:
 				break;
 			}
-			
+
 
 
 #else
@@ -257,8 +258,8 @@ void MPI_manager::mpi_gridbuild( ) {
 	global_edge_ind[5][my_rank] = 1;
 	global_edge_ind[4][my_rank] = 0;
 #endif
-	
-	
+
+
 	// Using uniform decomposition
 #else
 
@@ -278,7 +279,7 @@ void MPI_manager::mpi_gridbuild( ) {
 #endif
 
 
-	
+
 	// Find global positions of edges of grid excluding the overlap from the global indices
 	for (int d = 0; d < 6; d++) {
 		global_edge_pos[d][my_rank] = global_edge_ind[d][my_rank] * dx;
@@ -296,7 +297,7 @@ void MPI_manager::mpi_gridbuild( ) {
 #ifdef MPI_VERBOSE
 	// Write out the Grid size vector
 	std::ofstream logout;
-	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Grid size on rank " << my_rank << " is (";
 	for (size_t d = 0; d < dims; d++) {
 		logout << "\t" << local_size[d];
@@ -304,14 +305,14 @@ void MPI_manager::mpi_gridbuild( ) {
 	logout << "\t)" << std::endl;
 
 	logout << "Limits of the grid (indices) and (position) are (" <<
-		global_edge_ind[0][my_rank] << "-" << global_edge_ind[1][my_rank] << 
-		", " << global_edge_ind[2][my_rank] << "-" << global_edge_ind[3][my_rank] << 
-		", " << global_edge_ind[4][my_rank] << "-" << global_edge_ind[5][my_rank] << 
-		"), (" << global_edge_pos[0][my_rank] << "-" << global_edge_pos[1][my_rank] << 
-		", " << global_edge_pos[2][my_rank] << "-" << global_edge_pos[3][my_rank] << 
-		", " << global_edge_pos[4][my_rank] << "-" << global_edge_pos[5][my_rank] << 
+		global_edge_ind[0][my_rank] << "-" << global_edge_ind[1][my_rank] <<
+		", " << global_edge_ind[2][my_rank] << "-" << global_edge_ind[3][my_rank] <<
+		", " << global_edge_ind[4][my_rank] << "-" << global_edge_ind[5][my_rank] <<
+		"), (" << global_edge_pos[0][my_rank] << "-" << global_edge_pos[1][my_rank] <<
+		", " << global_edge_pos[2][my_rank] << "-" << global_edge_pos[3][my_rank] <<
+		", " << global_edge_pos[4][my_rank] << "-" << global_edge_pos[5][my_rank] <<
 		")" << std:: endl;
-	
+
 	logout.close();
 #endif
 
@@ -333,7 +334,7 @@ void MPI_manager::mpi_gridbuild( ) {
 		) {
 
 			std::ofstream logout;
-			logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open(gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
 
@@ -343,19 +344,19 @@ void MPI_manager::mpi_gridbuild( ) {
 				zRankSize[neighbour_rank[0]] << " needed " << local_size[2]-2 << ", " <<
 				zRankSize[neighbour_rank[1]] << " needed " << local_size[2]-2 << ", " <<
 				" Z (up/down): " <<
-				zRankSize[neighbour_rank[4]] << " needed " << local_size[2]-2 << ", " << 
+				zRankSize[neighbour_rank[4]] << " needed " << local_size[2]-2 << ", " <<
 				zRankSize[neighbour_rank[5]] << " needed " << local_size[2]-2 << ", " <<
 				" Y (left/right): " <<
-				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " << 
+				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
 				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
 				" Y (front/back): " <<
 				yRankSize[neighbour_rank[8]] << " needed " << local_size[1]-2 << ", " <<
 				yRankSize[neighbour_rank[9]] << " needed " << local_size[1]-2 << ", " <<
 				" X (up/down): " <<
-				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " << 
-				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
+				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2 << ", " <<
 				" X (front/back): " <<
-				xRankSize[neighbour_rank[8]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[8]] << " needed " << local_size[0]-2 << ", " <<
 				xRankSize[neighbour_rank[9]] << " needed " << local_size[0]-2;
 
 			logout.close();
@@ -374,17 +375,17 @@ void MPI_manager::mpi_gridbuild( ) {
 		) {
 
 			std::ofstream logout;
-			logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
 
 			// Tell user size it should be
-			logout << 
+			logout <<
 				" Y (left/right): " <<
-				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " << 
+				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
 				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
 				" X (up/down): " <<
-				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " << 
+				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
 				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2;
 
 			logout.close();
@@ -396,7 +397,7 @@ void MPI_manager::mpi_gridbuild( ) {
 #endif
 #endif
 
-	
+
 
 
 
@@ -415,7 +416,7 @@ void MPI_manager::writeout_buf( std::string filename ) {
 
 		rankout << "\n\nf_buffer Values" << std::endl;
 		for (size_t v = 0; v < f_buffer.size(); v++) {
-			
+
 			rankout << f_buffer[v] << std::endl;
 
 		}

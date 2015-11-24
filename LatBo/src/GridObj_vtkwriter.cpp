@@ -17,7 +17,7 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Create file name then output file stream
 	stringstream fileName;
-	fileName << "./output/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
+	fileName << gUtils.path_str + "/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
 
 	ofstream fout;
 	fout.open( fileName.str().c_str() );
@@ -211,7 +211,7 @@ void GridObj::io_vtk_IBwriter(double tval) {
 
         // Create file name then output file stream
         stringstream fileName;
-        fileName << "./output/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+        fileName << gUtils.path_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
 
         ofstream fout;
         fout.open( fileName.str().c_str() );
@@ -236,11 +236,20 @@ void GridObj::io_vtk_IBwriter(double tval) {
 
 
         // Write out the connectivity of each Lagrange marker
-        size_t nLines = iBody[ib].markers.size() - 1;       // Non-closed surface only (for now)
-        fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+        size_t nLines = iBody[ib].markers.size() - 1;
+
+        if (iBody[ib].closed_surface == false)
+            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+        else if (iBody[ib].closed_surface == true)
+            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
 
         for (size_t i = 0; i < nLines; i++) {
             fout << 2 << " " << i << " " << i + 1 << std::endl;
+        }
+
+        // If iBody[ib] is a closed surface then join last point to first point
+        if (iBody[ib].closed_surface == true) {
+            fout << 2 << " " << nLines << " " << 0 << std::endl;
         }
 
         fout.close();

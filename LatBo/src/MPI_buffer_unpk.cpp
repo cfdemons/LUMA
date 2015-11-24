@@ -19,7 +19,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( "./output/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Unpacking direction " << dir << std::endl;
 	logout.close();
 #endif
@@ -50,7 +50,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		}
 		break;
 #else
-		// 3D version //			
+		// 3D version //
 		// Read the buffer (into the left-hand outer layer of the grid)
 		i = 0;
 		for (j = 1; j < local_size[1]-1; j++) {
@@ -117,7 +117,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		for (v = 0; v < nVels; v++) {
 
 			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
-				
+
 			count++;
 		}
 		// Update macroscopic (but not time-averaged quantities)
@@ -145,7 +145,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 	case 3:
 		// Left-Down
-#if (dims != 3)			
+#if (dims != 3)
 		// 2D version //
 		// Read the buffer
 		i = local_size[0]-1;
@@ -154,7 +154,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		for (v = 0; v < nVels; v++) {
 
 			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
-				
+
 			count++;
 		}
 		// Update macroscopic (but not time-averaged quantities)
@@ -256,7 +256,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		break;
 
 #endif
-		
+
 
 	case 6:
 		// Left-Up
@@ -269,7 +269,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		for (v = 0; v < nVels; v++) {
 
 			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
-				
+
 			count++;
 		}
 		// Update macroscopic (but not time-averaged quantities)
@@ -293,7 +293,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		break;
 
 #endif
-		
+
 
 	case 7:
 		// Right-Down
@@ -306,7 +306,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		for (v = 0; v < nVels; v++) {
 
 			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
-				
+
 			count++;
 		}
 		// Update macroscopic (but not time-averaged quantities)
@@ -337,7 +337,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 	case 8:
 		// Back
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			for (j = 1; j < local_size[1]-1; j++) {
 			k = 0;
 				for (v = 0; v < nVels; v++) {
@@ -354,7 +354,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 	case 9:
 		// Front
-		for (i = 1; i < local_size[0]-1; i++) {	
+		for (i = 1; i < local_size[0]-1; i++) {
 			for (j = 1; j < local_size[1]-1; j++) {
 			k = local_size[2]-1;
 				for (v = 0; v < nVels; v++) {
@@ -430,7 +430,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 		// Update macroscopic (but not time-averaged quantities)
 		Grids.LBM_macro(i,j,k);
 		break;
-		
+
 	case 14:
 		// Up-Back
 		for (i = 1; i < local_size[0]-1; i++) {

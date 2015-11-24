@@ -17,7 +17,7 @@ public:
 
 protected:
 
-	/*	
+	/*
 	***************************************************************************************************************
 	********************************************* Member Data *****************************************************
 	***************************************************************************************************************
@@ -29,6 +29,7 @@ protected:
 	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
 	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
 	GridUtils gUtils;					// Reference to parent GridObj's utility class
+	bool closed_surface;                // Flag to specify whether or not it is a closed surface (for output)
 
 	// Flexible body properties
 	double delta_rho;					// Difference in density between fluid and solid in lattice units
@@ -36,8 +37,8 @@ protected:
 	std::vector<double> tension;		// Tension between the current marker and its neighbour
 	std::vector<int> BCs;				// BCs type flags (flexible bodies)
 
-	
-	/*	
+
+	/*
 	***************************************************************************************************************
 	********************************************* Member Methods **************************************************
 	***************************************************************************************************************
@@ -53,15 +54,15 @@ public:
 	//////////////////////////////////
 
 	// Method to construct sphere/circle
-	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);		
+	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);
 	// Method to construct cuboid/rectangle
-	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre, 
-		bool flex_rigid, bool deform, unsigned int group);		
+	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
+		bool flex_rigid, bool deform, unsigned int group);
 	// Method to construct filament
-	void makeBody(unsigned int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs, 
+	void makeBody(unsigned int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs,
 		bool flex_rigid, bool deform, unsigned int group);
 	// Method to construct a 3D plate
-	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre, 
+	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 		bool flex_rigid, bool deform, unsigned int group, bool plate);
 
 };

@@ -58,10 +58,10 @@ int main( int argc, char* argv[] )
 
     // Get the time and convert it to a serial stamp for the output directory creation
     time_t curr_time = time(NULL);	// Current system date/time
-    struct tm* timeinfo = localtime (&curr_time);
-    char timeout_char [80];
-    strftime (timeout_char, 80, "./output_%F_%H-%M-%S", timeinfo);
-    std::string path_str (timeout_char);
+    struct tm* timeinfo = localtime(&curr_time);
+    char timeout_char[80];
+    std::strftime(timeout_char, 80, "./output_%Y-%m-%d_%H-%M-%S", timeinfo);
+    std::string path_str(timeout_char);
 
 
 	// MPI manager creation
@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
 #else // BUILD_FOR_MPI
 
 #ifdef _WIN32   // Running on Windows
-    int result = CreateDirectory((LPCWSTR)path_str.c_str(), NULL);
+    int result = CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
 #else   // Running on Unix system
     int result = system(command.c_str());
 #endif // _WIN32

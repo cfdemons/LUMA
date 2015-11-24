@@ -9,6 +9,7 @@
 #ifdef _WIN32
 
 #include "targetver.h"
+#define NOMINMAX	// Stop Windows.h redefining min/max
 #include <Windows.h>
 #include <tchar.h>
 

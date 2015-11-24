@@ -39,10 +39,10 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before whole grid output
+#define out_every 200			// How many timesteps before whole grid output
 
 // Types of output
-//#define TEXTOUT
+#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define MPI_VERBOSE
@@ -64,7 +64,7 @@ const static int zProbeLims[2] = {30, 120};
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
-#define NO_FLOW			// Initialise the domain with no flow
+//#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
 #define restart_out_every 500000
 
@@ -85,7 +85,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 10000		// Number of time steps
+#define T 200		// Number of time steps
 
 
 /*
@@ -95,9 +95,9 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 1
-#define Ycores 1
-#define Zcores 1	// Set to 1 if doing a 2D problem when using custom MPI sizes
+#define Xcores 2
+#define Ycores 2
+#define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
 
@@ -112,18 +112,18 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 150		// Number of x lattice sites
-#define M 150		// Number of y lattice sites
-#define K 30		// Number of z lattice sites
+#define N 100		// Number of x lattice sites
+#define M 20		// Number of y lattice sites
+#define K 80		// Number of z lattice sites
 
 
-// Physical dimensions (dictates scaling)
-#define a_x 0		// Start of domain-x
-#define b_x 150.0	// End of domain-x
-#define a_y 0		// Start of domain-y
-#define b_y 150.0	// End of domain-y
-#define a_z 0		// Start of domain-z
-#define b_z 8		// End of domain-z
+// Physical dimensions (dictates scaling -- specify as floating point values)
+#define a_x 0.0		// Start of domain-x
+#define b_x 5.0		// End of domain-x
+#define a_y 0.0		// Start of domain-y
+#define b_y 1.0		// End of domain-y
+#define a_z 0.0		// Start of domain-z
+#define b_z 1.0		// End of domain-z
 
 
 /*
@@ -133,17 +133,17 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Fluid data in lattice units
-#define USE_INLET_PROFILE
+//#define USE_INLET_PROFILE
 #define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x (u_max*(1 - pow( ( YPos[j] - (a_y + ((b_y-a_y)/2)) ) / (0.05 - (b_y-a_y)/2) ,2) ))	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 10			// Desired Reynolds number
+#define Re 150			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -155,7 +155,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Master IBM switches //
-#define IBM_ON						// Turn on IBM
+//#define IBM_ON						// Turn on IBM
 //#define IBM_DEBUG						// Write IBM body and matrix data out to text files
 //#define IBBODY_TRACER					// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
@@ -240,7 +240,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 ***************************************************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -256,10 +256,10 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 	static size_t RefZend[NumReg]		= {15, 35};
 
 	#elif NumReg == 1
-	const static size_t RefXstart[NumReg]	= {10};
-	const static size_t RefXend[NumReg]		= {30};
-	const static size_t RefYstart[NumReg]	= {5};
-	const static size_t RefYend[NumReg]		= {15};
+	const static size_t RefXstart[NumReg]	= {4};
+	const static size_t RefXend[NumReg]		= {24};
+	const static size_t RefYstart[NumReg]	= {1};
+	const static size_t RefYend[NumReg]		= {9};
 	static size_t RefZstart[NumReg]			= {5};
 	static size_t RefZend[NumReg]			= {15};
 	#endif

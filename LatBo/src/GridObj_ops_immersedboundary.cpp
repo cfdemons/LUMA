@@ -2,6 +2,7 @@
 #include "../inc/GridObj.h"
 #include "../inc/definitions.h"
 #include <cmath>
+#include <algorithm>
 
 
 

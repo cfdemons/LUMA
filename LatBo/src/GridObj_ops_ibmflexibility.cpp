@@ -15,7 +15,7 @@ It needs completely rewriting to generalise.
 void GridObj::ibm_jacowire( unsigned int ib ) {
 
     ///////// Initialisation /////////
-    double tolerance = 1.0e-4;		// Tolerance of iterative solver
+    double tolerance = 1.0e-9;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
 	unsigned int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
@@ -32,20 +32,19 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 		AL = new double*[3 * iBody[ib].markers.size()];
 		d = new double[1];
 	for (i = 0; i < 3 * iBody[ib].markers.size() ; ++i) {
-        AA[i] = new double[m1 + m2 + 1];
+        AA[i] = new double[m1 + m2 + 2];
         AL[i] = new double[m1 + 1];
     }
+	AA[3 * iBody[ib].markers.size()] = new double[m1 + m2 + 2];
 	res = new double[3 * iBody[ib].markers.size()];
 
 
 	// Reset tension vector
-	std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0);
+	//std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0); // **
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = gUtils.vecnorm(iBody[ib].markers[iBody[ib].markers.size()-1].position[0] - iBody[ib].markers[0].position[0],
-		iBody[ib].markers[iBody[ib].markers.size()-1].position[1] - iBody[ib].markers[0].position[1],
-		iBody[ib].markers[iBody[ib].markers.size()-1].position[2] - iBody[ib].markers[0].position[2]) / dx;
+	double length_lu = ibb_length / dx;
 
 	// Marker spacing in normalised instrinsic coordinates
 	double ds_nondim = iBody[ib].spacing / (length_lu*dx);
@@ -60,7 +59,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / u_ref) ), 2);
+	double beta = ds_sqrd / pow( (1 / pow(2,level)) / (length_lu / u_ref) , 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -81,7 +80,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
 	double Fref = iBody[ib].delta_rho * pow(u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
-		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
+		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) ); // **
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
 	}
 
@@ -200,7 +199,9 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
                 residual = abs(res[in]);
             }
         }
-        for (i = 0; i <= 3 * n + 1; ++i) {
+
+        // Set AA and AL matrices to zero
+        for (i = 0; i < 3 * iBody[ib].markers.size(); ++i) {
             indx[i] = 0;
             for (size_t j = 0; j < m1 + m2 + 2; ++j) {
                 AA[i][j] = 0.0;
@@ -208,6 +209,9 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
             for (size_t j = 0; j < m1 + 1; ++j) {
                 AL[i][j] = 0.0;
             }
+        }
+        for (size_t j = 0; j < m1 + m2 + 2; ++j) {
+        	AA[3 * iBody[ib].markers.size()][j] = 0.0;
         }
 
         //-- for jacobian matrix in a compact form (only non zeros entries)
@@ -313,8 +317,8 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	if (iBody[ib].BCs[0] == 2) {
 
 		// Apply clamped BC to first flexible marker
-		x[0] = x0 + ds_nondim * cos(0.0 * PI / 180.0);
-		y[0] = y0 + ds_nondim * sin(0.0 * PI / 180.0);
+		x[0] = x0 + ds_nondim * cos(ibb_angle_vert * PI / 180.0);
+		y[0] = y0 + ds_nondim * sin(ibb_angle_vert * PI / 180.0);
 
 	}
 
@@ -337,7 +341,17 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / dy) / (1 / pow(2,level));
     }
 
-
+    // Clean up the dynamic memory
+    for (i = 0; i < 3 * iBody[ib].markers.size(); ++i) {
+    	delete [] AA[i];
+    	delete [] AL[i];
+    }
+    delete [] AA[3 * iBody[ib].markers.size()];
+    delete [] AA;
+    delete [] AL;
+    delete [] indx;
+    delete [] d;
+    delete [] res;
 }
 
 

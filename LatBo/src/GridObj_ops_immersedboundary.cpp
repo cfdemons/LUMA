@@ -224,7 +224,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 #else
 
-	// 2D check support region
+	/*// 2D check support region
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
@@ -235,7 +235,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
-	}
+	}*/
 
 	// 2D version to find support nodes
 	for (size_t i = inear - 5; i <= inear + 5; i++) {

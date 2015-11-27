@@ -39,7 +39,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before whole grid output
+#define out_every 1			// How many timesteps before whole grid output
 
 // Types of output
 //#define TEXTOUT
@@ -85,7 +85,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 10000		// Number of time steps
+#define T 200	// Number of time steps
 
 
 /*
@@ -112,14 +112,14 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 150		// Number of x lattice sites
+#define N 50		// Number of x lattice sites
 #define M 150		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 150.0	// End of domain-x
+#define b_x 50.0	// End of domain-x
 #define a_y 0		// Start of domain-y
 #define b_y 150.0	// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -133,12 +133,12 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Fluid data in lattice units
-#define USE_INLET_PROFILE
+//#define USE_INLET_PROFILE
 #define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -168,28 +168,28 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 //#define INSERT_BOTH
 #define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-#define _2D_RIGID_PLATE_IBM
+//#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
 #define num_markers 31		// Number of Lagrange points (approximately)
-#define ibb_deform true	// Default deformable property of body to be built
+#define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
-#define ibb_x 50.0		// x Position of body centre
-#define ibb_y 10.0		// y Position of body centre
+#define ibb_x 75.0		// x Position of body centre
+#define ibb_y 75.0		// y Position of body centre
 #define ibb_z 0.0		// z Position of body centre
 #define ibb_w 10.0		// width (x) of IB body
 #define ibb_l 10.0		// length (y) of IB body
 #define ibb_d 0.0		// depth (z) of IB body
-#define ibb_r 5.0		// radius of IB body
+#define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
 #define ibb_length 30.0		// length of filament
-#define ibb_start_x 75.0	// start x position of the filament
-#define ibb_start_y 60.0	// start y position of the filament
+#define ibb_start_x 25.0	// start x position of the filament
+#define ibb_start_y 0.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
@@ -202,7 +202,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.5	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 0.001			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 0.01			// Flexural rigidity (lattice units) of filament
 
 
 /*

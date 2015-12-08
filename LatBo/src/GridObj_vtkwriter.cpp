@@ -228,9 +228,9 @@ void GridObj::io_vtk_IBwriter(double tval) {
         for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 
 #if (dims == 3)
-				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << iBody[ib].markers[i].position[2] << std::endl;
+				fout << iBody[ib].markers[i].position[0] + XPos[0] << " " << iBody[ib].markers[i].position[1] + YPos[0] << " " << iBody[ib].markers[i].position[2] + ZPos[0] << std::endl;
 #else
-				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
+				fout << iBody[ib].markers[i].position[0] + XPos[0] << " " << iBody[ib].markers[i].position[1] + YPos[0] << " " << ZPos[0] << std::endl; // Fluid ORIGIN is strangely located
 #endif
         }
 

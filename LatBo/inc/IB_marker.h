@@ -34,9 +34,9 @@ protected:
 	std::vector<double> position_old;	// Used for filaments: Vector containing the physical coordinates (x,y,z) of the marker at t-1
 	
 	// Vector of indices for the Eulerian nodes considered to be in support of marker
-	std::vector<int> supp_i;
-	std::vector<int> supp_j;
-	std::vector<int> supp_k;
+	std::vector<unsigned int> supp_i;
+	std::vector<unsigned int> supp_j;
+	std::vector<unsigned int> supp_k;
 
 	std::vector<double> deltaval;		// Value of delta function for a given support node
 

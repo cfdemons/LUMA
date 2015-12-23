@@ -224,7 +224,7 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 
 #else
 
-	/*// 2D check support region
+	// 2D check support region
 	if ( (int)inear - 5 < 0 || inear + 5 >= XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
@@ -235,33 +235,17 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 		*gUtils.logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
-	}*/
+	}
 
 	// 2D version to find support nodes
-	for (int i = inear - 5; i <= inear + 5; i++) {
-		for (int j = jnear - 5; j <= jnear + 5; j++) {
-			int k = 0;
+	for (size_t i = inear - 5; i <= inear + 5; i++) {
+		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
+			size_t k = 0;
 
 			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-			if (	( double(abs(inear - i)) < 1.5*iBody[ib].markers[m].dilation ) &&
-					( double(abs(jnear - j)) < 1.5*iBody[ib].markers[m].dilation )
+			if (	( fabs(XPos[inear] - XPos[i])/dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(YPos[jnear] - YPos[j])/dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
-
-
-					if ( i < 0 || i > (N - 1) || j < 0 || j > (M - 1) ) {
-
-						// Lies within support region so store information
-						iBody[ib].markers[m].supp_i.push_back(i);
-						iBody[ib].markers[m].supp_j.push_back(j);
-						iBody[ib].markers[m].supp_k.push_back(k);
-
-						// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
-						iBody[ib].markers[m].local_area = pow( 1 / pow(2,level) ,2) ;
-
-						// Delta function is zero outside of domain
-						iBody[ib].markers[m].deltaval.push_back( 0.0 );
-					}
-					else {
 
 					// Lies within support region so store information
 					iBody[ib].markers[m].supp_i.push_back(i);
@@ -280,7 +264,6 @@ void GridObj::ibm_findsupport(unsigned int ib, unsigned int m) {
 					delta_y = ibm_deltakernel(dist_y, iBody[ib].markers[m].dilation);
 
 					iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y );
-					}
 
 			}
 		}

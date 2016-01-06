@@ -2,6 +2,7 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
+#include "../inc/MpiManager.h"
 
 
 // ************************************************************** //
@@ -33,8 +34,8 @@ void GridObj::io_tecplot(double tval) {
 	}
 
 	// If the first rank or a subgrid then create file anew and add header details
-	if (my_rank == 0 || level != 0) {
-		tecfile.open("./output/tecplotout.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
+	if (MpiManager::my_rank == 0 || level != 0) {
+		tecfile.open("./" + GridUtils::path_str + "/tecplotout.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
 			+ "." + std::to_string((int)tval) + ".dat", std::ios::out);
 
 		// Add header
@@ -61,7 +62,7 @@ void GridObj::io_tecplot(double tval) {
 
 	} else {
 		// If not the first rank, append data
-		tecfile.open("./output/tecplotout.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
+		tecfile.open("./" + GridUtils::path_str + "/tecplotout.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
 			+ "." + std::to_string((int)tval) + ".dat", std::ios::out|std::ios::app);
 	}
 

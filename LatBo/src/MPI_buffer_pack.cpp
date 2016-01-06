@@ -3,11 +3,11 @@
 #include "../inc/definitions.h"
 #include <iostream>
 #include <fstream>
-#include "../inc/MPI_manager.h"
+#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 
 
-void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
+void MpiManager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 
 	// Imagine every grid has an inner layer with complete information post-stream
 	// and an outer layer with incomplete information post-stream.
@@ -21,7 +21,7 @@ void MPI_manager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Buffering direction " << dir << std::endl;
 	logout.close();
 #endif

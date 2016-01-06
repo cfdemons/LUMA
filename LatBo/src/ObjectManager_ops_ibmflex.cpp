@@ -1,7 +1,8 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
+#include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
-
+#include "../inc/MpiManager.h"
 
 /*
 This whole file was originally lifted from the 2D IBLB code.
@@ -9,10 +10,9 @@ It needs completely rewriting to generalise.
 */
 
 
-
 // **************************************************************************************** //
 // Jacowire function for flexible cilia with one simply supported end and one free end
-void GridObj::ibm_jacowire( unsigned int ib ) {
+void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 
     ///////// Initialisation /////////
     double tolerance = 1.0e-4;		// Tolerance of iterative solver
@@ -43,24 +43,24 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = gUtils.vecnorm(iBody[ib].markers[iBody[ib].markers.size()-1].position[0] - iBody[ib].markers[0].position[0],
+	double length_lu = GridUtils::vecnorm(iBody[ib].markers[iBody[ib].markers.size()-1].position[0] - iBody[ib].markers[0].position[0],
 		iBody[ib].markers[iBody[ib].markers.size()-1].position[1] - iBody[ib].markers[0].position[1],
-		iBody[ib].markers[iBody[ib].markers.size()-1].position[2] - iBody[ib].markers[0].position[2]) / dx;
+		iBody[ib].markers[iBody[ib].markers.size()-1].position[2] - iBody[ib].markers[0].position[2]) / g.dx;
 
 	// Marker spacing in normalised instrinsic coordinates
-	double ds_nondim = iBody[ib].spacing / (length_lu*dx);
+	double ds_nondim = iBody[ib].spacing / (length_lu * g.dx);
 
 	// Square of non-dimensional spacing
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = pow(gUtils.vecnorm(u_0x,u_0y,u_0z),2) / grav_force * length_lu;
+	Froude = pow(GridUtils::vecnorm(u_0x,u_0y,u_0z),2) / grav_force * length_lu;
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( ( (1 / pow(2,level)) / (length_lu / u_ref) ), 2);
+	double beta = ds_sqrd / pow( ( (1 / pow(2,g.level)) / (length_lu / u_ref) ), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -71,8 +71,8 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	// Get initial positions of markers in filament-normalised coordinates [0,+/-1] for below
 	std::vector<double> x, y;
 	for (i = 0; i < n; i++) {
-		x.push_back( (iBody[ib].markers[i+1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * dx) );
-		y.push_back( (iBody[ib].markers[i+1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * dy) );
+		x.push_back( (iBody[ib].markers[i+1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * g.dx) );
+		y.push_back( (iBody[ib].markers[i+1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * g.dy) );
 	}
 
 	// Create body force vectors
@@ -81,16 +81,16 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
 	double Fref = iBody[ib].delta_rho * pow(u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
-		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
-		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/dx) ) );
+		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
+		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
 	}
 
 	// Normalised position (x,y,z)/L at t+1 for each marker are computed using extrapolation of the current (t) position
 	// and previous (t-1) position_old at neighbour node of each marker
 	std::vector<double> xstar, ystar;
 	for (i = 0; i < n; i++) {
-		xstar.push_back( ((2 * iBody[ib].markers[i+1].position[0] - iBody[ib].markers[i+1].position_old[0]) - iBody[ib].markers[0].position[0]) / (dx * length_lu) );
-		ystar.push_back( ((2 * iBody[ib].markers[i+1].position[1] - iBody[ib].markers[i+1].position_old[1]) - iBody[ib].markers[0].position[1]) / (dy * length_lu)  );
+		xstar.push_back( ((2 * iBody[ib].markers[i+1].position[0] - iBody[ib].markers[i+1].position_old[0]) - iBody[ib].markers[0].position[0]) / (g.dx * length_lu) );
+		ystar.push_back( ((2 * iBody[ib].markers[i+1].position[1] - iBody[ib].markers[i+1].position_old[1]) - iBody[ib].markers[0].position[1]) / (g.dy * length_lu)  );
 	}
 
 
@@ -157,7 +157,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
-		Gout.open(gUtils.path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		Gout << "\nNEW TIME STEP" << std::endl;
 		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			Gout << G[i] << std::endl;
@@ -300,7 +300,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.open(gUtils.path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(my_rank) + ".out", std::ios::app);
+		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			resout << res[i] << std::endl;
@@ -326,15 +326,15 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
         // Current physical position comes from the newly computed positions
 		if (i != 0) { // New position vectors exclude the simply supported end and start from next node in so i-1
 			// Convert filament-normalised coordinates back to lu then to physical spacing then add offset of simply supported end
-			iBody[ib].markers[i].position[0] = (x[i-1] * length_lu * dx) + iBody[ib].markers[0].position[0];
-			iBody[ib].markers[i].position[1] = (y[i-1] * length_lu * dy) + iBody[ib].markers[0].position[1];
+			iBody[ib].markers[i].position[0] = (x[i-1] * length_lu * g.dx) + iBody[ib].markers[0].position[0];
+			iBody[ib].markers[i].position[1] = (y[i-1] * length_lu * g.dy) + iBody[ib].markers[0].position[1];
 		}
     }
 
 	// Desired velocity (in lattice units) on the makers is computed using a first order estimate based on position change
     for (i = 0; i < iBody[ib].markers.size(); i++) {
-        iBody[ib].markers[i].desired_vel[0] = ( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / dx) / (1 / pow(2,level));
-        iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / dy) / (1 / pow(2,level));
+        iBody[ib].markers[i].desired_vel[0] = ( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / g.dx) / (1 / pow(2,g.level));
+        iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
     }
 
 
@@ -366,7 +366,7 @@ void GridObj::ibm_jacowire( unsigned int ib ) {
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
 #define TINY 1.0e-20
-void GridObj::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+void ObjectManager::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double *d)
 {
 	unsigned long i,j,k,l;
@@ -433,7 +433,7 @@ void GridObj::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned 
 * B		= right hand side vector
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
-void GridObj::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+void ObjectManager::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 	unsigned long indx[], double b[])
 {
 	unsigned long i,k,l;
@@ -466,13 +466,13 @@ void GridObj::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned 
 
 // **************************************************************************************** //
 // Routine to update the position of deformable bodies
-void GridObj::ibm_position_update( unsigned int ib ) {
+void ObjectManager::ibm_position_update(unsigned int ib, GridObj& g) {
 
 	// If a flexible body then launch structural solver to find new positions
 	if (iBody[ib].flex_rigid) {
 
 		// Do jacowire calculation
-		ibm_jacowire(ib);
+		ibm_jacowire(ib, g);
 
 	} else {	// Body is deformable but not flexible so positional update comes from
 				// external forcing
@@ -495,7 +495,7 @@ void GridObj::ibm_position_update( unsigned int ib ) {
 		iBody[ib].markers[m].deltaval.clear();
 
 		// Recompute support
-		ibm_findsupport(ib, m);
+		ibm_findsupport(ib, m, g);
 	}
 
 
@@ -505,7 +505,7 @@ void GridObj::ibm_position_update( unsigned int ib ) {
 // Overloaded function to update position of body in a group using the position of the flexible
 // body in the group. Must be called after all previous positional update routines have been called.
 // group_update flag is only there to ensure the overload is defined.
-void GridObj::ibm_position_update_grp( unsigned int group ) {
+void ObjectManager::ibm_position_update_grp(unsigned int group, GridObj& g) {
 
 	// Find flexible body in group and store index
 	unsigned int ib_flex;
@@ -548,7 +548,7 @@ void GridObj::ibm_position_update_grp( unsigned int group ) {
 				iBody[ib].markers[m].deltaval.clear();
 
 				// Recompute support
-				ibm_findsupport(ib, m);
+				ibm_findsupport(ib, m, g);
 			}
 		}
 	}

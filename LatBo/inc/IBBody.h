@@ -1,19 +1,18 @@
 #pragma once
 
 #include <vector>
-#include "IB_marker.h"
+#include "IBMarker.h"
 #include "GridUtils.h"
 
-class IB_body {
+class IBBody {
 
-	// Make GridObj a friend class so it can access the protected data of IB_body objects
-	friend class GridObj;
+	// Make ObjectManager a friend class so it can access the protected data of IBBody objects
+	friend class ObjectManager;
 
 public:
 	// Constructor and destructor
-	IB_body();
-	IB_body(GridUtils&);	// Custom constructor which passes utility class
-	~IB_body(void);
+	IBBody();
+	~IBBody(void);
 
 protected:
 
@@ -23,12 +22,11 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	std::vector<IB_marker> markers;		// Array of Lagrange markers which make up the body
+	std::vector<IBMarker> markers;		// Array of Lagrange markers which make up the body
 	double spacing;						// Spacing of the Lagrange markers in physical units
 	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
 	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
 	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
-	GridUtils gUtils;					// Reference to parent GridObj's utility class
 	bool closed_surface;                // Flag to specify whether or not it is a closed surface (for output)
 
 	// Flexible body properties

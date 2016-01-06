@@ -1,20 +1,22 @@
-/* This file contains the body building methods for GridObj which in turn call a suitable IB_body.makebody constructor.
+/* This file contains the body building methods for GridObj which in turn call a suitable IBBody.makebody constructor.
 */
 
 #include "../inc/stdafx.h"
-#include "../inc/GridObj.h"
+#include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
 
+// Static declaration
+std::vector<IBBody> ObjectManager::iBody;
 
 // ***************************************************************************************************
 // Method to call body building routine for IBM
-void GridObj::ibm_build_body(int body_type) {
+void ObjectManager::ibm_build_body(int body_type) {
 
 	// Declarations
 	std::vector<double> dimensions, centrepoint, start_position, end_position;
 
-	// Increase the iBody array by single IB_body object
-	iBody.emplace_back(gUtils);
+	// Increase the iBody array by single IBBody object
+	iBody.emplace_back();
 
 
 	if (body_type == 1) {
@@ -68,7 +70,7 @@ void GridObj::ibm_build_body(int body_type) {
 		iBody[iBody.size()-1].makeBody(ibb_r,centrepoint,false,ibb_deform,iBody.size()-1);
 		
 		// Grow vector
-		iBody.emplace_back(gUtils);
+		iBody.emplace_back();
 
 		// Angle vector
 		std::vector<double> angles;
@@ -121,7 +123,7 @@ void GridObj::ibm_build_body(int body_type) {
 
 		// If 2D, just build a filament
 #if (dims == 2)
-		std::cout << "Building plate as a filament as only 2D" << std::endl;
+		*GridUtils::logfile << "Building plate as a filament as only 2D" << std::endl;
 		iBody.resize(iBody.size()-1); // Reduce size of iBody vector
 		ibm_build_body(4);	// Call add again but as a filament
 #else
@@ -171,8 +173,8 @@ void GridObj::ibm_build_body(int body_type) {
 			start_point[2] = (centrepoint[2] - (width_length[1]*cos(angles[1]* PI / 180))/2 ) + i*( lengthwise_spacing*cos(angles[1]* PI / 180) );
 
 			if (i != 0) {
-				// Increase the iBody array by single IB_body object when not on first loop
-				iBody.emplace_back(gUtils);
+				// Increase the iBody array by single IBBody object when not on first loop
+				iBody.emplace_back();
 			}
 
 			// Build filament with fixed group ID making centre filament flexible
@@ -235,7 +237,7 @@ void GridObj::ibm_build_body(int body_type) {
 		iBody[iBody.size()-1].makeBody(num_markers-1, start_position, ibb_length - lspace, angles, BCs, false, false, iBody.size()-1);
 
 		// Add flap of half the length (slightly lower resolution)
-		iBody.emplace_back(gUtils);
+		iBody.emplace_back();
 		angles[0] = 0.0;
 		start_position[0] = ( ibb_start_x - (ibb_length/2)*cos(-ibb_angle_vert * PI / 180) ) + (ibb_length)*cos(-ibb_angle_vert * PI / 180);
 		start_position[1] = ( ibb_start_y - (ibb_length/2)*sin(-ibb_angle_vert * PI / 180) ) + (ibb_length)*sin(-ibb_angle_vert * PI / 180);
@@ -318,8 +320,8 @@ void GridObj::ibm_build_body(int body_type) {
 		// Loop
 		for (unsigned int i = 0; i < lengthwise_fils; i++ ) {
 
-			// Increase the iBody array by single IB_body object
-			iBody.emplace_back(gUtils);
+			// Increase the iBody array by single IBBody object
+			iBody.emplace_back();
 
 			// Start point in z
 			start_point[2] = start_z + i*lspace;

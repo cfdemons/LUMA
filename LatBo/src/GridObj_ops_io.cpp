@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include "../inc/GridObj.h"
+#include "../inc/MpiManager.h"
+#include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
 
@@ -35,9 +37,9 @@ void GridObj::io_textout(std::string output_tag) {
 	else ex_str = to_string(RefXend[0]) + string("_") + to_string(RefYend[0]) + string("_") + to_string(RefZend[0]);
 	if (NumLev == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(NumReg);
-	mpirank = to_string(my_rank);
+	mpirank = to_string(MpiManager::my_rank);
 	// Build string
-	FNameG = string(gUtils.path_str + "/Grids")
+	FNameG = string(GridUtils::path_str + "/Grids")
 			+ string("D") +  to_string(dims)
 			+ string("x") + N_str
 			+ string("y") + M_str
@@ -250,71 +252,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 	} else {
 
-		cout << "Cannot open file" << endl;
-
-	}
-
-}
-
-
-// ***************************************************************************************************
-// Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::io_write_body_pos() {
-
-	// Get time step
-	unsigned int timestep = t;
-
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
-
-
-			// Open file for given time step
-			std::ofstream jout;
-			jout.open(gUtils.path_str + "/Body_" + to_string(ib) + "_position_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
-			jout << "x" + to_string(timestep) + ", y" + to_string(timestep) + ", z" << std::endl;
-
-			// Write out position
-			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-#if (dims == 3)
-				jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << iBody[ib].markers[i].position[2] << std::endl;
-#else
-				jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << 0.0 << std::endl;
-#endif
-			}
-			jout.close();
-
-	}
-
-}
-
-
-// ***************************************************************************************************
-// Routine to write out the coordinates of IBbodies at a given time step
-void GridObj::io_write_lift_drag() {
-
-	// Get time step
-	unsigned int timestep = t;
-
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
-
-
-			// Open file for given time step
-			std::ofstream jout;
-			jout.open(gUtils.path_str + "/Body_" + to_string(ib) + "_LD_" + to_string(timestep) + "_rank" + std::to_string(my_rank) + ".out", std::ios::out);
-			jout << "L" + to_string(timestep) + ", D" + to_string(timestep) << std::endl;
-
-			// Sum variables
-			double Lsum = 0.0, Dsum = 0.0;
-
-			// Compute lift and drag
-			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-				jout << iBody[ib].markers[i].force_xyz[0] << ", " << iBody[ib].markers[i].force_xyz[1] << std::endl;
-				Lsum += iBody[ib].markers[i].force_xyz[0];
-				Dsum += iBody[ib].markers[i].force_xyz[1];
-			}
-
-			jout << "Totals = " << std::endl;
-			jout << Lsum << ", " << Dsum << std::endl;
-			jout.close();
+		*GridUtils::logfile << "Cannot open file" << endl;
 
 	}
 
@@ -329,17 +267,17 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Restart file stream
 		std::ofstream file;
-		*gUtils.logfile << "Writing grid level " << level << " region " << region_number << " to restart file..." << endl;
+		*GridUtils::logfile << "Writing grid level " << level << " region " << region_number << " to restart file..." << endl;
 
 
 		///////////////////////
 		// LBM Data -- WRITE //
 		///////////////////////
 
-		if (my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(gUtils.path_str + "/restart_LBM.out", std::ios::out);
+		if (MpiManager::my_rank == 0 && level == 0) { // Overwrite as first to write
+			file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::out);
 		} else { // Append
-			file.open(gUtils.path_str + "/restart_LBM.out", std::ios::out | std::ios::app);
+			file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::out | std::ios::app);
 		}
 
 		// Get grid sizes
@@ -407,48 +345,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		if (my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::out);
-		} else if (level == 0) { // Append
-			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::out | std::ios::app);
-		} else { // Must be a subgrid which doesn't own any IB-bodies so return
-			return;
-		}
-
-
-		// Counters
-		unsigned int b, m, num_bod = iBody.size();
-
-		// Write out the number of bodies
-		file << num_bod << std::endl;
-
-		// Loop over bodies and markers and write out the positions
-		for (b = 0; b < num_bod; b++) {
-
-			// Add a separator between bodies
-			file << "\t/\t";
-
-			// Number of markers with separator
-			file << iBody[b].markers.size() << "\t/\t";
-
-			for (m = 0; m < iBody[b].markers.size(); m++) {
-
-				// Positions of each marker
-				file	<< iBody[b].markers[m].position[0] << "\t"
-						<< iBody[b].markers[m].position[1] << "\t"
-						<< iBody[b].markers[m].position[2] << "\t";
-
-				// Old positions of each marker
-				file	<< iBody[b].markers[m].position_old[0] << "\t"
-						<< iBody[b].markers[m].position_old[1] << "\t"
-						<< iBody[b].markers[m].position_old[2] << "\t";
-
-			}
-
-		}
-
-		// Close file
-		file.close();
+		ObjectManager::io_restart(IO_flag, level);
 
 #endif
 
@@ -458,17 +355,17 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Input stream
 		std::ifstream file;
-		*gUtils.logfile << "Initialising grid level " << level << " region " << region_number << " from restart file..." << endl;
+		*GridUtils::logfile << "Initialising grid level " << level << " region " << region_number << " from restart file..." << endl;
 
 
 		//////////////////////
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open(gUtils.path_str + "/restart_LBM.out", std::ios::in);
+		file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "Error opening LBM restart file. Exiting." << std::endl;
+			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		// Counters, sizes and indices
@@ -550,76 +447,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		// Only level 0 grids can own IB-bodies
-		if (level == 0) {
-			file.open(gUtils.path_str + "/restart_IB_body.out", std::ios::in);
-		}
-
-		if (!file.is_open()) {
-			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "Error opening IBM restart file. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
-		}
-
-		// Get line up to separator and put in buffer
-		std::getline(file,line_in,'/');
-		iss.str(line_in);
-		iss.seekg(0); // Reset buffer position to start of buffer
-
-		// Counters
-		unsigned int b, m, num_bod, num_mark;
-
-		// Read in number of bodies
-		iss >> num_bod;
-
-		// Check number of bodies is correct
-		if (iBody.size() != num_bod) {
-			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "Number of IBM bodies does not match the number specified in the restart file. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
-		}
-
-		// Loop over bodies
-		for (b = 0; b < num_bod; b++) {
-
-			// Exit if reached end of file
-			if (file.eof()) break;
-
-			// Get next bit up to separator and put in buffer
-			std::getline(file,line_in,'/');
-			iss.str(line_in);
-			iss.seekg(0); // Reset buffer position to start of buffer
-
-			// Read in the number of markers for this body
-			iss >> num_mark;
-
-			// Check number of markers the same
-			if (iBody[b].markers.size() != num_mark) {
-				std::cout << "Error: See Log File" << std::endl;
-				*gUtils.logfile << "Number of IBM markers does not match the number specified for body " <<
-					b << " in the restart file. Exiting." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-
-			// Read in marker data
-			for (m = 0; m < num_mark; m++) {
-
-				// Positions of each marker
-				iss		>> iBody[b].markers[m].position[0]
-						>> iBody[b].markers[m].position[1]
-						>> iBody[b].markers[m].position[2];
-
-				// Old positions of each marker
-				iss		>> iBody[b].markers[m].position_old[0]
-						>> iBody[b].markers[m].position_old[1]
-						>> iBody[b].markers[m].position_old[2];
-
-			}
-
-		}
-
-		// Close file
-		file.close();
+		ObjectManager::io_restart(IO_flag, level);
 
 #endif
 
@@ -644,7 +472,7 @@ void GridObj::io_probe_output() {
 	unsigned int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
 	unsigned int M_lims = YInd.size(), K_lims = ZInd.size();
 
-	if (t == out_every_probe && my_rank == 0) {
+	if (t == out_every_probe && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
 		probefile.open("./output/probe.out", std::ios::out);
 	} else {
@@ -653,7 +481,7 @@ void GridObj::io_probe_output() {
 	}
 
 	// Start a new line if first rank
-	if (my_rank == 0) probefile << std::endl;
+	if (MpiManager::my_rank == 0) probefile << std::endl;
 
 
 	// Probe spacing in each direction
@@ -679,12 +507,12 @@ void GridObj::io_probe_output() {
 #endif
 
 				// DEBUG
-				*gUtils.logfile << "Writing probe point: " << 
+				*GridUtils::logfile << "Writing probe point: " << 
 					i_global << "," << j_global << "," << k_global << 
 					std::endl;
 
 				// Is point on rank, if not move on
-				if (!gUtils.isOnThisRank(i_global,j_global,k_global,*this)) {
+				if (!GridUtils::isOnThisRank(i_global,j_global,k_global,*this)) {
 					continue;
 				}
 

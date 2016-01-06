@@ -1,12 +1,10 @@
-/* Class defintion for the GridObj class
-*/
-
 #pragma once
 
+/** GridObj class which represents a lattice */
+
 #include <vector>
-#include "ivector.h"
-#include "IB_body.h"
-#include "GridUtils.h"
+#include "IVector.h"
+#include "IBBody.h"
 #include <iostream>
 #include <fstream>
 
@@ -14,21 +12,20 @@
 class GridObj
 {
 
-	// Allow MPI_manager objects to access Grid information
-	friend class MPI_manager;
+	// Allow MpiManager and ObjectManager objects to access private Grid information as required
+	friend class MpiManager;
+	friend class ObjectManager;
 
 public:
 
 	// Constructors & Destructor //
 	GridObj( ); // Default constructor
-	GridObj(int level, std::ofstream* logfile); // Basic grid constructor
-	GridObj(int level, int RegionNumber, int rank, int max_ranks, std::ofstream* logfile); // MPI sub grid constructor with level, region and rank
-	// MPI L0 constructor with level, rank, local size and global edges
-	GridObj(int level, int rank, int max_ranks, std::vector<unsigned int> local_size, 
+	GridObj(int level); // Basic grid constructor
+	GridObj(int level, int RegionNumber); // Sub grid constructor with level and region
+	// MPI L0 constructor with local size and global edges
+	GridObj(int level, std::vector<unsigned int> local_size, 
 		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
-		std::vector< std::vector<double> > GlobalLimsPos,
-		int my_coords[],
-		std::ofstream* logfile);
+		std::vector< std::vector<double> > GlobalLimsPos);
 	~GridObj( ); // Default destructor
 
 
@@ -64,28 +61,25 @@ private :
 
 	// Vector nodal properties
 	// Flattened 4D arrays (i,j,k,vel)
-	ivector<double> f;
-	ivector<double> feq;
-	ivector<double> u;
-	ivector<double> force_xyz;
-	ivector<double> force_i;
+	IVector<double> f;
+	IVector<double> feq;
+	IVector<double> u;
+	IVector<double> force_xyz;
+	IVector<double> force_i;
 
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
-	ivector<double> rho;
-	ivector<int> LatTyp;
+	IVector<double> rho;
+	IVector<int> LatTyp;
 
 	// Grid scalars
 	double dx, dy, dz;	// Physical spacing
 	int region_number;	// ID of region at a particular level in the embedded grid hierarchy
 
 	// Time averaged statistics
-	ivector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
-	ivector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,dims)
-	ivector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*dims)
-
-	// IBM objects
-	std::vector<IB_body> iBody;		// Array of immersed boundary bodies
+	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
+	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,dims)
+	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*dims)
 
 
 	// Public data members
@@ -97,8 +91,7 @@ public :
 	double nu;						// Kinematic viscosity (in lattice units)
 	double omega;					// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
-	int my_rank, max_ranks;			// MPI rank and totla number of ranks
-	GridUtils gUtils;				// Utility class
+
 
 	/*
 	***************************************************************************************************************
@@ -125,7 +118,7 @@ public :
 	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel
 	void LBM_collide(bool core_flag);			// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
-	void LBM_mrt_collide(ivector<double>& f_new, int i, int j, int k);	// MRT collision operation
+	void LBM_mrt_collide(IVector<double>& f_new, int i, int j, int k);	// MRT collision operation
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
@@ -144,37 +137,11 @@ public :
 	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
 
 	// IO methods
-	void io_write_body_pos();					// Write out IB_body positions to text files
-	void io_write_lift_drag();					// Write out IB_body lift and drag
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	void io_probe_output();						// Output routine for point probes
 	void io_vtkwriter(double tval);				// VTK writer
-	void io_vtk_IBwriter(double tval);				// VTK body writer
 	void io_tecplot(double tval);				// TecPlot write out
-
-	// IBM methods
-	void ibm_build_body(int body_type);						// Build a new pre-fab body
-	void ibm_initialise();									// Initialise a built immersed body
-	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
-	void ibm_interpol(unsigned int ib);						// Interpolation of velocity field onto markers of ib-th body
-	void ibm_spread(unsigned int ib);						// Spreading of restoring force from ib-th body to grid
-	void ibm_findsupport(unsigned int ib, unsigned int m);	// Populates support information for the m-th marker of ib-th body
-	void ibm_computeforce(unsigned int ib);					// Compute restorative force at each marker in ib-th body
-	double ibm_findepsilon(unsigned int ib);				// Method to find epsilon weighting parameter for ib-th body
-	// Biconjugate gradient stablised method for solving asymmetric linear system required by finding epsilon
-	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon,
-						   double tolerance, unsigned int maxiterations);
-
-	// Flexible methods
-	void ibm_jacowire(unsigned int ib);				// Computes the tension and position of a 2D inextensible, flexible iBody filament
-	void ibm_position_update( unsigned int ib );	// Updates the position of deformable body markers
-	void ibm_position_update_grp( unsigned int group );	// Updates the positions of deformable bodies in a group using on the flexible group member
-	// Methods to solve the Jacobian system
-	void ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
-	unsigned long indx[], double b[]);
-	void ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
-	unsigned long indx[], double *d);
 
 
 };

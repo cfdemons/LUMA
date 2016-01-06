@@ -1,21 +1,21 @@
 #include "../inc/stdafx.h"
-#include "../inc/IB_marker.h"
+#include "../inc/IBMarker.h"
 #include "../inc/definitions.h"
 
 // ***************************************************************************************************
 // Default constructor and destructor
-IB_marker::IB_marker(void)
+IBMarker::IBMarker(void)
 {
 
 
 }
 
-IB_marker::~IB_marker(void)
+IBMarker::~IBMarker(void)
 {
 }
 
 // Custom constructor
-IB_marker::IB_marker(double xPos, double yPos, double zPos, bool flex_rigid) {
+IBMarker::IBMarker(double xPos, double yPos, double zPos, bool flex_rigid) {
 
 	// Assign position and type
 	this->flex_rigid = flex_rigid;

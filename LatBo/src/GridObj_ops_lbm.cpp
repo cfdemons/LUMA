@@ -6,10 +6,10 @@ streaming and macroscopic calulcation.
 #include "../inc/GridObj.h"
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
-#include "../inc/ivector.h"
+#include "../inc/IVector.h"
+#include "../inc/ObjectManager.h"
 
 using namespace std;
-
 
 // ***************************************************************************************************
 
@@ -25,12 +25,12 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// Copy distributions prior to IBM predictive step
 #ifdef IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
-	ivector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
+	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
 
 	// If IBM on and predictive loop flag true then store initial data and reset forces
 	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
 
-		*gUtils.logfile << "Prediction step..." << std::endl;
+		*GridUtils::logfile << "Prediction step..." << std::endl;
 
 		// Store lattice data
 		f_ibm_initial = f;
@@ -175,19 +175,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		// Reset force vectors on grid in preparation for spreading step
 		LBM_forcegrid(true);
 
-		// Loop over array of IB_bodies and perform IB operations
-		for (size_t ib = 0; ib < iBody.size(); ib++) {
 
-			// Interpolate velocity
-			ibm_interpol(ib);
-
-			// Compute restorative force
-			ibm_computeforce(ib);
-
-			// Spread force back to lattice (Cartesian vector)
-			ibm_spread(ib);
-
-		}
+		// Calculate and apply IBM forcing to fluid
+		ObjectManager::ibm_apply(*this);
 
 		// Restore data to start of time step
 		f = f_ibm_initial;
@@ -196,34 +186,12 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 		// Relaunch kernel with IBM flag set to false (corrector step)
 		// Corrector step does not reset force vectors but uses newly computed vector instead.
-		*gUtils.logfile << "Correction step..." << std::endl;
+		*GridUtils::logfile << "Correction step..." << std::endl;
 		t--;                // Predictor-corrector results in double time step (need to reset back 1)
 		LBM_multi(false);
 
-
-		// Loop over bodies launching positional update  if deformable to compute new locations of markers
-		*gUtils.logfile << "Relocating markers as required..." << std::endl;
-		for (size_t ib = 0; ib < iBody.size(); ib++) {
-
-			// If body is deformable it needs a positional update
-			if (iBody[ib].deformable) {
-
-				// Call structural or forced positional update and recompute support
-				ibm_position_update(ib);
-
-#ifndef STOP_EPSILON_RECOMPUTE
-				// Recompute epsilon
-				ibm_findepsilon(ib);
-#endif
-
-			}
-		}
-
-#if defined INSERT_FILARRAY
-		// Special bit for filament-based plates where flexible centreline is used to update position of others in group
-		*gUtils.logfile << "Filament-based plate positional update..." << std::endl;
-		ibm_position_update_grp(999);
-#endif
+		// Move the body if necessary
+		ObjectManager::ibm_move_bodies(*this);
 
 	}
 #endif
@@ -372,7 +340,7 @@ void GridObj::LBM_collide( bool core_flag ) {
 
 	// Create temporary lattice to prevent overwriting useful populations and initialise with same values as
 	// pre-collision f grid. Initialise with current f values.
-	ivector<double> f_new( f );
+	IVector<double> f_new( f );
 
 
 	// Loop over lattice sites
@@ -476,7 +444,7 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 // ***************************************************************************************************
 
 // MRT collision procedure for site (i,j,k).
-void GridObj::LBM_mrt_collide( ivector<double>& f_new, int i, int j, int k ) {
+void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k ) {
 #ifdef USE_MRT
 
 	// Size declarations
@@ -587,7 +555,7 @@ void GridObj::LBM_stream( ) {
 	unsigned int v_opp;
 
 	// Create temporary lattice of zeros to prevent overwriting useful populations
-	ivector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
+	IVector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
 	// DEBUG //
@@ -601,7 +569,7 @@ void GridObj::LBM_stream( ) {
 				for (int v = 0; v < nVels; v++) {
 
 					// Store opposite direction
-					v_opp = gUtils.getOpposite(v);
+					v_opp = GridUtils::getOpposite(v);
 
 
 					// DEBUG //
@@ -656,7 +624,7 @@ void GridObj::LBM_stream( ) {
 
 							// DEBUG //
 							/*count1++;
-							*gUtils.logfile << "Stream " << i << "," << j <<
+							*GridUtils::logfile << "Stream " << i << "," << j <<
 								" to \t" << dest_x << "," << dest_y << " : \toff-grid in " <<
 								v << " direction. Count1 = " << count1 << std::endl;*/
 
@@ -715,7 +683,7 @@ void GridObj::LBM_stream( ) {
 						(
 
 						// Source on overlap?
-						gUtils.isOnOverlap(i,j,k,N_lim,M_lim,K_lim)
+						GridUtils::isOnOverlap(i,j,k,N_lim,M_lim,K_lim)
 
 						) && (
 
@@ -729,7 +697,7 @@ void GridObj::LBM_stream( ) {
 						) && (
 
 						// Overlap is from a periodic rank?
-						gUtils.isOverlapPeriodic(i,j,k,N_lim,M_lim,K_lim,v_opp)
+						GridUtils::isOverlapPeriodic(i,j,k,N_lim,M_lim,K_lim,v_opp)
 
 						)
 
@@ -737,7 +705,7 @@ void GridObj::LBM_stream( ) {
 
 							// DEBUG //
 							/*count3++;
-							*gUtils.logfile << "Stream " << i << "," << j <<
+							*GridUtils::logfile << "Stream " << i << "," << j <<
 									" to \t" << dest_x << "," << dest_y << " : \tperiodic stream " <<
 									v << " direction. Count3 = " << count3 << std::endl;*/
 
@@ -805,7 +773,7 @@ void GridObj::LBM_stream( ) {
 
 						// DEBUG //
 						/*count4++;
-						*gUtils.logfile << "Stream " << i << "," << j <<
+						*GridUtils::logfile << "Stream " << i << "," << j <<
 								" to \t" << dest_x << "," << dest_y << " : \ton-grid stream " <<
 								v << " direction. Count4 = " << count4 << std::endl;*/
 
@@ -823,7 +791,7 @@ void GridObj::LBM_stream( ) {
 	}
 
 	// DEBUG //
-	//*gUtils.logfile << "Counts were " << count0 << "," << count1 << "," << count3 << "," << count4 << std::endl;
+	//*GridUtils::logfile << "Counts were " << count0 << "," << count1 << "," << count3 << "," << count4 << std::endl;
 
 	// Replace old grid with new grid
 	f = f_new;
@@ -1046,7 +1014,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = gUtils.indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = GridUtils::indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
 #if (dims == 3)
@@ -1124,7 +1092,7 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = gUtils.indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = GridUtils::indmapref(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
 #if (dims == 3)

@@ -3,6 +3,7 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
+#include "../inc/MpiManager.h"
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
 #include <fstream>
@@ -25,7 +26,7 @@ void GridObj::LBM_init_getInletProfile() {
 	if (!inletfile.is_open()) {
 		// Error opening file
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Cannot open inlet profile file named \"inlet_profile.in\". Exiting." << std::endl;
+		*GridUtils::logfile << "Cannot open inlet profile file named \"inlet_profile.in\". Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
 	} else {
@@ -247,7 +248,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	if (obj_x_max > N || obj_x_min < 0 || obj_y_max > M || obj_y_min < 0 || obj_z_max > K || obj_z_min < 0) {
 		// Block outside domain
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Block is placed outside the domain. Exiting." << std::endl;
+		*GridUtils::logfile << "Block is placed outside the domain. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -296,7 +297,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	if (u_max == 1 || u_ref == 1) {
 		// Singularity so exit
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
+		*GridUtils::logfile << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -471,7 +472,7 @@ void GridObj::LBM_init_refined_lab ( ) {
 
 				// Throw an error
 				std::cout << "Error: See Log File" << std::endl;
-				*gUtils.logfile << "Error: Refined region starts and ends on different ranks or is outside the grid. Exiting." << std::endl;
+				*GridUtils::logfile << "Error: Refined region starts and ends on different ranks or is outside the grid. Exiting." << std::endl;
 				exit(EXIT_FAILURE);
 		}
 
@@ -650,7 +651,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	// Check that lattice volumes are cubes in 3D
 	if ( (Lx/N) != (Ly/M) || (Lx/N) != (Lz/K) ) {
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions. Exiting." << std::endl;
+		*GridUtils::logfile << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	
@@ -658,7 +659,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	// 2D so need square lattice cells
 	if ( (Lx/N) != (Ly/M) ) {
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions. Exiting." << std::endl;
+		*GridUtils::logfile << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -682,7 +683,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 					) && NumLev > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
-					*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
+					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
 					exit(EXIT_FAILURE);
 			}
 		}
@@ -699,7 +700,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 					) && NumLev > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
-					*gUtils.logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
+					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
 					exit(EXIT_FAILURE);
 			}
 		}
@@ -732,9 +733,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 #ifdef BUILD_FOR_MPI	
 
 	// Build index vectors
-	XInd = gUtils.onespace( (int)GlobalLimsInd[0][my_rank], (int)GlobalLimsInd[1][my_rank] - 1 );
-	YInd = gUtils.onespace( (int)GlobalLimsInd[2][my_rank], (int)GlobalLimsInd[3][my_rank] - 1 );
-	ZInd = gUtils.onespace( (int)GlobalLimsInd[4][my_rank], (int)GlobalLimsInd[5][my_rank] - 1 );
+	XInd = GridUtils::onespace( (int)GlobalLimsInd[0][MpiManager::my_rank], (int)GlobalLimsInd[1][MpiManager::my_rank] - 1 );
+	YInd = GridUtils::onespace( (int)GlobalLimsInd[2][MpiManager::my_rank], (int)GlobalLimsInd[3][MpiManager::my_rank] - 1 );
+	ZInd = GridUtils::onespace( (int)GlobalLimsInd[4][MpiManager::my_rank], (int)GlobalLimsInd[5][MpiManager::my_rank] - 1 );
 
 	// Add overlap indices to both ends of the vector taking into account periodicity
 	XInd.insert( XInd.begin(), (XInd[0]-1 + N) % N ); XInd.insert( XInd.end(), (XInd[XInd.size()-1]+1 + N) % N );
@@ -745,9 +746,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 
 #else
 	// When not builiding for MPI indices are straightforward
-	XInd = gUtils.onespace( 0, N-1 );
-	YInd = gUtils.onespace( 0, M-1 );
-	ZInd = gUtils.onespace( 0, K-1 );
+	XInd = GridUtils::onespace( 0, N-1 );
+	YInd = GridUtils::onespace( 0, M-1 );
+	ZInd = GridUtils::onespace( 0, K-1 );
 #endif
 
 
@@ -761,9 +762,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 #ifdef BUILD_FOR_MPI
 
 	// Create position vectors excluding overlap
-	XPos = gUtils.linspace( GlobalLimsPos[0][my_rank] + dx/2, GlobalLimsPos[1][my_rank] - dx/2, N_lim-2 );
-	YPos = gUtils.linspace( GlobalLimsPos[2][my_rank] + dy/2, GlobalLimsPos[3][my_rank] - dy/2, M_lim-2 );
-	ZPos = gUtils.linspace( GlobalLimsPos[4][my_rank] + dz/2, GlobalLimsPos[5][my_rank] - dz/2, K_lim-2 );
+	XPos = GridUtils::linspace( GlobalLimsPos[0][MpiManager::my_rank] + dx/2, GlobalLimsPos[1][MpiManager::my_rank] - dx/2, N_lim-2 );
+	YPos = GridUtils::linspace( GlobalLimsPos[2][MpiManager::my_rank] + dy/2, GlobalLimsPos[3][MpiManager::my_rank] - dy/2, M_lim-2 );
+	ZPos = GridUtils::linspace( GlobalLimsPos[4][MpiManager::my_rank] + dz/2, GlobalLimsPos[5][MpiManager::my_rank] - dz/2, K_lim-2 );
 
 	// Add overlap sites taking into account periodicity
 	XPos.insert( XPos.begin(), fmod(XPos[0]-dx + Lx, Lx) ); XPos.insert( XPos.end(), fmod(XPos[XPos.size()-1]+dx + Lx, Lx) );
@@ -774,9 +775,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 
 #else
 	// When not builiding for MPI positions are straightforward
-	XPos = gUtils.linspace( a_x + dx/2, b_x - dx/2, N );
-	YPos = gUtils.linspace( a_y + dy/2, b_y - dy/2, M );
-	ZPos = gUtils.linspace( a_z + dz/2, b_z - dz/2, K );
+	XPos = GridUtils::linspace( a_x + dx/2, b_x - dx/2, N );
+	YPos = GridUtils::linspace( a_y + dy/2, b_y - dy/2, M );
+	ZPos = GridUtils::linspace( a_z + dz/2, b_z - dz/2, K );
 #endif
 
 	
@@ -908,10 +909,10 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ,
 								double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse) {
 
 	// Generate NODE NUMBERS
-	XInd = gUtils.onespace(0, (int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) );
-	YInd = gUtils.onespace(0, (int)((CoarseLimsY[1] - CoarseLimsY[0] + .5)*2) );
+	XInd = GridUtils::onespace(0, (int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) );
+	YInd = GridUtils::onespace(0, (int)((CoarseLimsY[1] - CoarseLimsY[0] + .5)*2) );
 #if (dims == 3)
-	ZInd = gUtils.onespace(0, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5)*2) );
+	ZInd = GridUtils::onespace(0, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5)*2) );
 #else
 	ZInd.insert(ZInd.begin(), 0); // Default for 2D
 	// Reset the refined region z-limits if only 2D
@@ -1058,10 +1059,10 @@ void GridObj::LBM_init_subgrid (double offsetX, double offsetY, double offsetZ,
 	dz = dx0/2;
 
 	// Populate the position vectors
-	XPos = gUtils.linspace(offsetX - dx/2, (offsetX - dx/2) + (XInd.size() - 1) * dx, XInd.size() );
-	YPos = gUtils.linspace(offsetY - dy/2, (offsetY - dy/2) + (YInd.size() - 1) * dy, YInd.size() );
+	XPos = GridUtils::linspace(offsetX - dx/2, (offsetX - dx/2) + (XInd.size() - 1) * dx, XInd.size() );
+	YPos = GridUtils::linspace(offsetY - dy/2, (offsetY - dy/2) + (YInd.size() - 1) * dy, YInd.size() );
 #if dims == 3
-	ZPos = gUtils.linspace(offsetZ - dz/2, (offsetZ - dz/2) + (ZInd.size() - 1) * dz, ZInd.size() );
+	ZPos = GridUtils::linspace(offsetZ - dz/2, (offsetZ - dz/2) + (ZInd.size() - 1) * dz, ZInd.size() );
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif

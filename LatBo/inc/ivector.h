@@ -2,23 +2,23 @@
 
 #include <vector>
 /*
-	This header defines the ivector class which is like std::vector but has a defined
+	This header defines the IVector class which is like std::vector but has a defined
 	operator() to allow automatic flattening of indices before returning a reference of value at
 	indexed location.
 */
 
 // Needs to be able to accept different datatypes so template
 template <typename GenTyp>
-class ivector :	public std::vector<GenTyp> // Define ivector class which inherits from std::vector
+class IVector :	public std::vector<GenTyp> // Define IVector class which inherits from std::vector
 {
 public:
 
 	// C++ standard does not automatically inherit constructors
-	ivector( )
+	IVector( )
 	{
 	}
 
-	~ivector( )
+	~IVector( )
 	{
 	}
 
@@ -29,7 +29,7 @@ public:
 				 */
 	
 	// Instead, define the required constructor myself
-	ivector(size_t size, GenTyp val) {
+	IVector(size_t size, GenTyp val) {
 
 		this->resize(size);
 

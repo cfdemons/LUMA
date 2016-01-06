@@ -61,7 +61,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) {
 
 							// Get incoming direction
-							size_t v_incoming = gUtils.getOpposite(v_outgoing);
+							size_t v_incoming = GridUtils::getOpposite(v_outgoing);
 							
 							// Assign incoming population to outgoing at current site
 							f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,nVels);
@@ -208,7 +208,7 @@ void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim
 
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
-	ivector<double> ftmp;
+	IVector<double> ftmp;
 	for (size_t n = 0; n < nVels; n++) {
 		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
 	}
@@ -304,7 +304,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
-	ivector<double> ftmp;
+	IVector<double> ftmp;
 	for (size_t n = 0; n < nVels; n++) {
 		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
 	}

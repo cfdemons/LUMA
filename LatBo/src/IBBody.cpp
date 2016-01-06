@@ -2,37 +2,31 @@
 */
 
 #include "../inc/stdafx.h"
-#include "../inc/IB_body.h"
+#include "../inc/IBBody.h"
 #include "../inc/definitions.h"
 #include <math.h>
 #include "../inc/GridObj.h"
 
 // ***************************************************************************************************
 // Constructor and destructor
-IB_body::IB_body() { }
-IB_body::~IB_body(void) { }
-
-// Utility class passed by reference
-IB_body::IB_body(GridUtils& g) {
-
+IBBody::IBBody()
+{
 	this->groupID = 0;	// Default ID
-	this->gUtils = g;	// Assign reference to utility class passed from parent GridObj
-
 }
-
+IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************
 // Method to add marker
-void IB_body::addMarker(double x, double y, double z, bool flex_rigid) {
+void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 
-	// Extend array of particles by 1 and construct a new IB_marker object
+	// Extend array of particles by 1 and construct a new IBMarker object
 	markers.emplace_back( x, y, z, flex_rigid );
 
 }
 
 // ***************************************************************************************************
 // Method to seed markers for a sphere / circle
-void IB_body::makeBody(double radius, std::vector<double> centre,
+void IBBody::makeBody(double radius, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
 
 	// Designate body as beiong flexible or rigid and a closed surface
@@ -69,13 +63,13 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	for (unsigned int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
-	spacing = gUtils.vecnorm( diff );
+	spacing = GridUtils::vecnorm( diff );
 
 
 
 #else
 	// Circle -- find theta
-	std::vector<double> theta = gUtils.linspace(0, 2*PI - (2*PI / num_markers), num_markers);
+	std::vector<double> theta = GridUtils::linspace(0, 2*PI - (2*PI / num_markers), num_markers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -89,14 +83,14 @@ void IB_body::makeBody(double radius, std::vector<double> centre,
 	for (unsigned int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
-	spacing = gUtils.vecnorm( diff );
+	spacing = GridUtils::vecnorm( diff );
 #endif
 
 }
 
 // ***************************************************************************************************
 // Method to seed markers for a cuboid/rectangle
-void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
+void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
 					   bool flex_rigid, bool deform, unsigned int group) {
 
 	// Designate body as being flexible or rigid and a closed surface
@@ -124,7 +118,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {
 			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
+			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -177,7 +171,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
+		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -239,7 +233,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
 			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
+			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -260,7 +254,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 		// Advisory of number of points
 		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
+		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -309,7 +303,7 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 	// Just in case anything goes wrong here...
 	if (markers.size() != num_points) {
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Body is not closed. Exiting." << std::endl;
+		*GridUtils::logfile << "Body is not closed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -317,14 +311,14 @@ void IB_body::makeBody(std::vector<double> width_length_depth, std::vector<doubl
 
 // ***************************************************************************************************
 // Method to seed markers for a flexible filament
-void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
+void IBBody::makeBody(unsigned int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
 					   std::vector<int> BCs, bool flex_rigid, bool deform, unsigned int group) {
 
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
+		*GridUtils::logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -382,13 +376,13 @@ void IB_body::makeBody(unsigned int nummarkers, std::vector<double> start_point,
 }
 // ***************************************************************************************************
 // Method to seed markers for a 3D plate inclined from the xz plane
-double IB_body::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
+double IBBody::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 	bool flex_rigid, bool deform, unsigned int group, bool plate) {
 
 	// Exit if called in 2D
 	if ( dims == 2 ) {
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
+		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -418,7 +412,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
 			std::cout << "Error: See Log File" << std::endl;
-			*gUtils.logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
+			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -439,7 +433,7 @@ double IB_body::makeBody(std::vector<double> width_length, double angle, std::ve
 		// Advisory of number of points
 		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
-		*gUtils.logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
+		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 

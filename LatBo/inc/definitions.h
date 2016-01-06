@@ -42,7 +42,7 @@
 #define out_every 200			// How many timesteps before whole grid output
 
 // Types of output
-#define TEXTOUT
+//#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define MPI_VERBOSE
@@ -60,7 +60,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force ( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force ( 3 * GridUtils::vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -111,10 +111,10 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 100		// Number of x lattice sites
 #define M 20		// Number of y lattice sites
-#define K 80		// Number of z lattice sites
+#define K 20		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling -- specify as floating point values)
@@ -156,10 +156,10 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Master IBM switches //
 //#define IBM_ON						// Turn on IBM
-//#define IBM_DEBUG						// Write IBM body and matrix data out to text files
-//#define IBBODY_TRACER					// Write out IBbody positions
+//#define IBM_DEBUG					// Write IBM body and matrix data out to text files
+//#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
-//#define STOP_EPSILON_RECOMPUTE			// Prevent recomputing of epsilon in an attempt to save time
+//#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
 // Switches for inserting certain bodies (enable only one at once!)
@@ -260,8 +260,8 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 	const static size_t RefXend[NumReg]		= {24};
 	const static size_t RefYstart[NumReg]	= {1};
 	const static size_t RefYend[NumReg]		= {9};
-	static size_t RefZstart[NumReg]			= {5};
-	static size_t RefZend[NumReg]			= {15};
+	static size_t RefZstart[NumReg]			= {1};
+	static size_t RefZend[NumReg]			= {9};
 	#endif
 
 #endif

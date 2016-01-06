@@ -3,13 +3,14 @@
 #include "definitions.h"
 #include "GridObj.h"
 
-class MPI_manager
+/* Manager class to handle all things MPI */
+class MpiManager
 {
 
 	// Default constructor and destructor
 public:
-	MPI_manager(void);
-	~MPI_manager(void);
+	MpiManager(void);
+	~MpiManager(void);
 
 	/*
 	***************************************************************************************************************
@@ -18,15 +19,16 @@ public:
 	*/
 
 	// MPI world data (all public)
-
 	MPI_Comm my_comm;						// MPI communicator
 	static const int MPI_cartlab[3][26];	// Cartesian unit vectors pointing to each neighbour in Cartesian topology
 	int MPI_dims[dims];						// Size of MPI Cartesian topology
-	int my_rank;							// Rank number
-	int num_ranks;							// Total number of ranks in MPI Cartesian topology
-	int MPI_coords[dims];					// Coordinates in MPI Cartesian topolgy
 	int neighbour_rank[MPI_dir];			// Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[dims][MPI_dir];	// Coordinates in MPI topology of neighbour ranks
+
+	// Static Data (commonly used and grid-independent)
+	static int my_rank;				// Rank number
+	static int num_ranks;			// Total number of ranks in MPI Cartesian topology
+	static int MPI_coords[dims];	// Coordinates in MPI Cartesian topolgy
 
 
 	// Grid data
@@ -38,11 +40,8 @@ public:
 	std::vector< std::vector<double> > global_edge_pos;	// Rows are x,y,z start and end pairs and columns are rank number
 
 	// Buffer data
-	ivector<double> f_buffer;				// Resizeable buffer used for data transfer
+	IVector<double> f_buffer;				// Resizeable buffer used for data transfer
 	MPI_Status stat;						// Status structure for Send-Receive return information
-
-	// Utility members
-	GridUtils gUtils;
 
 	/*
 	***************************************************************************************************************
@@ -51,7 +50,7 @@ public:
 	*/
 
 	// Initialisation
-	void mpi_init( );		// Initialisation of MPI_manager & Cartesian topology
+	void mpi_init( );		// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
 
 	// Buffer methods

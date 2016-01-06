@@ -5,23 +5,19 @@
 #include <iostream>
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
+#include "../inc/MpiManager.h"
 
-
+// Default Constructor/Destructor
 GridUtils::GridUtils(void)
 {
-	// Initialise neighbour rank coordinates to zero by default
-	for (int d = 0; d < dims; d++) {
-		my_MPI_coords[d] = 0;
-	}
-
 }
 
 GridUtils::~GridUtils(void)
 {
 }
 
-// ***************************************************************************************************
 
+// ***************************************************************************************************
 // Returns a vector with n uniformly spaced values between min and max
 std::vector<double> GridUtils::linspace(double min, double max, int n)
 {
@@ -180,15 +176,6 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 }
 
 // ***************************************************************************************************
-
-// Set the log file and grid handles for the utility class
-void GridUtils::setHandles(std::ofstream* log_ref) {
-
-	logfile = log_ref;
-
-}
-
-// ***************************************************************************************************
 // Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
 size_t GridUtils::getOpposite(size_t direction) {
 
@@ -213,17 +200,6 @@ size_t GridUtils::getOpposite(size_t direction) {
 	}
 
 	return direction_opposite;
-
-}
-
-// ***************************************************************************************************
-// Function to set the neighbours rank property of the GridObj
-void GridUtils::setMpiParameters(int my_coords[]) {
-
-	// Initialise neighbour rank array
-	for (int d = 0; d < dims; d++) {
-		my_MPI_coords[d] = my_coords[d];
-	}
 
 }
 
@@ -294,10 +270,10 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 		if (Ind[d] == Lims[d] - 1 || Ind[d] == 0) {
 
 			// Define expected MPI coordinates of neighbour rank
-			exp_MPI_coords[d] = my_MPI_coords[d] + c[d][lattice_dir];
+			exp_MPI_coords[d] = MpiManager::MPI_coords[d] + c[d][lattice_dir];
 
 			// Define actual MPI coordinates of neighbour rank (accounting for periodicity)
-			act_MPI_coords[d] = (my_MPI_coords[d] + c[d][lattice_dir] + MPI_dims[d]) % MPI_dims[d];
+			act_MPI_coords[d] = (MpiManager::MPI_coords[d] + c[d][lattice_dir] + MPI_dims[d]) % MPI_dims[d];
 
 			// If there is a difference then rank is periodically linked to its neighbour and the overlap
 			// site is from a periodic rank so return early
@@ -348,9 +324,38 @@ bool GridUtils::isOnThisRank(unsigned int i, unsigned int j, unsigned int k, Gri
 }
 
 // ***************************************************************************************************
-// Method to set the output file path
-void GridUtils::setPath(std::string str) {
-    path_str = str;
+// Creates output directory with filename and path passed as a string and returns int specifying whether
+// creation succeeded or failed.
+int GridUtils::createOutputDirectory(std::string path_str) {
+
+	GridUtils::path_str = path_str;   // Set static path variable for output directory
+
+	int result = 9; // Return code of directory creation
+
+	// Create output directory if it does not already exist
+	std::string command = "mkdir -p " + path_str;
+
+	// Only get rank 0 to create output directory
+#ifdef BUILD_FOR_MPI
+
+	#ifdef _WIN32   // Running on Windows
+		if (MpiManager::my_rank == 0)
+			result = CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
+	#else   // Running on Unix system
+		if (MpiManager::my_rank == 0)
+			result = system(command.c_str());
+	#endif // _WIN32
+
+#else // BUILD_FOR_MPI
+
+	#ifdef _WIN32   // Running on Windows
+		result = CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
+	#else   // Running on Unix system
+		result = system(command.c_str());
+	#endif // _WIN32
+
+#endif // BUILD_FOR_MPI
+
+	return result;
 }
 
-// ***************************************************************************************************

@@ -4,10 +4,10 @@
 #include "../inc/stdafx.h"
 #include <sstream>
 #include <iomanip>
-
 #include "../inc/definitions.h"
 #include "../inc/globalvars.h"
 #include "../inc/GridObj.h"
+#include "../inc/MpiManager.h"
 
 using namespace std;
 
@@ -17,7 +17,8 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Create file name then output file stream
 	stringstream fileName;
-	fileName << gUtils.path_str + "/vtk_out.Lev" << level << ".Reg" << region_number << ".Rnk" << my_rank << "." << (int)tval << ".vtk";
+	fileName << GridUtils::path_str + "/vtk_out.Lev" << level << ".Reg" << region_number << 
+		".Rnk" << MpiManager::my_rank << "." << (int)tval << ".vtk";
 
 	ofstream fout;
 	fout.open( fileName.str().c_str() );
@@ -199,60 +200,5 @@ void GridObj::io_vtkwriter(double tval)
 
 	return;
 
-}
-
-
-// ***************************************************************************************************
-// Routine to write out the vtk (position) for each IB body at time step t (current capability is for unclosed objects only)
-void GridObj::io_vtk_IBwriter(double tval) {
-
-    // Loop through each iBody
-    for (size_t ib = 0; ib < iBody.size(); ib++) {
-
-        // Create file name then output file stream
-        stringstream fileName;
-        fileName << gUtils.path_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
-
-        ofstream fout;
-        fout.open( fileName.str().c_str() );
-
-        // Add header information
-        fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << ib << " at time t = " << (int)tval << "\n";
-        fout << "ASCII\n";
-        fout << "DATASET POLYDATA\n";
-
-
-        // Write out the positions of each Lagrange marker
-        fout << "POINTS " << iBody[ib].markers.size() << " float\n";
-        for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-
-#if (dims == 3)
-				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << iBody[ib].markers[i].position[2] << std::endl;
-#else
-				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
-#endif
-        }
-
-
-        // Write out the connectivity of each Lagrange marker
-        size_t nLines = iBody[ib].markers.size() - 1;
-
-        if (iBody[ib].closed_surface == false)
-            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-        else if (iBody[ib].closed_surface == true)
-            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
-
-        for (size_t i = 0; i < nLines; i++) {
-            fout << 2 << " " << i << " " << i + 1 << std::endl;
-        }
-
-        // If iBody[ib] is a closed surface then join last point to first point
-        if (iBody[ib].closed_surface == true) {
-            fout << 2 << " " << nLines << " " << 0 << std::endl;
-        }
-
-        fout.close();
-    }
 }
 // ***************************************************************************************************

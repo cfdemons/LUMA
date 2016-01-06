@@ -3,25 +3,25 @@
 #include <iostream>
 #include <fstream>
 #include "../inc/definitions.h"
-#include "../inc/MPI_manager.h"
+#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 #include "../inc/globalvars.h"
 
 
 // Constructor
-MPI_manager::MPI_manager(void)
+MpiManager::MpiManager(void)
 {
 }
 
 // Destructor
-MPI_manager::~MPI_manager(void)
+MpiManager::~MpiManager(void)
 {
 }
 
 // *************************************************************************************************** //
 // Const data member initialised outside class definition
 // Define for 3D where first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.
-const int MPI_manager::MPI_cartlab[3][26] =
+const int MpiManager::MPI_cartlab[3][26] =
 	{
 		{1, -1,  1, -1,	 0,  0, -1,  1,		0,  0,		1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},
 		{0,  0, -1,  1, -1,  1, -1,  1,		0,  0,		0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1,  1, -1,  1, -1},
@@ -31,7 +31,7 @@ const int MPI_manager::MPI_cartlab[3][26] =
 // *************************************************************************************************** //
 
 // Initialisation routines
-void MPI_manager::mpi_init( ) {
+void MpiManager::mpi_init( ) {
 
 	// Create communicator and topology
 	int MPI_periodic[dims], MPI_reorder;
@@ -53,7 +53,7 @@ void MPI_manager::mpi_init( ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out );
+	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out );
 
 	// Write out coordinates
 	logout << "Coordinates on rank " << my_rank << " are (";
@@ -77,7 +77,7 @@ void MPI_manager::mpi_init( ) {
 
 #ifdef MPI_VERBOSE
 	// State my rank
-	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "My rank is " << my_rank << ". There are " << num_ranks << " ranks." << std::endl;
 	logout.close();
 #endif
@@ -90,7 +90,7 @@ void MPI_manager::mpi_init( ) {
 
 		MPI_Barrier(my_comm);
 #ifdef MPI_VERBOSE
-		logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+		logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 
 		if (my_rank == 0) {
 			logout<< "\nDirection = " << dir << std::endl;
@@ -141,7 +141,7 @@ void MPI_manager::mpi_init( ) {
 }
 
 // *************************************************************************************************** //
-void MPI_manager::mpi_gridbuild( ) {
+void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
 	double Lx = b_x - a_x;
@@ -162,7 +162,7 @@ void MPI_manager::mpi_gridbuild( ) {
 		} else if ( global_dims[d] % MPI_dims[d] != 0 ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
 			std::ofstream logout;
-			logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
 			logout.close();
@@ -297,7 +297,7 @@ void MPI_manager::mpi_gridbuild( ) {
 #ifdef MPI_VERBOSE
 	// Write out the Grid size vector
 	std::ofstream logout;
-	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Grid size on rank " << my_rank << " is (";
 	for (size_t d = 0; d < dims; d++) {
 		logout << "\t" << local_size[d];
@@ -334,7 +334,7 @@ void MPI_manager::mpi_gridbuild( ) {
 		) {
 
 			std::ofstream logout;
-			logout.open(gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open(GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
 
@@ -375,7 +375,7 @@ void MPI_manager::mpi_gridbuild( ) {
 		) {
 
 			std::ofstream logout;
-			logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+			logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 			std::cout << "Error: See Log File" << std::endl;
 			logout << "Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." << std::endl;
 
@@ -408,7 +408,7 @@ void MPI_manager::mpi_gridbuild( ) {
 
 // *************************************************************************************************** //
 
-void MPI_manager::writeout_buf( std::string filename ) {
+void MpiManager::writeout_buf( std::string filename ) {
 
 	std::ofstream rankout;
 	rankout.open(filename.c_str(), std::ios::out);

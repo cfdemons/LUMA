@@ -4,19 +4,19 @@
 
 // This class declaration is for an immersed boundary Lagrange point.
 // A collection of these points form an immersed boundary body.
-class IB_marker {
+class IBMarker {
 
-	// Make GridObj a friend class so it can access the protected data of IB_marker objects
-	friend class GridObj;
-	// Same for IB_body
-	friend class IB_body;
+	// Make ObjectManager a friend class so it can access the protected data of IBMarker objects
+	friend class ObjectManager;
+	// Same for IBBody
+	friend class IBBody;
 
 public:
 
 	// Default constructor and destructor
-	IB_marker(void);
-	~IB_marker(void);
-	IB_marker(double xPos, double yPos, double zPos, bool flex_rigid);	// Custom constructor
+	IBMarker(void);
+	~IBMarker(void);
+	IBMarker(double xPos, double yPos, double zPos, bool flex_rigid);	// Custom constructor
 
 protected:
 

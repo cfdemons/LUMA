@@ -3,13 +3,13 @@
 #include "../inc/definitions.h"
 #include <iostream>
 #include <fstream>
-#include "../inc/MPI_manager.h"
+#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 
 // ********************************************************************************************************
 
 // Routine to unpack the buffer and update the macroscopic quantities at that site based on the new values.
-void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
+void MpiManager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 	// Copy received information back to grid using the EXACT
 	// reverse algorithm of the copying procedure
@@ -19,7 +19,7 @@ void MPI_manager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 #ifdef MPI_VERBOSE
 	std::ofstream logout;
-	logout.open( gUtils.path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
+	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
 	logout << "Unpacking direction " << dir << std::endl;
 	logout.close();
 #endif

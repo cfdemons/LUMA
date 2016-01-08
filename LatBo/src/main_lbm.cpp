@@ -100,9 +100,11 @@ int main( int argc, char* argv[] )
 	rank_str = to_string(0);
 #endif
 	logfile.open(GridUtils::path_str + "/log_rank" + rank_str + ".out", std::ios::out);
-	// Pass logfile reference to GridUtils class
-	if (logfile.is_open()) {
-		GridUtils::logfile = &logfile;
+	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
+
+	// TODO
+	if (!logfile.is_open()) {
+		// Handle case when logfile doesn't open correctly
 	}
 
 	// Fix output format to screen

@@ -3,17 +3,6 @@
 #include "../inc/definitions.h"
 
 // ***************************************************************************************************
-// Default constructor and destructor
-IBMarker::IBMarker(void)
-{
-
-
-}
-
-IBMarker::~IBMarker(void)
-{
-}
-
 // Custom constructor
 IBMarker::IBMarker(double xPos, double yPos, double zPos, bool flex_rigid) {
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "IBBody.h"
+#include "Body.h"
 
 
 class ObjectManager
@@ -12,19 +13,24 @@ class ObjectManager
 private:
 
 	// IBM objects
-	static std::vector<IBBody> iBody;		// Array of immersed boundary bodies
+	static std::vector<IBBody> iBody;				// Array of immersed boundary bodies
+	static std::vector<Body<Marker>> bBody;			// Array of default bodies
 
 	/** Methods **/
 
 public:
 
 	// Constructor and Destructor
-	ObjectManager(void);
-	~ObjectManager(void);
+	ObjectManager(void)
+	{
+	};
+	~ObjectManager(void)
+	{
+	};
 
 	// IBM methods
 	static void ibm_apply(GridObj& g);					// Apply interpolate, compute and spread operations for all bodies and with GridObj g
-	static void ibm_build_body(int body_type);			// Build a new pre-fab body
+	static void ibm_build_body(int body_type);			// Build a new pre-fab IBM body
 	void ibm_initialise(GridObj& g);					// Initialise a built immersed body with support on the supplied grid
 	static double ibm_deltakernel(double rad, double dilation);		// Evaluate kernel (delta function approximation)
 	static void ibm_interpol(unsigned int ib, GridObj& g);			// Interpolation of velocity field on GridObj g onto markers of ib-th body
@@ -53,6 +59,11 @@ public:
 		unsigned long indx[], double b[]);
 	static void ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
 		unsigned long indx[], double *d);
+
+
+	// BFL methods
+	static void bfl_build_body(int body_type);			// Build a new pre-fab bounce-back body
+
 
 	// IBM IO methods
 	void io_vtk_IBwriter(double tval);							// VTK body writer

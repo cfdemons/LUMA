@@ -16,7 +16,7 @@ IBBody::IBBody()
 IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************
-// Method to add marker
+// Method to add an IB marker
 void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object

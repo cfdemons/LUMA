@@ -3,15 +3,17 @@
 #include <vector>
 #include "IBMarker.h"
 #include "GridUtils.h"
+#include "Body.h"
 
-class IBBody {
+/** Represents an IB body **/
+class IBBody : public Body<IBMarker> {
 
 	// Make ObjectManager a friend class so it can access the protected data of IBBody objects
 	friend class ObjectManager;
 
 public:
 	// Constructor and destructor
-	IBBody();
+	IBBody(void);
 	~IBBody(void);
 
 protected:
@@ -22,12 +24,9 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	std::vector<IBMarker> markers;		// Array of Lagrange markers which make up the body
-	double spacing;						// Spacing of the Lagrange markers in physical units
 	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
 	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
 	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
-	bool closed_surface;                // Flag to specify whether or not it is a closed surface (for output)
 
 	// Flexible body properties
 	double delta_rho;					// Difference in density between fluid and solid in lattice units
@@ -43,9 +42,8 @@ protected:
 	*/
 
 public:
-	// Add Lagrange marker to the body
-	void addMarker(double x, double y, double z, bool flex_rigid);
 
+	void addMarker(double x, double y, double z, bool flex_rigid);		// Add marker to the body (overload parent addMarker method)
 
 	//////////////////////////////////
 	// Prefab body building methods //

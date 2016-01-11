@@ -112,9 +112,9 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 60		// Number of x lattice sites
-#define M 65		// Number of y lattice sites
+#define M 60		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
@@ -122,9 +122,9 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 #define a_x 0.0		// Start of domain-x
 #define b_x 60.0	// End of domain-x
 #define a_y 0.0		// Start of domain-y
-#define b_y 65.0	// End of domain-y
+#define b_y 60.0	// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 8		// End of domain-z
+#define b_z 30.0	// End of domain-z
 
 
 /*
@@ -213,14 +213,14 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
-//#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
+#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
-//#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 #define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON

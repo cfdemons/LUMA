@@ -328,8 +328,6 @@ bool GridUtils::isOnThisRank(unsigned int i, unsigned int j, unsigned int k, Gri
 // creation succeeded or failed.
 int GridUtils::createOutputDirectory(std::string path_str) {
 
-	GridUtils::path_str = path_str;   // Set static path variable for output directory
-
 	int result = 9; // Return code of directory creation
 
 	// Create output directory if it does not already exist

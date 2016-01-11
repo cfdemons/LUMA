@@ -43,7 +43,7 @@
 
 
 // Types of output
-//#define TEXTOUT
+#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define MPI_VERBOSE
@@ -241,7 +241,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 ***************************************************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

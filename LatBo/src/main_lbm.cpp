@@ -41,6 +41,12 @@ int main( int argc, char* argv[] )
 	// Usual initialise
 	MPI_Init( &argc, &argv );
 
+#else
+
+	// When not using MPI, set max ranks to 1 and current rank to 0.
+	MpiManager::num_ranks = 1;
+	MpiManager::my_rank = 0;
+
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
@@ -65,6 +71,14 @@ int main( int argc, char* argv[] )
     char timeout_char[80];
     std::strftime(timeout_char, 80, "./output_%Y-%m-%d_%H-%M-%S", timeinfo);
     std::string path_str(timeout_char);
+	GridUtils::path_str = path_str;   // Set static path variable for output directory
+
+
+	// Output directory creation (only master rank)
+	if (MpiManager::my_rank == 0) {
+		int result = GridUtils::createOutputDirectory(path_str);
+		// TODO Handle directory creation errors
+	}
 
 
 	// MPI manager creation
@@ -77,19 +91,7 @@ int main( int argc, char* argv[] )
 
 	// Decompose the domain
 	mpim.mpi_gridbuild();
-
-#else
-
-	// When not using MPI, set max ranks to 1 and current rank to 0.
-	MpiManager::num_ranks = 1;
-	MpiManager::my_rank = 0;
-
 #endif
-
-
-	// Output directory creation
-    GridUtils::createOutputDirectory(path_str);
-
 	
 	// Create log file
 	std::ofstream logfile;
@@ -102,9 +104,9 @@ int main( int argc, char* argv[] )
 	logfile.open(GridUtils::path_str + "/log_rank" + rank_str + ".out", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
-	// TODO
+	// TODO Handle case when logfile doesn't open correctly
 	if (!logfile.is_open()) {
-		// Handle case when logfile doesn't open correctly
+		std::cout << "Logfile didn't open" << std::endl;
 	}
 
 	// Fix output format to screen

@@ -32,7 +32,7 @@ const int MpiManager::MPI_cartlab[3][26] =
 
 // Initialisation routines
 void MpiManager::mpi_init( ) {
-
+	
 	// Create communicator and topology
 	int MPI_periodic[dims], MPI_reorder;
 	MPI_reorder = true;

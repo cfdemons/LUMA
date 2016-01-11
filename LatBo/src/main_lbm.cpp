@@ -31,6 +31,7 @@ int main( int argc, char* argv[] )
 	*********************************************** MPI INITIALISE ************************************************
 	***************************************************************************************************************
 	*/
+
 #ifdef BUILD_FOR_MPI
 
 	// Filename for verbose write out
@@ -73,6 +74,12 @@ int main( int argc, char* argv[] )
     std::string path_str(timeout_char);
 	GridUtils::path_str = path_str;   // Set static path variable for output directory
 
+	// Timing variables
+	clock_t t_start, t_end, secs; // Wall clock variables
+	double timeav_mpi_overhead = 0.0, timeav_timestep = 0.0;	// Variables for measuring performance
+
+	// Start clock to time initialisation
+	t_start = clock();
 
 	// Output directory creation (only master rank)
 	if (MpiManager::my_rank == 0) {
@@ -111,10 +118,6 @@ int main( int argc, char* argv[] )
 
 	// Fix output format to screen
 	cout.precision(6);
-
-	// Timing variables
-	clock_t t_start, t_end, secs; // Wall clock variables
-	double timeav_mpi_overhead = 0.0, timeav_timestep = 0.0;	// Variables for measuring performance
 
 	// Output start time
 	char* time_str = ctime(&curr_time);	// Format strat time as string
@@ -329,7 +332,13 @@ int main( int argc, char* argv[] )
 
 #endif
 
-	*GridUtils::logfile << "Initialisation Complete." << endl << "Initialising LBM time-stepping..." << endl;
+	// Get time of initialisation
+#ifdef BUILD_FOR_MPI
+	MPI_Barrier(mpim.my_comm);
+#endif
+	secs = clock() - t_start;
+	*GridUtils::logfile << "Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC << "s." << std::endl;
+	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 
 
 	/* ***************************************************************************************************************

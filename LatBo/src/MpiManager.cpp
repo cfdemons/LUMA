@@ -263,7 +263,7 @@ void MpiManager::mpi_gridbuild( ) {
 	// Using uniform decomposition
 #else
 
-	// Find global indices of edges of grid excluding the overlap
+	// Find global indices of edges of coarse grid excluding the overlap
 	global_edge_ind[1][my_rank] = (N / Xcores) * (MPI_coords[0] + 1);
 	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - (N / Xcores);
 	global_edge_ind[3][my_rank] = (M / Ycores) * (MPI_coords[1] + 1);

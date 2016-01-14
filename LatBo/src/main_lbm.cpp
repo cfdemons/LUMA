@@ -15,7 +15,7 @@
 #include "../inc/globalvars.h"		// Global variable references
 #include "../inc/GridObj.h"			// Grid class definition
 #include "../inc/MpiManager.h"		// MPI manager class definition
-#include "../inc/ObjectManager.h"	// Object manager class defintion
+#include "../inc/ObjectManager.h"	// Object manager class definition
 
 using namespace std;	// Use the standard namespace
 
@@ -53,8 +53,10 @@ int main( int argc, char* argv[] )
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
 #if (dims != 3)
 	for (int i = 0; i < NumReg; i++) {
-		RefZstart[i] = 0;
-		RefZend[i] = 0;
+		for (int l = 0; l < NumLev; l++) {
+			RefZstart[l][i] = 0;
+			RefZend[l][i] = 0;
+		}
 	}
 #endif
 
@@ -102,11 +104,10 @@ int main( int argc, char* argv[] )
 	
 	// Create log file
 	std::ofstream logfile;
-	string rank_str;
 #ifdef BUILD_FOR_MPI
-	rank_str = to_string(MpiManager::my_rank);
+	string rank_str = to_string(MpiManager::my_rank);
 #else
-	rank_str = to_string(0);
+	string rank_str = to_string(0);
 #endif
 	logfile.open(GridUtils::path_str + "/log_rank" + rank_str + ".out", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
@@ -120,7 +121,7 @@ int main( int argc, char* argv[] )
 	cout.precision(6);
 
 	// Output start time
-	char* time_str = ctime(&curr_time);	// Format strat time as string
+	char* time_str = ctime(&curr_time);	// Format start time as string
     *GridUtils::logfile << "Simulation started at " << time_str;	// Write start time to log
 
 #ifdef BUILD_FOR_MPI
@@ -136,6 +137,20 @@ int main( int argc, char* argv[] )
 			exit(EXIT_FAILURE);
 	}
 #endif
+
+	// Get time of MPI initialisation
+#ifdef BUILD_FOR_MPI
+	MPI_Barrier(mpim.my_comm);
+	secs = clock() - t_start;
+	*GridUtils::logfile << "MPI Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+#endif
+
+
+	// Start clock again for next bit of initialisation
+#ifdef BUILD_FOR_MPI
+	MPI_Barrier(mpim.my_comm);
+#endif
+	t_start = clock();
 
 
 
@@ -332,14 +347,13 @@ int main( int argc, char* argv[] )
 
 #endif
 
-	// Get time of initialisation
+	// Get time of grid and object initialisation
 #ifdef BUILD_FOR_MPI
 	MPI_Barrier(mpim.my_comm);
 #endif
 	secs = clock() - t_start;
-	*GridUtils::logfile << "Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC << "s." << std::endl;
+	*GridUtils::logfile << "Grid & Object Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
-
 
 	/* ***************************************************************************************************************
 	********************************************** LBM PROCEDURE *****************************************************

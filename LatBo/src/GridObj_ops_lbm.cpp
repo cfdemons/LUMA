@@ -102,7 +102,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
 			LBM_boundary(2);	// Inlet (Zou-He)
 #endif
-#if (defined SOLID_ON || defined WALLS_ON)
+#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 
@@ -127,7 +127,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
 			LBM_boundary(2);	// Inlet (Zou-He)
 #endif
-#if (defined SOLID_ON || defined WALLS_ON)
+#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 			/*DEBUG*/ //io_textout("AFTER SOLID BC");
@@ -683,21 +683,17 @@ void GridObj::LBM_stream( ) {
 						(
 
 						// Source on overlap?
-						GridUtils::isOnOverlap(i,j,k,N_lim,M_lim,K_lim)
+						GridUtils::isOnEdge(i,j,k,*this)
 
 						) && (
 
 						// Destination on-grid (not in overlap)?
-						(dest_x < N_lim-1 && dest_x > 0) &&
-						(dest_y < M_lim-1 && dest_y > 0)
-#if (dims == 3)
-						&& (dest_z < K_lim-1 && dest_z > 0)
-#endif
+						!GridUtils::isOnEdge(dest_x,dest_y,dest_z,*this)
 
 						) && (
 
 						// Overlap is from a periodic rank?
-						GridUtils::isOverlapPeriodic(i,j,k,N_lim,M_lim,K_lim,v_opp)
+						GridUtils::isOverlapPeriodic(i,j,k,*this,v_opp)
 
 						)
 

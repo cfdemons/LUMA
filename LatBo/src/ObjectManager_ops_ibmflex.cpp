@@ -54,7 +54,7 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = pow(GridUtils::vecnorm(u_0x,u_0y,u_0z),2) / grav_force * length_lu;
+	Froude = pow(u_ref,2) / grav_force * length_lu;
 #else
 	Froude = 0.0;
 #endif

@@ -21,7 +21,7 @@ public:
 	// Constructors & Destructor //
 	GridObj( ); // Default constructor
 	GridObj(int level); // Basic grid constructor
-	GridObj(int level, int RegionNumber); // Sub grid constructor with level and region
+	GridObj(int RegionNumber, GridObj& pGrid); // Sub grid constructor with region and reference to parent grid for initialisation
 	// MPI L0 constructor with local size and global edges
 	GridObj(int level, std::vector<unsigned int> local_size, 
 		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
@@ -51,11 +51,11 @@ public :
 	std::vector<int> XInd; // Vectors of indices
 	std::vector<int> YInd;
 	std::vector<int> ZInd;
-private :
 	std::vector<double> XPos; // Vectors of positions of sites
 	std::vector<double> YPos;
 	std::vector<double> ZPos;
 
+private :
 	// Inlet velocity profile
 	std::vector<double> ux_in, uy_in, uz_in;
 
@@ -70,7 +70,6 @@ private :
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
 	IVector<double> rho;
-	IVector<int> LatTyp;
 
 	// Grid scalars
 	double dx, dy, dz;	// Physical spacing
@@ -85,6 +84,7 @@ private :
 	// Public data members
 public :
 
+	IVector<int> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
 	unsigned int t;					// Number of completed iterations
@@ -108,11 +108,11 @@ public :
 	void LBM_init_grid(std::vector<unsigned int> local_size,
 		std::vector< std::vector<unsigned int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
-	void LBM_init_subgrid(double offsetX, double offsetY, double offsetZ,
-		double dx0, double omega_coarse, std::vector<double> mrt_omega_coarse);	// Initialise subgrid with all quantities
-	void LBM_init_bound_lab();		// Initialise labels for objects and walls
-	void LBM_init_refined_lab();	// Initialise labels for refined regions
-	void LBM_init_getInletProfile();	// Initialise the store for inlet profile data from file
+	void LBM_init_subgrid(GridObj& pGrid);	// Initialise subgrid with all quantities
+	void LBM_init_bound_lab();				// Initialise labels for walls
+	void LBM_init_solid_lab();				// Initialise labels for solid objects
+	void LBM_init_refined_lab(GridObj& pGrid);	// Initialise labels for refined regions
+	void LBM_init_getInletProfile();		// Initialise the store for inlet profile data from file
 
 	// LBM operations
 	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel

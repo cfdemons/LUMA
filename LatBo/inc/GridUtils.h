@@ -39,6 +39,7 @@ public:
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double>& vec);
 	static std::vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: indmapref
+	static std::vector<int> revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: revindmapref
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x);	// Function: matrix_multiply
 
@@ -47,12 +48,12 @@ public:
 
 
 	// MPI-related utilities
-	static bool isOnOverlap(unsigned int i, unsigned int j, unsigned int k,
-		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim);	// Function: isOnOverlap
+	static bool isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOnEdge
 	static bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
-		unsigned int N_lim, unsigned int M_lim, unsigned int K_lim,
-		unsigned int lattice_dir);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOnThisRank
+		GridObj& pGrid,	unsigned int lattice_dir);	// Function: isOverlapPeriodic
+	static bool isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
+	static bool isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid);
+	static bool hasThisSubGrid(GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 
 };
 

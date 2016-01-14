@@ -133,6 +133,32 @@ std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, i
 }
 // ***************************************************************************************************
 
+// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
+std::vector<int> GridUtils::revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
+
+	// Initialise result
+	std::vector<int> coarse_ind;
+
+	// Convert to top corner index if necessary
+    if ((fine_i % 2) != 0) {
+        fine_i = fine_i - 1;
+    }
+    if ((fine_j % 2) != 0) {
+        fine_j = fine_j - 1;
+    }
+	if ((fine_k % 2) != 0) {
+        fine_k = fine_k - 1;
+    }
+
+	// Reverse map indices
+	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
+	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
+	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
+
+	return coarse_ind;
+}
+// ***************************************************************************************************
+
 // Dot Product
 double GridUtils::dotprod(std::vector<double> vec1, std::vector<double> vec2) {
 
@@ -204,12 +230,18 @@ size_t GridUtils::getOpposite(size_t direction) {
 }
 
 // ***************************************************************************************************
-// Function to find whether a site is on the overlap region of an MPI grid
-bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsigned int N_lim, unsigned int M_lim, unsigned int K_lim) {
+// Function to find whether a site with local indices i,j,k is on the edge of the supplied GridObj
+bool GridUtils::isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
 
-	// Source in overlap
+	// Get Grid size
+	unsigned int N_lim = pGrid.XInd.size();
+	unsigned int M_lim = pGrid.YInd.size();
+	unsigned int K_lim = pGrid.ZInd.size();
+
+
+	// Source on edge
 	if	(
-			// Case 1: X source in overlap, Y,Z take any value
+			// Case 1: X on edge, Y,Z take any value
 			(
 			(i == N_lim - 1 || i == 0) && ( (j < M_lim && j >= 0)
 #if (dims == 3)
@@ -217,7 +249,7 @@ bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsi
 #endif
 		)	)
 
-			// Case 2: Y source in overlap, X,Z take any value
+			// Case 2: Y on edge, X,Z take any value
 		||	(
 			(j == M_lim - 1 || j == 0) && ( (i < N_lim && i >= 0)
 #if (dims == 3)
@@ -225,7 +257,7 @@ bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsi
 
 		)	)
 
-			// Case 3: Z source in overlap, Y,X take any value
+			// Case 3: Z on edge, Y,X take any value
 		||	(
 			(k == K_lim - 1 || k == 0) && (	(j < M_lim && j >= 0)
 													&&	(i < N_lim && i >= 0)	)
@@ -248,25 +280,24 @@ bool GridUtils::isOnOverlap(unsigned int i, unsigned int j, unsigned int k, unsi
 }
 
 // ***************************************************************************************************
-// Function to find whether the specified site is on overlap from an adjacent or periodic neighbour rank.
-// Takes in the site indices (MPI local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
-								  unsigned int N_lim, unsigned int M_lim, unsigned int K_lim,
-								  unsigned int lattice_dir) {
+// Function to find whether the overlap belonging to local site i,j,k is from an adjacent or periodic neighbour rank.
+// Takes in the site indices (local) and the lattice direction in which to check.
+bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
+								  GridObj& pGrid, unsigned int lattice_dir) {
 
 	// Local declarations
 	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims], Lims[dims], Ind[dims];
 
 	// Initialise local variables
-	MPI_dims[0] = Xcores; Lims[0] = N_lim; Ind[0] = i;
-	MPI_dims[1] = Ycores; Lims[1] = M_lim; Ind[1] = j;
+	MPI_dims[0] = Xcores; Lims[0] = pGrid.XInd.size(); Ind[0] = i;
+	MPI_dims[1] = Ycores; Lims[1] = pGrid.YInd.size(); Ind[1] = j;
 #if (dims == 3)
-	MPI_dims[2] = Zcores; Lims[2] = K_lim; Ind[2] = k;
+	MPI_dims[2] = Zcores; Lims[2] = pGrid.ZInd.size(); Ind[2] = k;
 #endif
 
 	// Loop over each Cartesian direction
 	for (int d = 0; d < dims; d++) {
-		// If on X/Y/Z-overlap
+		// If on X/Y/Z-overlap (should be)
 		if (Ind[d] == Lims[d] - 1 || Ind[d] == 0) {
 
 			// Define expected MPI coordinates of neighbour rank
@@ -288,24 +319,24 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 }
 
 // ***************************************************************************************************
-// Function to find whether a site wiht global indices provided is on a given grid or not
-bool GridUtils::isOnThisRank(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
+// Function to find whether a site with global indices provided is on a given grid or not (doesn't include the overlap)
+bool GridUtils::isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid) {
 
 	if (
-		// Different conditions when using MPI
+		// Different conditions when using MPI due to extra overlap cells
 #ifdef BUILD_FOR_MPI
-		((int)i <= pGrid.XInd[pGrid.XInd.size()-2] && (int)i >= pGrid.XInd[1] ) &&
-		((int)j <= pGrid.YInd[pGrid.YInd.size()-2] && (int)j >= pGrid.YInd[1] )
+		((int)gi <= pGrid.XInd[pGrid.XInd.size()-2] + 1 && (int)gi >= pGrid.XInd[1] - 1 ) &&
+		((int)gj <= pGrid.YInd[pGrid.YInd.size()-2] + 1 && (int)gj >= pGrid.YInd[1] - 1 )
 #if (dims == 3)
-		&& ((int)k <= pGrid.ZInd[pGrid.ZInd.size()-2] && (int)k >= pGrid.ZInd[1] )
+		&& ((int)gk <= pGrid.ZInd[pGrid.ZInd.size()-2] + 1 && (int)gk >= pGrid.ZInd[1] - 1 )
 #endif
 
 #else
 
-		((int)i <= pGrid.XInd[pGrid.XInd.size()-1] && (int)i >= pGrid.XInd[1] ) &&
-		((int)j <= pGrid.YInd[pGrid.YInd.size()-1] && (int)j >= pGrid.YInd[0] )
+		((int)gi <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gi >= pGrid.XInd[0] ) &&
+		((int)gj <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gj >= pGrid.YInd[0] )
 #if (dims == 3)
-		&& ((int)k <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)k >= pGrid.ZInd[0] )
+		&& ((int)gk <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gk >= pGrid.ZInd[0] )
 #endif
 
 
@@ -321,6 +352,91 @@ bool GridUtils::isOnThisRank(unsigned int i, unsigned int j, unsigned int k, Gri
 	}
 
 
+}
+
+// ***************************************************************************************************
+// Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not (doesn't include the overlap)
+bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) {
+
+	switch (xyz) {
+
+	case 0:
+		// X direction
+#ifdef BUILD_FOR_MPI	// Exclude overlap
+		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-2] && (int)gl >= pGrid.XInd[1] )
+#else
+		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0] )
+#endif
+		{
+			return true;
+		
+		} else {
+
+			return false;
+		}
+
+	case 1:
+		// Y direction
+#ifdef BUILD_FOR_MPI
+		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-2] && (int)gl >= pGrid.YInd[1] )
+#else
+		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0] )
+#endif
+		{
+			return true;
+		
+		} else {
+
+			return false;
+		}
+
+	case 2:
+		// Z direction
+#ifdef BUILD_FOR_MPI
+		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-2] && (int)gl >= pGrid.ZInd[1] )
+#else
+		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0] )
+#endif
+		{
+			return true;
+		
+		} else {
+
+			return false;
+		}
+
+	}
+
+}
+
+// ***************************************************************************************************
+// Routine to see whether the specified refined region intersects with the span of the provided parent grid
+bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
+
+
+	// Loop through every global point on the given grid and if one 
+	// of them exists wihtin the refined region then return true.
+	for (unsigned int i : pGrid.XInd) {
+		for (unsigned int j : pGrid.YInd) {
+			for (unsigned int k : pGrid.ZInd) {
+
+				if	(
+					(i >= RefXstart[pGrid.level][RegNum] && i <= RefXend[pGrid.level][RegNum]) &&
+					(j >= RefYstart[pGrid.level][RegNum] && j <= RefYend[pGrid.level][RegNum])
+#if (dims == 3)
+					&& (k >= RefZstart[pGrid.level][RegNum] && k <= RefZend[pGrid.level][RegNum])
+#endif
+				) {
+				
+					return true;
+				}
+
+			}
+		}
+	}
+
+	return false;
+	
 }
 
 // ***************************************************************************************************

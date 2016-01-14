@@ -32,11 +32,11 @@ void GridObj::io_textout(std::string output_tag) {
 	N_str = to_string((int)N);
 	M_str = to_string((int)M);
 	K_str = to_string((int)K);
-	NumLev_str = to_string(NumLev);
+	NumLev_str = to_string(level);
 	if (NumLev == 0) ex_str = to_string(0);
-	else ex_str = to_string(RefXend[0]) + string("_") + to_string(RefYend[0]) + string("_") + to_string(RefZend[0]);
+	else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
 	if (NumLev == 0) NumReg_str = to_string(0);
-	else NumReg_str = to_string(NumReg);
+	else NumReg_str = to_string(region_number);
 	mpirank = to_string(MpiManager::my_rank);
 	// Build string
 	FNameG = string(GridUtils::path_str + "/Grids")
@@ -66,9 +66,11 @@ void GridObj::io_textout(std::string output_tag) {
 		// Add tag
 		gridoutput << output_tag << std::endl;
 
+		// Print Grid Size header
+		gridoutput << "L0 Grid Size = " << N << " x " << M << " x " << K << endl;
+		gridoutput << "Local Grid Size = " << XPos.size() << " x " << YPos.size() << " x " << ZPos.size() << " (including any MPI overlap)" << std::endl;
+
 		if (level == 0) {
-			// Print L0 Grid Size header
-			gridoutput << "L0 Grid Size = " << N << " x " << M << " x " << K << endl;
 			// If refined levels exist, print refinement ratio
 			if (subGrid.size() != 0) {
 				gridoutput << "Grid is refined." << endl;

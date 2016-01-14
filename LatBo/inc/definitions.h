@@ -36,7 +36,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 100			// How many timesteps before whole grid output
@@ -59,7 +59,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Gravity
-#define GRAVITY_ON
+//#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force 0.0000001//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 1	// Number of time steps
 
 
 /*
@@ -104,27 +104,27 @@ const static int zProbeLims[2] = {30, 120};
 
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
 #ifdef USE_CUSTOM_MPI_SIZES
-const static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
-const static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
-// The following can be arbitrary if doing a 2D problem
-const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
+	const static size_t xRankSize[Xcores*Ycores*Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
+	const static size_t yRankSize[Xcores*Ycores*Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
+	// The following can be arbitrary if doing a 2D problem
+	const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
 #endif
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 60		// Number of x lattice sites
-#define M 60		// Number of y lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 30		// Number of x lattice sites
+#define M 30		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0.0		// Start of domain-x
-#define b_x 60.0	// End of domain-x
+#define b_x 3.0		// End of domain-x
 #define a_y 0.0		// Start of domain-y
-#define b_y 60.0	// End of domain-y
+#define b_y 3.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 30.0	// End of domain-z
+#define b_z 3.0		// End of domain-z
 
 
 /*
@@ -139,12 +139,12 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 1			// Desired Reynolds number
+#define Re 50			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -224,14 +224,16 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 #define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
-// Wall labelling routine implements this
-// Specified in lattice units (i.e. by index)
-#define obj_x_min 0		// Index of start of object/wall in x-direction
-#define obj_x_max 59		// Index of end of object/wall in x-direction
-#define obj_y_min 0			// Index of start of object/wall in y-direction
-#define obj_y_max 5		// Index of end of object/wall in y-direction
-#define obj_z_min 105		// Index of start of object/wall in z-direction
-#define obj_z_max 135		// Index of end of object/wall in z-direction
+	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
+	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
+	// Wall labelling routine implements this
+	// Specified in lattice units (i.e. by index) local to the chosen grid level
+	#define obj_x_min 15		// Index of start of object/wall in x-direction
+	#define obj_x_max 25		// Index of end of object/wall in x-direction
+	#define obj_y_min 25		// Index of start of object/wall in y-direction
+	#define obj_y_max 35		// Index of end of object/wall in y-direction
+	#define obj_z_min 25		// Index of start of object/wall in z-direction
+	#define obj_z_max 35		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -241,29 +243,41 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 ***************************************************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet and won't span MPI ranks)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
-// Global lattice indices for refined region on level L0 start numbering at 0
+// Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
-	#if NumReg == 2 // Makes it easier to set up multi-region cases
-	const static size_t RefXstart[NumReg]	= {10, 50};
-	const static size_t RefXend[NumReg]		= {30, 70};
-	const static size_t RefYstart[NumReg]	= {10, 40};
-	const static size_t RefYend[NumReg]		= {20, 50};
+#if (NumReg == 2 && NumLev == 2) // Done this just to making testing easier
+	const static size_t RefXstart[NumLev][NumReg]	= { {5, 5}, {2, 2} };
+	const static size_t RefXend[NumLev][NumReg]		= { {25, 25}, {20, 10} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {5, 15}, {2, 5} };
+	const static size_t RefYend[NumLev][NumReg]		= { {12, 25}, {10, 10} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumReg]		= {5, 25};
-	static size_t RefZend[NumReg]		= {15, 35};
+	static size_t RefZstart[NumLev][NumReg]		= { {5, 10}, {2, 2} };
+	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
-	#elif NumReg == 1
-	const static size_t RefXstart[NumReg]	= {4};
-	const static size_t RefXend[NumReg]		= {24};
-	const static size_t RefYstart[NumReg]	= {1};
-	const static size_t RefYend[NumReg]		= {9};
-	static size_t RefZstart[NumReg]			= {1};
-	static size_t RefZend[NumReg]			= {9};
-	#endif
+#elif (NumReg == 1 && NumLev == 1)
+	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefXend[NumLev][NumReg]		= { 10 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 6 };
+	const static size_t RefYend[NumLev][NumReg]		= { 10 };
+	// If doing 2D, these can be arbitrary values
+	static size_t RefZstart[NumLev][NumReg]		= { 5 };
+	static size_t RefZend[NumLev][NumReg]		= { 10 };
+
+#elif (NumReg == 1 && NumLev == 2)
+	const static size_t RefXstart[NumLev][NumReg]	= { {5}, {3} };
+	const static size_t RefXend[NumLev][NumReg]		= { {10}, {6} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {6}, {3} };
+	const static size_t RefYend[NumLev][NumReg]		= { {10}, {6} };
+	// If doing 2D, these can be arbitrary values
+	static size_t RefZstart[NumLev][NumReg]		= { {5}, {5} };
+	static size_t RefZend[NumLev][NumReg]		= { {25}, {35} };
+
+
+#endif
 
 #endif
 
@@ -309,25 +323,23 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 #endif
 
 #if NumLev == 0
-// Set region info to default as no refinement
-#undef NumReg
-#define NumReg 1
-const static size_t RefXstart[NumReg]		= {0};
-const static size_t RefXend[NumReg]			= {0};
-const static size_t RefYstart[NumReg]		= {0};
-const static size_t RefYend[NumReg]			= {0};
-static size_t RefZstart[NumReg]				= {0};
-static size_t RefZend[NumReg]				= {0};
+	// Set region info to default as no refinement
+	const static size_t RefXstart[1][1]		= {0};
+	const static size_t RefXend[1][1]		= {0};
+	const static size_t RefYstart[1][1]		= {0};
+	const static size_t RefYend[1][1]		= {0};
+	static size_t RefZstart[1][1]			= {0};
+	static size_t RefZend[1][1]				= {0};
 #endif
 
 // Clean up for using profiled inlet
 #ifdef USE_INLET_PROFILE
-#undef u_0x
-#define u_0x ux_in[j]
-#undef u_0y
-#define u_0y uy_in[j]
-#undef u_0z
-#define u_0z uz_in[j]
+	#undef u_0x
+	#define u_0x ux_in[j]
+	#undef u_0y
+	#define u_0y uy_in[j]
+	#undef u_0z
+	#define u_0z uz_in[j]
 #endif
 
 #endif

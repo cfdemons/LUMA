@@ -522,17 +522,97 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 // Method to initialise the quantities for a refined subgrid assuming a volumetric configuration. Parent grid is passed by reference
 void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 
-	// Get position of coarse nodes on refined patch edges from parent
-	double offsetX[2] = { pGrid.XPos[ CoarseLimsX[0] ], pGrid.XPos[ CoarseLimsX[1] ] };
-	double offsetY[2] = { pGrid.YPos[ CoarseLimsY[0] ], pGrid.YPos[ CoarseLimsY[1] ] };
+	// Declarations
+	unsigned int IndXstart, IndYstart, IndZstart = 0;
+
+	/* MPI specific setup:
+	 * 1. Store coarse grid refinement limits;
+	 * 2. Get node numbering ends in global system
+	 *
+	 * These are stored as local indices as they are used to map between the 
+	 * fine and coarse grid cells during multi-grid operations. Therefore, we 
+	 * must only store local values relevant to the grid on the rank and not the
+	 * refined region as a whole or mapping will not be correct.
+	 *
+	 * When not using MPI, these can be read straight from the definitions file and 
+	 * converted to local coordinates corresponding to the parent grid.
+	 * However, when using MPI, the edges of the refined grid might not be on this 
+	 * rank so we must round the coarse limits to the edge of the parent grid so 
+	 * the correct offset is supplied to the mapping routine.
+	 */
+
+	// If region is not contained on a single rank adjust limits accordingly:
+
+	// X
+	if ( (int)RefXstart[pGrid.level][region_number] < pGrid.XInd[1] - 1 ) {
+		// Set grid limits to start edge of the rank
+		CoarseLimsX[0] = 0;
+		// Compute actual node start
+		IndXstart = ((pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2);
+	} else {
+		// Get limit from parent as edge on this rank (takes into account overlap if present)
+		CoarseLimsX[0] = RefXstart[pGrid.level][region_number] - pGrid.XInd[1] + 1;
+		// Start index is simply zero
+		IndXstart = 0;
+	}
+	if ( (int)RefXend[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 2] + 1 ) {
+		// Set grid limits to end edge of the rank
+		CoarseLimsX[1] = pGrid.XInd.size() - 1;
+	} else {
+		CoarseLimsX[1] = RefXend[pGrid.level][region_number] - pGrid.XInd[1] + 1;
+	}
+
+	// Y
+	if ( (int)RefYstart[pGrid.level][region_number] < pGrid.YInd[1] - 1 ) {
+		CoarseLimsY[0] = 0;
+		IndYstart = ((pGrid.YInd[CoarseLimsY[0]] - RefYstart[pGrid.level][region_number]) * 2);
+	} else {
+		CoarseLimsY[0] = RefYstart[pGrid.level][region_number] - pGrid.YInd[1] + 1;
+		IndYstart = 0;
+	}
+	if ( (int)RefYend[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 2] + 1 ) {
+		CoarseLimsY[1] = pGrid.YInd.size() - 1;
+	} else {
+		CoarseLimsY[1] = RefYend[pGrid.level][region_number] - pGrid.YInd[1] + 1;
+	}
+
 #if (dims == 3)
-	double offsetZ[2] = { pGrid.ZPos[ CoarseLimsZ[0] ], pGrid.ZPos[ CoarseLimsZ[0] ] };
+	// Z
+	if ( (int)RefZstart[pGrid.level][region_number] < pGrid.ZInd[1] - 1 ) {
+		CoarseLimsZ[0] = 0;
+		IndZstart = ((pGrid.ZInd[CoarseLimsZ[0]] - RefZstart[pGrid.level][region_number]) * 2);
+	} else {
+		CoarseLimsZ[0] = RefZstart[pGrid.level][region_number] - pGrid.ZInd[1] + 1;
+		IndZstart = 0;
+	}
+	if ( (int)RefZend[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 2] + 1 ) {
+		CoarseLimsZ[1] = pGrid.ZInd.size() - 1;
+	} else {
+		CoarseLimsZ[1] = RefZend[pGrid.level][region_number] - pGrid.ZInd[1] + 1;
+	}
 #else
-	double offsetZ[2] = { 0.0, 0.0 };
+	// Reset the refined region z-limits if only 2D
+	for (int i = 0; i < 2; i++) {
+		CoarseLimsZ[i] = 0;
+	}
 #endif
 
-	// Get global grid size of the sub grid
-	int global_size[dims] = {
+	/* Note that the CoarseLims are local values used to identify how much and which part of the 
+	 * parent grid is covered by the child sub-grid and might not conincide with edges of global 
+	 * refined patch defined by the input file if broken up across ranks. So we get the offset 
+	 * in position from the local refined patch edges specific to this rank. */
+
+	// Get positons of local refined patch edges
+	double posOffsetX[2] = { pGrid.XPos[ CoarseLimsX[0] ], pGrid.XPos[ CoarseLimsX[1] ] };
+	double posOffsetY[2] = { pGrid.YPos[ CoarseLimsY[0] ], pGrid.YPos[ CoarseLimsY[1] ] };
+#if (dims == 3)
+	double posOffsetZ[2] = { pGrid.ZPos[ CoarseLimsZ[0] ], pGrid.ZPos[ CoarseLimsZ[0] ] };
+#else
+	double posOffsetZ[2] = { 0.0, 0.0 };
+#endif
+
+	// Get local grid size of the sub grid based on limits
+	int local_size[dims] = {
 		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) + 1,
 		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5)*2) + 1
 #if (dims == 3)
@@ -540,17 +620,15 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 #endif
 	};
 
+
+
 	// Generate NODE NUMBERS
-	XInd = GridUtils::onespace(0, global_size[0] - 1 );
-	YInd = GridUtils::onespace(0, global_size[1] - 1 );
+	XInd = GridUtils::onespace( IndXstart, IndXstart + local_size[0] - 1 );
+	YInd = GridUtils::onespace( IndYstart, IndYstart + local_size[1] - 1 );
 #if (dims == 3)
-	ZInd = GridUtils::onespace(0, global_size[2] - 1 );
+	ZInd = GridUtils::onespace( IndZstart, IndZstart + local_size[2] - 1 );
 #else
 	ZInd.insert(ZInd.begin(), 0); // Default for 2D
-	// Reset the refined region z-limits if only 2D
-	for (int i = 0; i < 2; i++) {
-		CoarseLimsZ[i] = 0;
-	}
 #endif
 
 
@@ -562,10 +640,10 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	dz = dx;
 
 	// Populate the position vectors
-	XPos = GridUtils::linspace(offsetX[0] - dx/2, (offsetX[0] - dx/2) + (XInd.size() - 1) * dx, XInd.size() );
-	YPos = GridUtils::linspace(offsetY[0] - dy/2, (offsetY[0] - dy/2) + (YInd.size() - 1) * dy, YInd.size() );
+	XPos = GridUtils::linspace(posOffsetX[0] - dx/2, (posOffsetX[0] - dx/2) + (XInd.size() - 1) * dx, XInd.size() );
+	YPos = GridUtils::linspace(posOffsetY[0] - dy/2, (posOffsetY[0] - dy/2) + (YInd.size() - 1) * dy, YInd.size() );
 #if dims == 3
-	ZPos = GridUtils::linspace(offsetZ[0] - dz/2, (offsetZ[0] - dz/2) + (ZInd.size() - 1) * dz, ZInd.size() );
+	ZPos = GridUtils::linspace(posOffsetZ[0] - dz/2, (posOffsetZ[0] - dz/2) + (ZInd.size() - 1) * dz, ZInd.size() );
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
@@ -670,29 +748,54 @@ void GridObj::LBM_init_solid_lab() {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 
-	int i, j, k;
+	// Declarations
+	int i, j, k, local_i, local_j, local_k;
 
-	// Check solid block inside this grid (non-MPI only)
-#ifndef BUILD_FOR_MPI
-	if (obj_x_max >= N_lim - 2 || obj_x_min <= 1 || obj_y_max >= M_lim - 2 || obj_y_min <= 1 
+	/* Check solid block contained on the global grid specified in the definitions file.
+	 * If not then exit as user has specifed block outside the grid on which they want it 
+	 * placed. */
+
+	// Get global grid sizes
+	int Ng_lim = (RefXend[level-1][region_number] - RefXstart[level-1][region_number] + 1) * 2;
+	int Mg_lim = (RefYend[level-1][region_number] - RefYstart[level-1][region_number] + 1) * 2;
+	int Kg_lim = (RefZend[level-1][region_number] - RefZstart[level-1][region_number] + 1) * 2;
+
+	// Check block placement -- must not be on TL (last two sites) if on a level other than 0
+	if	(
+		(
+		
+		(level == 0) && 
+		
+		(obj_x_max > Ng_lim - 1 || obj_x_min < 0 || obj_y_max > Mg_lim - 1 || obj_y_min < 0 
 #if (dims == 3)
-		|| obj_z_max >= K_lim - 2 || obj_z_min <= 1
+		|| obj_z_max > Kg_lim - 1 || obj_z_min < 0
 #endif
-		) {
+		)
+
+		) || (
+
+		(level != 0) && 
+
+		(obj_x_max >= Ng_lim - 2 || obj_x_min <= 1 || obj_y_max >= Mg_lim - 2 || obj_y_min <= 1 
+#if (dims == 3)
+		|| obj_z_max >= Kg_lim - 2 || obj_z_min <= 1
+#endif
+		)
+	
+		)
+		){
+
 		// Block outside grid
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Block is placed outside or on the TL of the selected grid. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-#endif
 
-	// Loop over object definition
+
+	// Loop over object definition in global indices
 	for (i = obj_x_min; i <= obj_x_max; i++) {
 		for (j = obj_y_min; j <= obj_y_max; j++) {
 			for (k = obj_z_min; k <= obj_z_max; k++) {
-
-#ifdef BUILD_FOR_MPI
-				int local_i, local_j, local_k;
 
 				// Only label if the site is on current rank
 				if ( GridUtils::isOnThisRank(i,j,k,*this) ) {
@@ -715,8 +818,6 @@ void GridObj::LBM_init_solid_lab() {
 			}
 		}
 	}
-
-#endif
 
 }
 
@@ -899,21 +1000,21 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 	size_t Mp_lim = pGrid.YPos.size();
 	size_t Kp_lim = pGrid.ZPos.size();
 
-	// Declare indices
+	// Declare indices global and local
 	int i, j, k, local_i, local_j, local_k;
 
 	// Loop over global indices of refined patch and add "TL to lower" labels
-    for (i = pGrid.XInd[CoarseLimsX[0]]; i <= pGrid.XInd[CoarseLimsX[1]]; i++) {
-        for (j = pGrid.YInd[CoarseLimsY[0]]; j <= pGrid.YInd[CoarseLimsY[1]]; j++) {
+    for (i = (int)RefXstart[pGrid.level][region_number]; i <= (int)RefXend[pGrid.level][region_number]; i++) {
+        for (j = (int)RefYstart[pGrid.level][region_number]; j <= (int)RefYend[pGrid.level][region_number]; j++) {
 #if (dims == 3)
-			for (k = pGrid.ZInd[CoarseLimsZ[0]]; k <= pGrid.ZInd[CoarseLimsZ[1]]; k++)
+			for (k = (int)RefZstart[pGrid.level][region_number]; k <= (int)RefZend[pGrid.level][region_number]; k++)
 #else
 			k = 0;
 #endif
 			{
 
 #ifdef BUILD_FOR_MPI						
-			// Get local indices to correct LatTyp array on parent
+			// Compute local indices to correct LatTyp array on parent
 			local_i = i - pGrid.XInd[1] + 1;
 			local_j = j - pGrid.YInd[1] + 1;
 			local_k = k - pGrid.ZInd[1] + 1;
@@ -929,12 +1030,12 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 			// Only act if the site is on parent rank (inc overlap) to avoid out of bounds errors
 			if ( GridUtils::isOnThisRank(i,j,k,pGrid) ) {
 
-				// If on the edge of the refined patch then it is TL so label
+				// If on the edge of the global refined patch then it is TL so label
 				if	(
-					(i == pGrid.XInd[CoarseLimsX[0]] || i == pGrid.XInd[CoarseLimsX[1]]) ||
-					(j == pGrid.YInd[CoarseLimsY[0]] || j == pGrid.YInd[CoarseLimsY[1]])
+					(i == RefXstart[pGrid.level][region_number] || i == RefXend[pGrid.level][region_number]) ||
+					(j == RefYstart[pGrid.level][region_number] || j == RefYend[pGrid.level][region_number])
 #if (dims == 3)
-					|| (k == pGrid.ZInd[CoarseLimsZ[0]] || k == pGrid.ZInd[CoarseLimsZ[1]])
+					|| (k == RefZstart[pGrid.level][region_number] || k == RefZend[pGrid.level][region_number])
 #endif
 					) {
 
@@ -945,7 +1046,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 					}
 
 				} else {
-					// Else, label it a "refined" site as in the middle of the refined patch
+					// Else, label it a "refined" site as in the middle of the global refined patch
 					pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = 2;
 
 				}
@@ -976,25 +1077,15 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 			size_t k = 0;
 #endif
 			{
-				// Get parent site label
+				// Get parent site indices as locals for the current sub-grid local site
 				p = GridUtils::revindmapref(
-					XInd[i], pGrid.XInd[CoarseLimsX[0]], 
-					YInd[j], pGrid.YInd[CoarseLimsY[0]], 
-					ZInd[k], pGrid.ZInd[CoarseLimsZ[0]]
-				);	// Get parent site indices as globals
+					i, CoarseLimsX[0], 
+					j, CoarseLimsY[0], 
+					k, CoarseLimsZ[0]
+				);
 
-#ifdef BUILD_FOR_MPI						
-				// Convert global indices to locals
-				p[0] = p[0] - pGrid.XInd[1] + 1;
-				p[1] = p[1] - pGrid.YInd[1] + 1;
-#if (dims == 3)
-				p[2] = p[2] - pGrid.ZInd[1] + 1;
-#endif					
-#endif
-				par_label = pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim);	// Get label using local indices
-
-				//std::cout << MpiManager::my_rank << " parent site is local " << p[0] << "," << p[1] << "," << p[2] << std::endl;
-				//std::cout << MpiManager::my_rank << " parent label is " << par_label << std::endl;
+				// Get parent site label using local indices
+				par_label = pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim);
 
 				// If parent is a "TL to lower" then add "TL to upper" label
 				if (par_label == 4) {

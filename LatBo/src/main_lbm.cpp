@@ -86,7 +86,7 @@ int main( int argc, char* argv[] )
 	// Output directory creation (only master rank)
 	if (MpiManager::my_rank == 0) {
 		int result = GridUtils::createOutputDirectory(path_str);
-		// TODO Handle directory creation errors
+		// TODO: Handle directory creation errors
 	}
 
 
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
 	logfile.open(GridUtils::path_str + "/log_rank" + rank_str + ".out", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
-	// TODO Handle case when logfile doesn't open correctly
+	// TODO: Handle case when logfile doesn't open correctly
 	if (!logfile.is_open()) {
 		std::cout << "Logfile didn't open" << std::endl;
 	}

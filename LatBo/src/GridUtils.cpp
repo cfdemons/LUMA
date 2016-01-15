@@ -362,10 +362,10 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 
 	case 0:
 		// X direction
-#ifdef BUILD_FOR_MPI	// Exclude overlap
-		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-2] && (int)gl >= pGrid.XInd[1] )
+#ifdef BUILD_FOR_MPI	// Allow for overlap but ignore periodicity
+		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-2] + 1 && (int)gl >= pGrid.XInd[1] - 1)
 #else
-		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0] )
+		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0])
 #endif
 		{
 			return true;
@@ -378,9 +378,9 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 	case 1:
 		// Y direction
 #ifdef BUILD_FOR_MPI
-		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-2] && (int)gl >= pGrid.YInd[1] )
+		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-2] + 1 && (int)gl >= pGrid.YInd[1] - 1)
 #else
-		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0] )
+		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0])
 #endif
 		{
 			return true;
@@ -393,9 +393,9 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 	case 2:
 		// Z direction
 #ifdef BUILD_FOR_MPI
-		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-2] && (int)gl >= pGrid.ZInd[1] )
+		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-2] + 1 && (int)gl >= pGrid.ZInd[1] - 1)
 #else
-		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0] )
+		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0])
 #endif
 		{
 			return true;
@@ -415,7 +415,7 @@ bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 
 
 	// Loop through every global point on the given grid and if one 
-	// of them exists wihtin the refined region then return true.
+	// of them exists within the refined region then return true.
 	for (unsigned int i : pGrid.XInd) {
 		for (unsigned int j : pGrid.YInd) {
 			for (unsigned int k : pGrid.ZInd) {
@@ -426,8 +426,7 @@ bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 #if (dims == 3)
 					&& (k >= RefZstart[pGrid.level][RegNum] && k <= RefZend[pGrid.level][RegNum])
 #endif
-				) {
-				
+				) {				
 					return true;
 				}
 

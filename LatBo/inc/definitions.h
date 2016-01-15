@@ -36,7 +36,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 100			// How many timesteps before whole grid output
@@ -97,7 +97,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // MPI Data
 #define Xcores 2
-#define Ycores 2
+#define Ycores 3
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
@@ -213,7 +213,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Switches
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -224,16 +224,16 @@ const static int zProbeLims[2] = {30, 120};
 #define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 1		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 15		// Index of start of object/wall in x-direction
-	#define obj_x_max 25		// Index of end of object/wall in x-direction
-	#define obj_y_min 25		// Index of start of object/wall in y-direction
-	#define obj_y_max 35		// Index of end of object/wall in y-direction
-	#define obj_z_min 25		// Index of start of object/wall in z-direction
-	#define obj_z_max 35		// Index of end of object/wall in z-direction
+	#define obj_x_min 10		// Index of start of object/wall in x-direction
+	#define obj_x_max 15		// Index of end of object/wall in x-direction
+	#define obj_y_min 10		// Index of start of object/wall in y-direction
+	#define obj_y_max 15		// Index of end of object/wall in y-direction
+	#define obj_z_min 8			// Index of start of object/wall in z-direction
+	#define obj_z_max 13		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -260,21 +260,21 @@ const static int zProbeLims[2] = {30, 120};
 
 #elif (NumReg == 1 && NumLev == 1)
 	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefXend[NumLev][NumReg]		= { 10 };
+	const static size_t RefXend[NumLev][NumReg]		= { 20 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 6 };
-	const static size_t RefYend[NumLev][NumReg]		= { 10 };
+	const static size_t RefYend[NumLev][NumReg]		= { 20 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
-	static size_t RefZend[NumLev][NumReg]		= { 10 };
+	static size_t RefZend[NumLev][NumReg]		= { 15 };
 
 #elif (NumReg == 1 && NumLev == 2)
 	const static size_t RefXstart[NumLev][NumReg]	= { {5}, {3} };
-	const static size_t RefXend[NumLev][NumReg]		= { {10}, {6} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {6}, {3} };
-	const static size_t RefYend[NumLev][NumReg]		= { {10}, {6} };
+	const static size_t RefXend[NumLev][NumReg]		= { {20}, {6} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {6}, {4} };
+	const static size_t RefYend[NumLev][NumReg]		= { {20}, {10} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {5}, {5} };
-	static size_t RefZend[NumLev][NumReg]		= { {25}, {35} };
+	static size_t RefZend[NumLev][NumReg]		= { {15}, {15} };
 
 
 #endif

@@ -72,7 +72,7 @@ GridObj::GridObj(int level, std::vector<unsigned int> local_size,
 }
 
 // ***************************************************************************************************
-// Overload constructor for a sub grid
+// Overloaded constructor for a sub grid
 GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 {
 
@@ -82,21 +82,6 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 	this->t = 0;
 
 	*GridUtils::logfile << "Building Grid level " << level << ", region " << region_number << ", on rank " << MpiManager::my_rank << std::endl;
-
-	/* Store coarse grid refinement limits on the new sub-grid
-	 *
-	 * These are stored as local indices as they are used to map between the 
-	 * fine and coarse grid cells during multi-grid operations. Therefore, we 
-	 * must only store local values relevant to the grid on the rank and not the
-	 * refined region as a whole or mapping will not be correct.
-	 */
-	
-	// Get limits from the definitions file -- convert to local indices
-	CoarseLimsX[0] = RefXstart[pGrid.level][RegionNumber] - pGrid.XInd[1] + 1;	CoarseLimsX[1] = RefXend[pGrid.level][RegionNumber] - pGrid.XInd[1] + 1;
-	CoarseLimsY[0] = RefYstart[pGrid.level][RegionNumber] - pGrid.YInd[1] + 1;	CoarseLimsY[1] = RefYend[pGrid.level][RegionNumber] - pGrid.YInd[1] + 1;
-#if (dims == 3)
-	CoarseLimsZ[0] = RefZstart[pGrid.level][RegionNumber] - pGrid.ZInd[1] + 1;	CoarseLimsZ[1] = RefZend[pGrid.level][RegionNumber] - pGrid.ZInd[1] + 1;
-#endif
 
 }
 

@@ -40,6 +40,10 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Reset timers
+	this->timeav_mpi_overhead = 0.0;
+	this->timeav_timestep = 0.0;
+
 	*GridUtils::logfile << "Constructing Grid level " << level  << std::endl;
 
 	// Call L0 non-MPI initialiser
@@ -64,6 +68,10 @@ GridObj::GridObj(int level, std::vector<unsigned int> local_size,
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Reset timers
+	this->timeav_mpi_overhead = 0.0;
+	this->timeav_timestep = 0.0;
+
 	*GridUtils::logfile << "Building Grid level " << level << " on rank " << MpiManager::my_rank << std::endl;
 
 	// Call MPI initialisation routine
@@ -80,6 +88,10 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 	this->level = pGrid.level + 1;
     this->region_number = RegionNumber;
 	this->t = 0;
+
+	// Reset timers
+	this->timeav_mpi_overhead = 0.0;
+	this->timeav_timestep = 0.0;
 
 	*GridUtils::logfile << "Building Grid level " << level << ", region " << region_number << ", on rank " << MpiManager::my_rank << std::endl;
 

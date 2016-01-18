@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 1	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -243,7 +243,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

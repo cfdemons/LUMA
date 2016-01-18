@@ -3,15 +3,17 @@
 #include "definitions.h"
 #include "GridObj.h"
 
-/* Manager class to handle all things MPI */
+/* Manager class to handle all things MPI -- designed as a Singleton */
 class MpiManager
 {
 
-	// Default constructor and destructor
-public:
+	// Private constructor / destructor
+private :
 	MpiManager(void);
 	~MpiManager(void);
+	static MpiManager* me;	// Pointer to self
 
+public :
 	/*
 	***************************************************************************************************************
 	********************************************* Member Data *****************************************************
@@ -49,6 +51,9 @@ public:
 	***************************************************************************************************************
 	*/
 
+	// Singleton design
+	static MpiManager *getInstance();	// Get the pointer to the singleton instance (create it if necessary)
+
 	// Initialisation
 	void mpi_init( );		// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
@@ -59,5 +64,8 @@ public:
 
 	// IO
 	void writeout_buf( std::string filename );		// Write out the buffer to file
+
+	// Comms
+	void communicate( GridObj& Grid );		// Wrapper routine for communication between grids of given level/region
 };
 

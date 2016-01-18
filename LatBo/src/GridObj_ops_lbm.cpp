@@ -8,6 +8,7 @@ streaming and macroscopic calulcation.
 #include "../inc/globalvars.h"
 #include "../inc/IVector.h"
 #include "../inc/ObjectManager.h"
+#include "../inc/MpiManager.h"
 
 using namespace std;
 
@@ -16,6 +17,10 @@ using namespace std;
 // LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
 // IBM_flag dictates whether we need the predictor step or not
 void GridObj::LBM_multi ( bool IBM_flag ) {
+
+	// Start the clock to time the kernel
+	clock_t secs, t_start = clock();
+
 
 	///////////////////////////////
 	// IBM pre-kernel processing //
@@ -195,6 +200,34 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 	}
 #endif
+
+	// Get time of loop (includes sub-loops)
+	secs = clock() - t_start;
+
+	// Update average timestep time on this grid
+	timeav_timestep *= (t-1);
+	timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
+	timeav_timestep /= t;
+
+	if (t % out_every == 0) {
+		// Performance data to logfile
+		*GridUtils::logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
+	}
+
+
+	///////////////////////
+	// MPI communication //
+	///////////////////////
+
+#ifdef BUILD_FOR_MPI
+	// Do MPI communication on this grid level before returning //
+
+	// Launch communication wrapper passing reference to this GridObj
+	MpiManager::getInstance()->communicate(*this);
+
+
+#endif
+
 
 }
 

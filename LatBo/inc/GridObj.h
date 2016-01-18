@@ -92,6 +92,10 @@ public :
 	double omega;					// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 
+	// Timing variables
+	double timeav_mpi_overhead;		// Time of MPI communication
+	double timeav_timestep;			// Time of a timestep
+
 
 	/*
 	***************************************************************************************************************

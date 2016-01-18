@@ -77,8 +77,7 @@ int main( int argc, char* argv[] )
 	GridUtils::path_str = path_str;   // Set static path variable for output directory
 
 	// Timing variables
-	clock_t t_start, t_end, secs; // Wall clock variables
-	double timeav_mpi_overhead = 0.0, timeav_timestep = 0.0;	// Variables for measuring performance
+	clock_t t_start, secs; // Wall clock variables
 
 	// Start clock to time initialisation
 	t_start = clock();
@@ -93,13 +92,13 @@ int main( int argc, char* argv[] )
 	// MPI manager creation
 #ifdef BUILD_FOR_MPI
 	// Create MpiManager object
-	MpiManager mpim;
+	MpiManager* mpim = MpiManager::getInstance();
 
 	// Initialise the topology
-	mpim.mpi_init();
+	mpim->mpi_init();
 
 	// Decompose the domain
-	mpim.mpi_gridbuild();
+	mpim->mpi_gridbuild();
 #endif
 	
 	// Create log file
@@ -140,7 +139,7 @@ int main( int argc, char* argv[] )
 
 	// Get time of MPI initialisation
 #ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim.my_comm);
+	MPI_Barrier(mpim->my_comm);
 	secs = clock() - t_start;
 	*GridUtils::logfile << "MPI Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif
@@ -148,7 +147,7 @@ int main( int argc, char* argv[] )
 
 	// Start clock again for next bit of initialisation
 #ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim.my_comm);
+	MPI_Barrier(mpim->my_comm);
 #endif
 	t_start = clock();
 
@@ -161,7 +160,7 @@ int main( int argc, char* argv[] )
 	// Create the grid object (level = 0)
 #ifdef BUILD_FOR_MPI
 	// Call MPI constructor
-	GridObj Grids(0, mpim.local_size, mpim.global_edge_ind, mpim.global_edge_pos);
+	GridObj Grids(0, mpim->local_size, mpim->global_edge_ind, mpim->global_edge_pos);
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0);
@@ -290,7 +289,7 @@ int main( int argc, char* argv[] )
 
 		// Wait for rank accessing the file and only access if this rank's turn
 #ifdef BUILD_FOR_MPI
-		MPI_Barrier(mpim.my_comm);
+		MPI_Barrier(mpim->my_comm);
 
 		if (MpiManager::my_rank == n)
 #endif
@@ -335,7 +334,7 @@ int main( int argc, char* argv[] )
 		for (int n = 0; n < MpiManager::num_ranks; n++) {
 			// Wait for rank accessing the file and only access if this rank's turn
 #ifdef BUILD_FOR_MPI
-			MPI_Barrier(mpim.my_comm);
+			MPI_Barrier(mpim->my_comm);
 
 			if (MpiManager::my_rank == n)
 #endif
@@ -349,7 +348,7 @@ int main( int argc, char* argv[] )
 
 	// Get time of grid and object initialisation
 #ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim.my_comm);
+	MPI_Barrier(mpim->my_comm);
 #endif
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Grid & Object Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
@@ -362,8 +361,6 @@ int main( int argc, char* argv[] )
 
 		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
 
-		// Start the clock
-		t_start = clock();
 
 		///////////////////////
 		// Launch LBM Kernel //
@@ -374,15 +371,6 @@ int main( int argc, char* argv[] )
 		Grids.LBM_multi(false);	// Just called once as no IBM
 #endif
 
-		// Print Time of loop
-		t_end = clock();
-		secs = t_end - t_start;
-		printf("Last time step took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
-
-		// Update average timestep time
-		timeav_timestep *= (Grids.t-1);
-		timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
-		timeav_timestep /= Grids.t;
 
 
 		///////////////
@@ -392,7 +380,7 @@ int main( int argc, char* argv[] )
 		// Write out here
 		if (Grids.t % out_every == 0) {
 #ifdef BUILD_FOR_MPI
-			MPI_Barrier(mpim.my_comm);
+			MPI_Barrier(mpim->my_comm);
 #endif
 #ifdef TEXTOUT
 			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
@@ -409,7 +397,7 @@ int main( int argc, char* argv[] )
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim.my_comm);
+				MPI_Barrier(mpim->my_comm);
 
 				if (MpiManager::my_rank == n)
 #endif
@@ -429,9 +417,6 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
 			objMan.io_write_lift_drag(Grids.t);
 #endif
-			// Performance data
-			*GridUtils::logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
-
 		}		
 
 		// Probe output has different frequency
@@ -442,7 +427,7 @@ int main( int argc, char* argv[] )
 
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim.my_comm);
+				MPI_Barrier(mpim->my_comm);
 				if (MpiManager::my_rank == n) 
 #endif
 				{
@@ -467,7 +452,7 @@ int main( int argc, char* argv[] )
 
 				// Wait for turn and access one rank at a time
 #ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim.my_comm);
+				MPI_Barrier(mpim->my_comm);
 
 				if (MpiManager::my_rank == n)
 #endif
@@ -482,96 +467,6 @@ int main( int argc, char* argv[] )
 
 		}
 
-
-		///////////////////////
-		// MPI Communication //
-		///////////////////////
-#ifdef BUILD_FOR_MPI
-
-		// Start the clock
-		MPI_Barrier(mpim.my_comm);
-		t_start = clock();
-
-		// Loop over directions in Cartesian topology
-		for (int dir = 0; dir < MPI_dir; dir++) {
-
-			////////////////////////
-			// Buffer Information //
-			////////////////////////
-
-			MPI_Barrier(mpim.my_comm);
-			// Pass direction and Grids by reference
-			mpim.mpi_buffer_pack( dir, Grids );
-
-			//////////////////////
-			// Send Information //
-			//////////////////////
-
-			// Find opposite direction (neighbour it receives from)
-			unsigned int opp_dir;
-			// Opposite of even directions is +1, odd is -1 based on MPI_cartlab
-			if ( (dir + 2) % 2 == 0) {
-				opp_dir = dir + 1;
-			} else {
-				opp_dir = dir - 1;
-			}
-
-			MPI_Barrier(mpim.my_comm);
-
-			// Send info to neighbour while receiving from other neighbour
-			MPI_Sendrecv_replace( &mpim.f_buffer.front(), mpim.f_buffer.size(), MPI_DOUBLE, mpim.neighbour_rank[dir], dir,
-				mpim.neighbour_rank[opp_dir], dir, mpim.my_comm, &mpim.stat);
-
-
-
-#ifdef MPI_VERBOSE
-			// Write out buffer
-			MPI_Barrier(mpim.my_comm);
-			std::ofstream logout( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app );
-			logout << "Direction " << dir << "; Sending to " << mpim.neighbour_rank[dir] << "; Receiving from " << mpim.neighbour_rank[opp_dir] << std::endl;
-			filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
-			mpim.writeout_buf(filename);
-			logout.close();
-#endif
-
-			//////////////////////////////
-			// Copy from buffer to grid //
-			//////////////////////////////
-
-			MPI_Barrier(mpim.my_comm);
-			// Pass direction and Grids by reference
-			mpim.mpi_buffer_unpack( dir, Grids );
-
-
-		}
-
-		// Print Time of MPI comms
-		MPI_Barrier(mpim.my_comm);
-		t_end = clock();
-		secs = t_end - t_start;
-		printf("MPI overhead took %f second(s)\n", ((double)secs)/CLOCKS_PER_SEC);
-
-		// Update average MPI overhead time
-		timeav_mpi_overhead *= (Grids.t-1);
-		timeav_mpi_overhead += ((double)secs)/CLOCKS_PER_SEC;
-		timeav_mpi_overhead /= Grids.t;
-
-#ifdef TEXTOUT
-	if (Grids.t % out_every == 0) {
-		MPI_Barrier(mpim.my_comm);
-		*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
-		Grids.io_textout("POST MPI COMMS");
-	}
-#endif
-
-	if (Grids.t % out_every == 0) {
-		// Performance Data
-		*GridUtils::logfile << "MPI overhead taking an average of " << timeav_mpi_overhead*1000 << "ms" << std::endl;
-	}
-
-
-#endif
-
 	// Loop End
 	} while (Grids.t < T);
 
@@ -584,11 +479,6 @@ int main( int argc, char* argv[] )
 	// Close log file
 	curr_time = time(NULL);			// Current system date/time and string buffer
 	time_str = ctime(&curr_time);	// Format as string
-	// Performance data
-	*GridUtils::logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
-#ifdef BUILD_FOR_MPI
-	*GridUtils::logfile << "MPI overhead taking an average of " << timeav_mpi_overhead*1000 << "ms" << std::endl;
-#endif
 	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 

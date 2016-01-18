@@ -7,8 +7,11 @@
 #include "../inc/GridObj.h"
 #include "../inc/globalvars.h"
 
+// Static declarations
+MpiManager* MpiManager::me;
 
-// Constructor
+// *************************************************************************************************** //
+// Constructor (private)
 MpiManager::MpiManager(void)
 {
 }
@@ -16,6 +19,15 @@ MpiManager::MpiManager(void)
 // Destructor
 MpiManager::~MpiManager(void)
 {
+}
+
+// *************************************************************************************************** //
+// Instance creator
+MpiManager* MpiManager::getInstance() {
+
+	if (!me) me = new MpiManager;	// Private construction
+	return me;						// Return pointer to new object
+
 }
 
 // *************************************************************************************************** //
@@ -141,6 +153,7 @@ void MpiManager::mpi_init( ) {
 }
 
 // *************************************************************************************************** //
+// Routine to do the domain decomposition and generate parameters for GridObj constructors
 void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
@@ -407,7 +420,7 @@ void MpiManager::mpi_gridbuild( ) {
 }
 
 // *************************************************************************************************** //
-
+// Writes out f-buffer
 void MpiManager::writeout_buf( std::string filename ) {
 
 	std::ofstream rankout;
@@ -425,5 +438,96 @@ void MpiManager::writeout_buf( std::string filename ) {
 
 	return;
 }
+// *************************************************************************************************** //
+void MpiManager::communicate(GridObj& Grid) {
 
+	// Wall clock variables
+	clock_t t_start, t_end, secs;
+
+	///////////////////////
+	// MPI Communication //
+	///////////////////////
+
+	// Start the clock
+	MPI_Barrier(my_comm);
+	t_start = clock();
+
+	// Loop over directions in Cartesian topology
+	for (int dir = 0; dir < MPI_dir; dir++) {
+
+		////////////////////////
+		// Buffer Information //
+		////////////////////////
+
+		MPI_Barrier(my_comm);
+		// Pass direction and Grid by reference
+		mpi_buffer_pack( dir, Grid );
+
+		//////////////////////
+		// Send Information //
+		//////////////////////
+
+		// Find opposite direction (neighbour it receives from)
+		unsigned int opp_dir;
+		// Opposite of even directions is +1, odd is -1 based on MPI_cartlab
+		if ( (dir + 2) % 2 == 0) {
+			opp_dir = dir + 1;
+		} else {
+			opp_dir = dir - 1;
+		}
+
+		MPI_Barrier(my_comm);
+
+		// Send info to neighbour while receiving from other neighbour
+		MPI_Sendrecv_replace( &f_buffer.front(), f_buffer.size(), MPI_DOUBLE, neighbour_rank[dir], dir,
+			neighbour_rank[opp_dir], dir, my_comm, &stat);
+
+
+
+#ifdef MPI_VERBOSE
+		// Write out buffer
+		MPI_Barrier(my_comm);
+		std::ofstream logout( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app );
+		logout << "Direction " << dir << "; Sending to " << neighbour_rank[dir] << "; Receiving from " << neighbour_rank[opp_dir] << std::endl;
+		filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
+		writeout_buf(filename);
+		logout.close();
+#endif
+
+		//////////////////////////////
+		// Copy from buffer to grid //
+		//////////////////////////////
+
+		MPI_Barrier(my_comm);
+		// Pass direction and Grid by reference
+		mpi_buffer_unpack( dir, Grid );
+
+
+	}
+
+	// Print Time of MPI comms
+	MPI_Barrier(my_comm);
+	t_end = clock();
+	secs = t_end - t_start;
+
+	// Update average MPI overhead time
+	Grid.timeav_mpi_overhead *= (Grid.t-1);
+	Grid.timeav_mpi_overhead += ((double)secs)/CLOCKS_PER_SEC;
+	Grid.timeav_mpi_overhead /= Grid.t;
+
+#ifdef TEXTOUT
+	if (Grid.t % out_every == 0) {
+		MPI_Barrier(my_comm);
+		*GridUtils::logfile << "Writing out to <Grids.out>" << std::endl;
+		Grid.io_textout("POST MPI COMMS");
+	}
+#endif
+
+	if (Grid.t % out_every == 0) {
+		// Performance Data
+		*GridUtils::logfile << "MPI overhead taking an average of " << Grid.timeav_mpi_overhead*1000 << "ms" << std::endl;
+	}
+
+
+}
 // *************************************************************************************************** //

@@ -34,11 +34,6 @@ int main( int argc, char* argv[] )
 
 #ifdef BUILD_FOR_MPI
 
-	// Filename for verbose write out
-#ifdef MPI_VERBOSE
-	string filename;
-#endif
-
 	// Usual initialise
 	MPI_Init( &argc, &argv );
 
@@ -88,12 +83,16 @@ int main( int argc, char* argv[] )
 		// TODO: Handle directory creation errors
 	}
 
-
+	
 	// MPI manager creation
 #ifdef BUILD_FOR_MPI
 	// Create MpiManager object
 	MpiManager* mpim = MpiManager::getInstance();
-
+	
+	// Open Mpi Logfile
+	std::ofstream mpilog;
+	MpiManager::logout = &mpilog;	// Assign pointer to logfile to MpiManager
+	
 	// Initialise the topology
 	mpim->mpi_init();
 
@@ -101,14 +100,9 @@ int main( int argc, char* argv[] )
 	mpim->mpi_gridbuild();
 #endif
 	
-	// Create log file
+	// Create application log file
 	std::ofstream logfile;
-#ifdef BUILD_FOR_MPI
-	string rank_str = to_string(MpiManager::my_rank);
-#else
-	string rank_str = to_string(0);
-#endif
-	logfile.open(GridUtils::path_str + "/log_rank" + rank_str + ".out", std::ios::out);
+	logfile.open(GridUtils::path_str + "/log_rank" + to_string(MpiManager::my_rank) + ".out", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
 	// TODO: Handle case when logfile doesn't open correctly
@@ -141,7 +135,7 @@ int main( int argc, char* argv[] )
 #ifdef BUILD_FOR_MPI
 	MPI_Barrier(mpim->my_comm);
 	secs = clock() - t_start;
-	*GridUtils::logfile << "MPI Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	*GridUtils::logfile << "MPI Topolgy initialised in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif
 
 
@@ -351,8 +345,22 @@ int main( int argc, char* argv[] )
 	MPI_Barrier(mpim->my_comm);
 #endif
 	secs = clock() - t_start;
-	*GridUtils::logfile << "Grid & Object Initialisation Completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+
+
+	// Set the pointer to the hierarchy in the MpiManager and compute buffer sizes
+#ifdef BUILD_FOR_MPI
+	MPI_Barrier(mpim->my_comm);
+	t_start = clock();
+	
+	mpim->mpi_buffer_size(&Grids);	// Call buffer sizing routine routine
+
+	secs = clock() - t_start;
+	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+#endif
+
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
+
 
 	/* ***************************************************************************************************************
 	********************************************** LBM PROCEDURE *****************************************************
@@ -483,6 +491,8 @@ int main( int argc, char* argv[] )
 	logfile.close();
 
 #ifdef BUILD_FOR_MPI
+	// Close logfile
+	MpiManager::logout->close();
 	// Finalise MPI
 	MPI_Finalize();
 #endif

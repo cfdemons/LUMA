@@ -222,9 +222,8 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef BUILD_FOR_MPI
 	// Do MPI communication on this grid level before returning //
 
-	// Launch communication wrapper passing reference to this GridObj
-	MpiManager::getInstance()->communicate(*this);
-
+	// Launch communication on this grid by passing its level and region number
+	MpiManager::getInstance()->mpi_communicate(level, region_number);
 
 #endif
 

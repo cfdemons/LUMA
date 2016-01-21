@@ -46,7 +46,6 @@ public:
 	// LBM-specific utilities
 	static size_t getOpposite(size_t direction);	// Function: getOpposite
 
-
 	// MPI-related utilities
 	static bool isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOnEdge
 	static bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
@@ -54,6 +53,11 @@ public:
 	static bool isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
 	static bool isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid);
 	static bool hasThisSubGrid(GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
+	static bool isOnSenderLayer(double site_position, char dir, char* maxmin);
+	static bool isOnRecvLayer(double site_position, char dir, char* maxmin);
+
+	// General Utilities
+	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);
 
 };
 

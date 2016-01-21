@@ -3,6 +3,18 @@
 #include "definitions.h"
 #include "GridObj.h"
 
+
+// Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
+#define i_left i = 0; i < (unsigned int)pow(2, g->level + 1); i++
+#define i_right i = N_lim - (unsigned int)pow(2, g->level + 1); i < N_lim; i++
+#define j_down j = 0; j < (unsigned int)pow(2, g->level + 1); j++
+#define j_up j = M_lim - (unsigned int)pow(2, g->level + 1); j < M_lim; j++
+#define k_front k = 0; k < (unsigned int)pow(2, g->level + 1); k++
+#define k_back k = K_lim - (unsigned int)pow(2, g->level + 1); k < K_lim; k++
+
+
+
+
 /* Manager class to handle all things MPI -- designed as a Singleton */
 class MpiManager
 {
@@ -34,16 +46,37 @@ public :
 
 
 	// Grid data
-	int global_dims[3];						// Dimensions of problem lattice
+	int global_dims[3];						// Dimensions of problem coarse lattice
 	std::vector<unsigned int> local_size;	// Dimensions of coarse lattice represented on this rank (includes inner and outer overlapping layers)
-	// Global indices of lattice represented on this rank (excluding outer overlapping layer)
+	// Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer)
 	std::vector< std::vector<unsigned int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number
-	// Global positions of lattice represented on this rank (excluding outer overlapping layer)
-	std::vector< std::vector<double> > global_edge_pos;	// Rows are x,y,z start and end pairs and columns are rank number
+	// Global positions of coarse lattice nodes represented on this rank (excluding outer overlapping layer)
+	std::vector< std::vector<double> > global_edge_pos;			// Rows are x,y,z start and end pairs and columns are rank number
+	// Structures containing sender and receiver layer edges as global physical position
+	struct layer_edges {
+		double X[4];
+		double Y[4];
+		double Z[4];
+	} sender_layer_pos, recv_layer_pos;		// [left_min left_max right_min right_max] for X,Y and Z.
+	static GridObj* Grids;					// Pointer to grid hierarchy
+	
 
 	// Buffer data
-	IVector<double> f_buffer;				// Resizeable buffer used for data transfer
+	std::vector<double> f_buffer_send;			// Resizeable outgoing buffer used for data transfer
+	std::vector<double> f_buffer_recv;			// Resizeable incoming buffer used for data transfer
 	MPI_Status stat;						// Status structure for Send-Receive return information
+	// Structure storing the buffer sizes in each direction for a particular level and region
+	struct buffer_struct {
+		unsigned int size[MPI_dir];
+		unsigned int level;
+		unsigned int region;
+	};
+	std::vector<buffer_struct> buffer_send_info, buffer_recv_info;	// Array of buffer_info structures holding buffer size information
+
+	// Logfile
+	static std::ofstream* logout;
+
+
 
 	/*
 	***************************************************************************************************************
@@ -59,13 +92,17 @@ public :
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
 
 	// Buffer methods
-	void mpi_buffer_pack( int dir, GridObj& Grids );	// Pack the buffer ready for data transfer in specified direction
-	void mpi_buffer_unpack( int dir, GridObj& Grids );	// Unpack the buffer back to the grid
+	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction
+	void mpi_buffer_unpack( int dir, GridObj* g );		// Unpack the buffer back to the grid given
+	void mpi_buffer_size( GridObj* Grids );				// Set buffer size information for grids in hierarchy given and 
+														// set pointer to hierarchy for subsequent access
+	void mpi_buffer_size_send( GridObj*& g );			// Routine to find the size of the sending buffer on supplied grid
+	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid
 
 	// IO
-	void writeout_buf( std::string filename );		// Write out the buffer to file
+	void mpi_writeout_buf( std::string filename );		// Write out the buffers to file
 
 	// Comms
-	void communicate( GridObj& Grid );		// Wrapper routine for communication between grids of given level/region
+	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
 };
 

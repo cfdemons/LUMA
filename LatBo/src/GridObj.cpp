@@ -108,11 +108,11 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	subGrid.emplace_back( RegionNumber, *this);	
 
 	// Initialise the subgrid passing position of corner of the refined region on parent grid
-	this->subGrid[subGrid.size()-1].LBM_init_subgrid(*this);
+	this->subGrid.back().LBM_init_subgrid(*this);
 
 	// Add another subgrid beneath the one just created if necessary
-	if (this->subGrid[subGrid.size()-1].level < NumLev) {
-		this->subGrid[subGrid.size()-1].LBM_addSubGrid(this->subGrid[subGrid.size()-1].region_number);
+	if (this->subGrid.back().level < NumLev) {
+		this->subGrid.back().LBM_addSubGrid(this->subGrid.back().region_number);
 	}
 
 }

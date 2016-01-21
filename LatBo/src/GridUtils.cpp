@@ -231,6 +231,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 
 // ***************************************************************************************************
 // Function to find whether a site with local indices i,j,k is on the edge of the supplied GridObj
+// On L0 this is equivalent to being on the MPI overlap.
 bool GridUtils::isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
 
 	// Get Grid size
@@ -239,7 +240,7 @@ bool GridUtils::isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj
 	unsigned int K_lim = pGrid.ZInd.size();
 
 
-	// Source on edge
+	// Check each coordinate to see if it is on edge
 	if	(
 			// Case 1: X on edge, Y,Z take any value
 			(
@@ -436,6 +437,147 @@ bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 
 	return false;
 	
+}
+
+// ***************************************************************************************************
+// Pass pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed to by Grids*
+void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
+
+	// Check supplied grid for a match
+	if (Grids->level == level && Grids->region_number == region) {
+		ptr = Grids;
+		return;
+
+	} else {
+
+		// Loop through array of subgrids on this grid getting each one by reference
+		for (GridObj& g : Grids->subGrid) {
+
+			// Create pointer to subgrid
+			GridObj* G = &g;
+
+			// Region must match
+			if (G->region_number == region) {
+
+				// Look for match on this subgrid
+				GridUtils::getGrid(G, level, region, ptr);
+
+				// If a match found then return the non-null pointer
+				if (ptr != NULL) {
+					return;
+				}
+
+			}
+
+		}
+
+	}
+	
+	// Specified grid has not been found
+	return;
+
+}
+
+// ***************************************************************************************************
+// Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
+// whether it is an 'x','y' or 'z' coordinate and which edge of the rank you are checking either "min" or "max".
+bool GridUtils::isOnSenderLayer(double site_position, char dir, char* maxmin) {
+
+	// Get instance of MPI manager
+	MpiManager* mpim = MpiManager::getInstance();
+	
+	// Do checks on rank inner overlap regions dictated by the coarsest rank
+	switch (dir) {
+
+	case 'x':
+
+		if (!strcmp(maxmin,"max") ) {	// Note that strcmp() returns 0 if they are equal
+			if (site_position > mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->sender_layer_pos.X[0] && site_position < mpim->sender_layer_pos.X[1] ) return true;
+
+		}
+		break;
+
+	case 'y':
+
+		if (!strcmp(maxmin,"max") ) {
+			if (site_position > mpim->sender_layer_pos.Y[2] && site_position < mpim->sender_layer_pos.Y[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->sender_layer_pos.Y[0] && site_position < mpim->sender_layer_pos.Y[1] ) return true;
+
+		}
+		break;
+
+
+	case 'z':
+
+		if (!strcmp(maxmin,"max") ) {
+			if (site_position > mpim->sender_layer_pos.Z[2] && site_position < mpim->sender_layer_pos.Z[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->sender_layer_pos.Z[0] && site_position < mpim->sender_layer_pos.Z[1] ) return true;
+
+		}
+		break;
+
+	}
+
+	return false;
+
+}
+
+// ***************************************************************************************************
+// Routine to check whether a site is in the outer MPI overlap of the coarsest grid based on its position,
+// whether it is an 'x','y' or 'z' coordinate and which edge of the rank you are checking either "min" or "max".
+bool GridUtils::isOnRecvLayer(double site_position, char dir, char* maxmin) {
+
+	// Get instance of MPI manager
+	MpiManager* mpim = MpiManager::getInstance();
+	
+	// Do checks on rank outer overlap regions dictated by the coarsest rank
+	switch (dir) {
+
+	case 'x':
+
+		if (!strcmp(maxmin,"max") ) {
+			if (site_position > mpim->recv_layer_pos.X[2] && site_position < mpim->recv_layer_pos.X[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->recv_layer_pos.X[0] && site_position < mpim->recv_layer_pos.X[1] ) return true;
+
+		}
+		break;
+
+	case 'y':
+
+		if (!strcmp(maxmin,"max") ) {
+			if (site_position > mpim->recv_layer_pos.Y[2] && site_position < mpim->recv_layer_pos.Y[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->recv_layer_pos.Y[0] && site_position < mpim->recv_layer_pos.Y[1] ) return true;
+
+		}
+		break;
+
+
+	case 'z':
+
+		if (!strcmp(maxmin,"max") ) {
+			if (site_position > mpim->recv_layer_pos.Z[2] && site_position < mpim->recv_layer_pos.Z[3] ) return true;
+
+		} else if (!strcmp(maxmin,"min")) {
+			if (site_position > mpim->recv_layer_pos.Z[0] && site_position < mpim->recv_layer_pos.Z[1] ) return true;
+
+		}
+		break;
+
+	}
+
+	return false;
+
 }
 
 // ***************************************************************************************************

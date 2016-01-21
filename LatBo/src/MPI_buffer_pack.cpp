@@ -7,366 +7,284 @@
 #include "../inc/GridObj.h"
 
 
-void MpiManager::mpi_buffer_pack( int dir, GridObj& Grids ) {
-
-	// Imagine every grid has an inner layer with complete information post-stream
-	// and an outer layer with incomplete information post-stream.
-	// The inner layers need copying from one grid to the outer layer of its neighbour on
-	// the opposite side of the grid.
-	// To start the process we copy the inner values to the f_buffer (intermediate buffer).
-	// This buffer will also be used to receive the new values using MPI_Sendrecv_replace().
-	unsigned int count, i, j , k, v;
-
-	MPI_Barrier(my_comm);
-
-#ifdef MPI_VERBOSE
-	std::ofstream logout;
-	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
-	logout << "Buffering direction " << dir << std::endl;
-	logout.close();
+// Routine to pack the buffer on the supplied grid to be passed in the indicated direction.
+void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
+	
+	/* Imagine every grid overlap has an inner region with complete information post-stream
+	 * and an outer region with incomplete information post-stream.
+	 * In the case of the lower level grids the layers will increase in thickness by a 
+	 * factor of 2 with each refinement.
+	 * At every exchange, the inner layers need copying from one grid to the outer layer 
+	 * of its neighbour on the opposite side of the grid.
+	 * To start the process we copy the inner values to the f_buffer_send (intermediate buffer).
+	 * This buffer will also be used to receive the new values using MPI_Sendrecv_replace(). */
+	unsigned int idx, i, j , k, v;
+	unsigned int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
+#if (dims == 3)
+		, K_lim = g->ZInd.size();
+#else
+		, K_lim = 1;
 #endif
 
-	// Copy outgoing information from inner layer to f_buffer
-	count = 0;
+	// If the buffer size is zero then don't need to pack so return
+	/*if (!f_buffer_send.size()) {
+		return;
+	}*/
+
+#ifdef MPI_VERBOSE
+	*MpiManager::logout << "Packing direction " << dir << std::endl;
+#endif
+
+	/* Copy outgoing information from inner layers to f_buffer_send using 
+	 * same idenifying logic as the buffer_size routine. */
+	idx = 0;
+
+
+	// Switch based on direction
 	switch (dir)
 	{
 
 	case 0:
 		// Right
+		
+		// Examine possible inner and outer buffer locations
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
 
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer based on y-dimension
-		f_buffer.resize( (local_size[1]-2)*nVels );
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"max") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min"))
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-
-		// Populate the buffer
-		i = local_size[0]-2;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
-
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], 1, nVels );
-
-				count++;
-
-			}
-		}
-		break;
-#else
-
-		// 3D version //
-		// Resize buffer based on y-dimension and z-dimension
-		f_buffer.resize( (local_size[1]-2) * (local_size[2]-2) * nVels );
-
-
-		// Populate the buffer
-		i = local_size[0]-2;
-		for (j = 1; j < local_size[1]-1; j++) {
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
-#endif
-
 
 	case 1:
 		// Left
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer based on y-dimension
-		f_buffer.resize((local_size[1]-2)*nVels);
+		
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
 
-		// Populate the buffer
-		i = 1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"min") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min"))
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], 1, nVels);
-
-				count++;
-
-			}
-		}
-		break;
-
-#else
-
-		// 3D version //
-		// Resize buffer based on y-dimension and z-dimension
-		f_buffer.resize( (local_size[1]-2) * (local_size[2]-2) * nVels );
-
-
-		// Populate the buffer
-		i = 1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
-#endif
 
 	case 2:
-		// Right-Up
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer to single element of grid
-		f_buffer.resize(nVels);
+		// Right-Up		
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = 1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		for (i_right) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"max") && 
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			count++;
-		}
-		break;
-#else
-		// 3D version //
-		// Resize buffer to single vector of grid
-		f_buffer.resize( (local_size[2]-2) * nVels );
-
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = 1;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-
-				count++;
+				}
 			}
 		}
 		break;
-#endif
 
 	case 3:
-		// Left-Down
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer to single element of grid
-		f_buffer.resize(nVels);
+		// Left-Down		
 
-		// Populate the buffer
-		i = 1;
-		j = local_size[1]-2;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		for (i_left) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"min") && 
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			count++;
-		}
-		break;
-#else
-		// 3D version //
-		// Resize buffer to single vector of grid
-		f_buffer.resize( (local_size[2]-2) * nVels );
-
-		// Populate the buffer
-		i = 1;
-		j = local_size[1]-2;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-
-				count++;
+				}
 			}
 		}
 		break;
-#endif
 
 	case 4:
-		// Up
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer based on x-dimension
-		f_buffer.resize((local_size[0]-2)*nVels);
+		// Up		
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 1;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) &&
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				count++;
-
-			}
-		}
-		break;
-#else
-
-		// 3D version //
-		// Resize buffer based on y-dimension and z-dimension
-		f_buffer.resize( (local_size[0]-2) * (local_size[2]-2) * nVels );
-
-
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 1;
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
-#endif
+
 
 	case 5:
-		// Down
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer based on x-dimension
-		f_buffer.resize((local_size[0]-2)*nVels);
+		// Down		
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-2;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) &&
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				count++;
-
-			}
-		}
-		break;
-#else
-
-		// 3D version //
-		// Resize buffer based on y-dimension and z-dimension
-		f_buffer.resize( (local_size[0]-2) * (local_size[2]-2) * nVels );
-
-
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-2;
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
-#endif
 
 	case 6:
-		// Left-Up
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer to single element of grid
-		f_buffer.resize(nVels);
+		// Left-Up		
 
-		// Populate the buffer
-		i = 1;
-		j = 1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		for (i_left) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"min") && 
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			count++;
-		}
-
-		break;
-#else
-		// 3D version //
-		// Resize buffer to single vector of grid
-		f_buffer.resize( (local_size[2]-2) * nVels );
-
-		// Populate the buffer
-		i = 1;
-		j = 1;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-
-				count++;
+				}
 			}
 		}
 		break;
-#endif
 
 	case 7:
-		// Right-Down
-#if (dims != 3)
-		// 2D version //
-		// Resize buffer to single element of grid
-		f_buffer.resize(nVels);
+		// Right-Down		
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = local_size[1]-2;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		for (i_right) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], 1, nVels);
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],'x',"max") && 
+							GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+#endif
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			count++;
-		}
-		break;
-#else
-		// 3D version //
-		// Resize buffer to single vector of grid
-		f_buffer.resize( (local_size[2]-2) * nVels );
-
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = local_size[1]-2;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels);
-
-				count++;
+				}
 			}
 		}
 		break;
-#endif
 
 
 	///////////////////////
@@ -374,356 +292,488 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 	///////////////////////
 
 	case 8:
-		// Back
+		// Back		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * (local_size[1]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-2;
-				for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
 
 	case 9:
-		// Front
+		// Front		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * (local_size[1]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			for (j = 1; j < local_size[1]-1; j++) {
-			k = 1;
-				for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-					f_buffer[count]
-						= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-					count++;
 				}
 			}
 		}
 		break;
 
 	case 10:
-		// Right-Back
+		// Right-Back		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[1]-2) * nVels );
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-2;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 11:
-		// Left-Front
+		// Left-Front		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[1]-2) * nVels );
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = 1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 1;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 12:
-		// Right-Up-Back
+		// Right-Up-Back		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_right) {
+			for (j_up) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = 1;
-		k = local_size[2]-2;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 13:
-		// Left-Down-Front
+		// Left-Down-Front		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_left) {
+			for (j_down) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = 1;
-		j = local_size[1]-2;
-		k = 1;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 14:
-		// Up-Back
+		// Up-Back		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k_back) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 1;
-			k = local_size[2]-2;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 15:
-		// Down-Front
+		// Down-Front		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k_front) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-2;
-			k = 1;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 16:
-		// Left-Up-Back
+		// Left-Up-Back		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_left) {
+			for (j_up) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = 1;
-		j = 1;
-		k = local_size[2]-2;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 17:
-		// Right-Down-Front
+		// Right-Down-Front		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_right) {
+			for (j_down) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = local_size[1]-2;
-		k = 1;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 18:
-		// Left-Back
+		// Left-Back		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[1]-2) * nVels );
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = 1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-2;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 19:
-		// Right-Front
+		// Right-Front		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[1]-2) * nVels );
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 1;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 20:
-		// Left-Down-Back
+		// Left-Down-Back		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_left) {
+			for (j_down) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = 1;
-		j = local_size[1]-2;
-		k = local_size[2]-2;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 21:
-		// Right-Up-Front
+		// Right-Up-Front		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_right) {
+			for (j_up) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = 1;
-		k = 1;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 22:
-		// Down-Back
+		// Down-Back		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k_back) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-2;
-			k = local_size[2]-2;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 23:
-		// Up-Front
+		// Up-Front		
 
-		// Resize buffer
-		f_buffer.resize( (local_size[0]-2) * nVels );
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k_front) {
 
-		// Populate the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 1;
-			k = 1;
-			for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-				f_buffer[count]
-					= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-				count++;
+				}
 			}
 		}
 		break;
 
 	case 24:
-		// Right-Down-Back
+		// Right-Down-Back		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_right) {
+			for (j_down) {
+				for (k_back) {
 
-		// Populate the buffer
-		i = local_size[0]-2;
-		j = local_size[1]-2;
-		k = local_size[2]-2;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
 	case 25:
-		// Left-Up-Front
+		// Left-Up-Front		
 
-		// Resize buffer
-		f_buffer.resize( nVels );
+		for (i_left) {
+			for (j_up) {
+				for (k_front) {
 
-		// Populate the buffer
-		i = 1;
-		j = 1;
-		k = 1;
-		for (v = 0; v < nVels; v++) {
+					// Check conditions for sender
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Don't pass refined sites as zero anyway
+					{
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be a site to send
+							for (v = 0; v < nVels; v++) {
+								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								idx++;
+							}
+						}
+					}
 
-			f_buffer[count]
-				= Grids.f( i, j, k, v, local_size[1], local_size[2], nVels );
-
-			count++;
+				}
+			}
 		}
 		break;
 
@@ -731,5 +781,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj& Grids ) {
 		std::cout << "Unidentified direction: " << dir << std::endl;
 		break;
 	}
+
+#ifdef MPI_VERBOSE
+	*MpiManager::logout << "Packing direction " << dir << " complete." << std::endl;
+#endif
 
 }

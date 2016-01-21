@@ -73,7 +73,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define USE_MRT
 
 #if (dims == 3)
-// MRT relaxation times (D3Q19)
+// MRT relaxation times (D3Q19) -- (see Stiebler 2011 paper for some improvements)
 #define mrt_relax {1.0, 1.19, 1.4, 1.0, 1.2, 1.0, 1.2, 1.0, 1.2, omega, 1.4, omega, 1.4, omega, omega, omega, 1.98, 1.98, 1.98}
 #else
 // MRT relaxation times (D2Q9)
@@ -97,7 +97,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // MPI Data
 #define Xcores 2
-#define Ycores 3
+#define Ycores 2
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
@@ -213,7 +213,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -243,7 +243,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -252,17 +252,17 @@ const static int zProbeLims[2] = {30, 120};
 #if (NumReg == 2 && NumLev == 2) // Done this just to making testing easier
 	const static size_t RefXstart[NumLev][NumReg]	= { {5, 5}, {2, 2} };
 	const static size_t RefXend[NumLev][NumReg]		= { {25, 25}, {20, 10} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {5, 15}, {2, 5} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {5, 14}, {5, 2} };
 	const static size_t RefYend[NumLev][NumReg]		= { {12, 25}, {10, 10} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {5, 10}, {2, 2} };
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefXend[NumLev][NumReg]		= { 20 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 6 };
-	const static size_t RefYend[NumLev][NumReg]		= { 20 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 6 };
+	const static size_t RefXend[NumLev][NumReg]		= { 24 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 9 };
+	const static size_t RefYend[NumLev][NumReg]		= { 21 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 15 };

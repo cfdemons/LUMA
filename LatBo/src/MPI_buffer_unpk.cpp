@@ -9,327 +9,299 @@
 // ********************************************************************************************************
 
 // Routine to unpack the buffer and update the macroscopic quantities at that site based on the new values.
-void MpiManager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
-
+void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
+	
 	// Copy received information back to grid using the EXACT
 	// reverse algorithm of the copying procedure
-	unsigned int count, i, j , k, v;
-
-	MPI_Barrier(my_comm);
-
-#ifdef MPI_VERBOSE
-	std::ofstream logout;
-	logout.open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out | std::ios::app );
-	logout << "Unpacking direction " << dir << std::endl;
-	logout.close();
+	unsigned int i, j , k, v, idx;
+	unsigned int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
+#if (dims == 3)
+		, K_lim = g->ZInd.size();
+#else
+		, K_lim = 1;
 #endif
 
-	// Copy outgoing information from f_buffer to outer layer
-	count = 0;
+	// If the buffer size is zero then don't need to unpack so return
+	/*if (!f_buffer_recv.size()) {
+		return;
+	}*/
+
+#ifdef MPI_VERBOSE
+	*MpiManager::logout << "Unpacking direction " << dir << std::endl;
+#endif
+
+	// Copy outgoing information from f_buffer_recv to outer layers
+	idx = 0;
+
+	// Switch based on direction
 	switch (dir)
 	{
 
 	case 0:
 		// Right
+		
+		// Examine possible inner and outer buffer locations
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
 
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer (into the left-hand outer layer of the grid)
-		i = 0;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
-
-				Grids.f( i, j, k, v, local_size[1], 1, nVels ) = f_buffer[count];
-
-				count++;
-
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-#else
-		// 3D version //
-		// Read the buffer (into the left-hand outer layer of the grid)
-		i = 0;
-		for (j = 1; j < local_size[1]-1; j++) {
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-					count++;
-				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
-			}
-		}
-		break;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max"))
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
+		}
+		break;
 
 	case 1:
 		// Left
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		i = local_size[0]-1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k = 0; k < K_lim; k++) {
 
-				count++;
-
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-#else
-		// 3D version //
-		i = local_size[0]-1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-					count++;
-				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
-			}
-		}
-		break;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max"))
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
-
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+					
+				}
+			}
+		}
+		break;
 
 	case 2:
 		// Right-Up
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		i = 0;
-		j = local_size[1]-1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i_left) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-			count++;
-		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		i = 0;
-		j = local_size[1]-1;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-				count++;
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
 
+				}
+			}
+		}
+		break;
 
 	case 3:
 		// Left-Down
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		i = local_size[0]-1;
-		j = 0;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i_right) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-			count++;
-		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		i = local_size[0]-1;
-		j = 0;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-				count++;
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
 
+				}
+			}
+		}
+		break;
 
 	case 4:
 		// Up
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-1;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-				count++;
-
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-1;
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-					count++;
-				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
-			}
-		}
-		break;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
+		}
+		break;
 
 
 	case 5:
 		// Down
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 0;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-				count++;
-
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 0;
-			for (k = 1; k < local_size[2]-1; k++) {
-				for (v = 0; v < nVels; v++) {
-
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-					count++;
-				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
-			}
-		}
-		break;
-
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
 
+				}
+			}
+		}
+		break;
 
 	case 6:
 		// Left-Up
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		i = local_size[0]-1;
-		j = local_size[1]-1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i_right) {
+			for (j_down) {
+				for (k = 0; k < K_lim; k++) {
 
-			count++;
-		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		i = local_size[0]-1;
-		j = local_size[1]-1;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-				count++;
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
 
+				}
+			}
+		}
+		break;
 
 	case 7:
 		// Right-Down
-#if (dims != 3)
-		// 2D version //
-		// Read the buffer
-		i = 0;
-		j = 0;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], 1, nVels) = f_buffer[count];
+		for (i_left) {
+			for (j_up) {
+				for (k = 0; k < K_lim; k++) {
 
-			count++;
-		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
-		break;
-#else
-		// 3D version //
-		// Read the buffer
-		i = 0;
-		j = 0;
-		for (k = 1; k < local_size[2]-1; k++) {
-			for (v = 0; v < nVels; v++) {
-
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
-
-				count++;
-			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
-		}
-		break;
-
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+#if (dims == 3)
+							&&
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
 #endif
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
+		}
+		break;
+
 
 	///////////////////////
 	// 3D-specific cases //
@@ -337,289 +309,551 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj& Grids ) {
 
 	case 8:
 		// Back
-		for (i = 1; i < local_size[0]-1; i++) {
-			for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-				for (v = 0; v < nVels; v++) {
+		
 
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-					count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
 				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
 			}
 		}
 		break;
 
 	case 9:
 		// Front
-		for (i = 1; i < local_size[0]-1; i++) {
-			for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-1;
-				for (v = 0; v < nVels; v++) {
+		
 
-					Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-					count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
 				}
-				// Update macroscopic (but not time-averaged quantities)
-				Grids.LBM_macro(i,j,k);
 			}
 		}
 		break;
 
 	case 10:
 		// Right-Back
-		i = 0;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 11:
 		// Left-Front
-		i = local_size[0]-1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-1;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 12:
 		// Right-Up-Back
-		i = 0;
-		j = local_size[1]-1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j_down) {
+				for (k_front) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 13:
 		// Left-Down-Front
-		i = local_size[0]-1;
-		j = 0;
-		k = local_size[2]-1;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j_up) {
+				for (k_back) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 14:
 		// Up-Back
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-1;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k_front) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 15:
 		// Down-Front
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 0;
-			k = local_size[2]-1;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k_back) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 16:
 		// Left-Up-Back
-		i = local_size[0]-1;
-		j = local_size[1]-1;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j_down) {
+				for (k_front) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 17:
 		// Right-Down-Front
-		i = 0;
-		j = 0;
-		k = local_size[2]-1;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j_up) {
+				for (k_back) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 18:
 		// Left-Back
-		i = local_size[0]-1;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_front) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 19:
 		// Right-Front
-		i = 0;
-		for (j = 1; j < local_size[1]-1; j++) {
-			k = local_size[2]-1;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j = 0; j < M_lim; j++) {
+				for (k_back) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 20:
 		// Left-Down-Back
-		i = local_size[0]-1;
-		j = 0;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j_up) {
+				for (k_front) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 21:
 		// Right-Up-Front
-		i = 0;
-		j = local_size[1]-1;
-		k = local_size[2]-1;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j_down) {
+				for (k_back) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 22:
 		// Down-Back
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = 0;
-			k = 0;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_up) {
+				for (k_front) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 23:
 		// Up-Front
-		for (i = 1; i < local_size[0]-1; i++) {
-			j = local_size[1]-1;
-			k = local_size[2]-1;
-			for (v = 0; v < nVels; v++) {
+		
 
-				Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i = 0; i < N_lim; i++) {
+			for (j_down) {
+				for (k_back) {
 
-				count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
 			}
-			// Update macroscopic (but not time-averaged quantities)
-			Grids.LBM_macro(i,j,k);
 		}
 		break;
 
 	case 24:
 		// Right-Down-Back
-		i = 0;
-		j = 0;
-		k = 0;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_left) {
+			for (j_up) {
+				for (k_front) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities) (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	case 25:
 		// Left-Up-Front
-		i = local_size[0]-1;
-		j = local_size[1]-1;
-		k = local_size[2]-1;
-		for (v = 0; v < nVels; v++) {
+		
 
-			Grids.f( i, j, k, v, local_size[1], local_size[2], nVels ) = f_buffer[count];
+		for (i_right) {
+			for (j_down) {
+				for (k_back) {
 
-			count++;
+					// Check conditions for receiver
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					{
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						) {
+							// Must be suitable receiver site
+							for (v = 0; v < nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								idx++;
+							}
+							// Update macroscopic (but not time-averaged quantities)
+							g->LBM_macro(i,j,k);
+						}
+					}
+
+				}
+			}
 		}
-		// Update macroscopic (but not time-averaged quantities) (but not time-averaged quantities)
-		Grids.LBM_macro(i,j,k);
 		break;
 
 	default:
 		std::cout << "Unidentified direction: " << dir << std::endl;
 		break;
 	}
+
+#ifdef MPI_VERBOSE
+	*MpiManager::logout << "Unpacking direction " << dir << " complete." << std::endl;
+#endif
 
 }

@@ -15,6 +15,7 @@ class GridObj
 	// Allow MpiManager and ObjectManager objects to access private Grid information as required
 	friend class MpiManager;
 	friend class ObjectManager;
+	friend class GridUtils;
 
 public:
 

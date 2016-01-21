@@ -393,6 +393,28 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	ZPos.insert( ZPos.begin(), fmod(ZPos[0]-dz + Lz, Ly) ); ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size()-1]+dz + Lz, Lz) );
 #endif
 
+	// Update the sender/recv layer positions in the MpiManager
+	MpiManager* mpim = MpiManager::getInstance();
+
+	// X
+	mpim->sender_layer_pos.X[0] = XPos[1] - dx/2; mpim->sender_layer_pos.X[1] = XPos[1] + dx/2;
+	mpim->sender_layer_pos.X[2] = XPos[local_size[0] - 2] - dx/2; mpim->sender_layer_pos.X[3] = XPos[local_size[0] - 2] + dx/2;
+	mpim->recv_layer_pos.X[0] = XPos[0] - dx/2; mpim->recv_layer_pos.X[1] = XPos[0] + dx/2;
+	mpim->recv_layer_pos.X[2] = XPos[local_size[0] - 1] - dx/2; mpim->recv_layer_pos.X[3] = XPos[local_size[0] - 1] + dx/2;
+	// Y
+	mpim->sender_layer_pos.Y[0] = YPos[1] - dy/2; mpim->sender_layer_pos.Y[1] = YPos[1] + dy/2;
+	mpim->sender_layer_pos.Y[2] = YPos[local_size[1] - 2] - dy/2; mpim->sender_layer_pos.Y[3] = YPos[local_size[1] - 2] + dy/2;
+	mpim->recv_layer_pos.Y[0] = YPos[0] - dy/2; mpim->recv_layer_pos.Y[1] = YPos[0] + dy/2;
+	mpim->recv_layer_pos.Y[2] = YPos[local_size[0] - 1] - dy/2; mpim->recv_layer_pos.Y[3] = YPos[local_size[0] - 1] + dy/2;
+	// Z
+#if (dims == 3)
+	mpim->sender_layer_pos.Z[0] = ZPos[1] - dz/2; mpim->sender_layer_pos.Z[1] = ZPos[1] + dz/2;
+	mpim->sender_layer_pos.Z[2] = ZPos[local_size[2] - 2] - dz/2; mpim->sender_layer_pos.Z[3] = ZPos[local_size[2] - 2] + dz/2;
+	mpim->recv_layer_pos.Z[0] = ZPos[0] - dz/2; mpim->recv_layer_pos.Z[1] = ZPos[0] + dz/2;
+	mpim->recv_layer_pos.Z[2] = ZPos[local_size[0] - 1] - dz/2; mpim->recv_layer_pos.Z[3] = ZPos[local_size[0] - 1] + dz/2;
+#endif
+
+
 #else
 	// When not builiding for MPI positions are straightforward
 	XPos = GridUtils::linspace( a_x + dx/2, b_x - dx/2, N );
@@ -811,13 +833,12 @@ void GridObj::LBM_init_solid_lab() {
 
 						LatTyp(local_i,local_j,local_k,M_lim,K_lim) = 0;
 				}
-#else
-				LatTyp(i,j,k,M_lim,K_lim) = 0;
-#endif
 
 			}
 		}
 	}
+
+#endif
 
 }
 

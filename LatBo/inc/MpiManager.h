@@ -62,9 +62,10 @@ public :
 	
 
 	// Buffer data
-	std::vector<double> f_buffer_send;			// Resizeable outgoing buffer used for data transfer
-	std::vector<double> f_buffer_recv;			// Resizeable incoming buffer used for data transfer
-	MPI_Status stat;						// Status structure for Send-Receive return information
+	std::vector< std::vector<double>> f_buffer_send;	// Array of resizeable outgoing buffers used for data transfer
+	std::vector< std::vector<double>> f_buffer_recv;	// Array of resizeable incoming buffers used for data transfer
+	MPI_Status stat;		// Status structure for Send-Receive return information
+	MPI_Request request;	// Request structure for handle to a posted Send-Receive
 	// Structure storing the buffer sizes in each direction for a particular level and region
 	struct buffer_struct {
 		unsigned int size[MPI_dir];
@@ -100,7 +101,7 @@ public :
 	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid
 
 	// IO
-	void mpi_writeout_buf( std::string filename );		// Write out the buffers to file
+	void mpi_writeout_buf( std::string filename, unsigned int dir );		// Write out the buffers of direction dir to file
 
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region

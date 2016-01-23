@@ -397,23 +397,29 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	MpiManager* mpim = MpiManager::getInstance();
 
 	// X
-	mpim->sender_layer_pos.X[0] = XPos[1] - dx/2; mpim->sender_layer_pos.X[1] = XPos[1] + dx/2;
-	mpim->sender_layer_pos.X[2] = XPos[local_size[0] - 2] - dx/2; mpim->sender_layer_pos.X[3] = XPos[local_size[0] - 2] + dx/2;
-	mpim->recv_layer_pos.X[0] = XPos[0] - dx/2; mpim->recv_layer_pos.X[1] = XPos[0] + dx/2;
-	mpim->recv_layer_pos.X[2] = XPos[local_size[0] - 1] - dx/2; mpim->recv_layer_pos.X[3] = XPos[local_size[0] - 1] + dx/2;
+	mpim->sender_layer_pos.X[0] = XPos[1] - dx/2;					mpim->sender_layer_pos.X[1] = XPos[1] + dx/2;
+	mpim->sender_layer_pos.X[2] = XPos[local_size[0] - 2] - dx/2;	mpim->sender_layer_pos.X[3] = XPos[local_size[0] - 2] + dx/2;
+	mpim->recv_layer_pos.X[0]	= XPos[0] - dx/2;					mpim->recv_layer_pos.X[1]	= XPos[0] + dx/2;
+	mpim->recv_layer_pos.X[2]	= XPos[local_size[0] - 1] - dx/2;	mpim->recv_layer_pos.X[3]	= XPos[local_size[0] - 1] + dx/2;
 	// Y
-	mpim->sender_layer_pos.Y[0] = YPos[1] - dy/2; mpim->sender_layer_pos.Y[1] = YPos[1] + dy/2;
-	mpim->sender_layer_pos.Y[2] = YPos[local_size[1] - 2] - dy/2; mpim->sender_layer_pos.Y[3] = YPos[local_size[1] - 2] + dy/2;
-	mpim->recv_layer_pos.Y[0] = YPos[0] - dy/2; mpim->recv_layer_pos.Y[1] = YPos[0] + dy/2;
-	mpim->recv_layer_pos.Y[2] = YPos[local_size[0] - 1] - dy/2; mpim->recv_layer_pos.Y[3] = YPos[local_size[0] - 1] + dy/2;
+	mpim->sender_layer_pos.Y[0] = YPos[1] - dy/2;					mpim->sender_layer_pos.Y[1] = YPos[1] + dy/2;
+	mpim->sender_layer_pos.Y[2] = YPos[local_size[1] - 2] - dy/2;	mpim->sender_layer_pos.Y[3] = YPos[local_size[1] - 2] + dy/2;
+	mpim->recv_layer_pos.Y[0]	= YPos[0] - dy/2;					mpim->recv_layer_pos.Y[1]	= YPos[0] + dy/2;
+	mpim->recv_layer_pos.Y[2]	= YPos[local_size[1] - 1] - dy/2;	mpim->recv_layer_pos.Y[3]	= YPos[local_size[1] - 1] + dy/2;
 	// Z
 #if (dims == 3)
 	mpim->sender_layer_pos.Z[0] = ZPos[1] - dz/2; mpim->sender_layer_pos.Z[1] = ZPos[1] + dz/2;
 	mpim->sender_layer_pos.Z[2] = ZPos[local_size[2] - 2] - dz/2; mpim->sender_layer_pos.Z[3] = ZPos[local_size[2] - 2] + dz/2;
 	mpim->recv_layer_pos.Z[0] = ZPos[0] - dz/2; mpim->recv_layer_pos.Z[1] = ZPos[0] + dz/2;
-	mpim->recv_layer_pos.Z[2] = ZPos[local_size[0] - 1] - dz/2; mpim->recv_layer_pos.Z[3] = ZPos[local_size[0] - 1] + dz/2;
+	mpim->recv_layer_pos.Z[2] = ZPos[local_size[2] - 1] - dz/2; mpim->recv_layer_pos.Z[3] = ZPos[local_size[2] - 1] + dz/2;
 #endif
 
+#ifdef MPI_VERBOSE
+	*mpim->logout << "X sender layers are: " << mpim->sender_layer_pos.X[0] << " -- " << mpim->sender_layer_pos.X[1] << " (min edge) , " << mpim->sender_layer_pos.X[2] << " -- " << mpim->sender_layer_pos.X[3] << " (max edge)" << std::endl;
+	*mpim->logout << "Y sender layers are: " << mpim->sender_layer_pos.Y[0] << " -- " << mpim->sender_layer_pos.Y[1] << " (min edge) , " << mpim->sender_layer_pos.Y[2] << " -- " << mpim->sender_layer_pos.Y[3] << " (max edge)" << std::endl;
+	*mpim->logout << "X recv layers are: " << mpim->recv_layer_pos.X[0] << " -- " << mpim->recv_layer_pos.X[1] << " (min edge) , " << mpim->recv_layer_pos.X[2] << " -- " << mpim->recv_layer_pos.X[3] << " (max edge)" << std::endl;
+	*mpim->logout << "Y recv layers are: " << mpim->recv_layer_pos.Y[0] << " -- " << mpim->recv_layer_pos.Y[1] << " (min edge) , " << mpim->recv_layer_pos.Y[2] << " -- " << mpim->recv_layer_pos.Y[3] << " (max edge)" << std::endl;
+#endif
 
 #else
 	// When not builiding for MPI positions are straightforward
@@ -513,8 +519,8 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	// If IBM rectangle use y-dimension (in lattice units)
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
-	// Use object height
-	nu = (obj_y_max - obj_y_min) * u_ref / Re;
+	// Use object height (scaled back to L0 units)
+	nu = (obj_y_max - obj_y_min) * pow (2, block_on_grid_lev) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
 	nu = M * u_ref / Re;

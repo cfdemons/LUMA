@@ -26,11 +26,6 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		, K_lim = 1;
 #endif
 
-	// If the buffer size is zero then don't need to pack so return
-	/*if (!f_buffer_send.size()) {
-		return;
-	}*/
-
 #ifdef MPI_VERBOSE
 	*MpiManager::logout << "Packing direction " << dir << std::endl;
 #endif
@@ -64,7 +59,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -94,7 +89,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -124,7 +119,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -154,7 +149,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -184,7 +179,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -215,7 +210,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -245,7 +240,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -275,7 +270,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -307,7 +302,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -334,7 +329,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -361,7 +356,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -388,7 +383,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -415,7 +410,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -442,7 +437,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -469,7 +464,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -496,7 +491,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -523,7 +518,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -550,7 +545,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -577,7 +572,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -604,7 +599,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -631,7 +626,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -658,7 +653,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -685,7 +680,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -712,7 +707,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -739,7 +734,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}
@@ -766,7 +761,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 						) {
 							// Must be a site to send
 							for (v = 0; v < nVels; v++) {
-								f_buffer_send[idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,nVels);
 								idx++;
 							}
 						}

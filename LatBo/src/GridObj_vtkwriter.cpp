@@ -29,7 +29,9 @@ void GridObj::io_vtkwriter(double tval)
 	fout << "ASCII\n";
 
 	// Grid information -- structured points for uniform lattice
-	size_t ni, nj, nk, ni_corrected, nj_corrected, nk_corrected, startx, starty, startz, endx, endy, endz;
+	size_t ni, nj, nk;
+	size_t ni_corrected = 0, nj_corrected = 0, nk_corrected = 0;
+	size_t start_x, start_y, start_z;
 
 	// Actual grid sizes
 	ni = XPos.size();
@@ -38,31 +40,40 @@ void GridObj::io_vtkwriter(double tval)
 	nk = ZPos.size();
 #else
 	nk = 1;
+	start_z = 0;
+	nk_corrected = 1;
 #endif
 
-	// If using MPI correct grid size and starting and end loop
-	// indices to avoid writing out the outer buffers
+	// If using MPI, correct grid size to avoid writing out the receiving buffers
 #ifdef BUILD_FOR_MPI
-	ni_corrected = ni - 2;
-	nj_corrected = nj - 2;
-	startx = 1; endx = ni_corrected + 1;
-	starty = 1; endy = nj_corrected + 1;
+
+	// Loop over positions to determine size of grid without overlap
+	for (size_t i = 0; i < ni; i++) {
+		if(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min")) {
+			ni_corrected++;
+			if (i == 0 || XPos[i] < XPos[i-1]) {
+				start_x = i;
+			}
+		}
+	}
+	for (size_t j = 0; j < nj; j++) {
+		if(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) {
+			nj_corrected++;
+			if (j == 0 || YPos[j] < YPos[j-1]) {
+				start_y = j;
+			}
+		}
+	}
 #if (dims == 3)
-	nk_corrected = nk - 2;
-	startz = 1; endz = nk_corrected + 1;
-#else
-	nk_corrected = nk;
-	startz = 0; endz = nk_corrected;
+	for (int kj = 0; k < nk; k++) {
+		if(!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min")) {
+			nk_corrected++;
+			if (k == 0 || ZPos[k] < ZPos[k-1]) {
+				start_z = k;
+			}
+		}
+	}
 #endif
-
-#else
-	ni_corrected = ni;
-	nj_corrected = nj;
-	nk_corrected = nk;
-	startx = 0; endx = ni_corrected;
-	starty = 0; endy = nj_corrected;
-	startz = 0; endz = nk_corrected;
-
 #endif
 
 	fout << "DATASET STRUCTURED_POINTS\n";
@@ -71,9 +82,8 @@ void GridObj::io_vtkwriter(double tval)
 	fout << "DIMENSIONS " << ni_corrected << " " << nj_corrected << " " << nk_corrected << "\n";
 	fout << "SPACING " << dx << " " << dy << " " << dz << "\n";
 
-	// Even refined grids when using MPI need to start at zero
-	if ( level == 0 ) fout << "ORIGIN " << XPos[startx] << " " << YPos[starty] << " " << ZPos[startz] << "\n";
-	else fout << "ORIGIN " << XPos[0] << " " << YPos[0] << " " << ZPos[0] << "\n";
+	// Starting point
+	fout << "ORIGIN " << XPos[start_x] << " " << YPos[start_y] << " " << ZPos[start_z] << "\n";
 
 	// Data set
 	fout << "POINT_DATA " << ni_corrected * nj_corrected * nk_corrected << "\n";
@@ -81,11 +91,19 @@ void GridObj::io_vtkwriter(double tval)
 	// Density
 	fout << "SCALARS Density " << "float 1\n";	// Name of set = Density, type = float, components = 1
 	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
-				fout << (float)rho(i,j,k,nj,nk) << " ";
+			for (size_t i : XInd) {
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
+#if (dims == 3)
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#endif
+					) {
+						fout << (float)rho(i,j,k,nj,nk) << " ";
+				}
 			}
 		}
 	}
@@ -93,11 +111,19 @@ void GridObj::io_vtkwriter(double tval)
 	// Time-Averaged Density
 	fout << "\nSCALARS TimeAveragedDensity " << "float 1\n";	// Name of set = TimeAveragedDensity, type = float, components = 1
 	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
-				fout << (float)rho_timeav(i,j,k,nj,nk) << " ";
+			for (size_t i : XInd) {
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
+#if (dims == 3)
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#endif
+					) {
+						fout << (float)rho_timeav(i,j,k,nj,nk) << " ";
+				}
 			}
 		}
 	}
@@ -105,18 +131,27 @@ void GridObj::io_vtkwriter(double tval)
 	// Time-Averaged UiUj (dims-1 components)
 	fout << "\nSCALARS TimeAveragedUiUj " << "float " << to_string(2*dims-3) << "\n";	// Components = 2*dims-3
 	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
+			for (size_t i : XInd) {
 
-				// Write out element 1 in 2D (u_01)
-				fout << (float)uiuj_timeav(i,j,k,1,nj,nk,(3*dims-3)) << " ";
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
 #if (dims == 3)
-				// Also write out element 2 and 4 in 3D (u_02 and u_12 respectively)
-				fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
-				fout << (float)uiuj_timeav(i,j,k,4,nj,nk,(3*dims-3)) << " ";
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
 #endif
+					) {
+
+					// Write out element 1 in 2D (u_01)
+					fout << (float)uiuj_timeav(i,j,k,1,nj,nk,(3*dims-3)) << " ";
+#if (dims == 3)
+					// Also write out element 2 and 4 in 3D (u_02 and u_12 respectively)
+					fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
+					fout << (float)uiuj_timeav(i,j,k,4,nj,nk,(3*dims-3)) << " ";
+#endif
+				}
 
 			}
 		}
@@ -125,19 +160,28 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Velocity
 	fout << "\nVECTORS Velocity " << "float";	// Name of set = Velocity, type = float
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
+			for (size_t i : XInd) {
 
-				for (size_t dir = 0; dir < dims; dir++) {
-					fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
-				}
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
+#if (dims == 3)
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#endif
+					) {
+
+					for (size_t dir = 0; dir < dims; dir++) {
+						fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
+					}
 
 #if (dims != 3)
-				// Need to add a z-component of zero to complete file in 2D
-				fout << 0.0 << " ";
+					// Need to add a z-component of zero to complete file in 2D
+					fout << 0.0 << " ";
 #endif
+				}
 
 			}
 		}
@@ -145,45 +189,61 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Time-Averaged Ui
 	fout << "\nVECTORS TimeAveragedUi " << "float";	// Name of set = TimeAveragedUi, type = float
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
+			for (size_t i : XInd) {
 
-				for (size_t dir = 0; dir < dims; dir++) {
-					fout << (float)ui_timeav(i,j,k,dir,nj,nk,dims) << " ";
-				}
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
+#if (dims == 3)
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#endif
+					) {
+
+					for (size_t dir = 0; dir < dims; dir++) {
+						fout << (float)ui_timeav(i,j,k,dir,nj,nk,dims) << " ";
+					}
 
 #if (dims != 3)
-				// Need to add a z-component of zero to complete file in 2D
-				fout << 0.0 << " ";
+					// Need to add a z-component of zero to complete file in 2D
+					fout << 0.0 << " ";
 #endif
-
+				}
 			}
 		}
 	}
 
 	// Time-Averaged UiUi
 	fout << "\nVECTORS TimeAveragedUiUi " << "float";
-	for (size_t k = startz; k < endz; k++) {
-		for (size_t j = starty; j < endy; j++) {
+	for (size_t k : ZInd) {
+		for (size_t j : YInd) {
 			fout << "\n"; // New line for each row
-			for (size_t i = startx; i < endx; i++) {
+			for (size_t i : XInd) {
 
-				// Write out element 0 in both 2D and 3D (u_00)
-				fout << (float)uiuj_timeav(i,j,k,0,nj,nk,(3*dims-3)) << " ";
+				if (
+					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
+					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
+#if (dims == 3)
+					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#endif
+					) {
+
+					// Write out element 0 in both 2D and 3D (u_00)
+					fout << (float)uiuj_timeav(i,j,k,0,nj,nk,(3*dims-3)) << " ";
 
 #if (dims == 3)
-				// Also write out elements 3 and 5 in 3D (u_11 and u_22 respectively)
-				fout << (float)uiuj_timeav(i,j,k,3,nj,nk,(3*dims-3)) << " ";
-				fout << (float)uiuj_timeav(i,j,k,5,nj,nk,(3*dims-3)) << " ";
+					// Also write out elements 3 and 5 in 3D (u_11 and u_22 respectively)
+					fout << (float)uiuj_timeav(i,j,k,3,nj,nk,(3*dims-3)) << " ";
+					fout << (float)uiuj_timeav(i,j,k,5,nj,nk,(3*dims-3)) << " ";
 #else
-				// Also write out element 2 in 2D (u_11)
-				fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
-				// Need to add a z-component of zero to complete file in 2D
-				fout << 0.0 << " ";
+					// Also write out element 2 in 2D (u_11)
+					fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
+					// Need to add a z-component of zero to complete file in 2D
+					fout << 0.0 << " ";
 #endif
-
+				}
 			}
 		}
 	}

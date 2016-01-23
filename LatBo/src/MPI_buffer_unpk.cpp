@@ -21,11 +21,6 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		, K_lim = 1;
 #endif
 
-	// If the buffer size is zero then don't need to unpack so return
-	/*if (!f_buffer_recv.size()) {
-		return;
-	}*/
-
 #ifdef MPI_VERBOSE
 	*MpiManager::logout << "Unpacking direction " << dir << std::endl;
 #endif
@@ -57,7 +52,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -90,7 +85,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -123,7 +118,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -156,7 +151,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -189,7 +184,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -223,7 +218,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -256,7 +251,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -289,7 +284,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -324,7 +319,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -354,7 +349,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -384,7 +379,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -414,7 +409,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -444,7 +439,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -474,7 +469,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -504,7 +499,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -534,7 +529,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -564,7 +559,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -594,7 +589,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -624,7 +619,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -654,7 +649,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -684,7 +679,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -714,7 +709,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -744,7 +739,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -774,7 +769,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -804,7 +799,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -834,7 +829,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[idx];
+								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)

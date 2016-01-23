@@ -16,6 +16,9 @@ GridObj* MpiManager::Grids;
 // Constructor (private)
 MpiManager::MpiManager(void)
 {
+	// Resize buffer arrays based on number of MPI directions
+	f_buffer_send.resize(MPI_dir, std::vector<double>(0));
+	f_buffer_recv.resize(MPI_dir, std::vector<double>(0));
 }
 
 // Destructor
@@ -397,19 +400,19 @@ void MpiManager::mpi_gridbuild( ) {
 
 // *************************************************************************************************** //
 // Writes out f-buffers
-void MpiManager::mpi_writeout_buf( std::string filename ) {
+void MpiManager::mpi_writeout_buf( std::string filename, unsigned int dir ) {
 
 	std::ofstream rankout;
 	rankout.open(filename.c_str(), std::ios::out);
 
-	rankout << "f_buffer_send is of size " << f_buffer_send.size() << " with values: " << std::endl;
-	for (size_t v = 0; v < f_buffer_send.size(); v++) {
-		rankout << f_buffer_send[v] << std::endl;
+	rankout << "f_buffer_send is of size " << f_buffer_send[dir].size() << " with values: " << std::endl;
+	for (size_t v = 0; v < f_buffer_send[dir].size(); v++) {
+		rankout << f_buffer_send[dir][v] << std::endl;
 	}
 
-	rankout << "f_buffer_recv is of size " << f_buffer_recv.size() << " with values: " << std::endl;
-	for (size_t v = 0; v < f_buffer_recv.size(); v++) {
-		rankout << f_buffer_recv[v] << std::endl;
+	rankout << "f_buffer_recv is of size " << f_buffer_recv[dir].size() << " with values: " << std::endl;
+	for (size_t v = 0; v < f_buffer_recv[dir].size(); v++) {
+		rankout << f_buffer_recv[dir][v] << std::endl;
 	}
 
 	rankout.close();
@@ -431,87 +434,147 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	// MPI Communication //
 	///////////////////////
 
+	/* Must be able to send data but not expect to receive with using MPI on multi-grid configurations
+	* so cannot use MPI_Sendrecv_replace() and a single buffer as we did before. Use double buffer 
+	* call instead. Also, not every rank will need to send-receive on every grid level as it might 
+	* not have a sub-grid so need to handle sends and receives separately to ensure they only communicate 
+	* with grids that are expecting it.
+	*
+	* IMPORTANT: MPI_Barrier() calls synchronise the entire topology. If these calls are made on MPI 
+	* communications on a particular grid that only exists on some ranks, the sub-time steps on each rank 
+	* will be out of sync. Need to allow the blocking nature of the send and receive calls to force correct 
+	* synchronisation between processes.
+	*
+	* For each sending direction, pack and load a message into the message queue 
+	* for the destination rank with tag assocaited with direction.
+	* Then for each receive direction, pull message with correct tag from the queue 
+	* and unpack.
+	*
+	* In order to do this, need non-blocking send and receive calls and each needs
+	* their own buffer to store the information which cannot be touched until the 
+	* send is completed, hence this implementation carries a bigger memeory requirement
+	* as buffer reuse through the direction loop is not possible.
+	* Although MPI_Bsend() will do something similar it relies on creating and filling 
+	* MPI background buffers which might have limited resources and which is slower so 
+	* we use the MPI Manager class to hold the buffer in house. */
+
 	// Start the clock
-	MPI_Barrier(my_comm);
 	t_start = clock();
+
+	// Create a unique tag based on level, region and direction
+	int TAG;
 
 	// Loop over directions in Cartesian topology
 	for (int dir = 0; dir < MPI_dir; dir++) {
 
+		// Create tag
+		TAG = ((Grid->level + 1) * 100000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
+
 		////////////////////////////
 		// Resize and Pack Buffer //
 		////////////////////////////
-		MPI_Barrier(my_comm);
 
-		// Adjust buffer sizes
+		// Adjust buffer size
 		for (MpiManager::buffer_struct bufs : buffer_send_info) {
 			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
-				f_buffer_send.resize(bufs.size[dir] * nVels);
+				f_buffer_send[dir].resize(bufs.size[dir] * nVels);
 			}
 		}
-		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
-			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
-				f_buffer_recv.resize(bufr.size[dir] * nVels);
-			}
+
+		// Only pack and send if required
+		if (f_buffer_send[dir].size()) {
+
+			// Pass direction and Grid by reference and pack if required
+			mpi_buffer_pack( dir, Grid );
+		
+
+			///////////////
+			// Post Send //
+			///////////////
+
+#ifdef MPI_VERBOSE
+			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+								<< " -->  Posting Send for " << f_buffer_send[dir].size() / nVels
+								<< " sites to Rank " << neighbour_rank[dir] << "." << std::endl;
+#endif
+			// Post send message to message queue
+			MPI_Isend( &f_buffer_send[dir].front(), f_buffer_send[dir].size(), MPI_DOUBLE, neighbour_rank[dir], TAG, my_comm, &request );
+
+#ifdef MPI_VERBOSE
+			*MpiManager::logout << "Direction " << dir << " --> Send Posted." << std::endl;
+#endif
+
 		}
-		//if (f_buffer_send.size() == 0 && f_buffer_recv.size() == 0) continue;
+	}
 
-		// Pass direction and Grid by reference and pack
-		mpi_buffer_pack( dir, Grid );
 
-		//////////////////
-		// Send/Receive //
-		//////////////////
+	// Now loop again using blocking receive calls to synchronise
+	// Loop over directions in Cartesian topology
+	for (int dir = 0; dir < MPI_dir; dir++) {
 
 		// Find opposite direction (neighbour it receives from)
 		unsigned int opp_dir = GridUtils::getOpposite(dir);
-		/* Must be able to send data but not expect to receive with using MPI on multi-grid configurations
-		 * so cannot use MPI_Sendrecv_replace() and a single buffer as we did before. Use double buffer 
-		 * MPI_Sendrecv() instead.
-		 */
+
+		// Create tag
+		TAG = ((Grid->level + 1) * 100000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
+
+		// Resize the receive buffer
+		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
+			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
+				f_buffer_recv[dir].resize(bufr.size[dir] * nVels);
+			}
+		}
+
+
+		///////////////////
+		// Fetch Message //
+		///////////////////
+
+		if (f_buffer_recv[dir].size()) {
 
 #ifdef MPI_VERBOSE
-		*MpiManager::logout << "Direction " << dir << " --> Sending and Receiving." << std::endl;
+			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+								<< " -->  Fetching message for " << f_buffer_recv[dir].size() / nVels	
+								<< " sites from Rank " << neighbour_rank[opp_dir] << "." << std::endl;
 #endif
+
+			// Use a blocking receive call if required
+			MPI_Recv( &f_buffer_recv[dir].front(), f_buffer_recv[dir].size(), MPI_DOUBLE, neighbour_rank[opp_dir], TAG,	my_comm, &stat );
 		
-		MPI_Barrier(my_comm);		
-		// Blocking call
-		MPI_Sendrecv(	&f_buffer_send.front(), f_buffer_send.size(), MPI_DOUBLE, neighbour_rank[dir], dir,
-						&f_buffer_recv.front(), f_buffer_recv.size(), MPI_DOUBLE, neighbour_rank[opp_dir], dir,
-						my_comm, &stat
-					);
-		MPI_Barrier(my_comm);
 
 #ifdef MPI_VERBOSE
-		*MpiManager::logout << "Direction " << dir << " --> Sending and Receiving Complete." << std::endl;
+			*MpiManager::logout << "Direction " << dir << " --> Received." << std::endl;
 
-		// Write out buffers
-		*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir << " -- Sent " << f_buffer_send.size() << " to " << neighbour_rank[dir] << ": Received " << f_buffer_recv.size() << " from " << neighbour_rank[opp_dir] << std::endl;
-		std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
-		mpi_writeout_buf(filename);
+			// Write out buffers
+			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+								<< " -- Sent " << f_buffer_send[dir].size() / nVels << " to " << neighbour_rank[dir] 
+								<< ": Received " << f_buffer_recv[dir].size() / nVels << " from " << neighbour_rank[opp_dir] << std::endl;
+			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
+			mpi_writeout_buf(filename, dir);
 #endif
 
-		///////////////////////////
-		// Unpack Buffer to Grid //
-		///////////////////////////
+			///////////////////////////
+			// Unpack Buffer to Grid //
+			///////////////////////////
 
-		// Pass direction and Grid by reference
-		mpi_buffer_unpack( dir, Grid );
+			// Pass direction and Grid by reference
+			mpi_buffer_unpack( dir, Grid );
+
+		}
+
 	}
 
 	// Print Time of MPI comms
-	MPI_Barrier(my_comm);
 	t_end = clock();
 	secs = t_end - t_start;
 
-	// Update average MPI overhead time
+	// Update average MPI overhead time for this particular grid
 	Grid->timeav_mpi_overhead *= (Grid->t-1);
 	Grid->timeav_mpi_overhead += ((double)secs)/CLOCKS_PER_SEC;
 	Grid->timeav_mpi_overhead /= Grid->t;
 
 #ifdef TEXTOUT
 	if (Grid->t % out_every == 0) {
-		MPI_Barrier(my_comm);
 		*GridUtils::logfile << "Writing out to <Grids.out>" << std::endl;
 		Grid->io_textout("POST MPI COMMS");
 	}

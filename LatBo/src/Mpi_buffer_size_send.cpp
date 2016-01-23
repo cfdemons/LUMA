@@ -6,6 +6,7 @@
 #include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 
+
 // Called from the general size routine to find the size of the sending buffer.
 void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 

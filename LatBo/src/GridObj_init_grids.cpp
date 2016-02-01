@@ -876,7 +876,8 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use object height
-	nu = (obj_y_max - obj_y_min) * u_ref / Re;
+	//nu = (obj_y_max - obj_y_min) * u_ref / Re;
+	nu = (M - obj_y_max) * u_ref / Re;	// Want the solid block neglected
 #else
 	// If no object then use domain height (in lattice units)
 	nu = M * u_ref / Re;

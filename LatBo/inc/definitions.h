@@ -36,10 +36,10 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 100			// How many timesteps before whole grid output
+#define out_every 1000			// How many timesteps before whole grid output
 
 
 // Types of output
@@ -61,7 +61,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 #define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 0.0000001//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 2500000	// Number of time steps
 
 
 /*
@@ -113,16 +113,16 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 60		// Number of x lattice sites
-#define M 65		// Number of y lattice sites
+#define N 62		// Number of x lattice sites
+#define M 62		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x 0.0		// Start of domain-x
-#define b_x 60.0	// End of domain-x
-#define a_y 0.0		// Start of domain-y
-#define b_y 65.0	// End of domain-y
+#define a_x -0.01		// Start of domain-x
+#define b_x 0.61	// End of domain-x
+#define a_y -0.01		// Start of domain-y
+#define b_y 0.61	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -135,11 +135,11 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -188,9 +188,9 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 20.0		// length of filament
-#define ibb_start_x 30.0	// start x position of the filament
-#define ibb_start_y 5.0	// start y position of the filament
+#define ibb_length 0.2		// length of filament
+#define ibb_start_x 0.3	// start x position of the filament
+#define ibb_start_y 0.05	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
@@ -213,7 +213,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 //#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -257,10 +257,10 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 	static size_t RefZend[NumReg]		= {15, 35};
 
 	#elif NumReg == 1
-	const static size_t RefXstart[NumReg]	= {4};
-	const static size_t RefXend[NumReg]		= {24};
-	const static size_t RefYstart[NumReg]	= {1};
-	const static size_t RefYend[NumReg]		= {9};
+	const static size_t RefXstart[NumReg]	= {10};
+	const static size_t RefXend[NumReg]		= {30};
+	const static size_t RefYstart[NumReg]	= {10};
+	const static size_t RefYend[NumReg]		= {20};
 	static size_t RefZstart[NumReg]			= {1};
 	static size_t RefZend[NumReg]			= {9};
 	#endif

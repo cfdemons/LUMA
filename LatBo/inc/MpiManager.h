@@ -6,11 +6,11 @@
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
 #define i_left i = 0; i < (unsigned int)pow(2, g->level + 1); i++
-#define i_right i = N_lim - (unsigned int)pow(2, g->level + 1); i < N_lim; i++
+#define i_right i = GridUtils::upToZero(N_lim - (unsigned int)pow(2, g->level + 1)); i < N_lim; i++
 #define j_down j = 0; j < (unsigned int)pow(2, g->level + 1); j++
-#define j_up j = M_lim - (unsigned int)pow(2, g->level + 1); j < M_lim; j++
+#define j_up j = GridUtils::upToZero(M_lim - (unsigned int)pow(2, g->level + 1)); j < M_lim; j++
 #define k_front k = 0; k < (unsigned int)pow(2, g->level + 1); k++
-#define k_back k = K_lim - (unsigned int)pow(2, g->level + 1); k < K_lim; k++
+#define k_back k = GridUtils::upToZero(K_lim - (unsigned int)pow(2, g->level + 1)); k < K_lim; k++
 
 
 

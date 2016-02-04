@@ -42,22 +42,29 @@ public:
 	static std::vector<int> revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: revindmapref
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x);	// Function: matrix_multiply
+	
+	template <typename NumType>
+	static NumType upToZero(NumType x) {	
+		if (x < 0) return 0;
+		else return x;		
+	};	// Function: upToZero (templated to take any numerical data type
 
 	// LBM-specific utilities
 	static size_t getOpposite(size_t direction);	// Function: getOpposite
 
 	// MPI-related utilities
-	static bool isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOnEdge
-	static bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k,
-		GridObj& pGrid,	unsigned int lattice_dir);	// Function: isOverlapPeriodic
+	static bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOverlapPeriodic
 	static bool isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
 	static bool isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid);
 	static bool hasThisSubGrid(GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
-	static bool isOnSenderLayer(double site_position, char dir, char* maxmin);
-	static bool isOnRecvLayer(double site_position, char dir, char* maxmin);
+	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
+	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
+	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
+	static bool isOnSenderLayer(double site_position, char dir, char* maxmin);	// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, char dir, char* maxmin);	// Is site on speicfied recv layer
 
 	// General Utilities
-	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);
+	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
 
 };
 

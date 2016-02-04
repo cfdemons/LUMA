@@ -120,8 +120,8 @@ public :
 	void LBM_init_getInletProfile();		// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	void LBM_multi(bool IBM_flag);				// Launch the multi-grid kernel
-	void LBM_collide(bool core_flag);			// Apply collision + 1 overload for equilibrium calculation
+	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
+	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_mrt_collide(IVector<double>& f_new, int i, int j, int k);	// MRT collision operation
 	void LBM_stream();							// Stream populations
@@ -147,6 +147,7 @@ public :
 	void io_probe_output();						// Output routine for point probes
 	void io_vtkwriter(double tval);				// VTK writer
 	void io_tecplot(double tval);				// TecPlot write out
+	void io_tecplot_debug(double tval, std::string tag);	// Special debugging writer to help debug problems with MPI
 
 
 };

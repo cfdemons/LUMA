@@ -31,7 +31,7 @@ void GridObj::io_vtkwriter(double tval)
 	// Grid information -- structured points for uniform lattice
 	size_t ni, nj, nk;
 	size_t ni_corrected = 0, nj_corrected = 0, nk_corrected = 0;
-	size_t start_x, start_y, start_z;
+	size_t start_x = 0, start_y = 0, start_z = 0;
 
 	// Actual grid sizes
 	ni = XPos.size();
@@ -49,7 +49,7 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Loop over positions to determine size of grid without overlap
 	for (size_t i = 0; i < ni; i++) {
-		if(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min")) {
+		if(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"max")) {
 			ni_corrected++;
 			if (ni_corrected == 1) {
 				start_x = i;
@@ -57,7 +57,7 @@ void GridObj::io_vtkwriter(double tval)
 		}
 	}
 	for (size_t j = 0; j < nj; j++) {
-		if(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) {
+		if(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"max")) {
 			nj_corrected++;
 			if (nj_corrected == 1) {
 				start_y = j;
@@ -65,8 +65,8 @@ void GridObj::io_vtkwriter(double tval)
 		}
 	}
 #if (dims == 3)
-	for (int kj = 0; k < nk; k++) {
-		if(!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min")) {
+	for (size_t k = 0; k < nk; k++) {
+		if(!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"max")) {
 			nk_corrected++;
 			if (nk_corrected == 1) {
 				start_z = k;
@@ -74,6 +74,12 @@ void GridObj::io_vtkwriter(double tval)
 		}
 	}
 #endif
+
+#else
+	// Not using MPI so no overlaps to consider
+	ni_corrected = XInd.size();
+	nj_corrected = YInd.size();
+
 #endif
 
 	fout << "DATASET STRUCTURED_POINTS\n";
@@ -89,25 +95,17 @@ void GridObj::io_vtkwriter(double tval)
 	fout << "POINT_DATA " << ni_corrected * nj_corrected * nk_corrected << "\n";
 
 	// Density
-	int count = 0;
 	fout << "SCALARS Density " << "float 1\n";	// Name of set = Density, type = float, components = 1
-	fout << "LOOKUP_TABLE default\n"; // Required if not using a custom lookup table
+	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
-						fout << (float)rho(i,j,k,nj,nk) << " ";
-						count++;
-						if (count == ni_corrected) {
-							fout << "\n"; // New line for each row
-							count = 0;	// Reset element per line counter
-						}
+				{
+					fout << (float)rho(i,j,k,nj,nk) << " ";
 				}
 			}
 		}
@@ -115,23 +113,16 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Time-Averaged Density
 	fout << "\nSCALARS TimeAveragedDensity " << "float 1\n";	// Name of set = TimeAveragedDensity, type = float, components = 1
-	fout << "LOOKUP_TABLE default\n"; // Required if not using a custom lookup table
+	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
-						fout << (float)rho_timeav(i,j,k,nj,nk) << " ";
-						count++;
-						if (count == ni_corrected) {
-							fout << "\n"; // New line for each row
-							count = 0;	// Reset element per line counter
-						}
+				{
+					fout << (float)rho_timeav(i,j,k,nj,nk) << " ";
 				}
 			}
 		}
@@ -139,19 +130,15 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Time-Averaged UiUj (dims-1 components)
 	fout << "\nSCALARS TimeAveragedUiUj " << "float " << to_string(2*dims-3) << "\n";	// Components = 2*dims-3
-	fout << "LOOKUP_TABLE default\n"; // Required if not using a custom lookup table
+	fout << "LOOKUP_TABLE default"; // Required if not using a custom lookup table
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
-
+				{
 					// Write out element 1 in 2D (u_01)
 					fout << (float)uiuj_timeav(i,j,k,1,nj,nk,(3*dims-3)) << " ";
 #if (dims == 3)
@@ -159,11 +146,6 @@ void GridObj::io_vtkwriter(double tval)
 					fout << (float)uiuj_timeav(i,j,k,2,nj,nk,(3*dims-3)) << " ";
 					fout << (float)uiuj_timeav(i,j,k,4,nj,nk,(3*dims-3)) << " ";
 #endif
-					count++;
-					if (count == ni_corrected) {
-						fout << "\n"; // New line for each row
-						count = 0;	// Reset element per line counter
-					}
 				}
 
 			}
@@ -172,19 +154,15 @@ void GridObj::io_vtkwriter(double tval)
 
 
 	// Velocity
-	fout << "\nVECTORS Velocity " << "float\n";	// Name of set = Velocity, type = float
+	fout << "\nVECTORS Velocity " << "float";	// Name of set = Velocity, type = float
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
-
+				{
 					for (size_t dir = 0; dir < dims; dir++) {
 						fout << (float)u(i,j,k,dir,nj,nk,dims) << " ";
 					}
@@ -193,13 +171,6 @@ void GridObj::io_vtkwriter(double tval)
 					// Need to add a z-component of zero to complete file in 2D
 					fout << 0.0 << " ";
 #endif
-
-					count++;
-					if (count == ni_corrected) {
-						fout << "\n"; // New line for each row
-						count = 0;	// Reset element per line counter
-					}
-
 				}
 
 			}
@@ -207,18 +178,15 @@ void GridObj::io_vtkwriter(double tval)
 	}
 
 	// Time-Averaged Ui
-	fout << "\nVECTORS TimeAveragedUi " << "float\n";	// Name of set = TimeAveragedUi, type = float
+	fout << "\nVECTORS TimeAveragedUi " << "float";	// Name of set = TimeAveragedUi, type = float
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
+				{
 
 					for (size_t dir = 0; dir < dims; dir++) {
 						fout << (float)ui_timeav(i,j,k,dir,nj,nk,dims) << " ";
@@ -228,29 +196,21 @@ void GridObj::io_vtkwriter(double tval)
 					// Need to add a z-component of zero to complete file in 2D
 					fout << 0.0 << " ";
 #endif
-					count++;
-					if (count == ni_corrected) {
-						fout << "\n"; // New line for each row
-						count = 0;	// Reset element per line counter
-					}
 				}
 			}
 		}
 	}
 
 	// Time-Averaged UiUi
-	fout << "\nVECTORS TimeAveragedUiUi " << "float\n";
+	fout << "\nVECTORS TimeAveragedUiUi " << "float";
 	for (size_t k = 0; k < ZInd.size(); k++) {
 		for (size_t j = 0; j < YInd.size(); j++ ) {
+			fout << "\n"; // New line for each row
 			for (size_t i = 0; i < XInd.size(); i++) {
-
-				if (
-					(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"min")) &&
-					(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"min"))
-#if (dims == 3)
-					&& (!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"min"))
+#ifdef BUILD_FOR_MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif
-					) {
+				{
 
 					// Write out element 0 in both 2D and 3D (u_00)
 					fout << (float)uiuj_timeav(i,j,k,0,nj,nk,(3*dims-3)) << " ";
@@ -265,11 +225,6 @@ void GridObj::io_vtkwriter(double tval)
 					// Need to add a z-component of zero to complete file in 2D
 					fout << 0.0 << " ";
 #endif
-					count++;
-					if (count == ni_corrected) {
-						fout << "\n"; // New line for each row
-						count = 0;	// Reset element per line counter
-					}
 				}
 			}
 		}

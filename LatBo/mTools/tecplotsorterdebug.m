@@ -1,4 +1,4 @@
-function tecplotsorter(t,tstep, l, r, precision)
+function tecplotsorterdebug(t,tstep, l, r, precision)
 
 for tt = 0 : tstep : t
     
@@ -8,8 +8,8 @@ for tt = 0 : tstep : t
 
             try
             % Get file name
-            input_filename = ['tecplotout.Lev' num2str(lev) '.Reg' num2str(reg) '.' num2str(tt) '.dat'];
-            output_filename = ['tecplotsrted.Lev' num2str(lev) '.Reg' num2str(reg) '.' num2str(tt) '.dat'];
+            input_filename = ['tecplotdebug.Lev' num2str(lev) '.Reg' num2str(reg) '.' num2str(tt) '.dat'];
+            output_filename = ['tecplotsrteddebug.Lev' num2str(lev) '.Reg' num2str(reg) '.' num2str(tt) '.dat'];
 
             % Read file
             data = importdata(input_filename,'\t',7);
@@ -18,6 +18,7 @@ for tt = 0 : tstep : t
             sorteddata = sortrows(sortrows(sortrows(data.data,1),2),3);
 
             % Write header
+            data.textdata(7,:) = [];
             tbl = cell2table(data.textdata);
             writetable(tbl, output_filename);
 

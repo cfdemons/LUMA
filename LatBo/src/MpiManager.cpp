@@ -44,7 +44,7 @@ MpiManager* MpiManager::getInstance() {
 const int MpiManager::MPI_cartlab[3][26] =
 	{
 		{1, -1,  1, -1,	 0,  0, -1,  1,		0,  0,		1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},
-		{0,  0, -1,  1, -1,  1, -1,  1,		0,  0,		0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1,  1, -1,  1, -1},
+		{0,  0,  1, -1,  1, -1,  1, -1,		0,  0,		0,  0,  1, -1,  1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1},
 		{0,  0,  0,  0,  0,  0,  0,  0,		1, -1,		1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}
 	};
 
@@ -458,17 +458,20 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	* MPI background buffers which might have limited resources and which is slower so 
 	* we use the MPI Manager class to hold the buffer in house. */
 
+	// Sync before starting the clock
+	MPI_Barrier(MpiManager::my_comm);
+
 	// Start the clock
 	t_start = clock();
-
-	// Create a unique tag based on level, region and direction
-	int TAG;
 
 	// Loop over directions in Cartesian topology
 	for (int dir = 0; dir < MPI_dir; dir++) {
 
-		// Create tag
-		TAG = ((Grid->level + 1) * 100000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
+		// Sync before changing buffer size
+		MPI_Barrier(MpiManager::my_comm);
+
+		// Create a unique tag based on level, region and direction
+		int TAG = ((Grid->level + 1) * 1000000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
 
 		////////////////////////////
 		// Resize and Pack Buffer //
@@ -480,6 +483,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 				f_buffer_send[dir].resize(bufs.size[dir] * nVels);
 			}
 		}
+
+		// Sync before changing buffer data and posting send
+		MPI_Barrier(MpiManager::my_comm);
 
 		// Only pack and send if required
 		if (f_buffer_send[dir].size()) {
@@ -505,18 +511,12 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 #endif
 
 		}
-	}
 
-
-	// Now loop again using blocking receive calls to synchronise
-	// Loop over directions in Cartesian topology
-	for (int dir = 0; dir < MPI_dir; dir++) {
+		// Sync before changing buffer size
+		MPI_Barrier(MpiManager::my_comm);
 
 		// Find opposite direction (neighbour it receives from)
 		unsigned int opp_dir = GridUtils::getOpposite(dir);
-
-		// Create tag
-		TAG = ((Grid->level + 1) * 100000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
 
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
@@ -529,6 +529,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		///////////////////
 		// Fetch Message //
 		///////////////////
+
+		// Sync before receiving message and reading buffer data
+		MPI_Barrier(MpiManager::my_comm);
 
 		if (f_buffer_recv[dir].size()) {
 
@@ -563,6 +566,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		}
 
 	}
+
+	// Sync before stopping the clock
+	MPI_Barrier(MpiManager::my_comm);
 
 	// Print Time of MPI comms
 	t_end = clock();

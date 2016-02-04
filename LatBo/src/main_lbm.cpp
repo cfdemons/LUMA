@@ -353,7 +353,7 @@ int main( int argc, char* argv[] )
 	MPI_Barrier(mpim->my_comm);
 	t_start = clock();
 	
-	mpim->mpi_buffer_size(&Grids);	// Call buffer sizing routine routine
+	mpim->mpi_buffer_size(&Grids);	// Call buffer sizing routine
 
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;

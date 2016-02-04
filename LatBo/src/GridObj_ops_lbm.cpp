@@ -67,23 +67,20 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
 		LBM_boundary(2);
 #endif
-		/*DEBUG*/ //io_textout("AFTER INLET BC");
+
+#ifdef MEGA_DEBUG
+		/*DEBUG*/ io_tecplot_debug(t*100 + 0,"AFTER INLET BC");
+#endif
+
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
 		LBM_forcegrid(false);
 
 		// Collision on Lr
-		if (level == 0) {
+		LBM_collide();
 
-			// Collide on whole grid
-			LBM_collide(false);
-
-		} else {
-
-			// Collide on core only (excludes upper transition layer)
-			LBM_collide(true);
-
-		}
-		/*DEBUG*/ //io_textout("AFTER COLLIDE");
+#ifdef MEGA_DEBUG
+		/*DEBUG*/ io_tecplot_debug(t*100 + 1,"AFTER COLLIDE");
+#endif
 
 		////////////////////
 		// Refined levels //
@@ -111,8 +108,16 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+#endif
+
 			// Stream
 			LBM_stream();
+
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+#endif
 
 			for (size_t reg = 0; reg < regions; reg++) {
 
@@ -120,6 +125,10 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 				LBM_coalesce(reg);
 
 			}
+
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER COALESCE"); // Do not change this tag!
+#endif
 
 
 			///////////////////////
@@ -135,10 +144,18 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
-			/*DEBUG*/ //io_textout("AFTER SOLID BC");
+
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+#endif
+
 			// Stream
 			LBM_stream();
-			/*DEBUG*/ //io_textout("AFTER STREAM");
+
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+#endif
+
 		}
 
 
@@ -150,10 +167,18 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef OUTLET_ON
 		LBM_boundary(3);	// Outlet
 #endif
-		/*DEBUG*/ //io_textout("AFTER OUTLET BC");
+
+#ifdef MEGA_DEBUG
+		/*DEBUG*/ io_tecplot_debug(t*100 + 5,"AFTER OUTLET BC");
+#endif
+
 		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
-		/*DEBUG*/ //io_textout("AFTER MACRO");
+
+#ifdef MEGA_DEBUG
+		/*DEBUG*/ io_tecplot_debug(t*100 + 6,"AFTER MACRO");
+#endif
+
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
 		if (level == 0) {
 			// Increment time step counter and break
@@ -338,8 +363,7 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 // ***************************************************************************************************
 
 // Collision operator
-// Excludes the upper TL sites if core_flag set to true
-void GridObj::LBM_collide( bool core_flag ) {
+void GridObj::LBM_collide( ) {
 
 	/*
 	Loop through the lattice points to compute the new distribution functions.
@@ -351,37 +375,19 @@ void GridObj::LBM_collide( bool core_flag ) {
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	int i_low, j_low, k_low, i_high, j_high, k_high;
-
-	// Respond to core flag
-	if (core_flag) {
-		// Ignore TL sites to upper level
-		i_low = 2; i_high = N_lim-2;
-		j_low = 2; j_high = M_lim-2;
-#if (dims == 3)
-		k_low = 2; k_high = K_lim-2;
-#else
-		k_low = 0; k_high = K_lim; // if 2D set to default
-#endif
-
-	} else {
-		i_low = 0; i_high = N_lim;
-		j_low = 0; j_high = M_lim;
-		k_low = 0; k_high = K_lim;
-	}
 
 	// Create temporary lattice to prevent overwriting useful populations and initialise with same values as
 	// pre-collision f grid. Initialise with current f values.
 	IVector<double> f_new( f );
 
 
-	// Loop over lattice sites
-	for (int i = i_low; i < i_high; i++) {
-		for (int j = j_low; j < j_high; j++) {
-			for (int k = k_low; k < k_high; k++) {
+	// Loop over all lattice sites
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
 
-				// Ignore refined sites
-				if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+				// Ignore refined sites and TL sites (based on Rohde refinement)
+				if (LatTyp(i,j,k,M_lim,K_lim) == 2 || LatTyp(i,j,k,M_lim,K_lim) == 3) {
 					// Do nothing as taken care of on lower level grid
 
 				} else {
@@ -590,8 +596,10 @@ void GridObj::LBM_stream( ) {
 	IVector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
-	// DEBUG //
-	//int count0 = 0, count1 = 0, count3 = 0, count4 = 0;
+#ifdef MEGA_DEBUG
+	/*DEBUG*/
+	int count0 = 0, count1 = 0, count2 = 0, count3 = 0;
+#endif
 
 	// Stream one lattice site at a time
 	for (int i = 0; i < N_lim; i++) {
@@ -603,9 +611,10 @@ void GridObj::LBM_stream( ) {
 					// Store opposite direction
 					v_opp = GridUtils::getOpposite(v);
 
-
-					// DEBUG //
-					//count0++;
+#ifdef MEGA_DEBUG
+					/*DEBUG*/
+					count0++;
+#endif
 
 
 					/////////////////////////////////
@@ -636,7 +645,7 @@ void GridObj::LBM_stream( ) {
 
 					/* If destination off-grid then ask whether periodic boundaries in use
 					 * and if so then only stream if Coarse --> Coarse.
-					 * If not then retain the incoming value at the site as it not receive
+					 * If not then retain the incoming value at the site as it will not receive
 					 * an update from off-grid.
 					 * If using MPI, periodic BCs are applied differently later.
 					 */
@@ -649,20 +658,28 @@ void GridObj::LBM_stream( ) {
 
 					// If off-grid
 					if (	(dest_x >= N_lim || dest_x < 0) ||
-							(dest_y >= M_lim || dest_y < 0) ||
-							(dest_z >= K_lim || dest_z < 0)
+							(dest_y >= M_lim || dest_y < 0)
+#if (dims == 3)
+							|| (dest_z >= K_lim || dest_z < 0)
+#endif
 						) {
 
 
-							// DEBUG //
-							/*count1++;
-							*GridUtils::logfile << "Stream " << i << "," << j <<
-								" to \t" << dest_x << "," << dest_y << " : \toff-grid in " <<
-								v << " direction. Count1 = " << count1 << std::endl;*/
+#ifdef MEGA_DEBUG
+							/*DEBUG*/
+							count1++;
+							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
+								" (" << XPos[i] << "," << YPos[j] << "," << ZPos[k] << ")" <<
+								" to \t" << dest_x << "," << dest_y << "," << dest_z <<
+								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" <<
+								" : \toff-grid in " <<
+								v << " direction. Count1 = " << count1 << ". Value is f = " 
+								<< f(i,j,k,v,M_lim,K_lim,nVels) << std::endl;
+#endif
 
 
 
-							// Apply periodic boundary conditions (non-MPI)
+							// Apply periodic boundary conditions (serial/non-MPI)
 #if (defined PERIODIC_BOUNDARIES  && !defined BUILD_FOR_MPI)
 
 							// Compute destination site indices using periodicity
@@ -677,18 +694,20 @@ void GridObj::LBM_stream( ) {
 							) {
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
-								continue;
+								continue;	// Move on to next site
 							}
 
 #endif
 
-							// Retain incoming value and continue
+							// If not using periodic boundary conditions then retain incoming value as 
+							// will not receive an update from off-grid and continue
 							f_new(i,j,k,v_opp,M_lim,K_lim,nVels) = f(i,j,k,v_opp,M_lim,K_lim,nVels);
 							continue;
 
 
 
 					} else {
+
 
 						///////////////////////
 						// On-grid streaming //
@@ -697,54 +716,60 @@ void GridObj::LBM_stream( ) {
 
 						/* If it is an on-grid stream and using MPI need some
 						 * additional logic checking to make sure we prevent stream
-						 * from an overlap site when periodic BCs are not in effect.
-						 */
-
-
-
+						 * from a periodic recv layer site when periodic BCs are not in effect. */
+						
 #ifdef BUILD_FOR_MPI
 
 						//////////////////////
 						// MPI Periodic BCs //
 						//////////////////////
 
-						// If source in overlap and destination in grid (equivalent to periodic non-MPI off-grid stream)
-						// and periodic BCs are set then allow stream
+						/* If source in recv layer and destination in sender layer 
+						 * check if this is a periodic stream. If periodic BCs are 
+						 * in use then allow stream. If not then do not stream from 
+						 * recv layer to sender layer as this would constitute an 
+						 * illegal periodic stream. */
 						if (
 
 						(
 
-						// Source on overlap?
-						GridUtils::isOnEdge(i,j,k,*this)
+						// Condition 1: Source in a recv layer
+						GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k])
 
 						) && (
 
-						// Destination on-grid (not in overlap)?
-						!GridUtils::isOnEdge(dest_x,dest_y,dest_z,*this)
+						// Condition 2: Destination on-grid (in a sender layer)
+						GridUtils::isOnSenderLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z])
+						
 
 						) && (
 
-						// Overlap is from a periodic rank?
-						GridUtils::isOverlapPeriodic(i,j,k,*this,v_opp)
+						// Condition 3: Recv layer is linked to a periodic neighbour rank
+						GridUtils::isOverlapPeriodic(i,j,k,*this)
 
 						)
 
 						) {
 
-							// DEBUG //
-							/*count3++;
-							*GridUtils::logfile << "Stream " << i << "," << j <<
-									" to \t" << dest_x << "," << dest_y << " : \tperiodic stream " <<
-									v << " direction. Count3 = " << count3 << std::endl;*/
+
+#ifdef MEGA_DEBUG
+							/*DEBUG*/
+							count2++;
+							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
+								" (" << XPos[i] << "," << YPos[j] << "," << ZPos[k] << ")" <<
+								" to \t" << dest_x << "," << dest_y << "," << dest_z <<
+								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" << 
+								" : \tperiodic stream " <<
+									v << " direction. Count2 = " << count2 << ". Value is f = " 
+									<< f(i,j,k,v,M_lim,K_lim,nVels) << std::endl;
+#endif
 
 
-						// Either apply periodic BCs or not on those sites which stream from periodic overlap
+						// Either apply periodic BCs or not on these sites (ones which stream from periodic recv site)
 
 #ifdef PERIODIC_BOUNDARIES
-							if (
-								(level == 0) &&
-								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
-							) {
+							if (LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+							{
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 								continue;
@@ -766,8 +791,9 @@ void GridObj::LBM_stream( ) {
 
 						}
 
-#endif
-#endif
+#endif	// PERIODIC_BOUNDARIES
+
+#endif	// BUILD_FOR_MPI
 
 
 
@@ -799,11 +825,17 @@ void GridObj::LBM_stream( ) {
 						}
 #endif
 
-						// DEBUG //
-						/*count4++;
-						*GridUtils::logfile << "Stream " << i << "," << j <<
-								" to \t" << dest_x << "," << dest_y << " : \ton-grid stream " <<
-								v << " direction. Count4 = " << count4 << std::endl;*/
+#ifdef MEGA_DEBUG
+						/*DEBUG*/
+						count3++;
+						*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
+								" (" << XPos[i] << "," << YPos[j] << "," << ZPos[k] << ")" <<
+								" to \t" << dest_x << "," << dest_y << "," << dest_z <<
+								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" << 
+								" : \ton-grid stream " <<
+								v << " direction. Count3 = " << count3 << ". Value is f = " 
+								<< f(i,j,k,v,M_lim,K_lim,nVels) << std::endl;
+#endif
 
 
 						// Stream population
@@ -818,8 +850,11 @@ void GridObj::LBM_stream( ) {
 		}
 	}
 
-	// DEBUG //
-	//*GridUtils::logfile << "Counts were " << count0 << "," << count1 << "," << count3 << "," << count4 << std::endl;
+
+#ifdef MEGA_DEBUG
+	/*DEBUG*/
+	*GridUtils::logfile << "Counts were " << count0 << "," << count1 << "," << count2 << "," << count3 << std::endl;
+#endif
 
 	// Replace old grid with new grid
 	f = f_new;
@@ -836,11 +871,11 @@ void GridObj::LBM_macro( ) {
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	double rho_temp = 0;
-	double fux_temp = 0;
-	double fuy_temp = 0;
-	double fuz_temp = 0;
-	double ta_temp = 0;
+	double rho_temp = 0.0;
+	double fux_temp = 0.0;
+	double fuy_temp = 0.0;
+	double fuz_temp = 0.0;
+	double ta_temp = 0.0;
 
 
 	// Loop over lattice
@@ -851,11 +886,11 @@ void GridObj::LBM_macro( ) {
 				if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 
 					// Refined site so set both density and velocity to zero
-					rho(i,j,k,M_lim,K_lim) = 0;
-					u(i,j,k,0,M_lim,K_lim,dims) = 0;
-					u(i,j,k,1,M_lim,K_lim,dims) = 0;
+					rho(i,j,k,M_lim,K_lim) = 0.0;
+					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
 #if (dims == 3)
-					u(i,j,k,2,M_lim,K_lim,dims) = 0;
+					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
@@ -872,14 +907,14 @@ void GridObj::LBM_macro( ) {
 				} else {
 
 					// Any other of type of site compute both density and velocity from populations
-					rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
+					rho_temp = 0.0; fux_temp = 0.0; fuy_temp = 0.0; fuz_temp = 0.0;
 
 					for (int v = 0; v < nVels; v++) {
 
 						// Sum up to find momentum
-						fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-						fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-						fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+						fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+						fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+						fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 
 						// Sum up to find density
 						rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);
@@ -908,23 +943,23 @@ void GridObj::LBM_macro( ) {
 				// Update time-averaged quantities thus...
 
 				// Multiply current value by completed time steps to get sum
-				ta_temp = rho_timeav(i,j,k,M_lim,K_lim) * t;
+				ta_temp = rho_timeav(i,j,k,M_lim,K_lim) * (double)t;
 				// Add new value
 				ta_temp += rho(i,j,k,M_lim,K_lim);
 				// Divide by completed time steps + 1 to get new average
-				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (t+1);
+				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (double)(t+1);
 
 				// Repeat for other quantities
 				unsigned int ta_count = 0;
 				for (int p = 0; p < dims; p++) {
-					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,dims) * t;
+					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,dims) * (double)t;
 					ta_temp += u(i,j,k,p,M_lim,K_lim,dims);
-					ui_timeav(i,j,k,p,M_lim,K_lim,dims) = ta_temp / (t+1);
+					ui_timeav(i,j,k,p,M_lim,K_lim,dims) = ta_temp / (double)(t+1);
 					// Do necessary products
 					for (int q = p; q < dims; q++) {
-						ta_temp = uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) * t;
+						ta_temp = uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) * (double)t;
 						ta_temp += ( u(i,j,k,p,M_lim,K_lim,dims) * u(i,j,k,q,M_lim,K_lim,dims) );
-						uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) = ta_temp / (t+1);
+						uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*dims-3)) = ta_temp / (double)(t+1);
 						ta_count++;
 					}
 				}
@@ -949,20 +984,20 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
-	double rho_temp = 0;
-	double fux_temp = 0;
-	double fuy_temp = 0;
-	double fuz_temp = 0;
+	double rho_temp = 0.0;
+	double fux_temp = 0.0;
+	double fuy_temp = 0.0;
+	double fuz_temp = 0.0;
 
 
 	if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 
 		// Refined site so set both density and velocity to zero
-		rho(i,j,k,M_lim,K_lim) = 0;
-		u(i,j,k,0,M_lim,K_lim,dims) = 0;
-		u(i,j,k,1,M_lim,K_lim,dims) = 0;
+		rho(i,j,k,M_lim,K_lim) = 0.0;
+		u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
+		u(i,j,k,1,M_lim,K_lim,dims) = 0.0;
 #if (dims == 3)
-		u(i,j,k,2,M_lim,K_lim,dims) = 0;
+		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
 	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
@@ -978,14 +1013,14 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 	} else {
 
 		// Any other of type of site compute both density and velocity from populations
-		rho_temp = 0; fux_temp = 0; fuy_temp = 0; fuz_temp = 0;
+		rho_temp = 0.0; fux_temp = 0.0; fuy_temp = 0.0; fuz_temp = 0.0;
 
 		for (int v = 0; v < nVels; v++) {
 
 			// Sum up to find momentum
-			fux_temp += c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-			fuy_temp += c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
-			fuz_temp += c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+			fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+			fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
+			fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 
 			// Sum up to find density
 			rho_temp += f(i,j,k,v,M_lim,K_lim,nVels);

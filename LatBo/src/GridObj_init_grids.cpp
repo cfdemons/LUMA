@@ -520,7 +520,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use object height (scaled back to L0 units)
-	nu = (obj_y_max - obj_y_min) * pow (2, block_on_grid_lev) * u_ref / Re;
+	nu = ((obj_y_max - obj_y_min) / pow (2, block_on_grid_lev)) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
 	nu = M * u_ref / Re;
@@ -784,9 +784,15 @@ void GridObj::LBM_init_solid_lab() {
 	 * placed. */
 
 	// Get global grid sizes
-	int Ng_lim = (RefXend[level-1][region_number] - RefXstart[level-1][region_number] + 1) * 2;
-	int Mg_lim = (RefYend[level-1][region_number] - RefYstart[level-1][region_number] + 1) * 2;
-	int Kg_lim = (RefZend[level-1][region_number] - RefZstart[level-1][region_number] + 1) * 2;
+	int Ng_lim, Mg_lim, Kg_lim;
+	if (level != 0) {
+		Ng_lim = (RefXend[level-1][region_number] - RefXstart[level-1][region_number] + 1) * 2;
+		Mg_lim = (RefYend[level-1][region_number] - RefYstart[level-1][region_number] + 1) * 2;
+		Kg_lim = (RefZend[level-1][region_number] - RefZstart[level-1][region_number] + 1) * 2;
+	} else {
+		Ng_lim = N; Mg_lim = M; Kg_lim = K;
+	}
+
 
 	// Check block placement -- must not be on TL (last two sites) if on a level other than 0
 	if	(

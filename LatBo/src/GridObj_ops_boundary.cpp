@@ -57,13 +57,29 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 						   ) {
 							   continue;	// Move on to next direction
 
-						// If site is fluid site then apply BC by overwriting reverse population with expected incoming value
-						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) {
+#ifdef BUILD_FOR_MPI
+						// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
+						// periodic boundaries disabled.
+						} else if (GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
+							&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this)) {
+
+#if (!defined PERIODIC_BOUNDARIES)
+							continue;	// Periodic boundaries disabled so do not try to apply BC
+#endif
+
+#endif	// BUILD_FOR_MPI
+
+						}	// End of exclusions
+
+						/* Not been filtered by above exclusions so try to apply boundary condition. */
+
+						// Only apply if destination is a fluid site 
+						if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) {
 
 							// Get incoming direction
 							size_t v_incoming = GridUtils::getOpposite(v_outgoing);
 							
-							// Assign incoming population to outgoing at current site
+							// Overwriting outgoing population with expected incoming value
 							f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,nVels);
 							
 						}
@@ -277,6 +293,10 @@ void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim
         (ftmp[0] + ftmp[3]) + ftmp[2] + 2.0*ftmp[7] + ftmp[1] );
 
 #endif
+
+
+	//* NEED A CORNER TREATMENT *//
+
 
 	// Apply new f values to grid
 	for (size_t n = 0; n < nVels; n++) {

@@ -230,88 +230,59 @@ size_t GridUtils::getOpposite(size_t direction) {
 }
 
 // ***************************************************************************************************
-// Function to find whether a site with local indices i,j,k is on the edge of the supplied GridObj
-// On L0 this is equivalent to being on the MPI overlap.
-bool GridUtils::isOnEdge(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
-
-	// Get Grid size
-	unsigned int N_lim = pGrid.XInd.size();
-	unsigned int M_lim = pGrid.YInd.size();
-	unsigned int K_lim = pGrid.ZInd.size();
-
-
-	// Check each coordinate to see if it is on edge
-	if	(
-			// Case 1: X on edge, Y,Z take any value
-			(
-			(i == N_lim - 1 || i == 0) && ( (j < M_lim && j >= 0)
-#if (dims == 3)
-		&&	(k < K_lim && k >= 0)
-#endif
-		)	)
-
-			// Case 2: Y on edge, X,Z take any value
-		||	(
-			(j == M_lim - 1 || j == 0) && ( (i < N_lim && i >= 0)
-#if (dims == 3)
-		&&	(k < K_lim && k >= 0)
-
-		)	)
-
-			// Case 3: Z on edge, Y,X take any value
-		||	(
-			(k == K_lim - 1 || k == 0) && (	(j < M_lim && j >= 0)
-													&&	(i < N_lim && i >= 0)	)
-
-			)
-#else
-		)	)
-#endif
-
-		) {
-
-			return true;
-
-	} else {
-
-		return false;
-	}
-
-
-}
-
-// ***************************************************************************************************
-// Function to find whether the overlap belonging to local site i,j,k is from an adjacent or periodic neighbour rank.
+// Function to find whether the recv layer containing local site i,j,k links to an adjacent or periodic neighbour rank.
 // Takes in the site indices (local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, 
-								  GridObj& pGrid, unsigned int lattice_dir) {
+bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
 
 	// Local declarations
-	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims], Lims[dims], Ind[dims];
+	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
+	int shift[3] = {0, 0, 0};
 
 	// Initialise local variables
-	MPI_dims[0] = Xcores; Lims[0] = pGrid.XInd.size(); Ind[0] = i;
-	MPI_dims[1] = Ycores; Lims[1] = pGrid.YInd.size(); Ind[1] = j;
+	MPI_dims[0] = Xcores;
+	MPI_dims[1] = Ycores;
 #if (dims == 3)
-	MPI_dims[2] = Zcores; Lims[2] = pGrid.ZInd.size(); Ind[2] = k;
+	MPI_dims[2] = Zcores;
+#endif
+
+	// Define shifts based on which overlap we are on
+
+	// X
+	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],'x',"max")) {
+		shift[0] = 1;
+	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],'x',"min")) {
+		shift[0] = -1;
+	}
+
+	// Y
+	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],'y',"max")) {
+		shift[1] = 1;
+	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],'y',"min")) {
+		shift[1] = -1;
+	}
+
+#if (dims == 3)
+	// Z
+	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],'z',"max")) {
+		shift[2] = 1;
+	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],'z',"min")) {
+		shift[2] = -1;
+	}
 #endif
 
 	// Loop over each Cartesian direction
 	for (int d = 0; d < dims; d++) {
-		// If on X/Y/Z-overlap (should be)
-		if (Ind[d] == Lims[d] - 1 || Ind[d] == 0) {
+		// Define expected (non-periodic) MPI coordinates of neighbour rank
+		exp_MPI_coords[d] = MpiManager::MPI_coords[d] + shift[d];
 
-			// Define expected MPI coordinates of neighbour rank
-			exp_MPI_coords[d] = MpiManager::MPI_coords[d] + c[d][lattice_dir];
+		// Define actual MPI coordinates of neighbour rank (accounting for periodicity)
+		act_MPI_coords[d] = (MpiManager::MPI_coords[d] + shift[d] + MPI_dims[d]) % MPI_dims[d];
 
-			// Define actual MPI coordinates of neighbour rank (accounting for periodicity)
-			act_MPI_coords[d] = (MpiManager::MPI_coords[d] + c[d][lattice_dir] + MPI_dims[d]) % MPI_dims[d];
-
-			// If there is a difference then rank is periodically linked to its neighbour and the overlap
-			// site is from a periodic rank so return early
-			if (exp_MPI_coords[d] != act_MPI_coords[d]) return true;
-		}
+		// If there is a difference then rank is periodically linked to its neighbour and the overlap
+		// site is from a periodic rank so return early
+		if (exp_MPI_coords[d] != act_MPI_coords[d]) return true;
 	}
+	
 
 	// Expected and actual are the same so the neighbour rank is not periodically linked and the overlap site
 	// is from an adjacent neighbour not a periodic one.
@@ -320,16 +291,29 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 }
 
 // ***************************************************************************************************
-// Function to find whether a site with global indices provided is on a given grid or not (doesn't include the overlap)
+// Function to find whether a site with global indices provided is on a given grid or not
+// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
 bool GridUtils::isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid) {
 
 	if (
 		// Different conditions when using MPI due to extra overlap cells
 #ifdef BUILD_FOR_MPI
-		((int)gi <= pGrid.XInd[pGrid.XInd.size()-2] + 1 && (int)gi >= pGrid.XInd[1] - 1 ) &&
-		((int)gj <= pGrid.YInd[pGrid.YInd.size()-2] + 1 && (int)gj >= pGrid.YInd[1] - 1 )
+		(	(int)gi <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+		&&	(int)gi >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
+		)
+		
+		&&
+
+		(	(int)gj <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+		&&	(int)gj >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
+		)
+
 #if (dims == 3)
-		&& ((int)gk <= pGrid.ZInd[pGrid.ZInd.size()-2] + 1 && (int)gk >= pGrid.ZInd[1] - 1 )
+		&&
+		
+		(	(int)gk <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+		&&	(int)gk >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
+		)
 #endif
 
 #else
@@ -356,15 +340,17 @@ bool GridUtils::isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, 
 }
 
 // ***************************************************************************************************
-// Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not (doesn't include the overlap)
+// Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
+// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
 bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) {
 
 	switch (xyz) {
 
 	case 0:
 		// X direction
-#ifdef BUILD_FOR_MPI	// Allow for overlap but ignore periodicity
-		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-2] + 1 && (int)gl >= pGrid.XInd[1] - 1)
+#ifdef BUILD_FOR_MPI	// Allow for overlap of thickness 2^level but ignore periodicity
+		if (	(int)gl <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+			&&	(int)gl >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
 #else
 		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0])
 #endif
@@ -379,7 +365,8 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 	case 1:
 		// Y direction
 #ifdef BUILD_FOR_MPI
-		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-2] + 1 && (int)gl >= pGrid.YInd[1] - 1)
+		if (	(int)gl <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+			&&	(int)gl >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
 #else
 		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0])
 #endif
@@ -394,7 +381,8 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 	case 2:
 		// Z direction
 #ifdef BUILD_FOR_MPI
-		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-2] + 1 && (int)gl >= pGrid.ZInd[1] - 1)
+		if (	(int)gl <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
+			&&	(int)gl >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
 #else
 		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0])
 #endif
@@ -477,6 +465,53 @@ void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
 	return;
 
 }
+// ***************************************************************************************************
+// Wrapper routine to check whether a site is on the inner MPI overlap based on its position by checking 
+// all possible sender layer locations
+bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
+
+	/* Checks whether X,Y or Z are on a sender layer first.
+	 * If true, ensures that neither of the other two are on a receiver layer.
+	 * If true then site must be on a sender layer. */
+
+	if (
+	(
+		// X on sender
+		(GridUtils::isOnSenderLayer(pos_x,'x',"min") || GridUtils::isOnSenderLayer(pos_x,'x',"max")) &&
+
+		// Y and Z not recv
+		(!GridUtils::isOnRecvLayer(pos_y,'y',"min") && !GridUtils::isOnRecvLayer(pos_y,'y',"max")
+#if (dims == 3)
+		&& !GridUtils::isOnRecvLayer(pos_z,'z',"min") && !GridUtils::isOnRecvLayer(pos_z,'z',"max")
+#endif
+		)
+	) || (
+		// Y on sender
+		(GridUtils::isOnSenderLayer(pos_y,'y',"min") || GridUtils::isOnSenderLayer(pos_y,'y',"max")) &&
+
+		// X and Z not recv
+		(!GridUtils::isOnRecvLayer(pos_x,'x',"min") && !GridUtils::isOnRecvLayer(pos_x,'x',"max")
+#if (dims == 3)
+		&& !GridUtils::isOnRecvLayer(pos_z,'z',"min") && !GridUtils::isOnRecvLayer(pos_z,'z',"max")
+
+		)
+	) || (
+		// Z on sender
+		(GridUtils::isOnSenderLayer(pos_z,'z',"min") || GridUtils::isOnSenderLayer(pos_z,'z',"max")) &&
+
+		// X and Y not recv
+		(!GridUtils::isOnRecvLayer(pos_x,'x',"min") && !GridUtils::isOnRecvLayer(pos_x,'x',"max")	&& 
+		!GridUtils::isOnRecvLayer(pos_y,'y',"min") && !GridUtils::isOnRecvLayer(pos_y,'y',"max")
+#endif
+		)
+	)
+	) {
+		return true;
+	}
+
+	return false;
+
+}
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
@@ -523,6 +558,28 @@ bool GridUtils::isOnSenderLayer(double site_position, char dir, char* maxmin) {
 		}
 		break;
 
+	}
+
+	return false;
+
+}
+
+// ***************************************************************************************************
+// Wrapper routine to check whether a site is on the outer MPI overlap based on its position by checking 
+// all possible recv layer locations
+bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
+
+	/* If any of the coordinates is in the receiver layer then the site will always 
+	 * be a receiver layer site regardless of the other coordinates so teh logic is
+	 * simple. */
+
+	if (	GridUtils::isOnRecvLayer(pos_x,'x',"min") || GridUtils::isOnRecvLayer(pos_x,'x',"max") ||
+			GridUtils::isOnRecvLayer(pos_y,'y',"min") || GridUtils::isOnRecvLayer(pos_y,'y',"max")
+#if (dims == 3)
+			|| GridUtils::isOnRecvLayer(pos_z,'z',"min") || GridUtils::isOnRecvLayer(pos_z,'z',"max")
+#endif
+		) {
+			return true;
 	}
 
 	return false;

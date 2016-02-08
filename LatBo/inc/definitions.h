@@ -61,7 +61,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 #define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 3e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -113,15 +113,15 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 62		// Number of x lattice sites
-#define M 62		// Number of y lattice sites
+#define N 61		// Number of x lattice sites
+#define M 66		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x -0.01		// Start of domain-x
+#define a_x 0		// Start of domain-x
 #define b_x 0.61	// End of domain-x
-#define a_y -0.01		// Start of domain-y
+#define a_y -0.05		// Start of domain-y
 #define b_y 0.61	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
@@ -175,7 +175,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 21		// Number of Lagrange points (approximately)
+#define num_markers 19		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -190,7 +190,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 // Physical dimensions of flexible IB filament
 #define ibb_length 0.2		// length of filament
 #define ibb_start_x 0.3	// start x position of the filament
-#define ibb_start_y 0.05	// start y position of the filament
+#define ibb_start_y 0.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
@@ -203,7 +203,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 0.1			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 2			// Flexural rigidity (lattice units) of filament
 
 
 /*
@@ -213,7 +213,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 */
 
 // Switches
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 //#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -227,9 +227,9 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 // Wall labelling routine implements this
 // Specified in lattice units (i.e. by index)
 #define obj_x_min 0		// Index of start of object/wall in x-direction
-#define obj_x_max 59		// Index of end of object/wall in x-direction
+#define obj_x_max 60		// Index of end of object/wall in x-direction
 #define obj_y_min 0			// Index of start of object/wall in y-direction
-#define obj_y_max 5		// Index of end of object/wall in y-direction
+#define obj_y_max 4		// Index of end of object/wall in y-direction
 #define obj_z_min 105		// Index of start of object/wall in z-direction
 #define obj_z_max 135		// Index of end of object/wall in z-direction
 #endif

@@ -151,11 +151,11 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (unsigned int)std::floor( (iBody[ib].markers[m].position[0] - a_x)/g.dx + 0.5);	// Simulates std::round
-	jnear = (unsigned int)std::floor( (iBody[ib].markers[m].position[1] - a_y)/g.dy + 0.5);
+	inear = (unsigned int)std::floor( (iBody[ib].markers[m].position[0] - a_x)/g.dx);	// Simulates std::round
+	jnear = (unsigned int)std::floor( (iBody[ib].markers[m].position[1] - a_y)/g.dy);
 
 #if (dims == 3)
-	knear = (unsigned int)std::floor( (iBody[ib].markers[m].position[2] - a_z)/g.dz + 0.5);
+	knear = (unsigned int)std::floor( (iBody[ib].markers[m].position[2] - a_z)/g.dz);
 #endif
 
 
@@ -209,12 +209,12 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 
 	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
-	double h_plus = std::max( abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx), abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
-	double h_minus = std::min( abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
+	double h_plus = std::max( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
+	double h_minus = std::min( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
 	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
-		+ ( (1.0/9.0) * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
+			+ ( (1.0/9.0) * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
 
 	// Test to see if required support nodes are available

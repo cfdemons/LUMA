@@ -347,7 +347,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 	Syz = ftmp[10] + ftmp[11] - ftmp[12] - ftmp[13];
 
 	// Compute regularised off-equilibrium components, overwriting ftmp as we have finished with it
-	for (unsigned int v = 0; v < nVels; v++) {
+	for (int v = 0; v < nVels; v++) {
 
 		ftmp[v] = (w[v] / (2*pow(cs,4))) * (
 			( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
@@ -375,7 +375,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 	Syy = ftmp[2] + ftmp[3] + 2*(ftmp[5] + ftmp[7]) - rho_wall*( (1.0/3.0) - (1.0/3.0)*u_0x );
 
 	// Compute regularised off-equilibrium components, overwriting ftmp as we have finished with it
-	for (unsigned int v = 0; v < nVels; v++) {
+	for (int v = 0; v < nVels; v++) {
 
 		ftmp[v] = (w[v] / (2*pow(cs,4))) * (
 			( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
@@ -396,7 +396,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 #endif
 	
 	// Overwrite all the populations on the node
-	for (unsigned int v = 0; v < nVels; v++) {
+	for (int v = 0; v < nVels; v++) {
 
 		// Find feq corresponding to prescribed inlet macroscopic conditions and add regularised f_neq
 		f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i,j,k,v) + ftmp[v];

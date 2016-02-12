@@ -86,7 +86,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		// Refined levels //
 		////////////////////
 
-		// Check if lower level exists
+		// Check if lower level expected
 		if (NumLev > level) {
 
 			size_t regions = subGrid.size();
@@ -245,7 +245,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	///////////////////////
 
 #ifdef BUILD_FOR_MPI
-	// Do MPI communication on this grid level before returning //
+	/* Do MPI communication on this grid level before returning. */
 
 	// Launch communication on this grid by passing its level and region number
 	MpiManager::getInstance()->mpi_communicate(level, region_number);
@@ -332,13 +332,13 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 							lambda_v = (1 - 0.5 * omega) * ( w[v] / pow(cs,2) );
 
 							// Dot product (sum over d dimensions)
-							for (unsigned int d = 0; d < dims; d++) {
+							for (int d = 0; d < dims; d++) {
 								beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,dims));
 							}
 							beta_v = beta_v * (1/pow(cs,2));
 
 							// Compute force using shorthand sum described above
-							for (unsigned int d = 0; d < dims; d++) {
+							for (int d = 0; d < dims; d++) {
 								force_i(i,j,k,v,M_lim,K_lim,nVels) += force_xyz(i,j,k,d,M_lim,K_lim,dims) *
 									(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,dims));
 							}
@@ -590,7 +590,7 @@ void GridObj::LBM_stream( ) {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 	int dest_x, dest_y, dest_z;
-	unsigned int v_opp;
+	int v_opp;
 
 	// Create temporary lattice of zeros to prevent overwriting useful populations
 	IVector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
@@ -671,7 +671,6 @@ void GridObj::LBM_stream( ) {
 							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
 								" (" << XPos[i] << "," << YPos[j] << "," << ZPos[k] << ")" <<
 								" to \t" << dest_x << "," << dest_y << "," << dest_z <<
-								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" <<
 								" : \toff-grid in " <<
 								v << " direction. Count1 = " << count1 << ". Value is f = " 
 								<< f(i,j,k,v,M_lim,K_lim,nVels) << std::endl;
@@ -950,7 +949,7 @@ void GridObj::LBM_macro( ) {
 				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (double)(t+1);
 
 				// Repeat for other quantities
-				unsigned int ta_count = 0;
+				int ta_count = 0;
 				for (int p = 0; p < dims; p++) {
 					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,dims) * (double)t;
 					ta_temp += u(i,j,k,p,M_lim,K_lim,dims);

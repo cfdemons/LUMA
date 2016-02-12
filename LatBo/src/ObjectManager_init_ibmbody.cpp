@@ -128,7 +128,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		ibm_build_body(4);	// Call add again but as a filament
 #else
 		// In 3D, build an array of filaments
-		unsigned int group = 999;
+		int group = 999;
 
 		// Centre point
 		centrepoint.push_back(ibb_x);
@@ -283,8 +283,8 @@ void ObjectManager::ibm_build_body(int body_type) {
 		start_y = centrepoint[1] + (ibb_w/2)*sin(-ibb_angle_vert * PI / 180);
 
 		// Delete TE markers
-		std::vector<unsigned int> logvec;
-		for (unsigned int m = 0; m < iBody.back().markers.size(); m++) {
+		std::vector<int> logvec;
+		for (size_t m = 0; m < iBody.back().markers.size(); m++) {
 			if (fabs(iBody.back().markers[m].position[1] - start_y) < 1e-6) {				
 				logvec.push_back(m);
 			}
@@ -305,7 +305,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		BCs.push_back(end_BC);
 	
 		// Define number of filaments (slightly lower resolution)
-		unsigned int lengthwise_fils;
+		int lengthwise_fils;
 		// Must use odd number of filaments to ensure ones on edges and in centre
 		lengthwise_fils = (int) (ibb_d / lspace);
 		if (lengthwise_fils % 2 == 0) {
@@ -318,7 +318,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		start_point[1] = start_y;
 
 		// Loop
-		for (unsigned int i = 0; i < lengthwise_fils; i++ ) {
+		for (int i = 0; i < lengthwise_fils; i++ ) {
 
 			// Increase the iBody array by single IBBody object
 			iBody.emplace_back();

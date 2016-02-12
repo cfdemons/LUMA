@@ -5,12 +5,12 @@
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
-#define i_left i = 0; i < (unsigned int)pow(2, g->level + 1); i++
-#define i_right i = GridUtils::upToZero(N_lim - (unsigned int)pow(2, g->level + 1)); i < N_lim; i++
-#define j_down j = 0; j < (unsigned int)pow(2, g->level + 1); j++
-#define j_up j = GridUtils::upToZero(M_lim - (unsigned int)pow(2, g->level + 1)); j < M_lim; j++
-#define k_front k = 0; k < (unsigned int)pow(2, g->level + 1); k++
-#define k_back k = GridUtils::upToZero(K_lim - (unsigned int)pow(2, g->level + 1)); k < K_lim; k++
+#define i_left i = 0; i < (int)pow(2, g->level + 1); i++
+#define i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++
+#define j_down j = 0; j < (int)pow(2, g->level + 1); j++
+#define j_up j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
+#define k_front k = 0; k < (int)pow(2, g->level + 1); k++
+#define k_back k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
 
 
 
@@ -47,9 +47,9 @@ public :
 
 	// Grid data
 	int global_dims[3];						// Dimensions of problem coarse lattice
-	std::vector<unsigned int> local_size;	// Dimensions of coarse lattice represented on this rank (includes inner and outer overlapping layers)
+	std::vector<int> local_size;	// Dimensions of coarse lattice represented on this rank (includes inner and outer overlapping layers)
 	// Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer)
-	std::vector< std::vector<unsigned int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number
+	std::vector< std::vector<int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number
 	// Global positions of coarse lattice nodes represented on this rank (excluding outer overlapping layer)
 	std::vector< std::vector<double> > global_edge_pos;			// Rows are x,y,z start and end pairs and columns are rank number
 	// Structures containing sender and receiver layer edges as global physical position
@@ -68,9 +68,9 @@ public :
 	MPI_Request request;	// Request structure for handle to a posted Send-Receive
 	// Structure storing the buffer sizes in each direction for a particular level and region
 	struct buffer_struct {
-		unsigned int size[MPI_dir];
-		unsigned int level;
-		unsigned int region;
+		int size[MPI_dir];
+		int level;
+		int region;
 	};
 	std::vector<buffer_struct> buffer_send_info, buffer_recv_info;	// Array of buffer_info structures holding buffer size information
 
@@ -101,7 +101,7 @@ public :
 	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid
 
 	// IO
-	void mpi_writeout_buf( std::string filename, unsigned int dir );		// Write out the buffers of direction dir to file
+	void mpi_writeout_buf( std::string filename, int dir );		// Write out the buffers of direction dir to file
 
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region

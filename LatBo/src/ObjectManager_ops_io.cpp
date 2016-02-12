@@ -7,7 +7,7 @@
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBBodies at a given time step
-void ObjectManager::io_write_body_pos(unsigned int timestep) {
+void ObjectManager::io_write_body_pos(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -35,7 +35,7 @@ void ObjectManager::io_write_body_pos(unsigned int timestep) {
 
 // ***************************************************************************************************
 // Routine to write out the coordinates of IBbodies at a given time step
-void ObjectManager::io_write_lift_drag(unsigned int timestep) {
+void ObjectManager::io_write_lift_drag(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -64,7 +64,7 @@ void ObjectManager::io_write_lift_drag(unsigned int timestep) {
 }
 
 // ***************************************************************************************************
-void ObjectManager::io_restart(bool IO_flag, unsigned int level) {
+void ObjectManager::io_restart(bool IO_flag, int level) {
 
 	if (IO_flag) {
 
@@ -81,7 +81,7 @@ void ObjectManager::io_restart(bool IO_flag, unsigned int level) {
 
 
 		// Counters
-		unsigned int b, m, num_bod = iBody.size();
+		size_t b, m, num_bod = iBody.size();
 
 		// Write out the number of bodies
 		file << num_bod << std::endl;
@@ -141,7 +141,7 @@ void ObjectManager::io_restart(bool IO_flag, unsigned int level) {
 		iss.seekg(0); // Reset buffer position to start of buffer
 
 		// Counters
-		unsigned int b, m, num_bod, num_mark;
+		int b, m, num_bod, num_mark;
 
 		// Read in number of bodies
 		iss >> num_bod;

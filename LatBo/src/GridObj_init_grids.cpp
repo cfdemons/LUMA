@@ -16,7 +16,7 @@ using namespace std;
 // ***************************************************************************************************
 void GridObj::LBM_init_getInletProfile() {
 
-	unsigned int i, j;
+	size_t i, j;
 	double y, tmp;
 	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;	
 
@@ -221,8 +221,8 @@ void GridObj::LBM_init_rho ( ) {
 void GridObj::LBM_init_grid( ) {
 
 	// Set default value for the following MPI-specific settings
-	std::vector<unsigned int> local_size;
-	std::vector< std::vector<unsigned int> > global_edge_ind;
+	std::vector<int> local_size;
+	std::vector< std::vector<int> > global_edge_ind;
 	std::vector< std::vector<double> > global_edge_pos;
 
 	// Set local size to total grid size
@@ -231,7 +231,7 @@ void GridObj::LBM_init_grid( ) {
 	local_size.push_back(K);
 
 	// Set global edge indices and position indices arbitrarily to zero as they won't be accessed anyway
-	global_edge_ind.resize(1, std::vector<unsigned int>(1) );
+	global_edge_ind.resize(1, std::vector<int>(1) );
 	global_edge_ind[0][0] = 0;	
 	global_edge_pos.resize(1, std::vector<double>(1) );
 	global_edge_pos[0][0] = 0.0;
@@ -245,8 +245,8 @@ void GridObj::LBM_init_grid( ) {
 // ***************************************************************************************************
 
 // Initialise level 0 grid method
-void GridObj::LBM_init_grid( std::vector<unsigned int> local_size, 
-							std::vector< std::vector<unsigned int> > global_edge_ind, 
+void GridObj::LBM_init_grid( std::vector<int> local_size, 
+							std::vector< std::vector<int> > global_edge_ind, 
 							std::vector< std::vector<double> > global_edge_pos ) {
 	
 	// Store physical spacing
@@ -254,9 +254,9 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	double Lx = b_x - a_x;
 	double Ly = b_y - a_y;
 	double Lz = b_z - a_z;
-	dx = 2*(Lx/(2*N));
-	dy = 2*(Ly/(2*M));
-	dz = 2*(Lz/(2*K));
+	dx = 2 * (Lx / (2 * static_cast<double>(N)));
+	dy = 2 * (Ly / (2 * static_cast<double>(M)));
+	dz = 2 * (Lz / (2 * static_cast<double>(K)));
 
 	// Physical time step = physical grid spacing
 	dt = dx;
@@ -333,12 +333,12 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 	///////////////////
 
 	// Get local grid sizes (includes overlap)
-	size_t N_lim = local_size[0];
-	size_t M_lim = local_size[1];
+	int N_lim = local_size[0];
+	int M_lim = local_size[1];
 #if (dims == 3)
-	size_t K_lim = local_size[2];
+	int K_lim = local_size[2];
 #else
-	size_t K_lim = 1;
+	int K_lim = 1;
 #endif
 	
 
@@ -495,10 +495,10 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 
 
 	// Loop over grid
-	for (size_t i = 0; i < N_lim; i++) {
-		for (size_t j = 0; j < M_lim; j++) {
-			for (size_t k = 0; k < K_lim; k++) {
-				for (size_t v = 0; v < nVels; v++) {
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
+				for (int v = 0; v < nVels; v++) {
 
 					// Initialise f to feq
 					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
@@ -551,7 +551,7 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 
 	// Declarations
-	unsigned int IndXstart, IndYstart, IndZstart = 0;
+	int IndXstart, IndYstart, IndZstart = 0;
 
 	/* MPI specific setup:
 	 * 1. Store coarse grid refinement limits;

@@ -21,16 +21,19 @@ GridUtils::~GridUtils(void)
 // Returns a vector with n uniformly spaced values between min and max
 std::vector<double> GridUtils::linspace(double min, double max, int n)
 {
-	// Decalre resulting vector
+	// Declare resulting vector
 	std::vector<double> result;
 
 	// Set counter to zero
 	int count = 0;
 
+	// Number of values
+	int numvals = n - 1; // Cast n to a double to use floor
+
 	// Loop
 	for (int i = 0; i <= n-2; i++)
 	{
-		double temp = min + i*(max-min)/(floor( (double)n ) - 1); // Cast n to a double to use floor
+		double temp = min + i * (max - min) / numvals;
 		result.insert(result.begin() + count, temp); // Insert element
 		count += 1;
 	}
@@ -232,7 +235,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 // ***************************************************************************************************
 // Function to find whether the recv layer containing local site i,j,k links to an adjacent or periodic neighbour rank.
 // Takes in the site indices (local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid) {
+bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
 
 	// Local declarations
 	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
@@ -293,7 +296,7 @@ bool GridUtils::isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k
 // ***************************************************************************************************
 // Function to find whether a site with global indices provided is on a given grid or not
 // MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
-bool GridUtils::isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
 
 	if (
 		// Different conditions when using MPI due to extra overlap cells
@@ -342,7 +345,7 @@ bool GridUtils::isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
 // MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
-bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 
 	switch (xyz) {
 
@@ -396,6 +399,8 @@ bool GridUtils::isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid) 
 
 	}
 
+	return false;
+
 }
 
 // ***************************************************************************************************
@@ -405,9 +410,9 @@ bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 
 	// Loop through every global point on the given grid and if one 
 	// of them exists within the refined region then return true.
-	for (unsigned int i : pGrid.XInd) {
-		for (unsigned int j : pGrid.YInd) {
-			for (unsigned int k : pGrid.ZInd) {
+	for (size_t i : pGrid.XInd) {
+		for (size_t j : pGrid.YInd) {
+			for (size_t k : pGrid.ZInd) {
 
 				if	(
 					(i >= RefXstart[pGrid.level][RegNum] && i <= RefXend[pGrid.level][RegNum]) &&

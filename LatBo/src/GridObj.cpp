@@ -53,8 +53,8 @@ GridObj::GridObj(int level)
 
 // ***************************************************************************************************
 // MPI constructor for level 0 with grid level, rank, local grid size and its global edges
-GridObj::GridObj(int level, std::vector<unsigned int> local_size, 
-				 std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+GridObj::GridObj(int level, std::vector<int> local_size, 
+				 std::vector< std::vector<int> > GlobalLimsInd, 
 				 std::vector< std::vector<double> > GlobalLimsPos)
 {
 	// Assign

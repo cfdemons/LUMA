@@ -24,8 +24,8 @@ public:
 	GridObj(int level); // Basic grid constructor
 	GridObj(int RegionNumber, GridObj& pGrid); // Sub grid constructor with region and reference to parent grid for initialisation
 	// MPI L0 constructor with local size and global edges
-	GridObj(int level, std::vector<unsigned int> local_size, 
-		std::vector< std::vector<unsigned int> > GlobalLimsInd, 
+	GridObj(int level, std::vector<int> local_size, 
+		std::vector< std::vector<int> > GlobalLimsInd, 
 		std::vector< std::vector<double> > GlobalLimsPos);
 	~GridObj( ); // Default destructor
 
@@ -88,7 +88,7 @@ public :
 	IVector<int> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
-	unsigned int t;					// Number of completed iterations
+	int t;					// Number of completed iterations
 	double nu;						// Kinematic viscosity (in lattice units)
 	double omega;					// Relaxation frequency
 	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
@@ -110,8 +110,8 @@ public :
 	void LBM_init_vel();		// Initialise the velocity field
 	void LBM_init_rho();		// Initialise the density field
 	void LBM_init_grid();		// Non-MPI wrapper for initialiser
-	void LBM_init_grid(std::vector<unsigned int> local_size,
-		std::vector< std::vector<unsigned int> > GlobalLimsInd,
+	void LBM_init_grid(std::vector<int> local_size,
+		std::vector< std::vector<int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_init_subgrid(GridObj& pGrid);	// Initialise subgrid with all quantities
 	void LBM_init_bound_lab();				// Initialise labels for walls

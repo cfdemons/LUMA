@@ -12,12 +12,12 @@ It needs completely rewriting to generalise.
 
 // **************************************************************************************** //
 // Jacowire function for flexible cilia with one simply supported end and one free end
-void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
+void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
-	unsigned int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
+	int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
 	size_t n = iBody[ib].markers.size() - 1;	// Number of markers - 1
 	size_t i = 0;								// Iterator
@@ -26,7 +26,7 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 	// Special variables for the Numerical Recipe code
 	unsigned long *indx;
 		indx = new unsigned long[3 * iBody[ib].markers.size()];
-	unsigned int m1 = 3, m2 = 3;
+	int m1 = 3, m2 = 3;
 	double **AA, **AL, *d, *res;
 		AA = new double*[3 * iBody[ib].markers.size()+1];
 		AL = new double*[3 * iBody[ib].markers.size()];
@@ -382,11 +382,11 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
 #define TINY 1.0e-20
-void ObjectManager::ibm_bandec(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+void ObjectManager::ibm_bandec(double **a, unsigned long n, int m1, int m2, double **al,
 	unsigned long indx[], double *d)
 {
 	unsigned long i,j,k,l;
-	unsigned int mm;
+	int mm;
 	double dum;
 
 	mm=m1+m2+1;
@@ -449,11 +449,11 @@ void ObjectManager::ibm_bandec(double **a, unsigned long n, unsigned int m1, uns
 * B		= right hand side vector
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
-void ObjectManager::ibm_banbks(double **a, unsigned long n, unsigned int m1, unsigned int m2, double **al,
+void ObjectManager::ibm_banbks(double **a, unsigned long n, int m1, int m2, double **al,
 	unsigned long indx[], double b[])
 {
 	unsigned long i,k,l;
-	unsigned int mm;
+	int mm;
 	double dum;
         //timeval t1, t2;
         //double elapsedTime;
@@ -482,7 +482,7 @@ void ObjectManager::ibm_banbks(double **a, unsigned long n, unsigned int m1, uns
 
 // **************************************************************************************** //
 // Routine to update the position of deformable bodies
-void ObjectManager::ibm_position_update(unsigned int ib, GridObj& g) {
+void ObjectManager::ibm_position_update(int ib, GridObj& g) {
 
 	// If a flexible body then launch structural solver to find new positions
 	if (iBody[ib].flex_rigid) {
@@ -521,10 +521,10 @@ void ObjectManager::ibm_position_update(unsigned int ib, GridObj& g) {
 // Overloaded function to update position of body in a group using the position of the flexible
 // body in the group. Must be called after all previous positional update routines have been called.
 // group_update flag is only there to ensure the overload is defined.
-void ObjectManager::ibm_position_update_grp(unsigned int group, GridObj& g) {
+void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 
 	// Find flexible body in group and store index
-	unsigned int ib_flex;
+	int ib_flex;
 	for (size_t i = 0; i < iBody.size(); i++) {
 
 		if (iBody[i].flex_rigid && iBody[i].groupID == group) {

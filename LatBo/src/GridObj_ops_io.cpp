@@ -25,7 +25,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 	// Create stream and open text file
 	ofstream gridoutput;
-	gridoutput.precision(6);
+	gridoutput.precision(output_precision);
 
 	// Construct File Name
 	string FNameG, N_str, M_str, K_str, ex_str, NumLev_str, NumReg_str, mpirank;
@@ -283,7 +283,7 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 
 		// Get grid sizes
-		unsigned int N_lim, M_lim, K_lim, min, minz;
+		int N_lim, M_lim, K_lim, min, minz;
 		N_lim = XInd.size();
 		M_lim = YInd.size();
 		K_lim = ZInd.size();
@@ -307,7 +307,7 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 
 		// Counters
-		unsigned int i,j,k,v;
+		int i,j,k,v;
 
 		// Write out global grid indices and then the values of f, u and rho
 		for (k = minz; k < K_lim; k++) {
@@ -372,9 +372,9 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
-		unsigned int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
+		int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
 		int gi, gj, gk;
-		unsigned int in_level, in_regnum;
+		int in_level, in_regnum;
 
 		// Read in one line of file at a time
 		std::string line_in;	// String to store line
@@ -458,7 +458,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 	// Call recursively for subgrids
 	if (level < NumLev && subGrid.size()) {
-		for (unsigned int g = 0; g < subGrid.size(); g++) {
+		for (size_t g = 0; g < subGrid.size(); g++) {
 			subGrid[g].io_restart(IO_flag);
 		}
 	}
@@ -471,8 +471,8 @@ void GridObj::io_probe_output() {
 
 	// Declarations
 	std::ofstream probefile;
-	unsigned int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
-	unsigned int M_lims = YInd.size(), K_lims = ZInd.size();
+	int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
+	int M_lims = YInd.size(), K_lims = ZInd.size();
 
 	if (t == out_every_probe && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
@@ -502,7 +502,7 @@ void GridObj::io_probe_output() {
 			j_global = yProbeLims[0] + j*pspace[1];
 
 #if (dims == 3)
-			for (unsigned int k = 0; k < nProbes[2]; k++) {
+			for (int k = 0; k < nProbes[2]; k++) {
 				k_global = zProbeLims[0] + k*pspace[2];
 #else
 			k_global = 0; {

@@ -26,7 +26,7 @@ protected:
 
 	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
 	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
-	unsigned int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
+	int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
 
 	// Flexible body properties
 	double delta_rho;					// Difference in density between fluid and solid in lattice units
@@ -50,16 +50,16 @@ public:
 	//////////////////////////////////
 
 	// Method to construct sphere/circle
-	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, unsigned int group);
+	void makeBody(double radius, std::vector<double> centre, bool flex_rigid, bool moving, int group);
 	// Method to construct cuboid/rectangle
 	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
-		bool flex_rigid, bool deform, unsigned int group);
+		bool flex_rigid, bool deform, int group);
 	// Method to construct filament
-	void makeBody(unsigned int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs,
-		bool flex_rigid, bool deform, unsigned int group);
+	void makeBody(int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs,
+		bool flex_rigid, bool deform, int group);
 	// Method to construct a 3D plate
 	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
-		bool flex_rigid, bool deform, unsigned int group, bool plate);
+		bool flex_rigid, bool deform, int group, bool plate);
 
 };
 

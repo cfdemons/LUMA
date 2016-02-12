@@ -24,7 +24,7 @@ void GridObj::io_tecplot(double tval) {
 	tecfile.open(filename, std::ios::out|std::ios::app);
 
 	// Set precision and force fixed formatting
-	tecfile.precision(10);
+	tecfile.precision(output_precision);
 	tecfile.setf(std::ios::fixed);
 	tecfile.setf(std::ios::showpoint);
 
@@ -32,7 +32,7 @@ void GridObj::io_tecplot(double tval) {
 	if (!exists_flag) {
 
 		// Declare sizes
-		unsigned int i_count = 0, j_count = 0, k_count = 1;
+		int i_count = 0, j_count = 0, k_count = 1;
 
 		// Get number of sites
 		if (level == 0) {
@@ -72,7 +72,7 @@ void GridObj::io_tecplot(double tval) {
 
 
 	// Indices
-	unsigned int i,j,k,v;
+	size_t i,j,k,v;
 		
 	// Write out values
 	for (k = 0; k < ZInd.size(); k++) {
@@ -184,7 +184,7 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 	tecfile.open(filename, std::ios::out|std::ios::app);
 
 	// Set precision and force fixed formatting
-	tecfile.precision(10);
+	tecfile.precision(output_precision);
 	tecfile.setf(std::ios::fixed);
 	tecfile.setf(std::ios::showpoint);
 
@@ -192,7 +192,7 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 	if (!exists_flag) {
 
 		// Declare sizes
-		unsigned int i_count = 0, j_count = 0, k_count = 1;
+		int i_count = 0, j_count = 0, k_count = 1;
 
 		// Get number of sites
 		if (level == 0) {
@@ -233,7 +233,7 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 
 
 	// Indices
-	unsigned int i,j,k,v;
+	size_t i,j,k,v;
 		
 	// Write out values
 	for (k = 0; k < ZInd.size(); k++) {

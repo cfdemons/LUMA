@@ -18,8 +18,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	 * of its neighbour on the opposite side of the grid.
 	 * To start the process we copy the inner values to the f_buffer_send (intermediate buffer).
 	 * This buffer will also be used to receive the new values using MPI_Sendrecv_replace(). */
-	unsigned int idx, i, j , k, v;
-	unsigned int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
+	int idx, i, j , k, v;
+	int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
 #if (dims == 3)
 		, K_lim = g->ZInd.size();
 #else

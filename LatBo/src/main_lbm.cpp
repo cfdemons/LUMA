@@ -111,7 +111,7 @@ int main( int argc, char* argv[] )
 	}
 
 	// Fix output format to screen
-	cout.precision(6);
+	cout.precision(output_precision);
 
 	// Output start time
 	char* time_str = ctime(&curr_time);	// Format start time as string
@@ -366,6 +366,11 @@ int main( int argc, char* argv[] )
 	********************************************** LBM PROCEDURE *****************************************************
 	*************************************************************************************************************** */
 	do {
+
+		// Synchronise MPI processes before next time step starts
+#ifdef BUILD_FOR_MPI
+		MPI_Barrier(mpim->my_comm);
+#endif
 
 		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
 

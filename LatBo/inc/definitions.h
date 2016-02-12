@@ -32,7 +32,7 @@
 ***************************************************************************************************************
 */
 
-// Debug -- Warning: Heavy IO to 10dp
+// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 //#define MEGA_DEBUG
 
 // Numbers
@@ -42,19 +42,20 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before whole grid output
+#define out_every 500			// How many timesteps before whole grid output
+#define output_precision 6		// Precision of output
 
 
 // Types of output
 //#define TEXTOUT
-//#define VTK_WRITER
-#define TECPLOT
+#define VTK_WRITER
+//#define TECPLOT
 //#define MPI_VERBOSE
 
 // High frequency output options
 //#define PROBE_OUTPUT
 #define out_every_probe 250
-const static unsigned int nProbes[3] = {3, 3, 3};		// Number of probes in each direction
+const static int nProbes[3] = {3, 3, 3};		// Number of probes in each direction
 // Start and End points for planes of probes
 const static int xProbeLims[2] = {90, 270};
 const static int yProbeLims[2] = {15, 45};
@@ -89,7 +90,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 20	// Number of time steps
+#define T 10000	// Number of time steps
 
 
 /*
@@ -116,14 +117,14 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 120		// Number of x lattice sites
+#define N 240		// Number of x lattice sites
 #define M 60		// Number of y lattice sites
 #define K 60		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0.0		// Start of domain-x
-#define b_x 12.0		// End of domain-x
+#define b_x 24.0		// End of domain-x
 #define a_y 0.0		// Start of domain-y
 #define b_y 6.0		// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -217,24 +218,24 @@ const static int zProbeLims[2] = {30, 120};
 
 // Switches
 #define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
 	#define obj_x_min 20		// Index of start of object/wall in x-direction
-	#define obj_x_max 25		// Index of end of object/wall in x-direction
-	#define obj_y_min 10		// Index of start of object/wall in y-direction
-	#define obj_y_max 15		// Index of end of object/wall in y-direction
+	#define obj_x_max 60		// Index of end of object/wall in x-direction
+	#define obj_y_min 40		// Index of start of object/wall in y-direction
+	#define obj_y_max 80		// Index of end of object/wall in y-direction
 	#define obj_z_min 20		// Index of start of object/wall in z-direction
 	#define obj_z_max 50		// Index of end of object/wall in z-direction
 #endif
@@ -246,13 +247,15 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
 // Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
-#if (NumReg == 2 && NumLev == 2) // Done this just to making testing easier
+
+// Following options are only here to making testing different grid combinations easier
+#if (NumReg == 2 && NumLev == 2) 
 	const static size_t RefXstart[NumLev][NumReg]	= { {5, 5}, {2, 2} };
 	const static size_t RefXend[NumLev][NumReg]		= { {25, 25}, {20, 10} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {5, 14}, {5, 2} };
@@ -264,17 +267,17 @@ const static int zProbeLims[2] = {30, 120};
 #elif (NumReg == 1 && NumLev == 1)
 	const static size_t RefXstart[NumLev][NumReg]	= { 20 };
 	const static size_t RefXend[NumLev][NumReg]		= { 70 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 10 };
-	const static size_t RefYend[NumLev][NumReg]		= { 40 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefYend[NumLev][NumReg]		= { 15 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 10 };
 	static size_t RefZend[NumLev][NumReg]		= { 40 };
 
 #elif (NumReg == 1 && NumLev == 2)
 	const static size_t RefXstart[NumLev][NumReg]	= { {20}, {20} };
-	const static size_t RefXend[NumLev][NumReg]		= { {70}, {70} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {10}, {20} };
-	const static size_t RefYend[NumLev][NumReg]		= { {40}, {50} };
+	const static size_t RefXend[NumLev][NumReg]		= { {100}, {100} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {10}, {10} };
+	const static size_t RefYend[NumLev][NumReg]		= { {50}, {70} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {1}, {2} };
 	static size_t RefZend[NumLev][NumReg]		= { {4}, {5} };

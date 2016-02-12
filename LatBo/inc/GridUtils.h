@@ -53,9 +53,9 @@ public:
 	static size_t getOpposite(size_t direction);	// Function: getOpposite
 
 	// MPI-related utilities
-	static bool isOverlapPeriodic(unsigned int i, unsigned int j, unsigned int k, GridObj& pGrid);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(unsigned int gi, unsigned int gj, unsigned int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
-	static bool isOnThisRank(unsigned int gl, unsigned int xyz, GridObj& pGrid);
+	static bool isOverlapPeriodic(int i, int j, int k, GridObj& pGrid);	// Function: isOverlapPeriodic
+	static bool isOnThisRank(int gi, int gj, int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
+	static bool isOnThisRank(int gl, int xyz, GridObj& pGrid);
 	static bool hasThisSubGrid(GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer

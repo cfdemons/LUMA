@@ -28,9 +28,9 @@ protected:
 	std::vector<double> position;		// Position vector of marker location in physical units
 
 	// Vector of indices for the LBM nodes considered to be in support of marker
-	std::vector<unsigned int> supp_i;
-	std::vector<unsigned int> supp_j;
-	std::vector<unsigned int> supp_k;
+	std::vector<int> supp_i;
+	std::vector<int> supp_j;
+	std::vector<int> supp_k;
 
 
 };

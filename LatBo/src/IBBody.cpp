@@ -27,7 +27,7 @@ void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 // ***************************************************************************************************
 // Method to seed markers for a sphere / circle
 void IBBody::makeBody(double radius, std::vector<double> centre,
-					   bool flex_rigid, bool deform, unsigned int group) {
+					   bool flex_rigid, bool deform, int group) {
 
 	// Designate body as beiong flexible or rigid and a closed surface
 	this->flex_rigid = flex_rigid;
@@ -49,7 +49,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 	// using Fibonacci sphere technique. Code is not my own but works.
 	double inc = PI * (3 - sqrt(5));
     double off = 2.0 / (float)num_markers ;
-    for (unsigned int k = 0; k < num_markers; k++) {
+    for (int k = 0; k < num_markers; k++) {
         double y = k * off - 1 + (off / 2);
         double r = sqrt(1 - y*y);
         double phi = k * inc;
@@ -60,7 +60,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing (assuming all Lagrange markers are uniformly spaced)
 	std::vector<double> diff;
-	for (unsigned int d = 0; d < dims; d++) {
+	for (int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -80,7 +80,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing
 	std::vector<double> diff;
-	for (unsigned int d = 0; d < dims; d++) {
+	for (int d = 0; d < dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -91,7 +91,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 // ***************************************************************************************************
 // Method to seed markers for a cuboid/rectangle
 void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
-					   bool flex_rigid, bool deform, unsigned int group) {
+					   bool flex_rigid, bool deform, int group) {
 
 	// Designate body as being flexible or rigid and a closed surface
 	this->flex_rigid = flex_rigid;
@@ -162,7 +162,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(8 +
+		int advisory_num_points = (int)(8 +
 			(4 * (pow(2,1) -1) ) +
 			(4 * ( (side_ratio_1 * pow(2,1)) -1) ) +
 			(4 * ( (side_ratio_2 * pow(2,1)) -1) ) +
@@ -176,7 +176,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	}
 
 	// Number of points required to get uniform distribution and points on corners
-	unsigned int num_points = (unsigned int)(8 +
+	int num_points = (int)(8 +
 			(4 * (pow(2,ref) -1) ) +
 			(4 * ( (side_ratio_1 * pow(2,ref)) -1) ) +
 			(4 * ( (side_ratio_2 * pow(2,ref)) -1) ) +
@@ -192,12 +192,12 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, start_z = centre[2]-dep/2, x, y, z, xdash, ydash, zdash;
 
 	// Number of points in each direction
-	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1, np_z = (unsigned int)(dep / spacing)+1;
+	int np_x = (int)(len / spacing)+1, np_y = (int)(wid / spacing)+1, np_z = (int)(dep / spacing)+1;
 
 	// Loop over matrix of points
-	for (unsigned int i = 0; i < np_x; i++) {
-		for (unsigned int j = 0; j < np_y; j++) {
-			for (unsigned int k = 0; k < np_z; k++) {
+	for (int i = 0; i < np_x; i++) {
+		for (int j = 0; j < np_y; j++) {
+			for (int k = 0; k < np_z; k++) {
 
 				// x, y and z positions
 				x = start_x + i*spacing;
@@ -252,14 +252,14 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
+		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
-	unsigned int num_points = (unsigned int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
+	int num_points = (int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
 
 	// Find spacing of nodes
 	spacing = (2 * (wid + len) ) / num_points;
@@ -268,11 +268,11 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	double start_x = centre[0]-wid/2, start_y = centre[1]-len/2, x, y, z, xdash, ydash, zdash;
 
 	// Number of points in each direction
-	unsigned int np_x = (unsigned int)(len / spacing)+1, np_y = (unsigned int)(wid / spacing)+1;
+	int np_x = (int)(len / spacing)+1, np_y = (int)(wid / spacing)+1;
 
 	// Loop over matrix of points
-	for (unsigned int i = 0; i < np_x; i++) {
-		for (unsigned int j = 0; j < np_y; j++) {
+	for (int i = 0; i < np_x; i++) {
+		for (int j = 0; j < np_y; j++) {
 			// 2D specification of z
 			z = (b_z - a_z)/2;
 
@@ -311,8 +311,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 // ***************************************************************************************************
 // Method to seed markers for a flexible filament
-void IBBody::makeBody(unsigned int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
-					   std::vector<int> BCs, bool flex_rigid, bool deform, unsigned int group) {
+void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
+					   std::vector<int> BCs, bool flex_rigid, bool deform, int group) {
 
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
@@ -353,7 +353,7 @@ void IBBody::makeBody(unsigned int nummarkers, std::vector<double> start_point, 
 	double spacing_h = spacing*cos(body_angle_v * PI / 180);	// Local spacing projected onto the horizontal plane
 
 	// Add all markers
-	for (size_t i = 0; i < nummarkers; i++) {
+	for (int i = 0; i < nummarkers; i++) {
 		addMarker(	start_point[0] + i*spacing_h*cos(body_angle_h * PI / 180),
 					start_point[1] + i*spacing*sin(body_angle_v * PI / 180),
 					start_point[2] + i*spacing_h*sin(body_angle_h * PI / 180),
@@ -362,7 +362,7 @@ void IBBody::makeBody(unsigned int nummarkers, std::vector<double> start_point, 
 
 
 	// Add dynamic positions in physical units
-	for (size_t i = 0; i < nummarkers; i++) {
+	for (int i = 0; i < nummarkers; i++) {
 		markers[i].position_old.push_back(markers[i].position[0]);
 		markers[i].position_old.push_back(markers[i].position[1]);
 		markers[i].position_old.push_back(markers[i].position[2]);
@@ -377,7 +377,7 @@ void IBBody::makeBody(unsigned int nummarkers, std::vector<double> start_point, 
 // ***************************************************************************************************
 // Method to seed markers for a 3D plate inclined from the xz plane
 double IBBody::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
-	bool flex_rigid, bool deform, unsigned int group, bool plate) {
+	bool flex_rigid, bool deform, int group, bool plate) {
 
 	// Exit if called in 2D
 	if ( dims == 2 ) {
@@ -431,14 +431,14 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	// Check to see if enough points
 	if (ref == 0) {
 		// Advisory of number of points
-		unsigned int advisory_num_points = (unsigned int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
+		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
-	unsigned int num_points = (unsigned int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
+	int num_points = (int)(4 + (2 * (pow(2,ref) -1) ) + (2 * ( (side_ratio * pow(2,ref)) -1) ));
 
 	// Find spacing of nodes
 	spacing = (2 * (len_z + len_x) ) / num_points;
@@ -450,11 +450,11 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 		x, y, z;
 
 	// Number of points in each direction
-	unsigned int np_x = (unsigned int)(len_x / spacing)+1, np_z = (unsigned int)(len_z / spacing)+1;
+	int np_x = (int)(len_x / spacing)+1, np_z = (int)(len_z / spacing)+1;
 
 	// Loop over matrix of points
-	for (unsigned int i = 0; i < np_x; i++) {
-		for (unsigned int j = 0; j < np_z; j++) {
+	for (int i = 0; i < np_x; i++) {
+		for (int j = 0; j < np_z; j++) {
 
 			// x and y positions
 			x = start_x + (i*spacing*cos(angle * PI / 180));
@@ -469,7 +469,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	}
 
 	// Add dynamic positions in physical units
-	for (size_t i = 0; i < np_x*np_z; i++) {
+	for (int i = 0; i < np_x*np_z; i++) {
 		markers[i].position_old.push_back(markers[i].position[0]);
 		markers[i].position_old.push_back(markers[i].position[1]);
 		markers[i].position_old.push_back(markers[i].position[2]);

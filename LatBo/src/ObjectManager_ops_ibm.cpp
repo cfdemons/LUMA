@@ -138,10 +138,10 @@ double ObjectManager::ibm_deltakernel(double radius, double dilation) {
 
 // ***************************************************************************************************
 // Method to find the support points in the Eulerian fluid of Lagrange marker m
-void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g) {
+void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 	// Declarations
-	unsigned int inear, jnear;					// Nearest node indices
+	int inear, jnear;					// Nearest node indices
 	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
 #if (dims == 3)
 	// Extras for 3D
@@ -151,11 +151,11 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (unsigned int)std::floor( iBody[ib].markers[m].position[0]/g.dx + 0.5);	// Simulates std::round
-	jnear = (unsigned int)std::floor( iBody[ib].markers[m].position[1]/g.dy + 0.5);
+	inear = (int)std::floor( iBody[ib].markers[m].position[0]/g.dx + 0.5);	// Simulates std::round
+	jnear = (int)std::floor( iBody[ib].markers[m].position[1]/g.dy + 0.5);
 
 #if (dims == 3)
-	knear = (unsigned int)std::floor( iBody[ib].markers[m].position[2]/g.dz + 0.5);
+	knear = (int)std::floor( iBody[ib].markers[m].position[2]/g.dz + 0.5);
 #endif
 
 
@@ -220,17 +220,17 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 	// Test to see if required support nodes are available
 #if (dims == 3)
 
-	if ( (int)inear - 5 < 0 || inear + 5 >= g.XPos.size() ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
-	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= g.YPos.size() ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
-	} else if ( (int)knear - 5 < 0 || knear + 5 >= g.ZPos.size() ) {
+	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= g.ZPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
@@ -238,9 +238,9 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 
 
 	// Loop over surrounding 5 nodes to find support nodes
-	for (size_t i = inear - 5; i <= inear + 5; i++) {
-		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
-			for (size_t k = knear - 5; k <= knear + 5; k++) {
+	for (int i = inear - 5; i <= inear + 5; i++) {
+		for (int j = jnear - 5; j <= jnear + 5; j++) {
+			for (int k = knear - 5; k <= knear + 5; k++) {
 
 				// Find distance between Lagrange marker and possible support node and decide whether in cage or not
 				if (	( fabs(g.XPos[inear] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
@@ -277,12 +277,12 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 #else
 
 	// 2D check support region
-	if ( (int)inear - 5 < 0 || inear + 5 >= g.XPos.size() ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
 
-	} else if ( (int)jnear - 5 < 0 || jnear + 5 >= g.YPos.size() ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(EXIT_FAILURE);
@@ -290,9 +290,9 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 	}
 
 	// 2D version to find support nodes
-	for (size_t i = inear - 5; i <= inear + 5; i++) {
-		for (size_t j = jnear - 5; j <= jnear + 5; j++) {
-			size_t k = 0;
+	for (int i = inear - 5; i <= inear + 5; i++) {
+		for (int j = jnear - 5; j <= jnear + 5; j++) {
+			int k = 0;
 
 			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
 			if (	( fabs(g.XPos[inear] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
@@ -325,7 +325,7 @@ void ObjectManager::ibm_findsupport(unsigned int ib, unsigned int m, GridObj& g)
 
 // ***************************************************************************************************
 // Method to interpolate the velocity field onto the Lagrange markers
-void ObjectManager::ibm_interpol(unsigned int ib, GridObj& g) {
+void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 
 	// Get grid sizes
 	size_t M_lim = g.YPos.size();
@@ -344,7 +344,7 @@ void ObjectManager::ibm_interpol(unsigned int ib, GridObj& g) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 
 			// Loop over directions x y z
-			for (unsigned int dir = 0; dir < dims; dir++) {
+			for (int dir = 0; dir < dims; dir++) {
 
 				// Read given velocity component from support node, multiply by delta function
 				// for that support node and sum to get interpolated velocity.
@@ -371,11 +371,11 @@ void ObjectManager::ibm_interpol(unsigned int ib, GridObj& g) {
 
 // ***************************************************************************************************
 // Method to compute restorative force at each marker in a body
-void ObjectManager::ibm_computeforce(unsigned int ib, GridObj& g) {
+void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 
 	// Loop over markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		for (unsigned int dir = 0; dir < dims; dir++) {
+		for (int dir = 0; dir < dims; dir++) {
 			// Compute restorative force (in lattice units)
 			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
 				1 / pow(2,g.level);	// Time step in lattice units dt = 1 / 2^level = dx
@@ -386,7 +386,7 @@ void ObjectManager::ibm_computeforce(unsigned int ib, GridObj& g) {
 
 // ***************************************************************************************************
 // Method to spread the restorative force back on to the fluid sites
-void ObjectManager::ibm_spread(unsigned int ib, GridObj& g) {
+void ObjectManager::ibm_spread(int ib, GridObj& g) {
 
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
@@ -410,7 +410,7 @@ void ObjectManager::ibm_spread(unsigned int ib, GridObj& g) {
 
 // ***************************************************************************************************
 // Method to find epsilon
-double ObjectManager::ibm_findepsilon(unsigned int ib, GridObj& g) {
+double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
 
 	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
@@ -483,7 +483,7 @@ double ObjectManager::ibm_findepsilon(unsigned int ib, GridObj& g) {
 
 	// Settings
     double tolerance = 1.0e-4;
-	unsigned int maxiterations = 2500;
+	int maxiterations = 2500;
 	double minimum_residual_achieved;
 
     // Biconjugate gradient stabilised method for solving asymmetric linear systems
@@ -505,7 +505,7 @@ double ObjectManager::ibm_findepsilon(unsigned int ib, GridObj& g) {
 // Tolerance of iterator is tolerance and maximum iterations pursued is maxiterations.
 // Returns the minimum residual achieved.
 double ObjectManager::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon,
-						   double tolerance, unsigned int maxiterations) {
+						   double tolerance, int maxiterations) {
 
 	// Declarations //
 
@@ -542,7 +542,7 @@ double ObjectManager::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, 
     }
 
 	// Step 5: Iterate
-	for (unsigned int i = 1; i < maxiterations; i++) {
+	for (int i = 1; i < maxiterations; i++) {
 
 		// Step 5a: Compute new rho
 		bic_rho[1] = GridUtils::dotprod(bic_rhat, bic_r);

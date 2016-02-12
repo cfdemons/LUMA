@@ -13,8 +13,8 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 	
 	// Copy received information back to grid using the EXACT
 	// reverse algorithm of the copying procedure
-	unsigned int i, j , k, v, idx;
-	unsigned int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
+	int i, j , k, v, idx;
+	int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
 #if (dims == 3)
 		, K_lim = g->ZInd.size();
 #else

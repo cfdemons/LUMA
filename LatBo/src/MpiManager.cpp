@@ -156,9 +156,9 @@ void MpiManager::mpi_gridbuild( ) {
 	double Lx = b_x - a_x;
 	double Ly = b_y - a_y;
 	double Lz = b_z - a_z;
-	double dx = 2*(Lx/(2*N));
-	double dy = 2*(Ly/(2*M));
-	double dz = 2*(Lz/(2*K));
+	double dx = 2 * (Lx / (2 * static_cast<double>(N)));
+	double dy = 2 * (Ly / (2 * static_cast<double>(M)));
+	double dz = 2 * (Lz / (2 * static_cast<double>(K)));
 
 	// Compute required local grid size
 	// Loop over dimensions
@@ -168,7 +168,7 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
-		} else if ( global_dims[d] % MPI_dims[d] != 0 ) {
+		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
 			std::cout << "Error: See Log File" << std::endl;
 			*MpiManager::logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
@@ -210,7 +210,7 @@ void MpiManager::mpi_gridbuild( ) {
 	}
 
 	// Find indices and positions of edges of each grid in the global coordinate space excluding the overlap
-	global_edge_ind.resize( 6, std::vector<unsigned int>(num_ranks) );
+	global_edge_ind.resize( 6, std::vector<int>(num_ranks) );
 	global_edge_pos.resize( 6, std::vector<double>(num_ranks) );
 
 
@@ -400,7 +400,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 // *************************************************************************************************** //
 // Writes out f-buffers
-void MpiManager::mpi_writeout_buf( std::string filename, unsigned int dir ) {
+void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 
 	std::ofstream rankout;
 	rankout.open(filename.c_str(), std::ios::out);
@@ -443,10 +443,10 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	* IMPORTANT: MPI_Barrier() calls synchronise the entire topology. If these calls are made on MPI 
 	* communications on a particular grid that only exists on some ranks, the sub-time steps on each rank 
 	* will be out of sync. Need to allow the blocking nature of the send and receive calls to force correct 
-	* synchronisation between processes.
+	* synchronisation between processes and only call barriers outside the grid scope.
 	*
 	* For each sending direction, pack and load a message into the message queue 
-	* for the destination rank with tag assocaited with direction.
+	* for the destination rank with tag associated with direction.
 	* Then for each receive direction, pull message with correct tag from the queue 
 	* and unpack.
 	*
@@ -459,16 +459,13 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	* we use the MPI Manager class to hold the buffer in house. */
 
 	// Sync before starting the clock
-	MPI_Barrier(MpiManager::my_comm);
+	//MPI_Barrier(MpiManager::my_comm);
 
 	// Start the clock
 	t_start = clock();
 
 	// Loop over directions in Cartesian topology
 	for (int dir = 0; dir < MPI_dir; dir++) {
-
-		// Sync before changing buffer size
-		MPI_Barrier(MpiManager::my_comm);
 
 		// Create a unique tag based on level, region and direction
 		int TAG = ((Grid->level + 1) * 1000000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
@@ -483,9 +480,6 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 				f_buffer_send[dir].resize(bufs.size[dir] * nVels);
 			}
 		}
-
-		// Sync before changing buffer data and posting send
-		MPI_Barrier(MpiManager::my_comm);
 
 		// Only pack and send if required
 		if (f_buffer_send[dir].size()) {
@@ -512,11 +506,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		}
 
-		// Sync before changing buffer size
-		MPI_Barrier(MpiManager::my_comm);
-
 		// Find opposite direction (neighbour it receives from)
-		unsigned int opp_dir = GridUtils::getOpposite(dir);
+		int opp_dir = GridUtils::getOpposite(dir);
 
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
@@ -529,9 +520,6 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		///////////////////
 		// Fetch Message //
 		///////////////////
-
-		// Sync before receiving message and reading buffer data
-		MPI_Barrier(MpiManager::my_comm);
 
 		if (f_buffer_recv[dir].size()) {
 
@@ -567,8 +555,6 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	}
 
-	// Sync before stopping the clock
-	MPI_Barrier(MpiManager::my_comm);
 
 	// Print Time of MPI comms
 	t_end = clock();
@@ -616,8 +602,8 @@ void MpiManager::mpi_buffer_size(GridObj* Grids) {
 
 	// Loop through levels and regions
 	GridObj* g;	// Pointer to a GridObj
-	for (unsigned int l = 0; l <= NumLev; l++) {
-		for (unsigned int r = 0; r < NumReg; r++) {
+	for (int l = 0; l <= NumLev; l++) {
+		for (int r = 0; r < NumReg; r++) {
 
 			// Null the pointer
 			g = NULL;

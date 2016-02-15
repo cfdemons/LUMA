@@ -441,3 +441,105 @@ void GridObj::bc_solid_site_reset( ) {
 
 // ***************************************************************************************************
 // ***************************************************************************************************
+
+//****************************************************************************************************
+//                                        Non Reflective
+//****************************************************************************************************
+
+// ***************************************************************************************************
+// Routine to apply Zou-He boundary conditions
+void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_lim) {
+
+	/* According to REFERENCE
+	* Explain everything about the methodololy used to implement
+	* the non Reflective BC
+	* STEP by STEP
+	*
+	*/
+
+	// Get references for f values to make the following a bit neater and easier to read
+	// but does make it slower
+	ivector<double> ftmp;
+	for (size_t n = 0; n < nVels; n++) {
+		ftmp.push_back(f(i, j, k, n, M_lim, K_lim, nVels));
+	}
+
+
+
+#if (dims == 3)
+
+
+	//Extension of non reflective to a 3D case, this will be completed once validated the 2D version.
+
+
+
+#else
+
+	/* 2D Non Reflective BC for a Right hand outlet
+	* To implement this BC, It is necessary obtain the characteristic waves L´s and constants
+	*
+	*
+	*
+	*
+	*
+	*/
+
+	//***************************************************************************************************
+	//                                            LODI
+	//***************************************************************************************************
+
+	// Constants
+
+	double c1o6 = 1.0 / 6.0;
+	double c2o3 = 2.0 / 3.0;
+	double cs = 1.0 / sqrt(3.0);
+	double csSq = 1.0 / 3.0;
+	double c1oCsSq2 = 1.0 / 5.0;
+	double c1o2csrho0 = 0.5*sqrt(3);
+
+
+
+	// Compute derivatives
+	double    drhodx = -0.5*(3 * rho(i, j, k, M_lim, K_lim) - 4 * rho(i + 1, j, k, M_lim, K_lim) + rho(i + 2, j, k, M_lim, K_lim));
+	double    duxdx = -0.5*(3 * u(i, j, k, 0, M_lim, K_lim, dims) - 4 * u(i + 1, j, k, 0, M_lim, K_lim, dims) + u(i + 2, j, k, 0, M_lim, K_lim, dims));
+	double    duydx = -0.5*(3 * u(i, j, k, 1, M_lim, K_lim, dims) - 4 * u(i + 1, j, k, 1, M_lim, K_lim, dims) + u(i + 2, j, k, 1, M_lim, K_lim, dims));
+	double    L1 = ((u(i, j, k, 0, M_lim, K_lim, dims) - 1 / sqrt(3))*(drhodx / 3 - duxdx / sqrt(3)));
+	double    L2 = u(i, j, k, 0, M_lim, K_lim, dims)*duydx;
+
+	// Compute solution
+
+	rho(i, j, k, M_lim, K_lim) = rho(i, j, k, M_lim, K_lim) - 1.5*L1;
+	u(i, j, k, 0, M_lim, K_lim, dims) = u(i, j, k, 0, M_lim, K_lim, dims) + 0.5*sqrt(3)*L1;
+	u(i, j, k, 1, M_lim, K_lim, dims) = u(i, j, k, 1, M_lim, K_lim, dims) - L2;
+
+	//Set un-known distribution by a non equilibrium Bounce-back
+
+	ftmp[1] = ftmp[2] + 2 / 3 * u(i, j, k, 0, M_lim, K_lim, dims);
+	ftmp[5] = ftmp[6] + 1 / 6 * (u(i, j, k, 0, M_lim, K_lim, dims) + u(i, j, k, 1, M_lim, K_lim, dims));
+	ftmp[8] = ftmp[7] + 1 / 6 * (u(i, j, k, 0, M_lim, K_lim, dims) - u(i, j, k, 1, M_lim, K_lim, dims));
+
+	//******************************************************************************************************
+	//******************************************************************************************************
+
+
+
+
+
+
+
+
+#endif
+
+
+
+	// Set macroscopic quantities for calculation of feq and also ensuing collision step
+
+
+
+
+
+
+} // end Non Reflective BC
+
+  // ***************************************************************************************************
+

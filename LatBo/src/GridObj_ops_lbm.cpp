@@ -191,7 +191,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_multi(false);
 
 		// Move the body if necessary
-		//ObjectManager::ibm_move_bodies(*this);	// TODO Uncomment this so Jacowire can happen
+		ObjectManager::ibm_move_bodies(*this);
 
 	}
 #endif

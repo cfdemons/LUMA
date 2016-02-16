@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 1	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -158,6 +158,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
 #define IBM_DEBUG					// Write IBM body and matrix data out to text files
+#define PREC_FACTOR 20
 //#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time

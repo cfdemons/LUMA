@@ -67,10 +67,11 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out marker coordinates
 		std::ofstream bodyout;
+		bodyout.precision(PREC_FACTOR);
 		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
 		bodyout << "x\ty\tz" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << std::endl;
+			bodyout << std::fixed << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << std::endl;
 		}
 		bodyout.close();
 #endif
@@ -83,6 +84,7 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out support coordinates
 		std::ofstream suppout;
+		suppout.precision(PREC_FACTOR);
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
 			suppout << "x\ty\tz" << std::endl;
@@ -90,7 +92,7 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 				if (dims == 3) {
 					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << g.ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
 				} else {
-					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
+					suppout << std::fixed << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
 				}
 			}
 			suppout.close();
@@ -103,9 +105,10 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out epsilon values
 		std::ofstream epout;
+		epout.precision(PREC_FACTOR);
 		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			epout << iBody[ib].markers[m].epsilon << std::endl;
+			epout << std::fixed << iBody[ib].markers[m].epsilon << std::endl;
 		}
 		epout.close();
 #endif
@@ -367,6 +370,18 @@ void ObjectManager::ibm_interpol(unsigned int ib, GridObj& g) {
 		}
 	}
 
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out epsilon values
+		std::ofstream predout;
+		predout.precision(PREC_FACTOR);
+		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			predout << std::fixed << iBody[ib].markers[m].fluid_vel[0] << "\t" << iBody[ib].markers[m].fluid_vel[1] << std::endl;
+		}
+		predout.close();
+#endif
+
 }
 
 // ***************************************************************************************************
@@ -381,6 +396,18 @@ void ObjectManager::ibm_computeforce(unsigned int ib, GridObj& g) {
 				1 / pow(2,g.level);	// Time step in lattice units dt = 1 / 2^level = dx
 		}
 	}
+
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out epsilon values
+		std::ofstream forceout;
+		forceout.precision(PREC_FACTOR);
+		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			forceout << std::fixed << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
+		}
+		forceout.close();
+#endif
 
 }
 
@@ -461,11 +488,12 @@ double ObjectManager::ibm_findepsilon(unsigned int ib, GridObj& g) {
 #ifdef IBM_DEBUG
 	// DEBUG -- write out A
 	std::ofstream Aout;
+	Aout.precision(PREC_FACTOR);
 	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
 	for (size_t i = 0; i < A.size(); i++) {
 		Aout << "\n";
 		for (size_t j = 0; j < A.size(); j++) {
-			Aout << A[i][j] << "\t";
+			Aout << std::fixed << A[i][j] << "\t";
 		}
 	}
 	Aout.close();

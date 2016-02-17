@@ -422,6 +422,18 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
         iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
     }
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out res vector
+		std::ofstream velout;
+		velout.precision(PREC_FACTOR);
+		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		velout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+			velout << std::fixed << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
+		}
+		velout.close();
+#endif
+
     // Clean up the dynamic memory
     for (i = 0; i < 3 * iBody[ib].markers.size(); ++i) {
     	delete [] AA[i];

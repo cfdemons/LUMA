@@ -61,7 +61,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 #define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 1e-2	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 2	// Number of time steps
 
 
 /*
@@ -158,7 +158,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
 #define IBM_DEBUG					// Write IBM body and matrix data out to text files
-#define PREC_FACTOR 20
+#define PREC_FACTOR 30
 //#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
@@ -204,7 +204,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 2			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 0.001			// Flexural rigidity (lattice units) of filament
 
 
 /*

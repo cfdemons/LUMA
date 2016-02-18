@@ -42,18 +42,6 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 		res[i] = 0.0;
 	}
 
-#ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
-		std::ofstream ten1out;
-		ten1out.precision(PREC_FACTOR);
-		ten1out.open(GridUtils::path_str + "/ten1_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
-		ten1out << "\nNEW TIME STEP" << std::endl;
-		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			ten1out << std::fixed << iBody[ib].tension[i] << std::endl;
-		}
-		ten1out.close();
-#endif
-
 
 	// Reset tension vector
 	//std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0); // **
@@ -232,20 +220,7 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
         	}
         }
 
-#ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
-		std::ofstream AAout;
-		AAout.precision(PREC_FACTOR);
-		AAout.open(GridUtils::path_str + "/AA_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
-		AAout << "\nNEW NEWTON STEP" << std::endl;
-		for (int l = 0; l < 3 * iBody[ib].markers.size(); l++) {
-			for (int m = 0; m < 1; m++) {
-				AAout << std::fixed << res[l] << "\t";
-			}
-			AAout << std::endl;
-		}
-		AAout.close();
-#endif
+
         /*for (size_t j = 0; j < m1 + m2 + 2; ++j) {
         	AA[3 * iBody[ib].markers.size()][j] = 0.0;
         }*/
@@ -308,27 +283,9 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 
 
         ibm_bandec(AA, 3 * n + 1, m1, m2, AL, indx, d); // LU decomposition
-
-
-
-
         ibm_banbks(AA, 3 * n + 1, m1, m2, AL, indx, res); // solve banded problem
 
 
-#ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
-		//std::ofstream AAout;
-		AAout.precision(PREC_FACTOR);
-		AAout.open(GridUtils::path_str + "/AA_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
-		AAout << "\nNEW NEWTON STEP2" << std::endl;
-		for (int l = 0; l < 3 * iBody[ib].markers.size(); l++) {
-			for (int m = 0; m < 1; m++) {
-				AAout << std::fixed << res[l] << "\t";
-			}
-			AAout << std::endl;
-		}
-		AAout.close();
-#endif
 
 		// Iteration update
         Tension0 = Tension0 - res[1];
@@ -339,6 +296,8 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
             y[i] -= res[ii + 2];
             ii = ii + 3;
         }
+
+
 
         // Clamped boundary condition
         if (iBody[ib].BCs[0] == 2) {
@@ -391,6 +350,7 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 		}
     }
 
+
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream posout;
@@ -405,14 +365,14 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
-		std::ofstream ten2out;
-		ten2out.precision(PREC_FACTOR);
-		ten2out.open(GridUtils::path_str + "/ten2_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
-		ten2out << "\nNEW TIME STEP" << std::endl;
+		std::ofstream tenout;
+		tenout.precision(PREC_FACTOR);
+		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		tenout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			ten2out << std::fixed << iBody[ib].tension[i] << std::endl;
+			tenout << std::fixed << iBody[ib].tension[i] << std::endl;
 		}
-		ten2out.close();
+		tenout.close();
 #endif
 
 

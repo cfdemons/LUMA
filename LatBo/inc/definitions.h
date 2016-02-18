@@ -61,7 +61,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 #define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-1	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 1e-5	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -86,7 +86,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 1	// Number of time steps
+#define T 500	// Number of time steps
 
 
 /*
@@ -113,14 +113,14 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 11		// Number of x lattice sites
+#define N 15		// Number of x lattice sites
 #define M 15		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x -0.5		// Start of domain-x
-#define b_x 10.5	// End of domain-x
+#define b_x 14.5	// End of domain-x
 #define a_y -0.5		// Start of domain-y
 #define b_y 14.5	// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -158,7 +158,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
 #define IBM_DEBUG					// Write IBM body and matrix data out to text files
-#define PREC_FACTOR 30
+#define PREC_FACTOR 15
 //#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time

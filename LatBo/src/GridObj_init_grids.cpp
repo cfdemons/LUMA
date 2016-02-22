@@ -877,10 +877,10 @@ void GridObj::LBM_init_grid( std::vector<unsigned int> local_size,
 #elif defined SOLID_BLOCK_ON
 	// Use object height
 	//nu = (obj_y_max - obj_y_min) * u_ref / Re;
-	nu = ((M - obj_y_max) - 2) * u_ref / Re;	// Want the solid block neglected
+	nu = ((M - obj_y_max) - 2) * u_ref / Re;	// TODO This is case specific -this should be handled in a better way 
 #else
 	// If no object then use domain height (in lattice units)
-	nu = (M - 2) * u_ref / Re;
+	nu = (M - 2) * u_ref / Re;	// TODO The minus 2 is bacause of halfway BB - should have another if condition to check in case this isn't true
 #endif
 
 	// Relaxation frequency on L0

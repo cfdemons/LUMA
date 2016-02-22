@@ -38,6 +38,7 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 	AA[3 * iBody[ib].markers.size()] = new double[m1 + m2 + 2];
 	res = new double[3 * iBody[ib].markers.size()];
 
+	// Set the res vector to zero
 	for (int i = 0; i < 3 * iBody[ib].markers.size(); i++) {
 		res[i] = 0.0;
 	}
@@ -162,11 +163,10 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
-		Gout.precision(PREC_FACTOR);
 		Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		Gout << "\nNEW TIME STEP" << std::endl;
 		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
-			Gout << std::fixed << G[i] << std::endl;
+			Gout << G[i] << std::endl;
 		}
 		Gout.close();
 #endif
@@ -219,11 +219,6 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
         		AA[iii][jjj] = 0.0;
         	}
         }
-
-
-        /*for (size_t j = 0; j < m1 + m2 + 2; ++j) {
-        	AA[3 * iBody[ib].markers.size()][j] = 0.0;
-        }*/
 
         //-- for jacobian matrix in a compact form (only non zeros entries)
 
@@ -281,7 +276,6 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 
 
 
-
         ibm_bandec(AA, 3 * n + 1, m1, m2, AL, indx, d); // LU decomposition
         ibm_banbks(AA, 3 * n + 1, m1, m2, AL, indx, res); // solve banded problem
 
@@ -326,11 +320,10 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 #ifdef IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.precision(PREC_FACTOR);
 		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
-			resout << std::fixed << res[i] << std::endl;
+			resout << res[i] << std::endl;
 		}
 		resout.close();
 #endif
@@ -352,25 +345,23 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
 
 
 #ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
+		// DEBUG -- write out pos vector
 		std::ofstream posout;
-		posout.precision(PREC_FACTOR);
 		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		posout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			posout << std::fixed << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << std::endl;
+			posout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << std::endl;
 		}
 		posout.close();
 #endif
 
 #ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
+		// DEBUG -- write out ten vector
 		std::ofstream tenout;
-		tenout.precision(PREC_FACTOR);
 		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		tenout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			tenout << std::fixed << iBody[ib].tension[i] << std::endl;
+			tenout << iBody[ib].tension[i] << std::endl;
 		}
 		tenout.close();
 #endif
@@ -383,13 +374,12 @@ void ObjectManager::ibm_jacowire(unsigned int ib, GridObj& g) {
     }
 
 #ifdef IBM_DEBUG
-		// DEBUG -- write out res vector
+		// DEBUG -- write out desired vel vector
 		std::ofstream velout;
-		velout.precision(PREC_FACTOR);
 		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		velout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			velout << std::fixed << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
+			velout << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
 		}
 		velout.close();
 #endif
@@ -504,7 +494,7 @@ void ObjectManager::ibm_banbks(double **a, unsigned long n, unsigned int m1, uns
 	unsigned long indx[], double b[])
 {
 	unsigned long i,k,l;
-	int mm;
+	unsigned int mm;
 	double dum;
         //timeval t1, t2;
         //double elapsedTime;

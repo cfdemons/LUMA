@@ -203,7 +203,7 @@ const static size_t zRankSize[Xcores*Ycores*Zcores]		= {20, 30, 20, 30, 20, 30, 
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 25.0			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 2.0			// Flexural rigidity (lattice units) of filament
 
 
 /*

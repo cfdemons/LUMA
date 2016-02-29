@@ -17,7 +17,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
-	int max_terations = iBody[ib].markers.size();	// Set maximum number of iterations
+	int max_iterations = iBody[ib].markers.size();	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
 	size_t n = iBody[ib].markers.size() - 1;	// Number of markers - 1
 	size_t i = 0;								// Iterator
@@ -37,6 +37,11 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     }
 	AA[3 * iBody[ib].markers.size()] = new double[m1 + m2 + 2];
 	res = new double[3 * iBody[ib].markers.size()];
+
+	// Set the res vector to zero
+	for (int i = 0; i < 3 * iBody[ib].markers.size(); i++) {
+		res[i] = 0.0;
+	}
 
 
 	// Reset tension vector
@@ -173,7 +178,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	// ******************* //
 
     size_t iter = 0;
-    while (residual > tolerance && iter < max_terations) {
+    while (residual > tolerance && iter < max_iterations) {
         iter++;
         res[0] = 0; //  not used res is used starting from 1
         res[1] = Tension0 - iBody[ib].tension[0] + (Fx[0] + Froude) * x[0] + Fy[0] * y[0] - G[1]; // SIMPLY SUPPORTED
@@ -197,23 +202,22 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         // maximum residual evaluation
         residual = 0;
         for (size_t in = 1; in <= 3 * n + 1; ++in) {
-            if (abs(res[in]) > residual) {
-                residual = abs(res[in]);
+            if (fabs(res[in]) > residual) {
+                residual = fabs(res[in]);
             }
         }
 
         // Set AA and AL matrices to zero
-        for (i = 0; i < 3 * iBody[ib].markers.size(); ++i) {
-            indx[i] = 0;
-            for (size_t j = 0; j < m1 + m2 + 2; ++j) {
-                AA[i][j] = 0.0;
-            }
-            for (size_t j = 0; j < m1 + 1; ++j) {
-                AL[i][j] = 0.0;
+        for (int iii = 0; iii < 3 * iBody[ib].markers.size(); iii++) {
+            indx[iii] = 0;
+            for (int jjj = 0; jjj < m1 + 1; jjj++) {
+            	AL[iii][jjj] = 0.0;
             }
         }
-        for (size_t j = 0; j < m1 + m2 + 2; ++j) {
-        	AA[3 * iBody[ib].markers.size()][j] = 0.0;
+        for (int iii = 0; iii < 3 * iBody[ib].markers.size() + 1; iii++) {
+        	for (int jjj = 0; jjj < m1 + m2 + 2; jjj++) {
+        		AA[iii][jjj] = 0.0;
+        	}
         }
 
         //-- for jacobian matrix in a compact form (only non zeros entries)
@@ -289,6 +293,16 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 
 
+        // Clamped boundary condition
+        if (iBody[ib].BCs[0] == 2) {
+
+        	// Apply clamped BC to first flexible marker
+        	x[0] = x0 + ds_nondim * cos(ibb_angle_vert * PI / 180.0);
+        	y[0] = y0 + ds_nondim * sin(ibb_angle_vert * PI / 180.0);
+
+        }
+
+
     } // end of Newton while loop
 
 
@@ -315,14 +329,6 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 #endif
 
 
-	// Clamped boundary condition
-	if (iBody[ib].BCs[0] == 2) {
-
-		// Apply clamped BC to first flexible marker
-		x[0] = x0 + ds_nondim * cos(ibb_angle_vert * PI / 180.0);
-		y[0] = y0 + ds_nondim * sin(ibb_angle_vert * PI / 180.0);
-
-	}
 
 	// After the Newton iteration has completed markers are updated from the temporary vectors used in the loop
     for (i = 0; i < iBody[ib].markers.size(); i++) {
@@ -337,11 +343,46 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 		}
     }
 
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out pos vector
+		std::ofstream posout;
+		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		posout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+			posout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << std::endl;
+		}
+		posout.close();
+#endif
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out ten vector
+		std::ofstream tenout;
+		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		tenout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+			tenout << iBody[ib].tension[i] << std::endl;
+		}
+		tenout.close();
+#endif
+
+
 	// Desired velocity (in lattice units) on the makers is computed using a first order estimate based on position change
     for (i = 0; i < iBody[ib].markers.size(); i++) {
         iBody[ib].markers[i].desired_vel[0] = ( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / g.dx) / (1 / pow(2,g.level));
         iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
     }
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out desired vel vector
+		std::ofstream velout;
+		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		velout << "\nNEW TIME STEP" << std::endl;
+		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+			velout << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
+		}
+		velout.close();
+#endif
 
     // Clean up the dynamic memory
     for (i = 0; i < 3 * iBody[ib].markers.size(); ++i) {

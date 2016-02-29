@@ -355,6 +355,22 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 		}
 
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out force components
+		std::ofstream testout;
+		testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app);
+		testout << "\nNEW TIME STEP" << std::endl;
+		for (size_t j = 1; j < M_lim - 1; j++) {
+			for (size_t i = 0; i < N_lim; i++) {
+				for (size_t v = 0; v < nVels; v++) {
+					testout << force_i(i,j,0,v,M_lim,K_lim,nVels) << "\t";
+				}
+				testout << std::endl;
+			}
+			testout << std::endl;
+		}
+		testout.close();
+#endif
 	}
 
 }

@@ -14,11 +14,62 @@ void ObjectManager::ibm_apply(GridObj& g) {
 	// Loop over array of IB_bodies and perform IB operations
 		for (size_t ib = 0; ib < iBody.size(); ib++) {
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out support coordinates
+		std::ofstream suppout;
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::app);
+			suppout << "\nNEW TIME STEP" << std::endl;
+			suppout << "x\ty\tz" << std::endl;
+			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
+				if (dims == 3) {
+					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << g.ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
+				} else {
+					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
+				}
+			}
+			suppout.close();
+		}
+#endif
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out epsilon values
+		std::ofstream epout;
+		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::app);
+		epout << "\nNEW TIME STEP" << std::endl;
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			epout << iBody[ib].markers[m].epsilon << std::endl;
+		}
+		epout.close();
+#endif
+
 			// Interpolate velocity
 			ibm_interpol(ib, g);
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out interpolate velocity values
+		std::ofstream predout;
+		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::app);
+		predout << "\nNEW TIME STEP" << std::endl;
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			predout << iBody[ib].markers[m].fluid_vel[0] << "\t" << iBody[ib].markers[m].fluid_vel[1] << std::endl;
+		}
+		predout.close();
+#endif
+
 			// Compute restorative force
 			ibm_computeforce(ib, g);
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out Lagrange force values
+		std::ofstream forceout;
+		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::app);
+		forceout << "\nNEW TIME STEP" << std::endl;
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
+		}
+		forceout.close();
+#endif
 
 			// Spread force back to lattice (Cartesian vector)
 			ibm_spread(ib, g);
@@ -80,35 +131,10 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 			ibm_findsupport(ib, m, g);	// Pass body ID, marker ID and Grid
 		}
 
-#ifdef IBM_DEBUG
-		// DEBUG -- write out support coordinates
-		std::ofstream suppout;
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
-			suppout << "x\ty\tz" << std::endl;
-			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
-				if (dims == 3) {
-					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << g.ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
-				} else {
-					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
-				}
-			}
-			suppout.close();
-		}
-#endif
 
 		// Find epsilon for the body
 		ibm_findepsilon(ib, g);
 
-#ifdef IBM_DEBUG
-		// DEBUG -- write out epsilon values
-		std::ofstream epout;
-		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out");
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			epout << iBody[ib].markers[m].epsilon << std::endl;
-		}
-		epout.close();
-#endif
 
 	}
 
@@ -151,11 +177,11 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (int)std::floor( iBody[ib].markers[m].position[0]/g.dx + 0.5);	// Simulates std::round
-	jnear = (int)std::floor( iBody[ib].markers[m].position[1]/g.dy + 0.5);
+	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - a_x)/g.dx);	// Simulates std::round
+	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - a_y)/g.dy);
 
 #if (dims == 3)
-	knear = (int)std::floor( iBody[ib].markers[m].position[2]/g.dz + 0.5);
+	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - a_z)/g.dz);
 #endif
 
 
@@ -209,8 +235,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
-	double h_plus = std::max( abs(g.XPos[inear + 1] - g.XPos[inear]), abs(g.XPos[inear] - g.XPos[inear-1]) ) /g.dx;
-	double h_minus = std::min( abs(g.XPos[inear + 1] - g.XPos[inear]), abs(g.XPos[inear] - g.XPos[inear-1]) ) /g.dx;
+	double h_plus = std::max( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
+	double h_minus = std::min( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
 	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
@@ -295,8 +321,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 			int k = 0;
 
 			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-			if (	( fabs(g.XPos[inear] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
-					( fabs(g.YPos[jnear] - g.YPos[j])/g.dx < 1.5*iBody[ib].markers[m].dilation )
+			if (	( fabs(iBody[ib].markers[m].position[0] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(iBody[ib].markers[m].position[1] - g.YPos[j])/g.dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
 
 					// Lies within support region so store information
@@ -367,6 +393,21 @@ void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 		}
 	}
 
+#ifdef IBM_DEBUG
+		// DEBUG -- write out res vector
+		std::ofstream testout;
+		testout.open(GridUtils::path_str + "/velSupp" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		testout << "\nNEW TIME STEP" << std::endl;
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+				testout << g.u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, dims) << "\t"
+									  << g.u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, dims) << std::endl;
+			}
+			testout << std::endl;
+		}
+		testout.close();
+#endif
+
 }
 
 // ***************************************************************************************************
@@ -381,7 +422,6 @@ void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 				1 / pow(2,g.level);	// Time step in lattice units dt = 1 / 2^level = dx
 		}
 	}
-
 }
 
 // ***************************************************************************************************
@@ -400,11 +440,29 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 			for (size_t dir = 0; dir < dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
 				g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, dims) +=
-					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * (iBody[ib].spacing/g.dx);
+					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon;// TODO Check if this extra scaling is required * (iBody[ib].spacing/g.dx);
 
 			}
 		}
 	}
+
+#ifdef IBM_DEBUG
+		// DEBUG -- write out res vector
+		std::ofstream testout;
+		testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		testout << "\nNEW TIME STEP" << std::endl;
+		// Get size of grid
+		size_t M_lim = g.YPos.size();
+		size_t K_lim = g.ZPos.size();
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+				testout << g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, dims) << "\t"
+									  << g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, dims) << std::endl;
+			}
+			testout << std::endl;
+		}
+		testout.close();
+#endif
 
 }
 

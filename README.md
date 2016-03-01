@@ -1,5 +1,4 @@
 ## README ##
-
 To start working on a feature:  
 
 1) Clone the repo  
@@ -12,10 +11,9 @@ To start working on a feature:
 8) Revise or merge as a group into the master  
 9) Mark the issue as closed.  
 
-Any questions feel free to contact me, Adrian.  
+Any questions contact Adrian.
 
-## SETTING UP CODEBLOCKS WITH MPI LIBRARIES ##
-
+## SETTING UP CODE::BLOCKS WITH MPI LIBRARIES ##
 MPI libraries are required in order to compile the code. The steps to installing these (in Ubuntu) and then setting up Codeblocks to include them are given below, as well as the compilation and execution steps.
 
 1) Install MPICH2 using the command: **sudo apt-get install mpich2**  
@@ -30,7 +28,13 @@ MPI libraries are required in order to compile the code. The steps to installing
 
 There is probably a way to execute in parallel directly from Codeblocks, when a solution for this is found it will be posted up here. Any questions or issues then contact Joe.
 
-## CONTACT ##
+## CODE::BLOCKS RETIRED IN FAVOUR OF ECLIPSE ##
+Contact Joe for guidance on setting up.
 
+## SETTING UP VISUAL STUDIO ON WINDOWS ##
+Most of the original cost has been written on Windows and compiled using VC++ 2012. Although platform independence is maintained as best as possible there are limitations to maintain compatibility for VC++ 2012 and MSMPI v7 which we used to develop the code originally.
+For advice and guidance setting up the code on Visual Studio contact Adrian.
+
+## CONTACTS ##
 Adrian Harwood (adrian.harwood@manchester.ac.uk)  
 Joe O'Connor (joseph.oconnor@manchester.ac.uk)

@@ -43,11 +43,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max"))
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","min") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],"y","min") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","max"))
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -76,11 +76,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"max"))
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],"y","min") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","max"))
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -109,11 +109,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","min") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","min")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -142,11 +142,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","max")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -175,11 +175,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) &&
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","min")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -209,11 +209,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) &&
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","max")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -242,11 +242,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && 
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","min")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -275,11 +275,11 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],'x',"min") && 
-							GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],"x","min") && 
+							GridUtils::isOnRecvLayer(g->YPos[j],"y","max")
 #if (dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 #endif
 						) {
 							// Must be suitable receiver site
@@ -313,9 +313,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -343,9 +343,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -373,9 +373,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -403,9 +403,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -433,9 +433,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -463,9 +463,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -493,9 +493,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -523,9 +523,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -553,9 +553,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -583,9 +583,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -613,9 +613,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -643,9 +643,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],'y',"max") && !GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],"y","max") && !GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -673,9 +673,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -703,9 +703,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -733,9 +733,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -763,9 +763,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],'x',"max") && !GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],"x","max") && !GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -793,9 +793,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"min")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"max")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"min"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","min")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","max")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","min"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {
@@ -823,9 +823,9 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 					// Check conditions for receiver
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],'x',"max")) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],'y',"min")) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],'z',"max"))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],"x","max")) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],"y","min")) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],"z","max"))
 						) {
 							// Must be suitable receiver site
 							for (v = 0; v < nVels; v++) {

@@ -39,7 +39,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	res = new double[3 * iBody[ib].markers.size()];
 
 	// Set the res vector to zero
-	for (int i = 0; i < 3 * iBody[ib].markers.size(); i++) {
+	for (size_t i = 0; i < 3 * iBody[ib].markers.size(); i++) {
 		res[i] = 0.0;
 	}
 
@@ -177,7 +177,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     // *** Newton Loop *** //
 	// ******************* //
 
-    size_t iter = 0;
+    int iter = 0;
     while (residual > tolerance && iter < max_iterations) {
         iter++;
         res[0] = 0; //  not used res is used starting from 1
@@ -208,13 +208,13 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         }
 
         // Set AA and AL matrices to zero
-        for (int iii = 0; iii < 3 * iBody[ib].markers.size(); iii++) {
+        for (size_t iii = 0; iii < 3 * iBody[ib].markers.size(); iii++) {
             indx[iii] = 0;
             for (int jjj = 0; jjj < m1 + 1; jjj++) {
             	AL[iii][jjj] = 0.0;
             }
         }
-        for (int iii = 0; iii < 3 * iBody[ib].markers.size() + 1; iii++) {
+        for (size_t iii = 0; iii < 3 * iBody[ib].markers.size() + 1; iii++) {
         	for (int jjj = 0; jjj < m1 + m2 + 2; jjj++) {
         		AA[iii][jjj] = 0.0;
         	}
@@ -423,10 +423,10 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
 #define TINY 1.0e-20
-void ObjectManager::ibm_bandec(double **a, unsigned long n, int m1, int m2, double **al,
+void ObjectManager::ibm_bandec(double **a, long n, int m1, int m2, double **al,
 	unsigned long indx[], double *d)
 {
-	unsigned long i,j,k,l;
+	long i,j,k,l;
 	int mm;
 	double dum;
 
@@ -490,10 +490,10 @@ void ObjectManager::ibm_bandec(double **a, unsigned long n, int m1, int m2, doub
 * B		= right hand side vector
 */
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
-void ObjectManager::ibm_banbks(double **a, unsigned long n, int m1, int m2, double **al,
+void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 	unsigned long indx[], double b[])
 {
-	unsigned long i,k,l;
+	long i,k,l;
 	int mm;
 	double dum;
         //timeval t1, t2;

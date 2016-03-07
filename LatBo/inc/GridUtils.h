@@ -60,8 +60,8 @@ public:
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
-	static bool isOnSenderLayer(double site_position, char dir, char* maxmin);	// Is site on specified sender layer
-	static bool isOnRecvLayer(double site_position, char dir, char* maxmin);	// Is site on speicfied recv layer
+	static bool isOnSenderLayer(double site_position, std::string dir, std::string maxmin);		// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, std::string dir, std::string maxmin);		// Is site on speicfied recv layer
 
 	// General Utilities
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy

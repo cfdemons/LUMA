@@ -926,7 +926,7 @@ void GridObj::LBM_macro( ) {
 
 					for (int v = 0; v < nVels; v++) {
 
-						// Sum up to find momentum
+						// Sum up to find mass flux
 						fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 						fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 						fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);
@@ -1032,7 +1032,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 		for (int v = 0; v < nVels; v++) {
 
-			// Sum up to find momentum
+			// Sum up to find mass flux
 			fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 			fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,nVels);
 			fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,nVels);

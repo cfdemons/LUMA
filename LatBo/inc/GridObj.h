@@ -134,7 +134,8 @@ public :
 	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Zou-He BC
 	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);		// Application of Regaulrised BC
 	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Extrapolation BC
-	void bc_solid_site_reset();	// Reset all the solid site velocities to zero
+	void bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of NRBC
+	void bc_solid_site_reset();	                                                        // Reset all the solid site velocities to zero
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine

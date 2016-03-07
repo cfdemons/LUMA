@@ -95,16 +95,28 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
 
 					// Choose option
-#if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED)
+#if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && !defined NRBC_INLET)
+
 					// Apply inlet Zou-He
 					bc_applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
 
-#elif (defined INLET_ON && !defined INLET_DO_NOTHING && defined INLET_REGULARISED)
+#elif (defined INLET_ON && !defined INLET_DO_NOTHING && defined INLET_REGULARISED && !defined NRBC_INLET)
+
 					// Apply regularised BC
 					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+
+#elif (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && defined NRBC_INLET)
+					
+					// Apply NRBC
+					bc_applyNRBC(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
 #endif
 
     
+
+
+
+
+
 				/*	******************************************************************************************
 					************************************ Outlet Sites ****************************************
 					******************************************************************************************	*/
@@ -113,8 +125,17 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 					// !! FOR NOW ASSUME THIS IS RIGHT HAND WALL !!
 
+
+
+#ifdef NRBC_EXIT
+					// Apply NRBC
+					bc_applyNRBC(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
+#else
+
+
 					// Apply extrapolation
 					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+#endif
 
 				}
 
@@ -311,7 +332,7 @@ void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim
 void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 	/* According to Latt & Chopard 2008 and the cited thesis by Latt 2007 we define the regularised
-	 * boundary condition as folows:
+	 * boundary condition as follows:
 	 *
 	 * 1) Apply off-equilibrium bounceback to the unknown populations.
 	 * 2) Compute off-equilibrium momentum flux tensor components PI^neq_ab = sum( c_ia c_ib f^neq_i ).
@@ -442,27 +463,16 @@ void GridObj::bc_solid_site_reset( ) {
 // ***************************************************************************************************
 // ***************************************************************************************************
 
-//****************************************************************************************************
-//                                        Non Reflective
-//****************************************************************************************************
-
-// ***************************************************************************************************
-// Routine to apply Zou-He boundary conditions
-void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_lim) {
-
-	/* According to REFERENCE
-	* Explain everything about the methodololy used to implement
-	* the non Reflective BC
-	* STEP by STEP
-	*
-	*/
+// Routine to apply Non Reflective boundary conditions
+void GridObj::bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
-	ivector<double> ftmp;
+	IVector<double> ftmp;
 	for (size_t n = 0; n < nVels; n++) {
 		ftmp.push_back(f(i, j, k, n, M_lim, K_lim, nVels));
 	}
+
 
 
 
@@ -476,7 +486,9 @@ void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_
 #else
 
 	/* 2D Non Reflective BC for a Right hand outlet
-	* To implement this BC, It is necessary obtain the characteristic waves L´s and constants
+	* 1)Calculate derivatives drho/dx, dux/dx and  duy/dy. Calculate L1 and L2.
+	* 2)Calculate rho, Ux and Uy with values of L1 and L2.
+	* 3)Calculate temporal equilibrium function.
 	*
 	*
 	*
@@ -488,23 +500,24 @@ void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_
 	//                                            LODI
 	//***************************************************************************************************
 
-	// Constants
-
-	double c1o6 = 1.0 / 6.0;
-	double c2o3 = 2.0 / 3.0;
-	double cs = 1.0 / sqrt(3.0);
-	double csSq = 1.0 / 3.0;
-	double c1oCsSq2 = 1.0 / 5.0;
-	double c1o2csrho0 = 0.5*sqrt(3);
-
-
-
-	// Compute derivatives
+	
+	
+	//Compute derivatives
 	double    drhodx = -0.5*(3 * rho(i, j, k, M_lim, K_lim) - 4 * rho(i + 1, j, k, M_lim, K_lim) + rho(i + 2, j, k, M_lim, K_lim));
 	double    duxdx = -0.5*(3 * u(i, j, k, 0, M_lim, K_lim, dims) - 4 * u(i + 1, j, k, 0, M_lim, K_lim, dims) + u(i + 2, j, k, 0, M_lim, K_lim, dims));
 	double    duydx = -0.5*(3 * u(i, j, k, 1, M_lim, K_lim, dims) - 4 * u(i + 1, j, k, 1, M_lim, K_lim, dims) + u(i + 2, j, k, 1, M_lim, K_lim, dims));
 	double    L1 = ((u(i, j, k, 0, M_lim, K_lim, dims) - 1 / sqrt(3))*(drhodx / 3 - duxdx / sqrt(3)));
 	double    L2 = u(i, j, k, 0, M_lim, K_lim, dims)*duydx;
+
+	double    L3=u(i, j, k, 0, M_lim, K_lim, dims)*(drhodx / 3 - duxdx / sqrt(3))
+    
+		 
+
+	L1 = ((ux(x, y) - 1 / sqrt(3))*(drhodx / 3 - duxdx / sqrt(3)));
+	L2 = ux(x, y)*duydx;
+	L3 = ux(x, y)*(drhodx / 3 - drhodx / 3);
+	L4 = ((ux(x, y) + 1 / sqrt(3))*(drhodx / 3 - duxdx / sqrt(3)));
+
 
 	// Compute solution
 
@@ -512,7 +525,7 @@ void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_
 	u(i, j, k, 0, M_lim, K_lim, dims) = u(i, j, k, 0, M_lim, K_lim, dims) + 0.5*sqrt(3)*L1;
 	u(i, j, k, 1, M_lim, K_lim, dims) = u(i, j, k, 1, M_lim, K_lim, dims) - L2;
 
-	//Set un-known distribution by a non equilibrium Bounce-back
+	// Set un - known distribution
 
 	ftmp[1] = ftmp[2] + 2 / 3 * u(i, j, k, 0, M_lim, K_lim, dims);
 	ftmp[5] = ftmp[6] + 1 / 6 * (u(i, j, k, 0, M_lim, K_lim, dims) + u(i, j, k, 1, M_lim, K_lim, dims));
@@ -523,18 +536,16 @@ void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_
 
 
 
-
-
-
-
-
 #endif
 
 
 
 	// Set macroscopic quantities for calculation of feq and also ensuing collision step
 
-
+	// Apply new f values to grid
+	for (size_t n = 0; n < nVels; n++) {
+		f(i, j, k, n, M_lim, K_lim, nVels) = ftmp[n];
+	}
 
 
 
@@ -542,4 +553,3 @@ void GridObj::bc_NonReflective(int label, int i, int j, int k, int M_lim, int K_
 } // end Non Reflective BC
 
   // ***************************************************************************************************
-

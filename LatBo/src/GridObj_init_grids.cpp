@@ -22,7 +22,7 @@ void GridObj::LBM_init_getInletProfile() {
 
 	// Buffer information from file
 	std::ifstream inletfile;
-	inletfile.open("./output/inlet_profile.in", std::ios::in);
+	inletfile.open("./input/inlet_profile.in", std::ios::in);
 	if (!inletfile.is_open()) {
 		// Error opening file
 		std::cout << "Error: See Log File" << std::endl;

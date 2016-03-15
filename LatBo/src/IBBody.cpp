@@ -13,6 +13,11 @@ IBBody::IBBody()
 {
 	this->groupID = 0;	// Default ID
 }
+IBBody::IBBody(GridObj* g)
+{
+	this->_Owner = g;
+	this->groupID = 0;	// Default ID
+};
 IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************

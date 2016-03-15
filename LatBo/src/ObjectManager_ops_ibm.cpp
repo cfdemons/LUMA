@@ -3,8 +3,6 @@
 #include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
 #include "../inc/MpiManager.h"
-#include <cmath>
-#include <algorithm>
 
 
 // ***************************************************************************************************
@@ -172,7 +170,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #if (dims == 3)
 	// Extras for 3D
 	double dist_z, delta_z;
-	size_t knear;
+	int knear;
 #endif
 
 

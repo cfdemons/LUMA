@@ -4,7 +4,6 @@
 #include "../inc/definitions.h"
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
-#include <vector>
 
 // Static declarations
 std::ofstream* GridUtils::logfile;

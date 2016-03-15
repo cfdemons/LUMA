@@ -42,7 +42,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
+#define out_every 10			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 
@@ -116,19 +116,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
-#define N 240		// Number of x lattice sites
-#define M 60		// Number of y lattice sites
-#define K 60		// Number of z lattice sites
+#define dims 3		// Number of dimensions to the problem
+#define N 120		// Number of x lattice sites
+#define M 40		// Number of y lattice sites
+#define K 40		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 24.0		// End of domain-x
-#define a_y -0.05		// Start of domain-y
-#define b_y 6.0		// End of domain-y
+#define b_x 3.0		// End of domain-x
+#define a_y 0		// Start of domain-y
+#define b_y 1.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 6.0		// End of domain-z
+#define b_z 1.0		// End of domain-z
 
 
 /*
@@ -139,16 +139,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.04	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref		//u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 50			// Desired Reynolds number
+#define Re 20			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -160,7 +160,8 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define IBM_ON						// Turn on IBM
+//#define IBM_ON						// Turn on IBM
+
 //#define IBM_DEBUG					// Write IBM body and matrix data out to text files
 //#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
@@ -216,16 +217,22 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-// Switches
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
+// Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
+
+
+// Outlets
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 #define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+
+
+// Solids
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
@@ -241,13 +248,29 @@ const static int zProbeLims[2] = {30, 120};
 #endif
 
 
+// BFL objects
+#define BFL_ON
+#define BFL_DEBUG
+
+#ifdef BFL_ON
+	#define bfl_on_grid_lev 0		// Provide grid level on which BFL body should be added 
+	#define bfl_on_grid_reg 0		// Provide grid region on which BFL body should be added
+	// Following specified in lattice units (i.e. by index) local to the chosen grid level
+	#define start_bfl_x 10
+	#define start_bfl_y 10
+	#define start_bfl_z 10
+	#define bfl_length_x 20		// The BFL object input is scaled based on this dimension
+#endif
+
+
+
 /*
 ***************************************************************************************************************
 ******************************************** Multi-grid data **************************************************
 ***************************************************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

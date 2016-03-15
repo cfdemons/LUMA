@@ -16,6 +16,56 @@ GridUtils::~GridUtils(void)
 {
 }
 
+// ***************************************************************************************************
+// Returns a vector which is the cross product of a and b
+std::vector<double> GridUtils::crossprod(std::vector<double> a, std::vector<double> b) {
+
+	// Declare resulting vector
+	std::vector<double> result;
+
+	result.push_back( a[1]*b[2] - a[2]*b[1] );
+	result.push_back( a[2]*b[0] - a[0]*b[2] );
+	result.push_back( a[0]*b[1] - a[1]*b[0] );
+
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is a minus b
+std::vector<double> GridUtils::subtract(std::vector<double> a, std::vector<double> b) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < a.size(); i++) {
+		result.push_back( a[i] - b[i] );
+	}
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is sum of a and b
+std::vector<double> GridUtils::add(std::vector<double> a, std::vector<double> b) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < a.size(); i++) {
+		result.push_back( a[i] + b[i] );
+	}
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is scalar multiplied by vector
+std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> vec) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < vec.size(); i++) {
+		result.push_back( vec[i] * scalar );
+	}
+	return result;
+}
+	
 
 // ***************************************************************************************************
 // Returns a vector with n uniformly spaced values between min and max

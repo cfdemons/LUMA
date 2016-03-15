@@ -347,7 +347,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		ObjectManager::io_restart(IO_flag, level);
+		ObjectManager::getInstance()->io_restart(IO_flag, level);
 
 #endif
 
@@ -449,7 +449,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		ObjectManager::io_restart(IO_flag, level);
+		ObjectManager::getInstance()->io_restart(IO_flag, level);
 
 #endif
 

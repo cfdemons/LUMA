@@ -112,11 +112,24 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
 #endif
 
+#ifdef BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
+#endif
+
 			// Stream
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
 			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+#endif
+
+			// Apply boundary conditions
+#ifdef BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER BFL");
 #endif
 
 			for (size_t reg = 0; reg < regions; reg++) {
@@ -127,7 +140,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER COALESCE"); // Do not change this tag!
+			/*DEBUG*/ io_tecplot_debug(t*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
 
 
@@ -149,11 +162,25 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
 #endif
 
+#ifdef BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
+#endif
+
 			// Stream
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
 			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+#endif
+
+
+			// Apply boundary conditions
+#ifdef BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER BFL");
 #endif
 
 		}
@@ -169,14 +196,14 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 5,"AFTER OUTLET BC");
+		/*DEBUG*/ io_tecplot_debug(t*100 + 6,"AFTER OUTLET BC");
 #endif
 
 		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 6,"AFTER MACRO");
+		/*DEBUG*/ io_tecplot_debug(t*100 + 7,"AFTER MACRO");
 #endif
 
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
@@ -207,7 +234,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 
 		// Calculate and apply IBM forcing to fluid
-		ObjectManager::ibm_apply(*this);
+		ObjectManager::getInstance()->ibm_apply(*this);
 
 		// Restore data to start of time step
 		f = f_ibm_initial;
@@ -221,7 +248,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_multi(false);
 
 		// Move the body if necessary
-		ObjectManager::ibm_move_bodies(*this);
+		ObjectManager::getInstance()->ibm_move_bodies(*this);
 
 	}
 #endif

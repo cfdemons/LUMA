@@ -252,3 +252,89 @@ void ObjectManager::io_vtk_IBwriter(double tval) {
         fout.close();
     }
 }
+
+
+// ***************************************************************************************************
+// Routine to read in point cloud data in tab separated, 3-column format from the input directory
+void ObjectManager::readInPCData(PCpts* _PCpts) {
+
+#ifdef BFL_ON
+
+	// Temporary variables
+	double tmp;
+
+	// Open input file
+	std::ifstream file;
+	file.open("./input/bfl_input.in", std::ios::in);
+	
+	// Handle failure to open
+	if (!file.is_open()) {
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Error opening BFL input file. Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// Loop over lines in file
+	while (!file.eof()) {
+
+		// Read in one line of file at a time
+		std::string line_in;	// String to store line in
+		std::istringstream iss;	// Buffer stream to store characters
+
+		// Get line up to new line separator and put in buffer
+		std::getline(file,line_in,'\n');
+		iss.str(line_in);	// Put line in the buffer
+		iss.seekg(0);		// Reset buffer position to start of buffer
+
+		// Add coordinates and update bounding box
+		iss >> tmp;
+		_PCpts->x.push_back(tmp);
+
+		iss >> tmp;
+		_PCpts->y.push_back(tmp);
+
+		iss >> tmp;
+		_PCpts->z.push_back(tmp);
+
+	}
+
+	file.close();
+
+	// Handle no data case
+	if (_PCpts->x.empty() || _PCpts->x.empty() || _PCpts->x.empty()) {
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "BFL data not read correctly. Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	
+	// Rescale coordinates and shift
+	double scale_factor = bfl_length_x / 
+		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+	double shift_x =  std::floor( start_bfl_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
+	double shift_y =  std::floor( start_bfl_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+	double shift_z =  std::floor( start_bfl_z - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) );
+
+	// Apply
+	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
+		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
+		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
+	}	
+	
+
+	// Get grid pointer
+	GridObj* g;	GridUtils::getGrid(_Grids, bfl_on_grid_lev, bfl_on_grid_reg, g);
+
+	// Check that no points are outside the domain	
+	if (	*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) > g->XInd.back() + 1 || *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) < 0 ||
+			*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) > g->YInd.back() + 1 || *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) < 0 ||
+			*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) > g->ZInd.back() + 1 || *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) < 0
+		) {
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "BFL object outside grid. Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+#endif
+}

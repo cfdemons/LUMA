@@ -80,6 +80,10 @@ void GridObj::io_vtkwriter(double tval)
 	ni_corrected = XInd.size();
 	nj_corrected = YInd.size();
 
+#if (dims == 3)
+	nk_corrected = ZInd.size();
+#endif
+
 #endif
 
 	fout << "DATASET STRUCTURED_POINTS\n";

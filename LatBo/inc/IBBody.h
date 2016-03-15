@@ -1,8 +1,6 @@
 #pragma once
 
-#include <vector>
 #include "IBMarker.h"
-#include "GridUtils.h"
 #include "Body.h"
 
 /** Represents an IB body **/
@@ -15,6 +13,7 @@ public:
 	// Constructor and destructor
 	IBBody(void);
 	~IBBody(void);
+	IBBody(GridObj* g);
 
 protected:
 

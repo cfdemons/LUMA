@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
 	*************************************************************************************************************** */
 
 	// Create Object Manager
-	ObjectManager objMan;
+	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
 	*GridUtils::logfile << "Object Manager Created." << endl;
 
 #ifdef IBM_ON
@@ -221,39 +221,39 @@ int main( int argc, char* argv[] )
 	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
 
 #if defined INSERT_RECTANGLE_CUBOID
-	objMan.ibm_build_body(1);
+	objMan->ibm_build_body(1);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
 
 #elif defined INSERT_CIRCLE_SPHERE
-	objMan.ibm_build_body(2);
+	objMan->ibm_build_body(2);
 	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
 
 #elif defined INSERT_BOTH
-	objMan.ibm_build_body(3);
+	objMan->ibm_build_body(3);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
 
 #elif defined INSERT_FILAMENT
-	objMan.ibm_build_body(4);
+	objMan->ibm_build_body(4);
 	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
 
 #elif defined INSERT_FILARRAY
-	objMan.ibm_build_body(5);
+	objMan->ibm_build_body(5);
 	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
 
 #elif defined _2D_RIGID_PLATE_IBM
-	objMan.ibm_build_body(6);
+	objMan->ibm_build_body(6);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
 
 #elif defined _2D_PLATE_WITH_FLAP
-	objMan.ibm_build_body(7);
+	objMan->ibm_build_body(7);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
 
 #elif defined _3D_RIGID_PLATE_IBM
-	objMan.ibm_build_body(8);
+	objMan->ibm_build_body(8);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
 
 #elif defined _3D_PLATE_WITH_FLAP
-	objMan.ibm_build_body(9);
+	objMan->ibm_build_body(9);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
 
 #endif
@@ -261,10 +261,27 @@ int main( int argc, char* argv[] )
 #if !defined RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
-	objMan.ibm_initialise(Grids);
+	objMan->ibm_initialise(Grids);
 	*GridUtils::logfile << "Number of markers requested = " << num_markers << std::endl;
 
 #endif
+
+#endif
+
+#ifdef BFL_ON
+
+
+	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
+
+	// Read in input file to arrays
+	PCpts* _PCpts = new PCpts();
+	objMan->readInPCData(_PCpts);
+
+	// Call BFL body builder
+	objMan->bfl_build_body(_PCpts);
+
+	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
+	
 
 #endif
 
@@ -321,7 +338,7 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Writing out to VTK file..." << endl;
 	Grids.io_vtkwriter(0.0);
 #ifdef IBM_ON
-    objMan.io_vtk_IBwriter(0.0);
+    objMan->io_vtk_IBwriter(0.0);
 #endif
 #endif
 #ifdef TECPLOT
@@ -403,7 +420,7 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to VTK file" << endl;
 			Grids.io_vtkwriter(Grids.t);
 #ifdef IBM_ON
-            objMan.io_vtk_IBwriter(Grids.t);
+            objMan->io_vtk_IBwriter(Grids.t);
 #endif
 #endif
 #ifdef TECPLOT
@@ -424,11 +441,11 @@ int main( int argc, char* argv[] )
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
 	&& defined IBM_ON && defined IBBODY_TRACER
 			*GridUtils::logfile << "Writing out flexible body position" << endl;
-			objMan.io_write_body_pos(Grids.t);
+			objMan->io_write_body_pos(Grids.t);
 #endif
 #if defined LD_OUT && defined IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
-			objMan.io_write_lift_drag(Grids.t);
+			objMan->io_write_lift_drag(Grids.t);
 #endif
 		}		
 

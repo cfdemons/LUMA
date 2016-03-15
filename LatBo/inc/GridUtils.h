@@ -41,13 +41,39 @@ public:
 	static std::vector<int> indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: indmapref
 	static std::vector<int> revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: revindmapref
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
+	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
+	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add
+	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
+	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: crossprod
 	static std::vector<double> matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x);	// Function: matrix_multiply
+
+	// Templated functions //
+
+	// Function: vecnorm + overload
+	template <typename NumType>
+	static NumType vecnorm(NumType a1, NumType a2, NumType a3) {
+		return (NumType)sqrt( a1*a1 + a2*a2 + a3*a3 );
+	}
+	template <typename NumType>
+	static NumType vecnorm(NumType a1, NumType a2) {
+		return (NumType)sqrt( a1*a1 + a2*a2 );
+	}
 	
+	// Function: upToZero
 	template <typename NumType>
 	static NumType upToZero(NumType x) {	
 		if (x < 0) return 0;
 		else return x;		
-	};	// Function: upToZero (templated to take any numerical data type
+	};
+
+	// Function: factorial
+	template <typename NumType>
+	static NumType factorial(NumType n) {
+		if (n == 0) 
+			return 1;
+		else
+			return n * GridUtils::factorial(n - 1);
+	};
 
 	// LBM-specific utilities
 	static size_t getOpposite(size_t direction);	// Function: getOpposite

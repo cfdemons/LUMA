@@ -5,6 +5,11 @@
 
 #pragma once
 
+// Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
+#include <algorithm>
+#include <cmath>
+#include <vector>
+
 // Check OS is Windows or not
 #ifdef _WIN32
 

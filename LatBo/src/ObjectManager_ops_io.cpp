@@ -274,6 +274,9 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		exit(EXIT_FAILURE);
 	}
 
+	// Get grid pointer
+	GridObj* g;	GridUtils::getGrid(_Grids, bfl_on_grid_lev, bfl_on_grid_reg, g);
+
 	// Loop over lines in file
 	while (!file.eof()) {
 
@@ -294,7 +297,13 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		_PCpts->y.push_back(tmp);
 
 		iss >> tmp;
+
+		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
+#if (dims == 3)
 		_PCpts->z.push_back(tmp);
+#else
+		_PCpts->z.push_back(0);
+#endif
 
 	}
 
@@ -320,11 +329,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
-	}	
-	
-
-	// Get grid pointer
-	GridObj* g;	GridUtils::getGrid(_Grids, bfl_on_grid_lev, bfl_on_grid_reg, g);
+	}
 
 	// Check that no points are outside the domain	
 	if (	*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) > g->XInd.back() + 1 || *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) < 0 ||

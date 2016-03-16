@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
+#define dims 2		// Number of dimensions to the problem
 #define N 120		// Number of x lattice sites
 #define M 40		// Number of y lattice sites
 #define K 40		// Number of z lattice sites
@@ -348,6 +348,10 @@ const static int zProbeLims[2] = {30, 120};
 
 	#undef ibb_d
 	#define ibb_d 0
+
+	// Set BFL start for 2D
+	#undef start_bfl_z
+	#define start_bfl_z 0
 
 #endif
 

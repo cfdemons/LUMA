@@ -102,8 +102,9 @@ protected:
 	// Marker adder (pass the marker index and the counter by reference so they are updated in the calling scope)
 	void bflMarkerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter);
 
-	// Compute Q routine
+	// Compute Q routine + overload
 	void computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, int v);
+	void computeQ(int i, int j, int dest_i, int dest_j, int vel);
 
 	// Utility functions (all static)
 	static std::vector<int> getVoxInd(double x, double y, double z);

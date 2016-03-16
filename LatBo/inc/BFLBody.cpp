@@ -69,7 +69,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	// Declarations
 	int dest_x, dest_y, dest_z;
 
-	// Initialise Q stores as big double
+	// Initialise Q stores as max double value
 	Q = std::vector< std::vector<double> > (nVels * 2, std::vector<double> ( 
 		markers.size(), std::numeric_limits<double>::max() ) );
 
@@ -90,7 +90,11 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 					if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == 10) {
 
 						// Compute Q for the stream storing on source voxel BFL marker
+#if (dims == 3)
 						computeQ(i,j,k,dest_x,dest_y,dest_z,v);
+#else
+						computeQ(i,j,dest_x,dest_y,v);
+#endif
 
 					}
 
@@ -106,7 +110,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 #ifdef BFL_DEBUG
 	std::ofstream file;
-	file.open(GridUtils::path_str + "/Q.out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_Qs.out",std::ios::out);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {
 			file << i[n] << '\t';
@@ -115,7 +119,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	}
 	file.close();
 
-	file.open(GridUtils::path_str + "/Pos.out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_positions.out",std::ios::out);
 	for (size_t n = 0; n < markers.size(); n++) {
 		file << markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << std::endl;
 	}
@@ -332,20 +336,156 @@ void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, 
 			if (s < 0.0 || s > 1.0)	continue;				// I is outside T
 			else if (t < 0.0 || (s + t) > 1.0) continue;	// I is outside T
 			else {
-				// Inside T
-				double dist = GridUtils::vecnorm( GridUtils::subtract(intersect,src) );
-				if (dist < Q[vel][storeID]) {
+				// Inside T so compute Q
+				double q = GridUtils::vecnorm( GridUtils::subtract(intersect,src) ) / GridUtils::vecnorm(dir);
+				if (q < Q[vel][storeID]) {
 
 					// Set outgoing Q value
-					Q[vel][storeID] = dist / GridUtils::vecnorm(dir);
+					Q[vel][storeID] = q;
 
 					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - (dist / GridUtils::vecnorm(dir));
+					Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
 				}
 			}
 
 		}
 	}
+
+}
+
+// Overloaded compute Q routine for 2D
+void BFLBody::computeQ(int i, int j, int dest_i, int dest_j, int vel) {
+
+	/* For each possible line extending from the marker voxel to an 
+	 * immediate neighbour we can check for an intersection between the 
+	 * stream vector and the constructed line. The distance of intersection
+	 * is the value of q. As with the 3D case, 1-q is assigned to the 
+	 * destination store after we have added q to the source store. */
+
+	// Set stencil centre data
+	int ib = i;
+	int jb = j;
+	MarkerData m_data = getMarkerData(i,j,0,this);
+	int storeID = m_data.ID;
+
+
+	// Get list of IDs of neighbour vertices for line construction
+	std::vector<int> V;
+	for (int ii = ib - 1; ii <= ib + 1; ii++) {
+		for (int jj = jb - 1; jj <= jb + 1; jj++) {
+			
+			// Fetch data if available
+			m_data = getMarkerData(ii,jj,0,this);
+
+			// If data valid, then store ID
+			if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+
+		}
+	}
+
+	// Get unique combinations of vertex IDs
+	std::vector< std::vector<int> > combo;
+
+	// Sort IDs in ascending order
+	std::sort(V.begin(), V.end());
+
+	// Loop over sorted array and store ID combinations
+	std::vector<int> tmp;
+	std::vector<bool> flags(V.size());
+	std::fill(flags.begin(), flags.end() - V.size() + 2, true);
+
+	// Loop over permutations
+	do {
+
+		// Reset tmp array
+		tmp.clear();
+
+		// Loop over permutation and pull corresponding 
+		// values from V into combo array
+		for (size_t i = 0; i < V.size(); ++i) {
+			if (flags[i]) {
+				tmp.push_back(V[i]);
+			}
+		}
+		if (tmp.size() == 2) combo.push_back(tmp);
+
+	} while (std::prev_permutation(flags.begin(), flags.end()));
+
+
+
+	// Loop through valid marker combinations (need at least 2 for a line)
+	if (V.size() < 2) return;
+	for (std::vector<int> line : combo) {
+
+		// Only check intersections when the surface line is between immediate neighbours
+		if ( GridUtils::vecnorm(
+				std::abs(markers[line[1]].supp_i[0] - markers[line[0]].supp_i[0]),
+				std::abs(markers[line[1]].supp_j[0] - markers[line[0]].supp_j[0]), 
+				std::abs(markers[line[1]].supp_k[0] - markers[line[0]].supp_k[0]) 
+				) < sqrt(2)			
+			) {
+
+
+			// Perform line intersection test //
+
+			// Compute vectors
+			std::vector<double> p;	// Position of source site
+			p.push_back(i);
+			p.push_back(j);
+			p.push_back(0);
+
+			std::vector<double> q;	// Position of first marker
+			q.push_back(markers[line[0]].position[0]);
+			q.push_back(markers[line[0]].position[1]);
+			q.push_back(markers[line[0]].position[2]);
+
+			std::vector<double> r;	// Length of streaming vector
+			r.push_back(dest_i - i);
+			r.push_back(dest_j - j);
+			r.push_back(0);
+
+			std::vector<double> s;	// Length of marker vector
+			s.push_back(markers[line[1]].position[0] - q[0]);
+			s.push_back(markers[line[1]].position[1] - q[1]);
+			s.push_back(markers[line[1]].position[2] - q[2]);
+    
+			// Compute parameters
+			double rXs = GridUtils::vecnorm(GridUtils::crossprod( r, s ));
+			double qpXr = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), r ));
+			double qpXs = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), s ));
+			double t = qpXs / rXs;
+			double u = qpXr / rXs;    
+    
+			// Check for the intersecting case
+			if (rXs != 0 && t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+        
+				// Lines intersect at p + tr = q + us
+				std::vector<double> intersect;
+				intersect.push_back(p[0] + t * r[0]);
+				intersect.push_back(p[1] + t * r[1]);
+				intersect.push_back(0);
+        
+				// Compute Q
+				double q = GridUtils::vecnorm( GridUtils::subtract(intersect, p) ) / GridUtils::vecnorm(r);
+				if (q < Q[vel][storeID]) {
+
+					// Set outgoing Q value
+					Q[vel][storeID] = q;
+
+					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
+					Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+				}
+        
+			}
+
+			// Maybe include the collinear case if it cuts through a vertex?
+
+		}
+
+
+	}
+
+
 
 }
 

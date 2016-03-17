@@ -125,52 +125,14 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************** BFL Sites *****************************************
 					******************************************************************************************	*/
     
-				} else if (bc_type_flag == 0 || bc_type_flag == 5 ) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 10 && (bc_type_flag == 0 || bc_type_flag == 5) ) {
 
-					// For each outgoing direction
-					for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
+					bc_applyBfl(i,j,k);
+						
 
-						// Identify site where the population will be streamed to
-						size_t dest_x = i+c[0][v_outgoing];
-						size_t dest_y = j+c[1][v_outgoing];
-						size_t dest_z = k+c[2][v_outgoing];
-
-						// If this site is off-grid then cannot apply the BC in preparation for streaming
-						if (	(dest_x >= N_lim || dest_x < 0) ||
-								(dest_y >= M_lim || dest_y < 0) ||
-								(dest_z >= K_lim || dest_z < 0)
-						   ) {
-							   continue;	// Move on to next direction
-
-#ifdef BUILD_FOR_MPI
-						// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
-						// periodic boundaries disabled.
-						} else if (GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
-							&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this)) {
-
-#if (!defined PERIODIC_BOUNDARIES)
-							continue;	// Periodic boundaries disabled so do not try to apply BC
-#endif
-
-#endif	// BUILD_FOR_MPI
-
-						}	// End of exclusions
-
-						/* Not been filtered by above exclusions so try to apply boundary condition. */
-
-						// Only apply if either source or destination is BFL site
-						if (LatTyp(i,j,k,M_lim,K_lim) == 10 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 10) {
-
-							bc_applyBfl(i,j,k,dest_x,dest_y,dest_z,M_lim,K_lim,v_outgoing);
-							
-						}
-
-					}
-
-				}
-
-			// End of lattice site loop
-			}
+				}	// End of BC type control flow
+			
+			}	// End of lattice site loop
 		}
 	}
     
@@ -458,59 +420,118 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 }
 
 // ***************************************************************************************************
-// Routine to apply Extrapolation outlet boundary condition
-void GridObj::bc_applyBfl(int i, int j, int k, int dest_i, int dest_j, int dest_k, int M_lim, int K_lim, int v_outgoing) {
+// Routine to apply Bfl boundary condition
+void GridObj::bc_applyBfl(int i, int j, int k) {
 
-	int store;
+	// Declarations
+	size_t N_lim = XInd.size();
+	size_t M_lim = YInd.size();
+	size_t K_lim = ZInd.size();
 	MarkerData m_data;
 	ObjectManager* objMan = ObjectManager::getInstance();
 
-	if (LatTyp(i,j,k,M_lim,K_lim) == 10) {
+	// For each even outgoing direction (saves BC being applied twice otherwise)
+	for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing+=2) {
 
-		// Get marker ID and set store shift
+		// Get oppposite direction
+		size_t v_incoming = GridUtils::getOpposite(v_outgoing);
+
+		// Identify site where the population will be streamed to (no periodicity)
+		size_t dest_i = i+c[0][v_outgoing];
+		size_t dest_j = j+c[1][v_outgoing];
+		size_t dest_k = k+c[2][v_outgoing];
+
+		// If this site is off-grid then cannot apply the BC in preparation for streaming
+		if (	(dest_i >= N_lim || dest_i < 0) ||
+				(dest_j >= M_lim || dest_j < 0) ||
+				(dest_k >= K_lim || dest_k < 0)
+			) {
+				continue;	// Move on to next direction
+
+#ifdef BUILD_FOR_MPI
+		// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
+		// periodic boundaries disabled.
+		} else if (GridUtils::isOnRecvLayer(XPos[dest_i],YPos[dest_j],ZPos[dest_k]) 
+			&& GridUtils::isOverlapPeriodic(dest_i,dest_j,dest_k,*this)) {
+
+#if (!defined PERIODIC_BOUNDARIES)
+			continue;	// Periodic boundaries disabled so do not try to apply BC
+#endif
+
+#endif	// BUILD_FOR_MPI
+
+		}	// End of exclusions
+
+		/* Not been filtered by above exclusions so try to apply boundary condition. */
+
+		// Get marker ID
 		m_data = BFLBody::getMarkerData(i,j,k,&(objMan->pBody[0]));
-        store = 0;
-                    
-	} else if (LatTyp(dest_i,dest_j,dest_k,M_lim,K_lim) == 10) {
 
-		m_data = BFLBody::getMarkerData(dest_i,dest_j,dest_k,&(objMan->pBody[0]));
-        store = nVels;
-                    
-	}
+		/** Apply BC in pairs  -- BC 1 **/
 
+		// Get value of q (outgoing direction, source store)
+		double q = objMan->pBody[0].Q[v_outgoing][m_data.ID];
 
-	// Get value of q (apply store shift to get correct q)
-    double q = objMan->pBody[0].Q[v_outgoing + store][m_data.ID];
+		// Choose which implementation is appropriate //     
+		
+		// Half-way Bounce Back
+		if (q == 0) {
 
-    // Choose which implementation is appropriate                
-    if (q == std::numeric_limits<double>::max()) {
-                            
-    // Half-way Bounce Back
-	} else if (q == 0) {
+			f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,nVels);
 
-        f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
-			objMan->f_prestream(i,j,k,GridUtils::getOpposite(v_outgoing),M_lim,K_lim,nVels);
-
-    // q less than 0.5 BFL bounce back (post stream)
-	} else if (q < 0.5 && q > 0) {
+		// q less than 0.5 BFL bounce back (post stream)
+		} else if (q < 0.5 && q > 0) {
           
-		f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
-			(1 - 2 * q) * 
-			objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],GridUtils::getOpposite(v_outgoing),M_lim,K_lim,nVels) +
-			2 * q * 
-			objMan->f_prestream(i,j,k,GridUtils::getOpposite(v_outgoing),M_lim,K_lim,nVels);
+			f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
+				(1 - 2 * q) * 
+				objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],v_incoming,M_lim,K_lim,nVels) +
+				2 * q * 
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,nVels);
 
-    // q greater than or equal to 0.5 BFL bounce back (post stream)
-	} else if (q >= 0.5 && q < 1) {
+		// q greater than or equal to 0.5 BFL bounce back (post stream)
+		} else if (q >= 0.5 && q < 1) {
 
-		f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
-			1 / (2 * q) *
-			objMan->f_prestream(i,j,k,GridUtils::getOpposite(v_outgoing),M_lim,K_lim,nVels) +
-			(2 * q - 1) / (2 * q) * 
-			objMan->f_prestream(i,j,k,v_outgoing,M_lim,K_lim,nVels);
+			f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
+				1 / (2 * q) *
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,nVels) +
+				(2 * q - 1) / (2 * q) * 
+				objMan->f_prestream(i,j,k,v_outgoing,M_lim,K_lim,nVels);
                           
-	}
+		}		
 
+		/** Apply BC in pairs  -- BC 2 **/
+
+		// Get value of q (incoming direction, destination store)
+		q = objMan->pBody[0].Q[v_incoming + nVels][m_data.ID];
+
+		// Half-way Bounce Back
+		if (q == 0) {
+
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,nVels) = 
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,nVels);
+
+		// q less than 0.5 BFL bounce back (post stream)
+		} else if (q < 0.5 && q > 0) {
+          
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,nVels) = 
+				(1 - 2 * q) * 
+				objMan->f_prestream(dest_i - c[0][v_incoming],dest_j - c[1][v_incoming],dest_k - c[2][v_incoming],v_outgoing,M_lim,K_lim,nVels) +
+				2 * q * 
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,nVels);
+
+		// q greater than or equal to 0.5 BFL bounce back (post stream)
+		} else if (q >= 0.5 && q < 1) {
+
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,nVels) = 
+				1 / (2 * q) *
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,nVels) +
+				(2 * q - 1) / (2 * q) * 
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,nVels);
+                          
+		}
+
+	}
 
 }
 

@@ -345,111 +345,63 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Function to find whether a site with global indices provided is on a given grid or not
-// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
 bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
+	
+	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gi);
+	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gj);
+	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gk);
 
-	if (
-		// Different conditions when using MPI due to extra overlap cells
-#ifdef BUILD_FOR_MPI
-		(	(int)gi <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gi >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
-		
-		&&
+	if (	found_x != std::end(pGrid.XInd) && found_y != std::end(pGrid.YInd)
 
-		(	(int)gj <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gj >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
 
 #if (dims == 3)
-		&&
-		
-		(	(int)gk <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gk >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
+		&& found_z != std::end(pGrid.ZInd)
 #endif
-
-#else
-
-		((int)gi <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gi >= pGrid.XInd[0] ) &&
-		((int)gj <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gj >= pGrid.YInd[0] )
-#if (dims == 3)
-		&& ((int)gk <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gk >= pGrid.ZInd[0] )
-#endif
-
-
-#endif
-
 		) {
 
-			return true;
+		return true;
 
 	} else {
 
 		return false;
 	}
 
-
 }
 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
 bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 
 	switch (xyz) {
 
 	case 0:
-		// X direction
-#ifdef BUILD_FOR_MPI	// Allow for overlap of thickness 2^level but ignore periodicity
-		if (	(int)gl <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// X direction
+		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
 
-			return false;
+		if (found_x != std::end(pGrid.XInd)) return true;		
+		else return false;
 		}
 
 	case 1:
-		// Y direction
-#ifdef BUILD_FOR_MPI
-		if (	(int)gl <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// Y direction
+		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
 
-			return false;
+		if (found_y != std::end(pGrid.YInd)) return true;		
+		else return false;
 		}
 
 	case 2:
-		// Z direction
-#ifdef BUILD_FOR_MPI
-		if (	(int)gl <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// Z direction
+		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
 
-			return false;
+		if (found_z != std::end(pGrid.ZInd)) return true;		
+		else return false;
 		}
 
 	}
-
-	return false;
 
 }
 
@@ -483,8 +435,8 @@ bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 }
 
 // ***************************************************************************************************
-// Pass pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed to by Grids*
-// which we also pass by reference to save copying it
+// Pass null pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed 
+// to by Grids* which we also pass by reference to save copying it
 void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
 
 	// Check supplied grid for a match

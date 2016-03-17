@@ -70,9 +70,10 @@ class BFLBody :
 	public Body<BFLMarker>
 {
 	
-	// Allow markers and Grid access to static utilities
+	// Allow markers, Grid and ObjectManager access to static utilities
 	friend class BFLMarker;
 	friend class GridObj;
+	friend class ObjectManager;
 
 public:
 	// Default constructor and destructor
@@ -103,11 +104,12 @@ protected:
 	void bflMarkerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter);
 
 	// Compute Q routine + overload
-	void computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, int v);
-	void computeQ(int i, int j, int dest_i, int dest_j, int vel);
+	void computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim);
+	void computeQ(int i, int j, int N_lim, int M_lim);
 
 	// Utility functions (all static)
 	static std::vector<int> getVoxInd(double x, double y, double z);
+	static int getVoxInd(double p);
 	static bool isInVoxel(double x, double y, double z, int curr_mark, BFLBody* body);
 	static bool isVoxelBflVoxel(double x, double y, double z, BFLBody* body);
 	static MarkerData BFLBody::getMarkerData(double x, double y, double z, BFLBody* body);

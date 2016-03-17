@@ -261,7 +261,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 #ifdef BFL_ON
 
 	// Temporary variables
-	double tmp;
+	double tmp_x, tmp_y, tmp_z;
 
 	// Open input file
 	std::ifstream file;
@@ -289,31 +289,27 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		iss.str(line_in);	// Put line in the buffer
 		iss.seekg(0);		// Reset buffer position to start of buffer
 
-		// Add coordinates and update bounding box
-		iss >> tmp;
-		_PCpts->x.push_back(tmp);
-
-		iss >> tmp;
-		_PCpts->y.push_back(tmp);
-
-		iss >> tmp;
-
+		// Add coordinates to data store
+		iss >> tmp_x;
+		iss >> tmp_y;
+		iss >> tmp_z;
+			
+		_PCpts->x.push_back(tmp_x);
+		_PCpts->y.push_back(tmp_y);
+			
 		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
 #if (dims == 3)
-		_PCpts->z.push_back(tmp);
+		_PCpts->z.push_back(tmp_z);
 #else
 		_PCpts->z.push_back(0);
 #endif
 
-	}
-
+		}
 	file.close();
 
-	// Handle no data case
-	if (_PCpts->x.empty() || _PCpts->x.empty() || _PCpts->x.empty()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "BFL data not read correctly. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+	// Warn of no data case
+	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
+		std::cout << "Warning: Rank " + std::to_string(MpiManager::my_rank) + " contains no BFL data." << std::endl;
 	}
 
 	
@@ -331,15 +327,35 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 	}
 
-	// Check that no points are outside the domain	
-	if (	*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) > g->XInd.back() + 1 || *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) < 0 ||
-			*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) > g->YInd.back() + 1 || *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) < 0 ||
-			*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) > g->ZInd.back() + 1 || *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) < 0
-		) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "BFL object outside grid. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+	// Exclude points which are not on this rank
+	int a = 0;
+	do {
+
+		// Delete points not on this rank (this is slow)
+		if ( GridUtils::isOnThisRank( 
+			BFLBody::getVoxInd(_PCpts->x[a]), BFLBody::getVoxInd(_PCpts->y[a]), BFLBody::getVoxInd(_PCpts->z[a]), *g) ) a++;
+		else {
+			_PCpts->x.erase(_PCpts->x.begin() + a);
+			_PCpts->y.erase(_PCpts->y.begin() + a);
+			_PCpts->z.erase(_PCpts->z.begin() + a);
+		}
+
+	} while (a < (int)_PCpts->x.size());
+
+
+	// Write out the points remaining in for debugging purposes
+#ifdef BFL_DEBUG
+	if (!_PCpts->x.empty()) {
+		std::ofstream fileout;
+		fileout.open(GridUtils::path_str + "/BFLpts_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+		for (size_t i = 0; i < _PCpts->x.size(); i++) {
+			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+			fileout << std::endl;
+		}
+		fileout.close();
 	}
+#endif
+
 
 #endif
 }

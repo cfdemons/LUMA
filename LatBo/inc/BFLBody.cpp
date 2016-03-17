@@ -2,6 +2,7 @@
 #include "../inc/BFLBody.h"
 #include "GridObj.h"
 #include "../inc/globalvars.h"
+#include "../inc/MpiManager.h"
 
 
 // Implementation of BFL body class //
@@ -48,6 +49,15 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	*GridUtils::logfile << "ObjectManagerBFL: Object represented by " << std::to_string(markers.size()) << 
 		" markers using 1 marker / voxel voxelisation." << std::endl;
 
+#ifdef BFL_DEBUG
+	std::ofstream file;
+	file.open(GridUtils::path_str + "/marker_positions_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	for (size_t n = 0; n < markers.size(); n++) {
+		file << markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << std::endl;
+	}
+	file.close();
+#endif
+
 
 
 	// Labelling //
@@ -66,37 +76,24 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
-	// Declarations
-	int dest_x, dest_y, dest_z;
-
 	// Initialise Q stores as max double value
 	Q = std::vector< std::vector<double> > (nVels * 2, std::vector<double> ( 
 		markers.size(), std::numeric_limits<double>::max() ) );
 
 	// Loop over grid and inspect the streaming operations
-	for (int i : _Owner->XInd) {
-		for (int j : _Owner->YInd) {
-			for (int k : _Owner->ZInd) {
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
 
-				// Loop over velocities (ignore rest distribution)
-				for (int v = 0; v < nVels - 1; v++) {
+				// If site is a BFL voxel
+				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == 10) {
 
-					// Compute destination coordinates
-					dest_x = (i + c[0][v] + N_lim) % N_lim;
-					dest_y = (j + c[1][v] + M_lim) % M_lim;
-					dest_z = (k + c[2][v] + K_lim) % K_lim;
-
-					// If source a BFL voxel
-					if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == 10) {
-
-						// Compute Q for the stream storing on source voxel BFL marker
+					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (dims == 3)
-						computeQ(i,j,k,dest_x,dest_y,dest_z,v);
+					computeQ(i,j,k,N_lim,M_lim,K_lim);
 #else
-						computeQ(i,j,dest_x,dest_y,v);
+					computeQ(i,j,N_lim,M_lim);
 #endif
-
-					}
 
 				}
 
@@ -109,19 +106,12 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
 #ifdef BFL_DEBUG
-	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_Qs.out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {
 			file << i[n] << '\t';
 		}
 		file << std::endl;
-	}
-	file.close();
-
-	file.open(GridUtils::path_str + "/marker_positions.out",std::ios::out);
-	for (size_t n = 0; n < markers.size(); n++) {
-		file << markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << std::endl;
 	}
 	file.close();
 #endif
@@ -152,6 +142,7 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 
 		// Recover voxel number
 		MarkerData m_data = getMarkerData(x,y,z,this);
+		curr_mark = m_data.ID;
 
 		// Increment point counter
 		counter[curr_mark]++;
@@ -182,10 +173,10 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 
 /*********************************************/
 // Routine to compute Q values for each application of the BFL BC.
-void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, int vel) {
+void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 
 	// Declarations
-	int ib, jb, kb, storeID;
+	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
 	MarkerData m_data;
 
 	/* Get voxel IDs of self and stencil required to specify planes
@@ -213,11 +204,15 @@ void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, 
 		for (int jj = jb - 1; jj <= jb + 1; jj++) {
 			for (int kk = kb - 1; kk <= kb + 1; kk++) {
 
-				// Fetch data if available
-				m_data = getMarkerData(ii,jj,kk,this);
+				// If indices are valid
+				if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim && kb >= 0 && kb < K_lim) {
 
-				// If data valid, then store ID
-				if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+					// Fetch data if available
+					m_data = getMarkerData(ii,jj,kk,this);
+
+					// If data valid, then store ID
+					if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+				}
 
 			}
 		}
@@ -258,7 +253,7 @@ void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, 
 	} while (std::prev_permutation(flags.begin(), flags.end()));
 
 	// Loop over each triangle
-	for (std::vector<int> tri : combo) {
+	for (std::vector<int>& tri : combo) {
 
 		// Consider only triangles where indices are single lattice site apart
 		if (
@@ -266,86 +261,96 @@ void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, 
 			std::abs(markers[tri[1]].supp_j[0] - markers[tri[0]].supp_j[0]), 
 			std::abs(markers[tri[1]].supp_k[0] - markers[tri[0]].supp_k[0]) ) < sqrt(2) )
 			&&
-			( GridUtils::vecnorm( std::abs(markers[tri[1]].supp_i[0] - markers[tri[0]].supp_i[0]),
-			std::abs(markers[tri[1]].supp_j[0] - markers[tri[0]].supp_j[0]), 
-			std::abs(markers[tri[1]].supp_k[0] - markers[tri[0]].supp_k[0]) ) < sqrt(2) )
+			( GridUtils::vecnorm( std::abs(markers[tri[2]].supp_i[0] - markers[tri[1]].supp_i[0]),
+			std::abs(markers[tri[2]].supp_j[0] - markers[tri[1]].supp_j[0]), 
+			std::abs(markers[tri[2]].supp_k[0] - markers[tri[1]].supp_k[0]) ) < sqrt(2) )
 			&&
-			( GridUtils::vecnorm( std::abs(markers[tri[1]].supp_i[0] - markers[tri[0]].supp_i[0]),
-			std::abs(markers[tri[1]].supp_j[0] - markers[tri[0]].supp_j[0]), 
-			std::abs(markers[tri[1]].supp_k[0] - markers[tri[0]].supp_k[0]) ) < sqrt(2) )
+			( GridUtils::vecnorm( std::abs(markers[tri[2]].supp_i[0] - markers[tri[0]].supp_i[0]),
+			std::abs(markers[tri[2]].supp_j[0] - markers[tri[0]].supp_j[0]), 
+			std::abs(markers[tri[2]].supp_k[0] - markers[tri[0]].supp_k[0]) ) < sqrt(2) )
 			) {
 
 			// Perform 3D line-triangle intersection test to get Q //
 
-			// Define vectors
-			std::vector<double> u, v, local_origin;
-			u.push_back(markers[tri[1]].position[0] - markers[tri[0]].position[0]);
-			u.push_back(markers[tri[1]].position[1] - markers[tri[0]].position[1]);
-			u.push_back(markers[tri[1]].position[2] - markers[tri[0]].position[2]);
-			v.push_back(markers[tri[2]].position[0] - markers[tri[0]].position[0]);
-			v.push_back(markers[tri[2]].position[1] - markers[tri[0]].position[1]);
-			v.push_back(markers[tri[2]].position[2] - markers[tri[0]].position[2]);
-			local_origin.push_back( markers[tri[0]].position[0] );
-			local_origin.push_back( markers[tri[0]].position[1] );
-			local_origin.push_back( markers[tri[0]].position[2] );
+			// Loop over even velocities and ignore rest distribution to save computing Q twice
+			for (int vel = 0; vel < nVels - 1; vel+=2) {
 
-			// Cross product gives normal vector to plane
-			std::vector<double> n = GridUtils::crossprod(u,v);
+				// Compute destination coordinates
+				dest_i = (i + c[0][vel] + N_lim) % N_lim;
+				dest_j = (j + c[1][vel] + M_lim) % M_lim;
+				dest_k = (k + c[2][vel] + K_lim) % K_lim;
 
-			if (GridUtils::vecnorm(n) == 0) continue; // Triangle degenerate
+				// Define vectors
+				std::vector<double> u, v, local_origin;
+				u.push_back(markers[tri[1]].position[0] - markers[tri[0]].position[0]);
+				u.push_back(markers[tri[1]].position[1] - markers[tri[0]].position[1]);
+				u.push_back(markers[tri[1]].position[2] - markers[tri[0]].position[2]);
+				v.push_back(markers[tri[2]].position[0] - markers[tri[0]].position[0]);
+				v.push_back(markers[tri[2]].position[1] - markers[tri[0]].position[1]);
+				v.push_back(markers[tri[2]].position[2] - markers[tri[0]].position[2]);
+				local_origin.push_back( markers[tri[0]].position[0] );
+				local_origin.push_back( markers[tri[0]].position[1] );
+				local_origin.push_back( markers[tri[0]].position[2] );
 
-			std::vector<double> src;
-			src.push_back(i);
-			src.push_back(j);
-			src.push_back(k);
+				// Cross product gives normal vector to plane
+				std::vector<double> n = GridUtils::crossprod(u,v);
 
-			std::vector<double> dest;
-			dest.push_back(dest_i);
-			dest.push_back(dest_j);
-			dest.push_back(dest_k);
+				if (GridUtils::vecnorm(n) == 0) continue; // Triangle degenerate
 
-			std::vector<double> dir = GridUtils::subtract(dest, src);
-			std::vector<double> w0 = GridUtils::subtract(src,local_origin);
-			double a = -GridUtils::dotprod(n,w0);
-			double b = GridUtils::dotprod(n,dir);
+				std::vector<double> src;
+				src.push_back(i);
+				src.push_back(j);
+				src.push_back(k);
 
-			if (abs(b) < 1e-9) {
-				if (a == 0) continue;	// Triangle and line are in the same plane
-				else continue;			// Triangle and line are disjoint
-			}
+				std::vector<double> dest;
+				dest.push_back(dest_i);
+				dest.push_back(dest_j);
+				dest.push_back(dest_k);
 
+				std::vector<double> dir = GridUtils::subtract(dest, src);
+				std::vector<double> w0 = GridUtils::subtract(src,local_origin);
+				double a = -GridUtils::dotprod(n,w0);
+				double b = GridUtils::dotprod(n,dir);
 
-			// Get intersect point
-			double r = a / b;
-
-			if (r < 0 || r > 1) continue; // No intersect
-
-			std::vector<double> intersect = GridUtils::add(src, GridUtils::vecmultiply(r,dir) );    // Intersect point
-
-			double uu = GridUtils::dotprod(u,u);
-			double uv = GridUtils::dotprod(u,v);
-			double vv = GridUtils::dotprod(v,v);
-			std::vector<double> w = GridUtils::subtract(intersect, local_origin);
-			double wu = GridUtils::dotprod(w,u);
-			double wv = GridUtils::dotprod(w,v);
-			double D = uv * uv - uu * vv;
-
-			double s = (uv * wv - vv * wu) / D;
-			double t = (uv * wu - uu * wv) / D;
-
-			if (s < 0.0 || s > 1.0)	continue;				// I is outside T
-			else if (t < 0.0 || (s + t) > 1.0) continue;	// I is outside T
-			else {
-				// Inside T so compute Q
-				double q = GridUtils::vecnorm( GridUtils::subtract(intersect,src) ) / GridUtils::vecnorm(dir);
-				if (q < Q[vel][storeID]) {
-
-					// Set outgoing Q value
-					Q[vel][storeID] = q;
-
-					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+				if (abs(b) < 1e-9) {
+					if (a == 0) continue;	// Triangle and line are in the same plane
+					else continue;			// Triangle and line are disjoint
 				}
+
+
+				// Get intersect point
+				double r = a / b;
+
+				if (r < 0 || r > 1) continue; // No intersect
+
+				std::vector<double> intersect = GridUtils::add(src, GridUtils::vecmultiply(r,dir) );    // Intersect point
+
+				double uu = GridUtils::dotprod(u,u);
+				double uv = GridUtils::dotprod(u,v);
+				double vv = GridUtils::dotprod(v,v);
+				std::vector<double> w = GridUtils::subtract(intersect, local_origin);
+				double wu = GridUtils::dotprod(w,u);
+				double wv = GridUtils::dotprod(w,v);
+				double D = uv * uv - uu * vv;
+
+				double s = (uv * wv - vv * wu) / D;
+				double t = (uv * wu - uu * wv) / D;
+
+				if (s < 0.0 || s > 1.0)	continue;				// I is outside T
+				else if (t < 0.0 || (s + t) > 1.0) continue;	// I is outside T
+				else {
+					// Inside T so compute Q
+					double q = GridUtils::vecnorm( GridUtils::subtract(intersect,src) ) / GridUtils::vecnorm(dir);
+					if (q < Q[vel][storeID]) {
+
+						// Set outgoing Q value
+						Q[vel][storeID] = q;
+
+						// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
+						Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+					}
+				}
+
 			}
 
 		}
@@ -354,13 +359,16 @@ void BFLBody::computeQ(int i, int j, int k, int dest_i, int dest_j, int dest_k, 
 }
 
 // Overloaded compute Q routine for 2D
-void BFLBody::computeQ(int i, int j, int dest_i, int dest_j, int vel) {
+void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
 
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
 	 * stream vector and the constructed line. The distance of intersection
 	 * is the value of q. As with the 3D case, 1-q is assigned to the 
 	 * destination store after we have added q to the source store. */
+
+	// Declarations
+	int dest_i, dest_j;
 
 	// Set stencil centre data
 	int ib = i;
@@ -373,15 +381,23 @@ void BFLBody::computeQ(int i, int j, int dest_i, int dest_j, int vel) {
 	std::vector<int> V;
 	for (int ii = ib - 1; ii <= ib + 1; ii++) {
 		for (int jj = jb - 1; jj <= jb + 1; jj++) {
-			
-			// Fetch data if available
-			m_data = getMarkerData(ii,jj,0,this);
 
-			// If data valid, then store ID
-			if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+			// If indices are valid
+			if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim) {
+			
+				// Fetch data if available
+				m_data = getMarkerData(ii,jj,0,this);
+
+				// If data valid, then store ID
+				if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+
+			}
 
 		}
 	}
+
+	// Can only continue if we have at least 2 points
+	if (V.size() < 2) return;
 
 	// Get unique combinations of vertex IDs
 	std::vector< std::vector<int> > combo;
@@ -413,9 +429,8 @@ void BFLBody::computeQ(int i, int j, int dest_i, int dest_j, int vel) {
 
 
 
-	// Loop through valid marker combinations (need at least 2 for a line)
-	if (V.size() < 2) return;
-	for (std::vector<int> line : combo) {
+	// Loop through valid marker combinations
+	for (std::vector<int>& line : combo) {
 
 		// Only check intersections when the surface line is between immediate neighbours
 		if ( GridUtils::vecnorm(
@@ -428,57 +443,66 @@ void BFLBody::computeQ(int i, int j, int dest_i, int dest_j, int vel) {
 
 			// Perform line intersection test //
 
-			// Compute vectors
-			std::vector<double> p;	// Position of source site
-			p.push_back(i);
-			p.push_back(j);
-			p.push_back(0);
+			// Loop over velocities (ignore rest distribution)
+			for (int vel = 0; vel < nVels - 1; vel++) {
 
-			std::vector<double> q;	// Position of first marker
-			q.push_back(markers[line[0]].position[0]);
-			q.push_back(markers[line[0]].position[1]);
-			q.push_back(markers[line[0]].position[2]);
+				// Compute destination coordinates
+				dest_i = (i + c[0][vel] + N_lim) % N_lim;
+				dest_j = (j + c[1][vel] + M_lim) % M_lim;
 
-			std::vector<double> r;	// Length of streaming vector
-			r.push_back(dest_i - i);
-			r.push_back(dest_j - j);
-			r.push_back(0);
+				// Compute vectors
+				std::vector<double> p;	// Position of source site
+				p.push_back(i);
+				p.push_back(j);
+				p.push_back(0);
 
-			std::vector<double> s;	// Length of marker vector
-			s.push_back(markers[line[1]].position[0] - q[0]);
-			s.push_back(markers[line[1]].position[1] - q[1]);
-			s.push_back(markers[line[1]].position[2] - q[2]);
+				std::vector<double> q;	// Position of first marker
+				q.push_back(markers[line[0]].position[0]);
+				q.push_back(markers[line[0]].position[1]);
+				q.push_back(markers[line[0]].position[2]);
+
+				std::vector<double> r;	// Length of streaming vector
+				r.push_back(dest_i - i);
+				r.push_back(dest_j - j);
+				r.push_back(0);
+
+				std::vector<double> s;	// Length of marker vector
+				s.push_back(markers[line[1]].position[0] - q[0]);
+				s.push_back(markers[line[1]].position[1] - q[1]);
+				s.push_back(markers[line[1]].position[2] - q[2]);
     
-			// Compute parameters
-			double rXs = GridUtils::vecnorm(GridUtils::crossprod( r, s ));
-			double qpXr = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), r ));
-			double qpXs = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), s ));
-			double t = qpXs / rXs;
-			double u = qpXr / rXs;    
+				// Compute parameters
+				double rXs = GridUtils::vecnorm(GridUtils::crossprod( r, s ));
+				double qpXr = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), r ));
+				double qpXs = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), s ));
+				double t = qpXs / rXs;
+				double u = qpXr / rXs;    
     
-			// Check for the intersecting case
-			if (rXs != 0 && t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+				// Check for the intersecting case
+				if (rXs != 0 && t >= 0 && t <= 1 && u >= 0 && u <= 1) {
         
-				// Lines intersect at p + tr = q + us
-				std::vector<double> intersect;
-				intersect.push_back(p[0] + t * r[0]);
-				intersect.push_back(p[1] + t * r[1]);
-				intersect.push_back(0);
+					// Lines intersect at p + tr = q + us
+					std::vector<double> intersect;
+					intersect.push_back(p[0] + t * r[0]);
+					intersect.push_back(p[1] + t * r[1]);
+					intersect.push_back(0);
         
-				// Compute Q
-				double q = GridUtils::vecnorm( GridUtils::subtract(intersect, p) ) / GridUtils::vecnorm(r);
-				if (q < Q[vel][storeID]) {
+					// Compute Q
+					double q = GridUtils::vecnorm( GridUtils::subtract(intersect, p) ) / GridUtils::vecnorm(r);
+					if (q < Q[vel][storeID]) {
 
-					// Set outgoing Q value
-					Q[vel][storeID] = q;
+						// Set outgoing Q value
+						Q[vel][storeID] = q;
 
-					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+						// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
+						Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+					}
+        
 				}
-        
-			}
 
-			// Maybe include the collinear case if it cuts through a vertex?
+				// Maybe include the collinear case if it cuts through a vertex?
+
+			}
 
 		}
 
@@ -508,6 +532,14 @@ std::vector<int> BFLBody::getVoxInd(double x, double y, double z) {
 	else vox.push_back( (int)std::floor(z) );
 
 	return vox;
+
+}
+
+// Overload of above for a single index
+int BFLBody::getVoxInd(double p) {
+
+	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
+	else return (int)std::floor(p);
 
 }
 

@@ -72,7 +72,7 @@ void MpiManager::mpi_init( ) {
 	MPI_Cart_coords(my_comm, my_rank, dims, MPI_coords);
 
 	// Open logfile now my_rank has been assigned
-	logout->open( GridUtils::path_str + "/mpiLog_Rank_" + std::to_string(my_rank) + ".out", std::ios::out );
+	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".out", std::ios::out );
 
 #ifdef MPI_VERBOSE
 	// Write out coordinates

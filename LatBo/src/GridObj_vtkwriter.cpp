@@ -49,7 +49,7 @@ void GridObj::io_vtkwriter(double tval)
 
 	// Loop over positions to determine size of grid without overlap
 	for (size_t i = 0; i < ni; i++) {
-		if(!GridUtils::isOnRecvLayer(XPos[i],'x',"min") && !GridUtils::isOnRecvLayer(XPos[i],'x',"max")) {
+		if(!GridUtils::isOnRecvLayer(XPos[i],"x","min") && !GridUtils::isOnRecvLayer(XPos[i],"x","max")) {
 			ni_corrected++;
 			if (ni_corrected == 1) {
 				start_x = i;
@@ -57,7 +57,7 @@ void GridObj::io_vtkwriter(double tval)
 		}
 	}
 	for (size_t j = 0; j < nj; j++) {
-		if(!GridUtils::isOnRecvLayer(YPos[j],'y',"min") && !GridUtils::isOnRecvLayer(YPos[j],'y',"max")) {
+		if(!GridUtils::isOnRecvLayer(YPos[j],"y","min") && !GridUtils::isOnRecvLayer(YPos[j],"y","max")) {
 			nj_corrected++;
 			if (nj_corrected == 1) {
 				start_y = j;
@@ -66,7 +66,7 @@ void GridObj::io_vtkwriter(double tval)
 	}
 #if (dims == 3)
 	for (size_t k = 0; k < nk; k++) {
-		if(!GridUtils::isOnRecvLayer(ZPos[k],'z',"min") && !GridUtils::isOnRecvLayer(ZPos[k],'z',"max")) {
+		if(!GridUtils::isOnRecvLayer(ZPos[k],"z","min") && !GridUtils::isOnRecvLayer(ZPos[k],"z","max")) {
 			nk_corrected++;
 			if (nk_corrected == 1) {
 				start_z = k;

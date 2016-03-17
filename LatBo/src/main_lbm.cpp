@@ -277,8 +277,8 @@ int main( int argc, char* argv[] )
 	PCpts* _PCpts = new PCpts();
 	objMan->readInPCData(_PCpts);
 
-	// Call BFL body builder
-	objMan->bfl_build_body(_PCpts);
+	// Call BFL body builder if there are points on this rank
+	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
 
 	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	

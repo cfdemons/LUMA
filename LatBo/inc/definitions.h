@@ -42,7 +42,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 100			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 
@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 120		// Number of x lattice sites
 #define M 40		// Number of y lattice sites
 #define K 40		// Number of z lattice sites

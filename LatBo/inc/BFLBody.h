@@ -104,8 +104,8 @@ protected:
 	void bflMarkerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter);
 
 	// Compute Q routine + overload
-	void computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim);
-	void computeQ(int i, int j, int N_lim, int M_lim);
+	void computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj* g);
+	void computeQ(int i, int j, int N_lim, int M_lim, GridObj* g);
 
 	// Utility functions (all static)
 	static std::vector<int> getVoxInd(double x, double y, double z);

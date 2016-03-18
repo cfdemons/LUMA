@@ -403,6 +403,8 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 
 	}
 
+	return false;
+
 }
 
 // ***************************************************************************************************
@@ -681,4 +683,3 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 
 	return result;
 }
-

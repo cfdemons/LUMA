@@ -331,7 +331,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 	int a = 0;
 	do {
 
-		// Delete points not on this rank (this is slow)
+		// Delete points not on this rank
 		if ( GridUtils::isOnThisRank( 
 			BFLBody::getVoxInd(_PCpts->x[a]), BFLBody::getVoxInd(_PCpts->y[a]), BFLBody::getVoxInd(_PCpts->z[a]), *g) ) a++;
 		else {

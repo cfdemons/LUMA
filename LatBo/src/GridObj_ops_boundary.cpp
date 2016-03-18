@@ -465,7 +465,13 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Get marker ID
+#ifdef BUILD_FOR_MPI
+		// Convert locals to global for marker access
+		std::vector<int> globals; GridUtils::local_to_global(i,j,k,this,globals);
+		m_data = BFLBody::getMarkerData(globals[0],globals[1],globals[2],&(objMan->pBody[0]));
+#else
 		m_data = BFLBody::getMarkerData(i,j,k,&(objMan->pBody[0]));
+#endif
 
 		/** Apply BC in pairs  -- BC 1 **/
 
@@ -482,7 +488,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
-          
+
 			f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
 				(1 - 2 * q) * 
 				objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],v_incoming,M_lim,K_lim,nVels) +
@@ -500,6 +506,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
                           
 		}		
 
+
 		/** Apply BC in pairs  -- BC 2 **/
 
 		// Get value of q (incoming direction, destination store)
@@ -513,7 +520,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
-          
+
 			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,nVels) = 
 				(1 - 2 * q) * 
 				objMan->f_prestream(dest_i - c[0][v_incoming],dest_j - c[1][v_incoming],dest_k - c[2][v_incoming],v_outgoing,M_lim,K_lim,nVels) +

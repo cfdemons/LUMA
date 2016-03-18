@@ -69,7 +69,15 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 	// Get with times and start using for_each instead of old-fashioned C syntax...
 	for (Marker& m : markers) {
+
+		// When using MPI need to convert the global indices of the support sites to local indices for array access
+#ifdef BUILD_FOR_MPI
+		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],g,locals);
+		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = 10;
+#else
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = 10;
+#endif
+
 	}
 
 
@@ -80,7 +88,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	Q = std::vector< std::vector<double> > (nVels * 2, std::vector<double> ( 
 		markers.size(), std::numeric_limits<double>::max() ) );
 
-	// Loop over grid and inspect the streaming operations
+	// Loop over local grid and inspect the streaming operations
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
@@ -90,9 +98,9 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (dims == 3)
-					computeQ(i,j,k,N_lim,M_lim,K_lim);
+					computeQ(i,j,k,N_lim,M_lim,K_lim,g);
 #else
-					computeQ(i,j,N_lim,M_lim);
+					computeQ(i,j,N_lim,M_lim,g);
 #endif
 
 				}
@@ -172,8 +180,8 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 }
 
 /*********************************************/
-// Routine to compute Q values for each application of the BFL BC.
-void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+// Routine to compute Q values at a given local voxel for each application of the BFL BC.
+void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj* g) {
 
 	// Declarations
 	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
@@ -195,7 +203,16 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 	ib = i;
 	jb = j;
 	kb = k;
+
+	// Get marker data associated with this local site
+#ifdef BUILD_FOR_MPI
+	// Convert to global indices for marker access
+	std::vector<int> globals; GridUtils::local_to_global(i,j,k,g,globals);
+	m_data = getMarkerData(globals[0],globals[1],globals[2],this);
+#else
 	m_data = getMarkerData(i,j,k,this);
+#endif
+
 	storeID = m_data.ID;
 
 	// Get list of IDs of neighbour vertices for plane construction
@@ -207,8 +224,14 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 				// If indices are valid
 				if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim && kb >= 0 && kb < K_lim) {
 
-					// Fetch data if available
+					// Fetch data if available //
+#ifdef BUILD_FOR_MPI
+					// Convert to global indices for marker access
+					globals.clear(); GridUtils::local_to_global(ii,jj,kk,g,globals);
+					m_data = getMarkerData(globals[0],globals[1],globals[2],this);
+#else
 					m_data = getMarkerData(ii,jj,kk,this);
+#endif
 
 					// If data valid, then store ID
 					if (!_isnan(m_data.x)) V.push_back(m_data.ID);
@@ -297,15 +320,11 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 
 				if (GridUtils::vecnorm(n) == 0) continue; // Triangle degenerate
 
-				std::vector<double> src;
-				src.push_back(i);
-				src.push_back(j);
-				src.push_back(k);
-
-				std::vector<double> dest;
-				dest.push_back(dest_i);
-				dest.push_back(dest_j);
-				dest.push_back(dest_k);
+				// Create global vectors to source and destination end of streaming vector
+				std::vector<double> src; 
+				GridUtils::local_to_global(i,j,k,g,src);
+				std::vector<double> dest; 
+				GridUtils::local_to_global(dest_i,dest_j,dest_k,g,dest);
 
 				std::vector<double> dir = GridUtils::subtract(dest, src);
 				std::vector<double> w0 = GridUtils::subtract(src,local_origin);
@@ -359,7 +378,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 }
 
 // Overloaded compute Q routine for 2D
-void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
+void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
@@ -369,11 +388,21 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
 
 	// Declarations
 	int dest_i, dest_j;
+	MarkerData m_data;
 
 	// Set stencil centre data
 	int ib = i;
 	int jb = j;
-	MarkerData m_data = getMarkerData(i,j,0,this);
+	
+	// Get marker data associated with this local site
+#ifdef BUILD_FOR_MPI
+	// Convert to global indices for marker access
+	std::vector<int> globals; GridUtils::local_to_global(i,j,0,g,globals);
+	m_data = getMarkerData(globals[0],globals[1],0,this);
+#else
+	m_data = getMarkerData(i,j,0,this);
+#endif
+
 	int storeID = m_data.ID;
 
 
@@ -385,8 +414,15 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
 			// If indices are valid
 			if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim) {
 			
-				// Fetch data if available
+
+				// Fetch data if available //
+#ifdef BUILD_FOR_MPI
+				// Convert to global indices for marker access
+				globals.clear(); GridUtils::local_to_global(ii,jj,0,g,globals);
+				m_data = getMarkerData(globals[0],globals[1],0,this);
+#else
 				m_data = getMarkerData(ii,jj,0,this);
+#endif
 
 				// If data valid, then store ID
 				if (!_isnan(m_data.x)) V.push_back(m_data.ID);
@@ -451,20 +487,17 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
 				dest_j = (j + c[1][vel] + M_lim) % M_lim;
 
 				// Compute vectors
-				std::vector<double> p;	// Position of source site
-				p.push_back(i);
-				p.push_back(j);
-				p.push_back(0);
+				std::vector<double> p;
+				GridUtils::local_to_global(i,j,0,g,p);	// Position of source site
+				std::vector<double> ppr;
+				GridUtils::local_to_global(dest_i,dest_j,0,g,ppr);	// Position of destination site
 
 				std::vector<double> q;	// Position of first marker
 				q.push_back(markers[line[0]].position[0]);
 				q.push_back(markers[line[0]].position[1]);
 				q.push_back(markers[line[0]].position[2]);
 
-				std::vector<double> r;	// Length of streaming vector
-				r.push_back(dest_i - i);
-				r.push_back(dest_j - j);
-				r.push_back(0);
+				std::vector<double> r = GridUtils::subtract(ppr,p);	// Length of streaming vector
 
 				std::vector<double> s;	// Length of marker vector
 				s.push_back(markers[line[1]].position[0] - q[0]);
@@ -517,7 +550,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim) {
 /*********************************************/
 // Utilities//
 
-// Return voxel indices for a given point in space
+// Return global voxel indices for a given point in global space
 std::vector<int> BFLBody::getVoxInd(double x, double y, double z) {
 
 	std::vector<int> vox;
@@ -543,7 +576,7 @@ int BFLBody::getVoxInd(double p) {
 
 }
 
-// Return marker and voxel data associated with position supplied by querying body*
+// Return marker and voxel data associated with global position supplied by querying given body*
 MarkerData BFLBody::getMarkerData(double x, double y, double z, BFLBody* body) {
 
 	// Get indices of voxel associated with the supplied position

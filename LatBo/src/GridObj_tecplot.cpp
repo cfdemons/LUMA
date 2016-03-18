@@ -153,6 +153,7 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 		return;
 	}
 
+// Flag to avoid writing out receiver layer sites
 #define EX_RECV_LAYER
 
 	// Access control for MPI application

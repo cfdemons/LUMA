@@ -1,13 +1,14 @@
 /*
-	**************************************************************************************************************
-	**************************************************************************************************************
-	**																											**
-	**											LatBo Defintions File											**
-	**											 (For user editing)												**
-	**																											**
-	**************************************************************************************************************
-	**************************************************************************************************************
+	**************************************************************************
+	**************************************************************************
+	**																		**
+	**							LatBo Defintions File						**
+	**							  (for user editing)						**
+	**																		**
+	**************************************************************************
+	**************************************************************************
 */
+// Definitions File Format ## 0.1 ## //
 
 
 // Header guard
@@ -25,32 +26,43 @@
 #include <mpi.h>			// Enable MPI
 
 
-
 /*
-***************************************************************************************************************
-************************************** Global configuration data **********************************************
-***************************************************************************************************************
+*******************************************************************************
+**************************** Debugging Options ********************************
+*******************************************************************************
 */
 
-// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
-//#define MEGA_DEBUG
+
+#define MEGA_DEBUG					// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+//#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
+//#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
+//#define IBM_DEBUG					// Write IBM body and matrix data out to text files
+//#define IBBODY_TRACER				// Write out IBBody positions
+//#define LD_OUT					// Write out lift and drag (sum x and y forces on Lagrange markers of IBBody)
+#define BFL_DEBUG					// Write out BFL marker positions and Q values out to files
+
+
+/*
+*******************************************************************************
+************************* Global configuration data ***************************
+*******************************************************************************
+*/
+
 
 // Numbers
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 100			// How many timesteps before whole grid output
+#define out_every 1000			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
-
 
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
-//#define MPI_VERBOSE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -85,18 +97,18 @@ const static int zProbeLims[2] = {30, 120};
 #endif
 
 /*
-***************************************************************************************************************
-********************************************** Time data ******************************************************
-***************************************************************************************************************
+*******************************************************************************
+******************************** Time data ************************************
+*******************************************************************************
 */
 
 #define T 1000	// Number of time steps
 
 
 /*
-***************************************************************************************************************
-******************************************* Domain dimensions *************************************************
-***************************************************************************************************************
+*******************************************************************************
+**************************** Domain Dimensions ********************************
+*******************************************************************************
 */
 
 // MPI Data
@@ -116,7 +128,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
+#define dims 2		// Number of dimensions to the problem
 #define N 120		// Number of x lattice sites
 #define M 40		// Number of y lattice sites
 #define K 40		// Number of z lattice sites
@@ -124,17 +136,17 @@ const static int zProbeLims[2] = {30, 120};
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 3.0		// End of domain-x
+#define b_x 12.0		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1.0		// End of domain-y
+#define b_y 4.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 1.0		// End of domain-z
+#define b_z 4.0		// End of domain-z
 
 
 /*
-***************************************************************************************************************
-*********************************************** Fluid data ****************************************************
-***************************************************************************************************************
+*******************************************************************************
+******************************** Fluid Data ***********************************
+*******************************************************************************
 */
 
 // Fluid data in lattice units
@@ -154,17 +166,14 @@ const static int zProbeLims[2] = {30, 120};
 
 
 /*
-***************************************************************************************************************
-******************************************* Immersed Boundary *************************************************
-***************************************************************************************************************
+*******************************************************************************
+****************************** Immersed Boundary ******************************
+*******************************************************************************
 */
 
 // Master IBM switches //
 //#define IBM_ON						// Turn on IBM
 
-//#define IBM_DEBUG					// Write IBM body and matrix data out to text files
-//#define IBBODY_TRACER				// Write out IBbody positions
-//#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
@@ -212,9 +221,9 @@ const static int zProbeLims[2] = {30, 120};
 
 
 /*
-***************************************************************************************************************
-********************************************** Wall data ******************************************************
-***************************************************************************************************************
+*******************************************************************************
+********************************** Wall Data **********************************
+*******************************************************************************
 */
 
 // Inlets
@@ -222,55 +231,59 @@ const static int zProbeLims[2] = {30, 120};
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
+//#define INLET_NRBC				// Turn on NRBC at inlet
 
 
 // Outlets
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+//#define OUTLET_NRBC				// Turn on NRBC at outlet
+
+
+// Periodicity
 #define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 //#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 1		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
 	#define obj_x_min 20		// Index of start of object/wall in x-direction
 	#define obj_x_max 60		// Index of end of object/wall in x-direction
-	#define obj_y_min 40		// Index of start of object/wall in y-direction
-	#define obj_y_max 80		// Index of end of object/wall in y-direction
-	#define obj_z_min 20		// Index of start of object/wall in z-direction
+	#define obj_y_min 10		// Index of start of object/wall in y-direction
+	#define obj_y_max 50		// Index of end of object/wall in y-direction
+	#define obj_z_min 10		// Index of start of object/wall in z-direction
 	#define obj_z_max 50		// Index of end of object/wall in z-direction
 #endif
 
 
 // BFL objects
 #define BFL_ON
-#define BFL_DEBUG
 
 #ifdef BFL_ON
-	#define bfl_on_grid_lev 0		// Provide grid level on which BFL body should be added 
+	#define bfl_on_grid_lev 1		// Provide grid level on which BFL body should be added 
 	#define bfl_on_grid_reg 0		// Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_bfl_x 10
+	#define start_bfl_x 20
 	#define start_bfl_y 10
 	#define start_bfl_z 10
-	#define bfl_length_x 20		// The BFL object input is scaled based on this dimension
+	#define bfl_length_x 40		// The BFL object input is scaled based on this dimension
 #endif
 
 
 
 /*
-***************************************************************************************************************
-******************************************** Multi-grid data **************************************************
-***************************************************************************************************************
+*******************************************************************************
+****************************** Multi-grid Data ********************************
+*******************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -288,13 +301,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 20 };
-	const static size_t RefXend[NumLev][NumReg]		= { 70 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 10 };
+	const static size_t RefXend[NumLev][NumReg]		= { 80 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefYend[NumLev][NumReg]		= { 15 };
+	const static size_t RefYend[NumLev][NumReg]		= { 35 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { 10 };
-	static size_t RefZend[NumLev][NumReg]		= { 40 };
+	static size_t RefZstart[NumLev][NumReg]		= { 5 };
+	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
 	const static size_t RefXstart[NumLev][NumReg]	= { {20}, {20} };
@@ -312,9 +325,9 @@ const static int zProbeLims[2] = {30, 120};
 
 
 /*
-***************************************************************************************************************
-************************************** Clean-up -- no need to edit ********************************************
-***************************************************************************************************************
+*******************************************************************************
+************************* Clean-up: NOT FOR EDITING ***************************
+*******************************************************************************
 */
 
 // Set default options if using 2D

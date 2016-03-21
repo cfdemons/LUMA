@@ -23,8 +23,8 @@ BFLBody::~BFLBody(void)
 // Custom constructor to populate body from array of points
 BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
-	// Assign pointer
-	this->_Owner = g;
+	// Assign pointer to owning grid
+	GridUtils::getGrid(g,bfl_on_grid_lev,bfl_on_grid_reg,this->_Owner);
 
 	// Voxel grid filter //
 
@@ -51,9 +51,11 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 #ifdef BFL_DEBUG
 	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_positions_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
 	for (size_t n = 0; n < markers.size(); n++) {
-		file << markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << std::endl;
+		file << std::to_string(n) << ", " << 
+			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
+			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
 	}
 	file.close();
 #endif
@@ -72,7 +74,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 		// When using MPI need to convert the global indices of the support sites to local indices for array access
 #ifdef BUILD_FOR_MPI
-		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],g,locals);
+		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],_Owner,locals);
 		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = 10;
 #else
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = 10;
@@ -98,9 +100,9 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (dims == 3)
-					computeQ(i,j,k,N_lim,M_lim,K_lim,g);
+					computeQ(i,j,k,N_lim,M_lim,K_lim,_Owner);
 #else
-					computeQ(i,j,N_lim,M_lim,g);
+					computeQ(i,j,N_lim,M_lim,_Owner);
 #endif
 
 				}

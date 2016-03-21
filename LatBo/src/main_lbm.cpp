@@ -170,13 +170,13 @@ int main( int argc, char* argv[] )
 		}
 		*GridUtils::logfile << "\t)" << std::endl;
 #endif
-	*GridUtils::logfile << "Number of time steps = " << T << endl;
-	*GridUtils::logfile << "Physical grid spacing = " << Grids.dt << endl;
-	*GridUtils::logfile << "Lattice viscosity = " << Grids.nu << endl;
-	*GridUtils::logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << u_ref << std::endl;
+	*GridUtils::logfile << "Number of time steps = " << std::to_string(T) << endl;
+	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dt) << endl;
+	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
+	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
+	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(u_ref) << std::endl;
 	// Reynolds Number
-	*GridUtils::logfile << "Reynolds Number = " << Re << endl;
+	*GridUtils::logfile << "Reynolds Number = " << std::to_string(Re) << endl;
 
 
 	/* ***************************************************************************************************************

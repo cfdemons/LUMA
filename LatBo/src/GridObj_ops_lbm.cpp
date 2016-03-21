@@ -69,7 +69,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 0,"AFTER INLET BC");
+		/*DEBUG*/ io_tecplot_debug((t+1)*100 + 0,"AFTER INLET BC");
 #endif
 
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
@@ -79,7 +79,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_collide();
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 1,"AFTER COLLIDE");
+		/*DEBUG*/ io_tecplot_debug((t+1)*100 + 1,"AFTER COLLIDE");
 #endif
 
 		////////////////////
@@ -109,7 +109,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 2,"AFTER SOLID BC");
 #endif
 
 #ifdef BFL_ON
@@ -121,7 +121,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 3,"AFTER STREAM");
 #endif
 
 			// Apply boundary conditions
@@ -129,7 +129,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_boundary(5);	// BFL boundary conditions
 #endif
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER BFL");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 4,"AFTER BFL");
 #endif
 
 			for (size_t reg = 0; reg < regions; reg++) {
@@ -140,7 +140,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 5,"AFTER COALESCE"); // Do not change this tag!
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
 
 
@@ -159,7 +159,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 2,"AFTER SOLID BC");
 #endif
 
 #ifdef BFL_ON
@@ -171,7 +171,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 3,"AFTER STREAM");
 #endif
 
 
@@ -180,7 +180,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			LBM_boundary(5);	// BFL boundary conditions
 #endif
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER BFL");
+			/*DEBUG*/ io_tecplot_debug((t+1)*100 + 4,"AFTER BFL");
 #endif
 
 		}
@@ -196,14 +196,14 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 6,"AFTER OUTLET BC");
+		/*DEBUG*/ io_tecplot_debug((t+1)*100 + 6,"AFTER OUTLET BC");
 #endif
 
 		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 7,"AFTER MACRO");
+		/*DEBUG*/ io_tecplot_debug((t+1)*100 + 7,"AFTER MACRO");
 #endif
 
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
@@ -639,7 +639,7 @@ void GridObj::LBM_stream( ) {
 	IVector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 	/*DEBUG*/
 	int count0 = 0, count1 = 0, count2 = 0, count3 = 0;
 #endif
@@ -654,7 +654,7 @@ void GridObj::LBM_stream( ) {
 					// Store opposite direction
 					v_opp = GridUtils::getOpposite(v);
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 					/*DEBUG*/
 					count0++;
 #endif
@@ -708,7 +708,7 @@ void GridObj::LBM_stream( ) {
 						) {
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 							/*DEBUG*/
 							count1++;
 							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -794,7 +794,7 @@ void GridObj::LBM_stream( ) {
 						) {
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 							/*DEBUG*/
 							count2++;
 							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -867,7 +867,7 @@ void GridObj::LBM_stream( ) {
 						}
 #endif
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 						/*DEBUG*/
 						count3++;
 						*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -893,7 +893,7 @@ void GridObj::LBM_stream( ) {
 	}
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 	/*DEBUG*/
 	*GridUtils::logfile << "Counts were " << count0 << "," << count1 << "," << count2 << "," << count3 << std::endl;
 #endif

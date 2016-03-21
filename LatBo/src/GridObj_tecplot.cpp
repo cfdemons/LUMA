@@ -149,7 +149,7 @@ void GridObj::io_tecplot(double tval) {
 void GridObj::io_tecplot_debug(double tval, std::string tag) {
 
 	// Only do this if needed
-	if (t % out_every != 0) {
+	if ((t+1) % out_every != 0) {
 		return;
 	}
 

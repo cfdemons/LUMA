@@ -39,10 +39,10 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
+#define out_every 10			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 
@@ -90,7 +90,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 10000	// Number of time steps
+#define T 100	// Number of time steps
 
 
 /*
@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 240		// Number of x lattice sites
 #define M 60		// Number of y lattice sites
 #define K 60		// Number of z lattice sites
@@ -125,7 +125,7 @@ const static int zProbeLims[2] = {30, 120};
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
 #define b_x 24.0		// End of domain-x
-#define a_y -0.05		// Start of domain-y
+#define a_y 0		// Start of domain-y
 #define b_y 6.0		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 6.0		// End of domain-z
@@ -139,11 +139,11 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.04	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -160,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define IBM_ON						// Turn on IBM
+//#define IBM_ON						// Turn on IBM
 //#define IBM_DEBUG					// Write IBM body and matrix data out to text files
 //#define IBBODY_TRACER				// Write out IBbody positions
 //#define LD_OUT						// Write out lift and drag (sum x and y forces on Lagrange markers of body)
@@ -218,26 +218,26 @@ const static int zProbeLims[2] = {30, 120};
 
 // Switches
 #define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 20		// Index of start of object/wall in x-direction
-	#define obj_x_max 60		// Index of end of object/wall in x-direction
-	#define obj_y_min 40		// Index of start of object/wall in y-direction
-	#define obj_y_max 80		// Index of end of object/wall in y-direction
+	#define obj_x_min 100		// Index of start of object/wall in x-direction
+	#define obj_x_max 120		// Index of end of object/wall in x-direction
+	#define obj_y_min 20		// Index of start of object/wall in y-direction
+	#define obj_y_max 40		// Index of end of object/wall in y-direction
 	#define obj_z_min 20		// Index of start of object/wall in z-direction
-	#define obj_z_max 50		// Index of end of object/wall in z-direction
+	#define obj_z_max 40		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -247,7 +247,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0         	// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

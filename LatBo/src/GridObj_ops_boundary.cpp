@@ -95,20 +95,20 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
 
 					// Choose option
-#if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && !defined NRBC_INLET)
+#if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && !defined INLET_NRBC)
 
 					// Apply inlet Zou-He
 					bc_applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
 
-#elif (defined INLET_ON && !defined INLET_DO_NOTHING && defined INLET_REGULARISED && !defined NRBC_INLET)
+#elif (defined INLET_ON && !defined INLET_DO_NOTHING && defined INLET_REGULARISED && !defined INLET_NRBC)
 
 					// Apply regularised BC
 					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
 
-#elif (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && defined NRBC_INLET)
+#elif (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED && defined INLET_NRBC)
 					
 					// Apply NRBC
-					bc_applyNRBC(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
+					bc_applyNrbc(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
 #endif
 
     
@@ -129,7 +129,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 #ifdef NRBC_EXIT
 					// Apply NRBC
-					bc_applyNRBC(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
+					bc_applyNrbc(LatTyp(i, j, k, M_lim, K_lim), i, j, k, M_lim, K_lim);
 #else
 
 
@@ -463,8 +463,8 @@ void GridObj::bc_solid_site_reset( ) {
 // ***************************************************************************************************
 // ***************************************************************************************************
 
-// Routine to apply Non Reflective boundary conditions
-void GridObj::bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim) {
+// Routine to apply Non-Reflecting Boundary Conditions
+void GridObj::bc_applyNrbc(int label, int i, int j, int k, int M_lim, int K_lim) {
 
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
@@ -489,11 +489,6 @@ void GridObj::bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim)
 	* 1)Calculate derivatives drho/dx, dux/dx and  duy/dy. Calculate L1 and L2.
 	* 2)Calculate rho, Ux and Uy with values of L1 and L2.
 	* 3)Calculate temporal equilibrium function.
-	*
-	*
-	*
-	*
-	*
 	*/
 
 	//***************************************************************************************************
@@ -550,6 +545,6 @@ void GridObj::bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim)
 
 
 
-} // end Non Reflective BC
+} // end Non-Reflecting BC
 
   // ***************************************************************************************************

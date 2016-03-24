@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.1-31 ## //
+// Definitions File Format ## 0.2-31 ## //
 
 
 // Header guard
@@ -33,13 +33,13 @@
 */
 
 
-#define MEGA_DEBUG					// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 //#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
 //#define IBM_DEBUG					// Write IBM body and matrix data out to text files
 //#define IBBODY_TRACER				// Write out IBBody positions
 //#define LD_OUT					// Write out lift and drag (sum x and y forces on Lagrange markers of IBBody)
-#define BFL_DEBUG					// Write out BFL marker positions and Q values out to files
+//#define BFL_DEBUG					// Write out BFL marker positions and Q values out to files
 
 
 /*
@@ -56,11 +56,11 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000			// How many timesteps before whole grid output
+#define out_every 1			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
-//#define TEXTOUT
+#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 1	// Number of time steps
 
 
 /*
@@ -240,30 +240,31 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define wall_thickness	2		// Thickness of walls in coarsest lattice units
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 1		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 20		// Index of start of object/wall in x-direction
-	#define obj_x_max 60		// Index of end of object/wall in x-direction
-	#define obj_y_min 10		// Index of start of object/wall in y-direction
-	#define obj_y_max 50		// Index of end of object/wall in y-direction
+	#define obj_x_min 10		// Index of start of object/wall in x-direction
+	#define obj_x_max 90		// Index of end of object/wall in x-direction
+	#define obj_y_min 4			// Index of start of object/wall in y-direction
+	#define obj_y_max 84		// Index of end of object/wall in y-direction
 	#define obj_z_min 10		// Index of start of object/wall in z-direction
-	#define obj_z_max 50		// Index of end of object/wall in z-direction
+	#define obj_z_max 90		// Index of end of object/wall in z-direction
 #endif
 
 
 // BFL objects
-#define BFL_ON
+//#define BFL_ON
 
 #ifdef BFL_ON
 	#define bfl_on_grid_lev 1		// Provide grid level on which BFL body should be added 
@@ -283,7 +284,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -303,20 +304,20 @@ const static int zProbeLims[2] = {30, 120};
 #elif (NumReg == 1 && NumLev == 1)
 	const static size_t RefXstart[NumLev][NumReg]	= { 10 };
 	const static size_t RefXend[NumLev][NumReg]		= { 80 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefYend[NumLev][NumReg]		= { 35 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
+	const static size_t RefYend[NumLev][NumReg]		= { 30 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {20}, {20} };
-	const static size_t RefXend[NumLev][NumReg]		= { {100}, {100} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {10}, {10} };
-	const static size_t RefYend[NumLev][NumReg]		= { {50}, {70} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {10}, {5} };
+	const static size_t RefXend[NumLev][NumReg]		= { {80}, {120} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
+	const static size_t RefYend[NumLev][NumReg]		= { {30}, {50} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {1}, {2} };
-	static size_t RefZend[NumLev][NumReg]		= { {4}, {5} };
+	static size_t RefZstart[NumLev][NumReg]		= { {5}, {2} };
+	static size_t RefZend[NumLev][NumReg]		= { {35}, {5} };
 
 
 #endif

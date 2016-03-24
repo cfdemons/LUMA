@@ -43,50 +43,12 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************* Solid Sites ****************************************
 					******************************************************************************************	*/
     
-				if (LatTyp(i,j,k,M_lim,K_lim) == 0 && (bc_type_flag == 0 || bc_type_flag == 1) ) {
+				// Apply to solid sites
+				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) 
+					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
 
-					// For each outgoing direction
-					for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
-
-						// Identify site where the population will be streamed to
-						size_t dest_x = i+c[0][v_outgoing];
-						size_t dest_y = j+c[1][v_outgoing];
-						size_t dest_z = k+c[2][v_outgoing];
-
-						// If this site is off-grid then cannot apply the BC in preparation for streaming
-						if (	(dest_x >= N_lim || dest_x < 0) ||
-								(dest_y >= M_lim || dest_y < 0) ||
-								(dest_z >= K_lim || dest_z < 0)
-						   ) {
-							   continue;	// Move on to next direction
-
-#ifdef BUILD_FOR_MPI
-						// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
-						// periodic boundaries disabled.
-						} else if (GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
-							&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this)) {
-
-#if (!defined PERIODIC_BOUNDARIES)
-							continue;	// Periodic boundaries disabled so do not try to apply BC
-#endif
-
-#endif	// BUILD_FOR_MPI
-
-						}	// End of exclusions
-
-						/* Not been filtered by above exclusions so try to apply boundary condition. */
-
-						// Only apply if destination is a fluid site 
-						if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 2) {
-
-							// Get incoming direction
-							size_t v_incoming = GridUtils::getOpposite(v_outgoing);
-							
-							// Overwriting outgoing population with expected incoming value
-							f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,nVels);
-							
-						}
-					}
+					// Apply half-way bounce-back
+					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
 
 
 				/*	******************************************************************************************
@@ -136,6 +98,59 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 		}
 	}
     
+}
+
+
+// ***************************************************************************************************
+// Routine to apply half-way bounceback boundary condition
+void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+
+
+	// For each outgoing direction
+	for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
+
+		// Identify site where the population will be streamed to
+		int dest_x = i+c[0][v_outgoing];
+		int dest_y = j+c[1][v_outgoing];
+		int dest_z = k+c[2][v_outgoing];
+
+		// If this site is off-grid then cannot apply the BC in preparation for streaming
+		if (	(dest_x >= N_lim || dest_x < 0) ||
+				(dest_y >= M_lim || dest_y < 0) ||
+				(dest_z >= K_lim || dest_z < 0)
+			) {
+				continue;	// Move on to next direction
+
+#ifdef BUILD_FOR_MPI
+		// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
+		// periodic boundaries disabled.
+		} else if (GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
+			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this)) {
+
+#if (!defined PERIODIC_BOUNDARIES)
+			continue;	// Periodic boundaries disabled so do not try to apply BC
+#endif
+
+#endif	// BUILD_FOR_MPI
+
+		}	// End of exclusions
+
+		/* Not been filtered by above exclusions so try to apply boundary condition. */
+
+		// Only apply if destination is a fluid site
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) != 7 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) != 8
+			) {
+
+			// Get incoming direction
+			size_t v_incoming = GridUtils::getOpposite(v_outgoing);
+							
+			// Overwriting outgoing population with expected incoming value
+			f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,nVels);
+							
+		}
+	}
+
 }
 
 // ***************************************************************************************************
@@ -424,9 +439,9 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 void GridObj::bc_applyBfl(int i, int j, int k) {
 
 	// Declarations
-	size_t N_lim = XInd.size();
-	size_t M_lim = YInd.size();
-	size_t K_lim = ZInd.size();
+	int N_lim = static_cast<int>( XInd.size() );
+	int M_lim = static_cast<int>( YInd.size() );
+	int K_lim = static_cast<int>( ZInd.size() );
 	MarkerData m_data;
 	ObjectManager* objMan = ObjectManager::getInstance();
 
@@ -437,9 +452,9 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		size_t v_incoming = GridUtils::getOpposite(v_outgoing);
 
 		// Identify site where the population will be streamed to (no periodicity)
-		size_t dest_i = i+c[0][v_outgoing];
-		size_t dest_j = j+c[1][v_outgoing];
-		size_t dest_k = k+c[2][v_outgoing];
+		int dest_i = i+c[0][v_outgoing];
+		int dest_j = j+c[1][v_outgoing];
+		int dest_k = k+c[2][v_outgoing];
 
 		// If this site is off-grid then cannot apply the BC in preparation for streaming
 		if (	(dest_i >= N_lim || dest_i < 0) ||
@@ -559,7 +574,7 @@ void GridObj::bc_solid_site_reset( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 				// Reset solid site velocities to zero
-				if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
 					
 					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
 					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;

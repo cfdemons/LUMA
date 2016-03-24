@@ -583,14 +583,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 // *************************************************************************************************** //
 // Sets pointer to grid hierarchy and finds sizes of buffers for this rank across all grids -- 
 // to be called post-initialisation.
-void MpiManager::mpi_buffer_size(GridObj* Grids) {
+void MpiManager::mpi_buffer_size() {
 
 	*GridUtils::logfile << "Pre-computing buffer sizes for MPI..." << std::endl;
-
-	// Set the pointer to the hierarchy
-	if (MpiManager::Grids == NULL) {
-		MpiManager::Grids = Grids;
-	}
 
 	/* For each grid in the hierarchy find communicating edges and store the buffer size.
 	 * The data are arranged:

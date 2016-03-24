@@ -172,7 +172,7 @@ double GridUtils::vecnorm( std::vector<double>& vec )
 // ***************************************************************************************************
 
 // Routine to map the index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
+std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> fine_ind;
@@ -180,14 +180,18 @@ std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, i
 	// Map indices
 	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
 	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
+#if (dims == 3)
 	fine_ind.insert(fine_ind.begin() + 2, 2*(coarse_k - z_start + 1) - 2 );
+#else
+	fine_ind.insert(fine_ind.begin() + 2, 0 );
+#endif
 
 	return fine_ind;
 }
 // ***************************************************************************************************
 
-// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
+// Routine to map the index of a fine grid site to parent coarse grid site on the level above
+std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> coarse_ind;
@@ -206,7 +210,11 @@ std::vector<int> GridUtils::revindmapref(int fine_i, int x_start, int fine_j, in
 	// Reverse map indices
 	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
 	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
+#if (dims == 3)
 	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
+#else
+	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
+#endif
 
 	return coarse_ind;
 }

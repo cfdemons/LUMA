@@ -440,7 +440,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Undefined
+	5 == Refined Boundary
 	6 == Undefined
 	7 == Inlet
 	8 == Outlet
@@ -686,7 +686,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Undefined
+	5 == Refined Boundary
 	6 == Undefined
 	7 == Inlet
 	8 == Outlet
@@ -865,7 +865,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Undefined
+	5 == Refined Boundary
 	6 == Undefined
 	7 == Inlet
 	8 == Outlet
@@ -1022,7 +1022,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Undefined
+	5 == Refined Boundary
 	6 == Undefined
 	7 == Inlet
 	8 == Outlet
@@ -1047,13 +1047,12 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 			{
 
 #ifdef BUILD_FOR_MPI						
-			// Compute local indices to correct LatTyp array on parent
-			local_i = i - pGrid.XInd[1] + 1;
-			local_j = j - pGrid.YInd[1] + 1;
-			local_k = k - pGrid.ZInd[1] + 1;
-#if (dims != 3)
-			local_k = k;
-#endif
+			// Compute local indices to access LatTyp array on parent
+			std::vector<int> locals;
+			GridUtils::global_to_local(i,j,k,&pGrid,locals);
+			local_i = locals[0];
+			local_j = locals[1];
+			local_k = locals[2];
 #else
 			local_i = i;
 			local_j = j;
@@ -1063,7 +1062,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 			// Only act if the site is on parent rank (inc overlap) to avoid out of bounds errors
 			if ( GridUtils::isOnThisRank(i,j,k,pGrid) ) {
 
-				// If on the edge of the global refined patch then it is TL so label
+				// If on the edge of the global refined patch and it is simply a fluid then it is TL so label
 				if	(
 					(i == RefXstart[pGrid.level][region_number] || i == RefXend[pGrid.level][region_number]) ||
 					(j == RefYstart[pGrid.level][region_number] || j == RefYend[pGrid.level][region_number])
@@ -1078,8 +1077,9 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 						pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = 4;
 					}
 
-				} else {
-					// Else, label it a "refined" site as in the middle of the global refined patch
+				// Else it is not on the edges but in the middle of the global refined patch
+				} else if (pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) == 1) {
+					// Label it a "refined" site
 					pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = 2;
 
 				}
@@ -1091,7 +1091,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
     }
     
 	// Generate grid type matrices for this level //
-
+	
 	// Get local grid sizes (includes overlap)
 	size_t N_lim = XPos.size();
 	size_t M_lim = YPos.size();
@@ -1101,7 +1101,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 	std::vector<int> p;
 	int par_label;
     
-    // Loop over sub-grid and add labels based on parent site labels
+    // Loop over sub-grid local indices and add labels based on parent site labels
     for (size_t i = 0; i < N_lim; i++) {
 		for (size_t j = 0; j < M_lim; j++) {
 #if (dims == 3)
@@ -1111,7 +1111,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 #endif
 			{
 				// Get parent site indices as locals for the current sub-grid local site
-				p = GridUtils::revindmapref(
+				p = GridUtils::getCoarseIndices(
 					i, CoarseLimsX[0], 
 					j, CoarseLimsY[0], 
 					k, CoarseLimsZ[0]
@@ -1136,7 +1136,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 					// If last site to be updated in fine block, change parent label
 					// to ensure boundary values are pulled from fine grid
 					if ((j % 2) != 0 && (i % 2) != 0) {
-						pGrid.LatTyp(p[0],p[1],p[2],pGrid.YInd.size(),pGrid.ZInd.size()) = 4;
+						pGrid.LatTyp(p[0],p[1],p[2],pGrid.YInd.size(),pGrid.ZInd.size()) = 5;
 					}
 				}
             }

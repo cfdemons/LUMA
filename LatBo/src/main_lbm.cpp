@@ -365,12 +365,15 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 
 
-	// Set the pointer to the hierarchy in the MpiManager and compute buffer sizes
+	// Set the pointer to the hierarchy in the MpiManager
+	MpiManager::Grids = &Grids;
+
 #ifdef BUILD_FOR_MPI
+	// Compute buffer sizes
 	MPI_Barrier(mpim->my_comm);
 	t_start = clock();
 	
-	mpim->mpi_buffer_size(&Grids);	// Call buffer sizing routine
+	mpim->mpi_buffer_size();	// Call buffer sizing routine
 
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;

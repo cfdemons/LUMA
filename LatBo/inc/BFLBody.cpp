@@ -23,6 +23,8 @@ BFLBody::~BFLBody(void)
 // Custom constructor to populate body from array of points
 BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
+#ifdef BFL_ON
+
 	// Assign pointer to owning grid
 	GridUtils::getGrid(g,bfl_on_grid_lev,bfl_on_grid_reg,this->_Owner);
 
@@ -124,6 +126,8 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 		file << std::endl;
 	}
 	file.close();
+#endif
+
 #endif
 
 }

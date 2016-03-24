@@ -95,7 +95,7 @@ public :
 	// Buffer methods
 	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction
 	void mpi_buffer_unpack( int dir, GridObj* g );		// Unpack the buffer back to the grid given
-	void mpi_buffer_size( GridObj* Grids );				// Set buffer size information for grids in hierarchy given and 
+	void mpi_buffer_size();								// Set buffer size information for grids in hierarchy given and 
 														// set pointer to hierarchy for subsequent access
 	void mpi_buffer_size_send( GridObj*& g );			// Routine to find the size of the sending buffer on supplied grid
 	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid

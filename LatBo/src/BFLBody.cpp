@@ -1,6 +1,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/BFLBody.h"
-#include "GridObj.h"
+#include "../inc/GridObj.h"
 #include "../inc/globalvars.h"
 #include "../inc/MpiManager.h"
 

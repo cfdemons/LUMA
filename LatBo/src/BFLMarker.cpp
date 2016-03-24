@@ -1,6 +1,6 @@
-#include "..\inc\stdafx.h"
-#include "..\inc\BFLMarker.h"
-#include "..\inc\BFLBody.h"
+#include "../inc/stdafx.h"
+#include "../inc/BFLMarker.h"
+#include "../inc/BFLBody.h"
 
 // Implementation for the BFLMarker class //
 

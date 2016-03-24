@@ -16,6 +16,7 @@
 #else // Compiling with gcc through Code::Blocks on Linux
 
 #include <stdlib.h> // Includes exit() function
+#include <cstring>
 
 #endif
 

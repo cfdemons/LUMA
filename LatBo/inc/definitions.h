@@ -65,7 +65,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 0.0000001//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -90,7 +90,7 @@ const static int zProbeLims[2] = {30, 120};
 ***************************************************************************************************************
 */
 
-#define T 200	// Number of time steps
+#define T 10000	// Number of time steps
 
 
 /*
@@ -116,16 +116,16 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 240		// Number of x lattice sites
 #define M 60		// Number of y lattice sites
 #define K 60		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x 0.0		// Start of domain-x
+#define a_x 0		// Start of domain-x
 #define b_x 24.0		// End of domain-x
-#define a_y 0.0		// Start of domain-y
+#define a_y 0		// Start of domain-y
 #define b_y 6.0		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 6.0		// End of domain-z
@@ -139,11 +139,11 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.04	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -179,7 +179,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 21		// Number of Lagrange points (approximately)
+#define num_markers 19		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -192,9 +192,9 @@ const static int zProbeLims[2] = {30, 120};
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 20.0		// length of filament
-#define ibb_start_x 30.0	// start x position of the filament
-#define ibb_start_y 5.0	// start y position of the filament
+#define ibb_length 0.2		// length of filament
+#define ibb_start_x 0.3	// start x position of the filament
+#define ibb_start_y 0.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
@@ -207,7 +207,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 0.1			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 2.0			// Flexural rigidity (lattice units) of filament
 
 
 /*
@@ -218,7 +218,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Switches
 //#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 
 //#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -228,21 +228,21 @@ const static int zProbeLims[2] = {30, 120};
 #define NRBC_INLET
 
 #define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 //#define NRBC_EXIT               // Non Reflective BC for outlet
 
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 20		// Index of start of object/wall in x-direction
-	#define obj_x_max 60		// Index of end of object/wall in x-direction
-	#define obj_y_min 40		// Index of start of object/wall in y-direction
-	#define obj_y_max 80		// Index of end of object/wall in y-direction
+	#define obj_x_min 100		// Index of start of object/wall in x-direction
+	#define obj_x_max 120		// Index of end of object/wall in x-direction
+	#define obj_y_min 20		// Index of start of object/wall in y-direction
+	#define obj_y_max 40		// Index of end of object/wall in y-direction
 	#define obj_z_min 20		// Index of start of object/wall in z-direction
-	#define obj_z_max 50		// Index of end of object/wall in z-direction
+	#define obj_z_max 40		// Index of end of object/wall in z-direction
 #endif
 
 

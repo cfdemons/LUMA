@@ -55,9 +55,9 @@ public:
 	static void ibm_position_update_grp(int group, GridObj& g );	// Updates the positions of deformable bodies in a group based on the 
 																			// flexible group member position and searches for support on GridObj g.
 	// Methods to solve the Jacobian system associated with Jacowire
-	static void ibm_banbks(double **a, unsigned long n, int m1, int m2, double **al,
+	static void ibm_banbks(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double b[]);
-	static void ibm_bandec(double **a, unsigned long n, int m1, int m2, double **al,
+	static void ibm_bandec(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double *d);
 
 

@@ -33,7 +33,7 @@
 */
 
 
-#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+//#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 //#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
 //#define IBM_DEBUG					// Write IBM body and matrix data out to text files
@@ -60,7 +60,7 @@
 #define output_precision 6		// Precision of output
 
 // Types of output
-#define TEXTOUT
+//#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -247,7 +247,7 @@ const static int zProbeLims[2] = {30, 120};
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define wall_thickness	2		// Thickness of walls in coarsest lattice units
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 2		// Provide grid level on which block should be added 

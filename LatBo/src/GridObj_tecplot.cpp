@@ -220,9 +220,9 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 		tecfile << "TITLE = L" << level << " R" << region_number << " --> All grid quantities" << std::endl;
 		tecfile << "TAG = " << tag << std::endl;
 #if (defined BUILD_FOR_MPI && !defined EX_RECV_LAYER)
-		tecfile << "VARIABLES = \"Rnk\" \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
+		tecfile << "VARIABLES = \"Rnk\" \"Type\" \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
 #else
-		tecfile << "VARIABLES = \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
+		tecfile << "VARIABLES = \"Type\" \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
 #endif
 		tecfile << "I = " << i_count
 				<< ", J = " << j_count
@@ -253,6 +253,9 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 					tecfile << MpiManager::my_rank << "\t";
 #endif
 				
+					// Write out type
+					tecfile << LatTyp(i,j,k,YInd.size(),ZInd.size()) << "\t";
+
 					// Write out X, Y, Z
 					tecfile << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 

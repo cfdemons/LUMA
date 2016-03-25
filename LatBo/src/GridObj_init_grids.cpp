@@ -520,7 +520,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	nu = (obj_x_max - obj_x_min) * pow(2,block_on_grid_lev) * u_ref / Re;
+	nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
 	nu = (M - 2) * u_ref / Re;	// TODO The minus 2 is bacause of halfway BB - should have another if condition to check in case this isn't true
@@ -549,7 +549,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 
 // Method to initialise the quantities for a refined subgrid assuming a volumetric configuration. Parent grid is passed by reference
 void GridObj::LBM_init_subgrid (GridObj& pGrid) {
-
+	
 	// Declarations
 	int IndXstart, IndYstart, IndZstart = 0;
 
@@ -624,7 +624,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 		CoarseLimsZ[i] = 0;
 	}
 #endif
-
+	
 	/* Note that the CoarseLims are local values used to identify how much and which part of the 
 	 * parent grid is covered by the child sub-grid and might not conincide with edges of global 
 	 * refined patch defined by the input file if broken up across ranks. So we get the offset 
@@ -676,7 +676,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
 
-
+	
 	// Generate TYPING MATRICES
 
 	// Typing defined as follows:
@@ -702,12 +702,12 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 
 	// Default labelling of coarse
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
-
+	
 	// Call refined labelling routine passing parent grid
 	LBM_init_refined_lab(pGrid);
 
 	
-
+	
 	// Assign MACROSCOPIC quantities
 	// Velocity
 	u.resize(N_lim * M_lim * K_lim * dims);
@@ -1032,7 +1032,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 	size_t Np_lim = pGrid.XPos.size();
 	size_t Mp_lim = pGrid.YPos.size();
 	size_t Kp_lim = pGrid.ZPos.size();
-
+	
 	// Declare indices global and local
 	int i, j, k, local_i, local_j, local_k;
 
@@ -1046,21 +1046,21 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 #endif
 			{
 
-#ifdef BUILD_FOR_MPI						
-			// Compute local indices to access LatTyp array on parent
-			std::vector<int> locals;
-			GridUtils::global_to_local(i,j,k,&pGrid,locals);
-			local_i = locals[0];
-			local_j = locals[1];
-			local_k = locals[2];
-#else
-			local_i = i;
-			local_j = j;
-			local_k = k;						
-#endif
-				
 			// Only act if the site is on parent rank (inc overlap) to avoid out of bounds errors
 			if ( GridUtils::isOnThisRank(i,j,k,pGrid) ) {
+
+#ifdef BUILD_FOR_MPI						
+				// Compute local indices to access LatTyp array on parent
+				std::vector<int> locals;
+				GridUtils::global_to_local(i,j,k,&pGrid,locals);
+				local_i = locals[0];
+				local_j = locals[1];
+				local_k = locals[2];
+#else
+				local_i = i;
+				local_j = j;
+				local_k = k;						
+#endif
 
 				// If on the edge of the global refined patch and it is simply a fluid then it is TL so label
 				if	(

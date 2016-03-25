@@ -574,7 +574,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	if (Grid->t % out_every == 0) {
 		// Performance Data
-		*GridUtils::logfile << "MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
+		*GridUtils::logfile << "Grid " << Grid->level << ": MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
 	}
 
 

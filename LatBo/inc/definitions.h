@@ -53,10 +53,10 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 50			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 5000	// Number of time steps
 
 
 /*
@@ -160,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 20			// Desired Reynolds number
+#define Re 200			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -240,14 +240,14 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 #define wall_thickness	2		// Thickness of walls in coarsest lattice units
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
@@ -311,13 +311,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {10}, {5} };
-	const static size_t RefXend[NumLev][NumReg]		= { {80}, {120} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {20}, {5} };
+	const static size_t RefXend[NumLev][NumReg]		= { {100}, {120} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
 	const static size_t RefYend[NumLev][NumReg]		= { {30}, {50} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {5}, {2} };
-	static size_t RefZend[NumLev][NumReg]		= { {35}, {5} };
+	static size_t RefZstart[NumLev][NumReg]		= { {5}, {5} };
+	static size_t RefZend[NumLev][NumReg]		= { {35}, {55} };
 
 
 #endif

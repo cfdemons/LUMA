@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include "GridUtils.h"
+
+class GridObj;
 
 // Markers may be of different types depending on the body
 template <typename MarkerType>
@@ -24,7 +25,7 @@ public:
 	};
 
 	// Protected Members //
-
+	
 protected:
 	double spacing;						// Spacing of the markers in physical units
 	std::vector<MarkerType> markers;	// Array of markers which make up the body
@@ -41,13 +42,3 @@ protected:
 	}
 
 };
-
-
-#include <iostream>
-
-using namespace std;
-
-
-
-
-

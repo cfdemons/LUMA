@@ -5,7 +5,8 @@
 #include "../inc/IBBody.h"
 #include "../inc/definitions.h"
 #include <math.h>
-#include "../inc/GridObj.h"
+
+class GridObj;
 
 // ***************************************************************************************************
 // Constructor and destructor

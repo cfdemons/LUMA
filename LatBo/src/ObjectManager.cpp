@@ -1,5 +1,5 @@
-#include "..\inc\stdafx.h"
-#include "..\inc\ObjectManager.h"
+#include "../inc/stdafx.h"
+#include "../inc/ObjectManager.h"
 
 
 // Static declarations

@@ -53,16 +53,16 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 50			// How many timesteps before whole grid output
+#define out_every 250			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
-//#define TECPLOT
+#define TECPLOT
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 5000	// Number of time steps
+#define T 10000	// Number of time steps
 
 
 /*

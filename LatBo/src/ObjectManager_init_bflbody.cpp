@@ -1,5 +1,5 @@
-#include "..\inc\stdafx.h"
-#include "..\inc\ObjectManager.h"
+#include "../inc/stdafx.h"
+#include "../inc/ObjectManager.h"
 
 // Prefab body building routine
 void ObjectManager::bfl_build_body(int body_type) {

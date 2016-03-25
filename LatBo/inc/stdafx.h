@@ -26,3 +26,23 @@
 #endif
 
 #include <stdio.h>
+
+// Grid utilities class definition (available to all parts of code)
+#include "../inc/GridUtils.h"
+
+// Function: is_nan
+template <typename NumType>
+inline static bool is_nan(NumType n) {
+
+	// Try test so it is platform independent
+	if (
+#ifdef _WIN32
+		_isnan(n)
+#else
+		isnan(n)
+#endif
+	) return true;
+				
+	else return false;
+
+};

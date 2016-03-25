@@ -1,5 +1,4 @@
 #include "../inc/stdafx.h"
-#include "../inc/GridUtils.h"
 #include "../inc/GridObj.h"
 #include <sstream>		// String stream package
 #include <iostream>
@@ -155,8 +154,8 @@ double GridUtils::vecnorm( double vec[] )
 	return result;
 }
 
-// Supplied as a std::vector (as reference just in case vector is big)
-double GridUtils::vecnorm( std::vector<double>& vec )
+// Supplied as a std::vector
+double GridUtils::vecnorm( std::vector<double> vec )
 {
 	double result = 0.0;
 

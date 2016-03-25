@@ -1,8 +1,9 @@
 #include "../inc/stdafx.h"
-#include "../inc/BFLBody.h"
-#include "../inc/GridObj.h"
 #include "../inc/globalvars.h"
 #include "../inc/MpiManager.h"
+#include "../inc/BFLBody.h"
+
+class GridObj;
 
 
 // Implementation of BFL body class //
@@ -240,7 +241,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 #endif
 
 					// If data valid, then store ID
-					if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+					if (!is_nan(m_data.x)) V.push_back(m_data.ID);
 				}
 
 			}
@@ -431,7 +432,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 #endif
 
 				// If data valid, then store ID
-				if (!_isnan(m_data.x)) V.push_back(m_data.ID);
+				if (!is_nan(m_data.x)) V.push_back(m_data.ID);
 
 			}
 
@@ -662,7 +663,7 @@ bool BFLBody::isVoxelBflVoxel(double x, double y, double z, BFLBody* body) {
 	MarkerData m_data = getMarkerData(x,y,z,body);
 
 	// True if the data store is not empty
-	if (!_isnan(m_data.x)) {
+	if (!is_nan(m_data.x)) {
 
 		return true;
 

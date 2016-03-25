@@ -467,8 +467,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	// Loop over directions in Cartesian topology
 	for (int dir = 0; dir < MPI_dir; dir++) {
 
-		// Create a unique tag based on level, region and direction
-		int TAG = ((Grid->level + 1) * 1000000) + ((Grid->region_number + 1) * 1000) + (dir + 1);
+		/* Create a unique tag based on level (< 32), region (< 10) and direction (< 100).
+		 * MPICH limits state that tag value cannot be greater than 32767 */
+		int TAG = ((Grid->level + 1) * 1000) + ((Grid->region_number + 1) * 100) + (dir + 1);
 
 		////////////////////////////
 		// Resize and Pack Buffer //

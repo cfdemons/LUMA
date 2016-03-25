@@ -262,7 +262,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 	if (t % out_every == 0) {
 		// Performance data to logfile
-		*GridUtils::logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
+		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 	}
 
 
@@ -354,13 +354,13 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 							double beta_v = 0.0;
 
 							// Compute the lattice forces based on Guo's forcing scheme
-							lambda_v = (1 - 0.5 * omega) * ( w[v] / pow(cs,2) );
+							lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
 
 							// Dot product (sum over d dimensions)
 							for (int d = 0; d < dims; d++) {
 								beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,dims));
 							}
-							beta_v = beta_v * (1/pow(cs,2));
+							beta_v = beta_v * (1/(cs*cs));
 
 							// Compute force using shorthand sum described above
 							for (int d = 0; d < dims; d++) {
@@ -494,9 +494,9 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 		+ 2c_x c_y u_x u_y + 2c_x c_z u_x u_z + 2c_y c_z u_y u_z
 		*/
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
-			(pow(c[2][v],2) - pow(cs,2)) * pow(u(i,j,k,2,M_lim,K_lim,dims),2) +
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,dims)*u(i,j,k,0,M_lim,K_lim,dims)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,dims)*u(i,j,k,1,M_lim,K_lim,dims)) +
+			((c[2][v]*c[2][v]) - (cs*cs)) * (u(i,j,k,2,M_lim,K_lim,dims)*u(i,j,k,2,M_lim,K_lim,dims)) +
 			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims) +
 			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims) +
 			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims);
@@ -504,14 +504,14 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 		// 2D versions of the above
 		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,dims));
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,dims)*u(i,j,k,0,M_lim,K_lim,dims)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,dims)*u(i,j,k,1,M_lim,K_lim,dims)) +
 			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims);
 #endif
 
 
 	// Compute f^eq
-	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))) );
+	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / (cs*cs)) + (B / (2*(cs*cs*cs*cs))) );
 
 	return feq;
 

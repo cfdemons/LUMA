@@ -83,7 +83,7 @@ const static int zProbeLims[2] = {30, 120};
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 500000
+#define restart_out_every 50000
 
 // LBM configuration
 //#define USE_MRT
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 10000	// Number of time steps
+#define T 50000	// Number of time steps
 
 
 /*
@@ -112,7 +112,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 2
+#define Xcores 6
 #define Ycores 2
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 

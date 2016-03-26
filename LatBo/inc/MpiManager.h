@@ -5,12 +5,12 @@
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
-#define i_left i = 0; i < (int)pow(2, g->level + 1); i++
+#define i_left	i = 0; i < GridUtils::downToLimit((int)pow(2, g->level + 1), N_lim); i++
+#define j_down	j = 0; j < GridUtils::downToLimit((int)pow(2, g->level + 1), M_lim); j++
+#define k_front k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++
 #define i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++
-#define j_down j = 0; j < (int)pow(2, g->level + 1); j++
-#define j_up j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
-#define k_front k = 0; k < (int)pow(2, g->level + 1); k++
-#define k_back k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
+#define j_up	j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
+#define k_back	k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
 
 
 
@@ -105,5 +105,6 @@ public :
 
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
+	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 };
 

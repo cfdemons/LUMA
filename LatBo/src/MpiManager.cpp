@@ -425,6 +425,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	// Wall clock variables
 	clock_t t_start, t_end, secs;
 
+	// Tag
+	int TAG;
+
 	// Get grid object
 	GridObj* Grid = NULL;
 	GridUtils::getGrid(Grids, lev, reg,  Grid);
@@ -458,9 +461,6 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	* MPI background buffers which might have limited resources and which is slower so 
 	* we use the MPI Manager class to hold the buffer in house. */
 
-	// Sync before starting the clock
-	//MPI_Barrier(MpiManager::my_comm);
-
 	// Start the clock
 	t_start = clock();
 
@@ -469,7 +469,11 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		/* Create a unique tag based on level (< 32), region (< 10) and direction (< 100).
 		 * MPICH limits state that tag value cannot be greater than 32767 */
-		int TAG = ((Grid->level + 1) * 1000) + ((Grid->region_number + 1) * 100) + (dir + 1);
+		TAG = ((Grid->level + 1) * 1000) + ((Grid->region_number + 1) * 100) + dir;
+
+#ifdef MPI_VERBOSE
+		*MpiManager::logout << "Processing Message with Tag --> " << TAG << std::endl;
+#endif
 
 		////////////////////////////
 		// Resize and Pack Buffer //
@@ -508,8 +512,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		}
 
 		// Find opposite direction (neighbour it receives from)
-		int opp_dir = GridUtils::getOpposite(dir);
-
+		int opp_dir = mpi_getOpposite(dir);
+		
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
 			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
@@ -538,7 +542,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			*MpiManager::logout << "Direction " << dir << " --> Received." << std::endl;
 
 			// Write out buffers
-			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir << " SUMMARY"
 								<< " -- Sent " << f_buffer_send[dir].size() / nVels << " to " << neighbour_rank[dir] 
 								<< ": Received " << f_buffer_recv[dir].size() / nVels << " from " << neighbour_rank[opp_dir] << std::endl;
 			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
@@ -575,7 +579,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	if (Grid->t % out_every == 0) {
 		// Performance Data
-		*GridUtils::logfile << "Grid " << Grid->level << ": MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
+		*GridUtils::logfile << "MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
 	}
 
 
@@ -635,29 +639,40 @@ void MpiManager::mpi_buffer_size() {
 			mpi_buffer_size_send(g);
 			mpi_buffer_size_recv(g);
 
-		}
-	}
 
-	// Write out buffer sizes
+			// Write out buffer sizes
 #ifdef MPI_VERBOSE
-	*MpiManager::logout << "Buffer Info Send Array Size = " << buffer_send_info.size() << std::endl;
-	for (MpiManager::buffer_struct bufi : buffer_send_info) {
-		*MpiManager::logout << "[" << bufi.level << "," << bufi.region << "]" << '\t';
+		*MpiManager::logout << "[" << buffer_send_info.back().level << "," << buffer_send_info.back().region << "]" << '\t';
 		for (int i = 0; i < MPI_dir; i++) {
-			*MpiManager::logout << bufi.size[i] << '\t';
+			*MpiManager::logout << buffer_send_info.back().size[i] << '\t';
 		}
-	}
-	*MpiManager::logout << std::endl;
+		*MpiManager::logout << std::endl;
 
-	*MpiManager::logout << "Buffer Info Recv Array Size = " << buffer_recv_info.size() << std::endl;
-	for (MpiManager::buffer_struct bufi : buffer_recv_info) {
-		*MpiManager::logout << "[" << bufi.level << "," << bufi.region << "]" << '\t';
+		*MpiManager::logout << "[" << buffer_recv_info.back().level << "," << buffer_recv_info.back().region << "]" << '\t';
 		for (int i = 0; i < MPI_dir; i++) {
-			*MpiManager::logout << bufi.size[i] << '\t';
+			*MpiManager::logout << buffer_recv_info.back().size[i] << '\t';
+		}
+		*MpiManager::logout << std::endl;
+#endif
+
+
 		}
 	}
-	*MpiManager::logout << std::endl;
-#endif
+
+	
 
 }
 // *************************************************************************************************** //
+// Get opposite direction in MPI cartesian topology
+int MpiManager::mpi_getOpposite(int direction) {
+
+	/*	If direction is even, then opposite is direction+1.
+		If direction is odd, then opposite is direction-1.
+		e.g. direction 0 (+x direction) has opposite 1 (-x direction) --> +1
+		however, direction 1 has opposite 0 --> -1
+		Hence we can add (-1 ^ direction) so it alternates between +/-1
+	*/
+
+		return direction + (int)pow(-1,direction);
+
+}

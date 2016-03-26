@@ -408,17 +408,23 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	mpim->recv_layer_pos.Y[2]	= YPos[local_size[1] - 1] - dy/2;	mpim->recv_layer_pos.Y[3]	= YPos[local_size[1] - 1] + dy/2;
 	// Z
 #if (dims == 3)
-	mpim->sender_layer_pos.Z[0] = ZPos[1] - dz/2; mpim->sender_layer_pos.Z[1] = ZPos[1] + dz/2;
-	mpim->sender_layer_pos.Z[2] = ZPos[local_size[2] - 2] - dz/2; mpim->sender_layer_pos.Z[3] = ZPos[local_size[2] - 2] + dz/2;
-	mpim->recv_layer_pos.Z[0] = ZPos[0] - dz/2; mpim->recv_layer_pos.Z[1] = ZPos[0] + dz/2;
-	mpim->recv_layer_pos.Z[2] = ZPos[local_size[2] - 1] - dz/2; mpim->recv_layer_pos.Z[3] = ZPos[local_size[2] - 1] + dz/2;
+	mpim->sender_layer_pos.Z[0] = ZPos[1] - dz/2;					mpim->sender_layer_pos.Z[1] = ZPos[1] + dz/2;
+	mpim->sender_layer_pos.Z[2] = ZPos[local_size[2] - 2] - dz/2;	mpim->sender_layer_pos.Z[3] = ZPos[local_size[2] - 2] + dz/2;
+	mpim->recv_layer_pos.Z[0]	= ZPos[0] - dz/2;					mpim->recv_layer_pos.Z[1]	= ZPos[0] + dz/2;
+	mpim->recv_layer_pos.Z[2]	= ZPos[local_size[2] - 1] - dz/2;	mpim->recv_layer_pos.Z[3]	= ZPos[local_size[2] - 1] + dz/2;
 #endif
 
 #ifdef MPI_VERBOSE
 	*mpim->logout << "X sender layers are: " << mpim->sender_layer_pos.X[0] << " -- " << mpim->sender_layer_pos.X[1] << " (min edge) , " << mpim->sender_layer_pos.X[2] << " -- " << mpim->sender_layer_pos.X[3] << " (max edge)" << std::endl;
-	*mpim->logout << "Y sender layers are: " << mpim->sender_layer_pos.Y[0] << " -- " << mpim->sender_layer_pos.Y[1] << " (min edge) , " << mpim->sender_layer_pos.Y[2] << " -- " << mpim->sender_layer_pos.Y[3] << " (max edge)" << std::endl;
 	*mpim->logout << "X recv layers are: " << mpim->recv_layer_pos.X[0] << " -- " << mpim->recv_layer_pos.X[1] << " (min edge) , " << mpim->recv_layer_pos.X[2] << " -- " << mpim->recv_layer_pos.X[3] << " (max edge)" << std::endl;
+
+	*mpim->logout << "Y sender layers are: " << mpim->sender_layer_pos.Y[0] << " -- " << mpim->sender_layer_pos.Y[1] << " (min edge) , " << mpim->sender_layer_pos.Y[2] << " -- " << mpim->sender_layer_pos.Y[3] << " (max edge)" << std::endl;
 	*mpim->logout << "Y recv layers are: " << mpim->recv_layer_pos.Y[0] << " -- " << mpim->recv_layer_pos.Y[1] << " (min edge) , " << mpim->recv_layer_pos.Y[2] << " -- " << mpim->recv_layer_pos.Y[3] << " (max edge)" << std::endl;
+
+#if (dims == 3)
+	*mpim->logout << "Z sender layers are: " << mpim->sender_layer_pos.Z[0] << " -- " << mpim->sender_layer_pos.Z[1] << " (min edge) , " << mpim->sender_layer_pos.Z[2] << " -- " << mpim->sender_layer_pos.Z[3] << " (max edge)" << std::endl;
+	*mpim->logout << "Z recv layers are: " << mpim->recv_layer_pos.Z[0] << " -- " << mpim->recv_layer_pos.Z[1] << " (min edge) , " << mpim->recv_layer_pos.Z[2] << " -- " << mpim->recv_layer_pos.Z[3] << " (max edge)" << std::endl;
+#endif
 #endif
 
 #else

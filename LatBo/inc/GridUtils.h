@@ -77,15 +77,22 @@ public:
 	// Function: upToZero
 	template <typename NumType>
 	static NumType upToZero(NumType x) {	
-		if (x < 0) return 0;
+		if (x < static_cast<NumType>(0)) return static_cast<NumType>(0);
+		else return x;		
+	};
+
+	// Function: downToLimit
+	template <typename NumType>
+	static NumType downToLimit(NumType x, NumType limit) {	
+		if (x > limit) return limit;
 		else return x;		
 	};
 
 	// Function: factorial
 	template <typename NumType>
 	static NumType factorial(NumType n) {
-		if (n == 0) 
-			return 1;
+		if (n == static_cast<NumType>(0)) 
+			return static_cast<NumType>(1);
 		else
 			return n * GridUtils::factorial(n - 1);
 	};

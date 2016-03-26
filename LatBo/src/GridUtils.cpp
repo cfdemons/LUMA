@@ -542,7 +542,7 @@ bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
 	// Do checks on rank inner overlap regions dictated by the coarsest rank
 	if (dir == 0) {
 
-		if (maxmin == 1) {	// Note that std::string::compare() returns 0 if they are equal
+		if (maxmin == 1) {
 			if (site_position > mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
 
 		} else if (maxmin == 0) {

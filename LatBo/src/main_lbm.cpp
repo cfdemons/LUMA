@@ -374,7 +374,7 @@ int main( int argc, char* argv[] )
 	t_start = clock();
 	
 	mpim->mpi_buffer_size();	// Call buffer sizing routine
-
+	
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif

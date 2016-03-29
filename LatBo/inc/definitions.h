@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.2-31 ## //
+// Definitions File Format ## 0.3-31 ## //
 
 
 // Header guard
@@ -56,7 +56,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 250			// How many timesteps before whole grid output
+#define out_every 100			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 500000	// Number of time steps
 
 
 /*
@@ -112,7 +112,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 6
+#define Xcores 2
 #define Ycores 2
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
@@ -129,18 +129,18 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 3		// Number of dimensions to the problem
-#define N 120		// Number of x lattice sites
-#define M 40		// Number of y lattice sites
-#define K 40		// Number of z lattice sites
+#define N 300		// Number of x lattice sites
+#define M 100		// Number of y lattice sites
+#define K 100		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 12.0		// End of domain-x
+#define b_x 15.0	// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 4.0		// End of domain-y
+#define b_y 5.0		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 4.0		// End of domain-z
+#define b_z 5.0		// End of domain-z
 
 
 /*
@@ -151,7 +151,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.04	// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -160,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 200			// Desired Reynolds number
+#define Re 100		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -246,21 +246,47 @@ const static int zProbeLims[2] = {30, 120};
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
-#define wall_thickness	2		// Thickness of walls in coarsest lattice units
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define WALLS_ON_FLOOR_ONLY		// Limit no-slip walls to bottom no-slip wall only
+#define wall_thickness	1		// Thickness of walls in coarsest lattice units
+
+
+
+/*
+*******************************************************************************
+********************************* Object Data *********************************
+*******************************************************************************
+*/
+
+// Bounce-back solids
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 10		// Index of start of object/wall in x-direction
-	#define obj_x_max 90		// Index of end of object/wall in x-direction
+	#define obj_x_min 4		// Index of start of object/wall in x-direction
+	#define obj_x_max 24		// Index of end of object/wall in x-direction
 	#define obj_y_min 4			// Index of start of object/wall in y-direction
-	#define obj_y_max 84		// Index of end of object/wall in y-direction
-	#define obj_z_min 10		// Index of start of object/wall in z-direction
-	#define obj_z_max 90		// Index of end of object/wall in z-direction
+	#define obj_y_max 24		// Index of end of object/wall in y-direction
+	#define obj_z_min 4		// Index of start of object/wall in z-direction
+	#define obj_z_max 24		// Index of end of object/wall in z-direction
 #endif
+
+
+// Bounce-back objects from point clouds
+#define SOLID_FROM_FILE
+
+#ifdef SOLID_FROM_FILE
+	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
+	#define object_on_grid_reg 0		// Provide grid region on which object should be added
+	// Following specified in lattice units (i.e. by index) local to the chosen grid level
+	#define start_object_x 4
+	#define start_object_y 4
+	#define start_object_z 4
+	#define object_length_x 80			// The object input is scaled based on this dimension
+#endif
+
 
 
 // BFL objects
@@ -311,13 +337,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {20}, {5} };
-	const static size_t RefXend[NumLev][NumReg]		= { {100}, {120} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {107}, {4} };
+	const static size_t RefXend[NumLev][NumReg]		= { {159}, {76} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {30}, {50} };
+	const static size_t RefYend[NumLev][NumReg]		= { {16}, {28} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {5}, {5} };
-	static size_t RefZend[NumLev][NumReg]		= { {35}, {55} };
+	static size_t RefZstart[NumLev][NumReg]		= { {36}, {4} };
+	static size_t RefZend[NumLev][NumReg]		= { {66}, {52} };
 
 
 #endif
@@ -364,6 +390,10 @@ const static int zProbeLims[2] = {30, 120};
 	#define ibb_d 0
 
 	// Set BFL start for 2D
+	#undef start_object_z
+	#define start_object_z 0
+
+	// Set Object start for 2D
 	#undef start_bfl_z
 	#define start_bfl_z 0
 

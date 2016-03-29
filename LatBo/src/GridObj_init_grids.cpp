@@ -465,13 +465,8 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	// Get the inlet profile data
 #ifdef USE_INLET_PROFILE
 
-	for (int n = 0; n < max_ranks; n++) {
-
-		if (n == my_rank) {
-
-			LBM_init_getInletProfile();
-		}
-	}
+	LBM_init_getInletProfile();
+	
 #endif
 
 	// Velocity field
@@ -527,6 +522,12 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 #elif defined SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
 	nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
+#elif defined SOLID_FROM_FILE
+	// Use object length (scaled back to L0 units)
+	nu = ((object_length_x - start_object_x) / pow(2,object_on_grid_lev)) * u_ref / Re;
+#elif defined BFL_ON
+	// Use bfl body length (scaled back to L0 units)
+	nu = ((bfl_length_x - start_bfl_x) / pow(2,bfl_on_grid_lev)) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
 	nu = (M - 2) * u_ref / Re;	// TODO The minus 2 is bacause of halfway BB - should have another if condition to check in case this isn't true
@@ -558,6 +559,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	
 	// Declarations
 	int IndXstart, IndYstart, IndZstart = 0;
+	int offset = (int)pow(2,pGrid.level);	// How many sites thick the recv data region is
 
 	/* MPI specific setup:
 	 * 1. Store coarse grid refinement limits;
@@ -573,56 +575,98 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	 * However, when using MPI, the edges of the refined grid might not be on this 
 	 * rank so we must round the coarse limits to the edge of the parent grid so 
 	 * the correct offset is supplied to the mapping routine.
+	 *
+	 * When dealing with sub-grids embedded in walls, it is more complicated. If the 
+	 * sub-grid starts on a max receiver layer which is also a periodic overlap then
+	 * we need to make sure the limits are set properly. Likewise if the sub-grid ends
+	 * on a min receiver layer which is also periodic.
 	 */
 
 	// If region is not contained on a single rank adjust limits accordingly:
+	
+	// X //
 
-	// X
-	if ( (int)RefXstart[pGrid.level][region_number] < pGrid.XInd[1] - 1 ) {
-		// Set grid limits to start edge of the rank
-		CoarseLimsX[0] = 0;
-		// Compute actual node start
-		IndXstart = ((pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2);
-	} else {
-		// Get limit from parent as edge on this rank (takes into account overlap if present)
-		CoarseLimsX[0] = RefXstart[pGrid.level][region_number] - pGrid.XInd[1] + 1;
+	// Start Limit
+	// Find the local index of the refinement limits if they are on the rank at all
+	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXstart[pGrid.level][region_number]);
+	if (found_x != pGrid.XInd.end()) {	// Starts on this rank
+		CoarseLimsX[0] = found_x - pGrid.XInd.begin();	// Store local index as the limit
 		// Start index is simply zero
 		IndXstart = 0;
+
+	// Starts on some rank to the left of this one
+	} else if ( (int)RefXstart[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
+		// Set limit to start edge of the rank
+		CoarseLimsX[0] = 0;
+		// Compute starting index of sub-grid on this rank (take into account rest of grid somewhere to left)
+		IndXstart = ((pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2);
+
 	}
-	if ( (int)RefXend[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 2] + 1 ) {
+
+	// End Limit
+	found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXend[pGrid.level][region_number]);
+	if (found_x != pGrid.XInd.end()) {	// Ends on this rank
+		CoarseLimsX[1] = found_x - pGrid.XInd.begin();
+
+	// End on some rank to the right of this one
+	} else if ( (int)RefXend[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 1 - offset] + offset ) {
 		// Set grid limits to end edge of the rank
 		CoarseLimsX[1] = pGrid.XInd.size() - 1;
-	} else {
-		CoarseLimsX[1] = RefXend[pGrid.level][region_number] - pGrid.XInd[1] + 1;
+
+	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
+	} else if ( (int)RefXend[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
+		// Set grid limits to end edge of the rank
+		CoarseLimsX[1] = pGrid.XInd.size() - 1;
+
 	}
 
-	// Y
-	if ( (int)RefYstart[pGrid.level][region_number] < pGrid.YInd[1] - 1 ) {
+
+	// Y //
+	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYstart[pGrid.level][region_number]);
+	if (found_y != pGrid.YInd.end()) {
+		CoarseLimsY[0] = found_y - pGrid.YInd.begin();
+		IndYstart = 0;
+
+	} else if ( (int)RefYstart[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
 		CoarseLimsY[0] = 0;
 		IndYstart = ((pGrid.YInd[CoarseLimsY[0]] - RefYstart[pGrid.level][region_number]) * 2);
-	} else {
-		CoarseLimsY[0] = RefYstart[pGrid.level][region_number] - pGrid.YInd[1] + 1;
-		IndYstart = 0;
-	}
-	if ( (int)RefYend[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 2] + 1 ) {
-		CoarseLimsY[1] = pGrid.YInd.size() - 1;
-	} else {
-		CoarseLimsY[1] = RefYend[pGrid.level][region_number] - pGrid.YInd[1] + 1;
 	}
 
+	found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYend[pGrid.level][region_number]);
+	if (found_y != pGrid.YInd.end()) {
+		CoarseLimsY[1] = found_y - pGrid.YInd.begin();
+
+	} else if ( (int)RefYend[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 1 - offset] + offset ) {
+		CoarseLimsY[1] = pGrid.YInd.size() - 1;
+
+	} else if ( (int)RefYend[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
+		CoarseLimsY[1] = pGrid.YInd.size() - 1;
+
+	}
+
+
 #if (dims == 3)
-	// Z
-	if ( (int)RefZstart[pGrid.level][region_number] < pGrid.ZInd[1] - 1 ) {
+	// Z //
+	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZstart[pGrid.level][region_number]);
+	if (found_z != pGrid.ZInd.end()) {
+		CoarseLimsZ[0] = found_z - pGrid.ZInd.begin();
+		IndZstart = 0;
+
+	} else if ( (int)RefZstart[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
 		CoarseLimsZ[0] = 0;
 		IndZstart = ((pGrid.ZInd[CoarseLimsZ[0]] - RefZstart[pGrid.level][region_number]) * 2);
-	} else {
-		CoarseLimsZ[0] = RefZstart[pGrid.level][region_number] - pGrid.ZInd[1] + 1;
-		IndZstart = 0;
 	}
-	if ( (int)RefZend[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 2] + 1 ) {
+
+	found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZend[pGrid.level][region_number]);
+	if (found_z != pGrid.ZInd.end()) {
+		CoarseLimsZ[1] = found_z - pGrid.ZInd.begin();
+
+	} else if ( (int)RefZend[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 1 - offset] + offset ) {
 		CoarseLimsZ[1] = pGrid.ZInd.size() - 1;
-	} else {
-		CoarseLimsZ[1] = RefZend[pGrid.level][region_number] - pGrid.ZInd[1] + 1;
+
+	} else if ( (int)RefZend[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
+		CoarseLimsZ[1] = pGrid.ZInd.size() - 1;
+
 	}
 #else
 	// Reset the refined region z-limits if only 2D
@@ -630,6 +674,28 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 		CoarseLimsZ[i] = 0;
 	}
 #endif
+
+
+	*GridUtils::logfile << "Local Coarse Lims are " << 
+		CoarseLimsX[0] << "-" << CoarseLimsX[1] << ", " << 
+		CoarseLimsY[0] << "-" << CoarseLimsY[1] << ", " <<
+		CoarseLimsZ[0] << "-" << CoarseLimsZ[1] << std::endl;
+
+	/* If sub-grid wraps periodically we do not support it wrapping back round to the same rank
+	 * again as this will confuse the mapping function so we error here. */
+
+	if (
+		(CoarseLimsX[1] < CoarseLimsX[0]) ||
+		(CoarseLimsX[1] < CoarseLimsX[0]) ||
+		(CoarseLimsX[1] < CoarseLimsX[0])
+		) {
+		
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Refined region wraps periodically which is not supported. Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+	}	
+
+
 	
 	/* Note that the CoarseLims are local values used to identify how much and which part of the 
 	 * parent grid is covered by the child sub-grid and might not conincide with edges of global 
@@ -653,8 +719,6 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5)*2) + 1
 #endif
 	};
-
-
 
 	// Generate NODE NUMBERS
 	XInd = GridUtils::onespace( IndXstart, IndXstart + local_size[0] - 1 );
@@ -697,14 +761,15 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	7 == Inlet
 	8 == Outlet
 	*/
-
+	
 	// Get local grid sizes
 	size_t N_lim = XInd.size();
 	size_t M_lim = YInd.size();
 	size_t K_lim = ZInd.size();
-
+	
 	// Resize
 	LatTyp.resize( YInd.size() * XInd.size() * ZInd.size() );
+
 
 	// Default labelling of coarse
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
@@ -882,7 +947,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 	int M_lim = YPos.size();
 	int K_lim = ZPos.size();
 
-#if defined WALLS_ON || defined INLET_ON || defined OUTLET_ON || defined WALLS_ON_2D
+#if defined WALLS_ON || defined INLET_ON || defined OUTLET_ON
 	int i, j, k;
 #endif
 
@@ -979,7 +1044,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 #endif
 
 #if defined WALLS_ON
-	// Search index vector to see if TOP wall on this rank
+	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
 		if (YInd[j] == 0) {		// Wall found
 
@@ -995,8 +1060,11 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 		}
 	}
+#endif
 
-	// Search index vector to see if BOTTOM wall on this rank
+#if (defined WALLS_ON && !defined WALLS_ON_FLOOR_ONLY)
+
+	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
 		if (YInd[j] == M-1) {		// Wall found
 
@@ -1020,7 +1088,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 // Initialise refined labels method
 void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
-
+	
 	// Typing defined as follows:
 	/*
 	0 == boundary site
@@ -1096,6 +1164,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
         }
     }
     
+
 	// Generate grid type matrices for this level //
 	
 	// Get local grid sizes (includes overlap)
@@ -1122,34 +1191,34 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 					j, CoarseLimsY[0], 
 					k, CoarseLimsZ[0]
 				);
-
+				
 				// Get parent site label using local indices
 				par_label = pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim);
-
+								
 				// If parent is a "TL to lower" then add "TL to upper" label
-				if (par_label == 4) {
+				if (par_label == 4) { 
 					LatTyp(i,j,k,M_lim,K_lim) = 3;
                 
 					// Else if parent is a "refined" label then label as coarse
-				} else if (par_label == 2) {
+				} else if (par_label == 2) { 
 					LatTyp(i,j,k,M_lim,K_lim) = 1;
                 
 					// Else parent label is some other kind of boundary so copy the
 					// label to retain the behaviour onto this grid
-				} else {
+				} else { 
 					LatTyp(i,j,k,M_lim,K_lim) = par_label;
-                
+					
 					// If last site to be updated in fine block, change parent label
 					// to ensure boundary values are pulled from fine grid
 					if ((j % 2) != 0 && (i % 2) != 0) {
-						pGrid.LatTyp(p[0],p[1],p[2],pGrid.YInd.size(),pGrid.ZInd.size()) = 5;
+						pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 5;
 					}
 				}
             }
         }
     }
 
-
+	
 	// Try to add the solid block labels
 	LBM_init_solid_lab();
 }

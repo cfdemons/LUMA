@@ -89,6 +89,7 @@ public:
 	void io_write_lift_drag(int timestep);				// Write out IBBody lift and drag at specified timestep
 	void io_restart(bool IO_flag, int level);			// Restart read and write for IBBodies given grid level
 	void readInPCData(PCpts* _PCpts);					// Method to read in Point Cloud data for constructing BFL body
+	void readInPointData(PCpts* _PCpts);				// Method to read in Point Cloud data for constructing bounce-back objects
 
 
 };

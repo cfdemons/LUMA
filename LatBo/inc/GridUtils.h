@@ -39,6 +39,7 @@ public:
 	static double vecnorm(std::vector<double> vec);
 	static std::vector<int> getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
 	static std::vector<int> getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
+	static double indexToPosition(int index, double dx);	// Function: indexToPosition
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add

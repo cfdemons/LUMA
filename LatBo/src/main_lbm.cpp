@@ -285,6 +285,16 @@ int main( int argc, char* argv[] )
 
 #endif
 
+#ifdef SOLID_FROM_FILE
+
+	*GridUtils::logfile << "Initialising Solid Objects from File..." << endl;
+
+	// Read in data from point cloud file
+	PCpts* _PCpts = new PCpts();
+	objMan->readInPointData(_PCpts);
+
+#endif
+
 
 	/* ***************************************************************************************************************
 	****************************************** READ IN RESTART DATA **************************************************

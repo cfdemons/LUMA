@@ -262,6 +262,14 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 }
 
 // ***************************************************************************************************
+// Change index to position
+double GridUtils::indexToPosition(int index, double dx) {
+
+	return dx * ( static_cast<double>(index) + 0.5 );
+
+}
+
+// ***************************************************************************************************
 // Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
 size_t GridUtils::getOpposite(size_t direction) {
 
@@ -418,28 +426,30 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 // Routine to see whether the specified refined region intersects with the span of the provided parent grid
 bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
 
-
-	// Loop through every global point on the given grid and if one 
-	// of them exists within the refined region then return true.
-	for (size_t i : pGrid.XInd) {
-		for (size_t j : pGrid.YInd) {
-			for (size_t k : pGrid.ZInd) {
-
-				if	(
-					(i >= RefXstart[pGrid.level][RegNum] && i <= RefXend[pGrid.level][RegNum]) &&
-					(j >= RefYstart[pGrid.level][RegNum] && j <= RefYend[pGrid.level][RegNum])
-#if (dims == 3)
-					&& (k >= RefZstart[pGrid.level][RegNum] && k <= RefZend[pGrid.level][RegNum])
-#endif
-				) {				
-					return true;
-				}
-
-			}
-		}
+	// Loop over over X range of subgrid and check for matching index on parent grid
+	for (size_t i = RefXstart[pGrid.level][RegNum]; i <= RefXend[pGrid.level][RegNum]; i++) {
+		auto found_i = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), i);
+		if (found_i != pGrid.XInd.end()) break;		// If a match is found then chance that range intersects parent grid indices
+		else if (i == RefXend[pGrid.level][RegNum] && found_i == pGrid.XInd.end()) return false;	// Got to the end and X is not intersecting
 	}
 
-	return false;
+	// Loop over over Y range
+	for (size_t j = RefYstart[pGrid.level][RegNum]; j <= RefYend[pGrid.level][RegNum]; j++) {
+		auto found_j = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), j);
+		if (found_j != pGrid.YInd.end()) break;
+		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
+	}
+
+#if (dims == 3)
+	// Loop over over Z range
+	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
+		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
+		if (found_k != pGrid.ZInd.end()) break;
+		else if (k == RefZend[pGrid.level][RegNum] && found_k == pGrid.ZInd.end()) return false;
+	}
+#endif
+
+	return true;
 	
 }
 

@@ -359,3 +359,123 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 
 #endif
 }
+
+// ***************************************************************************************************
+// Routine to read in point cloud data in tab separated, 3-column format from the input directory
+void ObjectManager::readInPointData(PCpts* _PCpts) {
+
+#ifdef SOLID_FROM_FILE
+
+	// Temporary variables
+	double tmp_x, tmp_y, tmp_z;
+
+	// Open input file
+	std::ifstream file;
+	file.open("./input/pointcloud.in", std::ios::in);
+	
+	// Handle failure to open
+	if (!file.is_open()) {
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Error opening Point Cloud input file. Exiting." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// Get grid pointer
+	GridObj* g = NULL;	GridUtils::getGrid(_Grids, object_on_grid_lev, object_on_grid_reg, g);
+	if (g == NULL) return; // If this grid does not exist, then exit
+
+	// Loop over lines in file
+	while (!file.eof()) {
+
+		// Read in one line of file at a time
+		std::string line_in;	// String to store line in
+		std::istringstream iss;	// Buffer stream to store characters
+
+		// Get line up to new line separator and put in buffer
+		std::getline(file,line_in,'\n');
+		iss.str(line_in);	// Put line in the buffer
+		iss.seekg(0);		// Reset buffer position to start of buffer
+
+		// Add coordinates to data store
+		iss >> tmp_x;
+		iss >> tmp_y;
+		iss >> tmp_z;
+			
+		_PCpts->x.push_back(tmp_x);
+		_PCpts->y.push_back(tmp_y);
+			
+		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
+#if (dims == 3)
+		_PCpts->z.push_back(tmp_z);
+#else
+		_PCpts->z.push_back(0);
+#endif
+
+		}
+	file.close();
+
+	// Warn of no data case
+	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
+		std::cout << "Warning: Rank " + std::to_string(MpiManager::my_rank) + " contains no object data." << std::endl;
+	}
+
+	
+	// Rescale coordinates and shift
+	double scale_factor = object_length_x / 
+		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+	double shift_x =  std::floor( start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
+	double shift_y =  std::floor( start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+	double shift_z =  std::floor( start_object_z - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) );
+
+	// Apply
+	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
+		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
+		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
+	}
+
+
+	// Write out
+	/*std::ofstream fileout;
+	fileout.open("./Out_" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	fileout << _PCpts->x.size() << " points read in." << std::endl;
+	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+		fileout << _PCpts->x[a] << " " << _PCpts->y[a] << " " << _PCpts->z[a] << std::endl;
+	}
+	fileout.close();*/
+
+	// Declare local variables
+	int local_i, local_j, local_k;
+
+	// Exclude points which are not on this rank
+	int a = 0;
+	do {
+
+		local_i = BFLBody::getVoxInd(_PCpts->x[a]);
+		local_j = BFLBody::getVoxInd(_PCpts->y[a]);
+		local_k = BFLBody::getVoxInd(_PCpts->z[a]);
+
+		// Delete points not on this rank
+		if ( GridUtils::isOnThisRank( local_i, local_j, local_k, *g) ) {
+
+			// Update Typing Matrix
+			if ( g->LatTyp(local_i, local_j, local_k, g->YInd.size(), g->ZInd.size()) == 1 ) g->LatTyp(local_i, local_j, local_k, g->YInd.size(), g->ZInd.size()) = 0;
+
+			// Increment counter
+			a++;
+
+
+		} else {
+
+			// Delete point from store as not on this rank
+			_PCpts->x.erase(_PCpts->x.begin() + a);
+			_PCpts->y.erase(_PCpts->y.begin() + a);
+			_PCpts->z.erase(_PCpts->z.begin() + a);
+
+		}
+
+	} while (a < (int)_PCpts->x.size());
+
+
+#endif
+}

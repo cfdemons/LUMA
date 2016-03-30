@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.3-31 ## //
+// Definitions File Format ## 0.4-31 ## //
 
 
 // Header guard
@@ -61,8 +61,9 @@
 
 // Types of output
 //#define TEXTOUT
-#define VTK_WRITER
-#define TECPLOT
+//#define VTK_WRITER
+//#define TECPLOT
+#define TECPLOT_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT

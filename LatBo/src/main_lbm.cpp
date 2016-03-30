@@ -344,6 +344,7 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 	Grids.io_textout("INITIALISATION");	// Do not change this tag!
 #endif
+
 #ifdef VTK_WRITER
 	*GridUtils::logfile << "Writing out to VTK file..." << endl;
 	Grids.io_vtkwriter(0.0);
@@ -351,6 +352,7 @@ int main( int argc, char* argv[] )
     objMan->io_vtk_IBwriter(0.0);
 #endif
 #endif
+
 #ifdef TECPLOT
 		for (int n = 0; n < MpiManager::num_ranks; n++) {
 			// Wait for rank accessing the file and only access if this rank's turn
@@ -365,6 +367,11 @@ int main( int argc, char* argv[] )
 			}
 		}
 
+#endif
+
+#ifdef TECPLOT_LITE
+		*GridUtils::logfile << "Writing out to TecPlot Lite file" << endl;
+		Grids.io_tecplot_lite(Grids.t);
 #endif
 
 	// Get time of grid and object initialisation
@@ -429,6 +436,7 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
+
 #ifdef VTK_WRITER
 			*GridUtils::logfile << "Writing out to VTK file" << endl;
 			Grids.io_vtkwriter(Grids.t);
@@ -436,6 +444,7 @@ int main( int argc, char* argv[] )
             objMan->io_vtk_IBwriter(Grids.t);
 #endif
 #endif
+
 #ifdef TECPLOT
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 				// Wait for rank accessing the file and only access if this rank's turn
@@ -450,6 +459,12 @@ int main( int argc, char* argv[] )
 				}
 			}
 #endif
+
+#ifdef TECPLOT_LITE
+		*GridUtils::logfile << "Writing out to TecPlot Lite file" << endl;
+		Grids.io_tecplot_lite(Grids.t);
+#endif
+
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
 	&& defined IBM_ON && defined IBBODY_TRACER

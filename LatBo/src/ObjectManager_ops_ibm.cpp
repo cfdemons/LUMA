@@ -213,7 +213,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 				if ( _finite(radius) == false ) {
 					std::cout << "Error: See Log File" << std::endl;
 					*GridUtils::logfile << "Jacowire calculation of new position has failed. Exiting." << std::endl;
-					exit(EXIT_FAILURE);
+					exit(10000);
 				}
 
 
@@ -247,17 +247,17 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= g.ZPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 	}
 
 
@@ -304,12 +304,12 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	}
 

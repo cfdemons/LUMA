@@ -128,7 +128,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening IBM restart file. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(10000);
 		}
 
 		// Read in one line of file at a time
@@ -150,7 +150,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		if (iBody.size() != num_bod) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Number of IBM bodies does not match the number specified in the restart file. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(10000);
 		}
 
 		// Loop over bodies
@@ -172,7 +172,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 				std::cout << "Error: See Log File" << std::endl;
 				*GridUtils::logfile << "Number of IBM markers does not match the number specified for body " <<
 					b << " in the restart file. Exiting." << std::endl;
-				exit(EXIT_FAILURE);
+				exit(10000);
 			}
 
 			// Read in marker data
@@ -271,7 +271,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Error opening BFL input file. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 	}
 
 	// Get grid pointer
@@ -377,7 +377,7 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Error opening Point Cloud input file. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 	}
 
 	// Get grid pointer

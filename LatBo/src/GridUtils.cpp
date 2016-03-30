@@ -244,7 +244,7 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
 		int ignore = system("pause");
-		exit(EXIT_FAILURE);
+		exit(10000);
 	}
 
 	// Initialise answer
@@ -585,7 +585,7 @@ bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	}
 
@@ -661,7 +661,7 @@ bool GridUtils::isOnRecvLayer(double site_position, int dir, int maxmin) {
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(10000);
 
 	}
 

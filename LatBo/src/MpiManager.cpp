@@ -136,7 +136,7 @@ void MpiManager::mpi_init( ) {
 		*MpiManager::logout << "Error: Zcores must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
 		MpiManager::logout->close();
 		MPI_Finalize();
-		exit(EXIT_FAILURE);
+		exit(10000);
 	}
 #endif
 #endif
@@ -174,7 +174,7 @@ void MpiManager::mpi_gridbuild( ) {
 			*MpiManager::logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
 			MpiManager::logout->close();
 			MPI_Finalize();
-			exit(EXIT_FAILURE);
+			exit(10000);
 
 		} else {
 
@@ -362,7 +362,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 			MpiManager::logout->close();
 			MPI_Finalize();
-			exit(EXIT_FAILURE);
+			exit(10000);
 
 		 }
 
@@ -389,7 +389,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 			MpiManager::logout->close();
 			MPI_Finalize();
-			exit(EXIT_FAILURE);
+			exit(10000);
 
 		 }
 

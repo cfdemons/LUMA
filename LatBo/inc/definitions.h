@@ -56,14 +56,14 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 100			// How many timesteps before whole grid output
+#define out_every 50			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
 //#define TEXTOUT
-//#define VTK_WRITER
+#define VTK_WRITER
 //#define TECPLOT
-#define TECPLOT_LITE
+//#define TECPLOT_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -129,17 +129,17 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 100		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 1200		// Number of x lattice sites
+#define M 200		// Number of y lattice sites
+#define K 400		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
 #define b_x 15.0	// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 5.0		// End of domain-y
+#define b_y 2.5		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 5.0		// End of domain-z
 
@@ -151,17 +151,18 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Fluid data in lattice units
-//#define USE_INLET_PROFILE
+#define USE_INLET_PROFILE
 #define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_ref		//u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref
+						//	u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 100		// Desired Reynolds number
+#define Re 5000		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -282,10 +283,10 @@ const static int zProbeLims[2] = {30, 120};
 	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 4
+	#define start_object_x 8
 	#define start_object_y 4
-	#define start_object_z 4
-	#define object_length_x 80			// The object input is scaled based on this dimension
+	#define start_object_z 8
+	#define object_length_x 320			// The object input is scaled based on this dimension
 #endif
 
 
@@ -338,13 +339,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {107}, {4} };
-	const static size_t RefXend[NumLev][NumReg]		= { {159}, {76} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {397}, {16} };
+	const static size_t RefXend[NumLev][NumReg]		= { {605}, {304} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {16}, {28} };
+	const static size_t RefYend[NumLev][NumReg]		= { {64}, {112} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {36}, {4} };
-	static size_t RefZend[NumLev][NumReg]		= { {66}, {52} };
+	static size_t RefZstart[NumLev][NumReg]		= { {144}, {16} };
+	static size_t RefZend[NumLev][NumReg]		= { {256}, {208} };
 
 
 #endif

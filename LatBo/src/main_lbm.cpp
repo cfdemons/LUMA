@@ -127,7 +127,7 @@ int main( int argc, char* argv[] )
 			std::cout << "Error: See Log File." << std::endl;
 			*GridUtils::logfile << "When using MPI must use at least 2 cores in each direction. Exiting." << std::endl;
 			MPI_Finalize();
-			exit(EXIT_FAILURE);
+			exit(10000);
 	}
 #endif
 

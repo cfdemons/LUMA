@@ -122,7 +122,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 
 		// Only level 0 grids can own IB-bodies
 		if (level == 0) {
-			file.open(GridUtils::path_str + "/restart_IBBody.out", std::ios::in);
+			file.open("./restart_IBBody.out", std::ios::in);
 		}
 
 		if (!file.is_open()) {

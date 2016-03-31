@@ -323,9 +323,9 @@ void GridObj::io_tecplot_lite(double tval) {
 	tecfile.setf(std::ios::showpoint);
 
 	// Write simple header
-	tecfile << "L" << level << " R" << region_number << " Rnk " << std::to_string(MpiManager::my_rank) << std::endl;
+	tecfile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << std::endl;
 	tecfile << "T = " << std::to_string(tval) << std::endl;
-	tecfile << "X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
+	tecfile << "TYPE X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
 	
 	// Indices
 	size_t i,j,k,v;
@@ -342,6 +342,9 @@ void GridObj::io_tecplot_lite(double tval) {
 #endif	// BUILD_FOR_MPI				
 				{
 				
+					// Write out type
+					tecfile << LatTyp(i,j,k,YInd.size(),ZInd.size()) << "\t";
+
 					// Write out X, Y, Z
 					tecfile << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 

@@ -56,14 +56,14 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000			// How many timesteps before whole grid output
+#define out_every 500			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
 //#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
-#define TECPLOT_LITE
+//#define TECPLOT_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -83,11 +83,11 @@ const static int zProbeLims[2] = {30, 120};
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
-//#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 50000
+#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
+#define restart_out_every 20000
 
 // LBM configuration
-//#define USE_MRT
+#define USE_MRT
 
 #if (dims == 3)
 // MRT relaxation times (D3Q19) -- (see Stiebler 2011 paper for some improvements)
@@ -103,7 +103,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 500000	// Number of time steps
+#define T 100000	// Number of time steps
 
 
 /*
@@ -113,9 +113,9 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 3
-#define Ycores 5
-#define Zcores 8	// Set to 1 if doing a 2D problem when using custom MPI sizes
+#define Xcores 4
+#define Ycores 2
+#define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
 
@@ -129,10 +129,10 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 768		// Number of x lattice sites
-#define M 160		// Number of y lattice sites
-#define K 256		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 720		// Number of x lattice sites
+#define M 150		// Number of y lattice sites
+#define K 240		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
@@ -283,10 +283,10 @@ const static int zProbeLims[2] = {30, 120};
 	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 26
+	#define start_object_x 24
 	#define start_object_y 4
-	#define start_object_z 26
-	#define object_length_x 256			// The object input is scaled based on this dimension
+	#define start_object_z 24
+	#define object_length_x 240			// The object input is scaled based on this dimension
 #endif
 
 
@@ -339,13 +339,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {241}, {13} };
-	const static size_t RefXend[NumLev][NumReg]	= { {407}, {243} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {226}, {12} };
+	const static size_t RefXend[NumLev][NumReg]		= { {382}, {228} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]	= { {51}, {90} };
+	const static size_t RefYend[NumLev][NumReg]		= { {48}, {84} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {83}, {13} };
-	static size_t RefZend[NumLev][NumReg]		= { {173}, {166} };
+	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
+	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };
 
 
 #endif

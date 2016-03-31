@@ -27,6 +27,9 @@ MpiManager::~MpiManager(void)
 
 	// Close the logfile
 	MpiManager::logout->close();
+
+	// Destroy
+	if(me) delete(me);
 }
 
 // *************************************************************************************************** //

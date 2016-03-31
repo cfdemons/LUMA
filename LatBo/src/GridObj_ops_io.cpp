@@ -283,36 +283,21 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 
 		// Get grid sizes
-		int N_lim, M_lim, K_lim, min, minz;
+		int N_lim, M_lim, K_lim;
 		N_lim = XInd.size();
 		M_lim = YInd.size();
 		K_lim = ZInd.size();
-		min = 0; minz = min;
-
-		// If building for MPI then correct grid sizes to avoid writing out outer overlap
-		if (level == 0) {
-
-#ifdef BUILD_FOR_MPI
-			min = 1; minz = min;
-			N_lim = XInd.size()-1;
-			M_lim = YInd.size()-1;
-#if (dims == 3)
-			K_lim = ZInd.size()-1;
-#else
-			K_lim = 1;
-			minz = 0;
-#endif
-#endif
-
-		}
 
 		// Counters
 		int i,j,k,v;
 
 		// Write out global grid indices and then the values of f, u and rho
-		for (k = minz; k < K_lim; k++) {
-			for (j = min; j < M_lim; j++) {
-				for (i = min; i < N_lim; i++) {
+		for (k = 0; k < K_lim; k++) {
+			for (j = 0; j < M_lim; j++) {
+				for (i = 0; i < N_lim; i++) {
+					
+					// Don't write out the receiver layer sites to avoid duplication
+					if (GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k])) continue;
 
 					// Grid level and region
 					file << level << "\t" << region_number << "\t";
@@ -364,7 +349,7 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::in);
+		file.open("./restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;
@@ -375,6 +360,7 @@ void GridObj::io_restart(bool IO_flag) {
 		int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
 		int gi, gj, gk;
 		int in_level, in_regnum;
+		std::vector<int> ind;
 
 		// Read in one line of file at a time
 		std::string line_in;	// String to store line
@@ -396,31 +382,18 @@ void GridObj::io_restart(bool IO_flag) {
 			// Read in global indices
 			iss >> gi >> gj >> gk;
 
-			// Global and local are the same for serial code or for lower grids
-			i = gi; j = gj; k = gk;
+			// Check on this rank before proceding
+			if ( !GridUtils::isOnThisRank(gi,gj,gk,*this) ) continue;
 
-			// For MPI cases, need to check on level 0 that site is on this rank before proceding
-#ifdef BUILD_FOR_MPI
-				if (level == 0) {
-
-					// Check whether on overlap or core of this rank
-
-					// Convert global to local indices
-					if (gi == XInd[0]) { i = 0;	} else if (gi == XInd[XInd.size()-1]) { i = XInd.size()-1; } // Overlap
-					else if (gi >= XInd[1] && gi <= XInd[XInd.size()-2]) { i = gi - XInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
-
-					if (gj == YInd[0]) { j = 0;	} else if (gj == YInd[YInd.size()-1]) { j = YInd.size()-1; } // Overlap
-					else if (gj >= YInd[1] && gj <= YInd[YInd.size()-2]) { j = gj - YInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
+			// Get local indices
+			ind.clear();
+			GridUtils::global_to_local(gi,gj,gk,this,ind);
+			i = ind[0];
+			j = ind[1];
 #if (dims == 3)
-					if (gk == ZInd[0]) { k = 0;	} else if (gk == ZInd[ZInd.size()-1]) { k = ZInd.size()-1; } // Overlap
-					else if (gk >= ZInd[1] && gk <= ZInd[ZInd.size()-2]) { k = gk - ZInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
+			k = ind[2];
 #else
-					k = gk; // In 2D no need to convert
-#endif
-				}
+			k = 0;
 #endif
 
 

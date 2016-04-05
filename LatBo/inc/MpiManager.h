@@ -87,6 +87,7 @@ public :
 
 	// Singleton design
 	static MpiManager* getInstance();	// Get the pointer to the singleton instance (create it if necessary)
+	static void destroyInstance();
 
 	// Initialisation
 	void mpi_init( );		// Initialisation of MpiManager & Cartesian topology

@@ -22,6 +22,13 @@ ObjectManager* ObjectManager::getInstance(GridObj* g) {
 
 }
 
+// Instance destuctor
+void ObjectManager::destroyInstance() {
+
+	if (me)	delete me;			// Delete pointer from static context not destructor
+
+}
+
 // *************************************************************************************************** //
 // Constructor & destructor
 ObjectManager::ObjectManager(void) { };

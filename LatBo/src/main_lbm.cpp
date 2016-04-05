@@ -26,6 +26,20 @@ int MpiManager::MPI_coords[dims];
 // Entry point
 int main( int argc, char* argv[] )
 {
+
+	// Memeory leak checking
+#ifdef _DEBUG
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	// Set output to the terminal window
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
+	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDOUT );
+	_CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDOUT );
+#endif
+
+
 	/*
 	***************************************************************************************************************
 	*********************************************** MPI INITIALISE ************************************************
@@ -281,6 +295,7 @@ int main( int argc, char* argv[] )
 	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
 
 	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
+	delete _PCpts;
 	
 
 #endif
@@ -292,6 +307,7 @@ int main( int argc, char* argv[] )
 	// Read in data from point cloud file
 	PCpts* _PCpts = new PCpts();
 	objMan->readInPointData(_PCpts);
+	delete _PCpts;
 
 #endif
 
@@ -540,11 +556,16 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 
+	// Destroy ObjectManager
+	ObjectManager::destroyInstance();
+
 #ifdef BUILD_FOR_MPI
 	// Close logfile
 	MpiManager::logout->close();
 	// Finalise MPI
 	MPI_Finalize();
+	// Destroy MpiManager
+	MpiManager::destroyInstance();
 #endif
 
 	return 0;

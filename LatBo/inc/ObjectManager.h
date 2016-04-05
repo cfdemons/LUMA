@@ -43,6 +43,7 @@ private:
 public:
 	// Singleton design
 	static ObjectManager *getInstance();
+	static void destroyInstance();
 	static ObjectManager *getInstance(GridObj* g);
 
 	// IBM methods

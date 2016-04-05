@@ -41,6 +41,13 @@ MpiManager* MpiManager::getInstance() {
 
 }
 
+// Instance destuctor
+void MpiManager::destroyInstance() {
+
+	if (me)	delete me;			// Delete pointer from static context not destructor
+
+}
+
 // *************************************************************************************************** //
 // Const data member initialised outside class definition
 // Define for 3D where first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.

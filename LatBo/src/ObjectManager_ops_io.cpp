@@ -128,7 +128,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening IBM restart file. Exiting." << std::endl;
-			exit(10000);
+			exit(LATBO_FAILED);
 		}
 
 		// Read in one line of file at a time
@@ -150,7 +150,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		if (iBody.size() != num_bod) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Number of IBM bodies does not match the number specified in the restart file. Exiting." << std::endl;
-			exit(10000);
+			exit(LATBO_FAILED);
 		}
 
 		// Loop over bodies
@@ -172,7 +172,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 				std::cout << "Error: See Log File" << std::endl;
 				*GridUtils::logfile << "Number of IBM markers does not match the number specified for body " <<
 					b << " in the restart file. Exiting." << std::endl;
-				exit(10000);
+				exit(LATBO_FAILED);
 			}
 
 			// Read in marker data
@@ -271,7 +271,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Error opening BFL input file. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 	// Get grid pointer
@@ -307,9 +307,11 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		}
 	file.close();
 
-	// Warn of no data case
+	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		std::cout << "Warning: Rank " + std::to_string(MpiManager::my_rank) + " contains no BFL data." << std::endl;
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Failed to read object data read from BFL input file." << std::endl;
+		exit(LATBO_FAILED);
 	}
 
 	
@@ -327,13 +329,23 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 	}
 
+	// Declare local variables
+	std::vector<int> locals;
+	int global_i, global_j, global_k;
+
 	// Exclude points which are not on this rank
 	int a = 0;
 	do {
 
-		// Delete points not on this rank
-		if ( GridUtils::isOnThisRank( 
-			BFLBody::getVoxInd(_PCpts->x[a]), BFLBody::getVoxInd(_PCpts->y[a]), BFLBody::getVoxInd(_PCpts->z[a]), *g) ) a++;
+		// Get global voxel index
+		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
+		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
+		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
+
+		// If on this rank
+		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
+			// Increment counter
+			a++;
 		else {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
 			_PCpts->y.erase(_PCpts->y.begin() + a);
@@ -377,7 +389,7 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Error opening Point Cloud input file. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 	// Get grid pointer
@@ -414,13 +426,17 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 		}
 	file.close();
 
-	// Warn of no data case
+	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		std::cout << "Warning: Rank " + std::to_string(MpiManager::my_rank) + " contains no object data." << std::endl;
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Failed to read object data read from point cloud input file." << std::endl;
+		exit(LATBO_FAILED);
+	} else {
+		*GridUtils::logfile << "Successfully acquired object data from point cloud file." << std::endl;
 	}
 
 	
-	// Rescale coordinates and shift
+	// Rescale coordinates and shift to global lattice units
 	double scale_factor = object_length_x / 
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	double shift_x =  std::floor( start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
@@ -434,47 +450,41 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 	}
 
-
-	// Write out
-	/*std::ofstream fileout;
-	fileout.open("./Out_" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
-	fileout << _PCpts->x.size() << " points read in." << std::endl;
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
-		fileout << _PCpts->x[a] << " " << _PCpts->y[a] << " " << _PCpts->z[a] << std::endl;
-	}
-	fileout.close();*/
+	//if (!_PCpts->x.empty()) {
+	//	std::ofstream fileout;
+	//	fileout.open(GridUtils::path_str + "/pts_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	//	for (size_t i = 0; i < _PCpts->x.size(); i++) {
+	//		fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+	//		fileout << std::endl;
+	//	}
+	//	fileout.close();
+	//}
 
 	// Declare local variables
-	int local_i, local_j, local_k;
+	std::vector<int> locals;
+	int global_i, global_j, global_k;
 
-	// Exclude points which are not on this rank
-	int a = 0;
-	do {
+	// Ignore points which are not on this rank
+	for (size_t a = 0; a < _PCpts->x.size(); a++) {
 
-		local_i = BFLBody::getVoxInd(_PCpts->x[a]);
-		local_j = BFLBody::getVoxInd(_PCpts->y[a]);
-		local_k = BFLBody::getVoxInd(_PCpts->z[a]);
+		// Get globals
+		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
+		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
+		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
 
-		// Delete points not on this rank
-		if ( GridUtils::isOnThisRank( local_i, local_j, local_k, *g) ) {
+		// Label voxel if on this rank
+		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
+
+			// Get local indices
+			GridUtils::global_to_local(global_i, global_j,global_k,g,locals);
 
 			// Update Typing Matrix
-			if ( g->LatTyp(local_i, local_j, local_k, g->YInd.size(), g->ZInd.size()) == 1 ) g->LatTyp(local_i, local_j, local_k, g->YInd.size(), g->ZInd.size()) = 0;
-
-			// Increment counter
-			a++;
-
-
-		} else {
-
-			// Delete point from store as not on this rank
-			_PCpts->x.erase(_PCpts->x.begin() + a);
-			_PCpts->y.erase(_PCpts->y.begin() + a);
-			_PCpts->z.erase(_PCpts->z.begin() + a);
+			if ( g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == 1 )
+			{ g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = 0; }
 
 		}
 
-	} while (a < (int)_PCpts->x.size());
+	}
 
 
 #endif

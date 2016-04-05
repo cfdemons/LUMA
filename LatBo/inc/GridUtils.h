@@ -100,9 +100,12 @@ public:
 
 
 	// ************************************************************************
-	// Map global to local indices where locals is an empty vector container
+	// Map global to local indices where locals is a vector container
 	template <typename NumType>
 	static void global_to_local(int i, int j, int k, GridObj* g, std::vector<NumType>& locals) {
+
+		// Clear array if not empty
+		if (locals.size()) locals.clear();
 
 		// Find indices in arrays
 		auto loc_i = std::find(g->XInd.begin(), g->XInd.end(), i);
@@ -111,18 +114,24 @@ public:
 
 		// Put indices in locals
 		if (loc_i != g->XInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->XInd.begin(),loc_i)) );
+		else locals.push_back(-1);
 		if (loc_j != g->YInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->YInd.begin(),loc_j)) );
+		else locals.push_back(-1);
 		if (loc_k != g->ZInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->ZInd.begin(),loc_k)) );
+		else locals.push_back(-1);
 
-		return;	// Will return vector with size() < 3 if global index not found on this grid
+		return;	// Directions not on the grid are returned with index -1
 
 
 	}
 
 	// ************************************************************************
-	// Map local to global indices where globals is an empty vector container
+	// Map local to global indices where globals is a vector container
 	template <typename NumType>
 	static void local_to_global(int i, int j, int k, GridObj* g, std::vector<NumType>& globals) {
+
+		// Clear array if not empty
+		if (globals.size()) globals.clear();
 
 		// Put indices in globals
 		globals.push_back( static_cast<NumType>(g->XInd[i]) );

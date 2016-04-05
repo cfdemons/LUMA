@@ -27,7 +27,7 @@ void GridObj::LBM_init_getInletProfile() {
 		// Error opening file
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Cannot open inlet profile file named \"inlet_profile.in\". Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 
 	} else {
 
@@ -127,7 +127,7 @@ void GridObj::LBM_init_getInletProfile() {
 		// No data read in
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Failed to read in inlet profile data. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 
@@ -279,7 +279,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	if ( (Lx/N) != (Ly/M) || (Lx/N) != (Lz/K) ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice volumes which are cubes -- either change N/M/K or change domain dimensions. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 	
 #else
@@ -287,7 +287,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	if ( (Lx/N) != (Ly/M) ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice cells which are squares -- either change N/M or change domain dimensions. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 #endif
@@ -311,7 +311,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 				) {
 					std::cout << "Error: See Log File" << std::endl;
 					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
-					exit(10000);
+					exit(LATBO_FAILED);
 			}
 		}
 #else
@@ -328,7 +328,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 				) {
 					std::cout << "Error: See Log File" << std::endl;
 					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
-					exit(10000);
+					exit(LATBO_FAILED);
 			}
 		}
 #endif
@@ -699,7 +699,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 		
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Refined region wraps periodically which is not supported. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}	
 
 
@@ -907,7 +907,7 @@ void GridObj::LBM_init_solid_lab() {
 		// Block outside grid
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Block is placed outside or on the TL of the selected grid. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 
@@ -976,7 +976,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 		// Singularity so exit
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Inlet BC fails with u_0x = 1, choose something else. Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 	// Search index vector to see if left hand wall on this rank

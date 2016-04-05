@@ -56,7 +56,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
+#define out_every 10			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -83,8 +83,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
-#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 20000
+//#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
+#define restart_out_every 200000
 
 // LBM configuration
 #define USE_MRT
@@ -103,7 +103,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 100000	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -130,18 +130,18 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 720		// Number of x lattice sites
-#define M 150		// Number of y lattice sites
-#define K 240		// Number of z lattice sites
+#define N 400		// Number of x lattice sites
+#define M 80		// Number of y lattice sites
+#define K 80		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 12.0	// End of domain-x
+#define b_x 200		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 2.5		// End of domain-y
+#define b_y 40		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 4.0		// End of domain-z
+#define b_z 40		// End of domain-z
 
 
 /*
@@ -151,7 +151,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Fluid data in lattice units
-#define USE_INLET_PROFILE
+//#define USE_INLET_PROFILE
 #define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
@@ -162,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 5000		// Desired Reynolds number
+#define Re 10000		// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -263,14 +263,14 @@ const static int zProbeLims[2] = {30, 120};
 //#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 4		// Index of start of object/wall in x-direction
-	#define obj_x_max 24		// Index of end of object/wall in x-direction
-	#define obj_y_min 4			// Index of start of object/wall in y-direction
-	#define obj_y_max 24		// Index of end of object/wall in y-direction
+	#define obj_x_min 100		// Index of start of object/wall in x-direction
+	#define obj_x_max 120		// Index of end of object/wall in x-direction
+	#define obj_y_min 30			// Index of start of object/wall in y-direction
+	#define obj_y_max 50		// Index of end of object/wall in y-direction
 	#define obj_z_min 4		// Index of start of object/wall in z-direction
 	#define obj_z_max 24		// Index of end of object/wall in z-direction
 #endif
@@ -280,13 +280,13 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 0		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 24
-	#define start_object_y 4
-	#define start_object_z 24
-	#define object_length_x 240			// The object input is scaled based on this dimension
+	#define start_object_x 100
+	#define start_object_y 1
+	#define start_object_z 10
+	#define object_length_x 60			// The object input is scaled based on this dimension
 #endif
 
 
@@ -312,7 +312,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

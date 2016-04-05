@@ -30,6 +30,9 @@
 // Grid utilities class definition (available to all parts of code)
 #include "../inc/GridUtils.h"
 
+// Error definition
+#define LATBO_FAILED 12345
+
 // Function: is_nan
 template <typename NumType>
 inline static bool is_nan(NumType n) {

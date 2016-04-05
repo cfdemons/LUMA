@@ -170,7 +170,7 @@ double GridUtils::vecnorm( std::vector<double> vec )
 
 // ***************************************************************************************************
 
-// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
+// Routine to map the global index of a coarse grid site to a corresponding fine site on the level below
 std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 
 	// Initialise result
@@ -189,7 +189,7 @@ std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse
 }
 // ***************************************************************************************************
 
-// Routine to map the index of a fine grid site to parent coarse grid site on the level above
+// Routine to map the global index of a fine grid site to parent coarse grid site on the level above
 std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
 
 	// Initialise result
@@ -244,7 +244,7 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
 		int ignore = system("pause");
-		exit(10000);
+		exit(LATBO_FAILED);
 	}
 
 	// Initialise answer
@@ -366,11 +366,11 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
 	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gj);
 	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gk);
 
-	if (	found_x != std::end(pGrid.XInd) && found_y != std::end(pGrid.YInd)
+	if (	found_x != pGrid.XInd.end() && found_y != pGrid.YInd.end()
 
 
 #if (dims == 3)
-		&& found_z != std::end(pGrid.ZInd)
+		&& found_z != pGrid.ZInd.end()
 #endif
 		) {
 
@@ -394,7 +394,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 		// X direction
 		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
 
-		if (found_x != std::end(pGrid.XInd)) return true;		
+		if (found_x != pGrid.XInd.end()) return true;		
 		else return false;
 		}
 
@@ -403,7 +403,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 		// Y direction
 		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
 
-		if (found_y != std::end(pGrid.YInd)) return true;		
+		if (found_y != pGrid.YInd.end()) return true;		
 		else return false;
 		}
 
@@ -412,7 +412,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 		// Z direction
 		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
 
-		if (found_z != std::end(pGrid.ZInd)) return true;		
+		if (found_z != pGrid.ZInd.end()) return true;		
 		else return false;
 		}
 
@@ -585,7 +585,7 @@ bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 
 	}
 
@@ -661,7 +661,7 @@ bool GridUtils::isOnRecvLayer(double site_position, int dir, int maxmin) {
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(10000);
+		exit(LATBO_FAILED);
 
 	}
 

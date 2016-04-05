@@ -353,7 +353,7 @@ void GridObj::io_restart(bool IO_flag) {
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;
-			exit(10000);
+			exit(LATBO_FAILED);
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;

@@ -437,6 +437,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	// Tag
 	int TAG;
+	int send_count = 0;
 
 	// Get grid object
 	GridObj* Grid = NULL;
@@ -507,13 +508,16 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			// Post Send //
 			///////////////
 
+			send_count++;
+
 #ifdef MPI_VERBOSE
 			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -->  Posting Send for " << f_buffer_send[dir].size() / nVels
 								<< " sites to Rank " << neighbour_rank[dir] << "." << std::endl;
 #endif
-			// Post send message to message queue
-			MPI_Isend( &f_buffer_send[dir].front(), f_buffer_send[dir].size(), MPI_DOUBLE, neighbour_rank[dir], TAG, my_comm, &request );
+			// Post send message to message queue and log request handle in array
+			MPI_Isend( &f_buffer_send[dir].front(), f_buffer_send[dir].size(), MPI_DOUBLE, neighbour_rank[dir], 
+				TAG, my_comm, &send_requests[send_count-1] );
 
 #ifdef MPI_VERBOSE
 			*MpiManager::logout << "Direction " << dir << " --> Send Posted." << std::endl;
@@ -570,8 +574,14 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	}
 
-	// Wait until last message sent has been processed by the processes
-	MPI_Wait(&request,&stat);
+#ifdef MPI_VERBOSE
+	*MpiManager::logout << "Waiting for Send Completion." << std::endl;
+#endif
+
+	/* Wait until other processes have handled all the sends from this rank
+	 * Note that calls to this command destroy the handles once complete so
+	 * do not need to clear the array afterward. */
+	MPI_Waitall(send_count,send_requests,send_stat);
 
 
 	// Print Time of MPI comms

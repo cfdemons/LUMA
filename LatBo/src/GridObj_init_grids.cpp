@@ -693,8 +693,8 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 
 	if (
 		(CoarseLimsX[1] < CoarseLimsX[0]) ||
-		(CoarseLimsX[1] < CoarseLimsX[0]) ||
-		(CoarseLimsX[1] < CoarseLimsX[0])
+		(CoarseLimsY[1] < CoarseLimsY[0]) ||
+		(CoarseLimsZ[1] < CoarseLimsZ[0])
 		) {
 		
 		std::cout << "Error: See Log File" << std::endl;

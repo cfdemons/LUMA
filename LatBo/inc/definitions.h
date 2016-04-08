@@ -56,7 +56,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before whole grid output
+#define out_every 100000			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -84,7 +84,7 @@ const static int zProbeLims[2] = {30, 120};
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 200000
+#define restart_out_every 300000
 
 // LBM configuration
 #define USE_MRT
@@ -103,7 +103,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 10	// Number of time steps
+#define T 32738	// Number of time steps
 
 
 /*
@@ -113,7 +113,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 2
+#define Xcores 4
 #define Ycores 2
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 

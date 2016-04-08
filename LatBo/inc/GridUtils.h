@@ -45,17 +45,17 @@ public:
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
 	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: crossprod
-	static std::vector<double> matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x);	// Function: matrix_multiply
+	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
 
 	// LBM-specific utilities
 	static size_t getOpposite(size_t direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
 	// MPI-related utilities
-	static bool isOverlapPeriodic(int i, int j, int k, GridObj& pGrid);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(int gi, int gj, int gk, GridObj& pGrid);	// Function: isOnThisRank + overloads
-	static bool isOnThisRank(int gl, int xyz, GridObj& pGrid);
-	static bool hasThisSubGrid(GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
+	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
+	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
+	static bool isOnThisRank(int gl, int xyz, const GridObj& pGrid);
+	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer

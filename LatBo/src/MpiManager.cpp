@@ -491,7 +491,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		// Adjust buffer size
 		for (MpiManager::buffer_struct bufs : buffer_send_info) {
-			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
+			if (bufs.level == Grid->level && bufs.region == Grid->region_number && (bufs.size[dir] * nVels) > (int)f_buffer_send[dir].size()) {
 				f_buffer_send[dir].resize(bufs.size[dir] * nVels);
 			}
 		}
@@ -526,7 +526,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
-			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
+			if (bufr.level == Grid->level && bufr.region == Grid->region_number && (bufr.size[dir] * nVels) > (int)f_buffer_recv[dir].size()) {
 				f_buffer_recv[dir].resize(bufr.size[dir] * nVels);
 			}
 		}
@@ -569,6 +569,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		}
 
 	}
+
+	// Wait until last message sent has been processed by the processes
+	MPI_Wait(&request,&stat);
 
 
 	// Print Time of MPI comms

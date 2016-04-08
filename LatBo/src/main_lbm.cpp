@@ -60,7 +60,7 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
-#if (dims != 3)
+#if (dims != 3 && NumLev)
 	for (int i = 0; i < NumReg; i++) {
 		for (int l = 0; l < NumLev; l++) {
 			RefZstart[l][i] = 0;

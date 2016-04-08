@@ -237,7 +237,7 @@ double GridUtils::dotprod(std::vector<double> vec1, std::vector<double> vec2) {
 // ***************************************************************************************************
 
 // Multiplies matrix A by vector x.
-std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x) {
+std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x) {
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != x.size()) {
@@ -300,7 +300,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 // ***************************************************************************************************
 // Function to find whether the recv layer containing local site i,j,k links to an adjacent or periodic neighbour rank.
 // Takes in the site indices (local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
+bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 
 	// Local declarations
 	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
@@ -360,7 +360,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Function to find whether a site with global indices provided is on a given grid or not
-bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 	
 	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gi);
 	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gj);
@@ -385,7 +385,7 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 
 	switch (xyz) {
 
@@ -424,7 +424,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Routine to see whether the specified refined region intersects with the span of the provided parent grid
-bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
+bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 
 	// Loop over over X range of subgrid and check for matching index on parent grid
 	for (size_t i = RefXstart[pGrid.level][RegNum]; i <= RefXend[pGrid.level][RegNum]; i++) {

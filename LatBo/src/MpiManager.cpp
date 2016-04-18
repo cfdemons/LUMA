@@ -549,7 +549,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 #endif
 
 			// Use a blocking receive call if required
-			MPI_Recv( &f_buffer_recv[dir].front(), f_buffer_recv[dir].size(), MPI_DOUBLE, neighbour_rank[opp_dir], TAG,	my_comm, &stat );
+			MPI_Recv( &f_buffer_recv[dir].front(), f_buffer_recv[dir].size(), MPI_DOUBLE, neighbour_rank[opp_dir], TAG,	my_comm, &recv_stat );
 		
 
 #ifdef MPI_VERBOSE

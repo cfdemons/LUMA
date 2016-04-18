@@ -151,7 +151,7 @@ public :
 	void io_vtkwriter(double tval);				// VTK writer
 	void io_tecplot(double tval);				// TecPlot write out
 	void io_tecplot_debug(double tval, std::string tag);	// Special debugging writer to help debug problems with MPI
-	void io_tecplot_lite(double tval);			// TecPlot writer to individual files
+	void io_lite(double tval);					// Generic writer to individual files
 
 
 };

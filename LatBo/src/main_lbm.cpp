@@ -385,9 +385,9 @@ int main( int argc, char* argv[] )
 
 #endif
 
-#ifdef TECPLOT_LITE
-		*GridUtils::logfile << "Writing out to TecPlot Lite file" << endl;
-		Grids.io_tecplot_lite(Grids.t);
+#ifdef IO_LITE
+		*GridUtils::logfile << "Writing out to IOLite file" << endl;
+		Grids.io_lite(Grids.t);
 #endif
 
 	// Get time of grid and object initialisation
@@ -476,9 +476,9 @@ int main( int argc, char* argv[] )
 			}
 #endif
 
-#ifdef TECPLOT_LITE
-		*GridUtils::logfile << "Writing out to TecPlot Lite file" << endl;
-		Grids.io_tecplot_lite(Grids.t);
+#ifdef IO_LITE
+		*GridUtils::logfile << "Writing out to IOLite file" << endl;
+		Grids.io_lite(Grids.t);
 #endif
 
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \

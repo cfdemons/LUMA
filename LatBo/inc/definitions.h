@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.4-31 ## //
+// Definitions File Format ## 0.5-31 ## //
 
 
 // Header guard
@@ -56,14 +56,14 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10000			// How many timesteps before whole grid output
-#define output_precision 6		// Precision of output
+#define out_every 1000			// How many timesteps before whole grid output
+#define output_precision 10		// Precision of output
 
 // Types of output
 //#define TEXTOUT
-#define VTK_WRITER
+//#define VTK_WRITER
 //#define TECPLOT
-//#define TECPLOT_LITE
+#define IO_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -87,7 +87,7 @@ const static int zProbeLims[2] = {30, 120};
 #define restart_out_every 300000
 
 // LBM configuration
-#define USE_MRT
+//#define USE_MRT
 
 #if (dims == 3)
 // MRT relaxation times (D3Q19) -- (see Stiebler 2011 paper for some improvements)
@@ -103,7 +103,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 300000	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -113,7 +113,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // MPI Data
-#define Xcores 4
+#define Xcores 2
 #define Ycores 2
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
@@ -129,7 +129,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 400		// Number of x lattice sites
 #define M 80		// Number of y lattice sites
 #define K 80		// Number of z lattice sites
@@ -162,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 10000		// Desired Reynolds number
+#define Re 100			// Desired Reynolds number
 
 // nu computed based on above selections
 

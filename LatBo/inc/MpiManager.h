@@ -64,9 +64,9 @@ public :
 	// Buffer data
 	std::vector< std::vector<double>> f_buffer_send;	// Array of resizeable outgoing buffers used for data transfer
 	std::vector< std::vector<double>> f_buffer_recv;	// Array of resizeable incoming buffers used for data transfer
-	MPI_Status stat;						// Status structure for Send-Receive return information
-	MPI_Request send_requests[MPI_dir];		// Array of request structures for handles to a posted ISends
-	MPI_Status send_stat[MPI_dir];			// Array of statuses for each send request
+	MPI_Status recv_stat;					// Status structure for Receive return information
+	MPI_Request send_requests[MPI_dir];		// Array of request structures for handles to posted ISends
+	MPI_Status send_stat[MPI_dir];			// Array of statuses for each Isend
 	// Structure storing the buffer sizes in each direction for a particular level and region
 	struct buffer_struct {
 		int size[MPI_dir];

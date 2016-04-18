@@ -521,4 +521,108 @@ void GridObj::io_probe_output() {
 
 
 }
+
+// ************************************************************** //
+// Generic writer for each rank to write out all daat rowise to be 
+// processed using a new post-processing application into a suitable 
+// output format.
+void GridObj::io_lite(double tval) {
+
+	std::ofstream litefile;
+
+	// Filename
+	std::string filename ("./" + GridUtils::path_str + "/io_lite.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
+			+ ".Rnk" + std::to_string(MpiManager::my_rank) + "." + std::to_string((int)tval) + ".dat");
+
+	// Create file
+	litefile.open(filename, std::ios::out);
+
+	// Set precision and force fixed formatting
+	litefile.precision(output_precision);
+	litefile.setf(std::ios::fixed);
+	litefile.setf(std::ios::showpoint);
+
+	// Write simple header
+	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << std::endl;
+	litefile << "T = " << std::to_string(tval) << std::endl;
+	litefile << "RANK TYPE X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
+	
+	// Indices
+	size_t i,j,k,v;
+		
+	// Write out values
+	for (k = 0; k < ZInd.size(); k++) {
+		for (j = 0; j < YInd.size(); j++) {
+			for (i = 0; i < XInd.size(); i++) {
+
+
+#ifdef BUILD_FOR_MPI
+				// Don't write out the receiver overlap in MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
+#endif	// BUILD_FOR_MPI				
+				{
+
+					// Write out rank
+					litefile << MpiManager::my_rank << "\t";
+				
+					// Write out type
+					litefile << LatTyp(i,j,k,YInd.size(),ZInd.size()) << "\t";
+
+					// Write out X, Y, Z
+					litefile << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
+
+					// Write out rho and u
+					litefile << rho(i,j,k,YInd.size(),ZInd.size()) << "\t";
+					for (v = 0; v < dims; v++) {
+						litefile << u(i,j,k,v,YInd.size(),ZInd.size(),dims) << "\t";
+					}
+#if (dims != 3)
+					litefile << 0 << "\t";
+#endif
+				
+					// Write out time averaged rho and u
+					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";
+					for (v = 0; v < dims; v++) {
+						litefile << ui_timeav(i,j,k,v,YInd.size(),ZInd.size(),dims) << "\t";
+					}
+#if (dims != 3)
+					litefile << 0 << "\t";
+#endif
+
+					// Write out time averaged u products
+					litefile << uiuj_timeav(i,j,k,0,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,1,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#if (dims == 3)
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#else
+					litefile << 0 << "\t";
+#endif
+#if (dims == 3)
+					litefile << uiuj_timeav(i,j,k,3,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,4,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,5,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#else
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << 0 << "\t" << 0 << "\t";
+#endif
+
+					// New line
+					litefile << std::endl;
+
+
+				}
+
+			}
+		}
+	}
+
+
+	// Now do any sub-grids
+	if (NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].io_lite(tval);
+		}
+	}
+
+}
 // ***************************************************************************************************

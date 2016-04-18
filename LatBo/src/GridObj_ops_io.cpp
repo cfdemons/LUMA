@@ -283,36 +283,21 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 
 		// Get grid sizes
-		int N_lim, M_lim, K_lim, min, minz;
+		int N_lim, M_lim, K_lim;
 		N_lim = XInd.size();
 		M_lim = YInd.size();
 		K_lim = ZInd.size();
-		min = 0; minz = min;
-
-		// If building for MPI then correct grid sizes to avoid writing out outer overlap
-		if (level == 0) {
-
-#ifdef BUILD_FOR_MPI
-			min = 1; minz = min;
-			N_lim = XInd.size()-1;
-			M_lim = YInd.size()-1;
-#if (dims == 3)
-			K_lim = ZInd.size()-1;
-#else
-			K_lim = 1;
-			minz = 0;
-#endif
-#endif
-
-		}
 
 		// Counters
 		int i,j,k,v;
 
 		// Write out global grid indices and then the values of f, u and rho
-		for (k = minz; k < K_lim; k++) {
-			for (j = min; j < M_lim; j++) {
-				for (i = min; i < N_lim; i++) {
+		for (k = 0; k < K_lim; k++) {
+			for (j = 0; j < M_lim; j++) {
+				for (i = 0; i < N_lim; i++) {
+					
+					// Don't write out the receiver layer sites to avoid duplication
+					if (GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k])) continue;
 
 					// Grid level and region
 					file << level << "\t" << region_number << "\t";
@@ -347,7 +332,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		ObjectManager::io_restart(IO_flag, level);
+		ObjectManager::getInstance()->io_restart(IO_flag, level);
 
 #endif
 
@@ -364,17 +349,18 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::in);
+		file.open("./restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(LATBO_FAILED);
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
 		int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
 		int gi, gj, gk;
 		int in_level, in_regnum;
+		std::vector<int> ind;
 
 		// Read in one line of file at a time
 		std::string line_in;	// String to store line
@@ -396,31 +382,18 @@ void GridObj::io_restart(bool IO_flag) {
 			// Read in global indices
 			iss >> gi >> gj >> gk;
 
-			// Global and local are the same for serial code or for lower grids
-			i = gi; j = gj; k = gk;
+			// Check on this rank before proceding
+			if ( !GridUtils::isOnThisRank(gi,gj,gk,*this) ) continue;
 
-			// For MPI cases, need to check on level 0 that site is on this rank before proceding
-#ifdef BUILD_FOR_MPI
-				if (level == 0) {
-
-					// Check whether on overlap or core of this rank
-
-					// Convert global to local indices
-					if (gi == XInd[0]) { i = 0;	} else if (gi == XInd[XInd.size()-1]) { i = XInd.size()-1; } // Overlap
-					else if (gi >= XInd[1] && gi <= XInd[XInd.size()-2]) { i = gi - XInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
-
-					if (gj == YInd[0]) { j = 0;	} else if (gj == YInd[YInd.size()-1]) { j = YInd.size()-1; } // Overlap
-					else if (gj >= YInd[1] && gj <= YInd[YInd.size()-2]) { j = gj - YInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
+			// Get local indices
+			ind.clear();
+			GridUtils::global_to_local(gi,gj,gk,this,ind);
+			i = ind[0];
+			j = ind[1];
 #if (dims == 3)
-					if (gk == ZInd[0]) { k = 0;	} else if (gk == ZInd[ZInd.size()-1]) { k = ZInd.size()-1; } // Overlap
-					else if (gk >= ZInd[1] && gk <= ZInd[ZInd.size()-2]) { k = gk - ZInd[1] + 1; } // Core
-					else { continue; } // Not on the rank
+			k = ind[2];
 #else
-					k = gk; // In 2D no need to convert
-#endif
-				}
+			k = 0;
 #endif
 
 
@@ -449,7 +422,7 @@ void GridObj::io_restart(bool IO_flag) {
 
 #ifdef IBM_ON
 
-		ObjectManager::io_restart(IO_flag, level);
+		ObjectManager::getInstance()->io_restart(IO_flag, level);
 
 #endif
 
@@ -546,6 +519,110 @@ void GridObj::io_probe_output() {
 
 	probefile.close();
 
+
+}
+
+// ************************************************************** //
+// Generic writer for each rank to write out all daat rowise to be 
+// processed using a new post-processing application into a suitable 
+// output format.
+void GridObj::io_lite(double tval) {
+
+	std::ofstream litefile;
+
+	// Filename
+	std::string filename ("./" + GridUtils::path_str + "/io_lite.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
+			+ ".Rnk" + std::to_string(MpiManager::my_rank) + "." + std::to_string((int)tval) + ".dat");
+
+	// Create file
+	litefile.open(filename, std::ios::out);
+
+	// Set precision and force fixed formatting
+	litefile.precision(output_precision);
+	litefile.setf(std::ios::fixed);
+	litefile.setf(std::ios::showpoint);
+
+	// Write simple header
+	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << std::endl;
+	litefile << "T = " << std::to_string(tval) << std::endl;
+	litefile << "RANK TYPE X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
+	
+	// Indices
+	size_t i,j,k,v;
+		
+	// Write out values
+	for (k = 0; k < ZInd.size(); k++) {
+		for (j = 0; j < YInd.size(); j++) {
+			for (i = 0; i < XInd.size(); i++) {
+
+
+#ifdef BUILD_FOR_MPI
+				// Don't write out the receiver overlap in MPI
+				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
+#endif	// BUILD_FOR_MPI				
+				{
+
+					// Write out rank
+					litefile << MpiManager::my_rank << "\t";
+				
+					// Write out type
+					litefile << LatTyp(i,j,k,YInd.size(),ZInd.size()) << "\t";
+
+					// Write out X, Y, Z
+					litefile << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
+
+					// Write out rho and u
+					litefile << rho(i,j,k,YInd.size(),ZInd.size()) << "\t";
+					for (v = 0; v < dims; v++) {
+						litefile << u(i,j,k,v,YInd.size(),ZInd.size(),dims) << "\t";
+					}
+#if (dims != 3)
+					litefile << 0 << "\t";
+#endif
+				
+					// Write out time averaged rho and u
+					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";
+					for (v = 0; v < dims; v++) {
+						litefile << ui_timeav(i,j,k,v,YInd.size(),ZInd.size(),dims) << "\t";
+					}
+#if (dims != 3)
+					litefile << 0 << "\t";
+#endif
+
+					// Write out time averaged u products
+					litefile << uiuj_timeav(i,j,k,0,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,1,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#if (dims == 3)
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#else
+					litefile << 0 << "\t";
+#endif
+#if (dims == 3)
+					litefile << uiuj_timeav(i,j,k,3,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,4,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,5,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+#else
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*dims-3)) << "\t";
+					litefile << 0 << "\t" << 0 << "\t";
+#endif
+
+					// New line
+					litefile << std::endl;
+
+
+				}
+
+			}
+		}
+	}
+
+
+	// Now do any sub-grids
+	if (NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].io_lite(tval);
+		}
+	}
 
 }
 // ***************************************************************************************************

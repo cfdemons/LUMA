@@ -26,6 +26,20 @@ int MpiManager::MPI_coords[dims];
 // Entry point
 int main( int argc, char* argv[] )
 {
+
+	// Memeory leak checking
+#ifdef _DEBUG
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	// Set output to the terminal window
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
+	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDOUT );
+	_CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE );
+	_CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDOUT );
+#endif
+
+
 	/*
 	***************************************************************************************************************
 	*********************************************** MPI INITIALISE ************************************************
@@ -46,7 +60,7 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
-#if (dims != 3)
+#if (dims != 3 && NumLev)
 	for (int i = 0; i < NumReg; i++) {
 		for (int l = 0; l < NumLev; l++) {
 			RefZstart[l][i] = 0;
@@ -127,7 +141,7 @@ int main( int argc, char* argv[] )
 			std::cout << "Error: See Log File." << std::endl;
 			*GridUtils::logfile << "When using MPI must use at least 2 cores in each direction. Exiting." << std::endl;
 			MPI_Finalize();
-			exit(EXIT_FAILURE);
+			exit(LATBO_FAILED);
 	}
 #endif
 
@@ -170,13 +184,13 @@ int main( int argc, char* argv[] )
 		}
 		*GridUtils::logfile << "\t)" << std::endl;
 #endif
-	*GridUtils::logfile << "Number of time steps = " << T << endl;
-	*GridUtils::logfile << "Physical grid spacing = " << Grids.dt << endl;
-	*GridUtils::logfile << "Lattice viscosity = " << Grids.nu << endl;
-	*GridUtils::logfile << "L0 relaxation time = " << (1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << u_ref << std::endl;
+	*GridUtils::logfile << "Number of time steps = " << std::to_string(T) << endl;
+	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dt) << endl;
+	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
+	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
+	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(u_ref) << std::endl;
 	// Reynolds Number
-	*GridUtils::logfile << "Reynolds Number = " << Re << endl;
+	*GridUtils::logfile << "Reynolds Number = " << std::to_string(Re) << endl;
 
 
 	/* ***************************************************************************************************************
@@ -202,7 +216,7 @@ int main( int argc, char* argv[] )
 	*************************************************************************************************************** */
 
 	// Create Object Manager
-	ObjectManager objMan;
+	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
 	*GridUtils::logfile << "Object Manager Created." << endl;
 
 #ifdef IBM_ON
@@ -221,39 +235,39 @@ int main( int argc, char* argv[] )
 	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
 
 #if defined INSERT_RECTANGLE_CUBOID
-	objMan.ibm_build_body(1);
+	objMan->ibm_build_body(1);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
 
 #elif defined INSERT_CIRCLE_SPHERE
-	objMan.ibm_build_body(2);
+	objMan->ibm_build_body(2);
 	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
 
 #elif defined INSERT_BOTH
-	objMan.ibm_build_body(3);
+	objMan->ibm_build_body(3);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
 
 #elif defined INSERT_FILAMENT
-	objMan.ibm_build_body(4);
+	objMan->ibm_build_body(4);
 	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
 
 #elif defined INSERT_FILARRAY
-	objMan.ibm_build_body(5);
+	objMan->ibm_build_body(5);
 	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
 
 #elif defined _2D_RIGID_PLATE_IBM
-	objMan.ibm_build_body(6);
+	objMan->ibm_build_body(6);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
 
 #elif defined _2D_PLATE_WITH_FLAP
-	objMan.ibm_build_body(7);
+	objMan->ibm_build_body(7);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
 
 #elif defined _3D_RIGID_PLATE_IBM
-	objMan.ibm_build_body(8);
+	objMan->ibm_build_body(8);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
 
 #elif defined _3D_PLATE_WITH_FLAP
-	objMan.ibm_build_body(9);
+	objMan->ibm_build_body(9);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
 
 #endif
@@ -261,10 +275,39 @@ int main( int argc, char* argv[] )
 #if !defined RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
-	objMan.ibm_initialise(Grids);
+	objMan->ibm_initialise(Grids);
 	*GridUtils::logfile << "Number of markers requested = " << num_markers << std::endl;
 
 #endif
+
+#endif
+
+#ifdef BFL_ON
+
+
+	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
+
+	// Read in input file to arrays
+	PCpts* _PCpts = new PCpts();
+	objMan->readInPCData(_PCpts);
+
+	// Call BFL body builder if there are points on this rank
+	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
+
+	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
+	delete _PCpts;
+	
+
+#endif
+
+#ifdef SOLID_FROM_FILE
+
+	*GridUtils::logfile << "Initialising Solid Objects from File..." << endl;
+
+	// Read in data from point cloud file
+	PCpts* _PCpts = new PCpts();
+	objMan->readInPointData(_PCpts);
+	delete _PCpts;
 
 #endif
 
@@ -317,13 +360,15 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 	Grids.io_textout("INITIALISATION");	// Do not change this tag!
 #endif
+
 #ifdef VTK_WRITER
 	*GridUtils::logfile << "Writing out to VTK file..." << endl;
 	Grids.io_vtkwriter(0.0);
 #ifdef IBM_ON
-    objMan.io_vtk_IBwriter(0.0);
+    objMan->io_vtk_IBwriter(0.0);
 #endif
 #endif
+
 #ifdef TECPLOT
 		for (int n = 0; n < MpiManager::num_ranks; n++) {
 			// Wait for rank accessing the file and only access if this rank's turn
@@ -340,6 +385,11 @@ int main( int argc, char* argv[] )
 
 #endif
 
+#ifdef IO_LITE
+		*GridUtils::logfile << "Writing out to IOLite file" << endl;
+		Grids.io_lite(Grids.t);
+#endif
+
 	// Get time of grid and object initialisation
 #ifdef BUILD_FOR_MPI
 	MPI_Barrier(mpim->my_comm);
@@ -348,13 +398,16 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 
 
-	// Set the pointer to the hierarchy in the MpiManager and compute buffer sizes
+	// Set the pointer to the hierarchy in the MpiManager
+	MpiManager::Grids = &Grids;
+
 #ifdef BUILD_FOR_MPI
+	// Compute buffer sizes
 	MPI_Barrier(mpim->my_comm);
 	t_start = clock();
 	
-	mpim->mpi_buffer_size(&Grids);	// Call buffer sizing routine
-
+	mpim->mpi_buffer_size();	// Call buffer sizing routine
+	
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif
@@ -399,13 +452,15 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
+
 #ifdef VTK_WRITER
 			*GridUtils::logfile << "Writing out to VTK file" << endl;
 			Grids.io_vtkwriter(Grids.t);
 #ifdef IBM_ON
-            objMan.io_vtk_IBwriter(Grids.t);
+            objMan->io_vtk_IBwriter(Grids.t);
 #endif
 #endif
+
 #ifdef TECPLOT
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 				// Wait for rank accessing the file and only access if this rank's turn
@@ -420,15 +475,21 @@ int main( int argc, char* argv[] )
 				}
 			}
 #endif
+
+#ifdef IO_LITE
+		*GridUtils::logfile << "Writing out to IOLite file" << endl;
+		Grids.io_lite(Grids.t);
+#endif
+
 #if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
 	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
 	&& defined IBM_ON && defined IBBODY_TRACER
 			*GridUtils::logfile << "Writing out flexible body position" << endl;
-			objMan.io_write_body_pos(Grids.t);
+			objMan->io_write_body_pos(Grids.t);
 #endif
 #if defined LD_OUT && defined IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
-			objMan.io_write_lift_drag(Grids.t);
+			objMan->io_write_lift_drag(Grids.t);
 #endif
 		}		
 
@@ -495,11 +556,16 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 
+	// Destroy ObjectManager
+	ObjectManager::destroyInstance();
+
 #ifdef BUILD_FOR_MPI
 	// Close logfile
 	MpiManager::logout->close();
 	// Finalise MPI
 	MPI_Finalize();
+	// Destroy MpiManager
+	MpiManager::destroyInstance();
 #endif
 
 	return 0;

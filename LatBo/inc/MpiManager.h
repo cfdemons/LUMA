@@ -5,12 +5,12 @@
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
-#define i_left i = 0; i < (int)pow(2, g->level + 1); i++
+#define i_left	i = 0; i < GridUtils::downToLimit((int)pow(2, g->level + 1), N_lim); i++
+#define j_down	j = 0; j < GridUtils::downToLimit((int)pow(2, g->level + 1), M_lim); j++
+#define k_front k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++
 #define i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++
-#define j_down j = 0; j < (int)pow(2, g->level + 1); j++
-#define j_up j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
-#define k_front k = 0; k < (int)pow(2, g->level + 1); k++
-#define k_back k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
+#define j_up	j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
+#define k_back	k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
 
 
 
@@ -64,8 +64,9 @@ public :
 	// Buffer data
 	std::vector< std::vector<double>> f_buffer_send;	// Array of resizeable outgoing buffers used for data transfer
 	std::vector< std::vector<double>> f_buffer_recv;	// Array of resizeable incoming buffers used for data transfer
-	MPI_Status stat;		// Status structure for Send-Receive return information
-	MPI_Request request;	// Request structure for handle to a posted Send-Receive
+	MPI_Status recv_stat;					// Status structure for Receive return information
+	MPI_Request send_requests[MPI_dir];		// Array of request structures for handles to posted ISends
+	MPI_Status send_stat[MPI_dir];			// Array of statuses for each Isend
 	// Structure storing the buffer sizes in each direction for a particular level and region
 	struct buffer_struct {
 		int size[MPI_dir];
@@ -86,7 +87,8 @@ public :
 	*/
 
 	// Singleton design
-	static MpiManager *getInstance();	// Get the pointer to the singleton instance (create it if necessary)
+	static MpiManager* getInstance();	// Get the pointer to the singleton instance (create it if necessary)
+	static void destroyInstance();
 
 	// Initialisation
 	void mpi_init( );		// Initialisation of MpiManager & Cartesian topology
@@ -95,7 +97,7 @@ public :
 	// Buffer methods
 	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction
 	void mpi_buffer_unpack( int dir, GridObj* g );		// Unpack the buffer back to the grid given
-	void mpi_buffer_size( GridObj* Grids );				// Set buffer size information for grids in hierarchy given and 
+	void mpi_buffer_size();								// Set buffer size information for grids in hierarchy given and 
 														// set pointer to hierarchy for subsequent access
 	void mpi_buffer_size_send( GridObj*& g );			// Routine to find the size of the sending buffer on supplied grid
 	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid
@@ -105,5 +107,6 @@ public :
 
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
+	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 };
 

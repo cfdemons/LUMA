@@ -3,7 +3,22 @@
 // are changed infrequently
 //
 
+#ifdef _DEBUG
+	#define _CRTDBG_MAP_ALLOC
+	#include <stdlib.h>
+	#include <crtdbg.h>	
+	#ifndef DBG_NEW
+		#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+		#define new DBG_NEW
+	#endif
+#endif  // _DEBUG
+
 #pragma once
+
+// Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
+#include <algorithm>
+#include <cmath>
+#include <vector>
 
 // Check OS is Windows or not
 #ifdef _WIN32
@@ -21,3 +36,26 @@
 #endif
 
 #include <stdio.h>
+
+// Grid utilities class definition (available to all parts of code)
+#include "../inc/GridUtils.h"
+
+// Error definition
+#define LATBO_FAILED 12345
+
+// Function: is_nan
+template <typename NumType>
+inline static bool is_nan(NumType n) {
+
+	// Try test so it is platform independent
+	if (
+#ifdef _WIN32
+		_isnan(n)
+#else
+		isnan(n)
+#endif
+	) return true;
+				
+	else return false;
+
+};

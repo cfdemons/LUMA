@@ -1,5 +1,4 @@
 #include "../inc/stdafx.h"
-#include "../inc/GridUtils.h"
 #include "../inc/GridObj.h"
 #include <sstream>		// String stream package
 #include <iostream>
@@ -16,6 +15,56 @@ GridUtils::~GridUtils(void)
 {
 }
 
+// ***************************************************************************************************
+// Returns a vector which is the cross product of a and b
+std::vector<double> GridUtils::crossprod(std::vector<double> a, std::vector<double> b) {
+
+	// Declare resulting vector
+	std::vector<double> result;
+
+	result.push_back( a[1]*b[2] - a[2]*b[1] );
+	result.push_back( a[2]*b[0] - a[0]*b[2] );
+	result.push_back( a[0]*b[1] - a[1]*b[0] );
+
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is a minus b
+std::vector<double> GridUtils::subtract(std::vector<double> a, std::vector<double> b) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < a.size(); i++) {
+		result.push_back( a[i] - b[i] );
+	}
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is sum of a and b
+std::vector<double> GridUtils::add(std::vector<double> a, std::vector<double> b) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < a.size(); i++) {
+		result.push_back( a[i] + b[i] );
+	}
+	return result;
+
+}
+
+// ***************************************************************************************************
+// Returns a vector which is scalar multiplied by vector
+std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> vec) {
+
+	std::vector<double> result;
+	for (size_t i = 0; i < vec.size(); i++) {
+		result.push_back( vec[i] * scalar );
+	}
+	return result;
+}
+	
 
 // ***************************************************************************************************
 // Returns a vector with n uniformly spaced values between min and max
@@ -105,8 +154,8 @@ double GridUtils::vecnorm( double vec[] )
 	return result;
 }
 
-// Supplied as a std::vector (as reference just in case vector is big)
-double GridUtils::vecnorm( std::vector<double>& vec )
+// Supplied as a std::vector
+double GridUtils::vecnorm( std::vector<double> vec )
 {
 	double result = 0.0;
 
@@ -121,8 +170,8 @@ double GridUtils::vecnorm( std::vector<double>& vec )
 
 // ***************************************************************************************************
 
-// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
+// Routine to map the global index of a coarse grid site to a corresponding fine site on the level below
+std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> fine_ind;
@@ -130,14 +179,18 @@ std::vector<int> GridUtils::indmapref(int coarse_i, int x_start, int coarse_j, i
 	// Map indices
 	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
 	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
+#if (dims == 3)
 	fine_ind.insert(fine_ind.begin() + 2, 2*(coarse_k - z_start + 1) - 2 );
+#else
+	fine_ind.insert(fine_ind.begin() + 2, 0 );
+#endif
 
 	return fine_ind;
 }
 // ***************************************************************************************************
 
-// Routine to map the index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::revindmapref(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
+// Routine to map the global index of a fine grid site to parent coarse grid site on the level above
+std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> coarse_ind;
@@ -156,7 +209,11 @@ std::vector<int> GridUtils::revindmapref(int fine_i, int x_start, int fine_j, in
 	// Reverse map indices
 	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
 	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
+#if (dims == 3)
 	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
+#else
+	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
+#endif
 
 	return coarse_ind;
 }
@@ -180,14 +237,14 @@ double GridUtils::dotprod(std::vector<double> vec1, std::vector<double> vec2) {
 // ***************************************************************************************************
 
 // Multiplies matrix A by vector x.
-std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> >& A, std::vector<double>& x) {
+std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x) {
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != x.size()) {
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Dimension mismatch -- cannot proceed. Exiting." << std::endl;
 		int ignore = system("pause");
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Initialise answer
@@ -202,6 +259,14 @@ std::vector<double> GridUtils::matrix_multiply(std::vector< std::vector<double> 
 	}
 
 	return product;
+}
+
+// ***************************************************************************************************
+// Change index to position
+double GridUtils::indexToPosition(int index, double dx) {
+
+	return dx * ( static_cast<double>(index) + 0.5 );
+
 }
 
 // ***************************************************************************************************
@@ -235,7 +300,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 // ***************************************************************************************************
 // Function to find whether the recv layer containing local site i,j,k links to an adjacent or periodic neighbour rank.
 // Takes in the site indices (local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
+bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 
 	// Local declarations
 	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
@@ -251,24 +316,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
 	// Define shifts based on which overlap we are on
 
 	// X
-	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],"x","max")) {
+	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,1)) {
 		shift[0] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],"x","min")) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,0)) {
 		shift[0] = -1;
 	}
 
 	// Y
-	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],"y","max")) {
+	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,1)) {
 		shift[1] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],"y","min")) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,0)) {
 		shift[1] = -1;
 	}
 
 #if (dims == 3)
 	// Z
-	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],"z","max")) {
+	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,1)) {
 		shift[2] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],"z","min")) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,0)) {
 		shift[2] = -1;
 	}
 #endif
@@ -295,106 +360,60 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Function to find whether a site with global indices provided is on a given grid or not
-// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
-bool GridUtils::isOnThisRank(int gi, int gj, int gk, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
+	
+	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gi);
+	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gj);
+	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gk);
 
-	if (
-		// Different conditions when using MPI due to extra overlap cells
-#ifdef BUILD_FOR_MPI
-		(	(int)gi <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gi >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
-		
-		&&
+	if (	found_x != pGrid.XInd.end() && found_y != pGrid.YInd.end()
 
-		(	(int)gj <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gj >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
 
 #if (dims == 3)
-		&&
-		
-		(	(int)gk <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-		&&	(int)gk >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level) 
-		)
+		&& found_z != pGrid.ZInd.end()
 #endif
-
-#else
-
-		((int)gi <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gi >= pGrid.XInd[0] ) &&
-		((int)gj <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gj >= pGrid.YInd[0] )
-#if (dims == 3)
-		&& ((int)gk <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gk >= pGrid.ZInd[0] )
-#endif
-
-
-#endif
-
 		) {
 
-			return true;
+		return true;
 
 	} else {
 
 		return false;
 	}
 
-
 }
 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-// MPI Note: doesn't work with periodic overlap, only corrects for its possible presence
-bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 
 	switch (xyz) {
 
 	case 0:
-		// X direction
-#ifdef BUILD_FOR_MPI	// Allow for overlap of thickness 2^level but ignore periodicity
-		if (	(int)gl <= pGrid.XInd[pGrid.XInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.XInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.XInd[pGrid.XInd.size()-1] && (int)gl >= pGrid.XInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// X direction
+		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
 
-			return false;
+		if (found_x != pGrid.XInd.end()) return true;		
+		else return false;
 		}
 
 	case 1:
-		// Y direction
-#ifdef BUILD_FOR_MPI
-		if (	(int)gl <= pGrid.YInd[pGrid.YInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.YInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.YInd[pGrid.YInd.size()-1] && (int)gl >= pGrid.YInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// Y direction
+		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
 
-			return false;
+		if (found_y != pGrid.YInd.end()) return true;		
+		else return false;
 		}
 
 	case 2:
-		// Z direction
-#ifdef BUILD_FOR_MPI
-		if (	(int)gl <= pGrid.ZInd[pGrid.ZInd.size() - (int)pow(2,pGrid.level) - 1] + (int)pow(2,pGrid.level) 
-			&&	(int)gl >= pGrid.ZInd[(int)pow(2,pGrid.level)] - (int)pow(2,pGrid.level))
-#else
-		if ((int)gl <= pGrid.ZInd[pGrid.ZInd.size()-1] && (int)gl >= pGrid.ZInd[0])
-#endif
 		{
-			return true;
-		
-		} else {
+		// Z direction
+		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
 
-			return false;
+		if (found_z != pGrid.ZInd.end()) return true;		
+		else return false;
 		}
 
 	}
@@ -405,36 +424,38 @@ bool GridUtils::isOnThisRank(int gl, int xyz, GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Routine to see whether the specified refined region intersects with the span of the provided parent grid
-bool GridUtils::hasThisSubGrid(GridObj& pGrid, int RegNum) {
+bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 
-
-	// Loop through every global point on the given grid and if one 
-	// of them exists within the refined region then return true.
-	for (size_t i : pGrid.XInd) {
-		for (size_t j : pGrid.YInd) {
-			for (size_t k : pGrid.ZInd) {
-
-				if	(
-					(i >= RefXstart[pGrid.level][RegNum] && i <= RefXend[pGrid.level][RegNum]) &&
-					(j >= RefYstart[pGrid.level][RegNum] && j <= RefYend[pGrid.level][RegNum])
-#if (dims == 3)
-					&& (k >= RefZstart[pGrid.level][RegNum] && k <= RefZend[pGrid.level][RegNum])
-#endif
-				) {				
-					return true;
-				}
-
-			}
-		}
+	// Loop over over X range of subgrid and check for matching index on parent grid
+	for (size_t i = RefXstart[pGrid.level][RegNum]; i <= RefXend[pGrid.level][RegNum]; i++) {
+		auto found_i = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), i);
+		if (found_i != pGrid.XInd.end()) break;		// If a match is found then chance that range intersects parent grid indices
+		else if (i == RefXend[pGrid.level][RegNum] && found_i == pGrid.XInd.end()) return false;	// Got to the end and X is not intersecting
 	}
 
-	return false;
+	// Loop over over Y range
+	for (size_t j = RefYstart[pGrid.level][RegNum]; j <= RefYend[pGrid.level][RegNum]; j++) {
+		auto found_j = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), j);
+		if (found_j != pGrid.YInd.end()) break;
+		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
+	}
+
+#if (dims == 3)
+	// Loop over over Z range
+	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
+		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
+		if (found_k != pGrid.ZInd.end()) break;
+		else if (k == RefZend[pGrid.level][RegNum] && found_k == pGrid.ZInd.end()) return false;
+	}
+#endif
+
+	return true;
 	
 }
 
 // ***************************************************************************************************
-// Pass pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed to by Grids*
-// which we also pass by reference to save copying it
+// Pass null pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed 
+// to by Grids* which we also pass by reference to save copying it
 void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
 
 	// Check supplied grid for a match
@@ -483,31 +504,31 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 	if (
 	(
 		// X on sender
-		(GridUtils::isOnSenderLayer(pos_x,"x","min") || GridUtils::isOnSenderLayer(pos_x,"x","max")) &&
+		(GridUtils::isOnSenderLayer(pos_x,0,0) || GridUtils::isOnSenderLayer(pos_x,0,1)) &&
 
 		// Y and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_y,"y","min") && !GridUtils::isOnRecvLayer(pos_y,"y","max")
+		(!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
 #if (dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,"z","min") && !GridUtils::isOnRecvLayer(pos_z,"z","max")
+		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
 #endif
 		)
 	) || (
 		// Y on sender
-		(GridUtils::isOnSenderLayer(pos_y,"y","min") || GridUtils::isOnSenderLayer(pos_y,"y","max")) &&
+		(GridUtils::isOnSenderLayer(pos_y,1,0) || GridUtils::isOnSenderLayer(pos_y,1,1)) &&
 
 		// X and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_x,"x","min") && !GridUtils::isOnRecvLayer(pos_x,"x","max")
+		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)
 #if (dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,"z","min") && !GridUtils::isOnRecvLayer(pos_z,"z","max")
+		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
 
 		)
 	) || (
 		// Z on sender
-		(GridUtils::isOnSenderLayer(pos_z,"z","min") || GridUtils::isOnSenderLayer(pos_z,"z","max")) &&
+		(GridUtils::isOnSenderLayer(pos_z,2,0) || GridUtils::isOnSenderLayer(pos_z,2,1)) &&
 
 		// X and Y not recv
-		(!GridUtils::isOnRecvLayer(pos_x,"x","min") && !GridUtils::isOnRecvLayer(pos_x,"x","max")	&& 
-		!GridUtils::isOnRecvLayer(pos_y,"y","min") && !GridUtils::isOnRecvLayer(pos_y,"y","max")
+		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)	&& 
+		!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
 #endif
 		)
 	)
@@ -521,39 +542,40 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
-// whether it is an "x", "y" or "z" coordinate and which edge of the rank you are checking either "min" or "max".
-bool GridUtils::isOnSenderLayer(double site_position, std::string dir, std::string maxmin) {
+// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
+// either "min" = 0 or "max" = 1.
+bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank inner overlap regions dictated by the coarsest rank
-	if (!dir.compare("x")) {
+	if (dir == 0) {
 
-		if (!maxmin.compare("max")) {	// Note that std::string::compare() returns 0 if they are equal
+		if (maxmin == 1) {
 			if (site_position > mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->sender_layer_pos.X[0] && site_position < mpim->sender_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (!dir.compare("y")) {
+	} else if (dir == 1) {
 
-		if (!maxmin.compare("max")) {
+		if (maxmin == 1) {
 			if (site_position > mpim->sender_layer_pos.Y[2] && site_position < mpim->sender_layer_pos.Y[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->sender_layer_pos.Y[0] && site_position < mpim->sender_layer_pos.Y[1] ) return true;
 
 		}
 
-	} else if (!dir.compare("z")) {
+	} else if (dir == 2) {
 
-		if (!maxmin.compare("max")) {
+		if (maxmin == 1) {
 			if (site_position > mpim->sender_layer_pos.Z[2] && site_position < mpim->sender_layer_pos.Z[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->sender_layer_pos.Z[0] && site_position < mpim->sender_layer_pos.Z[1] ) return true;
 
 		}
@@ -563,7 +585,7 @@ bool GridUtils::isOnSenderLayer(double site_position, std::string dir, std::stri
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 
 	}
 
@@ -581,10 +603,10 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
-	if (	GridUtils::isOnRecvLayer(pos_x,"x","min") || GridUtils::isOnRecvLayer(pos_x,"x","max") ||
-			GridUtils::isOnRecvLayer(pos_y,"y","min") || GridUtils::isOnRecvLayer(pos_y,"y","max")
+	if (	GridUtils::isOnRecvLayer(pos_x,0,0) || GridUtils::isOnRecvLayer(pos_x,0,1) ||
+			GridUtils::isOnRecvLayer(pos_y,1,0) || GridUtils::isOnRecvLayer(pos_y,1,1)
 #if (dims == 3)
-			|| GridUtils::isOnRecvLayer(pos_z,"z","min") || GridUtils::isOnRecvLayer(pos_z,"z","max")
+			|| GridUtils::isOnRecvLayer(pos_z,2,0) || GridUtils::isOnRecvLayer(pos_z,2,1)
 #endif
 		) {
 			return true;
@@ -596,39 +618,40 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the outer MPI overlap of the coarsest grid based on its position,
-// whether it is an "x", "y" or "z" coordinate and which edge of the rank you are checking either "min" or "max".
-bool GridUtils::isOnRecvLayer(double site_position, std::string dir, std::string maxmin) {
+// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
+// either "min" = 0 or "max" = 1.
+bool GridUtils::isOnRecvLayer(double site_position, int dir, int maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank outer overlap regions dictated by the coarsest rank
-	if (!dir.compare("x")) {
+	if (dir == 0) {
 
-		if (!maxmin.compare("max") ) {
+		if (maxmin == 1) {
 			if (site_position > mpim->recv_layer_pos.X[2] && site_position < mpim->recv_layer_pos.X[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->recv_layer_pos.X[0] && site_position < mpim->recv_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (!dir.compare("y")) {
+	} else if (dir == 1) {
 
-		if (!maxmin.compare("max") ) {
+		if (maxmin == 1) {
 			if (site_position > mpim->recv_layer_pos.Y[2] && site_position < mpim->recv_layer_pos.Y[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->recv_layer_pos.Y[0] && site_position < mpim->recv_layer_pos.Y[1] ) return true;
 
 		}
 		
-	} else if (!dir.compare("z")) {
+	} else if (dir == 2) {
 
-		if (!maxmin.compare("max") ) {
+		if (maxmin == 1) {
 			if (site_position > mpim->recv_layer_pos.Z[2] && site_position < mpim->recv_layer_pos.Z[3] ) return true;
 
-		} else if (!maxmin.compare("min")) {
+		} else if (maxmin == 0) {
 			if (site_position > mpim->recv_layer_pos.Z[0] && site_position < mpim->recv_layer_pos.Z[1] ) return true;
 
 		}
@@ -638,7 +661,7 @@ bool GridUtils::isOnRecvLayer(double site_position, std::string dir, std::string
 		// Invalid string indicating direction
 		std::cout << "Error: See Log File" << std::endl;
 		*logfile << "Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 
 	}
 
@@ -679,4 +702,3 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 
 	return result;
 }
-

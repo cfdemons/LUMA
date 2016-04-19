@@ -53,17 +53,18 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 1000			// How many timesteps before whole grid output
-#define output_precision 10		// Precision of output
+#define output_precision 16		// Precision of output
+
 
 // Types of output
-//#define TEXTOUT
-//#define VTK_WRITER
+#define TEXTOUT
+#define VTK_WRITER
 //#define TECPLOT
-#define IO_LITE
+//#define IO_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -76,7 +77,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Gravity
-//#define GRAVITY_ON
+#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
@@ -84,7 +85,7 @@ const static int zProbeLims[2] = {30, 120};
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 300000
+#define restart_out_every 500000
 
 // LBM configuration
 //#define USE_MRT
@@ -103,7 +104,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 2500000	// Number of time steps
 
 
 /*
@@ -129,19 +130,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 400		// Number of x lattice sites
-#define M 80		// Number of y lattice sites
-#define K 80		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 61		// Number of x lattice sites
+#define M 66		// Number of y lattice sites
+#define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 200		// End of domain-x
-#define a_y 0		// Start of domain-y
-#define b_y 40		// End of domain-y
+#define b_x 0.61	// End of domain-x
+#define a_y -0.05		// Start of domain-y
+#define b_y 0.61	// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 40		// End of domain-z
+#define b_z 8		// End of domain-z
 
 
 /*
@@ -152,17 +153,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_ref
-						//	u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 100			// Desired Reynolds number
+#define Re 1			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -174,7 +174,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-//#define IBM_ON						// Turn on IBM
+#define IBM_ON						// Turn on IBM
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -229,15 +229,15 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Inlets
-#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
+//#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
 
 // Outlets
-#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+//#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 //#define OUTLET_NRBC				// Turn on NRBC at outlet
 
 
@@ -259,24 +259,24 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Bounce-back solids
-//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 100		// Index of start of object/wall in x-direction
-	#define obj_x_max 120		// Index of end of object/wall in x-direction
-	#define obj_y_min 30			// Index of start of object/wall in y-direction
-	#define obj_y_max 50		// Index of end of object/wall in y-direction
-	#define obj_z_min 4		// Index of start of object/wall in z-direction
-	#define obj_z_max 24		// Index of end of object/wall in z-direction
+	#define obj_x_min 0		// Index of start of object/wall in x-direction
+	#define obj_x_max 60		// Index of end of object/wall in x-direction
+	#define obj_y_min 0		// Index of start of object/wall in y-direction
+	#define obj_y_max 4		// Index of end of object/wall in y-direction
+	#define obj_z_min 105		// Index of start of object/wall in z-direction
+	#define obj_z_max 135		// Index of end of object/wall in z-direction
 #endif
 
 
 // Bounce-back objects from point clouds
-#define SOLID_FROM_FILE
+//#define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
 	#define object_on_grid_lev 0		// Provide grid level on which object should be added 

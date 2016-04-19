@@ -528,7 +528,8 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
+	//nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
+	nu = ((M - obj_y_max) - 2) * u_ref / Re;	// TODO Needs to be a check on whether this is what we want
 #elif defined SOLID_FROM_FILE
 	// Use object length (scaled back to L0 units)
 	nu = (object_length_x / pow(2,object_on_grid_lev)) * u_ref / Re;

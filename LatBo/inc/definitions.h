@@ -56,14 +56,14 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000			// How many timesteps before whole grid output
+#define out_every 5000			// How many timesteps before whole grid output
 #define output_precision 10		// Precision of output
 
 // Types of output
 //#define TEXTOUT
-//#define VTK_WRITER
+#define VTK_WRITER
 //#define TECPLOT
-#define IO_LITE
+//#define IO_LITE
 
 // High frequency output options
 //#define PROBE_OUTPUT
@@ -84,7 +84,7 @@ const static int zProbeLims[2] = {30, 120};
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 300000
+#define restart_out_every 10000
 
 // LBM configuration
 //#define USE_MRT
@@ -103,7 +103,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 100000	// Number of time steps
 
 
 /*
@@ -129,19 +129,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 400		// Number of x lattice sites
-#define M 80		// Number of y lattice sites
-#define K 80		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 1500		// Number of x lattice sites
+#define M 600		// Number of y lattice sites
+#define K 600		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 200		// End of domain-x
+#define b_x 10		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 40		// End of domain-y
+#define b_y 4		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 40		// End of domain-z
+#define b_z 4		// End of domain-z
 
 
 /*
@@ -162,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 100			// Desired Reynolds number
+#define Re 5000			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -242,6 +242,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
+#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
@@ -279,13 +280,13 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 0		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 100
+	#define start_object_x 150
 	#define start_object_y 1
-	#define start_object_z 10
-	#define object_length_x 60			// The object input is scaled based on this dimension
+	#define start_object_z 75
+	#define object_length_x 300			// The object input is scaled based on this dimension
 #endif
 
 
@@ -311,7 +312,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -329,13 +330,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 10 };
-	const static size_t RefXend[NumLev][NumReg]		= { 80 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 375 };
+	const static size_t RefXend[NumLev][NumReg]		= { 675 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
-	const static size_t RefYend[NumLev][NumReg]		= { 30 };
+	const static size_t RefYend[NumLev][NumReg]		= { 150 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { 5 };
-	static size_t RefZend[NumLev][NumReg]		= { 35 };
+	static size_t RefZstart[NumLev][NumReg]		= { 150 };
+	static size_t RefZend[NumLev][NumReg]		= { 450 };
 
 #elif (NumReg == 1 && NumLev == 2)
 	const static size_t RefXstart[NumLev][NumReg]	= { {226}, {12} };

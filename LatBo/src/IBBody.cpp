@@ -5,7 +5,8 @@
 #include "../inc/IBBody.h"
 #include "../inc/definitions.h"
 #include <math.h>
-#include "../inc/GridObj.h"
+
+class GridObj;
 
 // ***************************************************************************************************
 // Constructor and destructor
@@ -13,6 +14,11 @@ IBBody::IBBody()
 {
 	this->groupID = 0;	// Default ID
 }
+IBBody::IBBody(GridObj* g)
+{
+	this->_Owner = g;
+	this->groupID = 0;	// Default ID
+};
 IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************
@@ -119,7 +125,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(LATBO_FAILED);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -172,7 +178,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 		);
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -234,7 +240,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(LATBO_FAILED);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -255,7 +261,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -304,7 +310,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if (markers.size() != num_points) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Body is not closed. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 }
@@ -319,7 +325,7 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Designate BCs
@@ -383,7 +389,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	if ( dims == 2 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Designate body as being flexible or rigid and an open surface
@@ -413,7 +419,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			exit(LATBO_FAILED);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -434,7 +440,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(EXIT_FAILURE);
+		exit(LATBO_FAILED);
 	}
 
 	// Number of points required to get uniform distribution and points on corners

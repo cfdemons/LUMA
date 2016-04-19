@@ -149,10 +149,11 @@ void GridObj::io_tecplot(double tval) {
 void GridObj::io_tecplot_debug(double tval, std::string tag) {
 
 	// Only do this if needed
-	if (t % out_every != 0) {
+	if ((t+1) % out_every != 0) {
 		return;
 	}
 
+// Flag to avoid writing out receiver layer sites
 #define EX_RECV_LAYER
 
 	// Access control for MPI application
@@ -191,44 +192,11 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 	// Only the first rank to write to the file writes the header
 	if (!exists_flag) {
 
-		// Declare sizes
-		int i_count = 0, j_count = 0, k_count = 1;
+		// Write simple header
+		tecfile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << std::endl;
+		tecfile << "T = " << std::to_string(tval) << std::endl;
+		tecfile << "RANK TYPE X Y Z F FEQ RHO UX UY UZ" << std::endl;
 
-		// Get number of sites
-		if (level == 0) {
-
-			// Level 0 admissable sites are straightforward
-			i_count = N;
-			j_count = M;
-#if (dims == 3)
-			k_count = K;
-#endif
-
-		} else {
-
-			// Sub-grid sites from global sizes
-			i_count = (RefXend[level-1][region_number] - RefXstart[level-1][region_number] + 1) * 2;
-			j_count = (RefYend[level-1][region_number] - RefYstart[level-1][region_number] + 1) * 2;
-#if (dims == 3)
-			k_count = (RefZend[level-1][region_number] - RefZstart[level-1][region_number] + 1) * 2;
-#endif
-		}
-		
-
-		// Add header
-		tecfile << "TITLE = L" << level << " R" << region_number << " --> All grid quantities" << std::endl;
-		tecfile << "TAG = " << tag << std::endl;
-#if (defined BUILD_FOR_MPI && !defined EX_RECV_LAYER)
-		tecfile << "VARIABLES = \"Rnk\" \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
-#else
-		tecfile << "VARIABLES = \"X\" \"Y\" \"Z\" \"F\" \"FEQ\" \"RHO\" \"UX\" \"UY\" \"UZ\" " << std::endl;
-#endif
-		tecfile << "I = " << i_count
-				<< ", J = " << j_count
-				<< ", K = " <<	k_count
-				<< std::endl;
-		tecfile << "SOLUTIONTIME = " << std::to_string(tval) << std::endl;
-		tecfile << std::endl << std::endl;
 	}
 
 
@@ -247,11 +215,12 @@ void GridObj::io_tecplot_debug(double tval, std::string tag) {
 #endif	// BUILD_FOR_MPI				
 				{
 
-#if (defined BUILD_FOR_MPI && !defined EX_RECV_LAYER)
-					// Write out Rank to identify the duplicates
+					// Write out Rank
 					tecfile << MpiManager::my_rank << "\t";
-#endif
 				
+					// Write out type
+					tecfile << LatTyp(i,j,k,YInd.size(),ZInd.size()) << "\t";
+
 					// Write out X, Y, Z
 					tecfile << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 

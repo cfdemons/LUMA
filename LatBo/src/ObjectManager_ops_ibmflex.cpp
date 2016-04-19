@@ -565,7 +565,7 @@ void ObjectManager::ibm_position_update(int ib, GridObj& g) {
 void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 
 	// Find flexible body in group and store index
-	int ib_flex;
+	int ib_flex = 0;
 	for (size_t i = 0; i < iBody.size(); i++) {
 
 		if (iBody[i].flex_rigid && iBody[i].groupID == group) {

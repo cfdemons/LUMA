@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.5-31 ## //
+// Definitions File Format ## 0.6-master ## //
 
 
 // Header guard
@@ -33,7 +33,8 @@
 */
 
 
-//#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+#define EX_RECV_LAYER				// Flag to avoid writing out receiver layer sites in MPI builds
 //#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
 //#define IBM_DEBUG					// Write IBM body and matrix data out to text files

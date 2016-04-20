@@ -110,10 +110,19 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 	// For each outgoing direction
 	for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
 
-		// Identify site where the population will be streamed to
+		// Identify site where the population will be streamed to //
+
+		// Consider periodic stream (serial/non-MPI)
+#if (defined PERIODIC_BOUNDARIES && !defined BUILD_FOR_MPI)
+
+		dest_x = (i+c[0][v_outgoing] + N_lim) % N_lim;
+		dest_y = (j+c[1][v_outgoing] + M_lim) % M_lim;
+		dest_z = (k+c[2][v_outgoing] + K_lim) % K_lim;
+#else
 		dest_x = i+c[0][v_outgoing];
 		dest_y = j+c[1][v_outgoing];
 		dest_z = k+c[2][v_outgoing];
+#endif
 
 		// If this site is off-grid then cannot apply the BC in preparation for streaming
 		if (	(dest_x >= N_lim || dest_x < 0) ||
@@ -123,14 +132,17 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 				continue;	// Move on to next direction
 
 #ifdef BUILD_FOR_MPI
-		// When using MPI, equivalent to off-grid is destination is in periodic recv layer with 
-		// periodic boundaries disabled.
+		// When using MPI, equivalent to off-grid is when destination is in 
+		// periodic recv layer with periodic boundaries disabled.
 		} else if ( GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
 			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this) ) {
 
 #if (!defined PERIODIC_BOUNDARIES)
 			continue;	// Periodic boundaries disabled so do not try to apply BC
 #endif
+
+			/* If periodic boundaries are enabled then this is a valid stream 
+			 * so allow flow through to next section */
 
 #endif	// BUILD_FOR_MPI
 

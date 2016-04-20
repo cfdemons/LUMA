@@ -56,7 +56,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000			// How many timesteps before whole grid output
+#define out_every 1			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -104,7 +104,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 2500000	// Number of time steps
+#define T 250	// Number of time steps
 
 
 /*
@@ -131,15 +131,15 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 61		// Number of x lattice sites
-#define M 66		// Number of y lattice sites
+#define N 16		// Number of x lattice sites
+#define M 16		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
 #define b_x 0.61	// End of domain-x
-#define a_y -0.05		// Start of domain-y
+#define a_y 0		// Start of domain-y
 #define b_y 0.61	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
@@ -174,7 +174,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define IBM_ON						// Turn on IBM
+//#define IBM_ON						// Turn on IBM
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -242,7 +242,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-
+#define	PERIODIC_BOUNDARIES
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
@@ -259,7 +259,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Bounce-back solids
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 0		// Provide grid level on which block should be added 

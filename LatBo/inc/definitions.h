@@ -131,8 +131,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 16		// Number of x lattice sites
-#define M 16		// Number of y lattice sites
+#define N 61		// Number of x lattice sites
+#define M 61		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
@@ -242,7 +242,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-#define	PERIODIC_BOUNDARIES
+#define PERIODIC_BOUNDARIES
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)

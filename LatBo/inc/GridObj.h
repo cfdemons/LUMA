@@ -152,6 +152,7 @@ public :
 	void io_tecplot(double tval);				// TecPlot write out
 	void io_tecplot_debug(double tval, std::string tag);	// Special debugging writer to help debug problems with MPI
 	void io_lite(double tval);					// Generic writer to individual files
+	void io_lite(double tval, std::string TAG);	// Generic writer to individual files
 
 
 };

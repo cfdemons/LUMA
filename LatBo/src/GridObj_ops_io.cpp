@@ -529,6 +529,7 @@ void GridObj::io_probe_output() {
 void GridObj::io_lite(double tval) {
 	io_lite(tval,"");	// Call with no tag if called without tag
 }
+
 void GridObj::io_lite(double tval, std::string TAG) {
 
 	std::ofstream litefile;

@@ -123,7 +123,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 				continue;	// Move on to next direction
 
 #ifdef BUILD_FOR_MPI
-		// When using MPI, equivalent to off-grid is destination is if in periodic recv layer with 
+		// When using MPI, equivalent to off-grid is destination is in periodic recv layer with 
 		// periodic boundaries disabled.
 		} else if ( GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
 			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this) ) {
@@ -139,8 +139,9 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Only apply if destination is a fluid site
-		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) != 7 &&
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) != 8
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
 			) {
 
 			// Get incoming direction

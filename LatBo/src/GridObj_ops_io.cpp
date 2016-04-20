@@ -527,6 +527,9 @@ void GridObj::io_probe_output() {
 // processed using a new post-processing application into a suitable 
 // output format.
 void GridObj::io_lite(double tval) {
+	io_lite(tval,"");	// Call with no tag if called without tag
+}
+void GridObj::io_lite(double tval, std::string TAG) {
 
 	std::ofstream litefile;
 
@@ -543,9 +546,13 @@ void GridObj::io_lite(double tval) {
 	litefile.setf(std::ios::showpoint);
 
 	// Write simple header
-	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << std::endl;
+	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << " -- " << TAG << std::endl;
 	litefile << "T = " << std::to_string(tval) << std::endl;
+#ifdef MEGA_DEBUG
+	litefile << "RANK TYPE X Y Z RHO UX UY UZ F FEQ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
+#else
 	litefile << "RANK TYPE X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
+#endif
 	
 	// Indices
 	size_t i,j,k,v;
@@ -556,10 +563,10 @@ void GridObj::io_lite(double tval) {
 			for (i = 0; i < XInd.size(); i++) {
 
 
-#ifdef BUILD_FOR_MPI
+#if (defined MEGA_DEBUG && defined EX_RECV_LAYER && defined BUILD_FOR_MPI) || (!defined MEGA_DEBUG && defined BUILD_FOR_MPI)
 				// Don't write out the receiver overlap in MPI
 				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
-#endif	// BUILD_FOR_MPI				
+#endif				
 				{
 
 					// Write out rank
@@ -578,6 +585,16 @@ void GridObj::io_lite(double tval) {
 					}
 #if (dims != 3)
 					litefile << 0 << "\t";
+#endif
+
+#ifdef MEGA_DEBUG
+					// Write out F and Feq
+					for (v = 0; v < nVels; v++) {
+						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),nVels) << "\t";
+					}
+					for (v = 0; v < nVels; v++) {
+						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),nVels) << "\t";
+					}
 #endif
 				
 					// Write out time averaged rho and u
@@ -617,12 +634,14 @@ void GridObj::io_lite(double tval) {
 	}
 
 
+#ifndef MEGA_DEBUG
 	// Now do any sub-grids
 	if (NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
 			subGrid[reg].io_lite(tval);
 		}
 	}
+#endif
 
 }
 // ***************************************************************************************************

@@ -152,7 +152,6 @@ public :
 	void io_tecplot(double tval);				// TecPlot write out
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	void io_lite(double tval);					// Generic writer to individual files
-	void io_lite(double tval, std::string TAG);	// Generic writer to individual files
 
 
 };

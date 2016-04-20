@@ -723,10 +723,15 @@ void GridObj::LBM_stream( ) {
 							dest_y = (j+c[1][v] + M_lim) % M_lim;
 							dest_z = (k+c[2][v] + K_lim) % K_lim;
 
-							// Only apply periodic BCs on coarsest level and if stream is Coarse --> Coarse
+							/* Only apply periodic BCs on coarsest level and if stream is:
+							 * Coarse --> Coarse
+							 * Solid --> Coarse (to allow half-way BB to be applied)
+							 * Coarse --> Solid (for consistency with the above) */
 							if (
 								(level == 0) &&
-								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+								( 	(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == 0 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0)	)
 							) {
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);

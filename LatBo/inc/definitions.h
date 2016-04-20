@@ -33,7 +33,7 @@
 */
 
 
-#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+//#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 #define EX_RECV_LAYER				// Flag to avoid writing out receiver layer sites in MPI builds
 //#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 10			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 250	// Number of time steps
+#define T 25000	// Number of time steps
 
 
 /*
@@ -132,8 +132,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 61		// Number of x lattice sites
-#define M 61		// Number of y lattice sites
+#define N 16		// Number of x lattice sites
+#define M 16		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 

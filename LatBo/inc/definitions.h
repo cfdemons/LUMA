@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000			// How many timesteps before whole grid output
+#define out_every 10			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 2500000	// Number of time steps
+#define T 2000	// Number of time steps
 
 
 /*
@@ -132,16 +132,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 61		// Number of x lattice sites
-#define M 66		// Number of y lattice sites
+#define N 31		// Number of x lattice sites
+#define M 36		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 0.61	// End of domain-x
+#define b_x 0.31	// End of domain-x
 #define a_y -0.05		// Start of domain-y
-#define b_y 0.61	// End of domain-y
+#define b_y 0.31	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -175,7 +175,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-//#define IBM_ON						// Turn on IBM
+#define IBM_ON						// Turn on IBM
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -192,7 +192,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 19		// Number of Lagrange points (approximately)
+#define num_markers 9		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -205,8 +205,8 @@ const static int zProbeLims[2] = {30, 120};
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 0.2		// length of filament
-#define ibb_start_x 0.3	// start x position of the filament
+#define ibb_length 0.1		// length of filament
+#define ibb_start_x 0.15	// start x position of the filament
 #define ibb_start_y 0.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
@@ -220,7 +220,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 2.0			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 1.0			// Flexural rigidity (lattice units) of filament
 
 
 /*
@@ -268,7 +268,7 @@ const static int zProbeLims[2] = {30, 120};
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
 	#define obj_x_min 0		// Index of start of object/wall in x-direction
-	#define obj_x_max 60		// Index of end of object/wall in x-direction
+	#define obj_x_max 30		// Index of end of object/wall in x-direction
 	#define obj_y_min 0		// Index of start of object/wall in y-direction
 	#define obj_y_max 4		// Index of end of object/wall in y-direction
 	#define obj_z_min 105		// Index of start of object/wall in z-direction

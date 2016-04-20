@@ -133,7 +133,7 @@ const static int zProbeLims[2] = {30, 120};
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
 #define N 31		// Number of x lattice sites
-#define M 36		// Number of y lattice sites
+#define M 66		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
@@ -141,7 +141,7 @@ const static int zProbeLims[2] = {30, 120};
 #define a_x 0		// Start of domain-x
 #define b_x 0.31	// End of domain-x
 #define a_y -0.05		// Start of domain-y
-#define b_y 0.31	// End of domain-y
+#define b_y 0.61	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -154,7 +154,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.0001 //2.80583613916949e-05	// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -192,7 +192,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 9		// Number of Lagrange points (approximately)
+#define num_markers 19		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -205,7 +205,7 @@ const static int zProbeLims[2] = {30, 120};
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 0.1		// length of filament
+#define ibb_length 0.2		// length of filament
 #define ibb_start_x 0.15	// start x position of the filament
 #define ibb_start_y 0.0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
@@ -312,7 +312,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 0		// Levels of refinement (can't use with IBM yet)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -330,10 +330,10 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 10 };
-	const static size_t RefXend[NumLev][NumReg]		= { 80 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 12 };
+	const static size_t RefXend[NumLev][NumReg]		= { 17 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
-	const static size_t RefYend[NumLev][NumReg]		= { 30 };
+	const static size_t RefYend[NumLev][NumReg]		= { 34 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };

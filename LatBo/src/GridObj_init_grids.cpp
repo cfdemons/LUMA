@@ -528,8 +528,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	nu = (ibb_l / dx) * u_ref / Re;
 #elif defined SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	//nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
-	nu = ((M - obj_y_max) - 2) * u_ref / Re;	// TODO Change this before pushing to master (can be done using wall_thickness)
+	nu = ((obj_x_max - obj_x_min) / pow(2,block_on_grid_lev)) * u_ref / Re;
 #elif defined SOLID_FROM_FILE
 	// Use object length (scaled back to L0 units)
 	nu = (object_length_x / pow(2,object_on_grid_lev)) * u_ref / Re;
@@ -538,7 +537,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	nu = (bfl_length_x / pow(2,bfl_on_grid_lev)) * u_ref / Re;
 #else
 	// If no object then use domain height (in lattice units)
-	nu = (M - 2) * u_ref / Re;	// TODO The minus 2 is bacause of halfway BB - should have another if condition to check in case this isn't true
+	nu = (M - wall_thickness_bottom - wall_thickness_top) * u_ref / Re;	// Based on actual width of channel (in lattice units)
 #endif
 
 	// Relaxation frequency on L0
@@ -1024,7 +1023,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 	// Search index vector to see if FRONT wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] == 0) {		// Wall found
+		if (ZInd[k] < wall_thickness_front) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1034,14 +1033,13 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}
 
 	// Search index vector to see if BACK wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] == K-1) {		// Wall found
+		if (ZInd[k] > K-1 - wall_thickness_back) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1051,7 +1049,6 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}
@@ -1061,7 +1058,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 #if defined WALLS_ON
 	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] == 0) {		// Wall found
+		if (YInd[j] < wall_thickness_bottom) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1071,8 +1068,6 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 				}
 			}
-			break;
-
 		}
 	}
 #endif
@@ -1081,7 +1076,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] == M-1) {		// Wall found
+		if (YInd[j] > M-1 - wall_thickness_top) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1091,8 +1086,6 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 				}
 			}
-			break;
-
 		}
 	}
 #endif

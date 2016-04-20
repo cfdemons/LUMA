@@ -249,7 +249,11 @@ const static int zProbeLims[2] = {30, 120};
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 //#define WALLS_ON_FLOOR_ONLY		// Limit no-slip walls to bottom no-slip wall only
-#define wall_thickness	1		// Thickness of walls in coarsest lattice units
+#define wall_thickness_bottom 5		// Thickness of bottom walls in coarsest lattice units
+#define wall_thickness_top 1		// Thickness of top walls in coarsest lattice units
+#define wall_thickness_front 5		// Thickness of front (3D) walls in coarsest lattice units
+#define wall_thickness_back 3		// Thickness of back (3D) walls in coarsest lattice units
+
 
 
 
@@ -260,7 +264,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Bounce-back solids
-#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
 	#define block_on_grid_lev 0		// Provide grid level on which block should be added 

@@ -492,7 +492,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		// Adjust buffer size
 		for (MpiManager::buffer_struct bufs : buffer_send_info) {
-			if (bufs.level == Grid->level && bufs.region == Grid->region_number && (bufs.size[dir] * nVels) > (int)f_buffer_send[dir].size()) {
+			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
 				f_buffer_send[dir].resize(bufs.size[dir] * nVels);
 			}
 		}
@@ -513,10 +513,10 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 #ifdef MPI_VERBOSE
 			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -->  Posting Send for " << f_buffer_send[dir].size() / nVels
-								<< " sites to Rank " << neighbour_rank[dir] << "." << std::endl;
+								<< " sites to Rank " << neighbour_rank[dir] << " with tag " << TAG << "." << std::endl;
 #endif
 			// Post send message to message queue and log request handle in array
-			MPI_Isend( &f_buffer_send[dir].front(), f_buffer_send[dir].size(), MPI_DOUBLE, neighbour_rank[dir], 
+			MPI_Isend( &f_buffer_send[dir].front(), static_cast<int>(f_buffer_send[dir].size()), MPI_DOUBLE, neighbour_rank[dir], 
 				TAG, my_comm, &send_requests[send_count-1] );
 
 #ifdef MPI_VERBOSE
@@ -530,7 +530,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
-			if (bufr.level == Grid->level && bufr.region == Grid->region_number && (bufr.size[dir] * nVels) > (int)f_buffer_recv[dir].size()) {
+			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
 				f_buffer_recv[dir].resize(bufr.size[dir] * nVels);
 			}
 		}
@@ -545,18 +545,19 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 #ifdef MPI_VERBOSE
 			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -->  Fetching message for " << f_buffer_recv[dir].size() / nVels	
-								<< " sites from Rank " << neighbour_rank[opp_dir] << "." << std::endl;
+								<< " sites from Rank " << neighbour_rank[opp_dir] << " with tag " << TAG << "." << std::endl;
 #endif
 
 			// Use a blocking receive call if required
-			MPI_Recv( &f_buffer_recv[dir].front(), f_buffer_recv[dir].size(), MPI_DOUBLE, neighbour_rank[opp_dir], TAG,	my_comm, &recv_stat );
+			MPI_Recv( &f_buffer_recv[dir].front(), static_cast<int>(f_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
+				TAG, my_comm, &recv_stat );
 		
 
 #ifdef MPI_VERBOSE
 			*MpiManager::logout << "Direction " << dir << " --> Received." << std::endl;
 
 			// Write out buffers
-			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir << " SUMMARY"
+			*MpiManager::logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -- Sent " << f_buffer_send[dir].size() / nVels << " to " << neighbour_rank[dir] 
 								<< ": Received " << f_buffer_recv[dir].size() / nVels << " from " << neighbour_rank[opp_dir] << std::endl;
 			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
@@ -575,7 +576,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	}
 
 #ifdef MPI_VERBOSE
-	*MpiManager::logout << "Waiting for Send Completion." << std::endl;
+	*MpiManager::logout << " *********************** Waiting for Send Completion  *********************** " << std::endl;
 #endif
 
 	/* Wait until other processes have handled all the sends from this rank
@@ -665,13 +666,13 @@ void MpiManager::mpi_buffer_size() {
 
 			// Write out buffer sizes
 #ifdef MPI_VERBOSE
-		*MpiManager::logout << "[" << buffer_send_info.back().level << "," << buffer_send_info.back().region << "]" << '\t';
+		*MpiManager::logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
 		for (int i = 0; i < MPI_dir; i++) {
 			*MpiManager::logout << buffer_send_info.back().size[i] << '\t';
 		}
 		*MpiManager::logout << std::endl;
 
-		*MpiManager::logout << "[" << buffer_recv_info.back().level << "," << buffer_recv_info.back().region << "]" << '\t';
+		*MpiManager::logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
 		for (int i = 0; i < MPI_dir; i++) {
 			*MpiManager::logout << buffer_recv_info.back().size[i] << '\t';
 		}

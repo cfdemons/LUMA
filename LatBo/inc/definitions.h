@@ -33,12 +33,12 @@
 */
 
 
-//#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 #define EX_RECV_LAYER				// Flag to avoid writing out receiver layer sites in MPI builds
 //#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
-//#define IBM_DEBUG					// Write IBM body and matrix data out to text files
-//#define IBBODY_TRACER				// Write out IBBody positions
+#define IBM_DEBUG					// Write IBM body and matrix data out to text files
+#define IBBODY_TRACER				// Write out IBBody positions
 //#define LD_OUT					// Write out lift and drag (sum x and y forces on Lagrange markers of IBBody)
 //#define BFL_DEBUG					// Write out BFL marker positions and Q values out to files
 
@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 10			// How many timesteps before whole grid output
+#define out_every 1			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -80,7 +80,7 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 #define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 0	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 2000	// Number of time steps
+#define T 2	// Number of time steps
 
 
 /*
@@ -132,16 +132,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 31		// Number of x lattice sites
-#define M 66		// Number of y lattice sites
+#define N 11		// Number of x lattice sites
+#define M 26		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x 0		// Start of domain-x
-#define b_x 0.31	// End of domain-x
-#define a_y -0.05		// Start of domain-y
-#define b_y 0.61	// End of domain-y
+#define a_x -0.5		// Start of domain-x
+#define b_x 10.5	// End of domain-x
+#define a_y -5.5		// Start of domain-y
+#define b_y 20.5	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -176,6 +176,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
+#define IB_Lev 1					// Grid level for immersed boundary object (0 if no refined regions)
+#define IB_Reg 0					// Grid region for immersed boundary object (0 if no refined regions)
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -192,7 +194,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 19		// Number of Lagrange points (approximately)
+#define num_markers 5		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -205,9 +207,9 @@ const static int zProbeLims[2] = {30, 120};
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 0.2		// length of filament
-#define ibb_start_x 0.15	// start x position of the filament
-#define ibb_start_y 0.0	// start y position of the filament
+#define ibb_length 4		// length of filament
+#define ibb_start_x 5	// start x position of the filament
+#define ibb_start_y 0	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
@@ -334,10 +336,10 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 12 };
-	const static size_t RefXend[NumLev][NumReg]		= { 17 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 2 };
+	const static size_t RefXend[NumLev][NumReg]		= { 8 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
-	const static size_t RefYend[NumLev][NumReg]		= { 34 };
+	const static size_t RefYend[NumLev][NumReg]		= { 11 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };

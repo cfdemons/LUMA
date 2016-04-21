@@ -275,7 +275,7 @@ int main( int argc, char* argv[] )
 #if !defined RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
-	objMan->ibm_initialise(Grids);
+	objMan->ibm_initialise();
 	*GridUtils::logfile << "Number of markers requested = " << num_markers << std::endl;
 
 #endif

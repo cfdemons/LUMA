@@ -108,7 +108,7 @@ void ObjectManager::ibm_move_bodies(GridObj& g) {
 
 // ***************************************************************************************************
 // Method to initialise array of IB_bodies
-void ObjectManager::ibm_initialise(GridObj& g) {
+void ObjectManager::ibm_initialise() {
 
 	// Loop over the number of bodies in the iBody array
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
@@ -126,12 +126,13 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 
 		// Compute support for each marker
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			ibm_findsupport(ib, m, g);	// Pass body ID, marker ID and Grid
+			ibm_findsupport(ib, m, *iBody[ib]._Owner);	// Pass body ID, marker ID and Grid
+
 		}
 
 
 		// Find epsilon for the body
-		ibm_findepsilon(ib, g);
+		ibm_findepsilon(ib, *iBody[ib]._Owner);
 
 
 	}
@@ -175,15 +176,15 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 
 #ifdef CHEAP_NEAREST_NODE_DETECTION
-	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - a_x)/g.dx);	// Simulates std::round
-	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - a_y)/g.dy);
+	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - (g.XPos[0] - g.dx / 2.0))/g.dx);	// Simulates std::round
+	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - (g.YPos[0] - g.dy / 2.0))/g.dy);
 
 #if (dims == 3)
-	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - a_z)/g.dz);
+	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - (g.ZPos[0] - g.dz / 2.0))/g.dz);
 #endif
 
 
-#else
+#else	// TODO Needs linking with subgrids (might not be worth it though?)
 
 	// Declarations
 	double r_min, radius;			// Minimum radius limit and actual radius from centre of kernel
@@ -238,7 +239,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
 	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
-		+ ( (1.0/9.0) * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
+		+ ( (1.0/9.0) * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units //TODO Think if this needs to change between grids
 
 
 	// Test to see if required support nodes are available

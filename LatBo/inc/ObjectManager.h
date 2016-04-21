@@ -49,7 +49,7 @@ public:
 	// IBM methods
 	void ibm_apply(GridObj& g);					// Apply interpolate, compute and spread operations for all bodies and with GridObj g
 	void ibm_build_body(int body_type);			// Build a new pre-fab IBM body
-	void ibm_initialise(GridObj& g);							// Initialise a built immersed body with support on the supplied grid
+	void ibm_initialise();							// Initialise a built immersed body with support on the supplied grid
 	double ibm_deltakernel(double rad, double dilation);		// Evaluate kernel (delta function approximation)
 	void ibm_interpol(int ib, GridObj& g);			// Interpolation of velocity field on GridObj g onto markers of ib-th body
 	void ibm_spread(int ib, GridObj& g);			// Spreading of restoring force from ib-th body to GridObj g

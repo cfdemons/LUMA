@@ -339,7 +339,7 @@ const static int zProbeLims[2] = {30, 120};
 	const static size_t RefXstart[NumLev][NumReg]	= { 2 };
 	const static size_t RefXend[NumLev][NumReg]		= { 8 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
-	const static size_t RefYend[NumLev][NumReg]		= { 11 };
+	const static size_t RefYend[NumLev][NumReg]		= { 12 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };

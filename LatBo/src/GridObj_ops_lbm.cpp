@@ -32,7 +32,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
 
 	// If IBM on and predictive loop flag true then store initial data and reset forces
-	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
+	if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) { // Limit to level 0 immersed body for now
 
 		*GridUtils::logfile << "Prediction step..." << std::endl;
 
@@ -226,7 +226,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 	// Execute IBM procedure using newly computed predicted data
 #ifdef IBM_ON
-	if (level == 0 && IBM_flag == true) {
+	if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) {
 
 		// Reset force vectors on grid in preparation for spreading step
 		LBM_forcegrid(true);

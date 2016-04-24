@@ -12,7 +12,6 @@ streaming and macroscopic calulcation.
 
 using namespace std;
 
-
 // ***************************************************************************************************
 // LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
 // IBM_flag dictates whether we need the predictor step or not

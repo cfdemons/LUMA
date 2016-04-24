@@ -418,7 +418,7 @@ void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 		for (int dir = 0; dir < dims; dir++) {
 			// Compute restorative force (in lattice units)
 			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
-				1 / pow(2,g.level);	// Time step in lattice units dt = 1 / 2^level = dx
+				1;//(1 / pow(2,g.level));	// Time step in lattice units dt = 1 / 2^level = dx //TODO Check scaling here
 		}
 	}
 }

@@ -33,9 +33,9 @@
 */
 
 
-#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
+//#define MEGA_DEBUG				// Debug F, Feq, Macropcopic all in one file -- Warning: Heavy IO which kills performance
 #define EX_RECV_LAYER				// Flag to avoid writing out receiver layer sites in MPI builds
-#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
+//#define DEBUG_STREAM				// Writes out the number and type of streaming operations used to test streaming exclusions
 //#define MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
 #define IBM_DEBUG					// Write IBM body and matrix data out to text files
 #define IBBODY_TRACER				// Write out IBBody positions
@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 50			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -78,7 +78,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Gravity
-#define GRAVITY_ON
+//#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force 1e-4	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 2	// Number of time steps
+#define T 5000	// Number of time steps
 
 
 /*
@@ -132,14 +132,14 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 21		// Number of x lattice sites
+#define N 81		// Number of x lattice sites
 #define M 41		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x -0.5		// Start of domain-x
-#define b_x 20.5	// End of domain-x
+#define b_x 80.5	// End of domain-x
 #define a_y -0.5		// Start of domain-y
 #define b_y 40.5	// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -175,7 +175,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define IBM_ON						// Turn on IBM
+//#define IBM_ON						// Turn on IBM
 #define IB_Lev 1				// Grid level for immersed boundary object (0 if no refined regions)
 #define IB_Reg 0					// Grid region for immersed boundary object (0 if no refined regions)
 
@@ -194,7 +194,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 9		// Number of Lagrange points (approximately)
+#define num_markers 4		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -208,7 +208,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Physical dimensions of flexible IB filament
 #define ibb_length 4		// length of filament
-#define ibb_start_x 10	// start x position of the filament
+#define ibb_start_x 40	// start x position of the filament
 #define ibb_start_y 20	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
@@ -232,20 +232,20 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Inlets
-//#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
+#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-//#define UNIFORM_INLET			// Make the inlet a uniform inlet
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
 
 // Outlets
-//#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 //#define OUTLET_NRBC				// Turn on NRBC at outlet
 
 
 // Periodicity
-#define PERIODIC_BOUNDARIES
+//#define PERIODIC_BOUNDARIES
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
@@ -318,7 +318,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -336,19 +336,19 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 7 };
-	const static size_t RefXend[NumLev][NumReg]		= { 13 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 14 };
-	const static size_t RefYend[NumLev][NumReg]		= { 26 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 33 };
+	const static size_t RefXend[NumLev][NumReg]		= { 47 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefYend[NumLev][NumReg]		= { 35 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {226}, {12} };
-	const static size_t RefXend[NumLev][NumReg]		= { {382}, {228} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {48}, {84} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {33}, {11} };
+	const static size_t RefXend[NumLev][NumReg]		= { {47}, {18} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {5}, {21} };
+	const static size_t RefYend[NumLev][NumReg]		= { {35}, {40} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
 	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };
@@ -364,6 +364,12 @@ const static int zProbeLims[2] = {30, 120};
 ************************* Clean-up: NOT FOR EDITING ***************************
 *******************************************************************************
 */
+
+// Set default value for level and region for IB body if no subgrids
+#if (defined IBM_ON && NumLev == 0)
+	#define IB_Lev 0				// Grid level for immersed boundary object (0 if no refined regions)
+	#define IB_Reg 0				// Grid region for immersed boundary object (0 if no refined regions)
+#endif
 
 // Set default options if using 2D
 #if dims == 3

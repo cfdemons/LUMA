@@ -12,6 +12,7 @@ streaming and macroscopic calulcation.
 
 using namespace std;
 
+
 // ***************************************************************************************************
 // LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
 // IBM_flag dictates whether we need the predictor step or not
@@ -32,18 +33,19 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
 
 	// If IBM on and predictive loop flag true then store initial data and reset forces
-	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
+	if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
 
-		*GridUtils::logfile << "Prediction step..." << std::endl;
+		*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
 
 		// Store lattice data
 		f_ibm_initial = f;
 		u_ibm_initial = u;
 		rho_ibm_initial = rho;
-
-		// Reset lattice and Cartesian force vectors at each site
-		LBM_forcegrid(true);
 	}
+
+	// Reset lattice and Cartesian force vectors at each site
+	LBM_forcegrid(true);
+
 #else
 
 	// If not using IBM then just reset the force vectors
@@ -205,6 +207,73 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		/*DEBUG*/ io_lite((t+1)*100 + 7,"AFTER MACRO");
 #endif
 
+
+		////////////////////////////////
+		// IBM post-kernel processing //
+		////////////////////////////////
+
+		// Execute IBM procedure using newly computed predicted data
+#ifdef IBM_ON
+		if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) {
+
+			// Reset force vectors on grid in preparation for spreading step
+			LBM_forcegrid(true);
+
+			// Calculate and apply IBM forcing to fluid
+			ObjectManager::getInstance()->ibm_apply(*this);
+
+			// Restore data to start of time step
+			f = f_ibm_initial;
+			u = u_ibm_initial;
+			rho = rho_ibm_initial;
+
+			// Corrector step does not reset force vectors but uses newly computed vector instead.
+			*GridUtils::logfile << "Correction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
+
+			// Apply boundary conditions (regularised must be applied before collision)
+#if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
+			LBM_boundary(2);
+#endif
+
+			// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
+			LBM_forcegrid(false);
+
+			// Collision on Lr
+			LBM_collide();
+
+			// Apply boundary conditions
+#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
+			LBM_boundary(2);	// Inlet (Zou-He)
+#endif
+#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
+			LBM_boundary(1);	// Bounce-back (walls and solids)
+#endif
+#ifdef BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
+#endif
+
+			// Stream
+			LBM_stream();
+
+			// Apply boundary conditions
+#ifdef BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef OUTLET_ON
+			LBM_boundary(3);	// Outlet
+#endif
+
+			// Update macroscopic quantities (including time-averaged quantities)
+			LBM_macro();
+
+			// Move the body if necessary
+			ObjectManager::getInstance()->ibm_move_bodies(*this);
+
+		}
+#endif
+
+
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
 		if (level == 0) {
 			// Increment time step counter and break
@@ -212,45 +281,30 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			break;
 		}
 
+
+		// If first loop then store the lattice values and reset the forces before starting loop again
+		if (count == 1) {
+#ifdef IBM_ON
+			if (level == IB_Lev && region_number == IB_Reg) {
+				*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
+
+				// Store lattice data
+				f_ibm_initial = f;
+				u_ibm_initial = u;
+				rho_ibm_initial = rho;
+			}
+#endif IBM_ON
+
+			// Reset lattice and Cartesian force vectors at each site
+			LBM_forcegrid(true);
+		}
+
+
 		// Increment counters
 		t++; count++;
 
 	} while (count < 3);
 
-
-
-
-	////////////////////////////////
-	// IBM post-kernel processing //
-	////////////////////////////////
-
-	// Execute IBM procedure using newly computed predicted data
-#ifdef IBM_ON
-	if (level == 0 && IBM_flag == true) {
-
-		// Reset force vectors on grid in preparation for spreading step
-		LBM_forcegrid(true);
-
-
-		// Calculate and apply IBM forcing to fluid
-		ObjectManager::getInstance()->ibm_apply(*this);
-
-		// Restore data to start of time step
-		f = f_ibm_initial;
-		u = u_ibm_initial;
-		rho = rho_ibm_initial;
-
-		// Relaunch kernel with IBM flag set to false (corrector step)
-		// Corrector step does not reset force vectors but uses newly computed vector instead.
-		*GridUtils::logfile << "Correction step..." << std::endl;
-		t--;                // Predictor-corrector results in double time step (need to reset back 1)
-		LBM_multi(false);
-
-		// Move the body if necessary
-		ObjectManager::getInstance()->ibm_move_bodies(*this);
-
-	}
-#endif
 
 	// Get time of loop (includes sub-loops)
 	secs = clock() - t_start;

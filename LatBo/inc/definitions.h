@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 50			// How many timesteps before whole grid output
+#define out_every 1			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 5000	// Number of time steps
+#define T 2	// Number of time steps
 
 
 /*
@@ -176,9 +176,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
-#define IB_Lev 1				// Grid level for immersed boundary object (0 if no refined regions)
+#define IB_Lev 2				// Grid level for immersed boundary object (0 if no refined regions)
 #define IB_Reg 0					// Grid region for immersed boundary object (0 if no refined regions)
-//TODO Sort out the redefintion warnings in the default values
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -195,7 +194,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 9		// Number of Lagrange points (approximately)
+#define num_markers 19		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -319,7 +318,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -368,6 +367,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Set default value for level and region for IB body if no subgrids
 #if (defined IBM_ON && NumLev == 0)
+	#undef IB_Lev
+	#undef IB_Reg
 	#define IB_Lev 0				// Grid level for immersed boundary object (0 if no refined regions)
 	#define IB_Reg 0				// Grid region for immersed boundary object (0 if no refined regions)
 #endif

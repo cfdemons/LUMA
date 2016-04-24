@@ -292,7 +292,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 				u_ibm_initial = u;
 				rho_ibm_initial = rho;
 			}
-#endif IBM_ON
+#endif
 
 			// Reset lattice and Cartesian force vectors at each site
 			LBM_forcegrid(true);

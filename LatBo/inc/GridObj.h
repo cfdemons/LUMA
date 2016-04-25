@@ -131,10 +131,12 @@ public :
 	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
 
 	// Boundary operations
-	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Zou-He BC
-	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);		// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);	// Application of Extrapolation BC
-	void bc_applyNRBC(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of NRBC
+	void bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWBB BC
+	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);					// Application of Zou-He BC
+	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);				// Application of Regaulrised BC
+	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Extrapolation BC
+	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
+	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
 	void bc_solid_site_reset();	                                                        // Reset all the solid site velocities to zero
 
 	// Multi-grid operations
@@ -148,7 +150,8 @@ public :
 	void io_probe_output();						// Output routine for point probes
 	void io_vtkwriter(double tval);				// VTK writer
 	void io_tecplot(double tval);				// TecPlot write out
-	void io_tecplot_debug(double tval, std::string tag);	// Special debugging writer to help debug problems with MPI
+	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
+	void io_lite(double tval);					// Generic writer to individual files
 
 
 };

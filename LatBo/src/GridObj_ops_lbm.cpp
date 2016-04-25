@@ -13,7 +13,6 @@ streaming and macroscopic calulcation.
 using namespace std;
 
 // ***************************************************************************************************
-
 // LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
 // IBM_flag dictates whether we need the predictor step or not
 void GridObj::LBM_multi ( bool IBM_flag ) {
@@ -69,7 +68,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 0,"AFTER INLET BC");
+		/*DEBUG*/ io_lite((t+1)*100 + 0,"AFTER INLET BC");
 #endif
 
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
@@ -79,7 +78,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_collide();
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 1,"AFTER COLLIDE");
+		/*DEBUG*/ io_lite((t+1)*100 + 1,"AFTER COLLIDE");
 #endif
 
 		////////////////////
@@ -109,14 +108,27 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
+#endif
+
+#ifdef BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
 #endif
 
 			// Stream
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
+#endif
+
+			// Apply boundary conditions
+#ifdef BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
 
 			for (size_t reg = 0; reg < regions; reg++) {
@@ -127,7 +139,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 4,"AFTER COALESCE"); // Do not change this tag!
+			/*DEBUG*/ io_lite((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
 
 
@@ -146,14 +158,28 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 2,"AFTER SOLID BC");
+			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
+#endif
+
+#ifdef BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
 #endif
 
 			// Stream
 			LBM_stream();
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_tecplot_debug(t*100 + 3,"AFTER STREAM");
+			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
+#endif
+
+
+			// Apply boundary conditions
+#ifdef BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
 
 		}
@@ -169,14 +195,14 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 5,"AFTER OUTLET BC");
+		/*DEBUG*/ io_lite((t+1)*100 + 6,"AFTER OUTLET BC");
 #endif
 
 		// Update macroscopic quantities (including time-averaged quantities)
 		LBM_macro();
 
 #ifdef MEGA_DEBUG
-		/*DEBUG*/ io_tecplot_debug(t*100 + 6,"AFTER MACRO");
+		/*DEBUG*/ io_lite((t+1)*100 + 7,"AFTER MACRO");
 #endif
 
 		// Check if on L0 and if so drop out as only need to loop once on coarsest level
@@ -207,7 +233,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 
 		// Calculate and apply IBM forcing to fluid
-		ObjectManager::ibm_apply(*this);
+		ObjectManager::getInstance()->ibm_apply(*this);
 
 		// Restore data to start of time step
 		f = f_ibm_initial;
@@ -221,7 +247,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		LBM_multi(false);
 
 		// Move the body if necessary
-		ObjectManager::ibm_move_bodies(*this);
+		ObjectManager::getInstance()->ibm_move_bodies(*this);
 
 	}
 #endif
@@ -236,7 +262,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 	if (t % out_every == 0) {
 		// Performance data to logfile
-		*GridUtils::logfile << "Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
+		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 	}
 
 
@@ -256,7 +282,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 }
 
 // ***************************************************************************************************
-
 // Takes Cartesian force vector and populates forces for each lattice direction.
 // If reset_flag is true, resets the force vectors.
 void GridObj::LBM_forcegrid(bool reset_flag) {
@@ -329,13 +354,13 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 							double beta_v = 0.0;
 
 							// Compute the lattice forces based on Guo's forcing scheme
-							lambda_v = (1 - 0.5 * omega) * ( w[v] / pow(cs,2) );
+							lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
 
 							// Dot product (sum over d dimensions)
 							for (int d = 0; d < dims; d++) {
 								beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,dims));
 							}
-							beta_v = beta_v * (1/pow(cs,2));
+							beta_v = beta_v * (1/(cs*cs));
 
 							// Compute force using shorthand sum described above
 							for (int d = 0; d < dims; d++) {
@@ -377,7 +402,6 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 
 // ***************************************************************************************************
-
 // Collision operator
 void GridObj::LBM_collide( ) {
 
@@ -439,7 +463,6 @@ void GridObj::LBM_collide( ) {
 }
 
 // ***************************************************************************************************
-
 // Overload of collision function to allow calculation of feq only for initialisation
 double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
@@ -471,9 +494,9 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 		+ 2c_x c_y u_x u_y + 2c_x c_z u_x u_z + 2c_y c_z u_y u_z
 		*/
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
-			(pow(c[2][v],2) - pow(cs,2)) * pow(u(i,j,k,2,M_lim,K_lim,dims),2) +
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,dims)*u(i,j,k,0,M_lim,K_lim,dims)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,dims)*u(i,j,k,1,M_lim,K_lim,dims)) +
+			((c[2][v]*c[2][v]) - (cs*cs)) * (u(i,j,k,2,M_lim,K_lim,dims)*u(i,j,k,2,M_lim,K_lim,dims)) +
 			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims) +
 			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims) +
 			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,dims) * u(i,j,k,2,M_lim,K_lim,dims);
@@ -481,14 +504,14 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 		// 2D versions of the above
 		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,dims));
 
-		B =	(pow(c[0][v],2) - pow(cs,2)) * pow(u(i,j,k,0,M_lim,K_lim,dims),2) +
-			(pow(c[1][v],2) - pow(cs,2)) * pow(u(i,j,k,1,M_lim,K_lim,dims),2) +
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,dims)*u(i,j,k,0,M_lim,K_lim,dims)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,dims)*u(i,j,k,1,M_lim,K_lim,dims)) +
 			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,dims) * u(i,j,k,1,M_lim,K_lim,dims);
 #endif
 
 
 	// Compute f^eq
-	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / pow(cs,2)) + (B / (2*pow(cs,4))) );
+	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / (cs*cs)) + (B / (2*(cs*cs*cs*cs))) );
 
 	return feq;
 
@@ -496,7 +519,6 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
 
 // ***************************************************************************************************
-
 // MRT collision procedure for site (i,j,k).
 void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k ) {
 #ifdef USE_MRT
@@ -582,7 +604,6 @@ void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k ) {
 }
 
 // ***************************************************************************************************
-
 // Streaming operator
 // Applies periodic BCs on level 0
 void GridObj::LBM_stream( ) {
@@ -612,7 +633,7 @@ void GridObj::LBM_stream( ) {
 	IVector<double> f_new( f.size(), 0.0 );	// Could just initialise to f to make the logic below simpler //
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 	/*DEBUG*/
 	int count0 = 0, count1 = 0, count2 = 0, count3 = 0;
 #endif
@@ -627,7 +648,7 @@ void GridObj::LBM_stream( ) {
 					// Store opposite direction
 					v_opp = GridUtils::getOpposite(v);
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 					/*DEBUG*/
 					count0++;
 #endif
@@ -681,7 +702,7 @@ void GridObj::LBM_stream( ) {
 						) {
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 							/*DEBUG*/
 							count1++;
 							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -702,10 +723,15 @@ void GridObj::LBM_stream( ) {
 							dest_y = (j+c[1][v] + M_lim) % M_lim;
 							dest_z = (k+c[2][v] + K_lim) % K_lim;
 
-							// Only apply periodic BCs on coarsest level and if stream is Coarse --> Coarse
+							/* Only apply periodic BCs on coarsest level and if stream is:
+							 * Coarse --> Coarse
+							 * Solid --> Coarse (to allow half-way BB to be applied)
+							 * Coarse --> Solid (for consistency with the above) */
 							if (
 								(level == 0) &&
-								(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+								( 	(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == 0 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0)	)
 							) {
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
@@ -767,7 +793,7 @@ void GridObj::LBM_stream( ) {
 						) {
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 							/*DEBUG*/
 							count2++;
 							*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -840,7 +866,7 @@ void GridObj::LBM_stream( ) {
 						}
 #endif
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 						/*DEBUG*/
 						count3++;
 						*GridUtils::logfile << "Stream " << i << "," << j << "," << k << 
@@ -866,7 +892,7 @@ void GridObj::LBM_stream( ) {
 	}
 
 
-#ifdef MEGA_DEBUG
+#ifdef DEBUG_STREAM
 	/*DEBUG*/
 	*GridUtils::logfile << "Counts were " << count0 << "," << count1 << "," << count2 << "," << count3 << std::endl;
 #endif
@@ -878,7 +904,6 @@ void GridObj::LBM_stream( ) {
 
 
 // ***************************************************************************************************
-
 // Macroscopic quantity calculation and update of time-averaged quantities
 void GridObj::LBM_macro( ) {
 
@@ -908,7 +933,7 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
 
 					// Solid site so do not update density but set velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -989,7 +1014,6 @@ void GridObj::LBM_macro( ) {
 
 
 // ***************************************************************************************************
-
 // Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by
 // the MPI unpacking routine to update the values for the next collision step. This routine does not
 // update the time-averaged quantities.
@@ -1015,7 +1039,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
-	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0) {
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
 
 		// Solid site so do not update density but set velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -1065,70 +1089,72 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 
 // ***************************************************************************************************
-
 // Explosion operation
 void GridObj::LBM_explode( int RegionNumber ) {
 
 	// Declarations
+	GridObj* fGrid = NULL;
+	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = subGrid[RegionNumber].YPos.size();
+	int M_fine = fGrid->YPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
-#if (dims == 3)
-	int K_fine = subGrid[RegionNumber].ZPos.size();
-#endif
+	int K_fine = fGrid->ZPos.size();
 
 	// Loop over coarse grid (just region of interest)
-	for (size_t i = subGrid[RegionNumber].CoarseLimsX[0]; i <= subGrid[RegionNumber].CoarseLimsX[1]; i++) {
-		for (size_t j = subGrid[RegionNumber].CoarseLimsY[0]; j <= subGrid[RegionNumber].CoarseLimsY[1]; j++) {
-			for (size_t k = subGrid[RegionNumber].CoarseLimsZ[0]; k <= subGrid[RegionNumber].CoarseLimsZ[1]; k++) {
+	for (size_t i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
+		for (size_t j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
+			for (size_t k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
-				// If TL to lower level and point belongs to region then partitioning required
+				// If TL to lower level and point belongs to region then explosion required
 				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
 
 					// Lookup indices for lower level
-					x_start = subGrid[RegionNumber].CoarseLimsX[0];
-					y_start = subGrid[RegionNumber].CoarseLimsY[0];
-					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
+					x_start = fGrid->CoarseLimsX[0];
+					y_start = fGrid->CoarseLimsY[0];
+					z_start = fGrid->CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = GridUtils::indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = GridUtils::getFineIndices(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
-#if (dims == 3)
 					int fk = idx_fine[2];
-#endif
 
-					// Update fine grid values according to Rohde et al.
-					for (int v = 0; v < nVels; v++) {
+					// Only pass information to lower levels if lower level is expecting it 
+					// (i.e. not a boundary site)
+					if (fGrid->LatTyp(fi,fj,fk,M_fine,K_fine) == 3) {
 
-						// Get coarse site value
-						double coarse_f = f(i,j,k,v,M_coarse,K_coarse,nVels);
+						// Update fine grid values according to Rohde et al.
+						for (int v = 0; v < nVels; v++) {
+
+							// Get coarse site value
+							double coarse_f = f(i,j,k,v,M_coarse,K_coarse,nVels);
 
 #if (dims == 3)
-						// 3D Case -- cube of 8 cells
+							// 3D Case -- cube of 8 cells
 
-						// Copy coarse to fine
-						subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+							// Copy coarse to fine
+							fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
+							fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)	= coarse_f;
 
 #else
 
-						// 2D Case -- square of 4 cells
+							// 2D Case -- square of 4 cells
 
-						// Copy coarse to fine
-						subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels)		= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels)		= coarse_f;
-						subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels)		= coarse_f;
-						subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels)		= coarse_f;
+							// Copy coarse to fine
+							fGrid->f(fi,	fj,		v,M_fine,nVels)		= coarse_f;
+							fGrid->f(fi+1,	fj,		v,M_fine,nVels)		= coarse_f;
+							fGrid->f(fi,	fj+1,	v,M_fine,nVels)		= coarse_f;
+							fGrid->f(fi+1,	fj+1,	v,M_fine,nVels)		= coarse_f;
 
 #endif
+						}
 					}
 
 				}
@@ -1142,40 +1168,41 @@ void GridObj::LBM_explode( int RegionNumber ) {
 
 
 // ***************************************************************************************************
-
 // Coalesce operation -- called from coarse level
 void GridObj::LBM_coalesce( int RegionNumber ) {
 
 	// Declarations
+	GridObj* fGrid;
+	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = subGrid[RegionNumber].YPos.size();
+	int M_fine = fGrid->YPos.size();
 	int M_coarse = YPos.size();
 	int K_coarse = ZPos.size();
 #if (dims == 3)
-	int K_fine = subGrid[RegionNumber].ZPos.size();
+	int K_fine = fGrid->ZPos.size();
+#else
+	int K_fine = 0;
 #endif
 
 
 	// Loop over coarse grid (only region of interest)
-	for (size_t i = subGrid[RegionNumber].CoarseLimsX[0]; i <= subGrid[RegionNumber].CoarseLimsX[1]; i++) {
-		for (size_t j = subGrid[RegionNumber].CoarseLimsY[0]; j <= subGrid[RegionNumber].CoarseLimsY[1]; j++) {
-			for (size_t k = subGrid[RegionNumber].CoarseLimsZ[0]; k <= subGrid[RegionNumber].CoarseLimsZ[1]; k++) {
+	for (size_t i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
+		for (size_t j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
+			for (size_t k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
 				// If TL to lower level then fetch values from lower level
-				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4 || LatTyp(i,j,k,M_coarse,K_coarse) == 5) {
 
 					// Lookup indices for lower level
-					x_start = subGrid[RegionNumber].CoarseLimsX[0];
-					y_start = subGrid[RegionNumber].CoarseLimsY[0];
-					z_start = subGrid[RegionNumber].CoarseLimsZ[0];
+					x_start = fGrid->CoarseLimsX[0];
+					y_start = fGrid->CoarseLimsY[0];
+					z_start = fGrid->CoarseLimsZ[0];
 
 					// Find indices of fine site
-					vector<int> idx_fine = GridUtils::indmapref(i, x_start, j, y_start, k, z_start);
+					vector<int> idx_fine = GridUtils::getFineIndices(i, x_start, j, y_start, k, z_start);
 					int fi = idx_fine[0];
 					int fj = idx_fine[1];
-#if (dims == 3)
 					int fk = idx_fine[2];
-#endif
 
 					// Loop over directions
 					for (int v = 0; v < nVels; v++) {
@@ -1188,14 +1215,14 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 							// Average the values
 							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
-								subGrid[RegionNumber].f(fi,		fj,		fk,		v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi,		fj+1,	fk,		v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi,		fj,		fk+1,	v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi,		fj+1,	fk+1,	v,M_fine,K_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)
+								fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,nVels) +
+								fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,nVels) +
+								fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,nVels) +
+								fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,nVels) +
+								fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,nVels) +
+								fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,nVels) +
+								fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,nVels) +
+								fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,nVels)
 								) / pow(2, dims);
 
 #else
@@ -1204,10 +1231,10 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 							// Average the values
 							f(i,j,k,v,M_coarse,K_coarse,nVels) = (
-								subGrid[RegionNumber].f(fi,		fj,		v,M_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj,		v,M_fine,nVels) +
-								subGrid[RegionNumber].f(fi,		fj+1,	v,M_fine,nVels) +
-								subGrid[RegionNumber].f(fi+1,	fj+1,	v,M_fine,nVels)
+								fGrid->f(fi,	fj,		v,M_fine,nVels) +
+								fGrid->f(fi+1,	fj,		v,M_fine,nVels) +
+								fGrid->f(fi,	fj+1,	v,M_fine,nVels) +
+								fGrid->f(fi+1,	fj+1,	v,M_fine,nVels)
 								) / pow(2, dims);
 
 #endif

@@ -5,9 +5,6 @@
 #include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
 
-// Static declaration
-std::vector<IBBody> ObjectManager::iBody;
-
 // ***************************************************************************************************
 // Method to call body building routine for IBM
 void ObjectManager::ibm_build_body(int body_type) {

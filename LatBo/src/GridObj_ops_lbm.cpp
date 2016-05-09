@@ -435,13 +435,13 @@ void GridObj::LBM_collide( ) {
 
 #ifdef USE_MRT
 					// Call MRT collision for given lattice site
-					LBM_mrt_collide( f_new, i, j, k);
+					LBM_mrt_collide( f_new, i, j, k, M_lim, K_lim);
 #else
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
+						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v, M_lim, K_lim);
 
 						// Recompute distribution function f
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) )
@@ -464,7 +464,7 @@ void GridObj::LBM_collide( ) {
 
 // ***************************************************************************************************
 // Overload of collision function to allow calculation of feq only for initialisation
-double GridObj::LBM_collide( int i, int j, int k, int v ) {
+double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) {
 
 	/* LBGK equilibrium function is represented as:
 		feq_i = rho * w_i * ( 1 + u_a c_ia / cs^2 + Q_iab u_a u_b / 2*cs^4 )
@@ -476,10 +476,6 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
 	// Declare single feq value and intermediate values A and B
 	double feq, A, B;
-
-	// Other declarations
-	int M_lim = YPos.size();
-	int K_lim = ZPos.size();
 
 	// Compute the parts of the expansion for feq (we now have a dot product routine so could simplify this code)
 
@@ -520,12 +516,8 @@ double GridObj::LBM_collide( int i, int j, int k, int v ) {
 
 // ***************************************************************************************************
 // MRT collision procedure for site (i,j,k).
-void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k ) {
+void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim ) {
 #ifdef USE_MRT
-
-	// Size declarations
-	int M_lim = YPos.size();
-	int K_lim = ZPos.size();
 
 	// Temporary vectors
 	std::vector<double> m;					// Vector of moments

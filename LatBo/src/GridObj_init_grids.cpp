@@ -509,7 +509,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 				for (int v = 0; v < nVels; v++) {
 
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
+					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
 
 				}
 			}
@@ -828,7 +828,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 				for (int v = 0; v < nVels; v++) {
 					
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
+					f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
 
 				}
 			}

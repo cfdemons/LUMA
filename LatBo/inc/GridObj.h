@@ -122,8 +122,8 @@ public :
 	// LBM operations
 	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
-	double LBM_collide(int i, int j, int k, int v);
-	void LBM_mrt_collide(IVector<double>& f_new, int i, int j, int k);	// MRT collision operation
+	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
+	void LBM_mrt_collide(IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim);	// MRT collision operation
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);

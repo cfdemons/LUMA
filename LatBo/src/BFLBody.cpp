@@ -156,8 +156,8 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 	} else if (isVoxelBflVoxel(x,y,z,this)) {
 
 		// Recover voxel number
-		MarkerData m_data = getMarkerData(x,y,z,this);
-		curr_mark = m_data.ID;
+		MarkerData* m_data = getMarkerData(x,y,z,this);
+		curr_mark = m_data->ID;
 
 		// Increment point counter
 		counter[curr_mark]++;
@@ -169,6 +169,8 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 			( (markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
 		markers[curr_mark].position[2] = 
 			( (markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
+
+		delete m_data;
 
 
 	// Must be in a new BFL voxel
@@ -192,7 +194,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 
 	// Declarations
 	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
-	MarkerData m_data;
+	MarkerData* m_data;
 
 	/* Get voxel IDs of self and stencil required to specify planes
 	 *
@@ -220,7 +222,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 	m_data = getMarkerData(i,j,k,this);
 #endif
 
-	storeID = m_data.ID;
+	storeID = m_data->ID;
 
 	// Get list of IDs of neighbour vertices for plane construction
 	std::vector<int> V;
@@ -241,13 +243,13 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 #endif
 
 					// If data valid, then store ID
-					if (!is_nan(m_data.x)) V.push_back(m_data.ID);
+					if (!is_nan(m_data->x)) V.push_back(m_data->ID);
 				}
 
 			}
 		}
 	}
-
+	delete m_data;
 
 	// Build a triangular plane for each combination of vertices //
 
@@ -395,7 +397,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 
 	// Declarations
 	int dest_i, dest_j;
-	MarkerData m_data;
+	MarkerData* m_data;
 
 	// Set stencil centre data
 	int ib = i;
@@ -410,7 +412,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 	m_data = getMarkerData(i,j,0,this);
 #endif
 
-	int storeID = m_data.ID;
+	int storeID = m_data->ID;
 
 
 	// Get list of IDs of neighbour vertices for line construction
@@ -432,12 +434,13 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 #endif
 
 				// If data valid, then store ID
-				if (!is_nan(m_data.x)) V.push_back(m_data.ID);
+				if (!is_nan(m_data->x)) V.push_back(m_data->ID);
 
 			}
 
 		}
 	}
+	delete m_data;
 
 	// Can only continue if we have at least 2 points
 	if (V.size() < 2) return;
@@ -584,47 +587,34 @@ int BFLBody::getVoxInd(double p) {
 }
 
 // Return marker and voxel data associated with global position supplied by querying given body*
-MarkerData BFLBody::getMarkerData(double x, double y, double z, BFLBody* body) {
+MarkerData* BFLBody::getMarkerData(double x, double y, double z, BFLBody* body) {
 
 	// Get indices of voxel associated with the supplied position
 	std::vector<int> vox = getVoxInd(x,y,z);
 
     // Find all marker IDs that match these indices
-	std::vector<int> found_i, found_j, found_k;
 	for (size_t i = 0; i < body->markers.size(); ++i) {
-		if (body->markers[i].supp_i[0] == vox[0]) found_i.push_back(i);
-		if (body->markers[i].supp_j[0] == vox[1]) found_j.push_back(i);
-		if (body->markers[i].supp_k[0] == vox[2]) found_k.push_back(i);
-	}
+		if (body->markers[i].supp_i[0] == vox[0] && 
+			body->markers[i].supp_j[0] == vox[1] && 
+			body->markers[i].supp_k[0] == vox[2]) {
 
-    // Loop over marker IDs and check for matches in the other two found vectors
-    for (size_t ind_x = 0; ind_x < found_i.size(); ++ind_x) {
-
-		int matching_index = found_i[ind_x];
-
-		// If a match exists in both other vectors (lambda expressions for C++)
-        if (	std::any_of(found_j.begin(), found_j.end(), [matching_index](int index) {
-					return index == matching_index; }) && 
-				std::any_of(found_k.begin(), found_k.end(), [matching_index](int index) { 
-					return index == matching_index; }) ) {
-
-			// "matching_index" is a valid ID so create new MarkerData store
-			MarkerData* m_MarkerData = new MarkerData(	body->markers[matching_index].supp_i[0],
-														body->markers[matching_index].supp_j[0],
-														body->markers[matching_index].supp_k[0],
-														body->markers[matching_index].position[0],
-														body->markers[matching_index].position[1],
-														body->markers[matching_index].position[2],
-														matching_index
+			// Indice represents the target ID so create new MarkerData store on the heap
+			MarkerData* m_MarkerData = new MarkerData(	body->markers[i].supp_i[0],
+														body->markers[i].supp_j[0],
+														body->markers[i].supp_k[0],
+														body->markers[i].position[0],
+														body->markers[i].position[1],
+														body->markers[i].position[2],
+														i
 														);
-			return *m_MarkerData;	// Return the store information through a copy
+			return m_MarkerData;	// Return the pointer to store information
 		}
 	
 	}
 
-	// Create empty MarkerData store using default constructor
+	// If not found then create empty MarkerData store using default constructor
 	MarkerData* m_MarkerData = new MarkerData();
-	return *m_MarkerData;
+	return m_MarkerData;
 
 }
 
@@ -660,11 +650,12 @@ bool BFLBody::isInVoxel(double x, double y, double z, int curr_mark, BFLBody* bo
 bool BFLBody::isVoxelBflVoxel(double x, double y, double z, BFLBody* body) {
 
 	// Try get the MarkerData store
-	MarkerData m_data = getMarkerData(x,y,z,body);
+	MarkerData* m_data = getMarkerData(x,y,z,body);
 
 	// True if the data store is not empty
-	if (!is_nan(m_data.x)) {
+	if (!is_nan(m_data->x)) {
 
+		delete m_data;	// Deallocate the store
 		return true;
 
 	}

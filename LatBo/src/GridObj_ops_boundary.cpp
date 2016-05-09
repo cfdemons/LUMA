@@ -441,7 +441,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int M_lim, int
 	for (int v = 0; v < nVels; v++) {
 
 		// Find feq corresponding to prescribed inlet macroscopic conditions and add regularised f_neq
-		f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i,j,k,v) + ftmp[v];
+		f(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i,j,k,v,M_lim,K_lim) + ftmp[v];
 
 	}
 	
@@ -456,7 +456,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 	int N_lim = static_cast<int>( XInd.size() );
 	int M_lim = static_cast<int>( YInd.size() );
 	int K_lim = static_cast<int>( ZInd.size() );
-	MarkerData m_data;
+	MarkerData* m_data;
 	ObjectManager* objMan = ObjectManager::getInstance();
 
 	// For each even outgoing direction (saves BC being applied twice otherwise)
@@ -505,7 +505,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/** Apply BC in pairs  -- BC 1 **/
 
 		// Get value of q (outgoing direction, source store)
-		double q = objMan->pBody[0].Q[v_outgoing][m_data.ID];
+		double q = objMan->pBody[0].Q[v_outgoing][m_data->ID];
 
 		// Choose which implementation is appropriate //     
 		
@@ -539,7 +539,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/** Apply BC in pairs  -- BC 2 **/
 
 		// Get value of q (incoming direction, destination store)
-		q = objMan->pBody[0].Q[v_incoming + nVels][m_data.ID];
+		q = objMan->pBody[0].Q[v_incoming + nVels][m_data->ID];
 
 		// Half-way Bounce Back
 		if (q == 0) {
@@ -567,6 +567,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
                           
 		}
 
+		delete m_data;
 	}
 
 }

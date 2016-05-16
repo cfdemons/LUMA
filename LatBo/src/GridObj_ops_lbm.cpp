@@ -935,6 +935,11 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 6) {
+
+					// Symmetry wall so ignore?
+					continue;
+
 
 				} else {
 

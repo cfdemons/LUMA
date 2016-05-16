@@ -13,7 +13,7 @@
 	Boundary condition application routine.
 	Supply an integer to specify which type of condition should be applied:
 	0 == apply all boundary conditions simultaneously
-	1 == apply solid wall conditions only
+	1 == apply solid wall and symmetry conditions only
 	2 == apply inlet conditions only
 	3 == apply outlet conditions only
 	4 == apply inlet and outlet simultaneously
@@ -21,6 +21,7 @@
 
 	Recognised boundary label types are:
 	0 == solid site (no-slip)
+	6 == symmetry site (free-slip)
 	7 == inlet site
 	8 == outlet site
 	10 == BFL site
@@ -44,11 +45,17 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************	*/
     
 				// Apply to solid sites
-				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) 
+				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5)
 					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
 
 					// Apply half-way bounce-back
 					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+
+				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 6)
+					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
+
+					// Apply half-way specular reflection
+					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
 
 
 				/*	******************************************************************************************
@@ -611,5 +618,76 @@ void GridObj::bc_applyNrbc(int i, int j, int k) {
 	// Jon's NRBC to go here
 
 }
+
+
+// ***************************************************************************************************
+// Routine to apply half-way specular reflection condition for free-slip
+void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+
+	int dest_x, dest_y, dest_z;
+
+	// Check the 4 (2D) or 6 (3D) normals to get orientation of the wall
+	for (size_t normal = 0; normal < (dims * 2); normal++) {
+
+		// Identify site where the population will be streamed to //
+
+		// Consider periodic stream (serial/non-MPI)
+#if (defined PERIODIC_BOUNDARIES && !defined BUILD_FOR_MPI)
+
+		dest_x = (i+c[0][normal] + N_lim) % N_lim;
+		dest_y = (j+c[1][normal] + M_lim) % M_lim;
+		dest_z = (k+c[2][normal] + K_lim) % K_lim;
+#else
+		dest_x = i+c[0][normal];
+		dest_y = j+c[1][normal];
+		dest_z = k+c[2][normal];
+#endif
+
+		// If this site is off-grid then cannot apply the BC in preparation for streaming
+		if (	(dest_x >= N_lim || dest_x < 0) ||
+				(dest_y >= M_lim || dest_y < 0) ||
+				(dest_z >= K_lim || dest_z < 0)
+			) {
+				continue;	// Move on to next direction
+
+#ifdef BUILD_FOR_MPI
+		// When using MPI, equivalent to off-grid is when destination is in 
+		// periodic recv layer with periodic boundaries disabled.
+		} else if ( GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
+			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this) ) {
+
+#if (!defined PERIODIC_BOUNDARIES)
+			continue;	// Periodic boundaries disabled so do not try to apply BC
+#endif
+
+			/* If periodic boundaries are enabled then this is a valid stream 
+			 * so allow flow through to next section */
+
+#endif	// BUILD_FOR_MPI
+
+		}	// End of exclusions
+
+		/* Not been filtered by above exclusions so try to apply boundary condition. */
+
+		// Only apply if destination is a fluid site
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
+			) {
+
+			// This normal is valid so apply specular reflection to sites getting 
+			// correct direction depending on the normal
+			for (size_t v_outgoing = 0; v_outgoing < nVels; v_outgoing++) {
+
+				f(i,j,k,v_outgoing,M_lim,K_lim,nVels) = 
+					f(dest_x,dest_y,dest_z,GridUtils::dir_reflect[normal][v_outgoing],M_lim,K_lim,nVels);
+			}
+			break; // Do not check for any other normals
+		}
+	}
+
+}
+
+
 // ***************************************************************************************************
 // ***************************************************************************************************

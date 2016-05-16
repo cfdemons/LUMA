@@ -18,6 +18,7 @@ class GridUtils {
 public:
 	static std::ofstream* logfile;			// Handle to output file
 	static std::string path_str;            // Static string representing output path
+	static const int dir_reflect[dims * 2][nVels];
 
 	// Methods //
 

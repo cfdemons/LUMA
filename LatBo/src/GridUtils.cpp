@@ -6,6 +6,28 @@
 #include "../inc/globalvars.h"
 #include "../inc/MpiManager.h"
 
+// Mappings of directions for specular reflection: col == normal direction, row == velocity
+// Constants so initialise outside the class but in scope.
+#if (dims == 3)
+const int GridUtils::dir_reflect[dims * 2][nVels] = 
+	{
+		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
+		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},
+		{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},
+		{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},
+		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18},
+		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}
+	};
+#else
+const int GridUtils::dir_reflect[dims * 2][nVels] = 
+	{
+		{1, 0, 2, 3, 7, 6, 5, 4, 8}, 
+		{1, 0, 2, 3, 4, 6, 5, 4, 8},
+		{0, 1, 3, 2, 6, 7, 4, 5, 8},
+		{0, 1, 3, 2, 6, 7, 4, 5, 8}
+	};
+#endif
+
 // Default Constructor/Destructor
 GridUtils::GridUtils(void)
 {

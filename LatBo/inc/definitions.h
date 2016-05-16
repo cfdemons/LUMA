@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.6-master ## //
+// Definitions File Format ## 0.7-47 ## //
 
 
 // Header guard
@@ -229,11 +229,14 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
+// Virtual Wind Tunnel
+#define VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
+
 // Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-//#define UNIFORM_INLET			// Make the inlet a uniform inlet
+#define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
 
@@ -249,7 +252,6 @@ const static int zProbeLims[2] = {30, 120};
 // Solids
 //#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
 #//define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
-//#define WALLS_ON_FLOOR_ONLY		// Limit no-slip walls to bottom no-slip wall only
 #define wall_thickness	1		// Thickness of walls in coarsest lattice units
 
 
@@ -278,7 +280,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Bounce-back objects from point clouds
-//#define SOLID_FROM_FILE
+#define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
 	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
@@ -293,7 +295,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // BFL objects
-#define BFL_ON
+//#define BFL_ON
 
 #ifdef BFL_ON
 	#define bfl_on_grid_lev 1		// Provide grid level on which BFL body should be added 

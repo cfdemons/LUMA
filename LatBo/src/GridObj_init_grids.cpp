@@ -453,10 +453,11 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Refined Boundary
-	6 == Undefined
-	7 == Inlet
-	8 == Outlet
+	5 == refined boundary
+	6 == symmetry boundary
+	7 == inlet
+	8 == outlet
+	10 == BFL site
 	*/
 
 	// Label as coarse site
@@ -764,10 +765,11 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Refined Boundary
-	6 == Undefined
-	7 == Inlet
-	8 == Outlet
+	5 == refined boundary
+	6 == symmetry boundary
+	7 == inlet
+	8 == outlet
+	10 == BFL site
 	*/
 	
 	// Get local grid sizes
@@ -951,10 +953,11 @@ void GridObj::LBM_init_bound_lab ( ) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Refined Boundary
-	6 == Undefined
-	7 == Inlet
-	8 == Outlet
+	5 == refined boundary
+	6 == symmetry boundary
+	7 == inlet
+	8 == outlet
+	10 == BFL site
 	*/
 
 	// Get grid sizes
@@ -1058,7 +1061,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 #endif
 
-#if defined WALLS_ON
+
 	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
 		if (YInd[j] == 0) {		// Wall found
@@ -1067,7 +1070,12 @@ void GridObj::LBM_init_bound_lab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (k = 0; k < K_lim; k++) {
 
+#ifdef WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
+#elif defined VIRTUAL_WINDTUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet
+					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry for debugging for now
+#endif
 
 				}
 			}
@@ -1075,9 +1083,8 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 		}
 	}
-#endif
 
-#if (defined WALLS_ON && !defined WALLS_ON_FLOOR_ONLY)
+
 
 	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
@@ -1087,7 +1094,11 @@ void GridObj::LBM_init_bound_lab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (k = 0; k < K_lim; k++) {
 
+#ifdef WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
+#elif defined VIRTUAL_WINDTUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry boundary
+#endif
 
 				}
 			}
@@ -1095,7 +1106,6 @@ void GridObj::LBM_init_bound_lab ( ) {
 
 		}
 	}
-#endif
 
 }
 
@@ -1111,10 +1121,11 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == Refined Boundary
-	6 == Undefined
-	7 == Inlet
-	8 == Outlet
+	5 == refined boundary
+	6 == symmetry boundary
+	7 == inlet
+	8 == outlet
+	10 == BFL site
 	*/
 
 	// Get parent local grid sizes

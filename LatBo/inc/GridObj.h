@@ -132,6 +132,7 @@ public :
 
 	// Boundary operations
 	void bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWBB BC
+	void bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWSR BC
 	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);					// Application of Zou-He BC
 	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);				// Application of Regaulrised BC
 	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Extrapolation BC

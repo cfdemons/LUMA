@@ -435,7 +435,7 @@ void GridObj::LBM_collide( ) {
 
 #ifdef USE_MRT
 					// Call MRT collision for given lattice site
-					LBM_mrt_collide( f_new, i, j, k, M_lim, K_lim);
+					LBM_mrtCollide( f_new, i, j, k, M_lim, K_lim);
 #else
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
@@ -516,7 +516,7 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 
 // ***************************************************************************************************
 // MRT collision procedure for site (i,j,k).
-void GridObj::LBM_mrt_collide( IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim ) {
+void GridObj::LBM_mrtCollide( IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim ) {
 #ifdef USE_MRT
 
 	// Temporary vectors

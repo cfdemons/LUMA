@@ -58,7 +58,7 @@
 
 // Output Options
 #define out_every 100			// How many timesteps before whole grid output
-#define output_precision 10		// Precision of output
+#define output_precision 6		// Precision of output
 
 // Types of output
 //#define TEXTOUT
@@ -104,7 +104,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 10000	// Number of time steps
+#define T 5000	// Number of time steps
 
 
 /*
@@ -402,6 +402,10 @@ const static int zProbeLims[2] = {30, 120};
 	#undef start_bfl_z
 	#define start_bfl_z 0
 
+	// Set z inlet velocity
+	#undef u_0z
+	#define u_0z 0
+
 #endif
 
 #if NumLev == 0
@@ -422,6 +426,15 @@ const static int zProbeLims[2] = {30, 120};
 	#define u_0y uy_in[j]
 	#undef u_0z
 	#define u_0z uz_in[j]
+#endif
+
+// Fix options for Virtual Windtunnel
+#ifdef VIRTUAL_WINDTUNNEL
+	#undef INLET_DO_NOTHING
+	#undef INLET_NRBC
+	#if !defined INLET_REGULARISED
+		#define INLET_REGULARISED
+	#endif
 #endif
 
 #endif

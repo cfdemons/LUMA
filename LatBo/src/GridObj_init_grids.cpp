@@ -136,7 +136,7 @@ void GridObj::LBM_init_getInletProfile() {
 // ***************************************************************************************************
 
 // Initialise velocity method
-void GridObj::LBM_init_vel ( ) {
+void GridObj::LBM_initVelocity ( ) {
 
 #ifdef UNIFORM_INLET
 	// Max velocity
@@ -193,7 +193,7 @@ void GridObj::LBM_init_vel ( ) {
 
 #if defined SOLID_BLOCK_ON || defined WALLS_ON || defined WALLS_ON_2D
 	// Perform solid site reset of velocity
-	bc_solid_site_reset();
+	bc_solidSiteReset();
 #endif
 
 }
@@ -202,7 +202,7 @@ void GridObj::LBM_init_vel ( ) {
 // ***************************************************************************************************
 
 // Initialise density method
-void GridObj::LBM_init_rho ( ) {
+void GridObj::LBM_initRho ( ) {
 
 	// Get grid sizes
 	int N_lim = XPos.size();
@@ -225,7 +225,7 @@ void GridObj::LBM_init_rho ( ) {
 // ***************************************************************************************************
 
 // Non-MPI initialise level 0 grid wrapper
-void GridObj::LBM_init_grid( ) {
+void GridObj::LBM_initGrid( ) {
 
 	// Set default value for the following MPI-specific settings
 	std::vector<int> local_size;
@@ -244,7 +244,7 @@ void GridObj::LBM_init_grid( ) {
 	global_edge_pos[0][0] = 0.0;
 
 	// Call MPI initialiser wiht these default options
-	LBM_init_grid(local_size, global_edge_ind, global_edge_pos);
+	LBM_initGrid(local_size, global_edge_ind, global_edge_pos);
 
 }
 
@@ -252,7 +252,7 @@ void GridObj::LBM_init_grid( ) {
 // ***************************************************************************************************
 
 // Initialise level 0 grid method
-void GridObj::LBM_init_grid( std::vector<int> local_size, 
+void GridObj::LBM_initGrid( std::vector<int> local_size, 
 							std::vector< std::vector<int> > global_edge_ind, 
 							std::vector< std::vector<double> > global_edge_pos ) {
 	
@@ -464,7 +464,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
 
 	// Add boundary-specific labels
-	LBM_init_bound_lab();
+	LBM_initBoundLab();
 
 
 
@@ -479,11 +479,11 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 
 	// Velocity field
 	u.resize( N_lim*M_lim*K_lim*dims );
-	LBM_init_vel();
+	LBM_initVelocity();
 	
 	// Density field
 	rho.resize( N_lim*M_lim*K_lim );
-	LBM_init_rho();
+	LBM_initRho();
 
 	// Cartesian force vector
 	force_xyz.resize(N_lim*M_lim*K_lim*dims, 0.0);
@@ -564,7 +564,7 @@ void GridObj::LBM_init_grid( std::vector<int> local_size,
 // ***************************************************************************************************
 
 // Method to initialise the quantities for a refined subgrid assuming a volumetric configuration. Parent grid is passed by reference
-void GridObj::LBM_init_subgrid (GridObj& pGrid) {
+void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	
 	// Declarations
 	int IndXstart, IndYstart, IndZstart = 0;
@@ -785,7 +785,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
 	
 	// Call refined labelling routine passing parent grid
-	LBM_init_refined_lab(pGrid);
+	LBM_initRefinedLab(pGrid);
 
 	
 	
@@ -799,11 +799,11 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 
 	// Velocity
 	u.resize(N_lim * M_lim * K_lim * dims);
-	LBM_init_vel( );
+	LBM_initVelocity( );
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
-	LBM_init_rho( );
+	LBM_initRho( );
 
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * dims, 0.0);
@@ -853,7 +853,7 @@ void GridObj::LBM_init_subgrid (GridObj& pGrid) {
 }
 
 // ***************************************************************************************************
-void GridObj::LBM_init_solid_lab() {
+void GridObj::LBM_initSolidLab() {
 
 #ifdef SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
@@ -944,7 +944,7 @@ void GridObj::LBM_init_solid_lab() {
 
 // ***************************************************************************************************
 // Initialise wall and object labels method (L0 only)
-void GridObj::LBM_init_bound_lab ( ) {
+void GridObj::LBM_initBoundLab ( ) {
 
 	// Typing defined as follows:
 	/*
@@ -970,7 +970,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 #endif
 
 	// Try to add the solid block
-	LBM_init_solid_lab();
+	LBM_initSolidLab();
 
 #ifdef INLET_ON
 	// Left hand face only
@@ -1075,6 +1075,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 #elif defined VIRTUAL_WINDTUNNEL
 					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet
 					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry for debugging for now
+					// TODO: Remove symmetry label here to enable rolling road
 #endif
 
 				}
@@ -1112,7 +1113,7 @@ void GridObj::LBM_init_bound_lab ( ) {
 // ***************************************************************************************************
 
 // Initialise refined labels method
-void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
+void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	
 	// Typing defined as follows:
 	/*
@@ -1246,7 +1247,7 @@ void GridObj::LBM_init_refined_lab (GridObj& pGrid) {
 
 	
 	// Try to add the solid block labels
-	LBM_init_solid_lab();
+	LBM_initSolidLab();
 }
 
 // ***************************************************************************************************

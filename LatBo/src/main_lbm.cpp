@@ -507,7 +507,7 @@ int main( int argc, char* argv[] )
 				{
 
 					*GridUtils::logfile << "Probe write out" << endl;
-					Grids.io_probe_output();
+					Grids.io_probeOutput();
 
 				}
 

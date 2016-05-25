@@ -107,23 +107,23 @@ public :
 public :
 
 	// Initialisation functions
-	void LBM_init_vel();		// Initialise the velocity field
-	void LBM_init_rho();		// Initialise the density field
-	void LBM_init_grid();		// Non-MPI wrapper for initialiser
-	void LBM_init_grid(std::vector<int> local_size,
+	void LBM_initVelocity();		// Initialise the velocity field
+	void LBM_initRho();				// Initialise the density field
+	void LBM_initGrid();			// Non-MPI wrapper for initialiser
+	void LBM_initGrid(std::vector<int> local_size,
 		std::vector< std::vector<int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
-	void LBM_init_subgrid(GridObj& pGrid);	// Initialise subgrid with all quantities
-	void LBM_init_bound_lab();				// Initialise labels for walls
-	void LBM_init_solid_lab();				// Initialise labels for solid objects
-	void LBM_init_refined_lab(GridObj& pGrid);	// Initialise labels for refined regions
-	void LBM_init_getInletProfile();		// Initialise the store for inlet profile data from file
+	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
+	void LBM_initBoundLab();					// Initialise labels for walls
+	void LBM_initSolidLab();					// Initialise labels for solid objects
+	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
+	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
 	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
-	double LBM_collide(int i, int j, int k, int v);
-	void LBM_mrt_collide(IVector<double>& f_new, int i, int j, int k);	// MRT collision operation
+	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
+	void LBM_mrtCollide(IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim);	// MRT collision operation
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
@@ -132,12 +132,15 @@ public :
 
 	// Boundary operations
 	void bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWBB BC
+	void bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWSR BC
 	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);					// Application of Zou-He BC
-	void bc_applyRegularised(int label, int i, int j, int k, int M_lim, int K_lim);				// Application of Regaulrised BC
+	void bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of Regaulrised BC
 	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Extrapolation BC
 	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
-	void bc_solid_site_reset();	                                                        // Reset all the solid site velocities to zero
+	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
+	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
+		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
@@ -147,7 +150,7 @@ public :
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
-	void io_probe_output();						// Output routine for point probes
+	void io_probeOutput();						// Output routine for point probes
 	void io_vtkwriter(double tval);				// VTK writer
 	void io_tecplot(double tval);				// TecPlot write out
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag

@@ -112,6 +112,6 @@ protected:
 	static int getVoxInd(double p);
 	static bool isInVoxel(double x, double y, double z, int curr_mark, BFLBody* body);
 	static bool isVoxelBflVoxel(double x, double y, double z, BFLBody* body);
-	static MarkerData getMarkerData(double x, double y, double z, BFLBody* body);
+	static MarkerData* getMarkerData(double x, double y, double z, BFLBody* body);
 
 };

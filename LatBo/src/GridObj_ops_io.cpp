@@ -440,7 +440,7 @@ void GridObj::io_restart(bool IO_flag) {
 }
 // ***************************************************************************************************
 // Custom routine for writing out point probes or other high frequency, low volume data
-void GridObj::io_probe_output() {
+void GridObj::io_probeOutput() {
 
 	// Declarations
 	std::ofstream probefile;

@@ -46,7 +46,7 @@ GridObj::GridObj(int level)
 	*GridUtils::logfile << "Constructing Grid level " << level  << std::endl;
 
 	// Call L0 non-MPI initialiser
-	this->LBM_init_grid();
+	this->LBM_initGrid();
 
 }
 
@@ -74,7 +74,7 @@ GridObj::GridObj(int level, std::vector<int> local_size,
 	*GridUtils::logfile << "Constructing Grid level " << level << " on rank " << MpiManager::my_rank << std::endl;
 	
 	// Call MPI initialisation routine
-	LBM_init_grid(local_size, GlobalLimsInd, GlobalLimsPos); 
+	LBM_initGrid(local_size, GlobalLimsInd, GlobalLimsPos); 
 
 }
 
@@ -107,7 +107,7 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	subGrid.emplace_back( RegionNumber, *this);	
 	
 	// Initialise the subgrid passing position of corner of the refined region on parent grid
-	this->subGrid.back().LBM_init_subgrid(*this);
+	this->subGrid.back().LBM_initSubGrid(*this);
 
 	// Add another subgrid beneath the one just created if necessary
 	if (this->subGrid.back().level < NumLev) {

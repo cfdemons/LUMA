@@ -346,7 +346,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
 			// Increment counter
 			a++;
-		else {
+		} else {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
 			_PCpts->y.erase(_PCpts->y.begin() + a);
 			_PCpts->z.erase(_PCpts->z.begin() + a);

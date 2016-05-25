@@ -139,8 +139,6 @@ public :
 	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
 	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
-	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
-		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine

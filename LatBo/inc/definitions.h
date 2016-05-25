@@ -182,7 +182,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Switches for inserting certain bodies (enable only one at once!)
 //#define INSERT_CIRCLE_SPHERE
-#define INSERT_RECTANGLE_CUBOID
+//#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
 #define INSERT_FILAMENT
 //#define INSERT_FILARRAY

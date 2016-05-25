@@ -1073,9 +1073,7 @@ void GridObj::LBM_initBoundLab ( ) {
 #ifdef WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
 #elif defined VIRTUAL_WINDTUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet
-					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry for debugging for now
-					// TODO: Remove symmetry label here to enable rolling road
+					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
 				}

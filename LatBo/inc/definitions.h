@@ -61,7 +61,7 @@
 #define output_precision 6		// Precision of output
 
 // Types of output
-//#define TEXTOUT
+#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define IO_LITE

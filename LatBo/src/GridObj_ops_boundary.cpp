@@ -360,7 +360,7 @@ void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim
 // Routine to apply Regularised boundary conditions
 void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 
-	int dest_x, dest_y, dest_z;
+	int dest_x, dest_y, dest_z, n;
 
 	/** To allow a generalised application of the regularised BC we need to 
 	 * implement the following:
@@ -376,26 +376,17 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
 	IVector<double> ftmp;
-	for (size_t n = 0; n < nVels; n++) {
+	for (n = 0; n < nVels; n++) {
 		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
 	}	
 
-	// Check the 4 (2D) or 6 (3D) normals to get orientation of the wall
-	for (size_t normal = 0; normal < (dims * 2); normal++) {
+	// Loop to find orientation of wall (do not include rest direction)
+	for (size_t v_outgoing = 0; v_outgoing < nVels - 1; v_outgoing++) {
 
 		// Identify site where the population will be streamed to //
-
-		// Consider periodic stream (serial/non-MPI)
-#if (defined PERIODIC_BOUNDARIES && !defined BUILD_FOR_MPI)
-
-		dest_x = (i+c[0][normal] + N_lim) % N_lim;
-		dest_y = (j+c[1][normal] + M_lim) % M_lim;
-		dest_z = (k+c[2][normal] + K_lim) % K_lim;
-#else
-		dest_x = i+c[0][normal];
-		dest_y = j+c[1][normal];
-		dest_z = k+c[2][normal];
-#endif
+		dest_x = i+c[0][v_outgoing];
+		dest_y = j+c[1][v_outgoing];
+		dest_z = k+c[2][v_outgoing];
 
 		// If this site is off-grid then cannot apply the BC in preparation for streaming
 		if (	(dest_x >= N_lim || dest_x < 0) ||
@@ -410,9 +401,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 		} else if ( GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
 			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this) ) {
 
-#if (!defined PERIODIC_BOUNDARIES)
 			continue;	// Periodic boundaries disabled so do not try to apply BC
-#endif
 
 			/* If periodic boundaries are enabled then this is a valid stream 
 			 * so allow flow through to next section */
@@ -429,76 +418,92 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
 			) {
 
-
-			// Apply the straight wall version
-
-			/* According to Latt & Chopard 2008 and the cited thesis by Latt 2007 we define the regularised
-				* boundary condition as folows:
-				*
-				* 1) Apply off-equilibrium bounceback to the unknown populations.
-				* 2) Compute off-equilibrium momentum flux tensor components PI^neq_ab = sum( c_ia c_ib f^neq_i ).
-				* 3) Substitute off-equilibrium definitions.
-				* 4) Compute regularised off-equilibrium part from f^neq = (w_i / (2*cs^4)) Q_iab * PI^neq_ab
-				* where Q_iab = dot(c_i, c_i) - cs^2 delta_ab.
-				* 5) Finally replace all populations on the inlet boundary node as f_i = f^eq_i + f^neq_i
-				* 
-				*/
-
-
-			// Based on the direction get the wall density form existing populations
+			// Declarations
+			double rho_wall;
 			double f_plus = 0, f_zero = 0;
 			std::vector<double> x_plus, x_minus, y_plus, y_minus, z_plus, z_minus;
 			double u_normal;
-
-			// Find nature of normal and assign normal velocity	
 			int normal_dir;
-			for (int n = 0; n < dims; n++) {
 
-				// Is it normal x, y or z vector?
-				if (abs(c[n][normal]) == 1) {
-					normal_dir = n;
+			// First 4 (2D) or 6 (3D) are normals so apply straight wall version of density
+			if (v_outgoing < 2 * dims) {
 
-					// Get appropriate normal velocity
-					switch (n) {
-					case 0:
-						u_normal = u_0x;
-						break;
-					case 1:
-						u_normal = u_0y;
-						break;
-					case 2:
-						u_normal = u_0z;
+				/* According to Latt & Chopard 2008 and the cited thesis by Latt 2007 we define the regularised
+				 * boundary condition as folows:
+				 *
+				 * 1) Apply off-equilibrium bounceback to the unknown populations.
+				 * 2) Compute off-equilibrium stress components PI^neq_ab = sum( c_ia c_ib f^neq_i ).
+				 * 3) Substitute off-equilibrium definitions.
+				 * 4) Compute regularised off-equilibrium part from f^neq = (w_i / (2*cs^4)) Q_iab * PI^neq_ab
+				 * where Q_iab = dot(c_i, c_i) - cs^2 delta_ab.
+				 * 5) Finally replace all populations on the inlet boundary node as f_i = f^eq_i + f^neq_i
+				 * 
+				 */				
+
+				// Find nature of normal and assign normal velocity
+				for (n = 0; n < dims; n++) {
+
+					// Is it normal x, y or z vector?
+					if (abs(c[n][v_outgoing]) == 1) {
+						normal_dir = n;
+
+						// Get appropriate normal velocity
+						switch (n) {
+						case 0:
+							u_normal = u_0x;
+							break;
+						case 1:
+							u_normal = u_0y;
+							break;
+						case 2:
+							u_normal = u_0z;
+							break;
+						}
+
 						break;
 					}
-
-					break;
 				}
-			}
 
 
-			// Loop through direction vectors and compute the momenta
-			for (int n = 0; n < nVels; n++) {
+				// Loop through direction vectors and compute the relevant momenta
+				for (n = 0; n < nVels; n++) {
 
-				// Check against normal
-				if (c[normal_dir][n] == -c[normal_dir][normal]) {
+					// Check against normal
+					if (c[normal_dir][n] == -c[normal_dir][v_outgoing]) {
 			
-					// Add to outgoing momentum
-					f_plus += ftmp[n];
+						// Add to outgoing momentum
+						f_plus += ftmp[n];
 
-				} else if (c[normal_dir][n] != -c[normal_dir][normal]) {
+					} else if (c[normal_dir][n] == 0) {
 
-					// Tangential and rest momentum
-					f_zero += ftmp[n];
+						// Tangential and rest momentum
+						f_zero += ftmp[n];
+
+					}
 
 				}
+
+				// Compute wall density from above momenta
+				rho_wall = (1.0 / (1.0 - u_normal)) * (2.0 * f_plus + f_zero);
+
+
+			// Otherwise, it must be a corner/edge
+			} else {
+
+				// Use second-order extrapolation along a line to approximate density at corner 
+				// as insufficient populations to compute it using the usual method
+				int dest_x2 = dest_x + c[0][v_outgoing];
+				int dest_y2 = dest_y + c[1][v_outgoing];
+				int dest_z2 = dest_z + c[2][v_outgoing];
+				rho_wall = 2 * rho(dest_x,dest_y,dest_z,M_lim,K_lim) - rho(dest_x2,dest_y2,dest_z2,M_lim,K_lim);
 
 			}
 
 
-			// Compute wall density
-			double rho_wall = (1.0 / (1.0 + u_normal)) * (2.0 * f_plus + f_zero);
 
-			// Set macroscopic quantities to known values
+			// Now density has been found continue... //
+
+			// Set macroscopic quantities to desired values
 			rho(i,j,k,M_lim,K_lim) = rho_wall;
 			u(i,j,k,0,M_lim,K_lim,dims) = u_0x;
 			u(i,j,k,1,M_lim,K_lim,dims) = u_0y;
@@ -506,80 +511,67 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 			u(i,j,k,2,M_lim,K_lim,dims) = u_0z;
 #endif
 
-			// Apply off-equilibrium bounce-back to unknown populations
-			for (int n = 0; n < nVels; n++) {
-				if (c[normal_dir][n] == c[normal_dir][normal]) {
-					// These directions are unknown so apply non-equilibrium bounce-back
-					ftmp[n] = LBM_collide(i,j,k,n,M_lim,K_lim) + 
-						(ftmp[GridUtils::getOpposite(n)] - LBM_collide(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim));
+			// Update feq to match the desired density and velocity and
+			// apply off-equilibrium bounce-back to unknown populations
+			for (n = 0; n < nVels; n++) {
+				feq(i,j,k,n,M_lim,K_lim,nVels) = LBM_collide(i,j,k,n,M_lim,K_lim);
+
+
+				// Different "if conditions" for corners/edges and normal walls
+				if (v_outgoing < 2 * dims) {
+					// Unknowns on normal wall share normal component
+					if (c[normal_dir][n] == c[normal_dir][v_outgoing]) {
+						ftmp[n] = ftmp[GridUtils::getOpposite(n)] - 
+							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,nVels) - feq(i,j,k,n,M_lim,K_lim,nVels));
+					}
+				} else {
+					// Unknowns on corners/edges are ones which do not share any component of outgoing vector
+					if (c[0][n] != c[0][v_outgoing] && c[1][n] != c[1][v_outgoing]
+#if (dims == 3)
+					&& c[2][n] != c[2][v_outgoing]
+#endif
+					) {
+						ftmp[n] = ftmp[GridUtils::getOpposite(n)] - 
+							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,nVels) - feq(i,j,k,n,M_lim,K_lim,nVels));
+					}
 				}
 			}
 
-			// Categorise components based on wall direction
-			for (int n = 0; n < nVels; n++) {				
-				if (c[0][n] == 1) x_plus.push_back(ftmp[n]);
-				if (c[0][n] == -1) x_minus.push_back(ftmp[n]);
-				if (c[1][n] == 1) y_plus.push_back(ftmp[n]);
-				if (c[1][n] == -1) y_minus.push_back(ftmp[n]);
-				if (c[2][n] == 1) z_plus.push_back(ftmp[n]);
-				if (c[2][n] == -1) z_minus.push_back(ftmp[n]);
+			// Get off-equilibrium stress components
+			double Sxx = 0, Syy = 0, Sxy = 0;	// 2D & 3D
+			double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
+			for (n = 0; n < nVels; n++) {
+				Sxx += c[0][n] * c[0][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
+				Syy += c[1][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
+				Szz += c[2][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
+				Sxy += c[0][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
+				Sxz += c[0][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
+				Syz += c[1][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,nVels));
 			}
 
-
-			// Compute stress components
-			double Sxx, Syy, Sxy;				// 2D & 3D
-			double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
-
-			Sxx = std::accumulate(x_plus.begin(),x_plus.end(),0.0) + std::accumulate(x_minus.begin(),x_minus.end(),0.0) 
-				- 1.0 / (1.0 / (cs*cs)) * (rho_wall - 1.0) 
-				- rho_wall * u_0x * u_0x;
-			Syy = std::accumulate(y_plus.begin(),y_plus.end(),0.0) + std::accumulate(y_minus.begin(),y_minus.end(),0.0) 
-				- 1.0 / (1.0 / (cs*cs)) * (rho_wall - 1.0) 
-				- rho_wall * u_0y * u_0y;
-			Szz = std::accumulate(z_plus.begin(),z_plus.end(),0.0) + std::accumulate(z_minus.begin(),z_minus.end(),0.0) 
-				- 1.0 / (1.0 / (cs*cs)) * (rho_wall - 1.0) 
-				- rho_wall * u_0z * u_0z;
-
-#if (dims == 3)
-			Sxy = (ftmp[7] - ftmp[9]) + (ftmp[6] - ftmp[8]) 
-				- rho_wall * u_0x * u_0y;
-			Sxz = (ftmp[15] - ftmp[17]) + (ftmp[14] - ftmp[16]) 
-				- rho_wall * u_0x * u_0z;
-			Syz = (ftmp[10] - ftmp[12]) + (ftmp[11] - ftmp[13]) 
-				- rho_wall * u_0y * u_0z;
-#else
-			Sxy = (ftmp[5] - ftmp[7]) + (ftmp[4] - ftmp[6]) 
-				- rho_wall * u_0x * u_0y;
-#endif
-
-			// Compute regularised non-equilibrium components and add to desired feq
+			// Compute regularised non-equilibrium components and add to feq to get new populations
 			for (int v = 0; v < nVels; v++) {
 
 				f(i,j,k,v,M_lim,K_lim,nVels) = 
 
 					LBM_collide(i,j,k,v,M_lim,K_lim) +
 						
-					(w[v] / (2*pow(cs,4))) * (
+					(w[v] / (2 * pow(cs,4))) * (
 					( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
 					( (pow(c[1][v],2) - pow(cs,2)) * Syy ) +
 					( (pow(c[2][v],2) - pow(cs,2)) * Szz ) +
-					( 2*c[0][v]*c[1][v]*Sxy ) +
-					( 2*c[0][v]*c[2][v]*Sxz ) +
-					( 2*c[1][v]*c[2][v]*Syz )
+					( 2 * c[0][v] * c[1][v] * Sxy ) +
+					( 2 * c[0][v] * c[2][v] * Sxz ) +
+					( 2 * c[1][v] * c[2][v] * Syz )
 					);
 			}
+
+			// Do not check anymore directions as BC applied
+			break;
 
 		}
 
 	}
-
-	// If we have reached here then the site is not on a normal wall but is a corner //
-
-
-	// TODO: Apply the corner versions
-
-
-
 
 }
 

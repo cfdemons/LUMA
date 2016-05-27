@@ -149,7 +149,8 @@ int main( int argc, char* argv[] )
 #ifdef BUILD_FOR_MPI
 	MPI_Barrier(mpim->my_comm);
 	secs = clock() - t_start;
-	*GridUtils::logfile << "MPI Topolgy initialised in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
+	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
 #endif
 
 
@@ -395,7 +396,8 @@ int main( int argc, char* argv[] )
 	MPI_Barrier(mpim->my_comm);
 #endif
 	secs = clock() - t_start;
-	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
+	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< obj_initialise_time << "ms." << std::endl;
 
 
 	// Set the pointer to the hierarchy in the MpiManager
@@ -548,6 +550,66 @@ int main( int argc, char* argv[] )
 	/* ***************************************************************************************************************
 	*********************************************** POST PROCESS *****************************************************
 	*************************************************************************************************************** */
+
+#ifdef LOG_TIMINGS
+	// TIMINGS FILE //
+	/** Format is as follows:
+	 * Mpi Init Time --- Obj Init Time --- Time Step Time L0 --- MPI Time L0 --- etc.
+	 **/
+
+	std::ofstream timings;
+
+	// Wait for rank accessing the file and only access if this rank's turn
+	for (int n = 0; n < MpiManager::num_ranks; n++) {
+		
+#ifdef BUILD_FOR_MPI
+		MPI_Barrier(mpim->my_comm);
+
+		if (MpiManager::my_rank == n)
+#endif
+		{
+			if (n == 0)	timings.open(GridUtils::path_str + "/timings.out",std::ios::out);
+			else timings.open(GridUtils::path_str + "/timings.out",std::ios::app);
+			GridObj* g = NULL;
+
+			// Put in initialisation times
+#ifdef BUILD_FOR_MPI
+			timings << mpi_initialise_time;
+#else
+			timings << 0;
+#endif
+			timings << "\t" << obj_initialise_time;
+
+			// Loop over expected grids
+			for (int lev = 0; lev <= NumLev; lev++) {
+				for (int reg = 0; reg < NumReg; reg++) {
+					
+					// Get the grid
+					GridUtils::getGrid(MpiManager::Grids,lev,reg,g);
+
+					// If grid does not exist the put in a zero
+					if (g == NULL) {
+
+						timings << "\t" << 0;
+
+					} else {
+
+						// Add time step time on this grid then mpi overhead time
+						timings << "\t" << g->timeav_timestep << "\t" << g->timeav_mpi_overhead;
+
+					}
+
+				}
+			}
+
+		}
+
+		timings << std::endl;
+		timings.close();
+	}
+
+	// END TIMINGS FILE //
+#endif
 
 
 	// Close log file

@@ -1033,7 +1033,11 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
+#if defined FLAT_PLATE_TUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 7;
+#else
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
+#endif
 
 				}
 			}
@@ -1050,7 +1054,11 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
+#if defined FLAT_PLATE_TUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 7;
+#else
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
+#endif
 
 				}
 			}
@@ -1072,7 +1080,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
-#elif defined VIRTUAL_WINDTUNNEL
+#elif (defined VIRTUAL_WINDTUNNEL || defined FLAT_PLATE_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
@@ -1097,6 +1105,8 @@ void GridObj::LBM_initBoundLab ( ) {
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
 #elif defined VIRTUAL_WINDTUNNEL
 					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry boundary
+#elif defined FLAT_PLATE_TUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as free-stream
 #endif
 
 				}

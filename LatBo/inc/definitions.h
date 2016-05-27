@@ -8,7 +8,7 @@
 	**************************************************************************
 	**************************************************************************
 */
-// Definitions File Format ## 0.7-47 ## //
+// Definitions File Format ## 0.8-47 ## //
 
 
 // Header guard
@@ -41,6 +41,7 @@
 //#define IBBODY_TRACER				// Write out IBBody positions
 //#define LD_OUT					// Write out lift and drag (sum x and y forces on Lagrange markers of IBBody)
 //#define BFL_DEBUG					// Write out BFL marker positions and Q values out to files
+#define LOG_TIMINGS					// Write out the initialisation, time step and mpi timings to an output file
 
 
 /*
@@ -54,14 +55,14 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 100			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
-#define TEXTOUT
+//#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define IO_LITE
@@ -104,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 5000	// Number of time steps
+#define T 100	// Number of time steps
 
 
 /*
@@ -131,18 +132,18 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 300		// Number of x lattice sites
-#define M 300		// Number of y lattice sites
-#define K 160		// Number of z lattice sites
+#define N 1500		// Number of x lattice sites
+#define M 1500		// Number of y lattice sites
+#define K 1500		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 3		// End of domain-x
+#define b_x 15		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 3		// End of domain-y
+#define b_y 15		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 4		// End of domain-z
+#define b_z 15		// End of domain-z
 
 
 /*
@@ -229,8 +230,9 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-// Virtual Wind Tunnel
-#define VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
+// Virtual Wind Tunnels
+//#define VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
+#define FLAT_PLATE_TUNNEL			// Adds an inlet to all faces except exit
 
 // Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
@@ -246,7 +248,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
@@ -283,13 +285,13 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 50
-	#define start_object_y 100
-	#define start_object_z 20
-	#define object_length_x 50			// The object input is scaled based on this dimension
+	#define start_object_x 579
+	#define start_object_y 652
+	#define start_object_z 0
+	#define object_length_x 346			// The object input is scaled based on this dimension
 #endif
 
 
@@ -315,7 +317,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -333,19 +335,19 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 100 };
-	const static size_t RefXend[NumLev][NumReg]		= { 200 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 100 };
-	const static size_t RefYend[NumLev][NumReg]		= { 200 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 375 };
+	const static size_t RefXend[NumLev][NumReg]		= { 1125 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 375 };
+	const static size_t RefYend[NumLev][NumReg]		= { 1125 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 40 };
 	static size_t RefZend[NumLev][NumReg]		= { 120 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {226}, {12} };
-	const static size_t RefXend[NumLev][NumReg]		= { {382}, {228} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {48}, {84} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {375}, {376} };
+	const static size_t RefXend[NumLev][NumReg]		= { {1125}, {1127} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {375}, {376} };
+	const static size_t RefYend[NumLev][NumReg]		= { {1125}, {1127} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
 	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };

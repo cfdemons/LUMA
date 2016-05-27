@@ -585,12 +585,13 @@ int main( int argc, char* argv[] )
 				for (int reg = 0; reg < NumReg; reg++) {
 					
 					// Get the grid
+					g = NULL;
 					GridUtils::getGrid(MpiManager::Grids,lev,reg,g);
 
 					// If grid does not exist the put in a zero
 					if (g == NULL) {
 
-						timings << "\t" << 0;
+						timings << "\t" << 0 << "\t" << 0;
 
 					} else {
 

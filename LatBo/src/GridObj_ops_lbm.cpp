@@ -657,15 +657,14 @@ void GridObj::LBM_stream( ) {
 					// Fine --> Any; do not stream in any direction
 					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
 						break;
-					}
 
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
-#if (defined INLET_ON && defined INLET_DO_NOTHING)
-					else if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
+#if (defined INLET_ON && defined INLET_DO_NOTHING)					
+					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 						continue;
-					}
 #endif
+					}
 
 
 					////////////////////////
@@ -849,14 +848,13 @@ void GridObj::LBM_stream( ) {
 						) {
 							continue;
 
-						}
-
 						// Any --> Do-nothing-inlet then ignore so as not to overwrite
 #if (defined INLET_ON && defined INLET_DO_NOTHING)
-						else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) {
+						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) {
 							continue;
-						}
 #endif
+						}
+						
 
 #ifdef DEBUG_STREAM
 						/*DEBUG*/
@@ -925,7 +923,7 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
 
 					// Solid site so do not update density but set velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -935,11 +933,11 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 6) {
+				} else if ( LatTyp(i,j,k,M_lim,K_lim) == 6 ||
+					(LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) ) {
 
-					// Symmetry wall so ignore?
+					// Symmetry or Inlet BC which update themselves prior to collision
 					continue;
-
 
 				} else {
 
@@ -1036,7 +1034,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
 
-	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
 
 		// Solid site so do not update density but set velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -1045,6 +1043,11 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 #if (dims == 3)
 		u(i,j,k,2,M_lim,K_lim,dims) = 0.0;
 #endif
+
+	} else if ( LatTyp(i,j,k,M_lim,K_lim) == 6 ||
+		(LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) ) {
+
+		// Symmetry or Inlet BC which update themselves prior to collision
 
 	} else {
 
@@ -1187,8 +1190,11 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 		for (size_t j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
 			for (size_t k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
-				// If TL to lower level then fetch values from lower level
-				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4 || LatTyp(i,j,k,M_coarse,K_coarse) == 5) {
+				// If TL to lower level or BC is on a refined level then fetch values from lower level
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4 || 
+					LatTyp(i,j,k,M_coarse,K_coarse) == 10 ||
+					LatTyp(i,j,k,M_coarse,K_coarse) == 16 ||
+					LatTyp(i,j,k,M_coarse,K_coarse) == 17) {
 
 					// Lookup indices for lower level
 					x_start = fGrid->CoarseLimsX[0];

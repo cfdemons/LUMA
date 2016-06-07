@@ -22,10 +22,13 @@
 
 	Recognised boundary label types are:
 	0 == solid site (no-slip)
+	5 == BFL site
 	6 == symmetry site (free-slip)
 	7 == inlet site
 	8 == outlet site
-	10 == BFL site
+	10 == solid site (no-slip -- site refined)
+	16 == symmetry site (free-slip -- site refined)
+	17 == inlet site (site refined)
 */
 void GridObj::LBM_boundary (int bc_type_flag) {
 
@@ -46,13 +49,13 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************	*/
     
 				// Apply to solid sites
-				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5)
+				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10)
 					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
 
 					// Apply half-way bounce-back
 					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
 
-				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 6)
+				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 6 || LatTyp(i,j,k,M_lim,K_lim) == 16)
 					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
 
 					// Apply half-way specular reflection
@@ -63,9 +66,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************* Inlet Sites ****************************************
 					******************************************************************************************	*/
     
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 && (bc_type_flag == 0 || bc_type_flag == 2 || bc_type_flag == 4) ) {
-
-					// !! FOR NOW ASSUME THIS IS LEFT HAND WALL !!
+				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) 
+					&& (bc_type_flag == 0 || bc_type_flag == 2 || bc_type_flag == 4) ) {
 
 					// Choose option
 #if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED)
@@ -95,7 +97,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************** BFL Sites *****************************************
 					******************************************************************************************	*/
     
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 10 && (bc_type_flag == 0 || bc_type_flag == 5) ) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == 5 && (bc_type_flag == 0 || bc_type_flag == 5) ) {
 
 					bc_applyBfl(i,j,k);
 						
@@ -158,10 +160,11 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
-		// Only apply if destination is a fluid site
+		// Only apply if destination is a fluid site or precomputed inlet
 		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
 				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7
 			) {
 
 			// Get incoming direction
@@ -383,39 +386,24 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 	// Loop to find orientation of wall (do not include rest direction)
 	for (size_t v_outgoing = 0; v_outgoing < nVels - 1; v_outgoing++) {
 
-		// Identify site where the population will be streamed to //
+		// Identify site in this direction //
 		dest_x = i+c[0][v_outgoing];
 		dest_y = j+c[1][v_outgoing];
 		dest_z = k+c[2][v_outgoing];
 
-		// If this site is off-grid then cannot apply the BC in preparation for streaming
-		if (	(dest_x >= N_lim || dest_x < 0) ||
-				(dest_y >= M_lim || dest_y < 0) ||
-				(dest_z >= K_lim || dest_z < 0)
-			) {
-				continue;	// Move on to next direction
+		// If this site is off-grid then cannot determine orientation of wall
+		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,N_lim,M_lim,K_lim,*this)) {
 
-#ifdef BUILD_FOR_MPI
-		// When using MPI, equivalent to off-grid is when destination is in 
-		// periodic recv layer with periodic boundaries disabled.
-		} else if ( GridUtils::isOnRecvLayer(XPos[dest_x],YPos[dest_y],ZPos[dest_z]) 
-			&& GridUtils::isOverlapPeriodic(dest_x,dest_y,dest_z,*this) ) {
+			continue;
 
-			continue;	// Periodic boundaries disabled so do not try to apply BC
+		}
 
-			/* If periodic boundaries are enabled then this is a valid stream 
-			 * so allow flow through to next section */
-
-#endif	// BUILD_FOR_MPI
-
-		}	// End of exclusions
-
-		/* Not been filtered by above exclusions so try to apply boundary condition. */
-
-		// Only apply if destination is a fluid site
+		// Only apply if destination is a fluid site or a solid site (i.e. an inlet site which feeds the domain)
 		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
 				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0 ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 10
 			) {
 
 			// Declarations
@@ -566,10 +554,35 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 					);
 			}
 
-			// Do not check anymore directions as BC applied
+			// Do not check anymore directions as BC applied but increment 
+			// so we can check whether BC has been applied
+			v_outgoing++;
 			break;
 
 		}
+
+		/** If it reaches here and has gone through all the directions then the wall orientation cannot be found
+		 * based on the fact that it cannot find an adjacent site within the centre of the domain on which to 
+		 * base the BC. In this case it must be a buffered layer of inlet sites (the "second row" of sites you get
+		 * when embedding a sub-grid in the inlet) so just set it to default values as it doesn't affect the domain
+		 * anyway. */
+		if (v_outgoing == nVels) {
+
+			// Set macroscopic quantities to default values
+			rho(i,j,k,M_lim,K_lim) = rho_in;
+			u(i,j,k,0,M_lim,K_lim,dims) = u_0x;
+			u(i,j,k,1,M_lim,K_lim,dims) = u_0y;
+#if (dims == 3)
+			u(i,j,k,2,M_lim,K_lim,dims) = u_0z;
+#endif
+
+			// Set f to default values
+			for (int v = 0; v < nVels; v++) {
+				feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i,j,k,v,M_lim,K_lim);
+				f(i,j,k,v,M_lim,K_lim,nVels) = feq(i,j,k,v,M_lim,K_lim,nVels);
+			}
+		}
+
 
 	}
 
@@ -795,7 +808,7 @@ void GridObj::bc_solidSiteReset( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 				// Reset solid site velocities to zero
-				if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 5) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
 					
 					u(i,j,k,0,M_lim,K_lim,dims) = 0.0;
 					u(i,j,k,1,M_lim,K_lim,dims) = 0.0;

@@ -724,3 +724,28 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 
 	return result;
 }
+
+// ***************************************************************************************************
+// Tests whether a site is on a given grid
+bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj& g) {
+
+	if (	(i >= N_lim || i < 0) ||
+			(j >= M_lim || j < 0) ||
+			(k >= K_lim || k < 0)
+			) {
+				return true;
+
+#ifdef BUILD_FOR_MPI
+		// When using MPI, equivalent to off-grid is when destination is in 
+		// periodic recv layer with periodic boundaries disabled.
+		} else if ( GridUtils::isOnRecvLayer(g.XPos[i],g.YPos[j],g.ZPos[k]) 
+			&& GridUtils::isOverlapPeriodic(i,j,k,g) ) {
+
+			return true;		
+
+#endif	// BUILD_FOR_MPI
+
+		}
+
+		return false;
+}

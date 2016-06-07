@@ -62,6 +62,8 @@ public:
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
 	static bool isOnSenderLayer(double site_position, int dir, int maxmin);		// Is site on specified sender layer
 	static bool isOnRecvLayer(double site_position, int dir, int maxmin);		// Is site on speicfied recv layer
+	static bool isOffGrid(int i, int j, int k, 
+		int N_lim, int M_lim, int K_lim, GridObj& g);							// Is site off supplied grid
 
 
 	// Templated functions //

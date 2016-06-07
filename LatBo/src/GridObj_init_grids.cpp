@@ -446,20 +446,6 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Define TYPING MATRICES
 	LatTyp.resize( N_lim*M_lim*K_lim );
 
-	// Typing defined as follows:
-	/*
-	0 == boundary site
-	1 == coarse site
-	2 == fine/refined site
-	3 == TL to upper (coarser) level
-	4 == TL to lower (finer) level
-	5 == refined boundary
-	6 == symmetry boundary
-	7 == inlet
-	8 == outlet
-	10 == BFL site
-	*/
-
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), 1);
 
@@ -757,20 +743,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	
 	// Generate TYPING MATRICES
-
-	// Typing defined as follows:
-	/*
-	0 == boundary site
-	1 == coarse site
-	2 == fine/refined site
-	3 == TL to upper (coarser) level
-	4 == TL to lower (finer) level
-	5 == refined boundary
-	6 == symmetry boundary
-	7 == inlet
-	8 == outlet
-	10 == BFL site
-	*/
 	
 	// Get local grid sizes
 	size_t N_lim = XInd.size();
@@ -778,7 +750,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	size_t K_lim = ZInd.size();
 	
 	// Resize
-	LatTyp.resize( YInd.size() * XInd.size() * ZInd.size() );
+	LatTyp.resize( N_lim * M_lim * K_lim );
 
 
 	// Default labelling of coarse
@@ -854,6 +826,22 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 // ***************************************************************************************************
 void GridObj::LBM_initSolidLab() {
+
+	// Typing defined as follows:
+	/*
+	0 == solid (no-slip) site
+	1 == coarse site
+	2 == fine/refined site
+	3 == TL to upper (coarser) level
+	4 == TL to lower (finer) level
+	5 == BFL site
+	6 == symmetry (free-slip) boundary
+	7 == inlet
+	8 == outlet
+	10 == solid (no-slip) refined
+	16 == symmetry (free-slip) refined
+	17 == inlet (site refined)
+	*/
 
 #ifdef SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
@@ -948,16 +936,18 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Typing defined as follows:
 	/*
-	0 == boundary site
+	0 == solid (no-slip) site
 	1 == coarse site
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == refined boundary
-	6 == symmetry boundary
+	5 == BFL site
+	6 == symmetry (free-slip) boundary
 	7 == inlet
 	8 == outlet
-	10 == BFL site
+	10 == solid (no-slip) refined
+	16 == symmetry (free-slip) refined
+	17 == inlet (site refined)
 	*/
 
 	// Get grid sizes
@@ -1125,16 +1115,18 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	
 	// Typing defined as follows:
 	/*
-	0 == boundary site
+	0 == solid (no-slip) site
 	1 == coarse site
 	2 == fine/refined site
 	3 == TL to upper (coarser) level
 	4 == TL to lower (finer) level
-	5 == refined boundary
-	6 == symmetry boundary
+	5 == BFL site
+	6 == symmetry (free-slip) boundary
 	7 == inlet
 	8 == outlet
-	10 == BFL site
+	10 == solid (no-slip) refined
+	16 == symmetry (free-slip) refined
+	17 == inlet (site refined)
 	*/
 
 	// Get parent local grid sizes
@@ -1246,7 +1238,16 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 					// If last site to be updated in fine block, change parent label
 					// to ensure boundary values are pulled from fine grid
 					if ((j % 2) != 0 && (i % 2) != 0) {
-						pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 5;
+						if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 0 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 10) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 10;
+
+						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 6 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 16) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 16;
+						
+						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 7 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 17) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 17;
+
+						}
 					}
 				}
             }

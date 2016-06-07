@@ -320,7 +320,11 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	double shift_x =  std::floor( start_bfl_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
 	double shift_y =  std::floor( start_bfl_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
-	double shift_z =  std::floor( start_bfl_z - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) );
+	// z-shift based on centre of object
+	double shift_z =  std::floor( centre_object_z - scale_factor * (
+		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
+		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
+		) );
 
 	// Apply
 	for (size_t a = 0; a < _PCpts->x.size(); a++) {
@@ -441,7 +445,11 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	double shift_x =  std::floor( start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
 	double shift_y =  std::floor( start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
-	double shift_z =  std::floor( start_object_z - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end()) );
+	// z-shift based on centre of object
+	double shift_z =  std::floor( centre_object_z - scale_factor * (
+		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
+		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
+		) );
 
 	// Apply
 	for (size_t a = 0; a < _PCpts->x.size(); a++) {

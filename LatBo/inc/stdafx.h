@@ -52,7 +52,7 @@ inline static bool is_nan(NumType n) {
 #ifdef _WIN32
 		_isnan(n)
 #else
-		isnan(n)
+		std::isnan(n)
 #endif
 	) return true;
 				

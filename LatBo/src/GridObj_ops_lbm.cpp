@@ -394,7 +394,7 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 #ifdef GRAVITY_ON
 					// Add gravity to any IBM forces currently stored
-					force_xyz(i,j,k,grav_direction,M_lim,K_lim,dims) += rho(i,j,k,M_lim,K_lim) * grav_force;
+					force_xyz(i,j,k,grav_direction,M_lim,K_lim,dims) += rho(i,j,k,M_lim,K_lim) * grav_force * (1 / pow(2,level));
 #endif
 
 					// Now compute force_i components from Cartesian force vector
@@ -1018,10 +1018,10 @@ void GridObj::LBM_macro( ) {
 					rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 					// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-					fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
-					fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+					fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+					fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
 #if (dims == 3)
-					fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+					fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
 #endif
 
 					// Assign velocity
@@ -1123,10 +1123,10 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-		fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
-		fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
+		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,dims);
+		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,dims);
 #if (dims == 3)
-		fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
+		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,dims);
 #endif
 
 		// Assign velocity

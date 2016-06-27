@@ -57,7 +57,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 100			// How many timesteps before whole grid output
 #define output_precision 16		// Precision of output
 
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 100	// Number of time steps
+#define T 10000	// Number of time steps
 
 
 /*
@@ -245,11 +245,11 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-//#define PERIODIC_BOUNDARIES
+#define PERIODIC_BOUNDARIES
 
 // Solids
-//#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-//#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
+#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
+#define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
 //#define WALLS_ON_FLOOR_ONLY		// Limit no-slip walls to bottom no-slip wall only
 #define wall_thickness_bottom 1		// Thickness of bottom walls in coarsest lattice units
 #define wall_thickness_top 1	// Thickness of top walls in coarsest lattice units
@@ -318,7 +318,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -336,19 +336,19 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 6 };
-	const static size_t RefXend[NumLev][NumReg]		= { 14 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 6 };
-	const static size_t RefYend[NumLev][NumReg]		= { 14 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefXend[NumLev][NumReg]		= { 15 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefYend[NumLev][NumReg]		= { 15 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {33}, {11} };
-	const static size_t RefXend[NumLev][NumReg]		= { {47}, {18} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {5}, {21} };
-	const static size_t RefYend[NumLev][NumReg]		= { {35}, {40} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {4}, {7} };
+	const static size_t RefXend[NumLev][NumReg]		= { {16}, {18} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {4}, {7} };
+	const static size_t RefYend[NumLev][NumReg]		= { {16}, {18} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
 	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };

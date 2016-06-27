@@ -418,7 +418,7 @@ void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 		for (int dir = 0; dir < dims; dir++) {
 			// Compute restorative force (in lattice units)
 			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
-				1;//(1 / pow(2,g.level));	// Time step in lattice units dt = 1 / 2^level = dx //TODO Check scaling here
+				1.0;	// Time step in grid-normalised lattice units
 		}
 	}
 }
@@ -439,8 +439,7 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 			for (size_t dir = 0; dir < dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
 				g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, dims) +=
-					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon;// TODO Check if this extra scaling is required * (iBody[ib].spacing/g.dx);
-
+					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * iBody[ib].spacing/g.dx;
 			}
 		}
 	}

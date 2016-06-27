@@ -58,7 +58,7 @@
 
 // Output Options
 #define out_every 100			// How many timesteps before whole grid output
-#define output_precision 16		// Precision of output
+#define output_precision 6		// Precision of output
 
 
 // Types of output
@@ -78,7 +78,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Gravity
-#define GRAVITY_ON
+//#define GRAVITY_ON
 // Expression for the gravity force
 #define grav_force 1e-4	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 10000	// Number of time steps
+#define T 3000	// Number of time steps
 
 
 /*
@@ -132,16 +132,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 21		// Number of x lattice sites
-#define M 21		// Number of y lattice sites
+#define N 81		// Number of x lattice sites
+#define M 41		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x -0.5		// Start of domain-x
-#define b_x 20.5	// End of domain-x
+#define b_x 80.5	// End of domain-x
 #define a_y -0.5		// Start of domain-y
-#define b_y 20.5	// End of domain-y
+#define b_y 40.5	// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x 0			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref			//u_ref //u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
@@ -175,7 +175,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-//#define IBM_ON						// Turn on IBM
+#define IBM_ON						// Turn on IBM
 #define IB_Lev 2				// Grid level for immersed boundary object (0 if no refined regions)
 #define IB_Reg 0					// Grid region for immersed boundary object (0 if no refined regions)
 
@@ -194,7 +194,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 19		// Number of Lagrange points (approximately)
+#define num_markers 17		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -232,20 +232,20 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Inlets
-//#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
+#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-//#define UNIFORM_INLET			// Make the inlet a uniform inlet
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
 
 // Outlets
-//#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
+#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
 //#define OUTLET_NRBC				// Turn on NRBC at outlet
 
 
 // Periodicity
-#define PERIODIC_BOUNDARIES
+//#define PERIODIC_BOUNDARIES
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
@@ -336,24 +336,22 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefXend[NumLev][NumReg]		= { 15 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 33 };
+	const static size_t RefXend[NumLev][NumReg]		= { 47 };
 	const static size_t RefYstart[NumLev][NumReg]	= { 5 };
-	const static size_t RefYend[NumLev][NumReg]		= { 15 };
+	const static size_t RefYend[NumLev][NumReg]		= { 35 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {4}, {7} };
-	const static size_t RefXend[NumLev][NumReg]		= { {16}, {18} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {4}, {7} };
-	const static size_t RefYend[NumLev][NumReg]		= { {16}, {18} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {23}, {11} };
+	const static size_t RefXend[NumLev][NumReg]		= { {57}, {58} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {5}, {11} };
+	const static size_t RefYend[NumLev][NumReg]		= { {35}, {50} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
 	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };
-
-
 #endif
 
 #endif

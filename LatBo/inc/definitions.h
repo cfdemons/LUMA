@@ -345,10 +345,10 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {23}, {11} };
-	const static size_t RefXend[NumLev][NumReg]		= { {57}, {58} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {5}, {11} };
-	const static size_t RefYend[NumLev][NumReg]		= { {35}, {50} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {30}, {10} };
+	const static size_t RefXend[NumLev][NumReg]		= { {50}, {30} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {10}, {5} };
+	const static size_t RefYend[NumLev][NumReg]		= { {30}, {35} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {78}, {12} };
 	static size_t RefZend[NumLev][NumReg]		= { {162}, {156} };

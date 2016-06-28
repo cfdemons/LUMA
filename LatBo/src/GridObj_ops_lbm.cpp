@@ -24,34 +24,10 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	///////////////////////////////
 	// IBM pre-kernel processing //
 	///////////////////////////////
-
-
-	// Copy distributions prior to IBM predictive step
 #ifdef IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
 	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
-
-	// If IBM on and predictive loop flag true then store initial data and reset forces
-	if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
-
-		*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
-
-		// Store lattice data
-		f_ibm_initial = f;
-		u_ibm_initial = u;
-		rho_ibm_initial = rho;
-	}
-
-	// Reset lattice and Cartesian force vectors at each site
-	LBM_forcegrid(true);
-
-#else
-
-	// If not using IBM then just reset the force vectors
-	LBM_forcegrid(true);
-
 #endif
-
 
 
 	////////////////
@@ -62,6 +38,24 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// Loop twice on refined levels as refinement ratio per level is 2
 	int count = 1;
 	do {
+
+		// Copy distributions prior to IBM predictive step
+#ifdef IBM_ON
+
+		// If IBM on and predictive loop flag true then store initial data and reset forces
+		if (level == IB_Lev && region_number == IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
+
+			*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
+
+			// Store lattice data
+			f_ibm_initial = f;
+			u_ibm_initial = u;
+			rho_ibm_initial = rho;
+		}
+#endif
+
+		// Reset lattice and Cartesian force vectors at each site
+		LBM_forcegrid(true);
 
 		// Apply boundary conditions (regularised must be applied before collision)
 #if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
@@ -279,25 +273,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			t++;
 			break;
 		}
-
-
-		// If first loop then store the lattice values and reset the forces before starting loop again
-		if (count == 1) {
-#ifdef IBM_ON
-			if (level == IB_Lev && region_number == IB_Reg) {
-				*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
-
-				// Store lattice data
-				f_ibm_initial = f;
-				u_ibm_initial = u;
-				rho_ibm_initial = rho;
-			}
-#endif
-
-			// Reset lattice and Cartesian force vectors at each site
-			LBM_forcegrid(true);
-		}
-
 
 		// Increment counters
 		t++; count++;

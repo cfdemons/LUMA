@@ -15,7 +15,7 @@ using namespace std;
 // ***************************************************************************************************
 // LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
 // IBM_flag dictates whether we need the predictor step or not
-void GridObj::LBM_multi ( bool IBM_flag ) {
+void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 
 	// Start the clock to time the kernel
 	clock_t secs, t_start = clock();
@@ -54,8 +54,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		}
 #endif
 
-		// Reset lattice and Cartesian force vectors at each site
-		LBM_forcegrid(true);
+		// Reset lattice and Cartesian force vectors at each site (don't do this if using IBM and on the corrector step on the sub-grid where IBM exists)
+		if (IBM_flag == true || repeatFlag == true || level != IB_Lev || region_number != IB_Reg)
+			LBM_forcegrid(true);
 
 		// Apply boundary conditions (regularised must be applied before collision)
 #if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
@@ -90,93 +91,57 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 				LBM_explode(reg);
 
 				// Call same routine for lower level
-				subGrid[reg].LBM_multi(IBM_flag);
-
+				subGrid[reg].LBM_multi(IBM_flag, true);
 			}
+		}
 
-			// Apply boundary conditions
+		// Apply boundary conditions
 #if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
+		LBM_boundary(2);	// Inlet (Zou-He)
 #endif
+
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON)
-			LBM_boundary(1);	// Bounce-back (walls and solids)
+		LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
+		/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
 #endif
 
 #ifdef BFL_ON
-			// Store the f values pre stream for BFL
-			ObjectManager::getInstance()->f_prestream = f;
+		// Store the f values pre stream for BFL
+		ObjectManager::getInstance()->f_prestream = f;
 #endif
 
-			// Stream
-			LBM_stream();
+		// Stream
+		LBM_stream();
 
 #ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
+		/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
 #endif
 
-			// Apply boundary conditions
+		// Apply boundary conditions
 #ifdef BFL_ON
-			LBM_boundary(5);	// BFL boundary conditions
-#endif
-#ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
+		LBM_boundary(5);	// BFL boundary conditions
 #endif
 
+#ifdef MEGA_DEBUG
+		/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
+#endif
+
+		// If there is lower levels then coalesce from them
+		if (NumLev > level) {
+
+			size_t regions = subGrid.size();
 			for (size_t reg = 0; reg < regions; reg++) {
 
 				// Coalesce
 				LBM_coalesce(reg);
-
 			}
 
 #ifdef MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
-
-
-			///////////////////////
-			// No refined levels //
-			///////////////////////
-
-		} else {
-
-			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
-#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
-			LBM_boundary(1);	// Bounce-back (walls and solids)
-#endif
-
-#ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
-#endif
-
-#ifdef BFL_ON
-			// Store the f values pre stream for BFL
-			ObjectManager::getInstance()->f_prestream = f;
-#endif
-
-			// Stream
-			LBM_stream();
-
-#ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
-#endif
-
-
-			// Apply boundary conditions
-#ifdef BFL_ON
-			LBM_boundary(5);	// BFL boundary conditions
-#endif
-#ifdef MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
-#endif
-
 		}
 
 
@@ -223,42 +188,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			// Corrector step does not reset force vectors but uses newly computed vector instead.
 			*GridUtils::logfile << "Correction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
 
-			// Apply boundary conditions (regularised must be applied before collision)
-#if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
-			LBM_boundary(2);
-#endif
-
-			// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
-			LBM_forcegrid(false);
-
-			// Collision on Lr
-			LBM_collide();
-
-			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
-#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
-			LBM_boundary(1);	// Bounce-back (walls and solids)
-#endif
-#ifdef BFL_ON
-			// Store the f values pre stream for BFL
-			ObjectManager::getInstance()->f_prestream = f;
-#endif
-
-			// Stream
-			LBM_stream();
-
-			// Apply boundary conditions
-#ifdef BFL_ON
-			LBM_boundary(5);	// BFL boundary conditions
-#endif
-#ifdef OUTLET_ON
-			LBM_boundary(3);	// Outlet
-#endif
-
-			// Update macroscopic quantities (including time-averaged quantities)
-			LBM_macro();
+			// Corrector step (no IBM, no repeat)
+			LBM_multi(false, false);
+			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
 
 			// Move the body if necessary
 			ObjectManager::getInstance()->ibm_move_bodies(*this);
@@ -266,16 +198,13 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		}
 #endif
 
-
-		// Check if on L0 and if so drop out as only need to loop once on coarsest level
-		if (level == 0) {
-			// Increment time step counter and break
-			t++;
-			break;
-		}
-
 		// Increment counters
 		t++; count++;
+
+		// Check if on L0 or corrector step and if so drop out as only need to loop once
+		if (repeatFlag == false) {
+			break;
+		}
 
 	} while (count < 3);
 
@@ -305,8 +234,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	MpiManager::getInstance()->mpi_communicate(level, region_number);
 
 #endif
-
-
 }
 
 // ***************************************************************************************************

@@ -1,0 +1,28 @@
+#!/bin/bash --login
+
+# PBS job options (name, compute nodes, job time, mail to)
+#PBS -N luma_job
+#PBS -l select=1
+#PBS -l walltime=02:00:00
+#PBS -M adrian.harwood@manchester.ac.uk
+
+# Replace [budget code] below with your project code (e.g. t01)
+#PBS -A e283-harwood
+
+# Make sure any symbolic links are resolved to absolute path
+export PBS_O_WORKDIR=$(readlink -f $PBS_O_WORKDIR)               
+
+# Change to the directory that the job was submitted from
+# (remember this should be on the /work filesystem)
+cd $PBS_O_WORKDIR
+
+# Set the number of threads to 1
+#   This prevents any system libraries from automatically 
+#   using threading.
+export OMP_NUM_THREADS=1
+
+# Launch the parallel job
+#   Using -n MPI processes (remember 24 MPI processes per node), 
+#	output files for terminal window and error log
+aprun -n 24 ./luma arg1 arg2 > terminal.out 2> errors.out
+

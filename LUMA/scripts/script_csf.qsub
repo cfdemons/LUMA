@@ -1,0 +1,11 @@
+# -- SGE options (whose lines must begin with #$)
+
+#$ -S /bin/bash       	# Our jobscript is written for the bash shell
+#$ -V                 	# Inherit environment settings (e.g., from loaded modules)
+#$ -cwd               	# Run the job in the current directory
+#$ -pe smp.pe 4			# Indicate parallel job type and number of cores required
+#$ -N luma_job			# Job Name
+#$ -o error.log			# Output File Name
+#$ -j y					# Merge the standard error stream into the standard output stream, i.e., job output and error messages are sent to the same file, rather than different files.
+
+mpirun -n 4 ./luma

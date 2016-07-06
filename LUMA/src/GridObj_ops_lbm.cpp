@@ -675,9 +675,9 @@ void GridObj::LBM_stream( ) {
 
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
 #if (defined INLET_ON && defined INLET_DO_NOTHING)					
-					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7) {
+					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
-						continue;
+						// Carry on and stream
 #endif
 					}
 
@@ -863,9 +863,9 @@ void GridObj::LBM_stream( ) {
 						) {
 							continue;
 
-						// Any --> Do-nothing-inlet then ignore so as not to overwrite
+						// Any --> Do-nothing-inlet then ignore so as not to overwrite inlet site
 #if (defined INLET_ON && defined INLET_DO_NOTHING)
-						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7) {
+						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 17) {
 							continue;
 #endif
 						}

@@ -4,9 +4,3 @@
 # Load modules
 module load compilers/gcc/4.9.0
 module load mpi/gcc/openmpi/1.6
-
-# Compile
-mpiCC -std=c++11 -Wall ./src/*.cpp -o ./luma
-
-# Run
-# mpiexec -n 4 luma

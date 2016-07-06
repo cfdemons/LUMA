@@ -450,16 +450,16 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 					if (abs(c[n][v_outgoing]) == 1) {
 						normal_dir = n;
 
-						// Get appropriate normal velocity
+						// Get appropriate normal velocity (+ve u_normal = incoming flow)
 						switch (n) {
 						case 0:
-							u_normal = u_0x;
+							u_normal = c[normal_dir][v_outgoing] * u_0x;
 							break;
 						case 1:
-							u_normal = u_0y;
+							u_normal = c[normal_dir][v_outgoing] * u_0y;
 							break;
 						case 2:
-							u_normal = u_0z;
+							u_normal = c[normal_dir][v_outgoing] * u_0z;
 							break;
 						}
 
@@ -469,6 +469,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 
 				// Loop through direction vectors and compute the relevant momenta
+				// from the known (outgoing) populations
 				for (n = 0; n < nVels; n++) {
 
 					// Check against normal

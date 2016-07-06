@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.0"
+#define LUMA_VERSION "1.0.1"
 
 
 // Header guard
@@ -62,7 +62,7 @@
 #define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1000				// How many timesteps before whole grid output
+#define out_every 500			// How many timesteps before whole grid output
 #define output_precision 3		// Precision of output
 
 // Types of output
@@ -135,19 +135,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
-#define N 1200		// Number of x lattice sites
-#define M 450		// Number of y lattice sites
-#define K 800		// Number of z lattice sites
+#define dims 3		// Number of dimensions to the problem
+#define N 40		// Number of x lattice sites
+#define M 20		// Number of y lattice sites
+#define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 12		// End of domain-x
+#define b_x 8		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 4.5		// End of domain-y
+#define b_y 4		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 8		// End of domain-z
+#define b_z 6		// End of domain-z
 
 
 /*
@@ -168,7 +168,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 1000			// Desired Reynolds number
+#define Re 500			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -235,13 +235,14 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Virtual Wind Tunnels
-#define VIRTUAL_WINDTUNNEL			// Adds a symmetry condition to the ceiling and inlet on floor
+//#define VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
 //#define FLAT_PLATE_TUNNEL			// Adds an inlet to all faces except exit
+#define FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
 // Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
-//#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
+//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
@@ -252,7 +253,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
@@ -272,16 +273,16 @@ const static int zProbeLims[2] = {30, 120};
 //#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 #ifdef SOLID_BLOCK_ON
-	#define block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 100		// Index of start of object/wall in x-direction
-	#define obj_x_max 120		// Index of end of object/wall in x-direction
-	#define obj_y_min 30			// Index of start of object/wall in y-direction
-	#define obj_y_max 50		// Index of end of object/wall in y-direction
-	#define obj_z_min 4		// Index of start of object/wall in z-direction
-	#define obj_z_max 24		// Index of end of object/wall in z-direction
+	#define obj_x_min 90		// Index of start of object/wall in x-direction
+	#define obj_x_max 110		// Index of end of object/wall in x-direction
+	#define obj_y_min 20			// Index of start of object/wall in y-direction
+	#define obj_y_max 40		// Index of end of object/wall in y-direction
+	#define obj_z_min 65		// Index of start of object/wall in z-direction
+	#define obj_z_max 85		// Index of end of object/wall in z-direction
 #endif
 
 
@@ -289,13 +290,13 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 4		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 100
-	#define start_object_y 4
-	#define centre_object_z 500
-	#define object_length_x 400			// The object input is scaled based on this dimension
+	#define start_object_x 20
+	#define start_object_y 16
+	#define centre_object_z 61
+	#define object_length_x 80			// The object input is scaled based on this dimension
 #endif
 
 
@@ -321,7 +322,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 2		// Levels of refinement (can't use with IBM yet)
+#define NumLev 4		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -356,6 +357,14 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZstart[NumLev][NumReg]		= { {100}, {200} };
 	static size_t RefZend[NumLev][NumReg]		= { {700}, {1000} };
 
+#elif (NumReg == 1 && NumLev == 4)
+	const static size_t RefXstart[NumLev][NumReg]	= { {5},	{3},	{5},	{10} };
+	const static size_t RefXend[NumLev][NumReg]		= { {25},	{35},	{55},	{80} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {0},	{0},	{0},	{0} };
+	const static size_t RefYend[NumLev][NumReg]		= { {8},	{13},	{20},	{30} };
+	// If doing 2D, these can be arbitrary values
+	static size_t RefZstart[NumLev][NumReg]		= { {7},	{3},	{5},	{10} };
+	static size_t RefZend[NumLev][NumReg]		= { {22},	{28},	{45},	{70} };
 
 #endif
 

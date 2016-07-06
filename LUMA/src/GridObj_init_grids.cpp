@@ -412,7 +412,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	XPos.insert( XPos.begin(), fmod(XPos[0]-dx + Lx, Lx) ); XPos.insert( XPos.end(), fmod(XPos[XPos.size()-1]+dx + Lx, Lx) );
 	YPos.insert( YPos.begin(), fmod(YPos[0]-dy + Ly, Ly) ); YPos.insert( YPos.end(), fmod(YPos[YPos.size()-1]+dy + Ly, Ly) );
 #if (dims == 3)
-	ZPos.insert( ZPos.begin(), fmod(ZPos[0]-dz + Lz, Ly) ); ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size()-1]+dz + Lz, Lz) );
+	ZPos.insert( ZPos.begin(), fmod(ZPos[0]-dz + Lz, Lz) ); ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size()-1]+dz + Lz, Lz) );
 #endif
 
 	// Update the sender/recv layer positions in the MpiManager
@@ -920,7 +920,8 @@ void GridObj::LBM_initSolidLab() {
 	// Loop over object definition in global indices
 	for (i = obj_x_min; i <= obj_x_max; i++) {
 		for (j = obj_y_min; j <= obj_y_max; j++) {
-			for (k = obj_z_min; k <= obj_z_max; k++) {
+			for (k = obj_z_min; k <= obj_z_max; k++)
+			{
 
 				// Only label if the site is on current rank
 				if ( GridUtils::isOnThisRank(i,j,k,*this) ) {
@@ -941,7 +942,7 @@ void GridObj::LBM_initSolidLab() {
 		}
 	}
 
-#endif
+#endif	// SOLID_BLOCK_ON
 
 }
 
@@ -1018,7 +1019,11 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
 
+#ifdef FREESTREAM_TUNNEL
+					LatTyp(i,j,k,M_lim,K_lim) = 7;
+#else
 					LatTyp(i,j,k,M_lim,K_lim) = 8;
+#endif
 
 				}
 			}
@@ -1028,7 +1033,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	}
 #endif
 
-#if defined WALLS_ON && !defined WALLS_ON_2D && (dims == 3)
+#if ((defined WALLS_ON && !defined WALLS_ON_2D) || defined FREESTREAM_TUNNEL) && (dims == 3)
 
 	// Search index vector to see if FRONT wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
@@ -1038,7 +1043,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if defined FLAT_PLATE_TUNNEL
+#if (defined FLAT_PLATE_TUNNEL || defined FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = 7;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
@@ -1059,7 +1064,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if defined FLAT_PLATE_TUNNEL
+#if (defined FLAT_PLATE_TUNNEL || defined FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = 7;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
@@ -1085,7 +1090,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
-#elif (defined VIRTUAL_WINDTUNNEL || defined FLAT_PLATE_TUNNEL)
+#elif (defined VIRTUAL_WINDTUNNEL || defined FLAT_PLATE_TUNNEL || defined FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
@@ -1110,7 +1115,7 @@ void GridObj::LBM_initBoundLab ( ) {
 					LatTyp(i,j,k,M_lim,K_lim) = 0;
 #elif defined VIRTUAL_WINDTUNNEL
 					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry boundary
-#elif defined FLAT_PLATE_TUNNEL
+#elif (defined FLAT_PLATE_TUNNEL || defined FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as free-stream
 #endif
 

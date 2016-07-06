@@ -1,0 +1,10 @@
+version=1.0.1
+
+Issue #57: Fix added to allow generalised regularised on right hand and upper and back walls to impose velocity with correct direction.
+Issue #58: Fixed do nothing inlet from crashing since wall-embedded sub-grid changes.
+Issue #49: Fixed z-direction position initialisation in MPI builds which addresses hangs witnessed in earlier versions.
+
+
+version=1.0
+
+Initial release of the code.

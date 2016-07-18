@@ -88,8 +88,8 @@ private :
 	IVector<double> rho;
 
 	// Grid scalars
-	double dx, dy, dz;	// Physical spacing
-	int region_number;	// ID of region at a particular level in the embedded grid hierarchy
+	double dx, dy, dz;		// Physical spacing
+	int region_number;		// ID of region at a particular level in the embedded grid hierarchy
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)

@@ -32,6 +32,16 @@ class ObjectManager
 
 private:
 
+	// Bounce-back object fields
+	double obj_start_x;
+	double obj_end_x;
+	double obj_start_y;
+	double obj_end_y;
+	double obj_start_z;
+	double obj_end_z;
+	std::vector<double> Cl;
+	std::vector<double> Cd;
+
 	// Objects
 	std::vector<IBBody> iBody;				// Array of immersed boundary bodies
 	std::vector<Body<Marker>> bBody;		// Array of default bodies

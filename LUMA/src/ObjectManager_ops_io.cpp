@@ -456,8 +456,18 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 
 	
 	// Rescale coordinates and shift to global lattice units
-	double scale_factor = object_length_x / 
+	// (option to scale based on whatever bounding box dimension chosen)
+#if (scale_direction == 0)
+	double scale_factor = object_length / 
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+#elif (scale_direction == 1)
+	double scale_factor = object_length / 
+		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
+#elif (scale_direction == 2)
+	double scale_factor = object_length / 
+		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
+#endif
+
 	double shift_x =  std::floor( start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
 	double shift_y =  std::floor( start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
 	// z-shift based on centre of object

@@ -118,7 +118,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
 			LBM_boundary(2);	// Inlet (Zou-He)
 #endif
-#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
+#if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 
@@ -168,7 +168,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
 			LBM_boundary(2);	// Inlet (Zou-He)
 #endif
-#if (defined SOLID_BLOCK_ON || defined WALLS_ON)
+#if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
 

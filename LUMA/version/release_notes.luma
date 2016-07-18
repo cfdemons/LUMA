@@ -1,3 +1,8 @@
+version=1.0.2
+
+Issue #61: Added ability to scale an object with respect to any direction not just x direction
+Issue #60: Fixed issue with BB not being applied when loading an object from a point cloud.
+
 version=1.0.1
 
 Issue #57: Fix added to allow generalised regularised on right hand and upper and back walls to impose velocity with correct direction.

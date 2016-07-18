@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.0.1"
+#define LUMA_VERSION "1.0.2"
 
 
 // Header guard
@@ -59,7 +59,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 500			// How many timesteps before whole grid output
@@ -135,19 +135,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 3		// Number of dimensions to the problem
-#define N 40		// Number of x lattice sites
-#define M 20		// Number of y lattice sites
-#define K 30		// Number of z lattice sites
+#define dims 2		// Number of dimensions to the problem
+#define N 100		// Number of x lattice sites
+#define M 100		// Number of y lattice sites
+#define K 50		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 8		// End of domain-x
+#define b_x 1		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 4		// End of domain-y
+#define b_y 1		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 6		// End of domain-z
+#define b_z 0.5		// End of domain-z
 
 
 /*
@@ -168,7 +168,7 @@ const static int zProbeLims[2] = {30, 120};
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 500			// Desired Reynolds number
+#define Re 100			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -290,13 +290,14 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 4		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 20
-	#define start_object_y 16
+	#define start_object_x 30
+	#define start_object_y 40
 	#define centre_object_z 61
-	#define object_length_x 80			// The object input is scaled based on this dimension
+	#define object_length 10			// The object input is scaled based on this dimension
+	#define scale_direction 0			// Scale in this direction (x = 0, y = 1, z = 2)
 #endif
 
 
@@ -322,7 +323,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 4		// Levels of refinement (can't use with IBM yet)
+#define NumLev 1		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -340,13 +341,13 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 450 };
-	const static size_t RefXend[NumLev][NumReg]		= { 700 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 0 };
-	const static size_t RefYend[NumLev][NumReg]		= { 100 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 30 };
+	const static size_t RefXend[NumLev][NumReg]		= { 70 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 30 };
+	const static size_t RefYend[NumLev][NumReg]		= { 70 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { 300 };
-	static size_t RefZend[NumLev][NumReg]		= { 700 };
+	static size_t RefZstart[NumLev][NumReg]		= { 30 };
+	static size_t RefZend[NumLev][NumReg]		= { 70 };
 
 #elif (NumReg == 1 && NumLev == 2)
 	const static size_t RefXstart[NumLev][NumReg]	= { {450}, {50} };

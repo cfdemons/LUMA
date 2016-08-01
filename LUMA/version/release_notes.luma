@@ -1,7 +1,8 @@
 version=1.0.3
 
-Issue #63: Fixed output directory segmentation for large MPI jobs
+WORKING VERSION
 Issue #62: Fixed Reynolds number definition for pointcloud/BFL objects
+Issue #63: Fixed output directory segmentation for large MPI jobs
 
 version=1.0.2
 

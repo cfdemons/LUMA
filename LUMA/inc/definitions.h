@@ -59,7 +59,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 500			// How many timesteps before whole grid output

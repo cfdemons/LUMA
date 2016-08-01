@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.0.2"
+#define LUMA_VERSION "1.0.3"
 
 
 // Header guard
@@ -59,7 +59,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 500			// How many timesteps before whole grid output
@@ -298,6 +298,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define centre_object_z 61
 	#define object_length 10			// The object input is scaled based on this dimension
 	#define scale_direction 0			// Scale in this direction (x = 0, y = 1, z = 2)
+	#define object_length_ref 10		// Reference length to be used in the definition of Reynolds number
 #endif
 
 
@@ -313,6 +314,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define start_bfl_y 100
 	#define centre_bfl_z 20
 	#define bfl_length_x 50		// The BFL object input is scaled based on this dimension
+	#define bfl_length_ref 10		// Reference length to be used in the definition of Reynolds number
 #endif
 
 

@@ -82,35 +82,28 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-    // Get the time and convert it to a serial stamp for the output directory creation
-    time_t curr_time = time(NULL);	// Current system date/time
-    struct tm* timeinfo = localtime(&curr_time);
-    char timeout_char[80];
-    std::strftime(timeout_char, 80, "./output_%Y-%m-%d_%H-%M-%S", timeinfo);
-    std::string path_str(timeout_char);
-	GridUtils::path_str = path_str;   // Set static path variable for output directory
-
-	// Timing variables
+    // Timing variables
 	clock_t t_start, secs; // Wall clock variables
 
 	// Start clock to time initialisation
 	t_start = clock();
 
-	// Output directory creation (only master rank)
-	if (MpiManager::my_rank == 0) {
-		int result = GridUtils::createOutputDirectory(path_str);
-		// TODO: Handle directory creation errors
-	}
+	// Get the time and convert it to a serial stamp for the output directory creation
+	time_t curr_time = time(NULL);	// Current system date/time
+	struct tm* timeinfo = localtime(&curr_time);
+	char timeout_char[80];
+	std::strftime(timeout_char, 80, "./output_%Y-%m-%d_%H-%M-%S", timeinfo);
+	std::string path_str(timeout_char);
+	GridUtils::path_str = path_str;   // Set static path variable for output directory
 
-	
-	// MPI manager creation
 #ifdef BUILD_FOR_MPI
+
 	// Create MpiManager object
 	MpiManager* mpim = MpiManager::getInstance();
 	
-	// Open Mpi Logfile
+	// Create stream for Mpi Logfile
 	std::ofstream mpilog;
-	MpiManager::logout = &mpilog;	// Assign pointer to logfile to MpiManager
+	MpiManager::logout = &mpilog;	// Assign pointer to logfile stream to MpiManager
 	
 	// Initialise the topology
 	mpim->mpi_init();
@@ -121,8 +114,13 @@ int main( int argc, char* argv[] )
 	// Decompose the domain
 	mpim->mpi_gridbuild();
 #else
+
+	// Create directory
+	int result = GridUtils::createOutputDirectory(path_str);
+
 	// Print out version number
 	std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
+
 #endif
 	
 	// Create application log file

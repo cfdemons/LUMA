@@ -76,7 +76,7 @@ const int MpiManager::MPI_cartlab[3][26] =
 // *************************************************************************************************** //
 
 // Initialisation routines
-void MpiManager::mpi_init( ) {
+void MpiManager::mpi_init() {
 	
 	// Create communicator and topology
 	int MPI_periodic[dims], MPI_reorder;
@@ -95,6 +95,20 @@ void MpiManager::mpi_init( ) {
 
 	// Store coordinates in the new topology
 	MPI_Cart_coords(my_comm, my_rank, dims, MPI_coords);
+
+	// Output directory creation (only master rank)
+	if (my_rank == 0) int result = GridUtils::createOutputDirectory(GridUtils::path_str);
+
+	// Buffer for passing path to other ranks
+	char* path_buffer = const_cast<char*>(GridUtils::path_str.c_str());
+	int path_buffer_size = GridUtils::path_str.size();
+
+	// Broadcast directory name (acquire directory name if not rank 0)
+	MPI_Bcast(path_buffer,path_buffer_size,MPI_CHAR,0,my_comm);
+	if (MpiManager::my_rank != 0) {
+		std::string char_to_str(path_buffer);
+		GridUtils::path_str = char_to_str;
+	}
 
 	// Open logfile now my_rank has been assigned
 	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".out", std::ios::out );

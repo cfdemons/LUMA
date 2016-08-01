@@ -106,7 +106,7 @@ public :
 	static void destroyInstance();
 
 	// Initialisation
-	void mpi_init( );		// Initialisation of MpiManager & Cartesian topology
+	void mpi_init();		// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
 
 	// Buffer methods

@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 100	// Number of time steps
+#define T 2500000	// Number of time steps
 
 
 /*

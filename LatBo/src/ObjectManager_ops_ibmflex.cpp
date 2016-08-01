@@ -59,7 +59,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = 0.0; // TODO Change this so that Froude = pow(u_ref,2) / grav_force * length_lu;
+	Froude = 0.0; //u_ref / sqrt(grav_force * length_lu);	//TODO This needs thought as there seems to be multiple definitions of Fr. Also, u_ref is ambiguous for a flow driven by gravity
 #else
 	Froude = 0.0;
 #endif

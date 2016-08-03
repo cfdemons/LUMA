@@ -29,6 +29,7 @@
 using namespace std;
 
 // ***************************************************************************************************
+// Method to get left-hand wall inlet profile from the input file (data may be over- or under-sampled)
 void GridObj::LBM_init_getInletProfile() {
 
 	size_t i, j;
@@ -153,11 +154,6 @@ void GridObj::LBM_init_getInletProfile() {
 // Initialise velocity method
 void GridObj::LBM_initVelocity ( ) {
 
-#ifdef UNIFORM_INLET
-	// Max velocity
-	double u_in[3] = {u_0x, u_0y, u_0z};
-#endif
-	
 	// Get grid sizes
 	int N_lim = XPos.size();
 	int M_lim = YPos.size();
@@ -169,24 +165,13 @@ void GridObj::LBM_initVelocity ( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				
-				
+#ifdef NO_FLOW				
 				for (size_t d = 0; d < dims; d++) {
 
-#ifdef NO_FLOW
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,dims) = 0.0;
 
-#elif defined UNIFORM_INLET
-
-					// Uniform initialise
-					u(i,j,k,d,M_lim,K_lim,dims) = u_in[d];
-
-#endif
-				}
-
-
-#if (!defined NO_FLOW && !defined UNIFORM_INLET)
-
+#else
 				/* Input velocity is specified by individual vectors for x, y and z which 
 				 * have either been read in from an input file or defined by an expression 
 				 * given in the definitions.
@@ -200,16 +185,12 @@ void GridObj::LBM_initVelocity ( ) {
 
 #endif
 
-
-
 			}
 		}
 	}
 
-#if defined SOLID_BLOCK_ON || defined WALLS_ON || defined WALLS_ON_2D
-	// Perform solid site reset of velocity
+	// Perform solid site reset of velocity for any solids
 	bc_solidSiteReset();
-#endif
 
 }
 
@@ -545,18 +526,11 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
-	omega = 1 / ( (nu / pow(cs,2) ) + .5 );
+	omega = 1 / ( (nu / pow(cs,2)) + .5 );
 
 	/* Above is valid for L0 only when dx = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dx,2)) ) + .5 );
 	 */
-
-#ifdef USE_MRT
-	double tmp[] = mrt_relax;
-	for (int i = 0; i < nVels; i++) {
-		mrt_omega.push_back(tmp[i]);
-	}
-#endif
 
 }
 	
@@ -827,15 +801,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/pGrid.omega - .5) *2) + .5);
-
-#ifdef USE_MRT
-	
-	// MRT relaxation times on the finer grid related to coarse in same way as SRT
-	for (size_t i = 0; i < nVels; i++) {
-		mrt_omega.push_back( 1 / ( ( (1/pGrid.mrt_omega[i] - .5) *2) + .5) );
-	}
-
-#endif
 
 }
 

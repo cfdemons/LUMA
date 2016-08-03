@@ -78,7 +78,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	do {
 
 		// Apply boundary conditions (regularised must be applied before collision)
-#if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
+#if (defined INLET_ON && defined INLET_REGULARISED)
 		LBM_boundary(2);
 #endif
 
@@ -115,9 +115,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
@@ -165,9 +162,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		} else {
 
 			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
@@ -447,11 +441,6 @@ void GridObj::LBM_collide( ) {
 
 				} else {
 
-
-#ifdef USE_MRT
-					// Call MRT collision for given lattice site
-					LBM_mrtCollide( f_new, i, j, k, M_lim, K_lim);
-#else
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
 
@@ -464,7 +453,6 @@ void GridObj::LBM_collide( ) {
 															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
 
 					}
-#endif
 
 				}
 
@@ -530,87 +518,6 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 
 
 // ***************************************************************************************************
-// MRT collision procedure for site (i,j,k).
-void GridObj::LBM_mrtCollide( IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim ) {
-#ifdef USE_MRT
-
-	// Temporary vectors
-	std::vector<double> m;					// Vector of moments
-	m.resize(nVels);
-	std::fill(m.begin(), m.end(), 0.0);		// Set to zero
-	std::vector<double> meq( m );			// Vector of equilibrium moments
-
-	// Loop over directions and update equilibrium function
-	for (int v = 0; v < nVels; v++) {
-
-		// Get feq value by calling overload of collision function
-		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
-
-	}
-
-
-	/* Compute the moment vectors using forward transformation to moment space
-	 *
-	 * m_p = M_pq f_q
-	 * m_eq_p = M_pq f_eq_q
-	 *
-	 */
-
-	// Do a matrix * vector operation
-	for (int p = 0; p < nVels; p++) {
-		for (int q = 0; q < nVels; q++) {
-
-			m[p] += mMRT[p][q] * f(i,j,k,q,M_lim,K_lim,nVels);
-			meq[p] += mMRT[p][q] * feq(i,j,k,q,M_lim,K_lim,nVels);
-
-		}
-	}
-
-
-	/* Perform the collision in moment space for a component q
-	 *
-	 * m_new_q = m_q - s_q(m_q - m_eq_q)
-	 *
-	 * where s_q is the relaxation rate for component q.
-	 *
-	 */
-
-	// Overwrite old moments
-	double mtmp;
-	for (int q = 0; q < nVels; q++) {
-
-		mtmp = m[q] - mrt_omega[q] * (m[q] - meq[q]);
-		m[q] = mtmp;
-
-	}
-
-
-
-	/* Get populations from the moments by transforming back to velocity space
-	 *
-	 * f_i_new = M^-1_ij * m_new_j
-	 *
-	 */
-
-	double ftmp;
-	// Do a matrix * vector operation
-	for (int p = 0; p < nVels; p++) {
-		ftmp = 0.0;
-
-		for (int q = 0; q < nVels; q++) {
-
-			ftmp += mInvMRT[p][q] * m[q];
-
-		}
-
-		f_new(i,j,k,p,M_lim,K_lim,nVels) = ftmp;
-
-	}
-
-#endif
-}
-
-// ***************************************************************************************************
 // Streaming operator
 // Applies periodic BCs on level 0
 void GridObj::LBM_stream( ) {
@@ -674,7 +581,7 @@ void GridObj::LBM_stream( ) {
 						break;
 
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
-#if (defined INLET_ON && defined INLET_DO_NOTHING)					
+#if (defined INLET_ON && !defined INLET_REGULARISED && !defined INLET_NRBC)					
 					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 						// Carry on and stream
@@ -864,7 +771,7 @@ void GridObj::LBM_stream( ) {
 							continue;
 
 						// Any --> Do-nothing-inlet then ignore so as not to overwrite inlet site
-#if (defined INLET_ON && defined INLET_DO_NOTHING)
+#if (defined INLET_ON && !defined INLET_REGULARISED && !defined INLET_NRBC)
 						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 17) {
 							continue;
 #endif

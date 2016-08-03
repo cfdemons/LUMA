@@ -85,14 +85,11 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					&& (bc_type_flag == 0 || bc_type_flag == 2 || bc_type_flag == 4) ) {
 
 					// Choose option
-#if (defined INLET_ON && !defined INLET_DO_NOTHING && !defined INLET_REGULARISED)
-					// Apply inlet Zou-He
-					bc_applyZouHe(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
-
-#elif (defined INLET_ON && !defined INLET_DO_NOTHING && defined INLET_REGULARISED)
+#if (defined INLET_ON && defined INLET_REGULARISED)
 					// Apply regularised BC
 					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k, N_lim, M_lim, K_lim);
 #endif
+					// Do-Nothing BC is applied by default in a different way
 
     
 				/*	******************************************************************************************
@@ -101,10 +98,11 @@ void GridObj::LBM_boundary (int bc_type_flag) {
     
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 8 && (bc_type_flag == 0 || bc_type_flag == 3 || bc_type_flag == 4) ) {
 
-					// !! FOR NOW ASSUME THIS IS RIGHT HAND WALL !!
-
+					// !! RIGHT HAND WALL ONLY !!
+#ifdef OUTLET_ON
 					// Apply extrapolation
 					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+#endif
 
 
 
@@ -275,106 +273,6 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, i
 
 
 // ***************************************************************************************************
-// Routine to apply Zou-He boundary conditions
-void GridObj::bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim) {
-
-	/* Zou-He velocity boundary condition computed from the following equations
-	 * rho = sum ( fi )
-	 * rho*ux = sum( fi * cxi )
-	 * rho*uy = sum( fi * cyi )
-	 * rho*uz = sum( fi * czi )
-	 * (fi - feq)_in = (fi - feq)_out ------ normal to wall
-	 * 
-	 * + transverse momentum corrections for 3D.
-	 * 
-	 * 3 populations (2D) or 5 populations (3D) will be unknown for the boundary site
-	 */
-
-	// Get references for f values to make the following a bit neater and easier to read
-	// but does make it slower
-	IVector<double> ftmp;
-	for (size_t n = 0; n < nVels; n++) {
-		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,nVels));
-	}
-
-#if dims == 3
-
-	/* Implement using equations
-	 * rho_in = sum( fi )
-	 * rho_in * ux = (f0 + f6 + f8 + f14 + f17) - (f1 + f7 + f9 + f15 + f16)
-	 * rho_in * uy = (f2 + f6 + f9 + f10 + f12) - (f3 + f7 + f8 + f11 + f13)
-	 * rho_in * uz = (f4 + f10 + f13 + f14 + f16) - (f5 + f11 + f12 + f15 + f17)
-	 * f0 - feq0 = f1 - feq1 (equilibrium normal to boundary)
-	 * 
-	 * Plus transverse momentum corrections (Hecht & Harting)
-	 */
-	            
-	// Find density on wall corresponding to given velocity
-    double rho_w = (1.0 / (1.0 - u_0x)) * ( (
-        ftmp[18] + ftmp[2] + ftmp[3] + ftmp[4] + ftmp[5] + ftmp[10] + ftmp[11] + ftmp[12] + ftmp[13] 
-		) + 2.0 * (
-        ftmp[1] + ftmp[7] + ftmp[9] + ftmp[15] + ftmp[16]
-		) );
-
-	// Find f0
-	ftmp[0] = ftmp[1] + (1.0/3.0) * rho_w * u_0x;
-
-	// Compute transverse momentum corrections
-	double Nxy = 0.5 * ( ftmp[2] + ftmp[10] + ftmp[12] - ( ftmp[3] + ftmp[11] + ftmp[13] ) ) - (1.0/3.0) * rho_w * u_0y;
-	double Nxz = 0.5 * ( ftmp[4] + ftmp[10] + ftmp[13] - ( ftmp[5] + ftmp[11] + ftmp[12] ) ) - (1.0/3.0) * rho_w * u_0z;
-
-	// Compute f6, f9, f14 and f18
-	ftmp[6] = ftmp[7] + (2.0 * w[7] / pow(cs,2)) * rho_w * (u_0x + u_0y) - Nxy;
-	ftmp[8] = ftmp[9] + (2.0 * w[9] / pow(cs,2)) * rho_w * (u_0x - u_0y) + Nxy;
-	ftmp[14] = ftmp[15] + (2.0 * w[15] / pow(cs,2)) * rho_w * (u_0x + u_0z) - Nxz;
-	ftmp[17] = ftmp[16] + (2.0 * w[16] / pow(cs,2)) * rho_w * (u_0x - u_0z) + Nxz;
-
-
-#else
-
-	/* 2D Zou-He for a left hand inlet
-	 *
-	 * Implement using 4 equations
-     * rho_in = sum( fi )
-     * rho_in * ux = (f6 + f0 + f4) - (f7 + f1 + f5)
-     * rho_in * uy = (f4 + f2 + f7) - (f5 + f3 + f6)
-     * f0 - feq0 = f1 - feq1 (equilibrium normal to boundary)
-	 */
-
-
-    // Find density on wall corresponding to given velocity
-    double rho_w = (1.0 / (1.0 - u_0x)) * 
-		( ftmp[8] + ftmp[2] + ftmp[3] + 
-			2.0 * (
-			ftmp[7] + ftmp[1] + ftmp[5]
-		) );
-            
-    // Find f0 using equations above
-    ftmp[0] = ftmp[1] + (2.0/3.0) * rho_w * u_0x;
-            
-    // Find f4 using equations above
-    ftmp[4] = 0.5 * ( (rho_w * u_0x) - 
-        (ftmp[0] + ftmp[2]) + ftmp[1] + 2.0*ftmp[5] + ftmp[3] );
-            
-    // Find f6 using equations above
-    ftmp[6] = 0.5 * ( (rho_w * u_0x) - 
-        (ftmp[0] + ftmp[3]) + ftmp[2] + 2.0*ftmp[7] + ftmp[1] );
-
-#endif
-
-
-	//* NEED A CORNER TREATMENT *//
-
-
-	// Apply new f values to grid
-	for (size_t n = 0; n < nVels; n++) {
-		f(i,j,k,n,M_lim,K_lim,nVels) = ftmp[n];
-	}
-
-}
-
-// ***************************************************************************************************
-
 // Routine to apply Regularised boundary conditions
 void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
 

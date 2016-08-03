@@ -103,10 +103,9 @@ public :
 	IVector<int> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
-	int t;					// Number of completed iterations
+	int t;							// Number of completed iterations
 	double nu;						// Kinematic viscosity (in lattice units)
 	double omega;					// Relaxation frequency
-	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 
 	// Timing variables
 	double timeav_mpi_overhead;		// Time of MPI communication
@@ -138,7 +137,6 @@ public :
 	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
-	void LBM_mrtCollide(IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim);	// MRT collision operation
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);

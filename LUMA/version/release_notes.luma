@@ -1,8 +1,13 @@
+version=1.1.0
+WORKING VERSION
+
+Issue #63: KBC collision operator added, Zou-He removed, Uniform Inlet setting removed...
+
+
 version=1.0.3
 
-WORKING VERSION
+Issue #64: Fixed output directory segmentation for large MPI jobs
 Issue #62: Fixed Reynolds number definition for pointcloud/BFL objects
-Issue #63: Fixed output directory segmentation for large MPI jobs
 
 version=1.0.2
 

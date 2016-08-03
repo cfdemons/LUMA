@@ -59,10 +59,10 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-#define BUILD_FOR_MPI
+//#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
+#define out_every 100			// How many timesteps before whole grid output
 #define output_precision 3		// Precision of output
 
 // Types of output
@@ -93,15 +93,8 @@ const static int zProbeLims[2] = {30, 120};
 #define restart_out_every 10000
 
 // LBM configuration
-//#define USE_MRT
+//#define USE_KBC_COLLISION
 
-#if (dims == 3)
-// MRT relaxation times (D3Q19) -- (see Stiebler 2011 paper for some improvements)
-#define mrt_relax {1.0, 1.19, 1.4, 1.0, 1.2, 1.0, 1.2, 1.0, 1.2, omega, 1.4, omega, 1.4, omega, omega, omega, 1.98, 1.98, 1.98}
-#else
-// MRT relaxation times (D2Q9)
-#define mrt_relax {1.0, 1.4, 1.4, 1.0, 1.2, 1.0, 1.2, omega, omega}
-#endif
 
 /*
 *******************************************************************************
@@ -109,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 4000	// Number of time steps
 
 
 /*
@@ -135,19 +128,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
-#define N 100		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 50		// Number of z lattice sites
+#define dims 3		// Number of dimensions to the problem
+#define N 64		// Number of x lattice sites
+#define M 32		// Number of y lattice sites
+#define K 32		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 1		// End of domain-x
+#define b_x 8		// End of domain-x
 #define a_y 0		// Start of domain-y
-#define b_y 1		// End of domain-y
+#define b_y 4		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 0.5		// End of domain-z
+#define b_z 4		// End of domain-z
 
 
 /*
@@ -162,13 +155,12 @@ const static int zProbeLims[2] = {30, 120};
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_ref
-						// u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref		// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 100			// Desired Reynolds number
+#define Re 200			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -239,17 +231,16 @@ const static int zProbeLims[2] = {30, 120};
 //#define FLAT_PLATE_TUNNEL			// Adds an inlet to all faces except exit
 #define FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
+
 // Inlets
-#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
-#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
+#define INLET_ON				// Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-#define UNIFORM_INLET			// Make the inlet a uniform inlet
-//#define INLET_NRBC				// Turn on NRBC at inlet
+//#define INLET_NRBC			// Turn on NRBC at inlet
 
 
 // Outlets
-#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now)
-//#define OUTLET_NRBC				// Turn on NRBC at outlet
+#define OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now -- default First Order Extrap.)
+//#define OUTLET_NRBC			// Turn on NRBC at outlet
 
 
 // Periodicity
@@ -258,7 +249,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Solids
 //#define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
-#//define WALLS_ON_2D				// Limit no-slip walls to top and bottom no-slip walls only
+//#define WALLS_ON_2D			// Limit no-slip walls to top and bottom no-slip walls only
 #define wall_thickness	1		// Thickness of walls in coarsest lattice units
 
 
@@ -290,17 +281,16 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 30
-	#define start_object_y 40
-	#define centre_object_z 61
-	#define object_length 10			// The object input is scaled based on this dimension
-	#define scale_direction 0			// Scale in this direction (x = 0, y = 1, z = 2)
-	#define object_length_ref 10		// Reference length to be used in the definition of Reynolds number
+	#define start_object_x 8
+	#define start_object_y 8
+	#define centre_object_z 40
+	#define object_length 32				// The object input is scaled based on this dimension
+	#define scale_direction 0				// Scale in this direction (x = 0, y = 1, z = 2)
+	#define object_length_ref 32			// Reference length to be used in the definition of Reynolds number
 #endif
-
 
 
 // BFL objects
@@ -325,7 +315,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 2		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -343,22 +333,31 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 30 };
-	const static size_t RefXend[NumLev][NumReg]		= { 70 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 30 };
-	const static size_t RefYend[NumLev][NumReg]		= { 70 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 8 };
+	const static size_t RefXend[NumLev][NumReg]		= { 24 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 8 };
+	const static size_t RefYend[NumLev][NumReg]		= { 24 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { 30 };
-	static size_t RefZend[NumLev][NumReg]		= { 70 };
+	static size_t RefZstart[NumLev][NumReg]		= { 8 };
+	static size_t RefZend[NumLev][NumReg]		= { 24 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {450}, {50} };
-	const static size_t RefXend[NumLev][NumReg]		= { {700}, {400} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {100}, {150} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {8}, {4} };
+	const static size_t RefXend[NumLev][NumReg]		= { {30}, {40} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {11}, {4} };
+	const static size_t RefYend[NumLev][NumReg]		= { {21}, {16} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {100}, {200} };
-	static size_t RefZend[NumLev][NumReg]		= { {700}, {1000} };
+	static size_t RefZstart[NumLev][NumReg]		= { {4}, {4} };
+	static size_t RefZend[NumLev][NumReg]		= { {28}, {44} };
+
+#elif (NumReg == 1 && NumLev == 3)
+	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };
+	const static size_t RefXend[NumLev][NumReg]		= { {34},	{48},	{80} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {9},	{4},	{8} };
+	const static size_t RefYend[NumLev][NumReg]		= { {23},	{24},	{32} };
+	// If doing 2D, these can be arbitrary values
+	static size_t RefZstart[NumLev][NumReg]		= { {2},	{4},	{8} };
+	static size_t RefZend[NumLev][NumReg]		= { {30},	{52},	{88} };
 
 #elif (NumReg == 1 && NumLev == 4)
 	const static size_t RefXstart[NumLev][NumReg]	= { {5},	{3},	{5},	{10} };
@@ -380,11 +379,11 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-// Set default options if using 2D
+// Set dependent options
 #if dims == 3
-	#define nVels 19	// Use D3Q19
+	#define nVels 27	// Use D3Q27
 
-	#define MPI_dir 26	// 3D MPI
+	#define MPI_dir 26	// 3D MPI configuration
 
 #else
 	#define nVels 9		// Use D2Q9
@@ -444,15 +443,6 @@ const static int zProbeLims[2] = {30, 120};
 	#define u_0y uy_in[j]
 	#undef u_0z
 	#define u_0z uz_in[j]
-#endif
-
-// Fix options for Virtual Windtunnel
-#ifdef VIRTUAL_WINDTUNNEL
-	#undef INLET_DO_NOTHING
-	#undef INLET_NRBC
-	#if !defined INLET_REGULARISED
-		#define INLET_REGULARISED
-	#endif
 #endif
 
 #endif

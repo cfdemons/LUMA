@@ -441,18 +441,32 @@ void GridObj::LBM_collide( ) {
 
 				} else {
 
+					
+
+#ifdef USE_KBC_COLLISION
+
+					// KBC collision
+					LBM_kbcCollide(i, j, k, M_lim, K_lim, f_new);
+
+#else
+
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v, M_lim, K_lim);
+						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
 
-						// Recompute distribution function f
-						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) )
-															+ f(i,j,k,v,M_lim,K_lim,nVels)
-															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
+						// LBGK collision
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = 
+							f(i,j,k,v,M_lim,K_lim,nVels) - 
+							omega * ( 
+								f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) 
+									) +
+							force_i(i,j,k,v,M_lim,K_lim,nVels);
 
 					}
+
+#endif
 
 				}
 
@@ -513,6 +527,105 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 	feq = rho(i,j,k,M_lim,K_lim) * w[v] * ( 1 + (A / (cs*cs)) + (B / (2*(cs*cs*cs*cs))) );
 
 	return feq;
+
+}
+
+// ***************************************************************************************************
+// KBC collision operator
+void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
+	
+	double ds[nVels], dh[nVels], gamma;
+
+	// Compute required moments and equilibrium moments
+#if (dims == 3)
+
+	// TODO
+
+#else
+
+	// Only need to compute these 3 in 2D for KBC-D model
+	double M20 = 0.0, M20eq = 0.0;
+	double M02 = 0.0, M02eq = 0.0;
+	double M11 = 0.0, M11eq = 0.0;
+
+	for (int v = 0; v < nVels; v++) {
+		
+		// Update feq
+		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+
+		// These are actually rho * MXX but no point in dividing to multiply later
+		M20 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M02 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M11 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+
+		M20eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M02eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M11eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+	}
+
+	// Compute ds
+	for (int v = 0; v < nVels; v++) {
+
+		// How to compute based on KBC model choice	and directions
+		if (c[0][v] == 0 && c[1][v] == 0) {
+
+			// First family
+			ds[v] = 0.0;
+
+		} else if (c[0][v] != 0 && c[1][v] == 0) {
+
+			// Second family
+			ds[v] =	( 0.25 * (M20 - M02) ) - 
+					( 0.25 * (M20eq - M02eq) );
+
+		} else if (c[0][v] == 0 && c[1][v] != 0) {
+
+			// Third family
+			ds[v] =	( -0.25 * (M20 - M02) ) -
+					( -0.25 * (M20eq - M02eq) );
+
+		} else {
+
+			// Fourth family
+			ds[v] =	( 0.25 * c[0][v] * c[1][v] * M11 ) - 
+					( 0.25 * c[0][v] * c[1][v] * M11eq );
+
+		}
+
+
+		// Compute dh
+		dh[v] = f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) - ds[v];
+
+	}
+
+#endif
+
+	// Once all dh and ds have been computed, compute the products
+	double top_prod = 0.0, bot_prod = 0.0;
+	for (int v = 0; v < nVels; v++) {
+
+		// Compute scalar products
+		top_prod += ds[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,nVels);
+		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,nVels);
+
+	}
+
+	
+	// Compute gamma
+	if (bot_prod == 0.0) gamma = (2/omega);
+	else gamma = (2/omega) - ( 2 - (2/omega) ) * (top_prod / bot_prod);
+
+	// Finally perform collision
+	for (int v = 0; v < nVels; v++) {
+
+		// Perform collision
+		f_new(i,j,k,v,M_lim,K_lim,nVels) = 
+							f(i,j,k,v,M_lim,K_lim,nVels) - 
+							(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
+							force_i(i,j,k,v,M_lim,K_lim,nVels);
+
+	}
+
 
 }
 

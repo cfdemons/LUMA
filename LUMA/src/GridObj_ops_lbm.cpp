@@ -539,7 +539,121 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	// Compute required moments and equilibrium moments
 #if (dims == 3)
 
-	// TODO
+	// Most moments are required in 3D for the KBC-N4 model
+
+	// Stress (second order)
+	double M200 = 0.0, M200eq = 0.0;
+	double M020 = 0.0, M020eq = 0.0;
+	double M002 = 0.0, M002eq = 0.0;
+	// Pis (second order)
+	double M110 = 0.0, M110eq = 0.0;
+	double M101 = 0.0, M101eq = 0.0;
+	double M011 = 0.0, M011eq = 0.0;
+	// Qs (third order)
+	double M111 = 0.0, M111eq = 0.0;
+	double M102 = 0.0, M102eq = 0.0;
+	double M210 = 0.0, M210eq = 0.0;
+	double M021 = 0.0, M021eq = 0.0;
+	double M201 = 0.0, M201eq = 0.0;
+	double M120 = 0.0, M120eq = 0.0;
+	double M012 = 0.0, M012eq = 0.0;
+
+	for (int v = 0; v < nVels; v++) {
+		
+		// Update feq
+		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+
+		// These are actually rho * MXXX but no point in dividing to multiply later
+		M200 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M020 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M002 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[2][v] * c[2][v]);
+		M110 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+		M101 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v]);
+		M011 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v]);
+		M111 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[2][v]);
+		M102 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v] * c[2][v]);
+		M210 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[1][v]);
+		M021 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v] * c[2][v]);
+		M201 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[2][v]);
+		M120 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[1][v]);
+		M012 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v] * c[2][v]);
+
+		M200eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M020eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M002eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[2][v] * c[2][v]);
+		M110eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+		M101eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v]);
+		M011eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v]);
+		M111eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[2][v]);
+		M102eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v] * c[2][v]);
+		M210eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[1][v]);
+		M021eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v] * c[2][v]);
+		M201eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[2][v]);
+		M120eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[1][v]);
+		M012eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v] * c[2][v]);
+	}
+
+	// Compute ds
+	for (int v = 0; v < nVels; v++) {
+
+		// s part dictated by KBC model choice and directions
+		if (c[0][v] == 0 && c[1][v] == 0 && c[2][v] == 0) {
+
+			// First family
+			ds[v] = ( -(M200 + M020 + M002) ) - 
+					( -(M200eq + M020eq + M002eq) );
+
+		} else if (c[0][v] != 0 && c[1][v] == 0 && c[2][v] == 0) {
+
+			// Second family
+			ds[v] =	( (2 * (M200 - M002) - (M020 - M002)) / 6 + (M200 + M020 + M002) / 6  - c[0][v] * 0.5 * (M120 + M102) ) - 
+					( (2 * (M200eq - M002eq) - (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[0][v] * 0.5 * (M120eq + M102eq));
+
+		} else if (c[0][v] == 0 && c[1][v] != 0 && c[2][v] == 0) {
+
+			// Third family
+			ds[v] =	( (-(M200 - M002) + 2 * (M020 - M002)) / 6 + (M200 + M020 + M002) / 6 - c[1][v] * 0.5 * (M210 + M012) ) - 
+					( (-(M200eq - M002eq) + 2 * (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[1][v] * 0.5 * (M210eq + M012eq));
+
+		} else if (c[0][v] == 0 && c[1][v] == 0 && c[2][v] != 0) {
+
+			// Fourth family
+			ds[v] =	( (-(M200 - M002) - (M020 - M002)) / 6 + (M200 + M020 + M002) / 6 - c[2][v] * 0.5 * (M201 + M021) ) - 
+					( (-(M200eq - M002eq) + 2 * (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[2][v] * 0.5 * (M201eq + M021eq) );
+
+		} else if (c[0][v] != 0 && c[1][v] != 0 && c[2][v] == 0) {
+
+			// Fifth family
+			ds[v] =	( c[0][v] * c[1][v] * 0.25 * M110 + (c[1][v] * 0.25 * M210 + c[0][v] * 0.25 * M120) ) - 
+					( c[0][v] * c[1][v] * 0.25 * M110eq + (c[1][v] * 0.25 * M210eq + c[0][v] * 0.25 * M120eq) );
+
+		} else if (c[0][v] != 0 && c[1][v] == 0 && c[2][v] != 0) {
+
+			// Sixth family
+			ds[v] =	( c[0][v] * c[2][v] * 0.25 * M101 + (c[2][v] * 0.25 * M201 + c[0][v] * 0.25 * M102) ) - 
+					( c[0][v] * c[2][v] * 0.25 * M101eq + (c[2][v] * 0.25 * M201eq + c[0][v] * 0.25 * M102eq) );
+
+		} else if (c[0][v] == 0 && c[1][v] != 0 && c[2][v] != 0) {
+
+			// Seventh family
+			ds[v] =	( c[1][v] * c[2][v] * 0.25 * M011 + (c[2][v] * 0.25 * M021 + c[1][v] * 0.25 * M012) ) - 
+					( c[1][v] * c[2][v] * 0.25 * M011eq + (c[2][v] * 0.25 * M021eq + c[1][v] * 0.25 * M012eq) );
+
+		} else if (c[0][v] != 0 && c[1][v] != 0 && c[2][v] != 0) {
+
+			// Eighth family
+			ds[v] =	( c[0][v] * c[1][v] * c[2][v] * M111 / 8 ) - 
+					( c[0][v] * c[1][v] * c[2][v] * M111eq / 8 );
+
+		}
+
+
+		// Compute dh
+		dh[v] = f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) - ds[v];
+
+	}
+
+
 
 #else
 
@@ -566,7 +680,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	// Compute ds
 	for (int v = 0; v < nVels; v++) {
 
-		// How to compute based on KBC model choice	and directions
+		// s part dictated by KBC model choice and directions
 		if (c[0][v] == 0 && c[1][v] == 0) {
 
 			// First family

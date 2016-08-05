@@ -1,8 +1,6 @@
-version=1.1.0
-WORKING VERSION
+version=1.1.0 **** WORKING VERSION ****
 
-Issue #63: KBC collision operator added, Zou-He removed, Uniform Inlet setting removed...
-
+Issue #63: KBC collision operator added in place of MRT operator, Zou-He velocity inlet removed, Uniform Inlet setting removed.
 
 version=1.0.3
 

@@ -128,7 +128,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define dims 2		// Number of dimensions to the problem
+#define dims 3		// Number of dimensions to the problem
 #define N 64		// Number of x lattice sites
 #define M 32		// Number of y lattice sites
 #define K 32		// Number of z lattice sites

@@ -38,7 +38,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 	if ( iBody.back()._Owner == NULL ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Could not find the subgrid where the immersed boundary is meant to lie." << std::endl;
-		exit(LATBO_FAILED);
+		exit(LUMA_FAILED);
 	}
 
 

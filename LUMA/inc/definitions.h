@@ -62,11 +62,11 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
-#define output_precision 3		// Precision of output
+#define out_every 100			// How many timesteps before whole grid output
+#define output_precision 6		// Precision of output
 
 // Types of output
-//#define TEXTOUT
+#define TEXTOUT
 #define VTK_WRITER
 //#define TECPLOT
 //#define IO_LITE
@@ -84,13 +84,13 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-10	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 1e-4	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
 //#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 10000
+#define restart_out_every 500000
 
 // LBM configuration
 //#define USE_MRT
@@ -109,7 +109,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 3000	// Number of time steps
 
 
 /*
@@ -136,18 +136,18 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 100		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
-#define K 50		// Number of z lattice sites
+#define N 81		// Number of x lattice sites
+#define M 41		// Number of y lattice sites
+#define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x 0		// Start of domain-x
-#define b_x 1		// End of domain-x
-#define a_y 0		// Start of domain-y
-#define b_y 1		// End of domain-y
+#define a_x -0.5		// Start of domain-x
+#define b_x 80.5		// End of domain-x
+#define a_y -0.5		// Start of domain-y
+#define b_y 40.5		// End of domain-y
 #define a_z 0		// Start of domain-z
-#define b_z 0.5		// End of domain-z
+#define b_z 8		// End of domain-z
 
 
 /*
@@ -158,17 +158,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.04		// Reference velocity for scaling (mean inlet velocity)
+#define u_ref 0.01		// Reference velocity for scaling (mean inlet velocity)
 #define u_max 0.06		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_ref
-						// u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_ref			// u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 100			// Desired Reynolds number
+#define Re 1			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -191,34 +190,34 @@ const static int zProbeLims[2] = {30, 120};
 //#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
-#define INSERT_FILAMENT
+//#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-//#define _2D_RIGID_PLATE_IBM
+#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 19		// Number of Lagrange points (approximately)
+#define num_markers 9		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
-#define ibb_x 75.0		// x Position of body centre
-#define ibb_y 75.0		// y Position of body centre
+#define ibb_x 10		// x Position of body centre
+#define ibb_y 10		// y Position of body centre
 #define ibb_z 0.0		// z Position of body centre
-#define ibb_w 10.0		// width (x) of IB body
-#define ibb_l 10.0		// length (y) of IB body
+#define ibb_w 4		// width (x) of IB body
+#define ibb_l 4		// length (y) of IB body
 #define ibb_d 0.0		// depth (z) of IB body
 #define ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define ibb_length 0.2		// length of filament
-#define ibb_start_x 0.3	// start x position of the filament
-#define ibb_start_y 0.0	// start y position of the filament
+#define ibb_length 4		// length of filament
+#define ibb_start_x 40	// start x position of the filament
+#define ibb_start_y 20	// start y position of the filament
 #define ibb_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
-#define ibb_angle_vert 90	// Inclination of filament in xy plane
+#define ibb_angle_vert -90	// Inclination of filament in xy plane
 #define ibb_angle_horz 0	// Inclination of filament in xz plane
 
 // Boundary conditions of flexible filament or flexible plate
@@ -227,7 +226,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Mechanical properties of filament
 #define ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
-#define ibb_EI 2.0			// Flexural rigidity (lattice units) of filament
+#define ibb_EI 1.0			// Flexural rigidity (lattice units) of filament
 
 
 /*
@@ -243,8 +242,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
-#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
-//#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
+#define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 #define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
@@ -283,17 +282,17 @@ const static int zProbeLims[2] = {30, 120};
 	#define block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define obj_x_min 90		// Index of start of object/wall in x-direction
-	#define obj_x_max 110		// Index of end of object/wall in x-direction
-	#define obj_y_min 20			// Index of start of object/wall in y-direction
-	#define obj_y_max 40		// Index of end of object/wall in y-direction
-	#define obj_z_min 65		// Index of start of object/wall in z-direction
-	#define obj_z_max 85		// Index of end of object/wall in z-direction
+	#define obj_x_min 0		// Index of start of object/wall in x-direction
+	#define obj_x_max 30		// Index of end of object/wall in x-direction
+	#define obj_y_min 0		// Index of start of object/wall in y-direction
+	#define obj_y_max 4		// Index of end of object/wall in y-direction
+	#define obj_z_min 105		// Index of start of object/wall in z-direction
+	#define obj_z_max 135		// Index of end of object/wall in z-direction
 #endif
 
 
 // Bounce-back objects from point clouds
-#define SOLID_FROM_FILE
+//#define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
 	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
@@ -350,18 +349,18 @@ const static int zProbeLims[2] = {30, 120};
 
 #elif (NumReg == 1 && NumLev == 1)
 	const static size_t RefXstart[NumLev][NumReg]	= { 30 };
-	const static size_t RefXend[NumLev][NumReg]		= { 70 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 30 };
-	const static size_t RefYend[NumLev][NumReg]		= { 70 };
+	const static size_t RefXend[NumLev][NumReg]		= { 50 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 10 };
+	const static size_t RefYend[NumLev][NumReg]		= { 30 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { 30 };
-	static size_t RefZend[NumLev][NumReg]		= { 70 };
+	static size_t RefZstart[NumLev][NumReg]		= { 5 };
+	static size_t RefZend[NumLev][NumReg]		= { 35 };
 
 #elif (NumReg == 1 && NumLev == 2)
-	const static size_t RefXstart[NumLev][NumReg]	= { {450}, {50} };
-	const static size_t RefXend[NumLev][NumReg]		= { {700}, {400} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {0}, {0} };
-	const static size_t RefYend[NumLev][NumReg]		= { {100}, {150} };
+	const static size_t RefXstart[NumLev][NumReg]	= { {30}, {10} };
+	const static size_t RefXend[NumLev][NumReg]		= { {50}, {30} };
+	const static size_t RefYstart[NumLev][NumReg]	= { {10}, {5} };
+	const static size_t RefYend[NumLev][NumReg]		= { {30}, {35} };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { {100}, {200} };
 	static size_t RefZend[NumLev][NumReg]		= { {700}, {1000} };

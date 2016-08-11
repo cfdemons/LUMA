@@ -78,7 +78,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	do {
 
 		// Apply boundary conditions (regularised must be applied before collision)
-#if (defined INLET_ON && defined INLET_REGULARISED && !defined INLET_DO_NOTHING)
+#if (defined INLET_ON && defined INLET_REGULARISED)
 		LBM_boundary(2);
 #endif
 
@@ -115,9 +115,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			}
 
 			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
@@ -165,9 +162,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		} else {
 
 			// Apply boundary conditions
-#if ( (defined INLET_ON || defined OUTLET_ON) && (!defined INLET_DO_NOTHING && !defined INLET_REGULARISED) )
-			LBM_boundary(2);	// Inlet (Zou-He)
-#endif
 #if (defined SOLID_BLOCK_ON || defined WALLS_ON || defined SOLID_FROM_FILE)
 			LBM_boundary(1);	// Bounce-back (walls and solids)
 #endif
@@ -447,23 +441,31 @@ void GridObj::LBM_collide( ) {
 
 				} else {
 
+					
 
-#ifdef USE_MRT
-					// Call MRT collision for given lattice site
-					LBM_mrtCollide( f_new, i, j, k, M_lim, K_lim);
+#ifdef USE_KBC_COLLISION
+
+					// KBC collision
+					LBM_kbcCollide(i, j, k, M_lim, K_lim, f_new);
+
 #else
+
 					// Loop over directions and perform collision
 					for (int v = 0; v < nVels; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v, M_lim, K_lim);
+						feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
 
-						// Recompute distribution function f
-						f_new(i,j,k,v,M_lim,K_lim,nVels) = ( -omega * (f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels)) )
-															+ f(i,j,k,v,M_lim,K_lim,nVels)
-															+ force_i(i,j,k,v,M_lim,K_lim,nVels);
+						// LBGK collision
+						f_new(i,j,k,v,M_lim,K_lim,nVels) = 
+							f(i,j,k,v,M_lim,K_lim,nVels) - 
+							omega * ( 
+								f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) 
+									) +
+							force_i(i,j,k,v,M_lim,K_lim,nVels);
 
 					}
+
 #endif
 
 				}
@@ -528,87 +530,219 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 
 }
 
-
 // ***************************************************************************************************
-// MRT collision procedure for site (i,j,k).
-void GridObj::LBM_mrtCollide( IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim ) {
-#ifdef USE_MRT
+// KBC collision operator
+void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
+	
+	double ds[nVels], dh[nVels], gamma;
 
-	// Temporary vectors
-	std::vector<double> m;					// Vector of moments
-	m.resize(nVels);
-	std::fill(m.begin(), m.end(), 0.0);		// Set to zero
-	std::vector<double> meq( m );			// Vector of equilibrium moments
+	// Compute required moments and equilibrium moments
+#if (dims == 3)
 
-	// Loop over directions and update equilibrium function
+	// Most moments are required in 3D for the KBC-N4 model
+
+	// Stress (second order)
+	double M200 = 0.0, M200eq = 0.0;
+	double M020 = 0.0, M020eq = 0.0;
+	double M002 = 0.0, M002eq = 0.0;
+	// Pis (second order)
+	double M110 = 0.0, M110eq = 0.0;
+	double M101 = 0.0, M101eq = 0.0;
+	double M011 = 0.0, M011eq = 0.0;
+	// Qs (third order)
+	double M111 = 0.0, M111eq = 0.0;
+	double M102 = 0.0, M102eq = 0.0;
+	double M210 = 0.0, M210eq = 0.0;
+	double M021 = 0.0, M021eq = 0.0;
+	double M201 = 0.0, M201eq = 0.0;
+	double M120 = 0.0, M120eq = 0.0;
+	double M012 = 0.0, M012eq = 0.0;
+
+	for (int v = 0; v < nVels; v++) {
+		
+		// Update feq
+		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+
+		// These are actually rho * MXXX but no point in dividing to multiply later
+		M200 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M020 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M002 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[2][v] * c[2][v]);
+		M110 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+		M101 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v]);
+		M011 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v]);
+		M111 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[2][v]);
+		M102 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v] * c[2][v]);
+		M210 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[1][v]);
+		M021 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v] * c[2][v]);
+		M201 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[2][v]);
+		M120 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[1][v]);
+		M012 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v] * c[2][v]);
+
+		M200eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M020eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M002eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[2][v] * c[2][v]);
+		M110eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+		M101eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v]);
+		M011eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v]);
+		M111eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[2][v]);
+		M102eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[2][v] * c[2][v]);
+		M210eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[1][v]);
+		M021eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v] * c[2][v]);
+		M201eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v] * c[2][v]);
+		M120eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v] * c[1][v]);
+		M012eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[2][v] * c[2][v]);
+	}
+
+	// Compute ds
 	for (int v = 0; v < nVels; v++) {
 
-		// Get feq value by calling overload of collision function
-		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide( i, j, k, v );
+		// s part dictated by KBC model choice and directions
+		if (c[0][v] == 0 && c[1][v] == 0 && c[2][v] == 0) {
 
-	}
+			// First family
+			ds[v] = ( -(M200 + M020 + M002) ) - 
+					( -(M200eq + M020eq + M002eq) );
 
+		} else if (c[0][v] != 0 && c[1][v] == 0 && c[2][v] == 0) {
 
-	/* Compute the moment vectors using forward transformation to moment space
-	 *
-	 * m_p = M_pq f_q
-	 * m_eq_p = M_pq f_eq_q
-	 *
-	 */
+			// Second family
+			ds[v] =	( (2 * (M200 - M002) - (M020 - M002)) / 6 + (M200 + M020 + M002) / 6  - c[0][v] * 0.5 * (M120 + M102) ) - 
+					( (2 * (M200eq - M002eq) - (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[0][v] * 0.5 * (M120eq + M102eq));
 
-	// Do a matrix * vector operation
-	for (int p = 0; p < nVels; p++) {
-		for (int q = 0; q < nVels; q++) {
+		} else if (c[0][v] == 0 && c[1][v] != 0 && c[2][v] == 0) {
 
-			m[p] += mMRT[p][q] * f(i,j,k,q,M_lim,K_lim,nVels);
-			meq[p] += mMRT[p][q] * feq(i,j,k,q,M_lim,K_lim,nVels);
+			// Third family
+			ds[v] =	( (-(M200 - M002) + 2 * (M020 - M002)) / 6 + (M200 + M020 + M002) / 6 - c[1][v] * 0.5 * (M210 + M012) ) - 
+					( (-(M200eq - M002eq) + 2 * (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[1][v] * 0.5 * (M210eq + M012eq));
 
-		}
-	}
+		} else if (c[0][v] == 0 && c[1][v] == 0 && c[2][v] != 0) {
 
+			// Fourth family
+			ds[v] =	( (-(M200 - M002) - (M020 - M002)) / 6 + (M200 + M020 + M002) / 6 - c[2][v] * 0.5 * (M201 + M021) ) - 
+					( (-(M200eq - M002eq) + 2 * (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[2][v] * 0.5 * (M201eq + M021eq) );
 
-	/* Perform the collision in moment space for a component q
-	 *
-	 * m_new_q = m_q - s_q(m_q - m_eq_q)
-	 *
-	 * where s_q is the relaxation rate for component q.
-	 *
-	 */
+		} else if (c[0][v] != 0 && c[1][v] != 0 && c[2][v] == 0) {
 
-	// Overwrite old moments
-	double mtmp;
-	for (int q = 0; q < nVels; q++) {
+			// Fifth family
+			ds[v] =	( c[0][v] * c[1][v] * 0.25 * M110 + (c[1][v] * 0.25 * M210 + c[0][v] * 0.25 * M120) ) - 
+					( c[0][v] * c[1][v] * 0.25 * M110eq + (c[1][v] * 0.25 * M210eq + c[0][v] * 0.25 * M120eq) );
 
-		mtmp = m[q] - mrt_omega[q] * (m[q] - meq[q]);
-		m[q] = mtmp;
+		} else if (c[0][v] != 0 && c[1][v] == 0 && c[2][v] != 0) {
 
-	}
+			// Sixth family
+			ds[v] =	( c[0][v] * c[2][v] * 0.25 * M101 + (c[2][v] * 0.25 * M201 + c[0][v] * 0.25 * M102) ) - 
+					( c[0][v] * c[2][v] * 0.25 * M101eq + (c[2][v] * 0.25 * M201eq + c[0][v] * 0.25 * M102eq) );
 
+		} else if (c[0][v] == 0 && c[1][v] != 0 && c[2][v] != 0) {
 
+			// Seventh family
+			ds[v] =	( c[1][v] * c[2][v] * 0.25 * M011 + (c[2][v] * 0.25 * M021 + c[1][v] * 0.25 * M012) ) - 
+					( c[1][v] * c[2][v] * 0.25 * M011eq + (c[2][v] * 0.25 * M021eq + c[1][v] * 0.25 * M012eq) );
 
-	/* Get populations from the moments by transforming back to velocity space
-	 *
-	 * f_i_new = M^-1_ij * m_new_j
-	 *
-	 */
+		} else if (c[0][v] != 0 && c[1][v] != 0 && c[2][v] != 0) {
 
-	double ftmp;
-	// Do a matrix * vector operation
-	for (int p = 0; p < nVels; p++) {
-		ftmp = 0.0;
-
-		for (int q = 0; q < nVels; q++) {
-
-			ftmp += mInvMRT[p][q] * m[q];
+			// Eighth family
+			ds[v] =	( c[0][v] * c[1][v] * c[2][v] * M111 / 8 ) - 
+					( c[0][v] * c[1][v] * c[2][v] * M111eq / 8 );
 
 		}
 
-		f_new(i,j,k,p,M_lim,K_lim,nVels) = ftmp;
+
+		// Compute dh
+		dh[v] = f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) - ds[v];
+
+	}
+
+
+
+#else
+
+	// Only need to compute these 3 in 2D for KBC-D model
+	double M20 = 0.0, M20eq = 0.0;
+	double M02 = 0.0, M02eq = 0.0;
+	double M11 = 0.0, M11eq = 0.0;
+
+	for (int v = 0; v < nVels; v++) {
+		
+		// Update feq
+		feq(i,j,k,v,M_lim,K_lim,nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+
+		// These are actually rho * MXX but no point in dividing to multiply later
+		M20 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M02 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M11 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+
+		M20eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
+		M02eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
+		M11eq += feq(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+	}
+
+	// Compute ds
+	for (int v = 0; v < nVels; v++) {
+
+		// s part dictated by KBC model choice and directions
+		if (c[0][v] == 0 && c[1][v] == 0) {
+
+			// First family
+			ds[v] = 0.0;
+
+		} else if (c[0][v] != 0 && c[1][v] == 0) {
+
+			// Second family
+			ds[v] =	( 0.25 * (M20 - M02) ) - 
+					( 0.25 * (M20eq - M02eq) );
+
+		} else if (c[0][v] == 0 && c[1][v] != 0) {
+
+			// Third family
+			ds[v] =	( -0.25 * (M20 - M02) ) -
+					( -0.25 * (M20eq - M02eq) );
+
+		} else {
+
+			// Fourth family
+			ds[v] =	( 0.25 * c[0][v] * c[1][v] * M11 ) - 
+					( 0.25 * c[0][v] * c[1][v] * M11eq );
+
+		}
+
+
+		// Compute dh
+		dh[v] = f(i,j,k,v,M_lim,K_lim,nVels) - feq(i,j,k,v,M_lim,K_lim,nVels) - ds[v];
 
 	}
 
 #endif
+
+	// Once all dh and ds have been computed, compute the products
+	double top_prod = 0.0, bot_prod = 0.0;
+	for (int v = 0; v < nVels; v++) {
+
+		// Compute scalar products
+		top_prod += ds[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,nVels);
+		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,nVels);
+
+	}
+
+	
+	// Compute gamma
+	if (bot_prod == 0.0) gamma = (2/omega);
+	else gamma = (2/omega) - ( 2 - (2/omega) ) * (top_prod / bot_prod);
+
+	// Finally perform collision
+	for (int v = 0; v < nVels; v++) {
+
+		// Perform collision
+		f_new(i,j,k,v,M_lim,K_lim,nVels) = 
+							f(i,j,k,v,M_lim,K_lim,nVels) - 
+							(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
+							force_i(i,j,k,v,M_lim,K_lim,nVels);
+
+	}
+
+
 }
+
 
 // ***************************************************************************************************
 // Streaming operator
@@ -674,7 +808,7 @@ void GridObj::LBM_stream( ) {
 						break;
 
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
-#if (defined INLET_ON && defined INLET_DO_NOTHING)					
+#if (defined INLET_ON && !defined INLET_REGULARISED && !defined INLET_NRBC)					
 					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) {
 						f_new(i,j,k,v,M_lim,K_lim,nVels) = f(i,j,k,v,M_lim,K_lim,nVels);
 						// Carry on and stream
@@ -864,7 +998,7 @@ void GridObj::LBM_stream( ) {
 							continue;
 
 						// Any --> Do-nothing-inlet then ignore so as not to overwrite inlet site
-#if (defined INLET_ON && defined INLET_DO_NOTHING)
+#if (defined INLET_ON && !defined INLET_REGULARISED && !defined INLET_NRBC)
 						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 17) {
 							continue;
 #endif

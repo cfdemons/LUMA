@@ -64,7 +64,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = ibb_length / g.dx;
+	double length_lu = L_ibb_length / g.dx;
 
 
 	// Marker spacing in normalised instrinsic coordinates
@@ -74,13 +74,13 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = pow(u_ref,2) / grav_force * length_lu;
+	Froude = pow(L_u_ref,2) / L_grav_force * length_lu;
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( (1 / pow(2,g.level)) / (length_lu / u_ref) , 2);
+	double beta = ds_sqrd / pow( (1 / pow(2,g.level)) / (length_lu / L_u_ref) , 2);
 
 
 
@@ -100,7 +100,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(u_ref, 2);
+	double Fref = iBody[ib].delta_rho * pow(L_u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
@@ -175,7 +175,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     G[ii + 2] = EI * (ystar[i - 2] - 4 * ystar[i - 1] + 6 * ystar[i] - 4 * ysp1 + ysp2) / ds_sqrd - ds_sqrd * Fy[i + 1] - beta * ystar[i];
 
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
 		Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -312,8 +312,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         if (iBody[ib].BCs[0] == 2) {
 
         	// Apply clamped BC to first flexible marker
-        	x[0] = x0 + ds_nondim * cos(ibb_angle_vert * PI / 180.0);
-        	y[0] = y0 + ds_nondim * sin(ibb_angle_vert * PI / 180.0);
+        	x[0] = x0 + ds_nondim * cos(L_ibb_angle_vert * L_PI / 180.0);
+        	y[0] = y0 + ds_nondim * sin(L_ibb_angle_vert * L_PI / 180.0);
 
         }
 
@@ -332,7 +332,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	Using the output from the above we update the marker positions and desired velocities
 	*/
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
 		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -359,7 +359,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     }
 
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out pos vector
 		std::ofstream posout;
 		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -370,7 +370,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 		posout.close();
 #endif
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out ten vector
 		std::ofstream tenout;
 		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -388,7 +388,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
     }
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out desired vel vector
 		std::ofstream velout;
 		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);

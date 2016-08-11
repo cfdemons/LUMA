@@ -50,14 +50,14 @@ public :
 	// MPI world data (all public)
 	MPI_Comm my_comm;						// MPI communicator
 	static const int MPI_cartlab[3][26];	// Cartesian unit vectors pointing to each neighbour in Cartesian topology
-	int MPI_dims[dims];						// Size of MPI Cartesian topology
-	int neighbour_rank[MPI_dir];			// Neighbour rank number for each direction in Cartesian topology
-	int neighbour_coords[dims][MPI_dir];	// Coordinates in MPI topology of neighbour ranks
+	int MPI_dims[L_dims];						// Size of MPI Cartesian topology
+	int neighbour_rank[L_MPI_dir];			// Neighbour rank number for each direction in Cartesian topology
+	int neighbour_coords[L_dims][L_MPI_dir];	// Coordinates in MPI topology of neighbour ranks
 
 	// Static Data (commonly used and grid-independent)
 	static int my_rank;				// Rank number
 	static int num_ranks;			// Total number of ranks in MPI Cartesian topology
-	static int MPI_coords[dims];	// Coordinates in MPI Cartesian topolgy
+	static int MPI_coords[L_dims];	// Coordinates in MPI Cartesian topolgy
 
 
 	// Grid data
@@ -80,11 +80,11 @@ public :
 	std::vector< std::vector<double>> f_buffer_send;	// Array of resizeable outgoing buffers used for data transfer
 	std::vector< std::vector<double>> f_buffer_recv;	// Array of resizeable incoming buffers used for data transfer
 	MPI_Status recv_stat;					// Status structure for Receive return information
-	MPI_Request send_requests[MPI_dir];		// Array of request structures for handles to posted ISends
-	MPI_Status send_stat[MPI_dir];			// Array of statuses for each Isend
+	MPI_Request send_requests[L_MPI_dir];		// Array of request structures for handles to posted ISends
+	MPI_Status send_stat[L_MPI_dir];			// Array of statuses for each Isend
 	// Structure storing the buffer sizes in each direction for a particular level and region
 	struct buffer_struct {
-		int size[MPI_dir];
+		int size[L_MPI_dir];
 		int level;
 		int region;
 	};

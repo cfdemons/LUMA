@@ -62,15 +62,15 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 	}
 	this->groupID = group;
 
-#if (dims == 3)
+#if (L_dims == 3)
 
 	// Sphere //
 
 	// Following code for point generation on unit sphere actually seeds
 	// using Fibonacci sphere technique. Code is not my own but works.
-	double inc = PI * (3 - sqrt(5));
-    double off = 2.0 / (float)num_markers ;
-    for (int k = 0; k < num_markers; k++) {
+	double inc = L_PI * (3 - sqrt(5));
+    double off = 2.0 / (float)L_num_markers ;
+    for (int k = 0; k < L_num_markers; k++) {
         double y = k * off - 1 + (off / 2);
         double r = sqrt(1 - y*y);
         double phi = k * inc;
@@ -81,7 +81,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing (assuming all Lagrange markers are uniformly spaced)
 	std::vector<double> diff;
-	for (int d = 0; d < dims; d++) {
+	for (int d = 0; d < L_dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -90,7 +90,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 #else
 	// Circle -- find theta
-	std::vector<double> theta = GridUtils::linspace(0, 2*PI - (2*PI / num_markers), num_markers);
+	std::vector<double> theta = GridUtils::linspace(0, 2*L_PI - (2*L_PI / L_num_markers), L_num_markers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -101,7 +101,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing
 	std::vector<double> diff;
-	for (int d = 0; d < dims; d++) {
+	for (int d = 0; d < L_dims; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -130,14 +130,14 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	double wid = width_length_depth[0];
 	double len = width_length_depth[1];
 
-#if (dims == 3)
+#if (L_dims == 3)
 
 	// Cube //
 
 	double dep = width_length_depth[2];
 
 	// Check side lengths to make sure we can ensure points on the corners
-	if (fmod(ibb_w,ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,ibb_d) != 0 && fmod(dep,len) != 0) {
+	if (fmod(L_ibb_w,L_ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,L_ibb_d) != 0 && fmod(dep,len) != 0) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(LUMA_FAILED);
@@ -168,12 +168,12 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Since we have points on the faces as well as the edges we have a quadratic expression to be solved to
-	// find the level of refinement required to get the nearest number of points to num_markers.
+	// find the level of refinement required to get the nearest number of points to L_num_markers.
 	int ref;
 
 	int a = 2*side_ratio_1 + 2*side_ratio_1 + 2*side_ratio_1*side_ratio_2;
 	int b = 4 + 4*side_ratio_1 + 4*side_ratio_2;
-	int c = 8-num_markers;
+	int c = 8-L_num_markers;
 
 	double P = (-b + sqrt(pow(b,2) - (4*a*c)) )/(2*a) + 1;
 
@@ -232,11 +232,11 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 					) {
 
 					// Transform x y and z based on rotation
-					xdash = (x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180))*cos(angles[1] * PI / 180)
-						- z*sin(angles[1] * PI / 180);
-					ydash = y*cos(angles[0] * PI / 180) + x*sin(angles[0] * PI / 180);
-					zdash = (x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180))*sin(angles[1] * PI / 180)
-						+ z*cos(angles[1] * PI / 180);
+					xdash = (x*cos(angles[0] * L_PI / 180) - y*sin(angles[0] * L_PI / 180))*cos(angles[1] * L_PI / 180)
+						- z*sin(angles[1] * L_PI / 180);
+					ydash = y*cos(angles[0] * L_PI / 180) + x*sin(angles[0] * L_PI / 180);
+					zdash = (x*cos(angles[0] * L_PI / 180) - y*sin(angles[0] * L_PI / 180))*sin(angles[1] * L_PI / 180)
+						+ z*cos(angles[1] * L_PI / 180);
 
 					// Add marker
 					addMarker(xdash,ydash,zdash,flex_rigid);
@@ -268,7 +268,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Double the number of points to be used as can be rounded down to only a relatively small number
-	int ref = (int)ceil( log( num_markers / (2 * (1+side_ratio)) ) / log(2) );
+	int ref = (int)ceil( log( L_num_markers / (2 * (1+side_ratio)) ) / log(2) );
 
 	// Check to see if enough points
 	if (ref == 0) {
@@ -295,7 +295,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	for (int i = 0; i < np_x; i++) {
 		for (int j = 0; j < np_y; j++) {
 			// 2D specification of z
-			z = (b_z - a_z)/2;
+			z = (L_b_z - L_a_z)/2;
 
 			// x and y positions
 			x = start_x + i*spacing;
@@ -307,8 +307,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 				) {
 
 				// Transform x y and z based on rotation
-				xdash = x*cos(angles[0] * PI / 180) - y*sin(angles[0] * PI / 180);
-				ydash = x*sin(angles[0] * PI / 180) + y*cos(angles[0] * PI / 180);
+				xdash = x*cos(angles[0] * L_PI / 180) - y*sin(angles[0] * L_PI / 180);
+				ydash = x*sin(angles[0] * L_PI / 180) + y*cos(angles[0] * L_PI / 180);
 				zdash = z;
 
 				// Add marker
@@ -359,8 +359,8 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 	this->groupID = group;
 
 	// Assign delta_rho and flexural rigidity
-	this->delta_rho = ibb_delta_rho;
-	this->flexural_rigidity = ibb_EI;
+	this->delta_rho = L_ibb_delta_rho;
+	this->flexural_rigidity = L_ibb_EI;
 
 	// Create zero tension vector for filament
 	std::fill(tension.begin(), tension.end(), 0.0);
@@ -371,13 +371,13 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 	// Compute spacing
 	spacing = fil_length / (nummarkers - 1);		// Physical spacing between markers
-	double spacing_h = spacing*cos(body_angle_v * PI / 180);	// Local spacing projected onto the horizontal plane
+	double spacing_h = spacing*cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
 
 	// Add all markers
 	for (int i = 0; i < nummarkers; i++) {
-		addMarker(	start_point[0] + i*spacing_h*cos(body_angle_h * PI / 180),
-					start_point[1] + i*spacing*sin(body_angle_v * PI / 180),
-					start_point[2] + i*spacing_h*sin(body_angle_h * PI / 180),
+		addMarker(	start_point[0] + i*spacing_h*cos(body_angle_h * L_PI / 180),
+					start_point[1] + i*spacing*sin(body_angle_v * L_PI / 180),
+					start_point[2] + i*spacing_h*sin(body_angle_h * L_PI / 180),
 					true);
 	}
 
@@ -401,7 +401,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	bool flex_rigid, bool deform, int group, bool plate) {
 
 	// Exit if called in 2D
-	if ( dims == 2 ) {
+	if ( L_dims == 2 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -420,8 +420,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	this->groupID = group;
 
 	// Assign delta_rho and flexural rigidity
-	this->delta_rho = ibb_delta_rho;
-	this->flexural_rigidity = ibb_EI;
+	this->delta_rho = L_ibb_delta_rho;
+	this->flexural_rigidity = L_ibb_EI;
 
 	// Shorter variable names for convenience
 	double len_z, len_x;
@@ -447,7 +447,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Double the number of points to be used as can be rounded down to only a relatively small number
-	int ref = (int)ceil( log( 2*num_markers / (2 * (1+side_ratio)) ) / log(2) );
+	int ref = (int)ceil( log( 2*L_num_markers / (2 * (1+side_ratio)) ) / log(2) );
 
 	// Check to see if enough points
 	if (ref == 0) {
@@ -466,8 +466,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Start locations of point generator (bottom corner)
 	double start_z = centre[2]-len_z/2,
-		start_x = centre[0] - (len_x/2)*cos(angle * PI / 180),
-		start_y = centre[1] - (len_x/2)*sin(angle * PI / 180),
+		start_x = centre[0] - (len_x/2)*cos(angle * L_PI / 180),
+		start_y = centre[1] - (len_x/2)*sin(angle * L_PI / 180),
 		x, y, z;
 
 	// Number of points in each direction
@@ -478,8 +478,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 		for (int j = 0; j < np_z; j++) {
 
 			// x and y positions
-			x = start_x + (i*spacing*cos(angle * PI / 180));
-			y = start_y + (i*spacing*sin(angle * PI / 180));
+			x = start_x + (i*spacing*cos(angle * L_PI / 180));
+			y = start_y + (i*spacing*sin(angle * L_PI / 180));
 			z = start_z + (j*spacing);
 
 			// Add marker

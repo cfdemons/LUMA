@@ -35,7 +35,7 @@ void ObjectManager::io_write_body_pos(int timestep) {
 
 			// Write out position
 			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-#if (dims == 3)
+#if (L_dims == 3)
 				jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << iBody[ib].markers[i].position[2] << std::endl;
 #else
 				jout << iBody[ib].markers[i].position[0] << ", " << iBody[ib].markers[i].position[1] << ", " << 0.0 << std::endl;
@@ -239,7 +239,7 @@ void ObjectManager::io_vtk_IBwriter(double tval) {
         fout << "POINTS " << iBody[ib].markers.size() << " float\n";
         for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 
-#if (dims == 3)
+#if (L_dims == 3)
 				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << iBody[ib].markers[i].position[2] << std::endl;
 #else
 				fout << iBody[ib].markers[i].position[0] << " " << iBody[ib].markers[i].position[1] << " " << 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
@@ -273,7 +273,7 @@ void ObjectManager::io_vtk_IBwriter(double tval) {
 // Routine to read in point cloud data in tab separated, 3-column format from the input directory
 void ObjectManager::readInPCData(PCpts* _PCpts) {
 
-#ifdef BFL_ON
+#ifdef L_BFL_ON
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
@@ -290,7 +290,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 	}
 
 	// Get grid pointer
-	GridObj* g;	GridUtils::getGrid(_Grids, bfl_on_grid_lev, bfl_on_grid_reg, g);
+	GridObj* g;	GridUtils::getGrid(_Grids, L_bfl_on_grid_lev, L_bfl_on_grid_reg, g);
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -313,7 +313,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 		_PCpts->y.push_back(tmp_y);
 			
 		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
-#if (dims == 3)
+#if (L_dims == 3)
 		_PCpts->z.push_back(tmp_z);
 #else
 		_PCpts->z.push_back(0);
@@ -331,12 +331,12 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 
 	
 	// Rescale coordinates and shift
-	double scale_factor = bfl_length_x / 
+	double scale_factor = L_bfl_length_x / 
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-	double shift_x =  std::floor( start_bfl_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
-	double shift_y =  std::floor( start_bfl_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+	double shift_x =  std::floor( L_start_bfl_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
+	double shift_y =  std::floor( L_start_bfl_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
 	// z-shift based on centre of object
-	double shift_z =  std::floor( centre_object_z - scale_factor * (
+	double shift_z =  std::floor( L_centre_object_z - scale_factor * (
 		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
 		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
 		) );
@@ -375,7 +375,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 
 
 	// Write out the points remaining in for debugging purposes
-#ifdef BFL_DEBUG
+#ifdef L_BFL_DEBUG
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
 		fileout.open(GridUtils::path_str + "/BFLpts_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
@@ -395,7 +395,7 @@ void ObjectManager::readInPCData(PCpts* _PCpts) {
 // Routine to read in point cloud data in tab separated, 3-column format from the input directory
 void ObjectManager::readInPointData(PCpts* _PCpts) {
 
-#ifdef SOLID_FROM_FILE
+#ifdef L_SOLID_FROM_FILE
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
@@ -412,7 +412,7 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 	}
 
 	// Get grid pointer
-	GridObj* g = NULL;	GridUtils::getGrid(_Grids, object_on_grid_lev, object_on_grid_reg, g);
+	GridObj* g = NULL;	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);
 	if (g == NULL) return; // If this grid does not exist, then exit
 
 	// Loop over lines in file
@@ -436,7 +436,7 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 		_PCpts->y.push_back(tmp_y);
 			
 		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
-#if (dims == 3)
+#if (L_dims == 3)
 		_PCpts->z.push_back(tmp_z);
 #else
 		_PCpts->z.push_back(0);
@@ -457,21 +457,21 @@ void ObjectManager::readInPointData(PCpts* _PCpts) {
 	
 	// Rescale coordinates and shift to global lattice units
 	// (option to scale based on whatever bounding box dimension chosen)
-#if (scale_direction == 0)
-	double scale_factor = object_length / 
+#if (L_scale_direction == 0)
+	double scale_factor = L_object_length / 
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-#elif (scale_direction == 1)
-	double scale_factor = object_length / 
+#elif (L_scale_direction == 1)
+	double scale_factor = L_object_length / 
 		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-#elif (scale_direction == 2)
-	double scale_factor = object_length / 
+#elif (L_scale_direction == 2)
+	double scale_factor = L_object_length / 
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 #endif
 
-	double shift_x =  std::floor( start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
-	double shift_y =  std::floor( start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+	double shift_x =  std::floor( L_start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
+	double shift_y =  std::floor( L_start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
 	// z-shift based on centre of object
-	double shift_z =  std::floor( centre_object_z - scale_factor * (
+	double shift_z =  std::floor( L_centre_object_z - scale_factor * (
 		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
 		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
 		) );

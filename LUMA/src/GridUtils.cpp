@@ -23,8 +23,8 @@
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
-#if (dims == 3)
-const int GridUtils::dir_reflect[dims * 2][nVels] = 
+#if (L_dims == 3)
+const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},
@@ -34,7 +34,7 @@ const int GridUtils::dir_reflect[dims * 2][nVels] =
 		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}
 	};
 #else
-const int GridUtils::dir_reflect[dims * 2][nVels] = 
+const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 7, 6, 5, 4, 8}, 
 		{1, 0, 2, 3, 4, 6, 5, 4, 8},
@@ -178,7 +178,7 @@ double GridUtils::vecnorm( double vec[] )
 {
 	double result;
 
-#if (dims == 3)
+#if (L_dims == 3)
 
 		result = sqrt( pow(vec[0],2) + pow(vec[1],2) + pow(vec[2],2) );
 
@@ -208,16 +208,16 @@ double GridUtils::vecnorm( std::vector<double> vec )
 // ***************************************************************************************************
 
 // Routine to map the global index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
+std::vector<int> GridUtils::getFineIndices(size_t coarse_i, size_t x_start, size_t coarse_j, size_t y_start, size_t coarse_k, size_t z_start) {
 
 	// Initialise result
 	std::vector<int> fine_ind;
 
 	// Map indices
-	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
-	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
-#if (dims == 3)
-	fine_ind.insert(fine_ind.begin() + 2, 2*(coarse_k - z_start + 1) - 2 );
+	fine_ind.insert( fine_ind.begin(), static_cast<int>( 2 * (coarse_i - x_start + 1) - 2) );
+	fine_ind.insert( fine_ind.begin() + 1, static_cast<int>(2 * (coarse_j - y_start + 1) - 2) );
+#if (L_dims == 3)
+	fine_ind.insert( fine_ind.begin() + 2, static_cast<int>(2 * (coarse_k - z_start + 1) - 2) );
 #else
 	fine_ind.insert(fine_ind.begin() + 2, 0 );
 #endif
@@ -227,7 +227,7 @@ std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse
 // ***************************************************************************************************
 
 // Routine to map the global index of a fine grid site to parent coarse grid site on the level above
-std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
+std::vector<int> GridUtils::getCoarseIndices(size_t fine_i, size_t x_start, size_t fine_j, size_t y_start, size_t fine_k, size_t z_start) {
 
 	// Initialise result
 	std::vector<int> coarse_ind;
@@ -244,10 +244,10 @@ std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j
     }
 
 	// Reverse map indices
-	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
-	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
-#if (dims == 3)
-	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
+	coarse_ind.insert( coarse_ind.begin(), static_cast<int>((fine_i / 2) + x_start) );
+	coarse_ind.insert( coarse_ind.begin() + 1, static_cast<int>((fine_j / 2) + y_start) );
+#if (L_dims == 3)
+	coarse_ind.insert( coarse_ind.begin() + 2, static_cast<int>((fine_k / 2) + z_start) );
 #else
 	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
 #endif
@@ -313,7 +313,7 @@ size_t GridUtils::getOpposite(size_t direction) {
 	size_t direction_opposite;
 
 	// If rest particle then opposite is simply itself
-	if (direction == nVels-1) {
+	if (direction == L_nVels-1) {
 
 		direction_opposite = direction;
 
@@ -340,14 +340,14 @@ size_t GridUtils::getOpposite(size_t direction) {
 bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 
 	// Local declarations
-	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
+	int exp_MPI_coords[L_dims], act_MPI_coords[L_dims], MPI_dims[L_dims];
 	int shift[3] = {0, 0, 0};
 
 	// Initialise local variables
-	MPI_dims[0] = Xcores;
-	MPI_dims[1] = Ycores;
-#if (dims == 3)
-	MPI_dims[2] = Zcores;
+	MPI_dims[0] = L_Xcores;
+	MPI_dims[1] = L_Ycores;
+#if (L_dims == 3)
+	MPI_dims[2] = L_Zcores;
 #endif
 
 	// Define shifts based on which overlap we are on
@@ -366,7 +366,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 		shift[1] = -1;
 	}
 
-#if (dims == 3)
+#if (L_dims == 3)
 	// Z
 	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,1)) {
 		shift[2] = 1;
@@ -376,7 +376,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 #endif
 
 	// Loop over each Cartesian direction
-	for (int d = 0; d < dims; d++) {
+	for (int d = 0; d < L_dims; d++) {
 		// Define expected (non-periodic) MPI coordinates of neighbour rank
 		exp_MPI_coords[d] = MpiManager::MPI_coords[d] + shift[d];
 
@@ -406,7 +406,7 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 	if (	found_x != pGrid.XInd.end() && found_y != pGrid.YInd.end()
 
 
-#if (dims == 3)
+#if (L_dims == 3)
 		&& found_z != pGrid.ZInd.end()
 #endif
 		) {
@@ -477,7 +477,7 @@ bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
 	}
 
-#if (dims == 3)
+#if (L_dims == 3)
 	// Loop over over Z range
 	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
 		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
@@ -545,7 +545,7 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 		// Y and Z not recv
 		(!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
-#if (dims == 3)
+#if (L_dims == 3)
 		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
 #endif
 		)
@@ -555,7 +555,7 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 		// X and Z not recv
 		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)
-#if (dims == 3)
+#if (L_dims == 3)
 		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
 
 		)
@@ -642,7 +642,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 	if (	GridUtils::isOnRecvLayer(pos_x,0,0) || GridUtils::isOnRecvLayer(pos_x,0,1) ||
 			GridUtils::isOnRecvLayer(pos_y,1,0) || GridUtils::isOnRecvLayer(pos_y,1,1)
-#if (dims == 3)
+#if (L_dims == 3)
 			|| GridUtils::isOnRecvLayer(pos_z,2,0) || GridUtils::isOnRecvLayer(pos_z,2,1)
 #endif
 		) {
@@ -717,7 +717,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 	std::string command = "mkdir -p " + path_str;
 
 	// Only get rank 0 to create output directory
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 
 	#ifdef _WIN32   // Running on Windows
 		if (MpiManager::my_rank == 0)
@@ -727,7 +727,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 			result = system(command.c_str());
 	#endif // _WIN32
 
-#else // BUILD_FOR_MPI
+#else // L_BUILD_FOR_MPI
 
 	#ifdef _WIN32   // Running on Windows
 		result = CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
@@ -735,7 +735,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 		result = system(command.c_str());
 	#endif // _WIN32
 
-#endif // BUILD_FOR_MPI
+#endif // L_BUILD_FOR_MPI
 
 	return result;
 }
@@ -750,7 +750,7 @@ bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, 
 			) {
 				return true;
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 		// When using MPI, equivalent to off-grid is when destination is in 
 		// periodic recv layer with periodic boundaries disabled.
 		} else if ( GridUtils::isOnRecvLayer(g.XPos[i],g.YPos[j],g.ZPos[k]) 
@@ -758,7 +758,7 @@ bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, 
 
 			return true;		
 
-#endif	// BUILD_FOR_MPI
+#endif	// L_BUILD_FOR_MPI
 
 		}
 

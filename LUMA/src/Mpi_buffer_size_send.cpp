@@ -26,9 +26,9 @@
 void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 	
 	int count, i, j, k, dir;	// Local counters
-	int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes
-#if (dims == 3)
-		, K_lim = g->ZInd.size();
+	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())		// Local grid sizes
+#if (L_dims == 3)
+		, K_lim = static_cast<int>(g->ZInd.size());
 #else
 		, K_lim = 1;
 #endif
@@ -62,7 +62,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 	* 24	=	Right-Down-Back
 	* 25	=	Left-Up-Front
 	*/
-	for (dir = 0; dir < MPI_dir; dir++)  {
+	for (dir = 0; dir < L_MPI_dir; dir++)  {
 
 		// Reset the site counter
 		count = 0;
@@ -84,7 +84,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0))
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -110,7 +110,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0))
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -136,7 +136,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],1,1)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -162,7 +162,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],1,0)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -188,7 +188,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) &&
 								GridUtils::isOnSenderLayer(g->YPos[j],1,1)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -215,7 +215,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) &&
 								GridUtils::isOnSenderLayer(g->YPos[j],1,0)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -241,7 +241,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],1,1)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif
@@ -267,7 +267,7 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],1,0)
-#if (dims == 3)
+#if (L_dims == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
 #endif

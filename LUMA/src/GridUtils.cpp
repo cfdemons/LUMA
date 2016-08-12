@@ -208,16 +208,16 @@ double GridUtils::vecnorm( std::vector<double> vec )
 // ***************************************************************************************************
 
 // Routine to map the global index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::getFineIndices(size_t coarse_i, size_t x_start, size_t coarse_j, size_t y_start, size_t coarse_k, size_t z_start) {
+std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> fine_ind;
 
 	// Map indices
-	fine_ind.insert( fine_ind.begin(), static_cast<int>( 2 * (coarse_i - x_start + 1) - 2) );
-	fine_ind.insert( fine_ind.begin() + 1, static_cast<int>(2 * (coarse_j - y_start + 1) - 2) );
+	fine_ind.insert( fine_ind.begin(), 2 * (coarse_i - x_start + 1) - 2 );
+	fine_ind.insert( fine_ind.begin() + 1, 2 * (coarse_j - y_start + 1) - 2 );
 #if (L_dims == 3)
-	fine_ind.insert( fine_ind.begin() + 2, static_cast<int>(2 * (coarse_k - z_start + 1) - 2) );
+	fine_ind.insert( fine_ind.begin() + 2, 2 * (coarse_k - z_start + 1) - 2 );
 #else
 	fine_ind.insert(fine_ind.begin() + 2, 0 );
 #endif
@@ -227,7 +227,7 @@ std::vector<int> GridUtils::getFineIndices(size_t coarse_i, size_t x_start, size
 // ***************************************************************************************************
 
 // Routine to map the global index of a fine grid site to parent coarse grid site on the level above
-std::vector<int> GridUtils::getCoarseIndices(size_t fine_i, size_t x_start, size_t fine_j, size_t y_start, size_t fine_k, size_t z_start) {
+std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
 
 	// Initialise result
 	std::vector<int> coarse_ind;
@@ -244,10 +244,10 @@ std::vector<int> GridUtils::getCoarseIndices(size_t fine_i, size_t x_start, size
     }
 
 	// Reverse map indices
-	coarse_ind.insert( coarse_ind.begin(), static_cast<int>((fine_i / 2) + x_start) );
-	coarse_ind.insert( coarse_ind.begin() + 1, static_cast<int>((fine_j / 2) + y_start) );
+	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
+	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
 #if (L_dims == 3)
-	coarse_ind.insert( coarse_ind.begin() + 2, static_cast<int>((fine_k / 2) + z_start) );
+	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
 #else
 	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
 #endif
@@ -308,9 +308,9 @@ double GridUtils::indexToPosition(int index, double dx) {
 
 // ***************************************************************************************************
 // Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
-size_t GridUtils::getOpposite(size_t direction) {
+int GridUtils::getOpposite(int direction) {
 
-	size_t direction_opposite;
+	int direction_opposite;
 
 	// If rest particle then opposite is simply itself
 	if (direction == L_nVels-1) {

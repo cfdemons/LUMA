@@ -48,15 +48,15 @@
 void GridObj::LBM_boundary (int bc_type_flag) {
 
 	// Get grid sizes
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
+	int N_lim = static_cast<int>(XPos.size());
+	int M_lim = static_cast<int>(YPos.size());
+	int K_lim = static_cast<int>(ZPos.size());
 
 
 	// Loop over grid, identify BC required & apply BC
-	for (size_t i = 0; i < N_lim; i++) {
-		for (size_t j = 0; j < M_lim; j++) {
-			for (size_t k = 0; k < K_lim; k++) {
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
 
 
 				/*	******************************************************************************************
@@ -131,7 +131,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 	int dest_x, dest_y, dest_z;
 
 	// For each outgoing direction
-	for (size_t v_outgoing = 0; v_outgoing < L_nVels; v_outgoing++) {
+	for (int v_outgoing = 0; v_outgoing < L_nVels; v_outgoing++) {
 
 		// Identify site where the population will be streamed to //
 
@@ -181,7 +181,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 			) {
 
 			// Get incoming direction
-			size_t v_incoming = GridUtils::getOpposite(v_outgoing);
+			int v_incoming = GridUtils::getOpposite(v_outgoing);
 							
 			// Overwriting outgoing population with expected incoming value
 			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,L_nVels);
@@ -514,10 +514,10 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 	ObjectManager* objMan = ObjectManager::getInstance();
 
 	// For each even outgoing direction (saves BC being applied twice otherwise)
-	for (size_t v_outgoing = 0; v_outgoing < L_nVels; v_outgoing+=2) {
+	for (int v_outgoing = 0; v_outgoing < L_nVels; v_outgoing+=2) {
 
 		// Get oppposite direction
-		size_t v_incoming = GridUtils::getOpposite(v_outgoing);
+		int v_incoming = GridUtils::getOpposite(v_outgoing);
 
 		// Identify site where the population will be streamed to (no periodicity)
 		int dest_i = i+c[0][v_outgoing];

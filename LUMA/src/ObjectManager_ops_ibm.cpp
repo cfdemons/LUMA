@@ -25,7 +25,7 @@
 void ObjectManager::ibm_apply(GridObj& g) {
 
 	// Loop over array of IB_bodies and perform IB operations
-		for (size_t ib = 0; ib < iBody.size(); ib++) {
+	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out support coordinates
@@ -95,27 +95,27 @@ void ObjectManager::ibm_apply(GridObj& g) {
 void ObjectManager::ibm_move_bodies(GridObj& g) {
 
 	// Loop over bodies launching positional update if deformable to compute new locations of markers
-		*GridUtils::logfile << "Relocating markers as required..." << std::endl;
-		for (size_t ib = 0; ib < iBody.size(); ib++) {
+	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
+	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
-			// If body is deformable it needs a positional update
-			if (iBody[ib].deformable) {
+		// If body is deformable it needs a positional update
+		if (iBody[ib].deformable) {
 
-				// Call structural or forced positional update and recompute support
-				ibm_position_update(ib, g);
+			// Call structural or forced positional update and recompute support
+			ibm_position_update(ib, g);
 
 #ifndef L_STOP_EPSILON_RECOMPUTE
-				// Recompute epsilon
-				ibm_findepsilon(ib, g);
+			// Recompute epsilon
+			ibm_findepsilon(ib, g);
 #endif
 
-			}
 		}
+	}
 
 #if defined L_INSERT_FILARRAY
-		// Special bit for filament-based plates where flexible centreline is used to update position of others in group
-		*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
-		ibm_position_update_grp(999, g);
+	// Special bit for filament-based plates where flexible centreline is used to update position of others in group
+	*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
+	ibm_position_update_grp(999, g);
 #endif
 
 }
@@ -126,7 +126,7 @@ void ObjectManager::ibm_move_bodies(GridObj& g) {
 void ObjectManager::ibm_initialise(GridObj& g) {
 
 	// Loop over the number of bodies in the iBody array
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
+	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out marker coordinates
@@ -140,7 +140,7 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 #endif
 
 		// Compute support for each marker
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 			ibm_findsupport(ib, m, g);	// Pass body ID, marker ID and Grid
 		}
 
@@ -235,9 +235,9 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 				if (radius < r_min) {
 					r_min = radius;	// This node is closer than the last one so update criterion
 					// Store nearest node position
-					inear = i;
-					jnear = j;
-					knear = k;
+					inear = static_cast<int>(i);
+					jnear = static_cast<int>(j);
+					knear = static_cast<int>(k);
 
 				}
 

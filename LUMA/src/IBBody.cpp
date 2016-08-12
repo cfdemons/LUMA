@@ -506,3 +506,43 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 }
 
 // ***************************************************************************************************
+void IBBody::makeBody(PCpts* _PCpts, GridObj* g) {
+
+	// Set some default body properties
+	this->deformable = L_ibb_deform;
+	this->flex_rigid = L_ibb_flex_rigid;
+
+	// Declare local variables
+	std::vector<int> locals;
+	int global_i, global_j, global_k;
+
+	// Ignore points which are not on this rank
+	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+
+		// Get globals using the voxelising method of BFLBody class
+		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
+		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
+		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
+
+		// Add marker if on this rank
+		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
+
+			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], L_ibb_flex_rigid);
+		}
+
+	}
+
+	// Add dynamic positions in physical units
+	for (size_t i = 0; i < markers.size(); i++) {
+		markers[i].position_old.push_back(markers[i].position[0]);
+		markers[i].position_old.push_back(markers[i].position[1]);
+		markers[i].position_old.push_back(markers[i].position[2]);
+	}
+
+	// Define spacing based on first two markers
+	this->spacing = GridUtils::vecnorm(
+		markers[1].position[0] - markers[0].position[0],
+		markers[1].position[1] - markers[0].position[1],
+		markers[1].position[2] - markers[0].position[2]);
+
+}

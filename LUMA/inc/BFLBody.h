@@ -16,23 +16,7 @@
 #pragma once
 #include "BFLMarker.h"
 #include "Body.h"
-
-/************************************************
- * Custom data storage for BFL implementations *
- ***********************************************/
-
-// Class representing the Point Cloud data
-class PCpts {
-
-public:
-
-	PCpts(void) {};
-	~PCpts(void) {};
-
-	std::vector<double> x;
-	std::vector<double> y;
-	std::vector<double> z;
-};
+#include "PCpts.h"
 
 // Class representing return structure for marker query
 class MarkerData {
@@ -124,9 +108,10 @@ protected:
 
 	// Utility functions (all static)
 	static std::vector<int> getVoxInd(double x, double y, double z);
-	static int getVoxInd(double p);
 	static bool isInVoxel(double x, double y, double z, int curr_mark, BFLBody* body);
 	static bool isVoxelBflVoxel(double x, double y, double z, BFLBody* body);
 	static MarkerData* getMarkerData(double x, double y, double z, BFLBody* body);
+public :
+	static int getVoxInd(double p);
 
 };

@@ -32,7 +32,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
-	int max_iterations = iBody[ib].markers.size();	// Set maximum number of iterations
+	int max_iterations = static_cast<int>(iBody[ib].markers.size());	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
 	size_t n = iBody[ib].markers.size() - 1;	// Number of markers - 1
 	size_t i = 0;								// Iterator
@@ -64,7 +64,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = L_ibb_length / g.dx;
+	double length_lu = L_ibb_filament_length / g.dx;
 
 
 	// Marker spacing in normalised instrinsic coordinates
@@ -291,8 +291,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 
 
-        ibm_bandec(AA, 3 * n + 1, m1, m2, AL, indx, d); // LU decomposition
-        ibm_banbks(AA, 3 * n + 1, m1, m2, AL, indx, res); // solve banded problem
+		ibm_bandec(AA, static_cast<long>(3 * n + 1), m1, m2, AL, indx, d); // LU decomposition
+		ibm_banbks(AA, static_cast<long>(3 * n + 1), m1, m2, AL, indx, res); // solve banded problem
 
 
 
@@ -556,7 +556,7 @@ void ObjectManager::ibm_position_update(int ib, GridObj& g) {
 	}
 
 	// Recompute support for new marker positions
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+	for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 
 		// Erase support vectors
 		// Note:	Fixing the number of support sites to 9 negates
@@ -581,7 +581,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 
 	// Find flexible body in group and store index
 	int ib_flex = 0;
-	for (size_t i = 0; i < iBody.size(); i++) {
+	for (int i = 0; i < static_cast<int>(iBody.size()); i++) {
 
 		if (iBody[i].flex_rigid && iBody[i].groupID == group) {
 			ib_flex = i;
@@ -591,7 +591,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 	}
 
 	// Loop over bodies in group
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
+	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
 		// If body is deformable but not flexible give it a positional update from flexible
 		if (iBody[ib].groupID == group &&
@@ -609,7 +609,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 			}
 
 			// Recompute support for new marker positions
-			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 
 				// Erase support vectors
 				// Note:	Fixing the number of support sites to 9 negates

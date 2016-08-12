@@ -126,7 +126,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		// Number of dimensions to the problem
+#define L_dims 2		// Number of dimensions to the problem
 #define L_N 64		// Number of x lattice sites
 #define L_M 32		// Number of y lattice sites
 #define L_K 32		// Number of z lattice sites
@@ -170,52 +170,69 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-//#define L_IBM_ON						// Turn on IBM
+#define L_IBM_ON						// Turn on IBM
 
 //#define L_STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define L_CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 //#define L_VTK_BODY_WRITE				// Write out the bodies to a VTK file
 
+// Read in IB Body from File
+#define L_IBB_FROM_FILE
+
+#ifdef L_IBB_FROM_FILE
+	#define L_ibb_on_grid_lev 0		// Provide grid level on which object should be added 
+	#define L_ibb_on_grid_reg 0		// Provide grid region on which object should be added
+	// Following specified in physical distances
+	#define L_start_ibb_x 3.5
+	#define L_start_ibb_y 1.5
+	#define L_centre_ibb_z 0.0
+	#define L_ibb_length 0.5			// The object input is scaled based on this dimension
+	#define L_ibb_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_ibb_length_ref 0.5		// Reference length to be used in the definition of Reynolds number
+	#define L_ibb_flex_rigid false		// Whether a structural calculation needs to be performed on the body
+#endif
+
+// Global properties
+#define L_num_markers 19		// Number of Lagrange points (approximately)
+#define L_ibb_deform false		// Default deformable property of body to be built (whether it moves or not)
+
+
 // Switches for inserting certain bodies (enable only one at once!)
 //#define L_INSERT_CIRCLE_SPHERE
 //#define L_INSERT_RECTANGLE_CUBOID
 //#define L_INSERT_BOTH
-#define L_INSERT_FILAMENT
+//#define L_INSERT_FILAMENT
 //#define L_INSERT_FILARRAY
 //#define L_2D_RIGID_PLATE_IBM
 //#define L_2D_PLATE_WITH_FLAP
 //#define L_3D_RIGID_PLATE_IBM
 //#define L_3D_PLATE_WITH_FLAP
 
-// Global properties
-#define L_num_markers 19		// Number of Lagrange points (approximately)
-#define L_ibb_deform false	// Default deformable property of body to be built
-
 // Physical dimensions of rigid IB body or flexible plate
 #define L_ibb_x 75.0		// x Position of body centre
 #define L_ibb_y 75.0		// y Position of body centre
-#define L_ibb_z 0.0		// z Position of body centre
+#define L_ibb_z 0.0			// z Position of body centre
 #define L_ibb_w 10.0		// width (x) of IB body
 #define L_ibb_l 10.0		// length (y) of IB body
-#define L_ibb_d 0.0		// depth (z) of IB body
+#define L_ibb_d 0.0			// depth (z) of IB body
 #define L_ibb_r 10.0		// radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define L_ibb_length 0.2		// length of filament
-#define L_ibb_start_x 0.3	// start x position of the filament
-#define L_ibb_start_y 0.0	// start y position of the filament
-#define L_ibb_start_z 0.0		// start z position of the filament
+#define L_ibb_filament_length 0.2		// length of filament
+#define L_ibb_filament_start_x 0.3	// start x position of the filament
+#define L_ibb_filament_start_y 0.0	// start y position of the filament
+#define L_ibb_filament_start_z 0.0		// start z position of the filament
 
 // Angles of filament or plate
 #define L_ibb_angle_vert 90	// Inclination of filament in xy plane
 #define L_ibb_angle_horz 0	// Inclination of filament in xz plane
 
 // Boundary conditions of flexible filament or flexible plate
-#define L_start_BC 2			// Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
+#define L_start_BC 2		// Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
 #define L_end_BC 0			// Type of boundary condition at filament end:		0 == free; 1 = simply supported; 2 == clamped
 
 // Mechanical properties of filament
-#define L_ibb_delta_rho 1.0	// Difference in density (lattice units) between solid and fluid
+#define L_ibb_delta_rho 1.0		// Difference in density (lattice units) between solid and fluid
 #define L_ibb_EI 2.0			// Flexural rigidity (lattice units) of filament
 
 
@@ -277,7 +294,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Bounce-back objects from point clouds
-#define L_SOLID_FROM_FILE
+//#define L_SOLID_FROM_FILE
 
 #ifdef L_SOLID_FROM_FILE
 	#define L_object_on_grid_lev 2		// Provide grid level on which object should be added 
@@ -287,7 +304,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_start_object_y 8
 	#define L_centre_object_z 40
 	#define L_object_length 32				// The object input is scaled based on this dimension
-	#define L_scale_direction 0				// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_object_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
 	#define L_object_length_ref 32			// Reference length to be used in the definition of Reynolds number
 #endif
 
@@ -302,8 +319,9 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_start_bfl_x 50
 	#define L_start_bfl_y 100
 	#define L_centre_bfl_z 20
-	#define L_bfl_length_x 50		// The BFL object input is scaled based on this dimension
-	#define L_bfl_length_ref 10		// Reference length to be used in the definition of Reynolds number
+	#define L_bfl_length_x 50			// The BFL object input is scaled based on this dimension
+	#define L_bfl_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_bfl_length_ref 10			// Reference length to be used in the definition of Reynolds number
 #endif
 
 
@@ -314,7 +332,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 2		// Levels of refinement
+#define L_NumLev 0		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -323,49 +341,49 @@ const static int zProbeLims[2] = {30, 120};
 
 // Following options are only here to making testing different grid combinations easier
 #if (L_NumReg == 2 && L_NumLev == 2) 
-	const static size_t RefXstart[L_NumLev][L_NumReg]	= { {5, 5}, {2, 2} };
-	const static size_t RefXend[L_NumLev][L_NumReg]		= { {25, 25}, {20, 10} };
-	const static size_t RefYstart[L_NumLev][L_NumReg]	= { {5, 14}, {5, 2} };
-	const static size_t RefYend[L_NumLev][L_NumReg]		= { {12, 25}, {10, 10} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {5, 5}, {2, 2} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {25, 25}, {20, 10} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {5, 14}, {5, 2} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {12, 25}, {10, 10} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[L_NumLev][L_NumReg]		= { {5, 10}, {2, 2} };
-	static size_t RefZend[L_NumLev][L_NumReg]		= { {20, 15}, {10, 10} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {5, 10}, {2, 2} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
-	const static size_t RefXstart[L_NumLev][L_NumReg]	= { 8 };
-	const static size_t RefXend[L_NumLev][L_NumReg]		= { 24 };
-	const static size_t RefYstart[L_NumLev][L_NumReg]	= { 8 };
-	const static size_t RefYend[L_NumLev][L_NumReg]		= { 24 };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { 8 };
+	const static int RefXend[L_NumLev][L_NumReg]	= { 24 };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { 8 };
+	const static int RefYend[L_NumLev][L_NumReg]	= { 24 };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[L_NumLev][L_NumReg]		= { 8 };
-	static size_t RefZend[L_NumLev][L_NumReg]		= { 24 };
+	static int RefZstart[L_NumLev][L_NumReg]		= { 8 };
+	static int RefZend[L_NumLev][L_NumReg]			= { 24 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static size_t RefXstart[L_NumLev][L_NumReg]	= { {8}, {4} };
-	const static size_t RefXend[L_NumLev][L_NumReg]		= { {30}, {40} };
-	const static size_t RefYstart[L_NumLev][L_NumReg]	= { {11}, {4} };
-	const static size_t RefYend[L_NumLev][L_NumReg]		= { {21}, {16} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {8}, {4} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {30}, {40} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {11}, {4} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {21}, {16} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[L_NumLev][L_NumReg]		= { {4}, {4} };
-	static size_t RefZend[L_NumLev][L_NumReg]		= { {28}, {44} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {4}, {4} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {28}, {44} };
 
 #elif (L_NumReg == 1 && L_NumLev == 3)
-	const static size_t RefXstart[L_NumLev][L_NumReg]	= { {8},	{4},	{8} };
-	const static size_t RefXend[L_NumLev][L_NumReg]		= { {34},	{48},	{80} };
-	const static size_t RefYstart[L_NumLev][L_NumReg]	= { {9},	{4},	{8} };
-	const static size_t RefYend[L_NumLev][L_NumReg]		= { {23},	{24},	{32} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {8},	{4},	{8} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {34},	{48},	{80} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {9},	{4},	{8} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {23},	{24},	{32} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[L_NumLev][L_NumReg]		= { {2},	{4},	{8} };
-	static size_t RefZend[L_NumLev][L_NumReg]		= { {30},	{52},	{88} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {2},	{4},	{8} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {30},	{52},	{88} };
 
 #elif (L_NumReg == 1 && L_NumLev == 4)
-	const static size_t RefXstart[L_NumLev][L_NumReg]	= { {5},	{3},	{5},	{10} };
-	const static size_t RefXend[L_NumLev][L_NumReg]		= { {25},	{35},	{55},	{80} };
-	const static size_t RefYstart[L_NumLev][L_NumReg]	= { {0},	{0},	{0},	{0} };
-	const static size_t RefYend[L_NumLev][L_NumReg]		= { {8},	{13},	{20},	{30} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {5},	{3},	{5},	{10} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {25},	{35},	{55},	{80} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {0},	{0},	{0},	{0} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {8},	{13},	{20},	{30} };
 	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[L_NumLev][L_NumReg]		= { {7},	{3},	{5},	{10} };
-	static size_t RefZend[L_NumLev][L_NumReg]		= { {22},	{28},	{45},	{70} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {7},	{3},	{5},	{10} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {22},	{28},	{45},	{70} };
 
 #endif
 
@@ -418,6 +436,10 @@ const static int zProbeLims[2] = {30, 120};
 	#undef L_centre_bfl_z
 	#define L_centre_bfl_z 0
 
+	// Set IBB start for 2D
+	#undef L_centre_ibb_z
+	#define L_centre_ibb_z 0
+
 	// Set z inlet velocity
 	#undef L_u_0z
 	#define L_u_0z 0
@@ -426,12 +448,12 @@ const static int zProbeLims[2] = {30, 120};
 
 #if L_NumLev == 0
 	// Set region info to default as no refinement
-	const static size_t RefXstart[1][1]		= {0};
-	const static size_t RefXend[1][1]		= {0};
-	const static size_t RefYstart[1][1]		= {0};
-	const static size_t RefYend[1][1]		= {0};
-	static size_t RefZstart[1][1]			= {0};
-	static size_t RefZend[1][1]				= {0};
+	const static int RefXstart[1][1]	= {0};
+	const static int RefXend[1][1]		= {0};
+	const static int RefYstart[1][1]	= {0};
+	const static int RefYend[1][1]		= {0};
+	static int RefZstart[1][1]			= {0};
+	static int RefZend[1][1]			= {0};
 #endif
 
 // Clean up for using profiled inlet

@@ -300,9 +300,9 @@ void GridObj::io_restart(bool IO_flag) {
 
 		// Get grid sizes
 		int N_lim, M_lim, K_lim;
-		N_lim = XInd.size();
-		M_lim = YInd.size();
-		K_lim = ZInd.size();
+		N_lim = static_cast<int>(XInd.size());
+		M_lim = static_cast<int>(YInd.size());
+		K_lim = static_cast<int>(ZInd.size());
 
 		// Counters
 		int i,j,k,v;
@@ -373,7 +373,9 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
-		int N_lim = XInd.size(), M_lim = YInd.size(), K_lim = ZInd.size();
+		int N_lim = static_cast<int>(XInd.size());
+		int M_lim = static_cast<int>(YInd.size());
+		int K_lim = static_cast<int>(ZInd.size());
 		int gi, gj, gk;
 		int in_level, in_regnum;
 		std::vector<int> ind;
@@ -462,7 +464,7 @@ void GridObj::io_probeOutput() {
 	// Declarations
 	std::ofstream probefile;
 	int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
-	int M_lims = YInd.size(), K_lims = ZInd.size();
+	int M_lims = static_cast<int>(YInd.size()), K_lims = static_cast<int>(ZInd.size());
 
 	if (t == L_out_every_probe && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
@@ -786,7 +788,7 @@ int GridObj::io_hdf5(double tval) {
 		delete dataset;
 
 		// WRITE POSITION Z
-#if (L_dims)
+#if (L_dims == 3)
 		dataset = new DataSet(
 			GridUtils::hdf_file[fid]->createDataSet(time_string + "/ZPos", PredType::NATIVE_DOUBLE, *dims_space));
 		dpos_size[0] = ZPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory

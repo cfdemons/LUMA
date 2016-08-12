@@ -54,9 +54,9 @@ public:
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double> vec);
 	static std::vector<int> getFineIndices(
-		size_t coarse_i, size_t x_start, size_t coarse_j, size_t y_start, size_t coarse_k, size_t z_start); // Function: getFineIndices
+		int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
 	static std::vector<int> getCoarseIndices(
-		size_t fine_i, size_t x_start, size_t fine_j, size_t y_start, size_t fine_k, size_t z_start); // Function: getCoarseIndices
+		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
 	static double indexToPosition(int index, double dx);	// Function: indexToPosition
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
@@ -66,7 +66,7 @@ public:
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
 
 	// LBM-specific utilities
-	static size_t getOpposite(size_t direction);	// Function: getOpposite
+	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
 	// MPI-related utilities

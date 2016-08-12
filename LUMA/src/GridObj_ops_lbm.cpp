@@ -103,8 +103,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		// Check if lower level expected
 		if (L_NumLev > level) {
 
-			size_t regions = subGrid.size();
-			for (size_t reg = 0; reg < regions; reg++) {
+			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
 				// Explode
 				LBM_explode(reg);
@@ -143,7 +142,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
 
-			for (int reg = 0; reg < regions; reg++) {
+			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
 				// Coalesce
 				LBM_coalesce(reg);
@@ -239,7 +238,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 		// Reset force vectors on grid in preparation for spreading step
 		LBM_forcegrid(true);
-
 
 		// Calculate and apply IBM forcing to fluid
 		ObjectManager::getInstance()->ibm_apply(*this);
@@ -481,7 +479,7 @@ void GridObj::LBM_collide( ) {
 
 // ***************************************************************************************************
 // Overload of collision function to allow calculation of feq only for initialisation
-double GridObj::LBM_collide( size_t i, size_t j, size_t k, size_t v, size_t M_lim, size_t K_lim ) {
+double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) {
 
 	/* LBGK equilibrium function is represented as:
 		feq_i = rho * w_i * ( 1 + u_a c_ia / cs^2 + Q_iab u_a u_b / 2*cs^4 )
@@ -1245,15 +1243,15 @@ void GridObj::LBM_explode( int RegionNumber ) {
 	GridObj* fGrid = NULL;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = fGrid->YPos.size();
-	int M_coarse = YPos.size();
-	int K_coarse = ZPos.size();
-	int K_fine = fGrid->ZPos.size();
+	int M_fine = static_cast<int>(fGrid->YPos.size());
+	int M_coarse = static_cast<int>(YPos.size());
+	int K_coarse = static_cast<int>(ZPos.size());
+	int K_fine = static_cast<int>(fGrid->ZPos.size());
 
 	// Loop over coarse grid (just region of interest)
-	for (size_t i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
-		for (size_t j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
-			for (size_t k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
+	for (int i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
+		for (int j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
+			for (int k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
 				// If TL to lower level and point belongs to region then explosion required
 				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
@@ -1324,20 +1322,20 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 	GridObj* fGrid;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = fGrid->YPos.size();
-	int M_coarse = YPos.size();
-	int K_coarse = ZPos.size();
+	int M_fine = static_cast<int>(fGrid->YPos.size());
+	int M_coarse = static_cast<int>(YPos.size());
+	int K_coarse = static_cast<int>(ZPos.size());
 #if (L_dims == 3)
-	int K_fine = fGrid->ZPos.size();
+	int K_fine = static_cast<int>(fGrid->ZPos.size());
 #else
 	int K_fine = 0;
 #endif
 
 
 	// Loop over coarse grid (only region of interest)
-	for (size_t i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
-		for (size_t j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
-			for (size_t k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
+	for (int i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
+		for (int j = fGrid->CoarseLimsY[0]; j <= fGrid->CoarseLimsY[1]; j++) {
+			for (int k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
 				// If TL to lower level or BC is on a refined level then fetch values from lower level
 				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4 || 

@@ -1,6 +1,8 @@
 version=1.1.0 **** WORKING VERSION ****
 
 Issue #39: Removal of VTK and Tecplot writers and implementation of HDF5 writer instead.
+Issue #70: Explicit casting of unsigned and signed integer types to remove compilation warnings on 64-bit systems.
+Issue #69: Added capability to build IBM body from markers specified in a file and renamed input files accordingly.
 Issue #68: Macro convention redefined to avoid current and future conflicts.
 Issue #63: KBC collision operator added in place of MRT operator, Zou-He velocity inlet removed, Uniform Inlet setting removed.
 

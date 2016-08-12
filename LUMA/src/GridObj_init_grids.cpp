@@ -574,7 +574,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Find the local index of the refinement limits if they are on the rank at all
 	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXstart[pGrid.level][region_number]);
 	if (found_x != pGrid.XInd.end()) {	// Starts on this rank
-		CoarseLimsX[0] = found_x - pGrid.XInd.begin();	// Store local index as the limit
+		CoarseLimsX[0] = static_cast<int>(found_x - pGrid.XInd.begin());	// Store local index as the limit
 		// Start index is simply zero
 		IndXstart = 0;
 
@@ -583,24 +583,24 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		// Set limit to start edge of the rank
 		CoarseLimsX[0] = 0;
 		// Compute starting index of sub-grid on this rank (take into account rest of grid somewhere to left)
-		IndXstart = static_cast<int>((pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2);
+		IndXstart = (pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2;
 
 	}
 
 	// End Limit
 	found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXend[pGrid.level][region_number]);
 	if (found_x != pGrid.XInd.end()) {	// Ends on this rank
-		CoarseLimsX[1] = found_x - pGrid.XInd.begin();
+		CoarseLimsX[1] = static_cast<int>(found_x - pGrid.XInd.begin());
 
 	// End on some rank to the right of this one
 	} else if ( (int)RefXend[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 1 - offset] + offset ) {
 		// Set grid limits to end edge of the rank
-		CoarseLimsX[1] = pGrid.XInd.size() - 1;
+		CoarseLimsX[1] = static_cast<int>(pGrid.XInd.size()) - 1;
 
 	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
 	} else if ( (int)RefXend[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
 		// Set grid limits to end edge of the rank
-		CoarseLimsX[1] = pGrid.XInd.size() - 1;
+		CoarseLimsX[1] = static_cast<int>(pGrid.XInd.size()) - 1;
 
 	}
 
@@ -608,23 +608,23 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Y //
 	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYstart[pGrid.level][region_number]);
 	if (found_y != pGrid.YInd.end()) {
-		CoarseLimsY[0] = found_y - pGrid.YInd.begin();
+		CoarseLimsY[0] = static_cast<int>(found_y - pGrid.YInd.begin());
 		IndYstart = 0;
 
 	} else if ( (int)RefYstart[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
 		CoarseLimsY[0] = 0;
-		IndYstart = static_cast<int>((pGrid.YInd[CoarseLimsY[0]] - RefYstart[pGrid.level][region_number]) * 2);
+		IndYstart = (pGrid.YInd[CoarseLimsY[0]] - RefYstart[pGrid.level][region_number]) * 2;
 	}
 
 	found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYend[pGrid.level][region_number]);
 	if (found_y != pGrid.YInd.end()) {
-		CoarseLimsY[1] = found_y - pGrid.YInd.begin();
+		CoarseLimsY[1] = static_cast<int>(found_y - pGrid.YInd.begin());
 
 	} else if ( (int)RefYend[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 1 - offset] + offset ) {
-		CoarseLimsY[1] = pGrid.YInd.size() - 1;
+		CoarseLimsY[1] = static_cast<int>(pGrid.YInd.size()) - 1;
 
 	} else if ( (int)RefYend[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
-		CoarseLimsY[1] = pGrid.YInd.size() - 1;
+		CoarseLimsY[1] = static_cast<int>(pGrid.YInd.size()) - 1;
 
 	}
 
@@ -633,23 +633,23 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Z //
 	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZstart[pGrid.level][region_number]);
 	if (found_z != pGrid.ZInd.end()) {
-		CoarseLimsZ[0] = found_z - pGrid.ZInd.begin();
+		CoarseLimsZ[0] = static_cast<int>(found_z - pGrid.ZInd.begin());
 		IndZstart = 0;
 
 	} else if ( (int)RefZstart[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
 		CoarseLimsZ[0] = 0;
-		IndZstart = static_cast<int>((pGrid.ZInd[CoarseLimsZ[0]] - RefZstart[pGrid.level][region_number]) * 2);
+		IndZstart = (pGrid.ZInd[CoarseLimsZ[0]] - RefZstart[pGrid.level][region_number]) * 2;
 	}
 
 	found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZend[pGrid.level][region_number]);
 	if (found_z != pGrid.ZInd.end()) {
-		CoarseLimsZ[1] = found_z - pGrid.ZInd.begin();
+		CoarseLimsZ[1] = static_cast<int>(found_z - pGrid.ZInd.begin());
 
 	} else if ( (int)RefZend[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 1 - offset] + offset ) {
-		CoarseLimsZ[1] = pGrid.ZInd.size() - 1;
+		CoarseLimsZ[1] = static_cast<int>(pGrid.ZInd.size()) - 1;
 
 	} else if ( (int)RefZend[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
-		CoarseLimsZ[1] = pGrid.ZInd.size() - 1;
+		CoarseLimsZ[1] = static_cast<int>(pGrid.ZInd.size()) - 1;
 
 	}
 #else
@@ -734,9 +734,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Generate TYPING MATRICES
 	
 	// Get local grid sizes
-	size_t N_lim = XInd.size();
-	size_t M_lim = YInd.size();
-	size_t K_lim = ZInd.size();
+	int N_lim = static_cast<int>(XInd.size());
+	int M_lim = static_cast<int>(YInd.size());
+	int K_lim = static_cast<int>(ZInd.size());
 	
 	// Resize
 	LatTyp.resize( N_lim * M_lim * K_lim );
@@ -785,10 +785,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	
 
 	// Loop over grid
-	for (size_t i = 0; i != N_lim; ++i) {
-		for (size_t j = 0; j != M_lim; ++j) {
-			for (size_t k = 0; k != K_lim; ++k) {
-				for (size_t v = 0; v < L_nVels; v++) {
+	for (int i = 0; i != N_lim; ++i) {
+		for (int j = 0; j != M_lim; ++j) {
+			for (int k = 0; k != K_lim; ++k) {
+				for (int v = 0; v < L_nVels; v++) {
 					
 					// Initialise f to feq
 					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
@@ -1189,12 +1189,12 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	int par_label;
     
     // Loop over sub-grid local indices and add labels based on parent site labels
-    for (size_t i = 0; i < N_lim; i++) {
-		for (size_t j = 0; j < M_lim; j++) {
+    for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
 #if (L_dims == 3)
-			for (size_t k = 0; k < K_lim; k++)
+			for (int k = 0; k < K_lim; k++)
 #else
-			size_t k = 0;
+			int k = 0;
 #endif
 			{
 				// Get parent site indices as locals for the current sub-grid local site

@@ -289,15 +289,26 @@ int main( int argc, char* argv[] )
 
 #endif
 
+#ifdef L_IBB_FROM_FILE
+
+	*GridUtils::logfile << "Initialising IB Body from File..." << endl;
+
+	// Read in data from point cloud file
+	PCpts* _PCpts = new PCpts();
+	objMan->readInIBBCloud(_PCpts);
+	delete _PCpts;
+
+#endif
+
 #if !defined L_RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
 	objMan->ibm_initialise(Grids);
-	*GridUtils::logfile << "Number of markers requested = " << L_num_markers << std::endl;
+	*GridUtils::logfile << "Number of markers requested for objects = " << L_num_markers << std::endl;
 
 #endif
 
-#endif
+#endif // End IBM_ON
 
 #ifdef L_BFL_ON
 
@@ -306,7 +317,7 @@ int main( int argc, char* argv[] )
 
 	// Read in input file to arrays
 	PCpts* _PCpts = new PCpts();
-	objMan->readInPCData(_PCpts);
+	objMan->readInBFLCloud(_PCpts);
 
 	// Call BFL body builder if there are points on this rank
 	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
@@ -323,7 +334,7 @@ int main( int argc, char* argv[] )
 
 	// Read in data from point cloud file
 	PCpts* _PCpts = new PCpts();
-	objMan->readInPointData(_PCpts);
+	objMan->readInSolidCloud(_PCpts);
 	delete _PCpts;
 
 #endif

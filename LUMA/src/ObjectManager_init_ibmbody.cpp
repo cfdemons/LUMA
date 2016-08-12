@@ -105,9 +105,9 @@ void ObjectManager::ibm_build_body(int body_type) {
 		// =========================== Build flexible filament ===========================  //
 
 		// End points
-		start_position.push_back(L_ibb_start_x);
-		start_position.push_back(L_ibb_start_y);
-		start_position.push_back(L_ibb_start_z);
+		start_position.push_back(L_ibb_filament_start_x);
+		start_position.push_back(L_ibb_filament_start_y);
+		start_position.push_back(L_ibb_filament_start_z);
 
 		// Angle vector
 		std::vector<double> angles;
@@ -124,7 +124,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		BCs.push_back(L_end_BC);
 
 		// Build body
-		iBody.back().makeBody(L_num_markers, start_position, L_ibb_length, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_num_markers, start_position, L_ibb_filament_length, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
 
 		
 	} else if (body_type == 5) {
@@ -206,8 +206,8 @@ void ObjectManager::ibm_build_body(int body_type) {
 		// =========================== Build 2D rigid plate ===========================  //
 
 		// End points
-		start_position.push_back( L_ibb_start_x - (L_ibb_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
-		start_position.push_back( L_ibb_start_y - (L_ibb_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
 		start_position.push_back( 0.0 );
 
 		// Angle vector
@@ -222,15 +222,15 @@ void ObjectManager::ibm_build_body(int body_type) {
 		BCs.push_back(L_end_BC);
 
 		// Build body as rigid filament
-		iBody.back().makeBody(L_num_markers, start_position, L_ibb_length, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_num_markers, start_position, L_ibb_filament_length, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
 
 
 	} else if (body_type == 7) {
 		// =========================== Build 2D rigid plate + flexible flap ===========================  //
 	
 		// End points
-		start_position.push_back( L_ibb_start_x - (L_ibb_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
-		start_position.push_back( L_ibb_start_y - (L_ibb_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
 		start_position.push_back( 0.0 );
 
 		// Angle vector
@@ -245,15 +245,15 @@ void ObjectManager::ibm_build_body(int body_type) {
 		BCs.push_back(L_end_BC);
 
 		// Build body with bit chopped off end to allow flap
-		double lspace = L_ibb_length / (L_num_markers-2);
-		iBody.back().makeBody(L_num_markers - 1, start_position, L_ibb_length - lspace, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
+		double lspace = L_ibb_filament_length / (L_num_markers-2);
+		iBody.back().makeBody(L_num_markers - 1, start_position, L_ibb_filament_length - lspace, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
 
 		// Add flap of half the length (slightly lower resolution)
 		iBody.emplace_back();
 		angles[0] = 0.0;
-		start_position[0] = ( L_ibb_start_x - (L_ibb_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_length)*cos(-L_ibb_angle_vert * L_PI / 180);
-		start_position[1] = ( L_ibb_start_y - (L_ibb_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_length)*sin(-L_ibb_angle_vert * L_PI / 180);
-		iBody.back().makeBody((L_num_markers / 2) - 3, start_position, L_ibb_length / 2, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
+		start_position[0] = ( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*cos(-L_ibb_angle_vert * L_PI / 180);
+		start_position[1] = ( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*sin(-L_ibb_angle_vert * L_PI / 180);
+		iBody.back().makeBody((L_num_markers / 2) - 3, start_position, L_ibb_filament_length / 2, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
 
 		
 

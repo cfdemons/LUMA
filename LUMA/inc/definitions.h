@@ -100,7 +100,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 4000	// Number of time steps
+#define L_Timesteps 100	// Number of time steps
 
 
 /*
@@ -126,19 +126,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2		// Number of dimensions to the problem
+#define L_dims 3	// Number of dimensions to the problem
 #define L_N 64		// Number of x lattice sites
-#define L_M 32		// Number of y lattice sites
-#define L_K 32		// Number of z lattice sites
+#define L_M 64		// Number of y lattice sites
+#define L_K 64		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0		// Start of domain-x
-#define L_b_x 8		// End of domain-x
+#define L_b_x 1		// End of domain-x
 #define L_a_y 0		// Start of domain-y
-#define L_b_y 4		// End of domain-y
+#define L_b_y 1		// End of domain-y
 #define L_a_z 0		// Start of domain-z
-#define L_b_z 4		// End of domain-z
+#define L_b_z 1		// End of domain-z
 
 
 /*
@@ -157,7 +157,7 @@ const static int zProbeLims[2] = {30, 120};
 #define L_u_0y 0			// Initial y-velocity
 #define L_u_0z 0			// Initial z-velocity
 
-#define L_rho_in 1		// Initial density
+#define L_rho_in 1			// Initial density
 #define L_Re 2000			// Desired Reynolds number
 
 // nu computed based on above selections
@@ -170,14 +170,14 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define L_IBM_ON						// Turn on IBM
+//#define L_IBM_ON						// Turn on IBM
 
 //#define L_STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define L_CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 //#define L_VTK_BODY_WRITE				// Write out the bodies to a VTK file
 
 // Read in IB Body from File
-#define L_IBB_FROM_FILE
+//#define L_IBB_FROM_FILE
 
 #ifdef L_IBB_FROM_FILE
 	#define L_ibb_on_grid_lev 0		// Provide grid level on which object should be added 
@@ -189,12 +189,12 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_ibb_length 0.5			// The object input is scaled based on this dimension
 	#define L_ibb_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
 	#define L_ibb_length_ref 0.5		// Reference length to be used in the definition of Reynolds number
-	#define L_ibb_flex_rigid false		// Whether a structural calculation needs to be performed on the body
 #endif
 
-// Global properties
+// Default global properties
 #define L_num_markers 19		// Number of Lagrange points (approximately)
 #define L_ibb_deform false		// Default deformable property of body to be built (whether it moves or not)
+#define L_ibb_flex_rigid false	// Whether a structural calculation needs to be performed on the body
 
 
 // Switches for inserting certain bodies (enable only one at once!)
@@ -294,7 +294,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Bounce-back objects from point clouds
-//#define L_SOLID_FROM_FILE
+#define L_SOLID_FROM_FILE
 
 #ifdef L_SOLID_FROM_FILE
 	#define L_object_on_grid_lev 2		// Provide grid level on which object should be added 
@@ -332,7 +332,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 0		// Levels of refinement
+#define L_NumLev 2		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0

@@ -666,7 +666,6 @@ void GridObj::io_lite(double tval, std::string TAG) {
 // portable format for easier post-processing
 int GridObj::io_hdf5(double tval) {
 
-
 	// Construct file name
 	H5std_string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
@@ -686,10 +685,11 @@ int GridObj::io_hdf5(double tval) {
 		// handle the errors appropriately
 		Exception::dontPrint();
 
-		// Top level grid creates the file and the time step
-		if (t == 0)	GridUtils::hdf_file.push_back(new H5File(FILE_NAME, H5F_ACC_TRUNC));
+		// Create/open the file and create the time step group
+		if (t == 0)	GridUtils::hdf_file.push_back(new H5File(FILE_NAME, H5F_ACC_TRUNC));	// New file, overwriting
+		else GridUtils::hdf_file[fid]->openFile(FILE_NAME, H5F_ACC_RDWR);	// Existing file, open read-write
 		GridUtils::hdf_file[fid]->createGroup(time_string);
-		
+				
 		// Create dimension dataspace in file
 		hsize_t dims_size[L_dims];
 #if (L_dims == 3)
@@ -736,7 +736,7 @@ int GridObj::io_hdf5(double tval) {
 		// WRITE POSITION X
 		dataset = new DataSet(
 			GridUtils::hdf_file[fid]->createDataSet(time_string + "/XPos", PredType::NATIVE_DOUBLE, *dims_space));
-		dpos_size[0] = XPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory
+		dpos_size[0] = XPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory covering the position vector
 		count_p[0] = XPos.size();
 		for (int j = 0; j < YPos.size(); j++) {
 			start_p[1] = j;
@@ -972,6 +972,8 @@ int GridObj::io_hdf5(double tval) {
 		// Call recursively on child grids
 		if (L_NumLev > level) for (GridObj& g : subGrid) g.io_hdf5(tval);
 
+		// Close file
+		GridUtils::hdf_file[fid]->close();
 
 
 	}  // End Try
@@ -979,22 +981,25 @@ int GridObj::io_hdf5(double tval) {
 	// Catch failure caused by the H5File operations
 	catch (FileIException error)
 	{
+		*GridUtils::logfile << "File I Exception: ";
 		error.printError();
-		return -1;
+		return -51;
 	}
 
 	// Catch failure caused by the DataSet operations
 	catch (DataSetIException error)
 	{
+		*GridUtils::logfile << "Data Set I Exception: ";
 		error.printError();
-		return -1;
+		return -52;
 	}
 
 	// Catch failure caused by the DataSpace operations
 	catch (DataSpaceIException error)
 	{
+		*GridUtils::logfile << "Data Space I Exception: ";
 		error.printError();
-		return -1;
+		return -53;
 	}
 
 

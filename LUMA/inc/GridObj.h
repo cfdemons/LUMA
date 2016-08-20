@@ -23,6 +23,34 @@
 #include <iostream>
 #include <fstream>
 
+// Enumeration for Lattice Typing
+enum eType
+{
+	eSolid,
+	eFluid,
+	eRefined,
+	eTransitionToCoarser,
+	eTransitionToFiner,
+	eBFL,
+	eSymmetry,
+	eInlet,
+	eOutlet,
+	eRefinedSolid,
+	eRefinedSymmetry,
+	eRefinedInlet
+};
+
+// Enumeration for BC application type
+enum eBCType
+{
+	eBCAll,
+	eBCSolidSymmetry,
+	eBCInlet,
+	eBCOutlet,
+	eBCInletOutlet,
+	eBCBFL
+};
+
 // Base class
 class GridObj
 {
@@ -100,7 +128,7 @@ private :
 	// Public data members
 public :
 
-	IVector<int> LatTyp;			// Flattened 3D array of site labels
+	IVector<eType> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
 	int t;							// Number of completed iterations

@@ -443,7 +443,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	LatTyp.resize( N_lim*M_lim*K_lim );
 
 	// Label as coarse site
-	std::fill(LatTyp.begin(), LatTyp.end(), 1);
+	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
 
 	// Add boundary-specific labels
 	LBM_initBoundLab();
@@ -743,7 +743,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 
 	// Default labelling of coarse
-	std::fill(LatTyp.begin(), LatTyp.end(), 1);
+	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
 	
 	// Call refined labelling routine passing parent grid
 	LBM_initRefinedLab(pGrid);
@@ -900,7 +900,7 @@ void GridObj::LBM_initSolidLab() {
 						local_k = k;
 #endif
 
-						LatTyp(local_i,local_j,local_k,M_lim,K_lim) = 0;
+						LatTyp(local_i,local_j,local_k,M_lim,K_lim) = eSolid;
 				}
 
 			}
@@ -963,7 +963,7 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Inlet site
-					LatTyp(i,j,k,M_lim,K_lim) = 7;
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 
 				}
 			}
@@ -985,9 +985,9 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (k = 0; k < K_lim; k++) {
 
 #ifdef L_FREESTREAM_TUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = 7;
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
-					LatTyp(i,j,k,M_lim,K_lim) = 8;
+					LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
 #endif
 
 				}
@@ -1009,9 +1009,9 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (j = 0; j < M_lim; j++) {
 
 #if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = 7;
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
-					LatTyp(i,j,k,M_lim,K_lim) = 0;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #endif
 
 				}
@@ -1030,9 +1030,9 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (j = 0; j < M_lim; j++) {
 
 #if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = 7;
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
-					LatTyp(i,j,k,M_lim,K_lim) = 0;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #endif
 
 				}
@@ -1054,9 +1054,9 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (k = 0; k < K_lim; k++) {
 
 #ifdef L_WALLS_ON
-					LatTyp(i,j,k,M_lim,K_lim) = 0;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #elif (defined L_VIRTUAL_WINDTUNNEL || defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as inlet (for rolling road -- velocity BC)
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
 				}
@@ -1077,11 +1077,11 @@ void GridObj::LBM_initBoundLab ( ) {
 				for (k = 0; k < K_lim; k++) {
 
 #ifdef L_WALLS_ON
-					LatTyp(i,j,k,M_lim,K_lim) = 0;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #elif defined L_VIRTUAL_WINDTUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = 6;	// Label as symmetry boundary
+					LatTyp(i,j,k,M_lim,K_lim) = eSymmetry;	// Label as symmetry boundary
 #elif (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = 7;	// Label as free-stream
+					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
 #endif
 
 				}
@@ -1158,15 +1158,15 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 					) {
 
 					// If parent site is fluid site then correct label
-					if (pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) == 1) {
+					if (pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) == eFluid) {
 						// Change to "TL to lower" label
-						pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = 4;
+						pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = eTransitionToFiner;
 					}
 
 				// Else it is not on the edges but in the middle of the global refined patch
-				} else if (pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) == 1) {
+				} else if (pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) == eFluid) {
 					// Label it a "refined" site
-					pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = 2;
+					pGrid.LatTyp(local_i,local_j,local_k,Mp_lim,Kp_lim) = eRefined;
 
 				}
 
@@ -1186,7 +1186,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 
 	// Declare array for parent site indices
 	std::vector<int> p;
-	int par_label;
+	eType par_label;
     
     // Loop over sub-grid local indices and add labels based on parent site labels
     for (int i = 0; i < N_lim; i++) {
@@ -1208,12 +1208,12 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 				par_label = pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim);
 								
 				// If parent is a "TL to lower" then add "TL to upper" label
-				if (par_label == 4) { 
-					LatTyp(i,j,k,M_lim,K_lim) = 3;
+				if (par_label == eTransitionToFiner) { 
+					LatTyp(i,j,k,M_lim,K_lim) = eTransitionToCoarser;
                 
 					// Else if parent is a "refined" label then label as coarse
-				} else if (par_label == 2) { 
-					LatTyp(i,j,k,M_lim,K_lim) = 1;
+				} else if (par_label == eRefined) { 
+					LatTyp(i,j,k,M_lim,K_lim) = eFluid;
                 
 					// Else parent label is some other kind of boundary so copy the
 					// label to retain the behaviour onto this grid
@@ -1223,14 +1223,14 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 					// If last site to be updated in fine block, change parent label
 					// to ensure boundary values are pulled from fine grid
 					if ((j % 2) != 0 && (i % 2) != 0) {
-						if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 0 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 10) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 10;
+						if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eSolid || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedSolid) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedSolid;
 
-						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 6 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 16) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 16;
+						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eSymmetry || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedSymmetry) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedSymmetry;
 						
-						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 7 || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == 17) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = 17;
+						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eInlet || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedInlet) {
+							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedInlet;
 
 						}
 					}

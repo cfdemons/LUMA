@@ -355,7 +355,7 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 					for (size_t v = 0; v < L_nVels; v++) {
 
 						// Only apply to non-solid sites
-						if (LatTyp(i,j,k,M_lim,K_lim) != 0) {
+						if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
 
 							// Reset beta_v
 							double beta_v = 0.0;
@@ -434,7 +434,7 @@ void GridObj::LBM_collide( ) {
 			for (int k = 0; k < K_lim; k++) {
 
 				// Ignore refined sites and TL sites (based on Rohde refinement)
-				if (LatTyp(i,j,k,M_lim,K_lim) == 2 || LatTyp(i,j,k,M_lim,K_lim) == 3) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == eRefined || LatTyp(i,j,k,M_lim,K_lim) == eTransitionToCoarser) {
 					// Do nothing as taken care of on lower level grid
 
 				} else {
@@ -802,12 +802,12 @@ void GridObj::LBM_stream( ) {
 					 */
 
 					// Fine --> Any; do not stream in any direction
-					if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+					if (LatTyp(i,j,k,M_lim,K_lim) == eRefined) {
 						break;
 
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
 #if (defined L_INLET_ON && !defined L_INLET_REGULARISED && !defined L_INLET_NRBC)					
-					} else if (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) {
+					} else if (LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) {
 						f_new(i,j,k,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
 						// Carry on and stream
 #endif
@@ -867,9 +867,9 @@ void GridObj::LBM_stream( ) {
 							 * Coarse --> Solid (for consistency with the above) */
 							if (
 								(level == 0) &&
-								( 	(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
-									(LatTyp(i,j,k,M_lim,K_lim) == 0 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1) ||
-									(LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0)	)
+								( 	(LatTyp(i,j,k,M_lim,K_lim) == eFluid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == eSolid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid) ||
+									(LatTyp(i,j,k,M_lim,K_lim) == eFluid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eSolid)	)
 							) {
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
@@ -947,7 +947,7 @@ void GridObj::LBM_stream( ) {
 						// Either apply periodic BCs or not on these sites (ones which stream from periodic recv site)
 
 #ifdef L_PERIODIC_BOUNDARIES
-							if (LatTyp(i,j,k,M_lim,K_lim) == 1 && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1)
+							if (LatTyp(i,j,k,M_lim,K_lim) == eFluid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid)
 							{
 								// Stream periodically
 								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
@@ -990,14 +990,14 @@ void GridObj::LBM_stream( ) {
 
 						// TL2lower --> TL2lower then ignore as done on lower grid stream
 						if (
-							(LatTyp(i,j,k,M_lim,K_lim) == 4) &&
-							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4)
+							(LatTyp(i,j,k,M_lim,K_lim) == eTransitionToFiner) &&
+							(LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToFiner)
 						) {
 							continue;
 
 						// Any --> Do-nothing-inlet then ignore so as not to overwrite inlet site
 #if (defined L_INLET_ON && !defined L_INLET_REGULARISED && !defined L_INLET_NRBC)
-						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7 || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 17) {
+						} else if (LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eInlet || LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eRefinedInlet) {
 							continue;
 #endif
 						}
@@ -1060,7 +1060,7 @@ void GridObj::LBM_macro( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 
-				if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == eRefined) {
 
 					// Refined site so set both density and velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 0.0;
@@ -1070,7 +1070,7 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
 #endif
 
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 
 					// Solid site so do not update density but set velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -1080,8 +1080,8 @@ void GridObj::LBM_macro( ) {
 					u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
 #endif
 
-				} else if ( LatTyp(i,j,k,M_lim,K_lim) == 6 ||
-					(LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) ) {
+				} else if ( LatTyp(i,j,k,M_lim,K_lim) == eSymmetry ||
+					(LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) ) {
 
 					// Symmetry or Inlet BC which update themselves prior to collision
 					continue;
@@ -1171,7 +1171,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 	double fuz_temp = 0.0;
 
 
-	if (LatTyp(i,j,k,M_lim,K_lim) == 2) {
+	if (LatTyp(i,j,k,M_lim,K_lim) == eRefined) {
 
 		// Refined site so set both density and velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 0.0;
@@ -1181,7 +1181,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
 #endif
 
-	} else if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 
 		// Solid site so do not update density but set velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -1191,8 +1191,8 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
 #endif
 
-	} else if ( LatTyp(i,j,k,M_lim,K_lim) == 6 ||
-		(LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) ) {
+	} else if ( LatTyp(i,j,k,M_lim,K_lim) == eSymmetry ||
+		(LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) ) {
 
 		// Symmetry or Inlet BC which update themselves prior to collision
 
@@ -1254,7 +1254,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 			for (int k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
 				// If TL to lower level and point belongs to region then explosion required
-				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4) {
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == eTransitionToFiner) {
 
 					// Lookup indices for lower level
 					x_start = fGrid->CoarseLimsX[0];
@@ -1269,7 +1269,7 @@ void GridObj::LBM_explode( int RegionNumber ) {
 
 					// Only pass information to lower levels if lower level is expecting it 
 					// (i.e. not a boundary site)
-					if (fGrid->LatTyp(fi,fj,fk,M_fine,K_fine) == 3) {
+					if (fGrid->LatTyp(fi,fj,fk,M_fine,K_fine) == eTransitionToCoarser) {
 
 						// Update fine grid values according to Rohde et al.
 						for (int v = 0; v < L_nVels; v++) {
@@ -1338,10 +1338,10 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 			for (int k = fGrid->CoarseLimsZ[0]; k <= fGrid->CoarseLimsZ[1]; k++) {
 
 				// If TL to lower level or BC is on a refined level then fetch values from lower level
-				if (LatTyp(i,j,k,M_coarse,K_coarse) == 4 || 
-					LatTyp(i,j,k,M_coarse,K_coarse) == 10 ||
-					LatTyp(i,j,k,M_coarse,K_coarse) == 16 ||
-					LatTyp(i,j,k,M_coarse,K_coarse) == 17) {
+				if (LatTyp(i,j,k,M_coarse,K_coarse) == eTransitionToFiner || 
+					LatTyp(i,j,k,M_coarse,K_coarse) == eRefinedSolid ||
+					LatTyp(i,j,k,M_coarse,K_coarse) == eRefinedSymmetry ||
+					LatTyp(i,j,k,M_coarse,K_coarse) == eRefinedInlet) {
 
 					// Lookup indices for lower level
 					x_start = fGrid->CoarseLimsX[0];

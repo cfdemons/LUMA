@@ -93,9 +93,9 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 		// When using MPI need to convert the global indices of the support sites to local indices for array access
 #ifdef L_BUILD_FOR_MPI
 		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],_Owner,locals);
-		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = 5;
+		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eBFL;
 #else
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = 5;
+		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 #endif
 
 	}
@@ -114,7 +114,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 			for (int k = 0; k < K_lim; k++) {
 
 				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == 5) {
+				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (L_dims == 3)

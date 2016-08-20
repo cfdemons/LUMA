@@ -511,8 +511,8 @@ void ObjectManager::readInSolidCloud(PCpts* _PCpts) {
 			GridUtils::global_to_local(global_i, global_j,global_k,g,locals);
 
 			// Update Typing Matrix
-			if ( g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == 1 )
-			{ g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = 0; }
+			if ( g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid )
+			{ g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid; }
 
 		}
 

@@ -34,16 +34,6 @@
 	3 == apply outlet conditions only
 	4 == apply inlet and outlet simultaneously
 	5 == apply BFL conditions
-
-	Recognised boundary label types are:
-	0 == solid site (no-slip)
-	5 == BFL site
-	6 == symmetry site (free-slip)
-	7 == inlet site
-	8 == outlet site
-	10 == solid site (no-slip -- site refined)
-	16 == symmetry site (free-slip -- site refined)
-	17 == inlet site (site refined)
 */
 void GridObj::LBM_boundary (int bc_type_flag) {
 
@@ -64,14 +54,14 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					******************************************************************************************	*/
     
 				// Apply to solid sites
-				if ( (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10)
-					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
+				if ( (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid)
+					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) ) {
 
 					// Apply half-way bounce-back
 					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
 
-				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 6 || LatTyp(i,j,k,M_lim,K_lim) == 16)
-					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
+				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eSymmetry || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSymmetry)
+					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry)) {
 
 					// Apply half-way specular reflection
 					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
@@ -81,8 +71,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************* Inlet Sites ****************************************
 					******************************************************************************************	*/
     
-				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 7 || LatTyp(i,j,k,M_lim,K_lim) == 17) 
-					&& (bc_type_flag == 0 || bc_type_flag == 2 || bc_type_flag == 4) ) {
+				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) 
+					&& (bc_type_flag == eBCAll || bc_type_flag == eBCInlet || bc_type_flag == eBCInletOutlet) ) {
 
 					// Choose option
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
@@ -96,7 +86,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************ Outlet Sites ****************************************
 					******************************************************************************************	*/
     
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 8 && (bc_type_flag == 0 || bc_type_flag == 3 || bc_type_flag == 4) ) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == eOutlet && 
+					(bc_type_flag == eBCAll || bc_type_flag == eBCOutlet || bc_type_flag == eBCInletOutlet) ) {
 
 					// !! RIGHT HAND WALL ONLY !!
 #ifdef L_OUTLET_ON
@@ -110,7 +101,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					************************************** BFL Sites *****************************************
 					******************************************************************************************	*/
     
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == 5 && (bc_type_flag == 0 || bc_type_flag == 5) ) {
+				} else if (LatTyp(i,j,k,M_lim,K_lim) == eBFL && (bc_type_flag == eBCAll || bc_type_flag == eBCBFL) ) {
 
 					bc_applyBfl(i,j,k);
 						
@@ -174,10 +165,10 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Only apply if destination is a fluid site or precomputed inlet
-		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 7
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid || 
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToCoarser ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToFiner ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eInlet
 			) {
 
 			// Get incoming direction
@@ -312,11 +303,11 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 		}
 
 		// Only apply if destination is a fluid site or a solid site (i.e. an inlet site which feeds the domain)
-		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 0 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 10
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid || 
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToCoarser ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToFiner ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eSolid ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eRefinedSolid
 			) {
 
 			// Declarations
@@ -685,9 +676,9 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Only apply if destination is a fluid site
-		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 1 || 
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 3 ||
-				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == 4
+		if (	LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid || 
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToCoarser ||
+				LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eTransitionToFiner
 			) {
 
 			// This normal is valid so apply specular reflection to sites getting 
@@ -722,7 +713,7 @@ void GridObj::bc_solidSiteReset( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 				// Reset solid site velocities to zero
-				if (LatTyp(i,j,k,M_lim,K_lim) == 0 || LatTyp(i,j,k,M_lim,K_lim) == 10) {
+				if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 					
 					u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
 					u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;

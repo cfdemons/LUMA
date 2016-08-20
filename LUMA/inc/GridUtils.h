@@ -15,6 +15,21 @@
 
 #pragma once
 
+// Enumeration for directional options
+enum eCartesianDirection
+{
+	eXDirection,
+	eYDirection,
+	eZDirection
+};
+
+// Enumeration for minimum and maximum
+enum eMinMax
+{
+	eMinimum,
+	eMaximum
+};
+
 /** GridUtils Class is a utility class to hold all the general
  *  methods used by the GridObj and others. Everything about this is static
  *  as no need to instantiate it for every grid on a process.
@@ -33,7 +48,6 @@ public:
 	static std::ofstream* logfile;			// Handle to output file
 	static std::string path_str;            // Static string representing output path
 	static const int dir_reflect[L_dims * 2][L_nVels];	
-	static std::vector<H5File*> hdf_file;	// Handles to HDF5 files (one per grid)
 
 	// Methods //
 
@@ -72,13 +86,13 @@ public:
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
 	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
-	static bool isOnThisRank(int gl, int xyz, const GridObj& pGrid);
+	static bool isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid);
 	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
-	static bool isOnSenderLayer(double site_position, int dir, int maxmin);		// Is site on specified sender layer
-	static bool isOnRecvLayer(double site_position, int dir, int maxmin);		// Is site on speicfied recv layer
+	static bool isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);	// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);		// Is site on speicfied recv layer
 	static bool isOffGrid(int i, int j, int k, 
 		int N_lim, int M_lim, int K_lim, GridObj& g);							// Is site off supplied grid
 

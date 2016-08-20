@@ -65,11 +65,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0))
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -95,11 +95,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0))
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -125,11 +125,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
-							GridUtils::isOnSenderLayer(g->YPos[j],1,1)
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -155,11 +155,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
-							GridUtils::isOnSenderLayer(g->YPos[j],1,0)
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -185,11 +185,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) &&
-							GridUtils::isOnSenderLayer(g->YPos[j],1,1)
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -216,11 +216,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) &&
-							GridUtils::isOnSenderLayer(g->YPos[j],1,0)
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -246,11 +246,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,0) && 
-							GridUtils::isOnSenderLayer(g->YPos[j],1,1)
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -276,11 +276,11 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if (  GridUtils::isOnSenderLayer(g->XPos[i],0,1) && 
-							GridUtils::isOnSenderLayer(g->YPos[j],1,0)
+						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
+							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
 #if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,1) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
@@ -311,9 +311,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -338,9 +338,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -365,9 +365,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -392,9 +392,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -419,9 +419,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -446,9 +446,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -473,9 +473,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -500,9 +500,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -527,9 +527,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -554,9 +554,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -581,9 +581,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -608,9 +608,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -635,9 +635,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -662,9 +662,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -689,9 +689,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -716,9 +716,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,0) && !GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -743,9 +743,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {
@@ -770,9 +770,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Do not pass refined sites as zero anyway
 					{
-						if ( (GridUtils::isOnSenderLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnSenderLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnSenderLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
 							for (v = 0; v < L_nVels; v++) {

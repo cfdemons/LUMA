@@ -59,7 +59,7 @@
 #define L_PI 3.14159265358979323846
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI
+#define L_BUILD_FOR_MPI
 
 // Output Options
 #define L_out_every 10			// How many timesteps before whole grid output
@@ -83,7 +83,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define GRAVITY_ON
 // Expression for the gravity force
 #define L_grav_force 1e-10	//( 3 * gUtils.vecnorm(L_u_0x,L_u_0y,L_u_0z) * nu / pow(fabs(L_b_y - L_a_y),2) )
-#define L_grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
+#define L_grav_direction eXDirection	// Gravity direction (Specify using enumeration)
 
 // Initialisation
 //#define L_NO_FLOW			// Initialise the domain with no flow
@@ -187,7 +187,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_start_ibb_y 1.5
 	#define L_centre_ibb_z 0.0
 	#define L_ibb_length 0.5			// The object input is scaled based on this dimension
-	#define L_ibb_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_ibb_scale_direction eXDirection	// Scale in this direction (Specify as enumeration)
 	#define L_ibb_length_ref 0.5		// Reference length to be used in the definition of Reynolds number
 #endif
 
@@ -304,7 +304,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_start_object_y 8
 	#define L_centre_object_z 40
 	#define L_object_length 32				// The object input is scaled based on this dimension
-	#define L_object_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_object_scale_direction eXDirection		// Scale in this direction (Specify as enumeration)
 	#define L_object_length_ref 32			// Reference length to be used in the definition of Reynolds number
 #endif
 
@@ -320,7 +320,7 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_start_bfl_y 100
 	#define L_centre_bfl_z 20
 	#define L_bfl_length_x 50			// The BFL object input is scaled based on this dimension
-	#define L_bfl_scale_direction 0		// Scale in this direction (x = 0, y = 1, z = 2)
+	#define L_bfl_scale_direction eXDirection	// Scale in this direction (Specify as enumeration)
 	#define L_bfl_length_ref 10			// Reference length to be used in the definition of Reynolds number
 #endif
 
@@ -332,7 +332,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 2		// Levels of refinement
+#define L_NumLev 0		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0

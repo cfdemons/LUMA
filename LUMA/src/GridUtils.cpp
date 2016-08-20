@@ -353,24 +353,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 	// Define shifts based on which overlap we are on
 
 	// X
-	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMaximum)) {
 		shift[0] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMinimum)) {
 		shift[0] = -1;
 	}
 
 	// Y
-	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMaximum)) {
 		shift[1] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMinimum)) {
 		shift[1] = -1;
 	}
 
 #if (L_dims == 3)
 	// Z
-	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMaximum)) {
 		shift[2] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMinimum)) {
 		shift[2] = -1;
 	}
 #endif
@@ -422,11 +422,11 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid) {
 
 	switch (xyz) {
 
-	case 0:
+	case eXDirection:
 		{
 		// X direction
 		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
@@ -435,7 +435,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 		else return false;
 		}
 
-	case 1:
+	case eYDirection:
 		{
 		// Y direction
 		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
@@ -444,7 +444,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 		else return false;
 		}
 
-	case 2:
+	case eZDirection:
 		{
 		// Z direction
 		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
@@ -541,31 +541,31 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 	if (
 	(
 		// X on sender
-		(GridUtils::isOnSenderLayer(pos_x,0,0) || GridUtils::isOnSenderLayer(pos_x,0,1)) &&
+		(GridUtils::isOnSenderLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_x,eXDirection,eMaximum)) &&
 
 		// Y and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
+		(!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
 #if (L_dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		)
 	) || (
 		// Y on sender
-		(GridUtils::isOnSenderLayer(pos_y,1,0) || GridUtils::isOnSenderLayer(pos_y,1,1)) &&
+		(GridUtils::isOnSenderLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_y,eYDirection,eMaximum)) &&
 
 		// X and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)
+		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)
 #if (L_dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 
 		)
 	) || (
 		// Z on sender
-		(GridUtils::isOnSenderLayer(pos_z,2,0) || GridUtils::isOnSenderLayer(pos_z,2,1)) &&
+		(GridUtils::isOnSenderLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_z,eZDirection,eMaximum)) &&
 
 		// X and Y not recv
-		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)	&& 
-		!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
+		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)	&& 
+		!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
 #endif
 		)
 	)
@@ -579,40 +579,39 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
-// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
-// either "min" = 0 or "max" = 1.
-bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
+// whether it is an X, Y or Z coordinate and which edge of the rank you are checking either Min or Max.
+bool GridUtils::isOnSenderLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank inner overlap regions dictated by the coarsest rank
-	if (dir == 0) {
+	if (dir == eXDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.X[0] && site_position < mpim->sender_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (dir == 1) {
+	} else if (dir == eYDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.Y[2] && site_position < mpim->sender_layer_pos.Y[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.Y[0] && site_position < mpim->sender_layer_pos.Y[1] ) return true;
 
 		}
 
-	} else if (dir == 2) {
+	} else if (dir == eZDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.Z[2] && site_position < mpim->sender_layer_pos.Z[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.Z[0] && site_position < mpim->sender_layer_pos.Z[1] ) return true;
 
 		}
@@ -640,10 +639,10 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
-	if (	GridUtils::isOnRecvLayer(pos_x,0,0) || GridUtils::isOnRecvLayer(pos_x,0,1) ||
-			GridUtils::isOnRecvLayer(pos_y,1,0) || GridUtils::isOnRecvLayer(pos_y,1,1)
+	if (	GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum) ||
+			GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
 #if (L_dims == 3)
-			|| GridUtils::isOnRecvLayer(pos_z,2,0) || GridUtils::isOnRecvLayer(pos_z,2,1)
+			|| GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		) {
 			return true;
@@ -655,40 +654,39 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the outer MPI overlap of the coarsest grid based on its position,
-// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
-// either "min" = 0 or "max" = 1.
-bool GridUtils::isOnRecvLayer(double site_position, int dir, int maxmin) {
+// whether it is an X, Y or Z coordinate and which edge of the rank you are checking Min or Max.
+bool GridUtils::isOnRecvLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank outer overlap regions dictated by the coarsest rank
-	if (dir == 0) {
+	if (dir == eXDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.X[2] && site_position < mpim->recv_layer_pos.X[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.X[0] && site_position < mpim->recv_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (dir == 1) {
+	} else if (dir == eYDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.Y[2] && site_position < mpim->recv_layer_pos.Y[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.Y[0] && site_position < mpim->recv_layer_pos.Y[1] ) return true;
 
 		}
 		
-	} else if (dir == 2) {
+	} else if (dir == eZDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.Z[2] && site_position < mpim->recv_layer_pos.Z[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.Z[0] && site_position < mpim->recv_layer_pos.Z[1] ) return true;
 
 		}

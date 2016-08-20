@@ -387,6 +387,9 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
+	// Set the pointer to the hierarchy in the MpiManager
+	MpiManager::Grids = &Grids;
+
 	// Write out t = 0
 #ifdef L_TEXTOUT
 	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
@@ -410,10 +413,6 @@ int main( int argc, char* argv[] )
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
 	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< obj_initialise_time << "ms." << std::endl;
-
-
-	// Set the pointer to the hierarchy in the MpiManager
-	MpiManager::Grids = &Grids;
 
 #ifdef L_BUILD_FOR_MPI
 	// Compute buffer sizes
@@ -621,13 +620,6 @@ int main( int argc, char* argv[] )
 	time_str = ctime(&curr_time);	// Format as string
 	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
-
-	// Close HDF5 file
-#if (defined L_HDF5_OUTPUT && !defined _DEBUG)
-	for (H5File* hf : GridUtils::hdf_file) {
-		hf->close();
-	}
-#endif
 
 	// Destroy ObjectManager
 	ObjectManager::destroyInstance();

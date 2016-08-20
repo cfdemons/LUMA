@@ -24,9 +24,6 @@
 #include "../inc/globalvars.h"
 #include "../inc/hdf5luma.h"
 
-// Static declarations
-std::vector<H5File*> GridUtils::hdf_file;
-
 using namespace std;
 
 // *****************************************************************************
@@ -678,17 +675,86 @@ int GridObj::io_hdf5(double tval) {
 	// File ID
 	int fid = level + region_number * L_NumLev;
 
+	/* Not convinced that the Cpp wrapper is sufficient to access all the parallel
+	 * IO function and there is no tutorial on it so will have to implement
+	 * in C for parallel IO. Will leave the Cpp version of serial IO in though */
+#ifdef L_BUILD_FOR_MPI
+
+	// Declarations
+	hid_t file_id, plist_id, group_id;
+	herr_t status;
+	bool bOK_to_write = false;
+
+	// Create file parallel access property list
+	MPI_Info info = MPI_INFO_NULL;
+	plist_id = H5Pcreate(H5P_FILE_ACCESS);
+	status = H5Pset_fapl_mpio(plist_id, MpiManager::getInstance()->my_comm, info);
+
+	// Create/open parallel file using the property list defined above
+	if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+	else file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_RDWR, H5P_DEFAULT, plist_id);
+	H5Pclose(plist_id);
+
+	// Only contribute to the file if this process has the (sub-)grid
+	GridObj* parentGrid = NULL;	
+	GridUtils::getGrid(MpiManager::Grids, level - 1, region_number, parentGrid);
+	if (level == 0)
+	{
+		bOK_to_write = true;
+	}
+	else if (GridUtils::hasThisSubGrid(*parentGrid, region_number))
+	{
+		bOK_to_write = true;
+	}
+	
+	// If OK for this process to write then continue
+	if (bOK_to_write)
+	{
+		
+		// Create group
+		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+		// Create property template for parallel dataset
+		plist_id = H5Pcreate(H5P_DATASET_XFER);
+
+		// Set data access mode (collective or independent I/O -- collective is the standard)
+		status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+
+
+
+		// Compute offset for this rank
+
+
+	}
+
+	// Close group
+	H5Gclose(group_id);
+
+	// Close property list
+	H5Pclose(plist_id);
+
+	// Close file
+	H5Fclose(file_id);
+
+
+
+#else
+
 	// Try block to detect exceptions raised by any of the calls inside it
 	try	{
 
 		// Turn off the auto-printing when failure occurs so that we can
 		// handle the errors appropriately
 		Exception::dontPrint();
+		
+		// Create/open the file
+		H5File* hdf_file = NULL;
+		if (t == 0)	hdf_file = new H5File(FILE_NAME, H5F_ACC_TRUNC);	// New file, overwriting
+		else hdf_file = new H5File(FILE_NAME, H5F_ACC_RDWR);			// Existing file, open read-write
 
-		// Create/open the file and create the time step group
-		if (t == 0)	GridUtils::hdf_file.push_back(new H5File(FILE_NAME, H5F_ACC_TRUNC));	// New file, overwriting
-		else GridUtils::hdf_file[fid]->openFile(FILE_NAME, H5F_ACC_RDWR);	// Existing file, open read-write
-		GridUtils::hdf_file[fid]->createGroup(time_string);
+		// Create time step group
+		hdf_file->createGroup(time_string);
 				
 		// Create dimension dataspace in file
 		hsize_t dims_size[L_dims];
@@ -735,7 +801,7 @@ int GridObj::io_hdf5(double tval) {
 
 		// WRITE POSITION X
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/XPos", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/XPos", PredType::NATIVE_DOUBLE, *dims_space));
 		dpos_size[0] = XPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory covering the position vector
 		count_p[0] = XPos.size();
 		for (int j = 0; j < YPos.size(); j++) {
@@ -762,7 +828,7 @@ int GridObj::io_hdf5(double tval) {
 
 		// WRITE POSITION Y
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/YPos", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/YPos", PredType::NATIVE_DOUBLE, *dims_space));
 		dpos_size[0] = YPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory
 		count_p[1] = YPos.size();
 		for (int i = 0; i < XPos.size(); i++) {
@@ -790,7 +856,7 @@ int GridObj::io_hdf5(double tval) {
 		// WRITE POSITION Z
 #if (L_dims == 3)
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/ZPos", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/ZPos", PredType::NATIVE_DOUBLE, *dims_space));
 		dpos_size[0] = ZPos.size();	mem_pos_space = new DataSpace(1, dpos_size);	// 1D array in memory
 		count_p[2] = ZPos.size();
 		for (int i = 0; i < XPos.size(); i++) {
@@ -812,21 +878,21 @@ int GridObj::io_hdf5(double tval) {
 		
 		// WRITE LATTYP
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/LatTyp", PredType::NATIVE_INT, *dims_space));
+			hdf_file->createDataSet(time_string + "/LatTyp", PredType::NATIVE_INT, *dims_space));
 		dataset->write(&LatTyp[0], PredType::NATIVE_INT);
 		dataset->close();
 		delete dataset;
 		
 		// WRITE RHO
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Rho", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Rho", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&rho[0], PredType::NATIVE_DOUBLE);
 		dataset->close();
 		delete dataset;
 	
 		// WRITE UX
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Ux", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Ux", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&u[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -836,7 +902,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 1;	// Shift by 1 element in memory
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Uy", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Uy", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&u[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -847,7 +913,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 2;	// Shift by 1 element in memory
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Uz", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Uz", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&u[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -855,7 +921,7 @@ int GridObj::io_hdf5(double tval) {
 
 		// WRITE RHO_TIMEAV
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Rho_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Rho_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&rho_timeav[0], PredType::NATIVE_DOUBLE);
 		dataset->close();
 		delete dataset;
@@ -865,7 +931,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 0;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Ux_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Ux_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&ui_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -875,7 +941,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 1;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Uy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Uy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&ui_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -886,7 +952,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 2;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/Uz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/Uz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&ui_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -901,7 +967,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 0;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UxUx_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UxUx_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -911,7 +977,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 1;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UxUy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UxUy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -926,7 +992,7 @@ int GridObj::io_hdf5(double tval) {
 #endif
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UyUy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UyUy_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -938,7 +1004,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 2;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UxUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UxUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -948,7 +1014,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 4;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UyUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UyUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -958,7 +1024,7 @@ int GridObj::io_hdf5(double tval) {
 		start[0] = 5;
 		mem_space->selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
 		dataset = new DataSet(
-			GridUtils::hdf_file[fid]->createDataSet(time_string + "/UzUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
+			hdf_file->createDataSet(time_string + "/UzUz_TimeAv", PredType::NATIVE_DOUBLE, *dims_space));
 		dataset->write(&uiuj_timeav[0], PredType::NATIVE_DOUBLE, *mem_space, DataSpace::ALL);
 		dataset->close();
 		delete dataset;
@@ -973,7 +1039,7 @@ int GridObj::io_hdf5(double tval) {
 		if (L_NumLev > level) for (GridObj& g : subGrid) g.io_hdf5(tval);
 
 		// Close file
-		GridUtils::hdf_file[fid]->close();
+		hdf_file->close();
 
 
 	}  // End Try
@@ -1003,7 +1069,7 @@ int GridObj::io_hdf5(double tval) {
 	}
 
 
-
+#endif // L_BUILD_FOR_MPI
 	return 0;
 
 }

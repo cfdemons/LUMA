@@ -14,6 +14,10 @@
 */
 
 
+#ifdef L_BUILD_FOR_MPI
+	#define H5_HAVE_PARALLEL
+#endif
+
 #include "H5Cpp.h"
 
 #define H5_BUILT_AS_DYNAMIC_LIB

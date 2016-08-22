@@ -1,3 +1,8 @@
+version=1.0.4
+
+Issue #59: Added lift and drag calculation for BB objects
+
+
 version=1.0.3
 
 Issue #63: Fixed output directory segmentation for large MPI jobs

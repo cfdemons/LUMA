@@ -664,37 +664,53 @@ void GridObj::io_lite(double tval, std::string TAG) {
 // ***************************************************************************************************
 // Routine for writing out the lift and drag forces on a BB object 
 
-void GridObj::io_writeForceonObject(double tval) {
+void GridObj::io_writeForceOnObject(double tval) {
 	
 
 	// Write file
 	// TODO : -Get grid where the BB object is
 	//		 - Write out the average forces in a file
 
-	//if (level == object_on_grid_lev) {
+	if (level == object_on_grid_lev) {
 
-	std::ofstream fout;
+		std::ofstream fout;
 
-	// Filename
-	stringstream fileName;
-	fileName << GridUtils::path_str +  "/io_lift_drag" << "Rnk" << MpiManager::my_rank << ".csv";
+		// Filename
+		std::stringstream fileName;
+		fileName << GridUtils::path_str + "/io_lift_drag" << "Rnk" << MpiManager::my_rank << ".csv";
 
-	// Create file
-	fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
-	
-		// Write out the data
-		if (t == out_every_forces) {
-			fout << "time \t Fx \t Fy \t Fz" << endl;
+		// Create file
+		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+
+		// Write out the header
+		if (static_cast<int>(tval) == out_every_forces) {
+			fout << "time,Fx,Fy,Fz" << std::endl;
 		}
 
-		fout << t << "\t" << subGrid[0].force_on_object_x[2 * t - 1] << "\t" << subGrid[0].force_on_object_y[2 * t - 1] << "\t";
-		if (dims == 3) {
-			fout << subGrid[0].force_on_object_z[2 * t - 1];
-		}
-		fout << endl;
+		fout	<< std::to_string(tval) << "," 
+				<< std::to_string(force_on_object_x) << "," 
+				<< std::to_string(force_on_object_y) << ","
+#if (dims == 3)
+				<< force_on_object_z
+#else
+				<< std::to_string(0.0)
+#endif
+				<< std::endl;
 
 		fout.close();
-	
+
+		// Reset for next time step
+		force_on_object_x = 0.0;
+		force_on_object_y = 0.0;
+		force_on_object_z = 0.0;
+	}
+
+	// Search any sub-grids
+	if (NumLev > level) {
+		for (int r = 0; r < NumReg; r++) {
+			subGrid[r].io_writeForceOnObject(tval);
+		}
+	}	
 	
 }
 

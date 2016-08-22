@@ -517,14 +517,13 @@ int main( int argc, char* argv[] )
 #endif
 		}
 		
-		
-		if (Grids.t % out_every_forces== 0) {
-#if defined COMPUTE_LIFT_AND_DRAG
-			*GridUtils::logfile << "Writing out BB object lift and drag" << endl;
-			
-			Grids.io_writeForceonObject(Grids.t); 
-#endif
-		}		
+		// Write out lift and drag coefficients of solid object
+#ifdef COMPUTE_LIFT_AND_DRAG
+		if (Grids.t % out_every_forces == 0) {
+			*GridUtils::logfile << "Writing out object lift and drag" << endl;
+			Grids.io_writeForceOnObject(Grids.t);
+		}
+#endif		
 
 		// Probe output has different frequency
 #ifdef PROBE_OUTPUT

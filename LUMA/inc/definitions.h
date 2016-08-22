@@ -62,9 +62,9 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 500			// How many timesteps before whole grid output
+#define out_every 20				// How many timesteps before whole grid output
 #define output_precision 3		// Precision of output
-#define out_every_forces 150	// Specific output for forces (based on strouhal number) to take account of oscillations
+#define out_every_forces 5		// Specific output for forces (based on strouhal number) to take account of oscillations
 
 // Types of output
 //#define TEXTOUT
@@ -300,9 +300,9 @@ const static int zProbeLims[2] = {30, 120};
 	#define start_object_x 40
 	#define start_object_y 20
 	#define centre_object_z 61
-	#define object_length 10			// The object input is scaled based on this dimension
+	#define object_length 80			// The object input is scaled based on this dimension
 	#define scale_direction 0			// Scale in this direction (x = 0, y = 1, z = 2)
-	#define object_length_ref 10		// Reference length to be used in the definition of Reynolds number
+	#define object_length_ref 80		// Reference length to be used in the definition of Reynolds number
 #endif
 
 

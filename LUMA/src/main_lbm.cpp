@@ -515,6 +515,15 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
 			objMan->io_write_lift_drag(Grids.t);
 #endif
+		}
+		
+		
+		if (Grids.t % out_every_forces== 0) {
+#if defined COMPUTE_LIFT_AND_DRAG
+			*GridUtils::logfile << "Writing out BB object lift and drag" << endl;
+			
+			Grids.io_writeForceonObject(Grids.t); 
+#endif
 		}		
 
 		// Probe output has different frequency

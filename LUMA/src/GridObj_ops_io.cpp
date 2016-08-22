@@ -660,4 +660,42 @@ void GridObj::io_lite(double tval, std::string TAG) {
 #endif
 
 }
+
+// ***************************************************************************************************
+// Routine for writing out the lift and drag forces on a BB object 
+
+void GridObj::io_writeForceonObject(double tval) {
+	
+
+	// Write file
+	// TODO : -Get grid where the BB object is
+	//		 - Write out the average forces in a file
+
+	//if (level == object_on_grid_lev) {
+
+	std::ofstream fout;
+
+	// Filename
+	stringstream fileName;
+	fileName << GridUtils::path_str +  "/io_lift_drag" << "Rnk" << MpiManager::my_rank << ".csv";
+
+	// Create file
+	fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+	
+		// Write out the data
+		if (t == out_every_forces) {
+			fout << "time \t Fx \t Fy \t Fz" << endl;
+		}
+
+		fout << t << "\t" << subGrid[0].force_on_object_x[2 * t - 1] << "\t" << subGrid[0].force_on_object_y[2 * t - 1] << "\t";
+		if (dims == 3) {
+			fout << subGrid[0].force_on_object_z[2 * t - 1];
+		}
+		fout << endl;
+
+		fout.close();
+	
+	
+}
+
 // ***************************************************************************************************

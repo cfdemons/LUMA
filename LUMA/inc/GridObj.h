@@ -71,6 +71,11 @@ public :
 	std::vector<double> YPos;
 	std::vector<double> ZPos;
 
+	// Lift and drag forces history on a BB object	
+	IVector<double> force_on_object_x ;
+	IVector<double> force_on_object_y;
+	IVector<double> force_on_object_z;
+
 private :
 	// Inlet velocity profile
 	std::vector<double> ux_in, uy_in, uz_in;
@@ -154,6 +159,8 @@ public :
 	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
 	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
+	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
+		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
@@ -168,7 +175,7 @@ public :
 	void io_tecplot(double tval);				// TecPlot write out
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	void io_lite(double tval);					// Generic writer to individual files
-
+	void io_writeForceonObject(double tval);    // Write out Lift and drag forces on object
 
 };
 

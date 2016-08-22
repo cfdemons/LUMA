@@ -64,6 +64,7 @@
 // Output Options
 #define out_every 500			// How many timesteps before whole grid output
 #define output_precision 3		// Precision of output
+#define out_every_forces 150	// Specific output for forces (based on strouhal number) to take account of oscillations
 
 // Types of output
 //#define TEXTOUT
@@ -109,7 +110,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 50000	// Number of time steps
+#define T 1000	// Number of time steps
 
 
 /*
@@ -136,14 +137,14 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 100		// Number of x lattice sites
-#define M 100		// Number of y lattice sites
+#define N 500		// Number of x lattice sites
+#define M 500		// Number of y lattice sites
 #define K 50		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define a_x 0		// Start of domain-x
-#define b_x 1		// End of domain-x
+#define b_x 1	// End of domain-x
 #define a_y 0		// Start of domain-y
 #define b_y 1		// End of domain-y
 #define a_z 0		// Start of domain-z
@@ -269,6 +270,9 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
+//COmpute lift and drag for BB object
+#define COMPUTE_LIFT_AND_DRAG
+
 // Bounce-back solids
 //#define SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
@@ -290,11 +294,11 @@ const static int zProbeLims[2] = {30, 120};
 #define SOLID_FROM_FILE
 
 #ifdef SOLID_FROM_FILE
-	#define object_on_grid_lev 1		// Provide grid level on which object should be added 
+	#define object_on_grid_lev 3		// Provide grid level on which object should be added 
 	#define object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_object_x 30
-	#define start_object_y 40
+	#define start_object_x 40
+	#define start_object_y 20
 	#define centre_object_z 61
 	#define object_length 10			// The object input is scaled based on this dimension
 	#define scale_direction 0			// Scale in this direction (x = 0, y = 1, z = 2)
@@ -310,10 +314,10 @@ const static int zProbeLims[2] = {30, 120};
 	#define bfl_on_grid_lev 1		// Provide grid level on which BFL body should be added 
 	#define bfl_on_grid_reg 0		// Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define start_bfl_x 50
-	#define start_bfl_y 100
+	#define start_bfl_x 40
+	#define start_bfl_y 20
 	#define centre_bfl_z 20
-	#define bfl_length_x 50		// The BFL object input is scaled based on this dimension
+	#define bfl_length_x 10		// The BFL object input is scaled based on this dimension
 	#define bfl_length_ref 10		// Reference length to be used in the definition of Reynolds number
 #endif
 
@@ -325,7 +329,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 3		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0
@@ -360,7 +364,19 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZstart[NumLev][NumReg]		= { {100}, {200} };
 	static size_t RefZend[NumLev][NumReg]		= { {700}, {1000} };
 
-#elif (NumReg == 1 && NumLev == 4)
+  #elif (NumReg == 1 && NumLev == 3)
+
+   const static size_t RefXstart[NumLev][NumReg] = { { 190},{ 10 },{ 10 } };
+   const static size_t RefXend[NumLev][NumReg] = { { 270 },{ 90 },{ 90 } };
+   const static size_t RefYstart[NumLev][NumReg] = { { 240 },{ 10 },{ 10 } };
+   const static size_t RefYend[NumLev][NumReg] = { { 270 },{ 50 },{ 70 } };
+   // If doing 2D, these can be arbitrary values
+   static size_t RefZstart[NumLev][NumReg] = { { 2 },{ 4 },{ 8 } };
+   static size_t RefZend[NumLev][NumReg] = { { 30 },{ 52 },{ 88 } };
+    
+
+
+    #elif (NumReg == 1 && NumLev == 4)
 	const static size_t RefXstart[NumLev][NumReg]	= { {5},	{3},	{5},	{10} };
 	const static size_t RefXend[NumLev][NumReg]		= { {25},	{35},	{55},	{80} };
 	const static size_t RefYstart[NumLev][NumReg]	= { {0},	{0},	{0},	{0} };

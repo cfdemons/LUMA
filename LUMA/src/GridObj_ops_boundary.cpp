@@ -52,6 +52,9 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 	size_t M_lim = YPos.size();
 	size_t K_lim = ZPos.size();
 
+	force_on_object_x.push_back(0);
+	force_on_object_y.push_back(0);
+	force_on_object_z.push_back(0);
 
 	// Loop over grid, identify BC required & apply BC
 	for (size_t i = 0; i < N_lim; i++) {
@@ -69,6 +72,59 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 					// Apply half-way bounce-back
 					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////7
+
+#ifdef COMPUTE_LIFT_AND_DRAG
+					// Lift and drag calculation (Mei's formula)
+					// TODO : put a condition box where the BB objec is (in case of walls)
+					
+					
+
+					// Consider Serial (not MPI)
+					for (size_t n = 0; n < nVels; n++) {
+						size_t n_opp = GridUtils::getOpposite(n);
+						size_t xdest = i + c[0][n];
+						size_t ydest = j + c[1][n];
+						size_t zdest = k + c[2][n];
+// If MPI activated
+#ifdef BUILD_FOR_MPI
+
+#endif
+						// Only apply if streamed in a fluid site
+						if (LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 1 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 3 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 4 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 7
+							) {
+
+							//printf("Calculating lift and drag");
+
+							//double newforcex = c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels)) ;
+							//double tempx = force_on_object_x * double(t);
+							//tempx += newforcex;
+							//force_on_object_x = tempx / (double)(t + 1);
+							force_on_object_x[t] += c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+
+							//printf("force_on_object_x[t]=%f \n", force_on_object_x[t]);
+
+							//double newforcey = c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+							//double tempy = force_on_object_y * double(t);
+							//tempy += newforcey;
+							//force_on_object_y = tempy / (double)(t + 1);
+							force_on_object_y[t] += c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+							
+							//printf("force_on_object_y[t]=%f \n", force_on_object_y[t]);
+
+						
+							if (dims == 3) {
+								force_on_object_z[t] += c[2][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+							}
+						}
+					}
+
+#endif
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == 6 || LatTyp(i,j,k,M_lim,K_lim) == 16)
 					&& (bc_type_flag == 0 || bc_type_flag == 1) ) {
@@ -115,7 +171,63 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == 5 && (bc_type_flag == 0 || bc_type_flag == 5) ) {
 
 					bc_applyBfl(i,j,k);
-						
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef COMPUTE_LIFT_AND_DRAG
+// Lift and drag calculation (Mei's formula)
+// TODO : put a condition box where the BB objec is (in case of walls)
+
+
+
+// Consider Serial (not MPI)
+					for (size_t n = 0; n < nVels; n++) {
+						size_t n_opp = GridUtils::getOpposite(n);
+						size_t xdest = i + c[0][n];
+						size_t ydest = j + c[1][n];
+						size_t zdest = k + c[2][n];
+						// If MPI activated
+#ifdef BUILD_FOR_MPI
+
+#endif
+						// Only apply if streamed in a fluid site
+						if (LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 1 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 3 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 4 ||
+							LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 7
+							) {
+
+							//printf("Calculating lift and drag");
+
+							//double newforcex = c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels)) ;
+							//double tempx = force_on_object_x * double(t);
+							//tempx += newforcex;
+							//force_on_object_x = tempx / (double)(t + 1);
+							force_on_object_x[t] += c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+
+							//printf("force_on_object_x[t]=%f \n", force_on_object_x[t]);
+
+							//double newforcey = c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+							//double tempy = force_on_object_y * double(t);
+							//tempy += newforcey;
+							//force_on_object_y = tempy / (double)(t + 1);
+							force_on_object_y[t] += c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+
+							//printf("force_on_object_y[t]=%f \n", force_on_object_y[t]);
+
+
+							if (dims == 3) {
+								force_on_object_z[t] += c[2][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+							}
+						}
+					}
+
+#endif
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////					
 
 				}	// End of BC type control flow
 			

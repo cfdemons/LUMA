@@ -59,7 +59,7 @@
 #define PI 3.14159265358979323846
 
 // Using MPI?
-//#define BUILD_FOR_MPI
+#define BUILD_FOR_MPI
 
 // Output Options
 #define out_every 20				// How many timesteps before whole grid output
@@ -110,7 +110,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 1000	// Number of time steps
+#define T 300	// Number of time steps
 
 
 /*
@@ -121,7 +121,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // MPI Data
 #define Xcores 2
-#define Ycores 2
+#define Ycores 4
 #define Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define USE_CUSTOM_MPI_SIZES
@@ -368,8 +368,8 @@ const static int zProbeLims[2] = {30, 120};
 
    const static size_t RefXstart[NumLev][NumReg] = { { 190},{ 10 },{ 10 } };
    const static size_t RefXend[NumLev][NumReg] = { { 270 },{ 90 },{ 90 } };
-   const static size_t RefYstart[NumLev][NumReg] = { { 240 },{ 10 },{ 10 } };
-   const static size_t RefYend[NumLev][NumReg] = { { 270 },{ 50 },{ 70 } };
+   const static size_t RefYstart[NumLev][NumReg] = { { 230 },{ 10 },{ 10 } };
+   const static size_t RefYend[NumLev][NumReg] = { { 260 },{ 50 },{ 70 } };
    // If doing 2D, these can be arbitrary values
    static size_t RefZstart[NumLev][NumReg] = { { 2 },{ 4 },{ 8 } };
    static size_t RefZend[NumLev][NumReg] = { { 30 },{ 52 },{ 88 } };

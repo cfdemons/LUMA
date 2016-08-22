@@ -23,6 +23,7 @@
 #include "../inc/ObjectManager.h"
 #include <numeric>
 
+#include "../inc/MpiManager.h"
 
 // ***************************************************************************************************
 /*
@@ -137,28 +138,35 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 /*******************************************************************************/
 // Lift and drag calculation (Mei's formula)
 void GridObj::bc_computeLiftDrag(int i, int j, int k, int M_lim, int K_lim) {
-	// TODO : put a condition box where the BB object is (in case of walls)
+	
+	// TODO : Need abounding box for object if we have walls in the domain otherwise they will also be counted
 
-	// Consider Serial (not MPI)
-	for (int n = 0; n < nVels; n++) {
-		int n_opp = GridUtils::getOpposite(n);
-		int xdest = i + c[0][n];
-		int ydest = j + c[1][n];
-		int zdest = k + c[2][n];
+	// For MPI builds, ignore if part of object is in halo region
+	if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
 
-		// Only apply if streamed in a fluid site
-		if (LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 1 ||
-			LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 3 ||
-			LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 7
-			) {
+		// Loop over directions from solid site
+		for (int n = 0; n < nVels; n++) {
 
-			force_on_object_x += c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
-			force_on_object_y += c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
-			force_on_object_z += c[2][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+			int n_opp = GridUtils::getOpposite(n); // Get incoming direction
 
+			// Compute destination coordinates
+			int xdest = i + c[0][n];
+			int ydest = j + c[1][n];
+			int zdest = k + c[2][n];
+
+			// Only apply if streamed in a fluid site
+			if (LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 1 ||
+				LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 3 ||
+				LatTyp(xdest, ydest, zdest, M_lim, K_lim) == 7
+				) {
+
+				force_on_object_x += c[0][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+				force_on_object_y += c[1][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+				force_on_object_z += c[2][n_opp] * (f(i, j, k, n, M_lim, K_lim, nVels) + f(xdest, ydest, zdest, n_opp, M_lim, K_lim, nVels));
+
+			}
 		}
 	}
-
 }
 
 

@@ -665,7 +665,6 @@ void GridObj::io_lite(double tval, std::string TAG) {
 // Routine for writing out the lift and drag forces on a BB object 
 
 void GridObj::io_writeForceOnObject(double tval) {
-	
 
 	// Write file
 	// TODO : -Get grid where the BB object is
@@ -707,7 +706,7 @@ void GridObj::io_writeForceOnObject(double tval) {
 
 	// Search any sub-grids
 	if (NumLev > level) {
-		for (int r = 0; r < NumReg; r++) {
+		for (int r = 0; r < static_cast<int>(subGrid.size()); r++) {
 			subGrid[r].io_writeForceOnObject(tval);
 		}
 	}	

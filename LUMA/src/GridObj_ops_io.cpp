@@ -663,8 +663,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 // portable format for easier post-processing
 int GridObj::io_hdf5(double tval) {
 
-	// Construct file name
-	H5std_string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
+	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
 
 	// Get local grid sizes
@@ -672,28 +671,37 @@ int GridObj::io_hdf5(double tval) {
 	size_t M_lim = YPos.size();
 	size_t K_lim = ZPos.size();
 
-	// File ID
-	int fid = level + region_number * L_NumLev;
-
-	/* Not convinced that the Cpp wrapper is sufficient to access all the parallel
-	 * IO function and there is no tutorial on it so will have to implement
-	 * in C for parallel IO. Will leave the Cpp version of serial IO in though */
+	/* Cpp wrapper is not sufficient to access all the parallel IO function 
+	 * and there is no tutorial on it so will have to implement in C for 
+	 * parallel IO. Will leave the Cpp version of serial IO in though */
 #ifdef L_BUILD_FOR_MPI
 
+	// Construct filename
+	std::string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
+
 	// Declarations
-	hid_t file_id, plist_id, group_id;
-	herr_t status;
+	hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
+	hid_t filespace = NULL; hsize_t dimsf[L_dims];
+	hid_t fileset = NULL;
+	hid_t memspace = NULL; hsize_t dimsm[L_dims];
+	herr_t status = 0;
 	bool bOK_to_write = false;
+
+	// Turn auto error printing off
+	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 
 	// Create file parallel access property list
 	MPI_Info info = MPI_INFO_NULL;
 	plist_id = H5Pcreate(H5P_FILE_ACCESS);
 	status = H5Pset_fapl_mpio(plist_id, MpiManager::getInstance()->my_comm, info);
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
 
 	// Create/open parallel file using the property list defined above
 	if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
-	else file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_RDWR, H5P_DEFAULT, plist_id);
-	H5Pclose(plist_id);
+	else file_id = H5Fopen(FILE_NAME.c_str(), H5F_ACC_RDWR, plist_id);
+	if (file_id == NULL) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
+	status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
 
 	// Only contribute to the file if this process has the (sub-)grid
 	GridObj* parentGrid = NULL;	
@@ -709,8 +717,7 @@ int GridObj::io_hdf5(double tval) {
 	
 	// If OK for this process to write then continue
 	if (bOK_to_write)
-	{
-		
+	{		
 		// Create group
 		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
@@ -719,27 +726,61 @@ int GridObj::io_hdf5(double tval) {
 
 		// Set data access mode (collective or independent I/O -- collective is the standard)
 		status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access mode failed: " << status << std::endl;
 
+		// Compute dataspaces
+		hsize_t N_lim_g = L_N, M_lim_g = L_M, K_lim_g = L_K;	// Size of grid (globally, ex. halo)
+		dimsf[0] = N_lim_g; dimsf[1] = M_lim_g;
+#if (L_dims == 3)
+		dimsf[2] = K_lim_g;
+#endif
+		filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
+		dimsm[0] = (N_lim * M_lim * K_lim);	// Size of block (locally, ex. halo)
+		memspace = H5Screate_simple(1, dimsm, NULL);	// Memory space is locally sized
 
+		// Create dataset
+		std::string tmpstring(time_string + "/LatTyp");
+		fileset = H5Dcreate(file_id, tmpstring.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+		// Write data
+		status = H5Dwrite(fileset, H5T_NATIVE_INT, memspace, filespace, plist_id, &LatTyp[0]);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Write data failed: " << status << std::endl;
 
-		// Compute offset for this rank
+		// Close dataset
+		status = H5Dclose(fileset);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
+		// Close memspace
+		status = H5Sclose(memspace);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
 
+		// Close filespace
+		status = H5Sclose(filespace);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close filespace failed: " << status << std::endl;
+
+		// Close property list
+		status = H5Pclose(plist_id);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file access mode list failed: " << status << std::endl;
+
+		// Close group
+		status = H5Gclose(group_id);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close group failed: " << status << std::endl;
 	}
 
-	// Close group
-	H5Gclose(group_id);
-
-	// Close property list
-	H5Pclose(plist_id);
-
 	// Close file
-	H5Fclose(file_id);
+	status = H5Fclose(file_id);
+	if (status != 0) {
+		*GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
+	}
 
+	// Call recursively on child grids
+	if (L_NumLev > level) for (GridObj& g : subGrid) g.io_hdf5(tval);
 
 
 #else
+
+	// Construct filename
+	H5std_string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
 
 	// Try block to detect exceptions raised by any of the calls inside it
 	try	{

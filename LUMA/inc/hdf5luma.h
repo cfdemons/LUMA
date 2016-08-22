@@ -13,18 +13,16 @@
 *
 */
 
-
 #ifdef L_BUILD_FOR_MPI
 	#define H5_HAVE_PARALLEL
+	#include "hdf5.h"	// Load C API
+#else
+	#include "H5Cpp.h"	// Load C++ API
+	#ifndef H5_NO_NAMESPACE
+		using namespace H5;
+	#endif
 #endif
-
-#include "H5Cpp.h"
 
 #define H5_BUILT_AS_DYNAMIC_LIB
 #define HDF5_EXT_ZLIB
 #define HDF5_EXT_SZIP
-
-#ifndef H5_NO_NAMESPACE
-	using namespace H5;
-#endif
-

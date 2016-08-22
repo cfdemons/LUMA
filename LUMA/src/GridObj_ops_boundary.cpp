@@ -25,16 +25,7 @@
 
 
 // ***************************************************************************************************
-/*
-	Boundary condition application routine.
-	Supply an integer to specify which type of condition should be applied:
-	0 == apply all boundary conditions simultaneously
-	1 == apply solid wall and symmetry conditions only
-	2 == apply inlet conditions only
-	3 == apply outlet conditions only
-	4 == apply inlet and outlet simultaneously
-	5 == apply BFL conditions
-*/
+// Method to apply suitable boundary conditions
 void GridObj::LBM_boundary (int bc_type_flag) {
 
 	// Get grid sizes

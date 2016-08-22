@@ -807,22 +807,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 // ***************************************************************************************************
 void GridObj::LBM_initSolidLab() {
 
-	// Typing defined as follows:
-	/*
-	0 == solid (no-slip) site
-	1 == coarse site
-	2 == fine/refined site
-	3 == TL to upper (coarser) level
-	4 == TL to lower (finer) level
-	5 == BFL site
-	6 == symmetry (free-slip) boundary
-	7 == inlet
-	8 == outlet
-	10 == solid (no-slip) refined
-	16 == symmetry (free-slip) refined
-	17 == inlet (site refined)
-	*/
-
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
 	if (L_block_on_grid_lev != level || L_block_on_grid_reg != region_number) return;
@@ -914,22 +898,6 @@ void GridObj::LBM_initSolidLab() {
 // ***************************************************************************************************
 // Initialise wall and object labels method (L0 only)
 void GridObj::LBM_initBoundLab ( ) {
-
-	// Typing defined as follows:
-	/*
-	0 == solid (no-slip) site
-	1 == coarse site
-	2 == fine/refined site
-	3 == TL to upper (coarser) level
-	4 == TL to lower (finer) level
-	5 == BFL site
-	6 == symmetry (free-slip) boundary
-	7 == inlet
-	8 == outlet
-	10 == solid (no-slip) refined
-	16 == symmetry (free-slip) refined
-	17 == inlet (site refined)
-	*/
 
 	// Get grid sizes
 	int N_lim = static_cast<int>(XPos.size());
@@ -1097,22 +1065,6 @@ void GridObj::LBM_initBoundLab ( ) {
 
 // Initialise refined labels method
 void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
-	
-	// Typing defined as follows:
-	/*
-	0 == solid (no-slip) site
-	1 == coarse site
-	2 == fine/refined site
-	3 == TL to upper (coarser) level
-	4 == TL to lower (finer) level
-	5 == BFL site
-	6 == symmetry (free-slip) boundary
-	7 == inlet
-	8 == outlet
-	10 == solid (no-slip) refined
-	16 == symmetry (free-slip) refined
-	17 == inlet (site refined)
-	*/
 
 	// Get parent local grid sizes
 	size_t Np_lim = pGrid.XPos.size();

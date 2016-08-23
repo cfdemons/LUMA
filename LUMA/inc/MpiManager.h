@@ -20,14 +20,12 @@
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
-#define i_left	i = 0; i < GridUtils::downToLimit((int)pow(2, g->level + 1), N_lim); i++
-#define j_down	j = 0; j < GridUtils::downToLimit((int)pow(2, g->level + 1), M_lim); j++
-#define k_front k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++
-#define i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++
-#define j_up	j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
-#define k_back	k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
-
-
+#define range_i_left	i = 0; i < GridUtils::downToLimit((int)pow(2, g->level + 1), N_lim); i++
+#define range_j_down	j = 0; j < GridUtils::downToLimit((int)pow(2, g->level + 1), M_lim); j++
+#define range_k_front k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++
+#define range_i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++
+#define range_j_up	j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++
+#define range_k_back	k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++
 
 
 /* Manager class to handle all things MPI -- designed as a Singleton */

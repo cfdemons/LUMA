@@ -34,7 +34,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	 * To start the process we copy the inner values to the f_buffer_send (intermediate buffer).
 	 * This buffer will also be used to receive the new values using MPI_Sendrecv_replace(). */
 	int idx, i, j , k, v;
-	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())		// Local grid sizes for read/writing arrays
+	// Local grid sizes for read/writing arrays
+	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
 #if (L_dims == 3)
 		, K_lim = static_cast<int>(g->ZInd.size());
 #else
@@ -58,7 +59,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Right
 		
 		// Examine possible inner and outer buffer locations
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
 
@@ -88,7 +89,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 1:
 		// Left
 		
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
 
@@ -118,8 +119,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 2:
 		// Right-Up		
 
-		for (i_right) {
-			for (j_up) {
+		for (range_i_right) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -148,8 +149,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 3:
 		// Left-Down		
 
-		for (i_left) {
-			for (j_down) {
+		for (range_i_left) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -179,7 +180,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Up		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -210,7 +211,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Down		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -239,8 +240,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 6:
 		// Left-Up		
 
-		for (i_left) {
-			for (j_up) {
+		for (range_i_left) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -269,8 +270,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 7:
 		// Right-Down		
 
-		for (i_right) {
-			for (j_down) {
+		for (range_i_right) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for sender
@@ -306,7 +307,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 
 		for (i = 0; i < N_lim; i++) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -333,7 +334,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 
 		for (i = 0; i < N_lim; i++) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -358,9 +359,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 10:
 		// Right-Back		
 
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -385,9 +386,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 11:
 		// Left-Front		
 
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -412,9 +413,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 12:
 		// Right-Up-Back		
 
-		for (i_right) {
-			for (j_up) {
-				for (k_back) {
+		for (range_i_right) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -439,9 +440,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 13:
 		// Left-Down-Front		
 
-		for (i_left) {
-			for (j_down) {
-				for (k_front) {
+		for (range_i_left) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -467,8 +468,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Up-Back		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
-				for (k_back) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -494,8 +495,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Down-Front		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
-				for (k_front) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -520,9 +521,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 16:
 		// Left-Up-Back		
 
-		for (i_left) {
-			for (j_up) {
-				for (k_back) {
+		for (range_i_left) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -547,9 +548,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 17:
 		// Right-Down-Front		
 
-		for (i_right) {
-			for (j_down) {
-				for (k_front) {
+		for (range_i_right) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -574,9 +575,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 18:
 		// Left-Back		
 
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -601,9 +602,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 19:
 		// Right-Front		
 
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -628,9 +629,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 20:
 		// Left-Down-Back		
 
-		for (i_left) {
-			for (j_down) {
-				for (k_back) {
+		for (range_i_left) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -655,9 +656,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 21:
 		// Right-Up-Front		
 
-		for (i_right) {
-			for (j_up) {
-				for (k_front) {
+		for (range_i_right) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -683,8 +684,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Down-Back		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
-				for (k_back) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -710,8 +711,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 		// Up-Front		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
-				for (k_front) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -736,9 +737,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 24:
 		// Right-Down-Back		
 
-		for (i_right) {
-			for (j_down) {
-				for (k_back) {
+		for (range_i_right) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
@@ -763,9 +764,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	case 25:
 		// Left-Up-Front		
 
-		for (i_left) {
-			for (j_up) {
-				for (k_front) {
+		for (range_i_left) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for sender
 					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway

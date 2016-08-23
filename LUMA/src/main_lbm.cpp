@@ -387,25 +387,6 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-	// Set the pointer to the hierarchy in the MpiManager
-	MpiManager::Grids = &Grids;
-
-	// Write out t = 0
-#ifdef L_TEXTOUT
-	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
-	Grids.io_textout("INITIALISATION");	// Do not change this tag!
-#endif
-
-#ifdef L_IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file." << endl;
-		Grids.io_lite(Grids.t);
-#endif
-
-#ifdef L_HDF5_OUTPUT
-		*GridUtils::logfile << "Writing out to HDF5 file." << endl;
-		Grids.io_hdf5(Grids.t);
-#endif
-
 	// Get time of grid and object initialisation
 #ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(mpim->my_comm);
@@ -413,6 +394,11 @@ int main( int argc, char* argv[] )
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
 	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< obj_initialise_time << "ms." << std::endl;
+
+
+	// Set the pointer to the hierarchy in the MpiManager
+	MpiManager::Grids = &Grids;
+
 
 #ifdef L_BUILD_FOR_MPI
 	// Compute buffer sizes
@@ -424,6 +410,24 @@ int main( int argc, char* argv[] )
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif
+
+
+	// Write out t = 0
+#ifdef L_TEXTOUT
+	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
+	Grids.io_textout("INITIALISATION");	// Do not change this tag!
+#endif
+
+#ifdef L_IO_LITE
+	*GridUtils::logfile << "Writing out to IOLite file." << endl;
+	Grids.io_lite(Grids.t);
+#endif
+
+#ifdef L_HDF5_OUTPUT
+	*GridUtils::logfile << "Writing out to HDF5 file." << endl;
+	Grids.io_hdf5(Grids.t);
+#endif
+
 
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 

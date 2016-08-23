@@ -667,9 +667,9 @@ int GridObj::io_hdf5(double tval) {
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
 
 	// Get local grid sizes
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
+	int N_lim = static_cast<int>(XPos.size());
+	int M_lim = static_cast<int>(YPos.size());
+	int K_lim = static_cast<int>(ZPos.size());
 
 	/* Cpp wrapper is not sufficient to access all the parallel IO function 
 	 * and there is no tutorial on it so will have to implement in C for 
@@ -727,24 +727,143 @@ int GridObj::io_hdf5(double tval) {
 		// Set data access mode (collective or independent I/O -- collective is the standard)
 		status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access mode failed: " << status << std::endl;
+		
+		// Retrieve corresponding buffer recv size info struct to determine halo presence
+		MpiManager::buffer_struct bri;
+		MpiManager* mpim = MpiManager::getInstance();
+		for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
+			if (bs.level == level && bs.region == region_number) bri = bs;
+		}
 
-		// Compute dataspaces
-		hsize_t N_lim_g = L_N, M_lim_g = L_M, K_lim_g = L_K;	// Size of grid (globally, ex. halo)
-		dimsf[0] = N_lim_g; dimsf[1] = M_lim_g;
+		// Set halo descriptors
+		int halo_min = 0, halo_max = 0;	// Boolean flags
+		int i_start = 0, i_end = 0, j_start = 0, j_end = 0, k_start = 0, k_end = 0;	// Indices
+
+		if (bri.size[0]) i_end = N_lim - static_cast<int>(pow(2, level)) - 1; else i_end = N_lim - 1;
+		if (bri.size[1]) i_start = static_cast<int>(pow(2, level)); else i_start = 0;
+		
+		if (bri.size[4]) {
+			j_end = M_lim - static_cast<int>(pow(2, level)) - 1;
+			halo_max = 1;
+		}
+		else j_end = M_lim - 1;
+
+		if (bri.size[5]) {
+			j_start = static_cast<int>(pow(2, level));
+			halo_min = 1;
+		}
+		else j_start = 0;
+
 #if (L_dims == 3)
-		dimsf[2] = K_lim_g;
+		if (bri.size[8]) {
+			k_end = K_lim - static_cast<int>(pow(2, level)) - 1;
+			halo_max = 1;
+		}
+		else k_end = K_lim - 1;
+
+		if (bri.size[9]) {
+			k_start = static_cast<int>(pow(2, level));
+			halo_min = 1;
+		}
+		else k_start = 0;
+#else
+		k_start = 0; k_end = 0;
 #endif
+		
+		// Compute dataspaces (file space then memory space)
+		if (level == 0) {
+			// L0 from definitions
+			dimsf[0] = L_N;
+			dimsf[1] = L_M;
+#if (L_dims == 3)
+			dimsf[2] = L_K;
+#endif
+		}
+		else {
+			// >L0 must get global sizes from the refinement region specification
+			dimsf[0] = RefXend[level][region_number] - RefXstart[level][region_number] + 1;
+			dimsf[1] = RefYend[level][region_number] - RefYstart[level][region_number] + 1;
+#if (L_dims == 3)
+			dimsf[2] = RefZend[level][region_number] - RefZstart[level][region_number] + 1;
+#endif
+		}
 		filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
-		dimsm[0] = (N_lim * M_lim * K_lim);	// Size of block (locally, ex. halo)
-		memspace = H5Screate_simple(1, dimsm, NULL);	// Memory space is locally sized
+		// Memory space is always 1D
+		dimsm[0] = (N_lim * M_lim * K_lim);
+		memspace = H5Screate_simple(1, dimsm, NULL);		// Memory space is locally sized
 
 		// Create dataset
 		std::string tmpstring(time_string + "/LatTyp");
 		fileset = H5Dcreate(file_id, tmpstring.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-		// Write data
-		status = H5Dwrite(fileset, H5T_NATIVE_INT, memspace, filespace, plist_id, &LatTyp[0]);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Write data failed: " << status << std::endl;
+		// Select hyperslabs within file space and memory space //
+		hsize_t f_count[L_dims], f_stride[L_dims], f_offset[L_dims], f_block[L_dims];
+		hsize_t m_count[1], m_stride[1], m_offset[1], m_block[1];
+		
+
+		
+#if (L_dims == 3)
+		// Copy data a 2D slice at a time for 3D cases
+		while (i_start <= i_end)
+#endif
+		{
+
+			// Get memory space slab parameters from halo descriptors
+#if (L_dims == 3)
+			m_offset[0] = k_start + j_start * K_lim + i_start * M_lim * K_lim;
+			m_block[0] = k_end - k_start + 1;
+			m_count[0] = j_end - j_start + 1;
+			m_stride[0] = m_block[0] + (halo_min + halo_max);
+#else
+			m_offset[0] = j_start + i_start * M_lim;
+			m_block[0] = j_end - j_start + 1;
+			m_count[0] = i_end - i_start + 1;
+			m_stride[0] = m_block[0] + (halo_min + halo_max);
+#endif
+			// Select memspace slab
+			status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, m_offset, m_stride, m_count, m_block);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Selection of memory space hyperslab failed: " << status << std::endl;
+
+
+			// Get global offsets for start of dataset from the indexing vector
+#if (L_dims == 3)
+			f_offset[0] = XInd[i_start];
+			f_offset[1] = YInd[j_start];
+			f_offset[2] = ZInd[k_start];
+
+			f_block[0] = 1;		// Single slice
+			f_block[1] = j_end - j_start + 1;
+			f_block[2] = k_end - k_start + 1;
+
+			f_count[0] = 1; f_count[1] = 1; f_count[2] = 1;
+			f_stride[0] = 1; f_stride[1] = 1; f_stride[2] = 1;
+#else
+			f_offset[0] = XInd[i_start];
+			f_offset[1] = YInd[j_start];
+
+			f_block[0] = i_end - i_start + 1;
+			f_block[1] = j_end - j_start + 1;
+
+			f_count[0] = 1; f_count[1] = 1;
+			f_stride[0] = 1; f_stride[1] = 1;
+#endif
+
+			// Select filespace slab
+			filespace = H5Dget_space(fileset);
+			status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, f_offset, f_stride, f_count, f_block);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Selection of file space hyperslab failed: " << status << std::endl;
+
+			// Write data
+			status = H5Dwrite(fileset, H5T_NATIVE_INT, memspace, filespace, plist_id, &LatTyp[0]);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Write data failed: " << status << std::endl;
+			H5Sselect_none(memspace);
+			H5Sselect_none(filespace);
+
+
+			i_start++;	// Move onto next slice
+
+		}	// End 2D slice loop
+		
 
 		// Close dataset
 		status = H5Dclose(fileset);

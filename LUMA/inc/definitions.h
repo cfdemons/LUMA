@@ -62,7 +62,7 @@
 #define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 1				// How many timesteps before whole grid output
+#define L_out_every 10				// How many timesteps before whole grid output
 #define L_output_precision 3		// Precision of output
 
 // Types of output
@@ -100,7 +100,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 10	// Number of time steps
+#define L_Timesteps 50	// Number of time steps
 
 
 /*

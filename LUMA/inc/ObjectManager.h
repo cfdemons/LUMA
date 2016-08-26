@@ -21,7 +21,6 @@
 #include "BFLBody.h"
 #include "IVector.h"
 
-
 class ObjectManager
 {
 
@@ -114,8 +113,9 @@ public:
 	void io_write_body_pos(int timestep);				// Write out IBBody positions at specified timestep to text files
 	void io_write_lift_drag(int timestep);				// Write out IBBody lift and drag at specified timestep
 	void io_restart(bool IO_flag, int level);			// Restart read and write for IBBodies given grid level
-	void readInPCData(PCpts* _PCpts);					// Method to read in Point Cloud data for constructing BFL body
-	void readInPointData(PCpts* _PCpts);				// Method to read in Point Cloud data for constructing bounce-back objects
+	void readInBFLCloud(PCpts* _PCpts);					// Method to read in Point Cloud data for constructing BFL body
+	void readInSolidCloud(PCpts* _PCpts);				// Method to read in Point Cloud data for constructing bounce-back objects
+	void readInIBBCloud(PCpts* _PCpts);					// Method to read in Point Cloud data for constructing IB objects
 
 
 };

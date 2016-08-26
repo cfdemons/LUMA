@@ -69,7 +69,7 @@ public:
 	inline GenTyp& operator() (size_t i, size_t j, size_t k, size_t v, size_t j_max, size_t k_max, size_t v_max) {
 
 		// Loop over vel then k then j then i
-		int idx = v + (k*v_max) + (j*v_max*k_max) + (i*v_max*k_max*j_max);
+		size_t idx = v + (k*v_max) + (j*v_max*k_max) + (i*v_max*k_max*j_max);
 
 		return this->operator[] (idx);
 
@@ -79,7 +79,7 @@ public:
 	inline GenTyp& operator() (size_t i, size_t j, size_t k, size_t j_max, size_t k_max) {
 
 		// Loop over k then j then i
-		int idx = k + (j*k_max) + (i*k_max*j_max);
+		size_t idx = k + (j*k_max) + (i*k_max*j_max);
 
 		return this->operator[] (idx);
 
@@ -89,7 +89,7 @@ public:
 	inline GenTyp& operator() (size_t i, size_t j, size_t j_max) {
 
 		// Loop over j then i
-		int idx = j + (i*j_max);
+		size_t idx = j + (i*j_max);
 
 		return this->operator[] (idx);
 

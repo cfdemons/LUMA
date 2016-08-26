@@ -22,6 +22,35 @@
 #include "IBBody.h"
 #include <iostream>
 #include <fstream>
+#include "hdf5luma.h"
+
+// Enumeration for Lattice Typing
+enum eType
+{
+	eSolid,
+	eFluid,
+	eRefined,
+	eTransitionToCoarser,
+	eTransitionToFiner,
+	eBFL,
+	eSymmetry,
+	eInlet,
+	eOutlet,
+	eRefinedSolid,
+	eRefinedSymmetry,
+	eRefinedInlet
+};
+
+// Enumeration for BC application type
+enum eBCType
+{
+	eBCAll,
+	eBCSolidSymmetry,
+	eBCInlet,
+	eBCOutlet,
+	eBCInletOutlet,
+	eBCBFL
+};
 
 // Base class
 class GridObj
@@ -53,14 +82,14 @@ public:
 
 private :
 
-	// 1D subgrid array (size = NumReg)
+	// 1D subgrid array (size = L_NumReg)
 	std::vector<GridObj> subGrid;
 
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
-	size_t CoarseLimsX[2];
-	size_t CoarseLimsY[2];
-	size_t CoarseLimsZ[2];
+	int CoarseLimsX[2];
+	int CoarseLimsY[2];
+	int CoarseLimsZ[2];
 
 	// 1D arrays
 public :
@@ -93,14 +122,14 @@ private :
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
-	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,dims)
-	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*dims)
+	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,L_dims)
+	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
 
 
 	// Public data members
 public :
 
-	IVector<int> LatTyp;			// Flattened 3D array of site labels
+	IVector<eType> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
 	int t;							// Number of completed iterations
@@ -165,11 +194,8 @@ public :
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	void io_probeOutput();						// Output routine for point probes
-	void io_vtkwriter(double tval);				// VTK writer
-	void io_tecplot(double tval);				// TecPlot write out
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
-	void io_lite(double tval);					// Generic writer to individual files
-
+	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
 
 };
 

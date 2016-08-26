@@ -26,7 +26,7 @@ using namespace std;	// Use the standard namespace
 
 // Static variable declarations
 std::string GridUtils::path_str;
-int MpiManager::MPI_coords[dims];
+int MpiManager::MPI_coords[L_dims];
 
 // Entry point
 int main( int argc, char* argv[] )
@@ -51,7 +51,7 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 
 	// Usual initialise
 	MPI_Init( &argc, &argv );
@@ -65,9 +65,9 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
-#if (dims != 3 && NumLev)
-	for (int i = 0; i < NumReg; i++) {
-		for (int l = 0; l < NumLev; l++) {
+#if (L_dims != 3 && L_NumLev)
+	for (int i = 0; i < L_NumReg; i++) {
+		for (int l = 0; l < L_NumLev; l++) {
 			RefZstart[l][i] = 0;
 			RefZend[l][i] = 0;
 		}
@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
 	std::string path_str(timeout_char);
 	GridUtils::path_str = path_str;   // Set static path variable for output directory
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 
 	// Create MpiManager object
 	MpiManager* mpim = MpiManager::getInstance();
@@ -109,7 +109,14 @@ int main( int argc, char* argv[] )
 	mpim->mpi_init();
 
 	// Print out version number
-	if (mpim->my_rank == 0) std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
+	if (mpim->my_rank == 0) {
+		std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
+#ifdef L_BUILD_FOR_MPI
+		std::cout << "(Parallel Build: " << mpim->num_ranks << " Processes)" << std::endl;
+#else
+		std::cout << "(Serial Build)" << std::endl;
+#endif
+	}
 
 	// Decompose the domain
 	mpim->mpi_gridbuild();
@@ -134,18 +141,18 @@ int main( int argc, char* argv[] )
 	}
 
 	// Fix output format to screen
-	cout.precision(output_precision);
+	cout.precision(L_output_precision);
 
 	// Output start time
 	*GridUtils::logfile << "LUMA -- Version " << LUMA_VERSION << std::endl;
 	char* time_str = ctime(&curr_time);	// Format start time as string
     *GridUtils::logfile << "Simulation started at " << time_str;	// Write start time to log
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
-	if (	Xcores < 2 || Ycores < 2
-#if (dims == 3)
-		|| Zcores < 2
+	if (	L_Xcores < 2 || L_Ycores < 2
+#if (L_dims == 3)
+		|| L_Zcores < 2
 #endif
 		) {
 			std::cout << "Error: See Log File." << std::endl;
@@ -156,8 +163,8 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Get time of MPI initialisation
-#ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+	MPI_Barrier(mpim->world_comm);
 	secs = clock() - t_start;
 	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
 	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
@@ -165,8 +172,8 @@ int main( int argc, char* argv[] )
 
 
 	// Start clock again for next bit of initialisation
-#ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+	MPI_Barrier(mpim->world_comm);
 #endif
 	t_start = clock();
 
@@ -179,7 +186,7 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create the grid object (level = 0)
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	// Call MPI constructor
 	GridObj Grids(0, mpim->local_size, mpim->global_edge_ind, mpim->global_edge_pos);
 #else
@@ -188,22 +195,22 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Log file information
-	*GridUtils::logfile << "Grid size = " << N << "x" << M << "x" << K << endl;
-#ifdef BUILD_FOR_MPI
-	*GridUtils::logfile << "MPI size = " << Xcores << "x" << Ycores << "x" << Zcores << endl;
+	*GridUtils::logfile << "Grid size = " << L_N << "x" << L_M << "x" << L_K << endl;
+#ifdef L_BUILD_FOR_MPI
+	*GridUtils::logfile << "MPI size = " << L_Xcores << "x" << L_Ycores << "x" << L_Zcores << endl;
 	*GridUtils::logfile << "Coordinates on rank " << MpiManager::my_rank << " are (";
-		for (size_t d = 0; d < dims; d++) {
+		for (size_t d = 0; d < L_dims; d++) {
 			*GridUtils::logfile << "\t" << MpiManager::MPI_coords[d];
 		}
 		*GridUtils::logfile << "\t)" << std::endl;
 #endif
-	*GridUtils::logfile << "Number of time steps = " << std::to_string(T) << endl;
+	*GridUtils::logfile << "Number of time steps = " << std::to_string(L_Timesteps) << endl;
 	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dt) << endl;
 	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
 	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(u_ref) << std::endl;
+	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_u_ref) << std::endl;
 	// Reynolds Number
-	*GridUtils::logfile << "Reynolds Number = " << std::to_string(Re) << endl;
+	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_Re) << endl;
 
 
 	/*
@@ -212,12 +219,12 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-	if (NumLev != 0) {
+	if (L_NumLev != 0) {
 
 		*GridUtils::logfile << "Initialising sub-grids..." << endl;
 
 		// Loop over number of regions and add subgrids to Grids
-		for (int reg = 0; reg < NumReg; reg++) {
+		for (int reg = 0; reg < L_NumReg; reg++) {
 
 			// Try adding subgrids and let constructor initialise
 			Grids.LBM_addSubGrid(reg);
@@ -236,7 +243,7 @@ int main( int argc, char* argv[] )
 	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
 	*GridUtils::logfile << "Object Manager Created." << endl;
 
-#ifdef IBM_ON
+#ifdef L_IBM_ON
 
 	*GridUtils::logfile << "Initialising IBM Objects..." << endl;
 
@@ -251,62 +258,73 @@ int main( int argc, char* argv[] )
 	//		body_type == 8 is a plate in 3D with rigid IBM
 	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
 
-#if defined INSERT_RECTANGLE_CUBOID
+#if defined L_INSERT_RECTANGLE_CUBOID
 	objMan->ibm_build_body(1);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
 
-#elif defined INSERT_CIRCLE_SPHERE
+#elif defined L_INSERT_CIRCLE_SPHERE
 	objMan->ibm_build_body(2);
 	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
 
-#elif defined INSERT_BOTH
+#elif defined L_INSERT_BOTH
 	objMan->ibm_build_body(3);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
 
-#elif defined INSERT_FILAMENT
+#elif defined L_INSERT_FILAMENT
 	objMan->ibm_build_body(4);
 	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
 
-#elif defined INSERT_FILARRAY
+#elif defined L_INSERT_FILARRAY
 	objMan->ibm_build_body(5);
 	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
 
-#elif defined _2D_RIGID_PLATE_IBM
+#elif defined L_2D_RIGID_PLATE_IBM
 	objMan->ibm_build_body(6);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
 
-#elif defined _2D_PLATE_WITH_FLAP
+#elif defined L_2D_PLATE_WITH_FLAP
 	objMan->ibm_build_body(7);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
 
-#elif defined _3D_RIGID_PLATE_IBM
+#elif defined L_3D_RIGID_PLATE_IBM
 	objMan->ibm_build_body(8);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
 
-#elif defined _3D_PLATE_WITH_FLAP
+#elif defined L_3D_PLATE_WITH_FLAP
 	objMan->ibm_build_body(9);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
 
 #endif
 
-#if !defined RESTARTING
+#ifdef L_IBB_FROM_FILE
+
+	*GridUtils::logfile << "Initialising IB Body from File..." << endl;
+
+	// Read in data from point cloud file
+	PCpts* _PCpts = new PCpts();
+	objMan->readInIBBCloud(_PCpts);
+	delete _PCpts;
+
+#endif
+
+#if !defined L_RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
 	objMan->ibm_initialise(Grids);
-	*GridUtils::logfile << "Number of markers requested = " << num_markers << std::endl;
+	*GridUtils::logfile << "Number of markers requested for objects = " << L_num_markers << std::endl;
 
 #endif
 
-#endif
+#endif // End IBM_ON
 
-#ifdef BFL_ON
+#ifdef L_BFL_ON
 
 
 	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
 
 	// Read in input file to arrays
 	PCpts* _PCpts = new PCpts();
-	objMan->readInPCData(_PCpts);
+	objMan->readInBFLCloud(_PCpts);
 
 	// Call BFL body builder if there are points on this rank
 	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
@@ -317,13 +335,13 @@ int main( int argc, char* argv[] )
 
 #endif
 
-#ifdef SOLID_FROM_FILE
+#ifdef L_SOLID_FROM_FILE
 
 	*GridUtils::logfile << "Initialising Solid Objects from File..." << endl;
 
 	// Read in data from point cloud file
 	PCpts* _PCpts = new PCpts();
-	objMan->readInPointData(_PCpts);
+	objMan->readInSolidCloud(_PCpts);
 	delete _PCpts;
 
 #endif
@@ -335,7 +353,7 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-#ifdef RESTARTING
+#ifdef L_RESTARTING
 
 	////////////////////////
 	// Restart File Input //
@@ -344,8 +362,8 @@ int main( int argc, char* argv[] )
 	for  (int n = 0; n < MpiManager::num_ranks; n++) {
 
 		// Wait for rank accessing the file and only access if this rank's turn
-#ifdef BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+		MPI_Barrier(mpim->world_comm);
 
 		if (MpiManager::my_rank == n)
 #endif
@@ -358,10 +376,10 @@ int main( int argc, char* argv[] )
 
 	}
 
-	// Re-initialise IB bodies based on restart positions
-#ifdef IBM_ON
+	// L_Re-initialise IB bodies based on restart positions
+#ifdef L_IBM_ON
 
-	// Re-initialise the bodies (compute support etc.)
+	// L_Re-initialise the bodies (compute support etc.)
 	Grids.ibm_initialise();
 	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
 
@@ -376,44 +394,9 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-	// Write out t = 0
-#ifdef TEXTOUT
-	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
-	Grids.io_textout("INITIALISATION");	// Do not change this tag!
-#endif
-
-#ifdef VTK_WRITER
-	*GridUtils::logfile << "Writing out to VTK file..." << endl;
-	Grids.io_vtkwriter(0.0);
-#ifdef IBM_ON
-    objMan->io_vtk_IBwriter(0.0);
-#endif
-#endif
-
-#ifdef TECPLOT
-		for (int n = 0; n < MpiManager::num_ranks; n++) {
-			// Wait for rank accessing the file and only access if this rank's turn
-#ifdef BUILD_FOR_MPI
-			MPI_Barrier(mpim->my_comm);
-
-			if (MpiManager::my_rank == n)
-#endif
-			{
-				*GridUtils::logfile << "Writing out to TecPlot file" << endl;
-				Grids.io_tecplot(Grids.t);
-			}
-		}
-
-#endif
-
-#ifdef IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file" << endl;
-		Grids.io_lite(Grids.t);
-#endif
-
 	// Get time of grid and object initialisation
-#ifdef BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+	MPI_Barrier(mpim->world_comm);
 #endif
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
@@ -423,9 +406,21 @@ int main( int argc, char* argv[] )
 	// Set the pointer to the hierarchy in the MpiManager
 	MpiManager::Grids = &Grids;
 
-#ifdef BUILD_FOR_MPI
+
+#ifdef L_BUILD_FOR_MPI
+
+	if (L_NumLev != 0) {
+
+		*GridUtils::logfile << "Creating communicators...";
+
+		// Create communicators for sub-grids
+		mpim->mpi_buildSubGridCommunicators();
+
+		*GridUtils::logfile << "Complete." << std::endl;
+	}
+
 	// Compute buffer sizes
-	MPI_Barrier(mpim->my_comm);
+	MPI_Barrier(mpim->world_comm);
 	t_start = clock();
 	
 	mpim->mpi_buffer_size();	// Call buffer sizing routine
@@ -433,6 +428,24 @@ int main( int argc, char* argv[] )
 	secs = clock() - t_start;
 	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
 #endif
+
+
+	// Write out t = 0
+#ifdef L_TEXTOUT
+	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
+	Grids.io_textout("INITIALISATION");	// Do not change this tag!
+#endif
+
+#ifdef L_IO_LITE
+	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
+	Grids.io_lite(Grids.t);
+#endif
+
+#ifdef L_HDF5_OUTPUT
+	*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+	Grids.io_hdf5(Grids.t);
+#endif
+
 
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 
@@ -445,17 +458,19 @@ int main( int argc, char* argv[] )
 	do {
 
 		// Synchronise MPI processes before next time step starts
-#ifdef BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+		MPI_Barrier(mpim->world_comm);
 #endif
 
-		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
+		if (MpiManager::my_rank == 0) {
+			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
+		}
 
 
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
-#ifdef IBM_ON
+#ifdef L_IBM_ON
 		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
 #else
 		Grids.LBM_multi(false);	// Just called once as no IBM
@@ -468,69 +483,56 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids.t % out_every == 0) {
-#ifdef BUILD_FOR_MPI
-			MPI_Barrier(mpim->my_comm);
+		if (Grids.t % L_out_every == 0) {
+#ifdef L_BUILD_FOR_MPI
+			MPI_Barrier(mpim->world_comm);
 #endif
-#ifdef TEXTOUT
-			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
+#ifdef L_TEXTOUT
+			*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
 
-#ifdef VTK_WRITER
-			*GridUtils::logfile << "Writing out to VTK file" << endl;
-			Grids.io_vtkwriter(Grids.t);
-#ifdef IBM_ON
-            objMan->io_vtk_IBwriter(Grids.t);
-#endif
-#endif
-
-#ifdef TECPLOT
-			for (int n = 0; n < MpiManager::num_ranks; n++) {
-				// Wait for rank accessing the file and only access if this rank's turn
-#ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim->my_comm);
-
-				if (MpiManager::my_rank == n)
-#endif
-				{
-					*GridUtils::logfile << "Writing out to TecPlot file" << endl;
-					Grids.io_tecplot(Grids.t);
-				}
-			}
-#endif
-
-#ifdef IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file" << endl;
+#ifdef L_IO_LITE
+		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 		Grids.io_lite(Grids.t);
 #endif
 
-#if (defined INSERT_FILAMENT || defined INSERT_FILARRAY || defined _2D_RIGID_PLATE_IBM || \
-	defined _2D_PLATE_WITH_FLAP || defined _3D_RIGID_PLATE_IBM || defined _3D_PLATE_WITH_FLAP) \
-	&& defined IBM_ON && defined IBBODY_TRACER
-			*GridUtils::logfile << "Writing out flexible body position" << endl;
+#ifdef L_HDF5_OUTPUT
+		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+		Grids.io_hdf5(Grids.t);
+#endif
+
+#if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
+		objMan->io_vtk_IBwriter(Grids.t);
+#endif
+
+#if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
+	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
+	&& defined L_IBM_ON && defined L_IBBODY_TRACER
+			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_write_body_pos(Grids.t);
 #endif
-#if defined LD_OUT && defined IBM_ON
-			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
+
+#if defined L_LD_OUT && defined L_IBM_ON
+			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
 			objMan->io_write_lift_drag(Grids.t);
 #endif
 		}		
 
 		// Probe output has different frequency
-#ifdef PROBE_OUTPUT
-		if (Grids.t % out_every_probe == 0) {
+#ifdef L_PROBE_OUTPUT
+		if (Grids.t % L_out_every_probe == 0) {
 
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 
 				// Wait for rank accessing the file and only access if this rank's turn
-#ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+				MPI_Barrier(mpim->world_comm);
 				if (MpiManager::my_rank == n) 
 #endif
 				{
 
-					*GridUtils::logfile << "Probe write out" << endl;
+					*GridUtils::logfile << "Probe write out..." << endl;
 					Grids.io_probeOutput();
 
 				}
@@ -544,13 +546,13 @@ int main( int argc, char* argv[] )
 		/////////////////////////
 		// Restart File Output //
 		/////////////////////////
-		if (Grids.t % restart_out_every == 0) {
+		if (Grids.t % L_restart_out_every == 0) {
 
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 
 				// Wait for turn and access one rank at a time
-#ifdef BUILD_FOR_MPI
-				MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+				MPI_Barrier(mpim->world_comm);
 
 				if (MpiManager::my_rank == n)
 #endif
@@ -566,7 +568,7 @@ int main( int argc, char* argv[] )
 		}
 
 	// Loop End
-	} while (Grids.t < T);
+	} while (Grids.t < L_Timesteps);
 
 
 	/*
@@ -575,7 +577,7 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-#ifdef LOG_TIMINGS
+#ifdef L_LOG_TIMINGS
 	// TIMINGS FILE //
 	/** Format is as follows:
 	 * Mpi Init Time --- Obj Init Time --- Time Step Time L0 --- MPI Time L0 --- etc.
@@ -586,8 +588,8 @@ int main( int argc, char* argv[] )
 	// Wait for rank accessing the file and only access if this rank's turn
 	for (int n = 0; n < MpiManager::num_ranks; n++) {
 		
-#ifdef BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+#ifdef L_BUILD_FOR_MPI
+		MPI_Barrier(mpim->world_comm);
 
 		if (MpiManager::my_rank == n)
 #endif
@@ -597,7 +599,7 @@ int main( int argc, char* argv[] )
 			GridObj* g = NULL;
 
 			// Put in initialisation times
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 			timings << mpi_initialise_time;
 #else
 			timings << 0;
@@ -605,8 +607,8 @@ int main( int argc, char* argv[] )
 			timings << "\t" << obj_initialise_time;
 
 			// Loop over expected grids
-			for (int lev = 0; lev <= NumLev; lev++) {
-				for (int reg = 0; reg < NumReg; reg++) {
+			for (int lev = 0; lev <= L_NumLev; lev++) {
+				for (int reg = 0; reg < L_NumReg; reg++) {
 					
 					// Get the grid
 					g = NULL;
@@ -646,7 +648,7 @@ int main( int argc, char* argv[] )
 	// Destroy ObjectManager
 	ObjectManager::destroyInstance();
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	// Close logfile
 	MpiManager::logout->close();
 	// Finalise MPI

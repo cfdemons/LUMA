@@ -23,10 +23,10 @@ using namespace std; // Standard namespace in use
 // Global initialisation as follows
 
 // Lattice velocities
-#if (dims == 3)
+#if (L_dims == 3)
 
 	// D3Q27
-	const int c[3][nVels] =
+	const int c[3][L_nVels] =
 		{
 			{1,	-1,  0,  0,  0,	 0,		0,  0,  0,  0,  1, -1,  1, -1,  1, -1,  1, -1,		1, -1, -1,	1, -1,  1,  1, -1,		0},
 			{0,  0,  1, -1,  0,	 0,		1, -1,  1, -1,  0,	0,  0,  0,  1, -1, -1,  1,		1, -1, -1,	1,	1, -1, -1,  1,		0},
@@ -36,7 +36,7 @@ using namespace std; // Standard namespace in use
 #else
 
 	// D2Q9
-	const int c[3][nVels] =
+	const int c[3][L_nVels] =
 		{
 			{1,	-1,  0,  0,  1, -1,  1, -1,		0},
 			{0,  0,  1, -1,  1, -1, -1,  1,		0},
@@ -47,9 +47,9 @@ using namespace std; // Standard namespace in use
 
 
 // Weights for D2Q9 and D3Q27 models
-#if (dims == 3)
+#if (L_dims == 3)
 
-	const double w[nVels] =
+	const double w[L_nVels] =
 		{2.0/27.0, 2.0/27.0, 2.0/27.0, 2.0/27.0, 2.0/27.0, 2.0/27.0,
 		1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0, 1.0/54.0,
 		1.0/216.0, 1.0/216.0, 1.0/216.0, 1.0/216.0, 1.0/216.0, 1.0/216.0, 1.0/216.0, 1.0/216.0,
@@ -57,7 +57,7 @@ using namespace std; // Standard namespace in use
 
 #else
 
-	const double w[nVels] =
+	const double w[L_nVels] =
 		{1.0/9.0, 1.0/9.0, 1.0/9.0, 1.0/9.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 4.0/9.0};
 
 #endif

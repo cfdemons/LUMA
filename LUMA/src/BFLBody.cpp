@@ -39,10 +39,10 @@ BFLBody::~BFLBody(void)
 // Custom constructor to populate body from array of points
 BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 
-#ifdef BFL_ON
+#ifdef L_BFL_ON
 
 	// Assign pointer to owning grid
-	GridUtils::getGrid(g,bfl_on_grid_lev,bfl_on_grid_reg,this->_Owner);
+	GridUtils::getGrid(g,L_bfl_on_grid_lev,L_bfl_on_grid_reg,this->_Owner);
 
 	// Voxel grid filter //
 
@@ -67,7 +67,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	*GridUtils::logfile << "ObjectManagerBFL: Object represented by " << std::to_string(markers.size()) << 
 		" markers using 1 marker / voxel voxelisation." << std::endl;
 
-#ifdef BFL_DEBUG
+#ifdef L_BFL_DEBUG
 	std::ofstream file;
 	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
 	for (size_t n = 0; n < markers.size(); n++) {
@@ -91,11 +91,11 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	for (Marker& m : markers) {
 
 		// When using MPI need to convert the global indices of the support sites to local indices for array access
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],_Owner,locals);
-		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = 5;
+		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eBFL;
 #else
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = 5;
+		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 #endif
 
 	}
@@ -105,7 +105,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores as max double value
-	Q = std::vector< std::vector<double> > (nVels * 2, std::vector<double> ( 
+	Q = std::vector< std::vector<double> > (L_nVels * 2, std::vector<double> ( 
 		markers.size(), std::numeric_limits<double>::max() ) );
 
 	// Loop over local grid and inspect the streaming operations
@@ -114,10 +114,10 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 			for (int k = 0; k < K_lim; k++) {
 
 				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == 5) {
+				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
-#if (dims == 3)
+#if (L_dims == 3)
 					computeQ(i,j,k,N_lim,M_lim,K_lim,_Owner);
 #else
 					computeQ(i,j,N_lim,M_lim,_Owner);
@@ -133,7 +133,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g) {
 	// Computation of Q complete
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
-#ifdef BFL_DEBUG
+#ifdef L_BFL_DEBUG
 	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {
@@ -192,7 +192,7 @@ void BFLBody::bflMarkerAdder(double x, double y, double z, int& curr_mark, std::
 	} else {
 
 		// Reset counter and increment voxel index
-		curr_mark = counter.size();
+		curr_mark = static_cast<int>(counter.size());
 		counter.push_back(1);        
 
 		// Create new marker as this is a new BFL voxel
@@ -229,7 +229,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 	kb = k;
 
 	// Get marker data associated with this local site
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	// Convert to global indices for marker access
 	std::vector<int> globals; GridUtils::local_to_global(i,j,k,g,globals);
 	m_data = getMarkerData(globals[0],globals[1],globals[2],this);
@@ -249,7 +249,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 				if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim && kb >= 0 && kb < K_lim) {
 
 					// Fetch data if available //
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 					// Convert to global indices for marker access
 					globals.clear(); GridUtils::local_to_global(ii,jj,kk,g,globals);
 					m_data = getMarkerData(globals[0],globals[1],globals[2],this);
@@ -320,7 +320,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 			// Perform 3D line-triangle intersection test to get Q //
 
 			// Loop over even velocities and ignore rest distribution to save computing Q twice
-			for (int vel = 0; vel < nVels - 1; vel+=2) {
+			for (int vel = 0; vel < L_nVels - 1; vel+=2) {
 
 				// Compute destination coordinates
 				dest_i = (i + c[0][vel] + N_lim) % N_lim;
@@ -379,10 +379,10 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 				double s = (uv * wv - vv * wu) / D;
 				double t = (uv * wu - uu * wv) / D;
 
-				if (s < 0.0 || s > 1.0)	continue;				// I is outside T
-				else if (t < 0.0 || (s + t) > 1.0) continue;	// I is outside T
+				if (s < 0.0 || s > 1.0)	continue;				// I is outside L_Timesteps
+				else if (t < 0.0 || (s + t) > 1.0) continue;	// I is outside L_Timesteps
 				else {
-					// Inside T so compute Q
+					// Inside L_Timesteps so compute Q
 					double q = GridUtils::vecnorm( GridUtils::subtract(intersect,src) ) / GridUtils::vecnorm(dir);
 					if (q < Q[vel][storeID]) {
 
@@ -390,7 +390,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 						Q[vel][storeID] = q;
 
 						// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-						Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+						Q[GridUtils::getOpposite(vel) + L_nVels][storeID] = 1 - q;
 					}
 				}
 
@@ -419,7 +419,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 	int jb = j;
 	
 	// Get marker data associated with this local site
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	// Convert to global indices for marker access
 	std::vector<int> globals; GridUtils::local_to_global(i,j,0,g,globals);
 	m_data = getMarkerData(globals[0],globals[1],0,this);
@@ -440,7 +440,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 			
 
 				// Fetch data if available //
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 				// Convert to global indices for marker access
 				globals.clear(); GridUtils::local_to_global(ii,jj,0,g,globals);
 				m_data = getMarkerData(globals[0],globals[1],0,this);
@@ -505,7 +505,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 			// Perform line intersection test //
 
 			// Loop over velocities (ignore rest distribution)
-			for (int vel = 0; vel < nVels - 1; vel++) {
+			for (int vel = 0; vel < L_nVels - 1; vel++) {
 
 				// Compute destination coordinates
 				dest_i = (i + c[0][vel] + N_lim) % N_lim;
@@ -553,7 +553,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 						Q[vel][storeID] = q;
 
 						// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-						Q[GridUtils::getOpposite(vel) + nVels][storeID] = 1 - q;
+						Q[GridUtils::getOpposite(vel) + L_nVels][storeID] = 1 - q;
 					}
         
 				}
@@ -608,7 +608,7 @@ MarkerData* BFLBody::getMarkerData(double x, double y, double z, BFLBody* body) 
 	std::vector<int> vox = getVoxInd(x,y,z);
 
     // Find all marker IDs that match these indices
-	for (size_t i = 0; i < body->markers.size(); ++i) {
+	for (int i = 0; i < static_cast<int>(body->markers.size()); ++i) {
 		if (body->markers[i].supp_i[0] == vox[0] && 
 			body->markers[i].supp_j[0] == vox[1] && 
 			body->markers[i].supp_k[0] == vox[2]) {

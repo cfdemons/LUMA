@@ -79,7 +79,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
     
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == eOutlet && 
 					(bc_type_flag == eBCAll || bc_type_flag == eBCOutlet || bc_type_flag == eBCInletOutlet) ) {
-#ifdef OUTLET_ON
+
 					// !! RIGHT HAND WALL ONLY !!
 #ifdef L_OUTLET_ON
 					// Apply extrapolation

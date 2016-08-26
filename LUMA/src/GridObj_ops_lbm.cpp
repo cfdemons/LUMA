@@ -532,25 +532,8 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 // KBC collision operator
 void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
 	
+	// Declarations
 	double ds[L_nVels], dh[L_nVels], gamma;
-	// Most moments are required in 3D for the KBC-N4 model
-
-	// Stress (second order)
-	double M200 = 0.0, M200eq = 0.0;
-	double M020 = 0.0, M020eq = 0.0;
-	double M002 = 0.0, M002eq = 0.0;
-	// Pis (second order)
-	double M110 = 0.0, M110eq = 0.0;
-	double M101 = 0.0, M101eq = 0.0;
-	double M011 = 0.0, M011eq = 0.0;
-	// Qs (third order)
-	double M111 = 0.0, M111eq = 0.0;
-	double M102 = 0.0, M102eq = 0.0;
-	double M210 = 0.0, M210eq = 0.0;
-	double M021 = 0.0, M021eq = 0.0;
-	double M201 = 0.0, M201eq = 0.0;
-	double M120 = 0.0, M120eq = 0.0;
-	double M012 = 0.0, M012eq = 0.0;
 
 	// Compute required moments and equilibrium moments
 #if (L_dims == 3)
@@ -757,13 +740,13 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	else gamma = (2/omega) - ( 2 - (2/omega) ) * (top_prod / bot_prod);
 
 	// Finally perform collision
-	for (int v = 0; v < nVels; v++) {
+	for (int v = 0; v < L_nVels; v++) {
 
 		// Perform collision
-		f_new(i,j,k,v,M_lim,K_lim,nVels) = 
-							f(i,j,k,v,M_lim,K_lim,nVels) - 
-							(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-							force_i(i,j,k,v,M_lim,K_lim,nVels);
+		f_new(i, j, k, v, M_lim, K_lim, L_nVels) =
+			f(i, j, k, v, M_lim, K_lim, L_nVels) -
+			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
+			force_i(i, j, k, v, M_lim, K_lim, L_nVels);
 
 	}
 
@@ -777,9 +760,9 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 
 		// Perform collision
 		f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
-							f(i,j,k,v,M_lim,K_lim,L_nVels) - 
-							(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels);
+			f(i,j,k,v,M_lim,K_lim,L_nVels) - 
+			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
+			force_i(i,j,k,v,M_lim,K_lim,L_nVels);
 
 	}
 

@@ -22,6 +22,7 @@
 #include "IBBody.h"
 #include <iostream>
 #include <fstream>
+#include "hdf5luma.h"
 
 // Enumeration for Lattice Typing
 enum eType
@@ -122,7 +123,7 @@ private :
 	// Time averaged statistics
 	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
 	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,L_dims)
-	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*L_dims)
+	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
 
 
 	// Public data members

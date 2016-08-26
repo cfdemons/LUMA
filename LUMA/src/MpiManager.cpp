@@ -56,7 +56,7 @@ MpiManager* MpiManager::getInstance() {
 
 }
 
-// Instance destuctor
+// Instance destroyer
 void MpiManager::destroyInstance() {
 
 	if (me)	delete me;			// Delete pointer from static context not destructor
@@ -87,14 +87,14 @@ void MpiManager::mpi_init() {
 	MPI_dims[2] = L_Zcores; MPI_periodic[2] = true;
 #endif
 
-	MPI_Cart_create(MPI_COMM_WORLD, L_dims, MPI_dims, MPI_periodic, MPI_reorder, &my_comm);
+	MPI_Cart_create(MPI_COMM_WORLD, L_dims, MPI_dims, MPI_periodic, MPI_reorder, &world_comm);
 
 	// Get Cartesian topology info
-	MPI_Comm_rank( my_comm, &my_rank );
-	MPI_Comm_size( my_comm, &num_ranks );
+	MPI_Comm_rank( world_comm, &my_rank );
+	MPI_Comm_size( world_comm, &num_ranks );
 
 	// Store coordinates in the new topology
-	MPI_Cart_coords(my_comm, my_rank, L_dims, MPI_coords);
+	MPI_Cart_coords(world_comm, my_rank, L_dims, MPI_coords);
 
 	// Output directory creation (only master rank)
 	if (my_rank == 0) int result = GridUtils::createOutputDirectory(GridUtils::path_str);
@@ -104,7 +104,7 @@ void MpiManager::mpi_init() {
 	int path_buffer_size = static_cast<int>(GridUtils::path_str.size());
 
 	// Broadcast directory name (acquire directory name if not rank 0)
-	MPI_Bcast(path_buffer,path_buffer_size,MPI_CHAR,0,my_comm);
+	MPI_Bcast(path_buffer,path_buffer_size,MPI_CHAR,0,world_comm);
 	if (MpiManager::my_rank != 0) {
 		std::string char_to_str(path_buffer);
 		GridUtils::path_str = char_to_str;
@@ -131,7 +131,7 @@ void MpiManager::mpi_init() {
 	global_dims[2] = 1;
 #endif
 
-	MPI_Barrier(my_comm);
+	MPI_Barrier(world_comm);
 
 #ifdef L_MPI_VERBOSE
 	// State my rank
@@ -144,7 +144,7 @@ void MpiManager::mpi_init() {
 	// Loop over grid direction
 	for (int dir = 0; dir < L_MPI_dir; dir++) {
 
-		MPI_Barrier(my_comm);
+		MPI_Barrier(world_comm);
 
 		// Get coordinates of neighbour (taking into account periodic structure)
 		int coord_tmp[L_dims];
@@ -155,10 +155,10 @@ void MpiManager::mpi_init() {
 
 		// Get rank of neighbour and build vector of neighbour ranks
 		int tmp;
-		MPI_Cart_rank(my_comm, coord_tmp, &tmp);
+		MPI_Cart_rank(world_comm, coord_tmp, &tmp);
 		neighbour_rank[dir] = tmp;
 
-		MPI_Barrier(my_comm);
+		MPI_Barrier(world_comm);
 
 #ifdef L_MPI_VERBOSE
 		// Print out current neighbour coordinates and rank
@@ -268,7 +268,7 @@ void MpiManager::mpi_gridbuild( ) {
 #else
 		int adj_coords[L_dims] = {i, MPI_coords[1]};
 #endif
-		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
 		global_edge_ind[1][my_rank] += xRankSize[adj_rank];
 	}
@@ -283,7 +283,7 @@ void MpiManager::mpi_gridbuild( ) {
 #else
 		int adj_coords[L_dims] = {MPI_coords[0], i};
 #endif
-		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
 		global_edge_ind[3][my_rank] += yRankSize[adj_rank];
 	}
@@ -295,7 +295,7 @@ void MpiManager::mpi_gridbuild( ) {
 	for (int i = 0; i < MPI_coords[2] + 1; i++) {
 		// Find i-th rank
 		int adj_coords[L_dims] = {MPI_coords[0], MPI_coords[1], i};
-		MPI_Cart_rank(my_comm, adj_coords, &adj_rank);
+		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
 		global_edge_ind[5][my_rank] += zRankSize[adj_rank];
 	}
@@ -338,7 +338,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 
 
-	MPI_Barrier(my_comm);
+	MPI_Barrier(world_comm);
 
 #ifdef L_MPI_VERBOSE
 	// Write out the Grid size vector
@@ -546,7 +546,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 #endif
 			// Post send message to message queue and log request handle in array
 			MPI_Isend( &f_buffer_send[dir].front(), static_cast<int>(f_buffer_send[dir].size()), MPI_DOUBLE, neighbour_rank[dir], 
-				TAG, my_comm, &send_requests[send_count-1] );
+				TAG, world_comm, &send_requests[send_count-1] );
 
 #ifdef L_MPI_VERBOSE
 			*MpiManager::logout << "Direction " << dir << " --> Send Posted." << std::endl;
@@ -579,7 +579,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 			// Use a blocking receive call if required
 			MPI_Recv( &f_buffer_recv[dir].front(), static_cast<int>(f_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
-				TAG, my_comm, &recv_stat );
+				TAG, world_comm, &recv_stat );
 		
 
 #ifdef L_MPI_VERBOSE
@@ -729,3 +729,41 @@ int MpiManager::mpi_getOpposite(int direction) {
 		return direction + (int)pow(-1,direction);
 
 }
+// *************************************************************************************************** //
+int MpiManager::mpi_buildSubGridCommunicators() {
+
+	int status;
+	int colour;		// Colour indicates which new communicator this process belongs to
+	int key = MpiManager::my_rank;	// Global rank as key (dictates numbering in new communicator)
+	
+	// Loop over the possible sub-grid combinations
+	for (int reg = 0; reg < L_NumReg; reg++) {
+		for (int lev = 1; lev <= L_NumLev; lev++) {
+
+			// Try gain access to the sub-grid on this rank
+			GridObj *targetGrid = NULL;
+			GridUtils::getGrid(Grids, lev, reg, targetGrid);
+
+			// Change colour if sub-grid found
+			if (targetGrid != NULL) {
+				colour = 1;
+			}
+			else {
+				colour = MPI_UNDEFINED;
+			}
+			
+			// Define new communicator which contains sub-grids of this level and region
+			// by splitting the global communicator
+			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NumLev]);
+
+#ifdef L_MPI_VERBOSE
+			*logout << "Region " << reg << ", Level " << lev << 
+				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << std::endl;
+#endif
+
+		}
+	}
+
+	return status;
+}
+// *************************************************************************************************** //

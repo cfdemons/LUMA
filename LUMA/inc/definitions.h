@@ -62,7 +62,7 @@
 #define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 10				// How many timesteps before whole grid output
+#define L_out_every 100				// How many timesteps before whole grid output
 #define L_output_precision 3		// Precision of output
 
 // Types of output
@@ -100,7 +100,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 50	// Number of time steps
+#define L_Timesteps 50000	// Number of time steps
 
 
 /*
@@ -127,14 +127,14 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define L_dims 3	// Number of dimensions to the problem
-#define L_N 64		// Number of x lattice sites
+#define L_N 128		// Number of x lattice sites
 #define L_M 64		// Number of y lattice sites
 #define L_K 64		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0		// Start of domain-x
-#define L_b_x 1		// End of domain-x
+#define L_b_x 2		// End of domain-x
 #define L_a_y 0		// Start of domain-y
 #define L_b_y 1		// End of domain-y
 #define L_a_z 0		// Start of domain-z
@@ -300,12 +300,12 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 8
-	#define L_start_object_y 8
-	#define L_centre_object_z 40
-	#define L_object_length 32				// The object input is scaled based on this dimension
+	#define L_start_object_x 16
+	#define L_start_object_y 16
+	#define L_centre_object_z 80
+	#define L_object_length 64				// The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection		// Scale in this direction (Specify as enumeration)
-	#define L_object_length_ref 32			// Reference length to be used in the definition of Reynolds number
+	#define L_object_length_ref 64			// Reference length to be used in the definition of Reynolds number
 #endif
 
 
@@ -332,7 +332,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 0		// Levels of refinement
+#define L_NumLev 2		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -351,21 +351,21 @@ const static int zProbeLims[2] = {30, 120};
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
 	const static int RefXstart[L_NumLev][L_NumReg]	= { 8 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 24 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 8 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 24 };
+	const static int RefXend[L_NumLev][L_NumReg]	= { 30 };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { 11 };
+	const static int RefYend[L_NumLev][L_NumReg]	= { 21 };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { 8 };
-	static int RefZend[L_NumLev][L_NumReg]			= { 24 };
+	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
+	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {8}, {4} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {30}, {40} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {11}, {4} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {21}, {16} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {16}, {8} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {60}, {80} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {22}, {8} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {42}, {32} };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {4}, {4} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {28}, {44} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {8}, {8} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {56}, {88} };
 
 #elif (L_NumReg == 1 && L_NumLev == 3)
 	const static int RefXstart[L_NumLev][L_NumReg]	= { {8},	{4},	{8} };
@@ -398,7 +398,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Set dependent options
 #if L_dims == 3
-	#define L_nVels 27	// Use D3Q27
+	#define L_nVels 27		// Use D3Q27
 
 	#define L_MPI_dir 26	// 3D MPI configuration
 

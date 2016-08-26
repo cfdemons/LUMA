@@ -659,9 +659,12 @@ void GridObj::io_lite(double tval, std::string TAG) {
 }
 
 // ***************************************************************************//
-// HDF5 writer which writes everything out as scalar arrays but is a fast, 
-// portable format for easier post-processing
+// HDF5 writer which writes quantities on grid out as scalar arrays
 int GridObj::io_hdf5(double tval) {
+
+#ifdef L_MPI_VERBOSE
+	*MpiManager::logout << "Rank " << MpiManager::my_rank << ": Writing out Level " << level << ", Region " << region_number << std::endl;
+#endif
 
 	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
@@ -671,10 +674,19 @@ int GridObj::io_hdf5(double tval) {
 	int M_lim = static_cast<int>(YPos.size());
 	int K_lim = static_cast<int>(ZPos.size());
 
+
+	///////////////////
+	// PARALLEL CASE //
+	///////////////////
+
 	/* Cpp wrapper is not sufficient to access all the parallel IO function 
 	 * and there is no tutorial on it so will have to implement in C for 
 	 * parallel IO. Will leave the Cpp version of serial IO in though */
 #ifdef L_BUILD_FOR_MPI
+
+	/***********************/
+	/****** FILE SETUP *****/
+	/***********************/
 
 	// Construct filename
 	std::string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
@@ -682,10 +694,11 @@ int GridObj::io_hdf5(double tval) {
 	// Declarations
 	hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
 	hid_t filespace = NULL; hsize_t dimsf[L_dims];
+	hid_t memspace = NULL; hsize_t dimsm[1];
 	hid_t fileset = NULL;
-	hid_t memspace = NULL; hsize_t dimsm[L_dims];
 	herr_t status = 0;
 	bool bOK_to_write = false;
+	std::string variable_name;
 
 	// Turn auto error printing off
 	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
@@ -693,7 +706,18 @@ int GridObj::io_hdf5(double tval) {
 	// Create file parallel access property list
 	MPI_Info info = MPI_INFO_NULL;
 	plist_id = H5Pcreate(H5P_FILE_ACCESS);
-	status = H5Pset_fapl_mpio(plist_id, MpiManager::getInstance()->my_comm, info);
+
+	// Set communicator to be used
+	if (level == 0)	{
+		// Global communicator
+		status = H5Pset_fapl_mpio(
+			plist_id, MpiManager::getInstance()->world_comm, info);
+	}
+	else {
+		// Appropriate sub-grid communicator
+		status = H5Pset_fapl_mpio(
+			plist_id, MpiManager::getInstance()->subGrid_comm[(level - 1) + region_number * L_NumLev], info);
+	}
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
 
 	// Create/open parallel file using the property list defined above
@@ -703,199 +727,281 @@ int GridObj::io_hdf5(double tval) {
 	status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
 
-	// Only contribute to the file if this process has the (sub-)grid
-	GridObj* parentGrid = NULL;	
-	GridUtils::getGrid(MpiManager::Grids, level - 1, region_number, parentGrid);
-	if (level == 0)
-	{
-		bOK_to_write = true;
+	/***********************/
+	/****** DATA SETUP *****/
+	/***********************/
+
+	// Create group
+	group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		
+	// Retrieve corresponding buffer recv size info struct
+	MpiManager::buffer_struct bri;
+	MpiManager* mpim = MpiManager::getInstance();
+	for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
+		if (bs.level == level && bs.region == region_number) {
+			bri = bs;
+			break;
+		}
 	}
-	else if (GridUtils::hasThisSubGrid(*parentGrid, region_number))
-	{
-		bOK_to_write = true;
-	}
+
+	// Set halo descriptors
+	phdf5_struct p_data;
+	p_data.halo_min = 0, p_data.halo_max = 0;	// Boolean flags
+	p_data.i_start = 0, p_data.i_end = 0,		// Indices
+	p_data.j_start = 0, p_data.j_end = 0,
+	p_data.k_start = 0, p_data.k_end = 0;
+
+	// Check x-direction for halo
+	if (bri.size[1]) p_data.i_end = N_lim - static_cast<int>(pow(2, level)) - 1; else p_data.i_end = N_lim - 1;
+	if (bri.size[0]) p_data.i_start = static_cast<int>(pow(2, level)); else p_data.i_start = 0;
 	
-	// If OK for this process to write then continue
-	if (bOK_to_write)
-	{		
-		// Create group
-		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-		// Create property template for parallel dataset
-		plist_id = H5Pcreate(H5P_DATASET_XFER);
-
-		// Set data access mode (collective or independent I/O -- collective is the standard)
-		status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access mode failed: " << status << std::endl;
-		
-		// Retrieve corresponding buffer recv size info struct to determine halo presence
-		MpiManager::buffer_struct bri;
-		MpiManager* mpim = MpiManager::getInstance();
-		for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
-			if (bs.level == level && bs.region == region_number) bri = bs;
-		}
-
-		// Set halo descriptors
-		int halo_min = 0, halo_max = 0;	// Boolean flags
-		int i_start = 0, i_end = 0, j_start = 0, j_end = 0, k_start = 0, k_end = 0;	// Indices
-
-		if (bri.size[0]) i_end = N_lim - static_cast<int>(pow(2, level)) - 1; else i_end = N_lim - 1;
-		if (bri.size[1]) i_start = static_cast<int>(pow(2, level)); else i_start = 0;
-		
-		if (bri.size[4]) {
-			j_end = M_lim - static_cast<int>(pow(2, level)) - 1;
-			halo_max = 1;
-		}
-		else j_end = M_lim - 1;
-
-		if (bri.size[5]) {
-			j_start = static_cast<int>(pow(2, level));
-			halo_min = 1;
-		}
-		else j_start = 0;
-
-#if (L_dims == 3)
-		if (bri.size[8]) {
-			k_end = K_lim - static_cast<int>(pow(2, level)) - 1;
-			halo_max = 1;
-		}
-		else k_end = K_lim - 1;
-
-		if (bri.size[9]) {
-			k_start = static_cast<int>(pow(2, level));
-			halo_min = 1;
-		}
-		else k_start = 0;
-#else
-		k_start = 0; k_end = 0;
-#endif
-		
-		// Compute dataspaces (file space then memory space)
-		if (level == 0) {
-			// L0 from definitions
-			dimsf[0] = L_N;
-			dimsf[1] = L_M;
-#if (L_dims == 3)
-			dimsf[2] = L_K;
-#endif
-		}
-		else {
-			// >L0 must get global sizes from the refinement region specification
-			dimsf[0] = RefXend[level][region_number] - RefXstart[level][region_number] + 1;
-			dimsf[1] = RefYend[level][region_number] - RefYstart[level][region_number] + 1;
-#if (L_dims == 3)
-			dimsf[2] = RefZend[level][region_number] - RefZstart[level][region_number] + 1;
-#endif
-		}
-		filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
-		// Memory space is always 1D
-		dimsm[0] = (N_lim * M_lim * K_lim);
-		memspace = H5Screate_simple(1, dimsm, NULL);		// Memory space is locally sized
-
-		// Create dataset
-		std::string tmpstring(time_string + "/LatTyp");
-		fileset = H5Dcreate(file_id, tmpstring.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-		// Select hyperslabs within file space and memory space //
-		hsize_t f_count[L_dims], f_stride[L_dims], f_offset[L_dims], f_block[L_dims];
-		hsize_t m_count[1], m_stride[1], m_offset[1], m_block[1];
-		
-
-		
-#if (L_dims == 3)
-		// Copy data a 2D slice at a time for 3D cases
-		while (i_start <= i_end)
-#endif
-		{
-
-			// Get memory space slab parameters from halo descriptors
-#if (L_dims == 3)
-			m_offset[0] = k_start + j_start * K_lim + i_start * M_lim * K_lim;
-			m_block[0] = k_end - k_start + 1;
-			m_count[0] = j_end - j_start + 1;
-			m_stride[0] = m_block[0] + (halo_min + halo_max);
-#else
-			m_offset[0] = j_start + i_start * M_lim;
-			m_block[0] = j_end - j_start + 1;
-			m_count[0] = i_end - i_start + 1;
-			m_stride[0] = m_block[0] + (halo_min + halo_max);
-#endif
-			// Select memspace slab
-			status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, m_offset, m_stride, m_count, m_block);
-			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Selection of memory space hyperslab failed: " << status << std::endl;
-
-
-			// Get global offsets for start of dataset from the indexing vector
-#if (L_dims == 3)
-			f_offset[0] = XInd[i_start];
-			f_offset[1] = YInd[j_start];
-			f_offset[2] = ZInd[k_start];
-
-			f_block[0] = 1;		// Single slice
-			f_block[1] = j_end - j_start + 1;
-			f_block[2] = k_end - k_start + 1;
-
-			f_count[0] = 1; f_count[1] = 1; f_count[2] = 1;
-			f_stride[0] = 1; f_stride[1] = 1; f_stride[2] = 1;
-#else
-			f_offset[0] = XInd[i_start];
-			f_offset[1] = YInd[j_start];
-
-			f_block[0] = i_end - i_start + 1;
-			f_block[1] = j_end - j_start + 1;
-
-			f_count[0] = 1; f_count[1] = 1;
-			f_stride[0] = 1; f_stride[1] = 1;
-#endif
-
-			// Select filespace slab
-			filespace = H5Dget_space(fileset);
-			status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, f_offset, f_stride, f_count, f_block);
-			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Selection of file space hyperslab failed: " << status << std::endl;
-
-			// Write data
-			status = H5Dwrite(fileset, H5T_NATIVE_INT, memspace, filespace, plist_id, &LatTyp[0]);
-			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Write data failed: " << status << std::endl;
-			H5Sselect_none(memspace);
-			H5Sselect_none(filespace);
-
-
-			i_start++;	// Move onto next slice
-
-		}	// End 2D slice loop
-		
-
-		// Close dataset
-		status = H5Dclose(fileset);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-		// Close memspace
-		status = H5Sclose(memspace);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
-
-		// Close filespace
-		status = H5Sclose(filespace);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close filespace failed: " << status << std::endl;
-
-		// Close property list
-		status = H5Pclose(plist_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file access mode list failed: " << status << std::endl;
-
-		// Close group
-		status = H5Gclose(group_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close group failed: " << status << std::endl;
+	// Check y-direction for halo
+	if (bri.size[5]) {
+		p_data.j_end = M_lim - static_cast<int>(pow(2, level)) - 1;
+		p_data.halo_max = 1;
 	}
+	else p_data.j_end = M_lim - 1;
+
+	if (bri.size[4]) {
+		p_data.j_start = static_cast<int>(pow(2, level));
+		p_data.halo_min = 1;
+	}
+	else p_data.j_start = 0;
+
+#if (L_dims == 3)
+	// Check z-direction for halo
+	if (bri.size[9]) {
+		p_data.k_end = K_lim - static_cast<int>(pow(2, level)) - 1;
+		p_data.halo_max = 1;
+	}
+	else {
+		p_data.k_end = K_lim - 1;
+		p_data.halo_max = 0;
+	}
+
+	if (bri.size[8]) {
+		p_data.k_start = static_cast<int>(pow(2, level));
+		p_data.halo_min = 1;
+	}
+	else {
+		p_data.k_start = 0;
+		p_data.halo_min = 0;
+	}
+#else
+	p_data.k_start = 0; p_data.k_end = 0;
+#endif
+		
+	// Compute dataspaces (file space then memory space)
+	if (level == 0) {
+		// L0 from definitions
+		dimsf[0] = L_N;
+		dimsf[1] = L_M;
+#if (L_dims == 3)
+		dimsf[2] = L_K;
+#endif
+	}
+	else {
+		// >L0 must get global sizes from the refinement region specification
+		dimsf[0] = (RefXend[level - 1][region_number] - RefXstart[level - 1][region_number] + 1) * 2;
+		dimsf[1] = (RefYend[level - 1][region_number] - RefYstart[level - 1][region_number] + 1) * 2;
+#if (L_dims == 3)
+		dimsf[2] = (RefZend[level - 1][region_number] - RefZstart[level - 1][region_number] + 1) * 2;
+#endif
+	}
+	filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
+
+	// Memory space is always 1D scalar sized ex. halo
+	dimsm[0] = 
+		(p_data.i_end - p_data.i_start + 1) *
+		(p_data.j_end - p_data.j_start + 1) *
+		(p_data.k_end - p_data.k_start + 1);
+	memspace = H5Screate_simple(1, dimsm, NULL);
+
+
+	/***********************/
+	/******* SCALARS *******/
+	/***********************/
+
+	// WRITE LATTYP
+	variable_name = time_string + "/LatTyp";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eScalar, p_data, N_lim, M_lim, K_lim, this, &LatTyp[0], H5T_NATIVE_INT);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE RHO
+	variable_name = time_string + "/Rho";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eScalar, p_data, N_lim, M_lim, K_lim, this, &rho[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE RHO_TIMEAV
+	variable_name = time_string + "/Rho_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eScalar, p_data, N_lim, M_lim, K_lim, this, &rho_timeav[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	
+
+	/***********************/
+	/******* VECTORS *******/
+	/***********************/
+
+	// WRITE UX
+	variable_name = time_string + "/Ux";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &u[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UY
+	variable_name = time_string + "/Uy";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &u[1], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UZ
+#if (L_dims == 3)
+	variable_name = time_string + "/Uz";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &u[2], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+	// WRITE UX_TIMEAV
+	variable_name = time_string + "/Ux_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &ui_timeav[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UY_TIMEAV
+	variable_name = time_string + "/Uy_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &ui_timeav[1], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UZ_TIMEAV
+#if (L_dims == 3)
+	variable_name = time_string + "/Uz_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eVector, p_data, N_lim, M_lim, K_lim, this, &ui_timeav[2], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+
+	/***********************/
+	/*** PRODUCT VECTORS ***/
+	/***********************/
+
+	// WRITE UXUX_TIMEAV
+	variable_name = time_string + "/UxUx_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UXUY_TIMEAV
+	variable_name = time_string + "/UxUy_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[1], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UYUY_TIMEAV
+	variable_name = time_string + "/UyUy_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);	
+#if (L_dims == 3)
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[3], H5T_NATIVE_DOUBLE);
+#else
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE);
+#endif
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+#if (L_dims == 3)
+	// WRITE UXUZ_TIMEAV
+	variable_name = time_string + "/UxUz_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UYUZ_TIMEAV
+	variable_name = time_string + "/UyUz_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[4], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE UZUZ_TIMEAV
+	variable_name = time_string + "/UzUz_TimeAv";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, eProductVector, p_data, N_lim, M_lim, K_lim, this, &uiuj_timeav[5], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+
+	/***********************/
+	/****** POSITIONS ******/
+	/***********************/
+
+	// WRITE POSITION X
+	variable_name = time_string + "/XPos";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, ePosX, p_data, N_lim, M_lim, K_lim, this, &XPos[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+	// WRITE POSITION Y
+	variable_name = time_string + "/YPos";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, ePosY, p_data, N_lim, M_lim, K_lim, this, &YPos[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+
+	// WRITE POSITION Z
+#if (L_dims == 3)
+	variable_name = time_string + "/ZPos";
+	fileset = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	phdf5_writeDataSet(memspace, filespace, fileset, ePosZ, p_data, N_lim, M_lim, K_lim, this, &ZPos[0], H5T_NATIVE_DOUBLE);
+	status = H5Dclose(fileset); // Close dataset
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+
+	// Close memspace
+	status = H5Sclose(memspace);
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
+		
+	// Close filespace
+	status = H5Sclose(filespace);
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close filespace failed: " << status << std::endl;
+
+	// Close group
+	status = H5Gclose(group_id);
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close group failed: " << status << std::endl;
 
 	// Close file
 	status = H5Fclose(file_id);
-	if (status != 0) {
-		*GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
-	}
+	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
 
-	// Call recursively on child grids
-	if (L_NumLev > level) for (GridObj& g : subGrid) g.io_hdf5(tval);
+	// Call recursively on any present sub-grids
+	if (level < L_NumLev) for (GridObj& g : subGrid) g.io_hdf5(tval);
 
 
+
+	/////////////////
+	// SERIAL CASE //
+	/////////////////
 #else
 
 	// Construct filename
@@ -1230,7 +1336,9 @@ int GridObj::io_hdf5(double tval) {
 
 
 #endif // L_BUILD_FOR_MPI
+
 	return 0;
 
 }
 // ***************************************************************************//
+

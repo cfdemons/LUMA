@@ -132,6 +132,18 @@ public:
 			return n * GridUtils::factorial(n - 1);
 	};
 
+	// Function: stridedCopy
+	template <typename NumType>
+	static void stridedCopy(NumType *dest, NumType *src, size_t block, 
+		size_t offset, size_t stride, size_t count,
+		size_t buf_offset = 0) {
+
+		for (size_t i = 0; i < count; i++) {
+			memcpy(dest + buf_offset, src + offset + (stride * i), block * sizeof(NumType));
+			buf_offset += block;
+		}
+	};
+
 
 	// ************************************************************************
 	// Map global to local indices where locals is a vector container

@@ -109,7 +109,14 @@ int main( int argc, char* argv[] )
 	mpim->mpi_init();
 
 	// Print out version number
-	if (mpim->my_rank == 0) std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
+	if (mpim->my_rank == 0) {
+		std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
+#ifdef L_BUILD_FOR_MPI
+		std::cout << "(Parallel Build: " << mpim->num_ranks << " Processes)" << std::endl;
+#else
+		std::cout << "(Serial Build)" << std::endl;
+#endif
+	}
 
 	// Decompose the domain
 	mpim->mpi_gridbuild();
@@ -157,7 +164,7 @@ int main( int argc, char* argv[] )
 
 	// Get time of MPI initialisation
 #ifdef L_BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+	MPI_Barrier(mpim->world_comm);
 	secs = clock() - t_start;
 	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
 	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
@@ -166,7 +173,7 @@ int main( int argc, char* argv[] )
 
 	// Start clock again for next bit of initialisation
 #ifdef L_BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+	MPI_Barrier(mpim->world_comm);
 #endif
 	t_start = clock();
 
@@ -356,7 +363,7 @@ int main( int argc, char* argv[] )
 
 		// Wait for rank accessing the file and only access if this rank's turn
 #ifdef L_BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+		MPI_Barrier(mpim->world_comm);
 
 		if (MpiManager::my_rank == n)
 #endif
@@ -389,7 +396,7 @@ int main( int argc, char* argv[] )
 
 	// Get time of grid and object initialisation
 #ifdef L_BUILD_FOR_MPI
-	MPI_Barrier(mpim->my_comm);
+	MPI_Barrier(mpim->world_comm);
 #endif
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
@@ -401,8 +408,19 @@ int main( int argc, char* argv[] )
 
 
 #ifdef L_BUILD_FOR_MPI
+
+	if (L_NumLev != 0) {
+
+		*GridUtils::logfile << "Creating communicators...";
+
+		// Create communicators for sub-grids
+		mpim->mpi_buildSubGridCommunicators();
+
+		*GridUtils::logfile << "Complete." << std::endl;
+	}
+
 	// Compute buffer sizes
-	MPI_Barrier(mpim->my_comm);
+	MPI_Barrier(mpim->world_comm);
 	t_start = clock();
 	
 	mpim->mpi_buffer_size();	// Call buffer sizing routine
@@ -419,12 +437,12 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_IO_LITE
-	*GridUtils::logfile << "Writing out to IOLite file." << endl;
+	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 	Grids.io_lite(Grids.t);
 #endif
 
 #ifdef L_HDF5_OUTPUT
-	*GridUtils::logfile << "Writing out to HDF5 file." << endl;
+	*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
 	Grids.io_hdf5(Grids.t);
 #endif
 
@@ -441,10 +459,12 @@ int main( int argc, char* argv[] )
 
 		// Synchronise MPI processes before next time step starts
 #ifdef L_BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+		MPI_Barrier(mpim->world_comm);
 #endif
 
-		cout << "\n------ Time Step " << Grids.t+1 << " of " << L_Timesteps << " ------" << endl;
+		if (MpiManager::my_rank == 0) {
+			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
+		}
 
 
 		///////////////////////
@@ -465,20 +485,20 @@ int main( int argc, char* argv[] )
 		// Write out here
 		if (Grids.t % L_out_every == 0) {
 #ifdef L_BUILD_FOR_MPI
-			MPI_Barrier(mpim->my_comm);
+			MPI_Barrier(mpim->world_comm);
 #endif
 #ifdef L_TEXTOUT
-			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
+			*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
 
 #ifdef L_IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file." << endl;
+		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 		Grids.io_lite(Grids.t);
 #endif
 
 #ifdef L_HDF5_OUTPUT
-		*GridUtils::logfile << "Writing out to HDF5 file." << endl;
+		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
 		Grids.io_hdf5(Grids.t);
 #endif
 
@@ -489,12 +509,12 @@ int main( int argc, char* argv[] )
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
 	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
 	&& defined L_IBM_ON && defined L_IBBODY_TRACER
-			*GridUtils::logfile << "Writing out flexible body position" << endl;
+			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_write_body_pos(Grids.t);
 #endif
 
 #if defined L_LD_OUT && defined L_IBM_ON
-			*GridUtils::logfile << "Writing out flexible body lift and drag" << endl;
+			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
 			objMan->io_write_lift_drag(Grids.t);
 #endif
 		}		
@@ -507,12 +527,12 @@ int main( int argc, char* argv[] )
 
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef L_BUILD_FOR_MPI
-				MPI_Barrier(mpim->my_comm);
+				MPI_Barrier(mpim->world_comm);
 				if (MpiManager::my_rank == n) 
 #endif
 				{
 
-					*GridUtils::logfile << "Probe write out" << endl;
+					*GridUtils::logfile << "Probe write out..." << endl;
 					Grids.io_probeOutput();
 
 				}
@@ -532,7 +552,7 @@ int main( int argc, char* argv[] )
 
 				// Wait for turn and access one rank at a time
 #ifdef L_BUILD_FOR_MPI
-				MPI_Barrier(mpim->my_comm);
+				MPI_Barrier(mpim->world_comm);
 
 				if (MpiManager::my_rank == n)
 #endif
@@ -569,7 +589,7 @@ int main( int argc, char* argv[] )
 	for (int n = 0; n < MpiManager::num_ranks; n++) {
 		
 #ifdef L_BUILD_FOR_MPI
-		MPI_Barrier(mpim->my_comm);
+		MPI_Barrier(mpim->world_comm);
 
 		if (MpiManager::my_rank == n)
 #endif

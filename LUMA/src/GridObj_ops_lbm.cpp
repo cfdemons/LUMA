@@ -1132,17 +1132,17 @@ void GridObj::LBM_macro( ) {
 				rho_timeav(i,j,k,M_lim,K_lim) = ta_temp / (double)(t+1);
 
 				// Repeat for other quantities
-				int ta_count = 0;
+				int pq_combo = 0;
 				for (int p = 0; p < L_dims; p++) {
 					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,L_dims) * (double)t;
 					ta_temp += u(i,j,k,p,M_lim,K_lim,L_dims);
 					ui_timeav(i,j,k,p,M_lim,K_lim,L_dims) = ta_temp / (double)(t+1);
 					// Do necessary products
 					for (int q = p; q < L_dims; q++) {
-						ta_temp = uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*L_dims-3)) * (double)t;
+						ta_temp = uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_dims-3)) * (double)t;
 						ta_temp += ( u(i,j,k,p,M_lim,K_lim,L_dims) * u(i,j,k,q,M_lim,K_lim,L_dims) );
-						uiuj_timeav(i,j,k,ta_count,M_lim,K_lim,(3*L_dims-3)) = ta_temp / (double)(t+1);
-						ta_count++;
+						uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_dims-3)) = ta_temp / (double)(t+1);
+						pq_combo++;
 					}
 				}
 

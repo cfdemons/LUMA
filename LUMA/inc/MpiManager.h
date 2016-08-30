@@ -47,12 +47,18 @@ public :
 
 	// MPI world data (all public)
 	MPI_Comm world_comm;						// Global MPI communicator
-	MPI_Comm subGrid_comm[L_NumLev*L_NumReg];	// Communicators for sub-grid / region combinations
 	static const int MPI_cartlab[3][26];		// Cartesian unit vectors pointing to each neighbour in Cartesian topology
 	int MPI_dims[L_dims];						// Size of MPI Cartesian topology
 	int neighbour_rank[L_MPI_dir];				// Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[L_dims][L_MPI_dir];	// Coordinates in MPI topology of neighbour ranks
-
+	
+	// Communicators for sub-grid / region combinations
+#if (L_NumLev > 0)
+	MPI_Comm subGrid_comm[L_NumLev*L_NumReg];	
+#else
+	MPI_Comm subGrid_comm[1];
+#endif
+	
 	// Static Data (commonly used and grid-independent)
 	static int my_rank;				// Rank number
 	static int num_ranks;			// Total number of ranks in MPI Cartesian topology

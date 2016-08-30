@@ -506,7 +506,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 }
 
 // ***************************************************************************************************
-void IBBody::makeBody(PCpts* _PCpts, GridObj* g) {
+void IBBody::makeBody(PCpts* _PCpts) {
+
 
 	// Set some default body properties
 	this->deformable = L_ibb_deform;
@@ -514,23 +515,29 @@ void IBBody::makeBody(PCpts* _PCpts, GridObj* g) {
 
 	// Declare local variables
 	std::vector<int> locals;
-	int global_i, global_j, global_k;
 
-	// Ignore points which are not on this rank
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+	// Voxel grid filter //
 
-		// Get globals using the voxelising method of BFLBody class
-		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
-		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
-		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
+	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
 
-		// Add marker if on this rank
-		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
+	// Place first marker
+	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], this->flex_rigid);
 
-			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], L_ibb_flex_rigid);
-		}
+	// Increment counters
+	int curr_marker = 0;
+	std::vector<int> counter;
+	counter.push_back(1);
+
+	// Loop over array of points
+	for (size_t a = 1; a < _PCpts->x.size(); a++) {
+
+		// Pass to point builder
+		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
 
 	}
+
+	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
+		" markers using 1 marker / voxel voxelisation." << std::endl;
 
 	// Add dynamic positions in physical units
 	for (size_t i = 0; i < markers.size(); i++) {
@@ -543,6 +550,8 @@ void IBBody::makeBody(PCpts* _PCpts, GridObj* g) {
 	this->spacing = GridUtils::vecnorm(
 		markers[1].position[0] - markers[0].position[0],
 		markers[1].position[1] - markers[0].position[1],
-		markers[1].position[2] - markers[0].position[2]);
+		markers[1].position[2] - markers[0].position[2]
+		);
 
 }
+// ***************************************************************************************************

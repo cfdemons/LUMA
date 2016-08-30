@@ -352,5 +352,13 @@ void ObjectManager::ibm_build_body(int body_type) {
 	}
 
 }
+// ***************************************************************************************************
+// Overloaded builder for building from point cloud data
+void ObjectManager::ibm_build_body(PCpts* _PCpts, GridObj *owner) {
 
+	// Add new body
+	iBody.emplace_back(owner);
+	iBody.back().makeBody(_PCpts);
+
+}
 // ***************************************************************************************************

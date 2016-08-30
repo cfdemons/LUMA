@@ -532,11 +532,12 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 // KBC collision operator
 void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
 	
+	// Declarations
 	double ds[L_nVels], dh[L_nVels], gamma;
 
 	// Compute required moments and equilibrium moments
 #if (L_dims == 3)
-
+		
 	// Most moments are required in 3D for the KBC-N4 model
 
 	// Stress (second order)
@@ -721,7 +722,6 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_nVels);
 
 	}
-
 	
 	// Compute gamma
 	if (bot_prod == 0.0) gamma = (2/omega);
@@ -732,9 +732,9 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 
 		// Perform collision
 		f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
-							f(i,j,k,v,M_lim,K_lim,L_nVels) - 
-							(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels);
+			f(i,j,k,v,M_lim,K_lim,L_nVels) - 
+			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
+			force_i(i,j,k,v,M_lim,K_lim,L_nVels);
 
 	}
 

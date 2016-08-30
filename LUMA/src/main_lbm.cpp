@@ -241,6 +241,7 @@ int main( int argc, char* argv[] )
 
 	// Create Object Manager
 	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
+	PCpts* _PCpts = NULL;
 	*GridUtils::logfile << "Object Manager Created." << endl;
 
 #ifdef L_IBM_ON
@@ -301,8 +302,8 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Initialising IB Body from File..." << endl;
 
 	// Read in data from point cloud file
-	PCpts* _PCpts = new PCpts();
-	objMan->readInIBBCloud(_PCpts);
+	_PCpts = new PCpts();
+	objMan->io_readInCloud(_PCpts, eIBBCloud);
 	delete _PCpts;
 
 #endif
@@ -323,8 +324,8 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
 
 	// Read in input file to arrays
-	PCpts* _PCpts = new PCpts();
-	objMan->readInBFLCloud(_PCpts);
+	_PCpts = new PCpts();
+	objMan->io_readInCloud(_PCpts, eBFLCloud);
 
 	// Call BFL body builder if there are points on this rank
 	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
@@ -340,8 +341,8 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Initialising Solid Objects from File..." << endl;
 
 	// Read in data from point cloud file
-	PCpts* _PCpts = new PCpts();
-	objMan->readInSolidCloud(_PCpts);
+	_PCpts = new PCpts();
+	objMan->io_readInCloud(_PCpts, eBBBCloud);
 	delete _PCpts;
 
 #endif

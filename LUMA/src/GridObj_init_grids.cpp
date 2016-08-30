@@ -513,6 +513,9 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Use block length (scaled back to L0 units)
 	//nu = ((L_obj_x_max - L_obj_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
 	nu = ((L_M - L_obj_y_max) - 2) * L_u_ref / L_Re;	// TODO Needs to be a check on whether this is what we want
+#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
+	// If IBM object read from file then use scale length as reference
+	nu = (L_ibb_length_ref / dx) * L_u_ref / L_Re;
 #elif defined L_SOLID_FROM_FILE
 	// Use object length (scaled back to L0 units)
 	nu = (L_object_length_ref / pow(2,L_object_on_grid_lev)) * L_u_ref / L_Re;
@@ -521,7 +524,8 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	nu = (L_bfl_length_ref / pow(2,L_bfl_on_grid_lev)) * L_u_ref / L_Re;
 #else
 	// If no object then use domain height (in lattice units)
-	nu = (L_M - 2) * L_u_ref / L_Re;	// TODO The minus 2 is bacause of halfway BB - should have another if condition to check in case this isn't true
+	nu = (L_M - 2) * L_u_ref / L_Re;	// TODO The minus 2 is bacause of halfway BB
+										// Should have another if condition to check in case this isn't true
 #endif
 
 	// Relaxation frequency on L0

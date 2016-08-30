@@ -18,7 +18,7 @@
 #include "../inc/definitions.h"
 
 // ***************************************************************************************************
-// Custom constructor
+// Custom constructors
 IBMarker::IBMarker(double xPos, double yPos, double zPos, bool flex_rigid) {
 
 	// Assign position and type

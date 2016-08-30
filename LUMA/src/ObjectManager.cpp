@@ -55,4 +55,31 @@ ObjectManager::ObjectManager(GridObj* g) {
 };
 
 
+// *************************************************************************************************** //
+// Voxelisation Utilities
 
+// Return global voxel indices for a given point in global space
+std::vector<int> ObjectManager::getVoxInd(double x, double y, double z) {
+
+	std::vector<int> vox;
+
+	if (x - (int)std::floor(x) > 0.5) vox.push_back((int)std::ceil(x));
+	else vox.push_back((int)std::floor(x));
+
+	if (y - (int)std::floor(y) > 0.5) vox.push_back((int)std::ceil(y));
+	else vox.push_back((int)std::floor(y));
+
+	if (z - (int)std::floor(z) > 0.5) vox.push_back((int)std::ceil(z));
+	else vox.push_back((int)std::floor(z));
+
+	return vox;
+
+}
+
+// Overload of above for a single index
+int ObjectManager::getVoxInd(double p) {
+
+	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
+	else return (int)std::floor(p);
+
+}

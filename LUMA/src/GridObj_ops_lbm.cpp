@@ -671,11 +671,6 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 		M02 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
 		M11 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
 
-		// These are actually rho * MXX but no point in dividing to multiply later
-		M20 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
-		M02 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
-		M11 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
-
 		M20eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
 		M02eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
 		M11eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
@@ -683,12 +678,6 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 
 	// Compute ds
 	for (int v = 0; v < L_nVels; v++) {
-
-		// s part dictated by KBC model choice and directions
-		if (c[0][v] == 0 && c[1][v] == 0) {
-
-			// First family
-			ds[v] = 0.0;
 
 		// s part dictated by KBC model choice and directions
 		if (c[0][v] == 0 && c[1][v] == 0) {
@@ -733,23 +722,6 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_nVels);
 
 	}
-
-	
-	// Compute gamma
-	if (bot_prod == 0.0) gamma = (2/omega);
-	else gamma = (2/omega) - ( 2 - (2/omega) ) * (top_prod / bot_prod);
-
-	// Finally perform collision
-	for (int v = 0; v < L_nVels; v++) {
-
-		// Perform collision
-		f_new(i, j, k, v, M_lim, K_lim, L_nVels) =
-			f(i, j, k, v, M_lim, K_lim, L_nVels) -
-			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-			force_i(i, j, k, v, M_lim, K_lim, L_nVels);
-
-	}
-
 	
 	// Compute gamma
 	if (bot_prod == 0.0) gamma = (2/omega);
@@ -765,7 +737,6 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 			force_i(i,j,k,v,M_lim,K_lim,L_nVels);
 
 	}
-
 
 }
 

@@ -368,15 +368,6 @@ const static int zProbeLims[2] = {30, 120};
 	static int RefZstart[L_NumLev][L_NumReg]		= { {8}, {8} };
 	static int RefZend[L_NumLev][L_NumReg]			= { {56}, {88} };
 
-#elif (NumReg == 1 && NumLev == 3)
-	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };
-	const static size_t RefXend[NumLev][NumReg]		= { {34},	{48},	{80} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {9},	{4},	{8} };
-	const static size_t RefYend[NumLev][NumReg]		= { {23},	{24},	{32} };
-	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {2},	{4},	{8} };
-	static size_t RefZend[NumLev][NumReg]		= { {30},	{52},	{88} };
-
 #elif (L_NumReg == 1 && L_NumLev == 3)
 	const static int RefXstart[L_NumLev][L_NumReg]	= { {8},	{4},	{8} };
 	const static int RefXend[L_NumLev][L_NumReg]	= { {34},	{48},	{80} };

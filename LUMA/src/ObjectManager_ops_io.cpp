@@ -278,26 +278,67 @@ void ObjectManager::io_vtk_IBwriter(double tval) {
 
 // ***************************************************************************************************
 // Routine to read in point cloud data in tab separated, 3-column format from the input directory
-void ObjectManager::readInBFLCloud(PCpts* _PCpts) {
-
-#ifdef L_BFL_ON
+void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
 
+	// Case-specific variables
+	int on_grid_lev, on_grid_reg, body_length, body_start_x, body_start_y, body_centre_z;
+	eCartesianDirection scale_direction;
+
 	// Open input file
 	std::ifstream file;
-	file.open("./input/bfl_input.in", std::ios::in);
+	switch (objtype) {
+
+	case eBBBCloud:
+		file.open("./input/bbb_input.in", std::ios::in);
+		on_grid_lev = L_object_on_grid_lev;
+		on_grid_reg = L_object_on_grid_reg;
+		body_length = L_object_length;
+		body_start_x = L_start_object_x;
+		body_start_y = L_start_object_y;
+		body_centre_z = L_centre_object_z;
+		scale_direction = L_object_scale_direction;
+		break;
+
+	case eBFLCloud:
+		file.open("./input/bfl_input.in", std::ios::in);
+		on_grid_lev = L_bfl_on_grid_lev;
+		on_grid_reg = L_bfl_on_grid_reg;
+		body_length = L_bfl_length;
+		body_start_x = L_start_bfl_x;
+		body_start_y = L_start_bfl_y;
+		body_centre_z = L_centre_bfl_z;
+		scale_direction = L_bfl_scale_direction;
+		break;
+
+	case eIBBCloud:
+		file.open("./input/ibb_input.in", std::ios::in);
+
+		// Definitions are in phsyical units so convert to LUs
+		on_grid_lev = L_ibb_on_grid_lev;
+		on_grid_reg = L_ibb_on_grid_reg;
+		GridObj* g = NULL;
+		GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
+		body_length = static_cast<int>(L_ibb_length / g->dx);
+		body_start_x = static_cast<int>(L_start_ibb_x / g->dx);
+		body_start_y = static_cast<int>(L_start_ibb_y / g->dx);
+		body_centre_z = static_cast<int>(L_centre_ibb_z / g->dx);
+		scale_direction = L_ibb_scale_direction;
+		break;
+
+	}
 	
 	// Handle failure to open
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Error opening BFL input file. Exiting." << std::endl;
+		*GridUtils::logfile << "Error opening cloud input file. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 	}
 
 	// Get grid pointer
-	GridObj* g;	GridUtils::getGrid(_Grids, L_bfl_on_grid_lev, L_bfl_on_grid_reg, g);
+	GridObj* g;	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -339,18 +380,27 @@ void ObjectManager::readInBFLCloud(PCpts* _PCpts) {
 	}
 
 	
-	// Rescale coordinates and shift
-	double scale_factor = L_bfl_length_x / 
+	// Rescale coordinates and shift to global lattice units
+	// (option to scale based on whatever bounding box dimension chosen)
+#if (scale_direction == eXDirection)
+	double scale_factor = body_length /
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-	double shift_x =  std::floor( L_start_bfl_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
-	double shift_y =  std::floor( L_start_bfl_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+#elif (scale_direction == eYDirection)
+	double scale_factor = body_length /
+		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
+#elif (scale_direction == eZDirection)
+	double scale_factor = body_length /
+		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
+#endif
+	double shift_x =  std::floor( body_start_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
+	double shift_y =  std::floor( body_start_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
 	// z-shift based on centre of object
-	double shift_z =  std::floor( L_centre_object_z - scale_factor * (
+	double shift_z =  std::floor( body_centre_z - scale_factor * (
 		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
 		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
 		) );
 
-	// Apply
+	// Apply to each point
 	for (size_t a = 0; a < _PCpts->x.size(); a++) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
@@ -366,9 +416,9 @@ void ObjectManager::readInBFLCloud(PCpts* _PCpts) {
 	do {
 
 		// Get global voxel index
-		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
-		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
-		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
+		global_i = getVoxInd(_PCpts->x[a]);
+		global_j = getVoxInd(_PCpts->y[a]);
+		global_k = getVoxInd(_PCpts->z[a]);
 
 		// If on this rank
 		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
@@ -384,10 +434,10 @@ void ObjectManager::readInBFLCloud(PCpts* _PCpts) {
 
 
 	// Write out the points remaining in for debugging purposes
-#ifdef L_BFL_DEBUG
+#ifdef L_CLOUD_DEBUG
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/BFLpts_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
 			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
 			fileout << std::endl;
@@ -396,240 +446,48 @@ void ObjectManager::readInBFLCloud(PCpts* _PCpts) {
 	}
 #endif
 
+	// If solid then call labeller
+	if (!_PCpts->x.empty())	{
 
-#endif
-}
+		// Perform a different post-processing action depending on the type of body
+		switch (objtype)
+		{
 
-// ***************************************************************************************************
-// Routine to read in point cloud data in tab separated, 3-column format from the input directory
-void ObjectManager::readInSolidCloud(PCpts* _PCpts) {
+		case eBBBCloud:
 
-#ifdef L_SOLID_FROM_FILE
+			// Label the grid sites
+			for (size_t a = 0; a < _PCpts->x.size(); a++) {
 
-	// Temporary variables
-	double tmp_x, tmp_y, tmp_z;
+				// Get globals
+				getVoxInd(_PCpts->x[a]);
+				getVoxInd(_PCpts->y[a]);
+				getVoxInd(_PCpts->z[a]);
 
-	// Open input file
-	std::ifstream file;
-	file.open("./input/bbb_input.in", std::ios::in);
-	
-	// Handle failure to open
-	if (!file.is_open()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Error opening Point Cloud input file. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-	}
+				// Get local indices
+				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
 
-	// Get grid pointer
-	GridObj* g = NULL;	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);
-	if (g == NULL) return; // If this grid does not exist, then exit
+				// Update Typing Matrix
+				if (g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid)
+				{
+					g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid;
+				}
+			}
+			break;
 
-	// Loop over lines in file
-	while (!file.eof()) {
+		case eBFLCloud:
 
-		// Read in one line of file at a time
-		std::string line_in;	// String to store line in
-		std::istringstream iss;	// Buffer stream to store characters
+			// Call BFL body builder
+			bfl_build_body(_PCpts);
+			break;
 
-		// Get line up to new line separator and put in buffer
-		std::getline(file,line_in,'\n');
-		iss.str(line_in);	// Put line in the buffer
-		iss.seekg(0);		// Reset buffer position to start of buffer
+		case eIBBCloud:
 
-		// Add coordinates to data store
-		iss >> tmp_x;
-		iss >> tmp_y;
-		iss >> tmp_z;
-			
-		_PCpts->x.push_back(tmp_x);
-		_PCpts->y.push_back(tmp_y);
-			
-		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
-#if (L_dims == 3)
-		_PCpts->z.push_back(tmp_z);
-#else
-		_PCpts->z.push_back(0);
-#endif
-
-		}
-	file.close();
-
-	// Error if no data
-	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Failed to read object data from point cloud input file." << std::endl;
-		exit(LUMA_FAILED);
-	} else {
-		*GridUtils::logfile << "Successfully acquired object data from point cloud file." << std::endl;
-	}
-
-	
-	// Rescale coordinates and shift to global lattice units
-	// (option to scale based on whatever bounding box dimension chosen)
-#if (L_object_scale_direction == 0)
-	double scale_factor = L_object_length / 
-		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-#elif (L_object_scale_direction == 1)
-	double scale_factor = L_object_length / 
-		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-#elif (L_object_scale_direction == 2)
-	double scale_factor = L_object_length / 
-		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-#endif
-
-	double shift_x =  std::floor( L_start_object_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
-	double shift_y =  std::floor( L_start_object_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
-	// z-shift based on centre of object
-	double shift_z =  std::floor( L_centre_object_z - scale_factor * (
-		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
-		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
-		) );
-
-	// Apply
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
-		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
-		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
-		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
-	}
-
-	// Declare local variables
-	std::vector<int> locals;
-	int global_i, global_j, global_k;
-
-	// Ignore points which are not on this rank
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
-
-		// Get globals
-		global_i = BFLBody::getVoxInd(_PCpts->x[a]);
-		global_j = BFLBody::getVoxInd(_PCpts->y[a]);
-		global_k = BFLBody::getVoxInd(_PCpts->z[a]);
-
-		// Label voxel if on this rank
-		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
-
-			// Get local indices
-			GridUtils::global_to_local(global_i, global_j,global_k,g,locals);
-
-			// Update Typing Matrix
-			if ( g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid )
-			{ g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid; }
+			// Call IBM body builder
+			ibm_build_body(_PCpts, g);
+			break;
 
 		}
 
 	}
 
-
-#endif
-}
-
-// ****************************************************************************
-// Routine to read in point cloud data in tab separated, 3-column format from 
-// the input directory for IB bodies.
-void ObjectManager::readInIBBCloud(PCpts* _PCpts) {
-
-#ifdef L_IBB_FROM_FILE
-
-	// Temporary variables
-	double tmp_x, tmp_y, tmp_z;
-
-	// Open input file
-	std::ifstream file;
-	file.open("./input/ibb_input.in", std::ios::in);
-
-	// Handle failure to open
-	if (!file.is_open()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Error opening IBB input file. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-	}
-
-	// Get grid pointer
-	GridObj* g = NULL;	GridUtils::getGrid(_Grids, L_ibb_on_grid_lev, L_ibb_on_grid_reg, g);
-	if (g == NULL) return; // If this grid does not exist, then exit
-
-	// Loop over lines in file
-	while (!file.eof()) { 
-
-		// Read in one line of file at a time
-		std::string line_in;	// String to store line in
-		std::istringstream iss;	// Buffer stream to store characters
-
-		// Get line up to new line separator and put in buffer
-		std::getline(file, line_in, '\n');
-		iss.str(line_in);	// Put line in the buffer
-		iss.seekg(0);		// Reset buffer position to start of buffer
-
-		// Add coordinates to data store
-		iss >> tmp_x;
-		iss >> tmp_y;
-		iss >> tmp_z;
-
-		_PCpts->x.push_back(tmp_x);
-		_PCpts->y.push_back(tmp_y);
-
-		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
-#if (L_dims == 3)
-		_PCpts->z.push_back(tmp_z);
-#else
-		_PCpts->z.push_back(0);
-#endif
-
-	}
-	file.close();
-
-	// Error if no data
-	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Failed to read data from IBB input file." << std::endl;
-		exit(LUMA_FAILED);
-	}
-	else {
-		*GridUtils::logfile << "Successfully acquired object data from IBB input file." << std::endl;
-	}
-
-
-	// Rescale coordinates and shift to global lattice units
-	// (option to scale based on whatever bounding box dimension chosen)
-#if (L_ibb_scale_direction == 0)
-	double scale_factor = L_ibb_length /
-		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-#elif (L_ibb_scale_direction == 1)
-	double scale_factor = L_ibb_length /
-		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-#elif (L_ibb_scale_direction == 2)
-	double scale_factor = L_ibb_length /
-		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-#endif
-
-	double shift_x = std::floor(L_start_ibb_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-	double shift_y = std::floor(L_start_ibb_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-	// z-shift based on centre of object
-	double shift_z = std::floor(L_centre_ibb_z - scale_factor * (
-		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) +
-		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
-		));
-
-	// Apply
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
-		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
-		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
-		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
-	}
-
-	// DEBUG -- write points back out again to chekc they are OK
-	//if (!_PCpts->x.empty()) {
-	//	std::ofstream fileout;
-	//	fileout.open(GridUtils::path_str + "/pts_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
-	//	for (size_t i = 0; i < _PCpts->x.size(); i++) {
-	//		fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
-	//		fileout << std::endl;
-	//	}
-	//	fileout.close();
-	//}
-
-	// Make body with markers at the locations read in from file
-	iBody.emplace_back();
-	iBody.back().makeBody(_PCpts, g);
-
-#endif
 }

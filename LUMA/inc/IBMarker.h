@@ -37,8 +37,8 @@ public:
 	{
 	};
 
-	// Custom constructor
-	IBMarker(double xPos, double yPos, double zPos, bool flex_rigid);
+	// Custom constructors
+	IBMarker(double xPos, double yPos, double zPos, bool flex_rigid = false);
 
 protected:
 

@@ -667,9 +667,9 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
 
 		// These are actually rho * MXX but no point in dividing to multiply later
-		M20 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[0][v]);
-		M02 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[1][v] * c[1][v]);
-		M11 += f(i,j,k,v,M_lim,K_lim,nVels) * (c[0][v] * c[1][v]);
+		M20 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
+		M02 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
+		M11 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
 
 		M20eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
 		M02eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);

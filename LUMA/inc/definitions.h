@@ -62,7 +62,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 100			// How many timesteps before whole grid output
+#define out_every 50			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -84,13 +84,13 @@ const static int zProbeLims[2] = {30, 120};
 // Gravity
 //#define GRAVITY_ON
 // Expression for the gravity force
-#define grav_force 1e-4	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
+#define grav_force 0	//( 3 * gUtils.vecnorm(u_0x,u_0y,u_0z) * nu / pow(fabs(b_y - a_y),2) )
 #define grav_direction 0	// Gravity direction (0 = x, 1 = y, 2 = z)
 
 // Initialisation
-//#define NO_FLOW			// Initialise the domain with no flow
+#define NO_FLOW			// Initialise the domain with no flow
 //#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 500000
+#define restart_out_every 30000
 
 // LBM configuration
 //#define USE_MRT
@@ -109,7 +109,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 3000	// Number of time steps
+#define T 20000	// Number of time steps
 
 
 /*
@@ -136,16 +136,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N 81		// Number of x lattice sites
-#define M 41		// Number of y lattice sites
+#define N (1*220+1)		// Number of x lattice sites
+#define M (1*41+2)		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x -0.5		// Start of domain-x
-#define b_x 80.5		// End of domain-x
-#define a_y -0.5		// Start of domain-y
-#define b_y 40.5		// End of domain-y
+#define a_x -0.005		// Start of domain-x
+#define b_x 2.205		// End of domain-x
+#define a_y -0.04		// Start of domain-y
+#define b_y 0.42		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -158,16 +158,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref 0.01		// Reference velocity for scaling (mean inlet velocity)
-#define u_max 0.06		// Max velocity of profile
+#define u_ref (0.0707070707070707)		// Reference velocity for scaling (mean inlet velocity)
+#define u_max u_ref*1.5		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
-#define u_0x u_ref			// u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-dy)/2)) ) / ((b_y-a_y-dy)/2) ,2) )	// Initial x-velocity
+#define u_0x u_max*(1 - pow( ( (YPos[j] - ((b_y-a_y-2*dy)/2)) ) / ((b_y-a_y-2*dy)/2) ,2) )	// Initial x-velocity
 #define u_0y 0			// Initial y-velocity
 #define u_0z 0			// Initial z-velocity
 
 #define rho_in 1		// Initial density
-#define Re 1			// Desired Reynolds number
+#define Re 20			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -180,35 +180,35 @@ const static int zProbeLims[2] = {30, 120};
 
 // Master IBM switches //
 #define IBM_ON						// Turn on IBM
-#define IB_Lev 1					// Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
+#define IB_Lev 0					// Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define IB_Reg 0					// Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 
 // Switches for inserting certain bodies (enable only one at once!)
-//#define INSERT_CIRCLE_SPHERE
+#define INSERT_CIRCLE_SPHERE
 //#define INSERT_RECTANGLE_CUBOID
 //#define INSERT_BOTH
 //#define INSERT_FILAMENT
 //#define INSERT_FILARRAY
-#define _2D_RIGID_PLATE_IBM
+//#define _2D_RIGID_PLATE_IBM
 //#define _2D_PLATE_WITH_FLAP
 //#define _3D_RIGID_PLATE_IBM
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 9		// Number of Lagrange points (approximately)
+#define num_markers 31		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
-#define ibb_x 10		// x Position of body centre
-#define ibb_y 10		// y Position of body centre
+#define ibb_x 0.2		// x Position of body centre
+#define ibb_y 0.2		// y Position of body centre
 #define ibb_z 0.0		// z Position of body centre
 #define ibb_w 4		// width (x) of IB body
 #define ibb_l 4		// length (y) of IB body
 #define ibb_d 0.0		// depth (z) of IB body
-#define ibb_r 10.0		// radius of IB body
+#define ibb_r 0.05		// radius of IB body
 
 // Physical dimensions of flexible IB filament
 #define ibb_length 4		// length of filament
@@ -238,13 +238,13 @@ const static int zProbeLims[2] = {30, 120};
 // Virtual Wind Tunnels
 //#define VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
 //#define FLAT_PLATE_TUNNEL			// Adds an inlet to all faces except exit
-#define FREESTREAM_TUNNEL			// Adds a inlet to all faces
+//#define FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
 // Inlets
 #define INLET_ON				// Turn on inlet boundary (assumed left-hand wall for now - default Zou-He)
 //#define INLET_DO_NOTHING		// Specify the inlet to be a do-nothing inlet condition (overrides other options)
 #define INLET_REGULARISED		// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-#define UNIFORM_INLET			// Make the inlet a uniform inlet
+//#define UNIFORM_INLET			// Make the inlet a uniform inlet
 //#define INLET_NRBC				// Turn on NRBC at inlet
 
 
@@ -254,7 +254,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Periodicity
-//#define PERIODIC_BOUNDARIES		// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define PERIODIC_BOUNDARIES	// Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 // Solids
 #define WALLS_ON				// Turn on no-slip walls (default is top, bottom, front, back unless WALLS_ON_2D is used)
@@ -262,8 +262,8 @@ const static int zProbeLims[2] = {30, 120};
 //#define WALLS_ON_FLOOR_ONLY		// Limit no-slip walls to bottom no-slip wall only
 #define wall_thickness_bottom 1		// Thickness of bottom walls in coarsest lattice units
 #define wall_thickness_top 1	// Thickness of top walls in coarsest lattice units
-#define wall_thickness_front 5		// Thickness of front (3D) walls in coarsest lattice units
-#define wall_thickness_back 3		// Thickness of back (3D) walls in coarsest lattice units
+#define wall_thickness_front 1		// Thickness of front (3D) walls in coarsest lattice units
+#define wall_thickness_back 1		// Thickness of back (3D) walls in coarsest lattice units
 
 
 
@@ -330,7 +330,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define NumLev 1		// Levels of refinement (can't use with IBM yet)
+#define NumLev 0		// Levels of refinement (can't use with IBM yet)
 #define NumReg 1		// Number of refined regions (can be arbitrary if NumLev = 0)
 
 #if NumLev != 0

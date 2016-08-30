@@ -449,7 +449,8 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->my_comm);
 #endif
 
-		cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
+		if ((Grids.t+1) % out_every == 0)
+			cout << "\n------ Time Step " << Grids.t+1 << " of " << T << " ------" << endl;
 
 
 		///////////////////////
@@ -476,6 +477,9 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to <Grids.out>" << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
+
+			// ** TODO Remove this before merging ** //
+			objMan->writeForce();
 
 #ifdef VTK_WRITER
 			*GridUtils::logfile << "Writing out to VTK file" << endl;

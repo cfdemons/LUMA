@@ -456,7 +456,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	ZPos = GridUtils::linspace( a_z + dz/2, b_z - dz/2, K );
 #endif
 
-	
+
 
 	// Define TYPING MATRICES
 	LatTyp.resize( N_lim*M_lim*K_lim );

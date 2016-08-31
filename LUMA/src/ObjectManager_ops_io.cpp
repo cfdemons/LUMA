@@ -286,6 +286,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Case-specific variables
 	int on_grid_lev, on_grid_reg, body_length, body_start_x, body_start_y, body_centre_z;
 	eCartesianDirection scale_direction;
+	GridObj* g = NULL;
 
 	// Open input file
 	std::ifstream file;
@@ -319,7 +320,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		// Definitions are in phsyical units so convert to LUs
 		on_grid_lev = L_ibb_on_grid_lev;
 		on_grid_reg = L_ibb_on_grid_reg;
-		GridObj* g = NULL;
 		GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 		body_length = static_cast<int>(L_ibb_length / g->dx);
 		body_start_x = static_cast<int>(L_start_ibb_x / g->dx);
@@ -338,7 +338,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 
 	// Get grid pointer
-	GridObj* g;	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
+	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -373,15 +373,18 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
 		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Failed to read object data from BFL input file." << std::endl;
+		*GridUtils::logfile << "Failed to read object data from cloud input file." << std::endl;
 		exit(LUMA_FAILED);
 	} else {
-		*GridUtils::logfile << "Successfully acquired object data from BFL input file." << std::endl;
+		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
 	}
 
 	
 	// Rescale coordinates and shift to global lattice units
 	// (option to scale based on whatever bounding box dimension chosen)
+#ifdef L_CLOUD_DEBUG
+	*GridUtils::logfile << "Rescaling..." << std::endl;
+#endif
 #if (scale_direction == eXDirection)
 	double scale_factor = body_length /
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
@@ -412,6 +415,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	int global_i, global_j, global_k;
 
 	// Exclude points which are not on this rank
+#ifdef L_CLOUD_DEBUG
+	*GridUtils::logfile << "Filtering..." << std::endl;
+#endif
 	int a = 0;
 	do {
 
@@ -421,10 +427,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		global_k = getVoxInd(_PCpts->z[a]);
 
 		// If on this rank
-		if ( GridUtils::isOnThisRank( global_i, global_j,global_k, *g) ) {
+		if ( GridUtils::isOnThisRank(global_i, global_j, global_k, *g) ) {
 			// Increment counter
 			a++;
-		} else {
+		} 
+		// If not, erase
+		else {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
 			_PCpts->y.erase(_PCpts->y.begin() + a);
 			_PCpts->z.erase(_PCpts->z.begin() + a);
@@ -435,6 +443,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Write out the points remaining in for debugging purposes
 #ifdef L_CLOUD_DEBUG
+	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
 		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
@@ -455,13 +464,16 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 		case eBBBCloud:
 
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Labelling..." << std::endl;
+#endif
 			// Label the grid sites
 			for (size_t a = 0; a < _PCpts->x.size(); a++) {
 
 				// Get globals
-				getVoxInd(_PCpts->x[a]);
-				getVoxInd(_PCpts->y[a]);
-				getVoxInd(_PCpts->z[a]);
+				global_i = getVoxInd(_PCpts->x[a]);
+				global_j = getVoxInd(_PCpts->y[a]);
+				global_k = getVoxInd(_PCpts->z[a]);
 
 				// Get local indices
 				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
@@ -476,12 +488,18 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 		case eBFLCloud:
 
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
 			// Call BFL body builder
 			bfl_build_body(_PCpts);
 			break;
 
 		case eIBBCloud:
 
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
 			// Call IBM body builder
 			ibm_build_body(_PCpts, g);
 			break;

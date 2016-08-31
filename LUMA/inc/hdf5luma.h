@@ -16,6 +16,7 @@
 #ifdef L_BUILD_FOR_MPI
 	#define H5_HAVE_PARALLEL
 	#include "hdf5.h"	// Load C API
+	#include "MpiManager.h"
 #else
 	#include "H5Cpp.h"	// Load C++ API
 	#ifndef H5_NO_NAMESPACE
@@ -27,6 +28,7 @@
 #define HDF5_EXT_ZLIB
 #define HDF5_EXT_SZIP
 
+#pragma once	// Just define the enumerated type once
 enum ePhdf5SlabType {
 	eScalar,		/* 2/3D data	-- One variable per grid site			*/
 	eVector,		/* 2/3D data	-- L_dims variables per grid site		*/
@@ -36,39 +38,30 @@ enum ePhdf5SlabType {
 	ePosZ			/* 1D data		-- Single L_dim vector per dimension	*/
 };
 
-
-#pragma once	// Only define the structure once to prevent redefinition
-struct phdf5_struct {
-	/* Structure storing indices and boolean flags 
-	 * related to the presence of halo regions in 
-	 * MPI PHDF5 writing */
-	int i_start;
-	int i_end;
-	int j_start;
-	int j_end;
-	int k_start;
-	int k_end;
-	int halo_min;
-	int halo_max;
-};
-
 // ***************************************************************************//
 // Helper method to write out using PHDF5 which automatically selects the 
 // correct slab arrangement. Templated so in header.
+#ifdef L_BUILD_FOR_MPI
+
 template <typename T>
 void phdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& fileset,
-	ePhdf5SlabType slab_type, phdf5_struct hdf_data,
+	ePhdf5SlabType slab_type, MpiManager::phdf5_struct hdf_data,
 	int N_lim, int M_lim, int K_lim, 
 	GridObj *g, T *data, hid_t hdf_datatype) {
 
 	// Create buffer (block of data we aim to write from this process)
-	const unsigned int buffer_size =
-		(hdf_data.i_end - hdf_data.i_start + 1) *
-		(hdf_data.j_end - hdf_data.j_start + 1) *
-		(hdf_data.k_end - hdf_data.k_start + 1);
-	//std::cout << (hdf_data.i_end - hdf_data.i_start + 1) << "," << (hdf_data.j_end - hdf_data.j_start + 1) << "," << (hdf_data.k_end - hdf_data.k_start + 1) << std::endl;
-	//std::cout << "BS " << buffer_size << std::endl;
-	T *buffer = (T*)malloc(buffer_size * sizeof(T));
+	T *buffer = (T*)malloc(hdf_data.writable_data_count * sizeof(T));
+
+	// DEBUG //
+#ifdef L_PHDF_DEBUG
+	*GridUtils::logfile << "Writable data size = " 
+		<< (hdf_data.i_end - hdf_data.i_start + 1) << "," 
+		<< (hdf_data.j_end - hdf_data.j_start + 1) << 
+#if (L_dims == 3)
+		"," << (hdf_data.k_end - hdf_data.k_start + 1) << 
+#endif
+		" = " << hdf_data.writable_data_count << std::endl;
+#endif
 
 	// Create status
 	herr_t status;
@@ -110,6 +103,22 @@ void phdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& fileset,
 	f_count[2] = 1;
 	f_stride[2] = f_block[2];
 #endif
+
+	// DEBUG //
+#ifdef L_PHDF_DEBUG
+#if (L_dims == 3)
+	*GridUtils::logfile << "f_offset = (" << f_offset[0] << " " << f_offset[1] << " " << f_offset[2] << ")" << std::endl;
+	*GridUtils::logfile << "f_stride = (" << f_stride[0] << " " << f_stride[1] << " " << f_stride[2] << ")" << std::endl;
+	*GridUtils::logfile << "f_count = (" << f_count[0] << " " << f_count[1] << " " << f_count[2] << ")" << std::endl;
+	*GridUtils::logfile << "f_block = (" << f_block[0] << " " << f_block[1] << " " << f_block[2] << ")" << std::endl;
+#else
+	*GridUtils::logfile << "f_offset = (" << f_offset[0] << " " << f_offset[1] << ")" << std::endl;
+	*GridUtils::logfile << "f_stride = (" << f_stride[0] << " " << f_stride[1] << ")" << std::endl;
+	*GridUtils::logfile << "f_count = (" << f_count[0] << " " << f_count[1] << ")" << std::endl;
+	*GridUtils::logfile << "f_block = (" << f_block[0] << " " << f_block[1] << ")" << std::endl;
+#endif
+#endif
+	
 
 	// Select filespace slab
 	status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, f_offset, f_stride, f_count, f_block);
@@ -330,6 +339,10 @@ void phdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& fileset,
 
 	}	// End switch on slab_type
 
+	// DEBUG //
+#ifdef L_PHDF_DEBUG
+	*GridUtils::logfile << "Lev " << g->level << " WRITING slab type " << std::to_string(slab_type) << std::endl;
+#endif
 
 	// Write data
 	status = H5Dwrite(fileset, hdf_datatype, memspace, filespace, plist_id, buffer);
@@ -347,3 +360,5 @@ void phdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& fileset,
 	free(buffer);
 
 }
+
+#endif	// L_BUILD_FOR_MPI

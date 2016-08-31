@@ -643,7 +643,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 // to be called post-initialisation.
 void MpiManager::mpi_buffer_size() {
 
-	*GridUtils::logfile << "Pre-computing buffer sizes for MPI..." << std::endl;
+	*GridUtils::logfile << "Pre-computing buffer sizes for MPI...";
 
 	/* For each grid in the hierarchy find communicating edges and store the buffer size.
 	 * The data are arranged:
@@ -712,7 +712,7 @@ void MpiManager::mpi_buffer_size() {
 		}
 	}
 
-	
+	*GridUtils::logfile << "Complete." << std::endl;
 
 }
 // *************************************************************************************************** //
@@ -730,12 +730,45 @@ int MpiManager::mpi_getOpposite(int direction) {
 
 }
 // *************************************************************************************************** //
-int MpiManager::mpi_buildSubGridCommunicators() {
+// Build sub-grid communicator including only ranks with HDF5 writable data.
+// Must be called AFTER the grids and buffers have been initialised.
+int MpiManager::mpi_buildCommunicators() {
+
+	*GridUtils::logfile << "Creating sub-grid communicators...";
 
 	int status;
 	int colour;		// Colour indicates which new communicator this process belongs to
 	int key = MpiManager::my_rank;	// Global rank as key (dictates numbering in new communicator)
-	
+
+	// Start by adding the L0 details
+	p_data.emplace_back();
+	p_data.back().level = 0;
+	p_data.back().region = 0;
+
+	// Get local grid sizes
+	int N_lim = static_cast<int>(Grids->XPos.size());
+	int M_lim = static_cast<int>(Grids->YPos.size());
+	int K_lim = static_cast<int>(Grids->ZPos.size());
+
+	// Halo exists on all edges on L0
+	p_data.back().i_end = N_lim - 2;
+	p_data.back().i_start = 1;
+	p_data.back().j_end = M_lim - 2;
+	p_data.back().j_start = 1;
+	p_data.back().halo_max = 1;
+	p_data.back().halo_min = 1;
+#if (L_dims == 3)
+	p_data.back().k_end = K_lim - 2;
+	p_data.back().k_start = 1;
+#else
+	p_data.back().k_start = 0;
+	p_data.back().k_end = 0;
+#endif
+	p_data.back().writable_data_count =
+		(p_data.back().i_end - p_data.back().i_start + 1) *
+		(p_data.back().j_end - p_data.back().j_start + 1) *
+		(p_data.back().k_end - p_data.back().k_start + 1);
+
 	// Loop over the possible sub-grid combinations
 	for (int reg = 0; reg < L_NumReg; reg++) {
 		for (int lev = 1; lev <= L_NumLev; lev++) {
@@ -744,9 +777,103 @@ int MpiManager::mpi_buildSubGridCommunicators() {
 			GridObj *targetGrid = NULL;
 			GridUtils::getGrid(Grids, lev, reg, targetGrid);
 
-			// Change colour if sub-grid found
+			// If sub-grid found
 			if (targetGrid != NULL) {
-				colour = 1;
+
+				/* Since we are doing this to use HDF5 we can exclude those ranks
+				 * which do not contain sub-grid regions that will need to be 
+				 * written out. If we did, at write-time the buffer size would be
+				 * zero and the HDF5 write would fail. So now we check for writable
+				 * data by checking the buffers versus the grid size. */
+
+				// Get local grid sizes
+				N_lim = static_cast<int>(targetGrid->XPos.size());
+				M_lim = static_cast<int>(targetGrid->YPos.size());
+				K_lim = static_cast<int>(targetGrid->ZPos.size());
+
+				// Add a new phdf5_struct
+				p_data.emplace_back();
+				p_data.back().level = targetGrid->level;
+				p_data.back().region = targetGrid->region_number;
+
+				// Retrieve corresponding buffer recv size info struct
+				MpiManager::buffer_struct bri;
+				MpiManager* mpim = MpiManager::getInstance();
+				for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
+					if (bs.level == targetGrid->level && bs.region == targetGrid->region_number) {
+						bri = bs;
+						break;
+					}
+				}
+
+				// Set halo descriptors
+				p_data.back().halo_min = 0, p_data.back().halo_max = 0;	// Boolean flags
+				p_data.back().i_start = 0, p_data.back().i_end = 0,		// Indices
+				p_data.back().j_start = 0, p_data.back().j_end = 0,
+				p_data.back().k_start = 0, p_data.back().k_end = 0;
+
+				// Check x-direction for halo
+				if (bri.size[1]) {
+					p_data.back().i_end = N_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
+				}
+				else {
+					p_data.back().i_end = N_lim - 1;
+				}
+
+				if (bri.size[0]) {
+					p_data.back().i_start = static_cast<int>(pow(2, targetGrid->level));
+				}
+				else {
+					p_data.back().i_start = 0;
+				}
+
+				// Check y-direction for halo
+				if (bri.size[5]) {
+					p_data.back().j_end = M_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
+					p_data.back().halo_max = 1;
+				}
+				else {
+					p_data.back().j_end = M_lim - 1;
+				}
+
+				if (bri.size[4]) {
+					p_data.back().j_start = static_cast<int>(pow(2, targetGrid->level));
+					p_data.back().halo_min = 1;
+				}
+				else {
+					p_data.back().j_start = 0;
+				}
+
+#if (L_dims == 3)
+				// Check z-direction for halo
+				if (bri.size[9]) {
+					p_data.back().k_end = K_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
+					p_data.back().halo_max = 1;
+				}
+				else {
+					p_data.back().k_end = K_lim - 1;
+					p_data.back().halo_max = 0;
+				}
+
+				if (bri.size[8]) {
+					p_data.back().k_start = static_cast<int>(pow(2, targetGrid->level));
+					p_data.back().halo_min = 1;
+				}
+				else {
+					p_data.back().k_start = 0;
+					p_data.back().halo_min = 0;
+				}
+#else
+				p_data.back().k_start = 0; p_data.back().k_end = 0;
+#endif
+
+				// If writable data is >0 then set colour to 1 to include in sub-grid communicator
+				p_data.back().writable_data_count =
+					(p_data.back().i_end - p_data.back().i_start + 1) *
+					(p_data.back().j_end - p_data.back().j_start + 1) *
+					(p_data.back().k_end - p_data.back().k_start + 1);
+				if (p_data.back().writable_data_count) colour = 1; else colour = MPI_UNDEFINED;
+
 			}
 			else {
 				colour = MPI_UNDEFINED;
@@ -758,11 +885,14 @@ int MpiManager::mpi_buildSubGridCommunicators() {
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Region " << reg << ", Level " << lev << 
-				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << std::endl;
+				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << 
+				" and writable data size " << p_data.back().writable_data_count << std::endl;
 #endif
 
 		}
 	}
+
+	*GridUtils::logfile << "Complete. Status = " << status << std::endl;
 
 	return status;
 }

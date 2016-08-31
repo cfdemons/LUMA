@@ -34,7 +34,10 @@ void GridObj::LBM_init_getInletProfile() {
 
 	size_t i, j;
 	double y, tmp;
-	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;	
+	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
+
+	// Indicate to log
+	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
 	// Buffer information from file
 	std::ifstream inletfile;
@@ -511,8 +514,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	nu = (L_ibb_l / dx) * L_u_ref / L_Re;
 #elif defined L_SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	//nu = ((L_obj_x_max - L_obj_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
-	nu = ((L_M - L_obj_y_max) - 2) * L_u_ref / L_Re;	// TODO Needs to be a check on whether this is what we want
+	nu = ((L_block_x_max - L_block_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
 #elif defined L_IBM_ON && defined L_IBB_FROM_FILE
 	// If IBM object read from file then use scale length as reference
 	nu = (L_ibb_length_ref / dx) * L_u_ref / L_Re;
@@ -844,9 +846,9 @@ void GridObj::LBM_initSolidLab() {
 		
 		(level == 0) && 
 		
-		(L_obj_x_max > Ng_lim - 1 || L_obj_x_min < 0 || L_obj_y_max > Mg_lim - 1 || L_obj_y_min < 0 
+		(L_block_x_max > Ng_lim - 1 || L_block_x_min < 0 || L_block_y_max > Mg_lim - 1 || L_block_y_min < 0 
 #if (L_dims == 3)
-		|| L_obj_z_max > Kg_lim - 1 || L_obj_z_min < 0
+		|| L_block_z_max > Kg_lim - 1 || L_block_z_min < 0
 #endif
 		)
 
@@ -854,9 +856,9 @@ void GridObj::LBM_initSolidLab() {
 
 		(level != 0) && 
 
-		(L_obj_x_max >= Ng_lim - 2 || L_obj_x_min <= 1 || L_obj_y_max >= Mg_lim - 2 || L_obj_y_min <= 1 
+		(L_block_x_max >= Ng_lim - 2 || L_block_x_min <= 1 || L_block_y_max >= Mg_lim - 2 || L_block_y_min <= 1 
 #if (L_dims == 3)
-		|| L_obj_z_max >= Kg_lim - 2 || L_obj_z_min <= 1
+		|| L_block_z_max >= Kg_lim - 2 || L_block_z_min <= 1
 #endif
 		)
 	
@@ -871,9 +873,9 @@ void GridObj::LBM_initSolidLab() {
 
 
 	// Loop over object definition in global indices
-	for (i = L_obj_x_min; i <= L_obj_x_max; i++) {
-		for (j = L_obj_y_min; j <= L_obj_y_max; j++) {
-			for (k = L_obj_z_min; k <= L_obj_z_max; k++)
+	for (i = L_block_x_min; i <= L_block_x_max; i++) {
+		for (j = L_block_y_min; j <= L_block_y_max; j++) {
+			for (k = L_block_z_min; k <= L_block_z_max; k++)
 			{
 
 				// Only label if the site is on current rank
@@ -980,7 +982,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1001,7 +1003,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1027,7 +1029,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_VIRTUAL_WINDTUNNEL || defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
@@ -1050,9 +1052,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif defined L_VIRTUAL_WINDTUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = eSymmetry;	// Label as symmetry boundary
-#elif (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
 #endif
 

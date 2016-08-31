@@ -1,5 +1,12 @@
-version=1.1.0 **** WORKING VERSION ****
+version=1.1.1 (WORKING VERSION)
 
+Issue #69: Patch to fix new point cloud reader where solid bodies were not being inserted correctly.
+Issue #77: Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.
+Issue #76: Fixed crash when using solid block due to erroneous Re definition.
+
+version=1.1.0
+
+Issue #75: New tool for inlet profile generator -- add a tab for your own type of profile.
 Issue #69: Unification of point cloud readers and added capability for IBB construction from point clouds.
 Issue #39: Removal of VTK and Tecplot writers and implementation of HDF5 writer instead.
 Issue #72: Added enumeration for common options in utility routines, boundary methods and LatTyp for ease of use.

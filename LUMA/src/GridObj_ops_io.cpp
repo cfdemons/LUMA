@@ -311,8 +311,10 @@ void GridObj::io_restart(bool IO_flag) {
 			for (j = 0; j < M_lim; j++) {
 				for (i = 0; i < N_lim; i++) {
 					
+#ifdef BUILD_FOR_MPI
 					// Don't write out the receiver layer sites to avoid duplication
 					if (GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k])) continue;
+#endif
 
 					// Grid level and region
 					file << level << "\t" << region_number << "\t";
@@ -364,7 +366,7 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open("./restart_LBM.out", std::ios::in);
+		file.open("./input/restart_LBM.out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;
@@ -436,9 +438,8 @@ void GridObj::io_restart(bool IO_flag) {
 		//////////////////////
 
 #ifdef IBM_ON
-
-		ObjectManager::getInstance()->io_restart(IO_flag, level);
-
+		if (level == IB_Lev)
+			ObjectManager::getInstance()->io_restart(IO_flag, level);
 #endif
 
 

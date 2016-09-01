@@ -253,8 +253,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	double h_minus = std::min( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
-	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
-		+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units //TODO Think if this needs to change between grids
+	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus;	// TODO Find out why this has such a drastic effect on everything
+		//+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units //TODO Think if this needs to change between grids
 
 
 	// Test to see if required support nodes are available
@@ -553,7 +553,7 @@ double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
 	//////////////////
 
 	// Settings
-    double tolerance = 1.0e-4;
+    double tolerance = 1.0e-5;
 	int maxiterations = 2500;
 	double minimum_residual_achieved;
 

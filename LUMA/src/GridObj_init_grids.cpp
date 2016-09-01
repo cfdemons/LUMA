@@ -827,6 +827,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/pGrid.omega - .5) *2) + .5);
 
+	// Lattice viscosity is constant across subgrids
+	nu = pGrid.nu;
+
 #ifdef USE_MRT
 	
 	// MRT relaxation times on the finer grid related to coarse in same way as SRT

@@ -1,5 +1,7 @@
 version=1.1.1 (WORKING VERSION)
 
+Issue #39: TL automatic exclusion and resuse of C utility rather than C++ API for HDF5.
+Issue #79: Fixed bug which allowed serial calls of a utility only compatible with MPI builds; also fixes for writing out IBB to restart correctly.
 Issue #69: Patch to fix new point cloud reader where solid bodies were not being inserted correctly.
 Issue #77: Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.
 Issue #76: Fixed crash when using solid block due to erroneous Re definition.

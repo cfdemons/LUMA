@@ -120,10 +120,12 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 						<< iBody[b].markers[m].position[1] << "\t"
 						<< iBody[b].markers[m].position[2] << "\t";
 
-				// Old positions of each marker
-				file	<< iBody[b].markers[m].position_old[0] << "\t"
+				if (iBody[b].flex_rigid) {
+					// Old positions of each marker
+					file << iBody[b].markers[m].position_old[0] << "\t"
 						<< iBody[b].markers[m].position_old[1] << "\t"
 						<< iBody[b].markers[m].position_old[2] << "\t";
+				}
 
 			}
 
@@ -140,7 +142,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 
 		// Only level 0 grids can own IB-bodies
 		if (level == 0) {
-			file.open("./restart_IBBody.out", std::ios::in);
+			file.open("./input/restart_IBBody.out", std::ios::in);
 		}
 
 		if (!file.is_open()) {
@@ -201,10 +203,12 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 						>> iBody[b].markers[m].position[1]
 						>> iBody[b].markers[m].position[2];
 
-				// Old positions of each marker
-				iss		>> iBody[b].markers[m].position_old[0]
+				if (iBody[b].flex_rigid) {
+					// Old positions of each marker
+					iss >> iBody[b].markers[m].position_old[0]
 						>> iBody[b].markers[m].position_old[1]
 						>> iBody[b].markers[m].position_old[2];
+				}
 
 			}
 

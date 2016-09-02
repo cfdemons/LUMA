@@ -47,7 +47,7 @@
 //#define L_BFL_DEBUG				// Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				// Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				// Write out the initialisation, time step and mpi timings to an output file
-//#define L_PHDF_DEBUG				// Write some HDF5 debugging information when using MPI
+#define L_HDF_DEBUG				// Write some HDF5 debugging information
 
 
 /*
@@ -64,7 +64,7 @@
 #define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 500			// How many timesteps before whole grid output
+#define L_out_every 100			// How many timesteps before whole grid output
 #define L_output_precision 3		// Precision of output (for text writers)
 
 // Types of output
@@ -102,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 10000	// Number of time steps
+#define L_Timesteps 500	// Number of time steps
 
 
 /*
@@ -128,7 +128,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3	// Number of dimensions to the problem
+#define L_dims 2	// Number of dimensions to the problem
 #define L_N 100		// Number of x lattice sites
 #define L_M 60		// Number of y lattice sites
 #define L_K 60		// Number of z lattice sites
@@ -456,6 +456,9 @@ const static int zProbeLims[2] = {30, 120};
 	const static int RefYend[1][1]		= {0};
 	static int RefZstart[1][1]			= {0};
 	static int RefZend[1][1]			= {0};
+
+	#undef L_NumReg
+	#define L_NumReg 1
 #endif
 
 // Clean up for using profiled inlet

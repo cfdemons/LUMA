@@ -62,7 +62,7 @@
 //#define BUILD_FOR_MPI
 
 // Output Options
-#define out_every 1			// How many timesteps before whole grid output
+#define out_every 50			// How many timesteps before whole grid output
 #define output_precision 6		// Precision of output
 
 // Types of output
@@ -89,8 +89,8 @@ const static int zProbeLims[2] = {30, 120};
 
 // Initialisation
 #define NO_FLOW			// Initialise the domain with no flow
-#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
-#define restart_out_every 2
+//#define RESTARTING		// Initialise the GridObj with quantities read from a restart file
+#define restart_out_every 30000
 
 // LBM configuration
 //#define USE_MRT
@@ -109,7 +109,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define T 316800	// Number of time steps
+#define T 19800	// Number of time steps
 
 
 /*
@@ -136,16 +136,16 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define dims 2		// Number of dimensions to the problem
-#define N (4*220+1)		// Number of x lattice sites
-#define M (4*41+2)		// Number of y lattice sites
+#define N (1*220+1)		// Number of x lattice sites
+#define M (1*41+2)		// Number of y lattice sites
 #define K 30		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
-#define a_x -0.00125		// Start of domain-x
-#define b_x 2.20125		// End of domain-x
-#define a_y -0.0025		// Start of domain-y
-#define b_y 0.4125		// End of domain-y
+#define a_x -0.005		// Start of domain-x
+#define b_x 2.205		// End of domain-x
+#define a_y -0.01		// Start of domain-y
+#define b_y 0.42		// End of domain-y
 #define a_z 0		// Start of domain-z
 #define b_z 8		// End of domain-z
 
@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // Fluid data in lattice units
 //#define USE_INLET_PROFILE
-#define u_ref (0.0707070707070707/4.0)		// Reference velocity for scaling (mean inlet velocity)
+#define u_ref (0.0707070707070707)		// Reference velocity for scaling (mean inlet velocity)
 #define u_max u_ref*1.5		// Max velocity of profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -198,7 +198,7 @@ const static int zProbeLims[2] = {30, 120};
 //#define _3D_PLATE_WITH_FLAP
 
 // Global properties
-#define num_markers 248		// Number of Lagrange points (approximately)
+#define num_markers 62		// Number of Lagrange points (approximately)
 #define ibb_deform false	// Default deformable property of body to be built
 
 // Physical dimensions of rigid IB body or flexible plate
@@ -348,10 +348,10 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {20, 15}, {10, 10} };
 
 #elif (NumReg == 1 && NumLev == 1)
-	const static size_t RefXstart[NumLev][NumReg]	= { 20 };
-	const static size_t RefXend[NumLev][NumReg]		= { 440 };
-	const static size_t RefYstart[NumLev][NumReg]	= { 13 };
-	const static size_t RefYend[NumLev][NumReg]		= { 152 };
+	const static size_t RefXstart[NumLev][NumReg]	= { 5 };
+	const static size_t RefXend[NumLev][NumReg]		= { 110 };
+	const static size_t RefYstart[NumLev][NumReg]	= { 4 };
+	const static size_t RefYend[NumLev][NumReg]		= { 38 };
 	// If doing 2D, these can be arbitrary values
 	static size_t RefZstart[NumLev][NumReg]		= { 5 };
 	static size_t RefZend[NumLev][NumReg]		= { 35 };

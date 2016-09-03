@@ -734,11 +734,13 @@ int MpiManager::mpi_getOpposite(int direction) {
 // Must be called AFTER the grids and buffers have been initialised.
 int MpiManager::mpi_buildCommunicators() {
 
-	*GridUtils::logfile << "Creating sub-grid communicators...";
+	*GridUtils::logfile << "Creating sub-grid communicators for HDF5...";
 
+	// Declarations
 	int status;
 	int colour;		// Colour indicates which new communicator this process belongs to
 	int key = MpiManager::my_rank;	// Global rank as key (dictates numbering in new communicator)
+	int N_global, M_global, K_global;	// Global grid sizes
 
 	// Start by adding the L0 details
 	p_data.emplace_back();
@@ -750,7 +752,7 @@ int MpiManager::mpi_buildCommunicators() {
 	int M_lim = static_cast<int>(Grids->YPos.size());
 	int K_lim = static_cast<int>(Grids->ZPos.size());
 
-	// Halo exists on all edges on L0
+	// Halo exists on all edges on L0 and there are no transition layers
 	p_data.back().i_end = N_lim - 2;
 	p_data.back().i_start = 1;
 	p_data.back().j_end = M_lim - 2;
@@ -780,9 +782,9 @@ int MpiManager::mpi_buildCommunicators() {
 			// If sub-grid found
 			if (targetGrid != NULL) {
 
-				/* Since we are doing this to use HDF5 we can exclude those ranks
-				 * which do not contain sub-grid regions that will need to be 
-				 * written out. If we did, at write-time the buffer size would be
+				/* Since we are doing this only for HDF5 we can exclude those ranks
+				 * which do not contain sub-grid regions that will need to be
+				 * written out. If we didn't, at write-time the buffer size would be
 				 * zero and the HDF5 write would fail. So now we check for writable
 				 * data by checking the buffers versus the grid size. */
 
@@ -790,6 +792,11 @@ int MpiManager::mpi_buildCommunicators() {
 				N_lim = static_cast<int>(targetGrid->XPos.size());
 				M_lim = static_cast<int>(targetGrid->YPos.size());
 				K_lim = static_cast<int>(targetGrid->ZPos.size());
+
+				// Get global grid sizes
+				N_global = 2 * (RefXend[lev - 1][reg] - RefXstart[lev - 1][reg] + 1);
+				M_global = 2 * (RefYend[lev - 1][reg] - RefYstart[lev - 1][reg] + 1);
+				K_global = 2 * (RefZend[lev - 1][reg] - RefZstart[lev - 1][reg] + 1);
 
 				// Add a new phdf5_struct
 				p_data.emplace_back();
@@ -806,81 +813,151 @@ int MpiManager::mpi_buildCommunicators() {
 					}
 				}
 
+				// Halo / TL thickness
+				int halo_thickness = static_cast<int>(pow(2, targetGrid->level));
+
 				// Set halo descriptors
 				p_data.back().halo_min = 0, p_data.back().halo_max = 0;	// Boolean flags
 				p_data.back().i_start = 0, p_data.back().i_end = 0,		// Indices
 				p_data.back().j_start = 0, p_data.back().j_end = 0,
 				p_data.back().k_start = 0, p_data.back().k_end = 0;
 
-				// Check x-direction for halo
+				// Check x-directions for halo
 				if (bri.size[1]) {
-					p_data.back().i_end = N_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
+					p_data.back().i_end = N_lim - halo_thickness - 1;
 				}
 				else {
 					p_data.back().i_end = N_lim - 1;
 				}
 
 				if (bri.size[0]) {
-					p_data.back().i_start = static_cast<int>(pow(2, targetGrid->level));
+					p_data.back().i_start = halo_thickness;
 				}
 				else {
 					p_data.back().i_start = 0;
 				}
 
-				// Check y-direction for halo
+				// Check y-directions for halo
 				if (bri.size[5]) {
-					p_data.back().j_end = M_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
-					p_data.back().halo_max = 1;
+					p_data.back().j_end = M_lim - halo_thickness - 1;
+#if (L_dims != 0)
+					p_data.back().halo_max++;	// Increment halo counter for striding
+#endif
 				}
 				else {
 					p_data.back().j_end = M_lim - 1;
 				}
 
 				if (bri.size[4]) {
-					p_data.back().j_start = static_cast<int>(pow(2, targetGrid->level));
-					p_data.back().halo_min = 1;
+					p_data.back().j_start = halo_thickness;
+#if (L_dims != 0)
+					p_data.back().halo_min++;
+#endif
 				}
 				else {
 					p_data.back().j_start = 0;
 				}
 
 #if (L_dims == 3)
-				// Check z-direction for halo
+				// Check z-directions for halo
 				if (bri.size[9]) {
-					p_data.back().k_end = K_lim - static_cast<int>(pow(2, targetGrid->level)) - 1;
-					p_data.back().halo_max = 1;
+					p_data.back().k_end = K_lim - halo_thickness - 1;
+					p_data.back().halo_max++;
 				}
 				else {
 					p_data.back().k_end = K_lim - 1;
-					p_data.back().halo_max = 0;
 				}
 
 				if (bri.size[8]) {
-					p_data.back().k_start = static_cast<int>(pow(2, targetGrid->level));
-					p_data.back().halo_min = 1;
+					p_data.back().k_start = halo_thickness;
+					p_data.back().halo_min++;
 				}
 				else {
 					p_data.back().k_start = 0;
-					p_data.back().halo_min = 0;
 				}
 #else
-				p_data.back().k_start = 0; p_data.back().k_end = 0;
+				p_data.back().k_start = 0;
+				p_data.back().k_end = 0;
 #endif
 
-				// If writable data is >0 then set colour to 1 to include in sub-grid communicator
-				p_data.back().writable_data_count =
-					(p_data.back().i_end - p_data.back().i_start + 1) *
-					(p_data.back().j_end - p_data.back().j_start + 1) *
-					(p_data.back().k_end - p_data.back().k_start + 1);
-				if (p_data.back().writable_data_count) colour = 1; else colour = MPI_UNDEFINED;
+				/* Now account for transition layers -- If the current indices
+				 * defining the writable region have a global index that is in
+				 * the TL then we can shift them off the TL. It is possible that
+				 * this causes indices to be negative or writable regions to
+				 * have a size < 0 which indicates that the rank has no writable
+				 * data. */
+				if (targetGrid->XInd[p_data.back().i_start] < halo_thickness) {
+					p_data.back().i_start += halo_thickness;
+				}
+				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - halo_thickness) {
+					p_data.back().i_end -= halo_thickness;
+				}
+
+				if (targetGrid->YInd[p_data.back().j_start] < halo_thickness) {
+					p_data.back().j_start += halo_thickness;
+#if (L_dims != 3)
+					p_data.back().halo_min++;		// Account for both halo and TL during striding
+#endif
+				}
+				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - halo_thickness) {
+					p_data.back().j_end -= halo_thickness;
+#if (L_dims != 3)
+					p_data.back().halo_max++;
+#endif
+				}
+
+#if (L_dims == 3)
+				if (targetGrid->ZInd[p_data.back().k_start] < halo_thickness) {
+					p_data.back().k_start += halo_thickness;
+					p_data.back().halo_min++;
+				}
+				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - halo_thickness) {
+					p_data.back().k_end -= halo_thickness;
+					p_data.back().halo_max++;
+				}
+#endif
+
+
+#ifdef L_MPI_VERBOSE
+				*logout << "Writable data limits computed as: " << std::endl <<
+					p_data.back().i_start << " - " << p_data.back().i_end << std::endl << "\t" <<
+					p_data.back().j_start << " - " << p_data.back().j_end << std::endl << "\t" <<
+					p_data.back().k_start << " - " << p_data.back().k_end << std::endl;
+
+				*logout << "Halo thicknesses are: " <<
+					p_data.back().halo_min << " & " << p_data.back().halo_max << std::endl;
+#endif
+
+				// Test for writable data
+				if	(
+					(p_data.back().i_end - p_data.back().i_start + 1) > 0 &&
+					(p_data.back().j_end - p_data.back().j_start + 1) > 0 &&
+					(p_data.back().k_end - p_data.back().k_start + 1) > 0
+					) {
+
+					// Writable data found to include in communicator
+					colour = 1;
+					p_data.back().writable_data_count =
+						(p_data.back().i_end - p_data.back().i_start + 1) *
+						(p_data.back().j_end - p_data.back().j_start + 1) *
+						(p_data.back().k_end - p_data.back().k_start + 1);
+				}
+				else {
+
+					// No writable data on the grid so exclude from communicator
+					colour = MPI_UNDEFINED;
+					p_data.back().writable_data_count = 0;
+				}
+
 
 			}
 			else {
+				// Grid not on this rank so exclude from communicator
 				colour = MPI_UNDEFINED;
 			}
 			
-			// Define new communicator which contains sub-grids of this level and region
-			// by splitting the global communicator
+			// Define new communicator which contains writable sub-grids of this level and region
+			// by splitting the global communicator using the flags provided.
 			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NumLev]);
 
 #ifdef L_MPI_VERBOSE

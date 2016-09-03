@@ -47,7 +47,7 @@
 //#define L_BFL_DEBUG				// Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				// Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				// Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				// Write some HDF5 debugging information
+//#define L_HDF_DEBUG				// Write some HDF5 debugging information
 
 
 /*
@@ -128,7 +128,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2	// Number of dimensions to the problem
+#define L_dims 3	// Number of dimensions to the problem
 #define L_N 100		// Number of x lattice sites
 #define L_M 60		// Number of y lattice sites
 #define L_K 60		// Number of z lattice sites

@@ -137,10 +137,24 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	// Strided copy variables
 	size_t m_count, m_stride, m_offset, m_block;
 
-	// Get global offsets for start of file space from the indexing vector
+	// Get starting positions in file space
+#ifdef L_BUILD_FOR_MPI
+
+	/* Get global offsets for start of file space from the indexing vector.
+	 * Correct the offset due to TL presence. */
 	f_offset[0] = g->XInd[i_start] - TL_thickness;
 	f_offset[1] = g->YInd[j_start] - TL_thickness;
+#if (L_dims == 3)
+	f_offset[2] = g->ZInd[k_start] - TL_thickness;
+#endif	
 
+#else
+	// In serial, only a single process so start writing at the beginning of the file
+	for (int d = 0; d < L_dims; d++) f_offset[d] = 0;
+
+#endif // L_BUILD_FOR_MPI
+
+	// Block size based on local writable data
 	f_block[0] = i_end - i_start + 1;
 	f_block[1] = j_end - j_start + 1;
 
@@ -149,8 +163,8 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	f_stride[0] = f_block[0];
 	f_stride[1] = f_block[1];
+
 #if (L_dims == 3)
-	f_offset[2] = g->ZInd[k_start] - TL_thickness;
 	f_block[2] = k_end - k_start + 1;
 	f_count[2] = 1;
 	f_stride[2] = f_block[2];

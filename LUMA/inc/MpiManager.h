@@ -90,7 +90,7 @@ public :
 
 
 	// Grid data
-	int global_dims[3];						// Dimensions of problem coarse lattice
+	int global_dims[3];				// Dimensions of problem coarse lattice
 	std::vector<int> local_size;	// Dimensions of coarse lattice represented on this rank (includes inner and outer overlapping layers)
 	// Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer)
 	std::vector< std::vector<int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number

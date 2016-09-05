@@ -409,25 +409,13 @@ int main( int argc, char* argv[] )
 
 
 #ifdef L_BUILD_FOR_MPI
-
-	if (L_NumLev != 0) {
-
-		*GridUtils::logfile << "Creating communicators...";
-
-		// Create communicators for sub-grids
-		mpim->mpi_buildSubGridCommunicators();
-
-		*GridUtils::logfile << "Complete." << std::endl;
-	}
-
+	
 	// Compute buffer sizes
-	MPI_Barrier(mpim->world_comm);
-	t_start = clock();
-	
-	mpim->mpi_buffer_size();	// Call buffer sizing routine
-	
-	secs = clock() - t_start;
-	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	mpim->mpi_buffer_size();
+
+	//  Build halo descriptors and sub-grid communicators
+	mpim->mpi_buildCommunicators();
+
 #endif
 
 

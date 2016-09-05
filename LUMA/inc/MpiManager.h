@@ -56,8 +56,32 @@ public :
 #if (L_NumLev > 0)
 	MPI_Comm subGrid_comm[L_NumLev*L_NumReg];	
 #else
-	MPI_Comm subGrid_comm[1];
+	MPI_Comm subGrid_comm[1];	// Default to size = 1
 #endif
+
+	/* Structure storing indices and boolean flags
+	* related to the presence of halo regions in
+	* MPI PHDF5 writing. Also stores the amount of
+	* writable data on the grid. */
+	struct phdf5_struct {
+	
+		int i_start;
+		int i_end;
+		int j_start;
+		int j_end;
+		int k_start;
+		int k_end;
+		int halo_min;
+		int halo_max;
+
+		// Identifiers
+		int level;
+		int region;
+
+		// Data count
+		unsigned int writable_data_count = 0;
+	};
+	std::vector<phdf5_struct> p_data;			// Structure containing halo descriptors for block writing (HDF5)
 	
 	// Static Data (commonly used and grid-independent)
 	static int my_rank;				// Rank number
@@ -66,7 +90,7 @@ public :
 
 
 	// Grid data
-	int global_dims[3];						// Dimensions of problem coarse lattice
+	int global_dims[3];				// Dimensions of problem coarse lattice
 	std::vector<int> local_size;	// Dimensions of coarse lattice represented on this rank (includes inner and outer overlapping layers)
 	// Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer)
 	std::vector< std::vector<int> > global_edge_ind;	// Rows are x,y,z start and end pairs and columns are rank number
@@ -113,7 +137,7 @@ public :
 	// Initialisation
 	void mpi_init();		// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
-	int mpi_buildSubGridCommunicators();	// Create a new communicator for each sub-grid and region combo
+	int mpi_buildCommunicators();	// Create a new communicator for each sub-grid and region combo
 
 	// Buffer methods
 	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction

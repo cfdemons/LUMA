@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.1.0 (WORKING VERSION)"
+#define LUMA_VERSION "1.1.1 (WORKING VERSION)"
 
 
 // Header guard
@@ -47,6 +47,7 @@
 //#define L_BFL_DEBUG				// Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				// Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				// Write out the initialisation, time step and mpi timings to an output file
+//#define L_HDF_DEBUG				// Write some HDF5 debugging information
 
 
 /*
@@ -60,11 +61,11 @@
 #define L_PI 3.14159265358979323846
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI
+#define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 100				// How many timesteps before whole grid output
-#define L_output_precision 3		// Precision of output
+#define L_out_every 100			// How many timesteps before whole grid output
+#define L_output_precision 3		// Precision of output (for text writers)
 
 // Types of output
 //#define L_TEXTOUT
@@ -101,7 +102,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 1000	// Number of time steps
+#define L_Timesteps 500	// Number of time steps
 
 
 /*
@@ -128,18 +129,18 @@ const static int zProbeLims[2] = {30, 120};
 
 // Lattice properties (in lattice units)
 #define L_dims 3	// Number of dimensions to the problem
-#define L_N 128		// Number of x lattice sites
-#define L_M 64		// Number of y lattice sites
-#define L_K 64		// Number of z lattice sites
+#define L_N 100		// Number of x lattice sites
+#define L_M 60		// Number of y lattice sites
+#define L_K 60		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0		// Start of domain-x
-#define L_b_x 2		// End of domain-x
+#define L_b_x 5		// End of domain-x
 #define L_a_y 0		// Start of domain-y
-#define L_b_y 1		// End of domain-y
+#define L_b_y 3		// End of domain-y
 #define L_a_z 0		// Start of domain-z
-#define L_b_z 1		// End of domain-z
+#define L_b_z 3		// End of domain-z
 
 
 /*
@@ -159,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};
 #define L_u_0z 0			// Initial z-velocity
 
 #define L_rho_in 1			// Initial density
-#define L_Re 2000			// Desired Reynolds number
+#define L_Re 5000			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -171,7 +172,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Master IBM switches //
-#define L_IBM_ON						// Turn on IBM
+//#define L_IBM_ON						// Turn on IBM
 
 //#define L_STOP_EPSILON_RECOMPUTE		// Prevent recomputing of epsilon in an attempt to save time
 #define L_CHEAP_NEAREST_NODE_DETECTION	// Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -242,8 +243,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Virtual Wind Tunnels
-//#define L_VIRTUAL_WINDTUNNEL		// Adds a symmetry condition to the ceiling and inlet on floor
-//#define L_FLAT_PLATE_TUNNEL		// Adds an inlet to all faces except exit
+//#define L_UPSTREAM_TUNNEL			// Adds an inlet to all faces except exit
 #define L_FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
 
@@ -255,7 +255,7 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Outlets
-#define L_OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall for now -- default First Order Extrap.)
+#define L_OUTLET_ON				// Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
 //#define L_OUTLET_NRBC			// Turn on NRBC at outlet
 
 
@@ -277,18 +277,18 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+#define L_SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
-	#define L_block_on_grid_lev 0		// Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 2		// Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_obj_x_min 32		// Index of start of object/wall in x-direction
-	#define L_obj_x_max 64		// Index of end of object/wall in x-direction
-	#define L_obj_y_min 16			// Index of start of object/wall in y-direction
-	#define L_obj_y_max 48		// Index of end of object/wall in y-direction
-	#define L_obj_z_min 16		// Index of start of object/wall in z-direction
-	#define L_obj_z_max 48		// Index of end of object/wall in z-direction
+	#define L_block_x_min 20		// Index of start of object/wall in x-direction
+	#define L_block_x_max 60		// Index of end of object/wall in x-direction
+	#define L_block_y_min 4			// Index of start of object/wall in y-direction
+	#define L_block_y_max 44		// Index of end of object/wall in y-direction
+	#define L_block_z_min 10		// Index of start of object/wall in z-direction
+	#define L_block_z_max 50		// Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
@@ -297,12 +297,12 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_object_on_grid_lev 2		// Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 16
-	#define L_start_object_y 16
-	#define L_centre_object_z 80
-	#define L_object_length 64				// The object input is scaled based on this dimension
+	#define L_start_object_x 20
+	#define L_start_object_y 4
+	#define L_centre_object_z 30
+	#define L_object_length 80				// The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection		// Scale in this direction (Specify as enumeration)
-	#define L_object_length_ref 64			// Reference length to be used in the definition of Reynolds number
+	#define L_object_length_ref 80			// Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
@@ -353,13 +353,13 @@ const static int zProbeLims[2] = {30, 120};
 	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {16}, {8} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {60}, {80} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {22}, {8} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {42}, {32} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {30}, {10} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {70}, {70} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {0}, {0} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {20}, {30} };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {8}, {8} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {56}, {88} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };
 
 #elif (NumReg == 1 && NumLev == 3)
 	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };
@@ -422,11 +422,11 @@ const static int zProbeLims[2] = {30, 120};
 	#define L_K 1
 
 	// Set object limits for 2D
-	#undef L_obj_z_min
-	#define L_obj_z_min 0
+	#undef L_block_z_min
+	#define L_block_z_min 0
 
-	#undef L_obj_z_max
-	#define L_obj_z_max 0
+	#undef L_block_z_max
+	#define L_block_z_max 0
 
 	#undef L_ibb_d
 	#define L_ibb_d 0
@@ -457,6 +457,9 @@ const static int zProbeLims[2] = {30, 120};
 	const static int RefYend[1][1]		= {0};
 	static int RefZstart[1][1]			= {0};
 	static int RefZend[1][1]			= {0};
+
+	#undef L_NumReg
+	#define L_NumReg 1
 #endif
 
 // Clean up for using profiled inlet

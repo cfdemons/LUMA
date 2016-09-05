@@ -501,12 +501,21 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_write_body_pos(Grids.t);
 #endif
+		}
 
-#if defined L_LD_OUT && defined L_IBM_ON
+		// Write out forces of objects
+#ifdef L_LD_OUT
+		if (Grids.t % L_out_every_forces == 0) {
+
+			*GridUtils::logfile << "Writing out object lift and drag" << endl;
+			objMan->io_writeForceOnObject(Grids.t);
+
+#ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
 			objMan->io_write_lift_drag(Grids.t);
 #endif
-		}		
+		}
+#endif	
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT

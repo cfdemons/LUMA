@@ -18,7 +18,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/definitions.h"
-#include "../inc/globalvars.h"
 #include "../inc/BFLBody.h"
 #include "../inc/ObjectManager.h"
 #include <numeric>
@@ -33,6 +32,8 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 	int M_lim = static_cast<int>(YPos.size());
 	int K_lim = static_cast<int>(ZPos.size());
 
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Loop over grid, identify BC required & apply BC
 	for (int i = 0; i < N_lim; i++) {
@@ -50,6 +51,11 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 					// Apply half-way bounce-back
 					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+
+#ifdef L_LD_OUT
+					// Compute lift and drag contribution of this site
+					objman->computeLiftDrag(i, j, k, M_lim, K_lim, this);
+#endif
 
 				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eSymmetry || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSymmetry)
 					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry)) {

@@ -344,6 +344,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Get grid pointer
 	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 
+	// Return if this process does not have this grid
+	if (g == NULL) return;
+
 	// Loop over lines in file
 	while (!file.eof()) {
 
@@ -431,10 +434,11 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		global_k = getVoxInd(_PCpts->z[a]);
 
 		// If on this rank
-		if ( GridUtils::isOnThisRank(global_i, global_j, global_k, *g) ) {
+		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
 			// Increment counter
 			a++;
-		} 
+
+		}
 		// If not, erase
 		else {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
@@ -467,18 +471,15 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		{
 
 		case eBBBCloud:
-
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
 			// Label the grid sites
 			for (size_t a = 0; a < _PCpts->x.size(); a++) {
-
 				// Get globals
 				global_i = getVoxInd(_PCpts->x[a]);
 				global_j = getVoxInd(_PCpts->y[a]);
 				global_k = getVoxInd(_PCpts->z[a]);
-
 				// Get local indices
 				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
 
@@ -489,7 +490,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 				}
 			}
 			break;
-
 		case eBFLCloud:
 
 #ifdef L_CLOUD_DEBUG
@@ -500,16 +500,65 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			break;
 
 		case eIBBCloud:
+				global_j = getVoxInd(_PCpts->y[a]);
+				global_k = getVoxInd(_PCpts->z[a]);
 
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
-#endif
 			// Call IBM body builder
 			ibm_build_body(_PCpts, g);
 			break;
 
-		}
+				// Update Typing Matrix
+				if (g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid)
+				{
+					g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid;
+				}
+			}
+			break;
 
+		case eBFLCloud:
+			// Call BFL body builder
+			bfl_build_body(_PCpts);
+			break;
+}
+// *****************************************************************************
+// Routine for writing out the lift and drag forces on a BB object 
+void ObjectManager::io_writeForceOnObject(double tval) {
+	// Get grid on which object resides
+	GridObj *g = NULL;
+	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);
+	// If this grid exists on this process
+	if (g != NULL)
+	{
+		// Create stream
+		std::ofstream fout;
+		fout.precision(L_output_precision);
+		// Filename
+		std::stringstream fileName;
+		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << MpiManager::my_rank << ".csv";
+		// Open file
+		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+		// Write out the header (first time step only)
+		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
+
+		fout << std::to_string(tval) << ","
+			<< std::to_string(force_on_object_x / pow(2, L_object_on_grid_lev)) << ","
+			<< std::to_string(force_on_object_y / pow(2, L_object_on_grid_lev)) << ","
+#if (dims == 3)
+			<< std::to_string(force_on_object_z / pow(2, L_object_on_grid_lev))
+#else
+			<< std::to_string(0.0)
+#endif
+			<< std::endl;
+
+		fout.close();
+
+		// Reset for next time step
+		force_on_object_x = 0.0;
+		force_on_object_y = 0.0;
+		force_on_object_z = 0.0;
 	}
 
 }
+// *****************************************************************************

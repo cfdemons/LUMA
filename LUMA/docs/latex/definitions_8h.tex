@@ -1,0 +1,542 @@
+\hypertarget{definitions_8h}{}\section{definitions.\+h File Reference}
+\label{definitions_8h}\index{definitions.\+h@{definitions.\+h}}
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$mpi.\+h$>$}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{definitions_8h_aad986a4e7a930719eb54951337fdf420}{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}~\char`\"{}1.\+1.\+1 (W\+O\+R\+K\+I\+NG V\+E\+R\+S\+I\+ON)\char`\"{}
+\item 
+\#define \hyperlink{definitions_8h_a90bb6a4429387db750f2c1bcd62673a7}{L\+\_\+\+PI}~3.\+14159265358979323846
+\item 
+\#define \hyperlink{definitions_8h_a8d3ae8088334a2477471d505546b51ee}{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}
+\item 
+\#define \hyperlink{definitions_8h_a28a1709dcacfade3f52e8abde7248f8a}{L\+\_\+out\+\_\+every}~100
+\item 
+\#define \hyperlink{definitions_8h_a6bfdb308641f4abefbe4f84a0d91e87b}{L\+\_\+output\+\_\+precision}~3
+\item 
+\#define \hyperlink{definitions_8h_ad1af4e8e23e70d05d6c600358a956bf0}{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}
+\item 
+\#define \hyperlink{definitions_8h_a405f8556b70b007f8c480015610cf517}{L\+\_\+out\+\_\+every\+\_\+probe}~250
+\item 
+\#define \hyperlink{definitions_8h_ac45ba1fe68555e0459bddd00e5d5009b}{L\+\_\+grav\+\_\+force}~1e-\/10
+\item 
+\#define \hyperlink{definitions_8h_a6785b0bdf3212af90868abaaec40bf21}{L\+\_\+grav\+\_\+direction}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
+\item 
+\#define \hyperlink{definitions_8h_abeda74d1aa49dee75dba26d1c718c389}{L\+\_\+restart\+\_\+out\+\_\+every}~10000
+\item 
+\#define \hyperlink{definitions_8h_ac1d657764693d08a528d49e6bea2ce10}{L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}
+\item 
+\#define \hyperlink{definitions_8h_a867735b7b941ea07d4a5628726831533}{L\+\_\+\+Timesteps}~500
+\item 
+\#define \hyperlink{definitions_8h_ac4d66c8ce40c53cfad97fb18baa547bb}{L\+\_\+\+Xcores}~2
+\item 
+\#define \hyperlink{definitions_8h_aec277aa78e57cf83fa31c00f8cf340dc}{L\+\_\+\+Ycores}~2
+\item 
+\#define \hyperlink{definitions_8h_a4c91fbc1e982033c77873475deb6024e}{L\+\_\+\+Zcores}~2
+\item 
+\#define \hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}~3
+\item 
+\#define \hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N}~100
+\item 
+\#define \hyperlink{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{L\+\_\+M}~60
+\item 
+\#define \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K}~60
+\item 
+\#define \hyperlink{definitions_8h_ad59618fcac4982530d1c348b0f8ca20e}{L\+\_\+a\+\_\+x}~0
+\item 
+\#define \hyperlink{definitions_8h_a1c85335eb1cd508129b82699c30d8271}{L\+\_\+b\+\_\+x}~5
+\item 
+\#define \hyperlink{definitions_8h_a580607e34a98d82c4cfecc1d37171851}{L\+\_\+a\+\_\+y}~0
+\item 
+\#define \hyperlink{definitions_8h_a619d566c8b0abcfc57ca2c22bd9515b2}{L\+\_\+b\+\_\+y}~3
+\item 
+\#define \hyperlink{definitions_8h_a09f97787185ad5c9ca8a4ee44b8497ee}{L\+\_\+a\+\_\+z}~0
+\item 
+\#define \hyperlink{definitions_8h_af329088f34d9abfe82be4fb904c5cb46}{L\+\_\+b\+\_\+z}~3
+\item 
+\#define \hyperlink{definitions_8h_a6cab568b829e40a2d5cf29812f00e10f}{L\+\_\+u\+\_\+ref}~0.\+04
+\item 
+\#define \hyperlink{definitions_8h_aec738206085d5c94e9197a9cd011d3d7}{L\+\_\+u\+\_\+max}~0.\+06
+\item 
+\#define \hyperlink{definitions_8h_a3757e94ba12a363feb127ba8cf37a851}{L\+\_\+u\+\_\+0x}~\hyperlink{definitions_8h_a6cab568b829e40a2d5cf29812f00e10f}{L\+\_\+u\+\_\+ref}
+\item 
+\#define \hyperlink{definitions_8h_a10ef77205b6a756f4571acc0bfb70936}{L\+\_\+u\+\_\+0y}~0
+\item 
+\#define \hyperlink{definitions_8h_a60d0425f97a84c3e70b976d8f498d495}{L\+\_\+u\+\_\+0z}~0
+\item 
+\#define \hyperlink{definitions_8h_aaac7141eaed748173409f411426f0b50}{L\+\_\+rho\+\_\+in}~1
+\item 
+\#define \hyperlink{definitions_8h_a190606d49203203e2efc67f307b78957}{L\+\_\+\+Re}~5000
+\item 
+\#define \hyperlink{definitions_8h_a7bdf550c43196b09145363ff95f6c970}{L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}
+\item 
+\#define \hyperlink{definitions_8h_ad147a9b6e66ad4cb7c9a7092abb15101}{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}~2
+\item 
+\#define \hyperlink{definitions_8h_ace0346b65662c14105fb1f778ca0320c}{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}~0
+\item 
+\#define \hyperlink{definitions_8h_a3f091f3cc037c083cb42baf4251a54a5}{L\+\_\+start\+\_\+ibb\+\_\+x}~0.\+3
+\item 
+\#define \hyperlink{definitions_8h_af023d613197d519f7eb4e11447011b3b}{L\+\_\+start\+\_\+ibb\+\_\+y}~0.\+2
+\item 
+\#define \hyperlink{definitions_8h_adcd30f220171aa1bb0c85547bc800b3e}{L\+\_\+centre\+\_\+ibb\+\_\+z}~0.\+5
+\item 
+\#define \hyperlink{definitions_8h_a4942eb5263d963b41b06f5872461658a}{L\+\_\+ibb\+\_\+length}~0.\+5
+\item 
+\#define \hyperlink{definitions_8h_a586ccdfcaafc1ab824162929e1ff501c}{L\+\_\+ibb\+\_\+scale\+\_\+direction}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
+\item 
+\#define \hyperlink{definitions_8h_ae1cc3d6fb33100357f1b7eee60d42fd8}{L\+\_\+ibb\+\_\+length\+\_\+ref}~0.\+5
+\item 
+\#define \hyperlink{definitions_8h_ae17c4661a287d27d053ac7797ad163bd}{L\+\_\+num\+\_\+markers}~19
+\item 
+\#define \hyperlink{definitions_8h_ad1722d62c3c6f62110827c4850825538}{L\+\_\+ibb\+\_\+deform}~false
+\item 
+\#define \hyperlink{definitions_8h_abca100b5534949d5cb3ebd4064e41f56}{L\+\_\+ibb\+\_\+flex\+\_\+rigid}~false
+\item 
+\#define \hyperlink{definitions_8h_a94a5d859e52cac4623aa8a7debf6c00e}{L\+\_\+ibb\+\_\+x}~75.\+0
+\item 
+\#define \hyperlink{definitions_8h_a4ed5c6c5978975c25a2d26b891aa49d6}{L\+\_\+ibb\+\_\+y}~75.\+0
+\item 
+\#define \hyperlink{definitions_8h_a3a98916f895de923e81e6088b8cbbde1}{L\+\_\+ibb\+\_\+z}~0.\+0
+\item 
+\#define \hyperlink{definitions_8h_a380a693b4f60e7085a03cc9bd6db9f80}{L\+\_\+ibb\+\_\+w}~10.\+0
+\item 
+\#define \hyperlink{definitions_8h_a6784d3e29b10d6d2cd94a25bfbe75329}{L\+\_\+ibb\+\_\+l}~10.\+0
+\item 
+\#define \hyperlink{definitions_8h_a22b2685068d7995e49f1641ef5c7c018}{L\+\_\+ibb\+\_\+d}~0.\+0
+\item 
+\#define \hyperlink{definitions_8h_a7541a2752a0159a30e180b1c16bdd0b7}{L\+\_\+ibb\+\_\+r}~10.\+0
+\item 
+\#define \hyperlink{definitions_8h_af0aefec11dae861758d5b60d2007e265}{L\+\_\+ibb\+\_\+filament\+\_\+length}~0.\+2
+\item 
+\#define \hyperlink{definitions_8h_a1270cb0d7b3d69fed5fa7413a5185e64}{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}~0.\+3
+\item 
+\#define \hyperlink{definitions_8h_ab4f7dc975c7a091950d4a94cb3b3f43d}{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}~0.\+0
+\item 
+\#define \hyperlink{definitions_8h_a755f80c1cc8c481855c2101c7905878c}{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}~0.\+0
+\item 
+\#define \hyperlink{definitions_8h_adbbae329ebf669f5a4f2c78f8cc499e0}{L\+\_\+ibb\+\_\+angle\+\_\+vert}~90
+\item 
+\#define \hyperlink{definitions_8h_acfdaa9053e947a7623485775fe8151eb}{L\+\_\+ibb\+\_\+angle\+\_\+horz}~0
+\item 
+\#define \hyperlink{definitions_8h_ae71eb336188ba9551926ead93741f572}{L\+\_\+start\+\_\+\+BC}~2
+\item 
+\#define \hyperlink{definitions_8h_ae9adbe0d535c9153e5cc921beaa67a5f}{L\+\_\+end\+\_\+\+BC}~0
+\item 
+\#define \hyperlink{definitions_8h_a5f41263d49a3b7c6373ef46c7b1e9e4e}{L\+\_\+ibb\+\_\+delta\+\_\+rho}~1.\+0
+\item 
+\#define \hyperlink{definitions_8h_a120a5e99374e1a42aad146162a94347a}{L\+\_\+ibb\+\_\+\+EI}~2.\+0
+\item 
+\#define \hyperlink{definitions_8h_ad4f483281423d9d20a756667342a521d}{L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}
+\item 
+\#define \hyperlink{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}
+\item 
+\#define \hyperlink{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}
+\item 
+\#define \hyperlink{definitions_8h_aa56a7e1c84c19ea84f4a98280f57793f}{L\+\_\+wall\+\_\+thickness}~1
+\item 
+\#define \hyperlink{definitions_8h_a5712e15457a5bc14fe43c546c6207bd0}{L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}
+\item 
+\#define \hyperlink{definitions_8h_a7e22b54c3bad81ef4eda4a5f4e85ee52}{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}~2
+\item 
+\#define \hyperlink{definitions_8h_ad33beadff0cdb732f0f994b398c631aa}{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}~0
+\item 
+\#define \hyperlink{definitions_8h_ac3819f0aa7a8b5595e16fd298d0d3e2c}{L\+\_\+block\+\_\+x\+\_\+min}~20
+\item 
+\#define \hyperlink{definitions_8h_ac5b1d5f78c4ef5855c2b4e0fae875321}{L\+\_\+block\+\_\+x\+\_\+max}~60
+\item 
+\#define \hyperlink{definitions_8h_a1003f176ed1bfef0f66dedd3af732471}{L\+\_\+block\+\_\+y\+\_\+min}~4
+\item 
+\#define \hyperlink{definitions_8h_a636bafbc060cb8d5a001dc5d9d28fbfa}{L\+\_\+block\+\_\+y\+\_\+max}~44
+\item 
+\#define \hyperlink{definitions_8h_af673d371e4fd31af7f1180f0d26bfc7e}{L\+\_\+block\+\_\+z\+\_\+min}~10
+\item 
+\#define \hyperlink{definitions_8h_a0b04ee3d402702a993bded0cc175cd7a}{L\+\_\+block\+\_\+z\+\_\+max}~50
+\item 
+\#define \hyperlink{definitions_8h_a507227e0c61f5c64ff89bdd2167412ee}{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}~2
+\item 
+\#define \hyperlink{definitions_8h_a0627ddd7b5e25f3f9941ff7e3c8eac0e}{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}~0
+\item 
+\#define \hyperlink{definitions_8h_a2be7a30d96713a5156792245d251966e}{L\+\_\+start\+\_\+object\+\_\+x}~20
+\item 
+\#define \hyperlink{definitions_8h_a645382e5a4caf02cf824e9fcbb36aabb}{L\+\_\+start\+\_\+object\+\_\+y}~4
+\item 
+\#define \hyperlink{definitions_8h_a885e82ec58877a3cf38439628afb26c1}{L\+\_\+centre\+\_\+object\+\_\+z}~30
+\item 
+\#define \hyperlink{definitions_8h_abe3410844da47b6b21dd985525f6e835}{L\+\_\+object\+\_\+length}~80
+\item 
+\#define \hyperlink{definitions_8h_a837d244028bc53a8b148a06bb2b3e31a}{L\+\_\+object\+\_\+scale\+\_\+direction}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
+\item 
+\#define \hyperlink{definitions_8h_ad74926f984f91ff5eab36ff13ffa9303}{L\+\_\+object\+\_\+length\+\_\+ref}~80
+\item 
+\#define \hyperlink{definitions_8h_a6dba5fb4dd81c59690cd02870a10ab74}{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}~1
+\item 
+\#define \hyperlink{definitions_8h_a406b762110a5553f70ce17313f69b14f}{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}~0
+\item 
+\#define \hyperlink{definitions_8h_ad87610438cb3bae6299aa559a67e679b}{L\+\_\+start\+\_\+bfl\+\_\+x}~50
+\item 
+\#define \hyperlink{definitions_8h_ab29cbf96e31a7f1d13f1822a63dbd390}{L\+\_\+start\+\_\+bfl\+\_\+y}~100
+\item 
+\#define \hyperlink{definitions_8h_abdcf05c8bc99e344e217b950ba25a69d}{L\+\_\+centre\+\_\+bfl\+\_\+z}~20
+\item 
+\#define \hyperlink{definitions_8h_af1a2a604bafdb2adf496b93b12fdbdb2}{L\+\_\+bfl\+\_\+length}~50
+\item 
+\#define \hyperlink{definitions_8h_aaac8c42a95673e323bc449ff7e161c3b}{L\+\_\+bfl\+\_\+scale\+\_\+direction}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
+\item 
+\#define \hyperlink{definitions_8h_af07b96a5a87c389bd1fb830403f2fb04}{L\+\_\+bfl\+\_\+length\+\_\+ref}~10
+\item 
+\#define \hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}~2
+\item 
+\#define \hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}~1
+\item 
+\#define \hyperlink{definitions_8h_a920e69a22e5f925675c5c77c521d586d}{L\+\_\+n\+Vels}~27
+\item 
+\#define \hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}~26
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{definitions_8h_a09daccd70e19a094d001212734d9a617}{n\+Probes} \mbox{[}3\mbox{]} = \{3, 3, 3\}
+\item 
+static const int \hyperlink{definitions_8h_a7021ecbd16faf72e542d525bb746e68a}{x\+Probe\+Lims} \mbox{[}2\mbox{]} = \{90, 270\}
+\item 
+static const int \hyperlink{definitions_8h_a092e97faaf1b8f28c21b17c7f9b16c28}{y\+Probe\+Lims} \mbox{[}2\mbox{]} = \{15, 45\}
+\item 
+static const int \hyperlink{definitions_8h_a81cea29fb5fa116286e8305f4984d833}{z\+Probe\+Lims} \mbox{[}2\mbox{]} = \{30, 120\}
+\item 
+static const int \hyperlink{definitions_8h_a0013af5be8fdb2984a97ddba4e6696ca}{Ref\+Xstart} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{30\}, \{10\} \}
+\item 
+static const int \hyperlink{definitions_8h_a87f50be4d1f2d71b8376fcc502535550}{Ref\+Xend} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{70\}, \{70\} \}
+\item 
+static const int \hyperlink{definitions_8h_a02825ae000043b6470c20b2aa9368936}{Ref\+Ystart} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{0\}, \{0\} \}
+\item 
+static const int \hyperlink{definitions_8h_a72e3435363310f2e08aa488a1bf8635f}{Ref\+Yend} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{20\}, \{30\} \}
+\item 
+static int \hyperlink{definitions_8h_ac0e0d36d97c0c3b562c0eb2760c4305f}{Ref\+Zstart} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{20\}, \{5\} \}
+\item 
+static int \hyperlink{definitions_8h_a1887d9f09e0f6522232255b47580c493}{Ref\+Zend} \mbox{[}\hyperlink{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}\hyperlink{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{40\}, \{35\} \}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+a\+\_\+x@{L\+\_\+a\+\_\+x}}
+\index{L\+\_\+a\+\_\+x@{L\+\_\+a\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+a\+\_\+x}{L_a_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+a\+\_\+x~0}\hypertarget{definitions_8h_ad59618fcac4982530d1c348b0f8ca20e}{}\label{definitions_8h_ad59618fcac4982530d1c348b0f8ca20e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+a\+\_\+y@{L\+\_\+a\+\_\+y}}
+\index{L\+\_\+a\+\_\+y@{L\+\_\+a\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+a\+\_\+y}{L_a_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+a\+\_\+y~0}\hypertarget{definitions_8h_a580607e34a98d82c4cfecc1d37171851}{}\label{definitions_8h_a580607e34a98d82c4cfecc1d37171851}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+a\+\_\+z@{L\+\_\+a\+\_\+z}}
+\index{L\+\_\+a\+\_\+z@{L\+\_\+a\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+a\+\_\+z}{L_a_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+a\+\_\+z~0}\hypertarget{definitions_8h_a09f97787185ad5c9ca8a4ee44b8497ee}{}\label{definitions_8h_a09f97787185ad5c9ca8a4ee44b8497ee}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+b\+\_\+x@{L\+\_\+b\+\_\+x}}
+\index{L\+\_\+b\+\_\+x@{L\+\_\+b\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+b\+\_\+x}{L_b_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+b\+\_\+x~5}\hypertarget{definitions_8h_a1c85335eb1cd508129b82699c30d8271}{}\label{definitions_8h_a1c85335eb1cd508129b82699c30d8271}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+b\+\_\+y@{L\+\_\+b\+\_\+y}}
+\index{L\+\_\+b\+\_\+y@{L\+\_\+b\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+b\+\_\+y}{L_b_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+b\+\_\+y~3}\hypertarget{definitions_8h_a619d566c8b0abcfc57ca2c22bd9515b2}{}\label{definitions_8h_a619d566c8b0abcfc57ca2c22bd9515b2}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+b\+\_\+z@{L\+\_\+b\+\_\+z}}
+\index{L\+\_\+b\+\_\+z@{L\+\_\+b\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+b\+\_\+z}{L_b_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+b\+\_\+z~3}\hypertarget{definitions_8h_af329088f34d9abfe82be4fb904c5cb46}{}\label{definitions_8h_af329088f34d9abfe82be4fb904c5cb46}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+bfl\+\_\+length@{L\+\_\+bfl\+\_\+length}}
+\index{L\+\_\+bfl\+\_\+length@{L\+\_\+bfl\+\_\+length}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+bfl\+\_\+length}{L_bfl_length}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+bfl\+\_\+length~50}\hypertarget{definitions_8h_af1a2a604bafdb2adf496b93b12fdbdb2}{}\label{definitions_8h_af1a2a604bafdb2adf496b93b12fdbdb2}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+bfl\+\_\+length\+\_\+ref@{L\+\_\+bfl\+\_\+length\+\_\+ref}}
+\index{L\+\_\+bfl\+\_\+length\+\_\+ref@{L\+\_\+bfl\+\_\+length\+\_\+ref}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+bfl\+\_\+length\+\_\+ref}{L_bfl_length_ref}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+bfl\+\_\+length\+\_\+ref~10}\hypertarget{definitions_8h_af07b96a5a87c389bd1fb830403f2fb04}{}\label{definitions_8h_af07b96a5a87c389bd1fb830403f2fb04}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}}
+\index{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}{L_bfl_on_grid_lev}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev~1}\hypertarget{definitions_8h_a6dba5fb4dd81c59690cd02870a10ab74}{}\label{definitions_8h_a6dba5fb4dd81c59690cd02870a10ab74}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}}
+\index{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}{L_bfl_on_grid_reg}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg~0}\hypertarget{definitions_8h_a406b762110a5553f70ce17313f69b14f}{}\label{definitions_8h_a406b762110a5553f70ce17313f69b14f}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+bfl\+\_\+scale\+\_\+direction@{L\+\_\+bfl\+\_\+scale\+\_\+direction}}
+\index{L\+\_\+bfl\+\_\+scale\+\_\+direction@{L\+\_\+bfl\+\_\+scale\+\_\+direction}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+bfl\+\_\+scale\+\_\+direction}{L_bfl_scale_direction}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+bfl\+\_\+scale\+\_\+direction~{\bf e\+X\+Direction}}\hypertarget{definitions_8h_aaac8c42a95673e323bc449ff7e161c3b}{}\label{definitions_8h_aaac8c42a95673e323bc449ff7e161c3b}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}}
+\index{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}{L_block_on_grid_lev}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev~2}\hypertarget{definitions_8h_a7e22b54c3bad81ef4eda4a5f4e85ee52}{}\label{definitions_8h_a7e22b54c3bad81ef4eda4a5f4e85ee52}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}}
+\index{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}{L_block_on_grid_reg}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg~0}\hypertarget{definitions_8h_ad33beadff0cdb732f0f994b398c631aa}{}\label{definitions_8h_ad33beadff0cdb732f0f994b398c631aa}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+x\+\_\+max@{L\+\_\+block\+\_\+x\+\_\+max}}
+\index{L\+\_\+block\+\_\+x\+\_\+max@{L\+\_\+block\+\_\+x\+\_\+max}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+x\+\_\+max}{L_block_x_max}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+x\+\_\+max~60}\hypertarget{definitions_8h_ac5b1d5f78c4ef5855c2b4e0fae875321}{}\label{definitions_8h_ac5b1d5f78c4ef5855c2b4e0fae875321}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+x\+\_\+min@{L\+\_\+block\+\_\+x\+\_\+min}}
+\index{L\+\_\+block\+\_\+x\+\_\+min@{L\+\_\+block\+\_\+x\+\_\+min}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+x\+\_\+min}{L_block_x_min}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+x\+\_\+min~20}\hypertarget{definitions_8h_ac3819f0aa7a8b5595e16fd298d0d3e2c}{}\label{definitions_8h_ac3819f0aa7a8b5595e16fd298d0d3e2c}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+y\+\_\+max@{L\+\_\+block\+\_\+y\+\_\+max}}
+\index{L\+\_\+block\+\_\+y\+\_\+max@{L\+\_\+block\+\_\+y\+\_\+max}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+y\+\_\+max}{L_block_y_max}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+y\+\_\+max~44}\hypertarget{definitions_8h_a636bafbc060cb8d5a001dc5d9d28fbfa}{}\label{definitions_8h_a636bafbc060cb8d5a001dc5d9d28fbfa}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+y\+\_\+min@{L\+\_\+block\+\_\+y\+\_\+min}}
+\index{L\+\_\+block\+\_\+y\+\_\+min@{L\+\_\+block\+\_\+y\+\_\+min}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+y\+\_\+min}{L_block_y_min}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+y\+\_\+min~4}\hypertarget{definitions_8h_a1003f176ed1bfef0f66dedd3af732471}{}\label{definitions_8h_a1003f176ed1bfef0f66dedd3af732471}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+z\+\_\+max@{L\+\_\+block\+\_\+z\+\_\+max}}
+\index{L\+\_\+block\+\_\+z\+\_\+max@{L\+\_\+block\+\_\+z\+\_\+max}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+z\+\_\+max}{L_block_z_max}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+z\+\_\+max~50}\hypertarget{definitions_8h_a0b04ee3d402702a993bded0cc175cd7a}{}\label{definitions_8h_a0b04ee3d402702a993bded0cc175cd7a}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+block\+\_\+z\+\_\+min@{L\+\_\+block\+\_\+z\+\_\+min}}
+\index{L\+\_\+block\+\_\+z\+\_\+min@{L\+\_\+block\+\_\+z\+\_\+min}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+block\+\_\+z\+\_\+min}{L_block_z_min}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+block\+\_\+z\+\_\+min~10}\hypertarget{definitions_8h_af673d371e4fd31af7f1180f0d26bfc7e}{}\label{definitions_8h_af673d371e4fd31af7f1180f0d26bfc7e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI@{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}}
+\index{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI@{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}{L_BUILD_FOR_MPI}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}\hypertarget{definitions_8h_a8d3ae8088334a2477471d505546b51ee}{}\label{definitions_8h_a8d3ae8088334a2477471d505546b51ee}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+centre\+\_\+bfl\+\_\+z@{L\+\_\+centre\+\_\+bfl\+\_\+z}}
+\index{L\+\_\+centre\+\_\+bfl\+\_\+z@{L\+\_\+centre\+\_\+bfl\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+centre\+\_\+bfl\+\_\+z}{L_centre_bfl_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+centre\+\_\+bfl\+\_\+z~20}\hypertarget{definitions_8h_abdcf05c8bc99e344e217b950ba25a69d}{}\label{definitions_8h_abdcf05c8bc99e344e217b950ba25a69d}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+centre\+\_\+ibb\+\_\+z@{L\+\_\+centre\+\_\+ibb\+\_\+z}}
+\index{L\+\_\+centre\+\_\+ibb\+\_\+z@{L\+\_\+centre\+\_\+ibb\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+centre\+\_\+ibb\+\_\+z}{L_centre_ibb_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+centre\+\_\+ibb\+\_\+z~0.\+5}\hypertarget{definitions_8h_adcd30f220171aa1bb0c85547bc800b3e}{}\label{definitions_8h_adcd30f220171aa1bb0c85547bc800b3e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+centre\+\_\+object\+\_\+z@{L\+\_\+centre\+\_\+object\+\_\+z}}
+\index{L\+\_\+centre\+\_\+object\+\_\+z@{L\+\_\+centre\+\_\+object\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+centre\+\_\+object\+\_\+z}{L_centre_object_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+centre\+\_\+object\+\_\+z~30}\hypertarget{definitions_8h_a885e82ec58877a3cf38439628afb26c1}{}\label{definitions_8h_a885e82ec58877a3cf38439628afb26c1}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON@{L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}}
+\index{L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON@{L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}{L_CHEAP_NEAREST_NODE_DETECTION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}\hypertarget{definitions_8h_a7bdf550c43196b09145363ff95f6c970}{}\label{definitions_8h_a7bdf550c43196b09145363ff95f6c970}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+dims@{L\+\_\+dims}}
+\index{L\+\_\+dims@{L\+\_\+dims}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+dims}{L_dims}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+dims~3}\hypertarget{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{}\label{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+end\+\_\+\+BC@{L\+\_\+end\+\_\+\+BC}}
+\index{L\+\_\+end\+\_\+\+BC@{L\+\_\+end\+\_\+\+BC}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+end\+\_\+\+BC}{L_end_BC}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+end\+\_\+\+BC~0}\hypertarget{definitions_8h_ae9adbe0d535c9153e5cc921beaa67a5f}{}\label{definitions_8h_ae9adbe0d535c9153e5cc921beaa67a5f}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL@{L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}}
+\index{L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL@{L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}{L_FREESTREAM_TUNNEL}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}\hypertarget{definitions_8h_ad4f483281423d9d20a756667342a521d}{}\label{definitions_8h_ad4f483281423d9d20a756667342a521d}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+grav\+\_\+direction@{L\+\_\+grav\+\_\+direction}}
+\index{L\+\_\+grav\+\_\+direction@{L\+\_\+grav\+\_\+direction}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+grav\+\_\+direction}{L_grav_direction}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+grav\+\_\+direction~{\bf e\+X\+Direction}}\hypertarget{definitions_8h_a6785b0bdf3212af90868abaaec40bf21}{}\label{definitions_8h_a6785b0bdf3212af90868abaaec40bf21}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+grav\+\_\+force@{L\+\_\+grav\+\_\+force}}
+\index{L\+\_\+grav\+\_\+force@{L\+\_\+grav\+\_\+force}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+grav\+\_\+force}{L_grav_force}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+grav\+\_\+force~1e-\/10}\hypertarget{definitions_8h_ac45ba1fe68555e0459bddd00e5d5009b}{}\label{definitions_8h_ac45ba1fe68555e0459bddd00e5d5009b}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT@{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}}
+\index{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT@{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}{L_HDF5_OUTPUT}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}\hypertarget{definitions_8h_ad1af4e8e23e70d05d6c600358a956bf0}{}\label{definitions_8h_ad1af4e8e23e70d05d6c600358a956bf0}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+angle\+\_\+horz@{L\+\_\+ibb\+\_\+angle\+\_\+horz}}
+\index{L\+\_\+ibb\+\_\+angle\+\_\+horz@{L\+\_\+ibb\+\_\+angle\+\_\+horz}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+angle\+\_\+horz}{L_ibb_angle_horz}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+angle\+\_\+horz~0}\hypertarget{definitions_8h_acfdaa9053e947a7623485775fe8151eb}{}\label{definitions_8h_acfdaa9053e947a7623485775fe8151eb}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+angle\+\_\+vert@{L\+\_\+ibb\+\_\+angle\+\_\+vert}}
+\index{L\+\_\+ibb\+\_\+angle\+\_\+vert@{L\+\_\+ibb\+\_\+angle\+\_\+vert}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+angle\+\_\+vert}{L_ibb_angle_vert}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+angle\+\_\+vert~90}\hypertarget{definitions_8h_adbbae329ebf669f5a4f2c78f8cc499e0}{}\label{definitions_8h_adbbae329ebf669f5a4f2c78f8cc499e0}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+d@{L\+\_\+ibb\+\_\+d}}
+\index{L\+\_\+ibb\+\_\+d@{L\+\_\+ibb\+\_\+d}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+d}{L_ibb_d}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+d~0.\+0}\hypertarget{definitions_8h_a22b2685068d7995e49f1641ef5c7c018}{}\label{definitions_8h_a22b2685068d7995e49f1641ef5c7c018}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+deform@{L\+\_\+ibb\+\_\+deform}}
+\index{L\+\_\+ibb\+\_\+deform@{L\+\_\+ibb\+\_\+deform}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+deform}{L_ibb_deform}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+deform~false}\hypertarget{definitions_8h_ad1722d62c3c6f62110827c4850825538}{}\label{definitions_8h_ad1722d62c3c6f62110827c4850825538}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+delta\+\_\+rho@{L\+\_\+ibb\+\_\+delta\+\_\+rho}}
+\index{L\+\_\+ibb\+\_\+delta\+\_\+rho@{L\+\_\+ibb\+\_\+delta\+\_\+rho}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+delta\+\_\+rho}{L_ibb_delta_rho}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+delta\+\_\+rho~1.\+0}\hypertarget{definitions_8h_a5f41263d49a3b7c6373ef46c7b1e9e4e}{}\label{definitions_8h_a5f41263d49a3b7c6373ef46c7b1e9e4e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+\+EI@{L\+\_\+ibb\+\_\+\+EI}}
+\index{L\+\_\+ibb\+\_\+\+EI@{L\+\_\+ibb\+\_\+\+EI}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+\+EI}{L_ibb_EI}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+\+EI~2.\+0}\hypertarget{definitions_8h_a120a5e99374e1a42aad146162a94347a}{}\label{definitions_8h_a120a5e99374e1a42aad146162a94347a}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+filament\+\_\+length@{L\+\_\+ibb\+\_\+filament\+\_\+length}}
+\index{L\+\_\+ibb\+\_\+filament\+\_\+length@{L\+\_\+ibb\+\_\+filament\+\_\+length}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+filament\+\_\+length}{L_ibb_filament_length}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+filament\+\_\+length~0.\+2}\hypertarget{definitions_8h_af0aefec11dae861758d5b60d2007e265}{}\label{definitions_8h_af0aefec11dae861758d5b60d2007e265}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}}
+\index{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}{L_ibb_filament_start_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x~0.\+3}\hypertarget{definitions_8h_a1270cb0d7b3d69fed5fa7413a5185e64}{}\label{definitions_8h_a1270cb0d7b3d69fed5fa7413a5185e64}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}}
+\index{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}{L_ibb_filament_start_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y~0.\+0}\hypertarget{definitions_8h_ab4f7dc975c7a091950d4a94cb3b3f43d}{}\label{definitions_8h_ab4f7dc975c7a091950d4a94cb3b3f43d}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}}
+\index{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z@{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}{L_ibb_filament_start_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z~0.\+0}\hypertarget{definitions_8h_a755f80c1cc8c481855c2101c7905878c}{}\label{definitions_8h_a755f80c1cc8c481855c2101c7905878c}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+flex\+\_\+rigid@{L\+\_\+ibb\+\_\+flex\+\_\+rigid}}
+\index{L\+\_\+ibb\+\_\+flex\+\_\+rigid@{L\+\_\+ibb\+\_\+flex\+\_\+rigid}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+flex\+\_\+rigid}{L_ibb_flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+flex\+\_\+rigid~false}\hypertarget{definitions_8h_abca100b5534949d5cb3ebd4064e41f56}{}\label{definitions_8h_abca100b5534949d5cb3ebd4064e41f56}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+l@{L\+\_\+ibb\+\_\+l}}
+\index{L\+\_\+ibb\+\_\+l@{L\+\_\+ibb\+\_\+l}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+l}{L_ibb_l}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+l~10.\+0}\hypertarget{definitions_8h_a6784d3e29b10d6d2cd94a25bfbe75329}{}\label{definitions_8h_a6784d3e29b10d6d2cd94a25bfbe75329}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+length@{L\+\_\+ibb\+\_\+length}}
+\index{L\+\_\+ibb\+\_\+length@{L\+\_\+ibb\+\_\+length}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+length}{L_ibb_length}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+length~0.\+5}\hypertarget{definitions_8h_a4942eb5263d963b41b06f5872461658a}{}\label{definitions_8h_a4942eb5263d963b41b06f5872461658a}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+length\+\_\+ref@{L\+\_\+ibb\+\_\+length\+\_\+ref}}
+\index{L\+\_\+ibb\+\_\+length\+\_\+ref@{L\+\_\+ibb\+\_\+length\+\_\+ref}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+length\+\_\+ref}{L_ibb_length_ref}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+length\+\_\+ref~0.\+5}\hypertarget{definitions_8h_ae1cc3d6fb33100357f1b7eee60d42fd8}{}\label{definitions_8h_ae1cc3d6fb33100357f1b7eee60d42fd8}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}}
+\index{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}{L_ibb_on_grid_lev}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev~2}\hypertarget{definitions_8h_ad147a9b6e66ad4cb7c9a7092abb15101}{}\label{definitions_8h_ad147a9b6e66ad4cb7c9a7092abb15101}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}}
+\index{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}{L_ibb_on_grid_reg}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg~0}\hypertarget{definitions_8h_ace0346b65662c14105fb1f778ca0320c}{}\label{definitions_8h_ace0346b65662c14105fb1f778ca0320c}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+r@{L\+\_\+ibb\+\_\+r}}
+\index{L\+\_\+ibb\+\_\+r@{L\+\_\+ibb\+\_\+r}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+r}{L_ibb_r}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+r~10.\+0}\hypertarget{definitions_8h_a7541a2752a0159a30e180b1c16bdd0b7}{}\label{definitions_8h_a7541a2752a0159a30e180b1c16bdd0b7}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+scale\+\_\+direction@{L\+\_\+ibb\+\_\+scale\+\_\+direction}}
+\index{L\+\_\+ibb\+\_\+scale\+\_\+direction@{L\+\_\+ibb\+\_\+scale\+\_\+direction}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+scale\+\_\+direction}{L_ibb_scale_direction}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+scale\+\_\+direction~{\bf e\+X\+Direction}}\hypertarget{definitions_8h_a586ccdfcaafc1ab824162929e1ff501c}{}\label{definitions_8h_a586ccdfcaafc1ab824162929e1ff501c}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+w@{L\+\_\+ibb\+\_\+w}}
+\index{L\+\_\+ibb\+\_\+w@{L\+\_\+ibb\+\_\+w}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+w}{L_ibb_w}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+w~10.\+0}\hypertarget{definitions_8h_a380a693b4f60e7085a03cc9bd6db9f80}{}\label{definitions_8h_a380a693b4f60e7085a03cc9bd6db9f80}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+x@{L\+\_\+ibb\+\_\+x}}
+\index{L\+\_\+ibb\+\_\+x@{L\+\_\+ibb\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+x}{L_ibb_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+x~75.\+0}\hypertarget{definitions_8h_a94a5d859e52cac4623aa8a7debf6c00e}{}\label{definitions_8h_a94a5d859e52cac4623aa8a7debf6c00e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+y@{L\+\_\+ibb\+\_\+y}}
+\index{L\+\_\+ibb\+\_\+y@{L\+\_\+ibb\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+y}{L_ibb_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+y~75.\+0}\hypertarget{definitions_8h_a4ed5c6c5978975c25a2d26b891aa49d6}{}\label{definitions_8h_a4ed5c6c5978975c25a2d26b891aa49d6}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+ibb\+\_\+z@{L\+\_\+ibb\+\_\+z}}
+\index{L\+\_\+ibb\+\_\+z@{L\+\_\+ibb\+\_\+z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+ibb\+\_\+z}{L_ibb_z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+ibb\+\_\+z~0.\+0}\hypertarget{definitions_8h_a3a98916f895de923e81e6088b8cbbde1}{}\label{definitions_8h_a3a98916f895de923e81e6088b8cbbde1}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}}
+\index{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}{L_INLET_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}\hypertarget{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}{}\label{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+K@{L\+\_\+K}}
+\index{L\+\_\+K@{L\+\_\+K}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+K}{L_K}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+K~60}\hypertarget{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{}\label{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+M@{L\+\_\+M}}
+\index{L\+\_\+M@{L\+\_\+M}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+M}{L_M}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+M~60}\hypertarget{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{}\label{definitions_8h_a9299d91330ef6046619e4785d69b62c6}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+dir@{L\+\_\+\+M\+P\+I\+\_\+dir}}
+\index{L\+\_\+\+M\+P\+I\+\_\+dir@{L\+\_\+\+M\+P\+I\+\_\+dir}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+dir}{L_MPI_dir}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+dir~26}\hypertarget{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{}\label{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+N@{L\+\_\+N}}
+\index{L\+\_\+N@{L\+\_\+N}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+N}{L_N}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+N~100}\hypertarget{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{}\label{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+num\+\_\+markers@{L\+\_\+num\+\_\+markers}}
+\index{L\+\_\+num\+\_\+markers@{L\+\_\+num\+\_\+markers}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+num\+\_\+markers}{L_num_markers}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+num\+\_\+markers~19}\hypertarget{definitions_8h_ae17c4661a287d27d053ac7797ad163bd}{}\label{definitions_8h_ae17c4661a287d27d053ac7797ad163bd}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Num\+Lev@{L\+\_\+\+Num\+Lev}}
+\index{L\+\_\+\+Num\+Lev@{L\+\_\+\+Num\+Lev}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Num\+Lev}{L_NumLev}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Num\+Lev~2}\hypertarget{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}{}\label{definitions_8h_aad79fd4a1a3f4399bc6b6b8410886cc6}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Num\+Reg@{L\+\_\+\+Num\+Reg}}
+\index{L\+\_\+\+Num\+Reg@{L\+\_\+\+Num\+Reg}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Num\+Reg}{L_NumReg}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Num\+Reg~1}\hypertarget{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}{}\label{definitions_8h_ae2c190fd969f872dea6af9cb4e31e1e2}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+n\+Vels@{L\+\_\+n\+Vels}}
+\index{L\+\_\+n\+Vels@{L\+\_\+n\+Vels}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+n\+Vels}{L_nVels}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+n\+Vels~27}\hypertarget{definitions_8h_a920e69a22e5f925675c5c77c521d586d}{}\label{definitions_8h_a920e69a22e5f925675c5c77c521d586d}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+object\+\_\+length@{L\+\_\+object\+\_\+length}}
+\index{L\+\_\+object\+\_\+length@{L\+\_\+object\+\_\+length}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+object\+\_\+length}{L_object_length}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+object\+\_\+length~80}\hypertarget{definitions_8h_abe3410844da47b6b21dd985525f6e835}{}\label{definitions_8h_abe3410844da47b6b21dd985525f6e835}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+object\+\_\+length\+\_\+ref@{L\+\_\+object\+\_\+length\+\_\+ref}}
+\index{L\+\_\+object\+\_\+length\+\_\+ref@{L\+\_\+object\+\_\+length\+\_\+ref}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+object\+\_\+length\+\_\+ref}{L_object_length_ref}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+object\+\_\+length\+\_\+ref~80}\hypertarget{definitions_8h_ad74926f984f91ff5eab36ff13ffa9303}{}\label{definitions_8h_ad74926f984f91ff5eab36ff13ffa9303}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}}
+\index{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev@{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}{L_object_on_grid_lev}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev~2}\hypertarget{definitions_8h_a507227e0c61f5c64ff89bdd2167412ee}{}\label{definitions_8h_a507227e0c61f5c64ff89bdd2167412ee}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}}
+\index{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg@{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}{L_object_on_grid_reg}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg~0}\hypertarget{definitions_8h_a0627ddd7b5e25f3f9941ff7e3c8eac0e}{}\label{definitions_8h_a0627ddd7b5e25f3f9941ff7e3c8eac0e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+object\+\_\+scale\+\_\+direction@{L\+\_\+object\+\_\+scale\+\_\+direction}}
+\index{L\+\_\+object\+\_\+scale\+\_\+direction@{L\+\_\+object\+\_\+scale\+\_\+direction}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+object\+\_\+scale\+\_\+direction}{L_object_scale_direction}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+object\+\_\+scale\+\_\+direction~{\bf e\+X\+Direction}}\hypertarget{definitions_8h_a837d244028bc53a8b148a06bb2b3e31a}{}\label{definitions_8h_a837d244028bc53a8b148a06bb2b3e31a}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+out\+\_\+every@{L\+\_\+out\+\_\+every}}
+\index{L\+\_\+out\+\_\+every@{L\+\_\+out\+\_\+every}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+out\+\_\+every}{L_out_every}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+out\+\_\+every~100}\hypertarget{definitions_8h_a28a1709dcacfade3f52e8abde7248f8a}{}\label{definitions_8h_a28a1709dcacfade3f52e8abde7248f8a}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+out\+\_\+every\+\_\+probe@{L\+\_\+out\+\_\+every\+\_\+probe}}
+\index{L\+\_\+out\+\_\+every\+\_\+probe@{L\+\_\+out\+\_\+every\+\_\+probe}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+out\+\_\+every\+\_\+probe}{L_out_every_probe}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+out\+\_\+every\+\_\+probe~250}\hypertarget{definitions_8h_a405f8556b70b007f8c480015610cf517}{}\label{definitions_8h_a405f8556b70b007f8c480015610cf517}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}}
+\index{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}{L_OUTLET_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}\hypertarget{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}{}\label{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+output\+\_\+precision@{L\+\_\+output\+\_\+precision}}
+\index{L\+\_\+output\+\_\+precision@{L\+\_\+output\+\_\+precision}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+output\+\_\+precision}{L_output_precision}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+output\+\_\+precision~3}\hypertarget{definitions_8h_a6bfdb308641f4abefbe4f84a0d91e87b}{}\label{definitions_8h_a6bfdb308641f4abefbe4f84a0d91e87b}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+PI@{L\+\_\+\+PI}}
+\index{L\+\_\+\+PI@{L\+\_\+\+PI}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+PI}{L_PI}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+PI~3.\+14159265358979323846}\hypertarget{definitions_8h_a90bb6a4429387db750f2c1bcd62673a7}{}\label{definitions_8h_a90bb6a4429387db750f2c1bcd62673a7}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Re@{L\+\_\+\+Re}}
+\index{L\+\_\+\+Re@{L\+\_\+\+Re}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Re}{L_Re}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Re~5000}\hypertarget{definitions_8h_a190606d49203203e2efc67f307b78957}{}\label{definitions_8h_a190606d49203203e2efc67f307b78957}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+restart\+\_\+out\+\_\+every@{L\+\_\+restart\+\_\+out\+\_\+every}}
+\index{L\+\_\+restart\+\_\+out\+\_\+every@{L\+\_\+restart\+\_\+out\+\_\+every}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+restart\+\_\+out\+\_\+every}{L_restart_out_every}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+restart\+\_\+out\+\_\+every~10000}\hypertarget{definitions_8h_abeda74d1aa49dee75dba26d1c718c389}{}\label{definitions_8h_abeda74d1aa49dee75dba26d1c718c389}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+rho\+\_\+in@{L\+\_\+rho\+\_\+in}}
+\index{L\+\_\+rho\+\_\+in@{L\+\_\+rho\+\_\+in}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+rho\+\_\+in}{L_rho_in}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+rho\+\_\+in~1}\hypertarget{definitions_8h_aaac7141eaed748173409f411426f0b50}{}\label{definitions_8h_aaac7141eaed748173409f411426f0b50}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON@{L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}}
+\index{L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON@{L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}{L_SOLID_BLOCK_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}\hypertarget{definitions_8h_a5712e15457a5bc14fe43c546c6207bd0}{}\label{definitions_8h_a5712e15457a5bc14fe43c546c6207bd0}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+\+BC@{L\+\_\+start\+\_\+\+BC}}
+\index{L\+\_\+start\+\_\+\+BC@{L\+\_\+start\+\_\+\+BC}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+\+BC}{L_start_BC}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+\+BC~2}\hypertarget{definitions_8h_ae71eb336188ba9551926ead93741f572}{}\label{definitions_8h_ae71eb336188ba9551926ead93741f572}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+bfl\+\_\+x@{L\+\_\+start\+\_\+bfl\+\_\+x}}
+\index{L\+\_\+start\+\_\+bfl\+\_\+x@{L\+\_\+start\+\_\+bfl\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+bfl\+\_\+x}{L_start_bfl_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+bfl\+\_\+x~50}\hypertarget{definitions_8h_ad87610438cb3bae6299aa559a67e679b}{}\label{definitions_8h_ad87610438cb3bae6299aa559a67e679b}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+bfl\+\_\+y@{L\+\_\+start\+\_\+bfl\+\_\+y}}
+\index{L\+\_\+start\+\_\+bfl\+\_\+y@{L\+\_\+start\+\_\+bfl\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+bfl\+\_\+y}{L_start_bfl_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+bfl\+\_\+y~100}\hypertarget{definitions_8h_ab29cbf96e31a7f1d13f1822a63dbd390}{}\label{definitions_8h_ab29cbf96e31a7f1d13f1822a63dbd390}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+ibb\+\_\+x@{L\+\_\+start\+\_\+ibb\+\_\+x}}
+\index{L\+\_\+start\+\_\+ibb\+\_\+x@{L\+\_\+start\+\_\+ibb\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+ibb\+\_\+x}{L_start_ibb_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+ibb\+\_\+x~0.\+3}\hypertarget{definitions_8h_a3f091f3cc037c083cb42baf4251a54a5}{}\label{definitions_8h_a3f091f3cc037c083cb42baf4251a54a5}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+ibb\+\_\+y@{L\+\_\+start\+\_\+ibb\+\_\+y}}
+\index{L\+\_\+start\+\_\+ibb\+\_\+y@{L\+\_\+start\+\_\+ibb\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+ibb\+\_\+y}{L_start_ibb_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+ibb\+\_\+y~0.\+2}\hypertarget{definitions_8h_af023d613197d519f7eb4e11447011b3b}{}\label{definitions_8h_af023d613197d519f7eb4e11447011b3b}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+object\+\_\+x@{L\+\_\+start\+\_\+object\+\_\+x}}
+\index{L\+\_\+start\+\_\+object\+\_\+x@{L\+\_\+start\+\_\+object\+\_\+x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+object\+\_\+x}{L_start_object_x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+object\+\_\+x~20}\hypertarget{definitions_8h_a2be7a30d96713a5156792245d251966e}{}\label{definitions_8h_a2be7a30d96713a5156792245d251966e}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+start\+\_\+object\+\_\+y@{L\+\_\+start\+\_\+object\+\_\+y}}
+\index{L\+\_\+start\+\_\+object\+\_\+y@{L\+\_\+start\+\_\+object\+\_\+y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+start\+\_\+object\+\_\+y}{L_start_object_y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+start\+\_\+object\+\_\+y~4}\hypertarget{definitions_8h_a645382e5a4caf02cf824e9fcbb36aabb}{}\label{definitions_8h_a645382e5a4caf02cf824e9fcbb36aabb}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Timesteps@{L\+\_\+\+Timesteps}}
+\index{L\+\_\+\+Timesteps@{L\+\_\+\+Timesteps}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Timesteps}{L_Timesteps}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Timesteps~500}\hypertarget{definitions_8h_a867735b7b941ea07d4a5628726831533}{}\label{definitions_8h_a867735b7b941ea07d4a5628726831533}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+u\+\_\+0x@{L\+\_\+u\+\_\+0x}}
+\index{L\+\_\+u\+\_\+0x@{L\+\_\+u\+\_\+0x}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+u\+\_\+0x}{L_u_0x}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+u\+\_\+0x~{\bf L\+\_\+u\+\_\+ref}}\hypertarget{definitions_8h_a3757e94ba12a363feb127ba8cf37a851}{}\label{definitions_8h_a3757e94ba12a363feb127ba8cf37a851}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+u\+\_\+0y@{L\+\_\+u\+\_\+0y}}
+\index{L\+\_\+u\+\_\+0y@{L\+\_\+u\+\_\+0y}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+u\+\_\+0y}{L_u_0y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+u\+\_\+0y~0}\hypertarget{definitions_8h_a10ef77205b6a756f4571acc0bfb70936}{}\label{definitions_8h_a10ef77205b6a756f4571acc0bfb70936}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+u\+\_\+0z@{L\+\_\+u\+\_\+0z}}
+\index{L\+\_\+u\+\_\+0z@{L\+\_\+u\+\_\+0z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+u\+\_\+0z}{L_u_0z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+u\+\_\+0z~0}\hypertarget{definitions_8h_a60d0425f97a84c3e70b976d8f498d495}{}\label{definitions_8h_a60d0425f97a84c3e70b976d8f498d495}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+u\+\_\+max@{L\+\_\+u\+\_\+max}}
+\index{L\+\_\+u\+\_\+max@{L\+\_\+u\+\_\+max}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+u\+\_\+max}{L_u_max}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+u\+\_\+max~0.\+06}\hypertarget{definitions_8h_aec738206085d5c94e9197a9cd011d3d7}{}\label{definitions_8h_aec738206085d5c94e9197a9cd011d3d7}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+u\+\_\+ref@{L\+\_\+u\+\_\+ref}}
+\index{L\+\_\+u\+\_\+ref@{L\+\_\+u\+\_\+ref}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+u\+\_\+ref}{L_u_ref}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+u\+\_\+ref~0.\+04}\hypertarget{definitions_8h_a6cab568b829e40a2d5cf29812f00e10f}{}\label{definitions_8h_a6cab568b829e40a2d5cf29812f00e10f}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON@{L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}}
+\index{L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON@{L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}{L_USE_KBC_COLLISION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}\hypertarget{definitions_8h_ac1d657764693d08a528d49e6bea2ce10}{}\label{definitions_8h_ac1d657764693d08a528d49e6bea2ce10}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+wall\+\_\+thickness@{L\+\_\+wall\+\_\+thickness}}
+\index{L\+\_\+wall\+\_\+thickness@{L\+\_\+wall\+\_\+thickness}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+wall\+\_\+thickness}{L_wall_thickness}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+wall\+\_\+thickness~1}\hypertarget{definitions_8h_aa56a7e1c84c19ea84f4a98280f57793f}{}\label{definitions_8h_aa56a7e1c84c19ea84f4a98280f57793f}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Xcores@{L\+\_\+\+Xcores}}
+\index{L\+\_\+\+Xcores@{L\+\_\+\+Xcores}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Xcores}{L_Xcores}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Xcores~2}\hypertarget{definitions_8h_ac4d66c8ce40c53cfad97fb18baa547bb}{}\label{definitions_8h_ac4d66c8ce40c53cfad97fb18baa547bb}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Ycores@{L\+\_\+\+Ycores}}
+\index{L\+\_\+\+Ycores@{L\+\_\+\+Ycores}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Ycores}{L_Ycores}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Ycores~2}\hypertarget{definitions_8h_aec277aa78e57cf83fa31c00f8cf340dc}{}\label{definitions_8h_aec277aa78e57cf83fa31c00f8cf340dc}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+Zcores@{L\+\_\+\+Zcores}}
+\index{L\+\_\+\+Zcores@{L\+\_\+\+Zcores}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+Zcores}{L_Zcores}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+Zcores~2}\hypertarget{definitions_8h_a4c91fbc1e982033c77873475deb6024e}{}\label{definitions_8h_a4c91fbc1e982033c77873475deb6024e}
+\index{definitions.\+h@{definitions.\+h}!L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON@{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}}
+\index{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON@{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}{LUMA_VERSION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON~\char`\"{}1.\+1.\+1 (W\+O\+R\+K\+I\+NG V\+E\+R\+S\+I\+ON)\char`\"{}}\hypertarget{definitions_8h_aad986a4e7a930719eb54951337fdf420}{}\label{definitions_8h_aad986a4e7a930719eb54951337fdf420}
+
+
+\subsection{Variable Documentation}
+\index{definitions.\+h@{definitions.\+h}!n\+Probes@{n\+Probes}}
+\index{n\+Probes@{n\+Probes}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{n\+Probes}{nProbes}}]{\setlength{\rightskip}{0pt plus 5cm}const int n\+Probes\mbox{[}3\mbox{]} = \{3, 3, 3\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a09daccd70e19a094d001212734d9a617}{}\label{definitions_8h_a09daccd70e19a094d001212734d9a617}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Xend@{Ref\+Xend}}
+\index{Ref\+Xend@{Ref\+Xend}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Xend}{RefXend}}]{\setlength{\rightskip}{0pt plus 5cm}const int Ref\+Xend\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{70\}, \{70\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a87f50be4d1f2d71b8376fcc502535550}{}\label{definitions_8h_a87f50be4d1f2d71b8376fcc502535550}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Xstart@{Ref\+Xstart}}
+\index{Ref\+Xstart@{Ref\+Xstart}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Xstart}{RefXstart}}]{\setlength{\rightskip}{0pt plus 5cm}const int Ref\+Xstart\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{30\}, \{10\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a0013af5be8fdb2984a97ddba4e6696ca}{}\label{definitions_8h_a0013af5be8fdb2984a97ddba4e6696ca}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Yend@{Ref\+Yend}}
+\index{Ref\+Yend@{Ref\+Yend}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Yend}{RefYend}}]{\setlength{\rightskip}{0pt plus 5cm}const int Ref\+Yend\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{20\}, \{30\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a72e3435363310f2e08aa488a1bf8635f}{}\label{definitions_8h_a72e3435363310f2e08aa488a1bf8635f}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Ystart@{Ref\+Ystart}}
+\index{Ref\+Ystart@{Ref\+Ystart}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Ystart}{RefYstart}}]{\setlength{\rightskip}{0pt plus 5cm}const int Ref\+Ystart\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{0\}, \{0\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a02825ae000043b6470c20b2aa9368936}{}\label{definitions_8h_a02825ae000043b6470c20b2aa9368936}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Zend@{Ref\+Zend}}
+\index{Ref\+Zend@{Ref\+Zend}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Zend}{RefZend}}]{\setlength{\rightskip}{0pt plus 5cm}int Ref\+Zend\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{40\}, \{35\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a1887d9f09e0f6522232255b47580c493}{}\label{definitions_8h_a1887d9f09e0f6522232255b47580c493}
+\index{definitions.\+h@{definitions.\+h}!Ref\+Zstart@{Ref\+Zstart}}
+\index{Ref\+Zstart@{Ref\+Zstart}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{Ref\+Zstart}{RefZstart}}]{\setlength{\rightskip}{0pt plus 5cm}int Ref\+Zstart\mbox{[}{\bf L\+\_\+\+Num\+Lev}\mbox{]}\mbox{[}{\bf L\+\_\+\+Num\+Reg}\mbox{]} = \{ \{20\}, \{5\} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_ac0e0d36d97c0c3b562c0eb2760c4305f}{}\label{definitions_8h_ac0e0d36d97c0c3b562c0eb2760c4305f}
+\index{definitions.\+h@{definitions.\+h}!x\+Probe\+Lims@{x\+Probe\+Lims}}
+\index{x\+Probe\+Lims@{x\+Probe\+Lims}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{x\+Probe\+Lims}{xProbeLims}}]{\setlength{\rightskip}{0pt plus 5cm}const int x\+Probe\+Lims\mbox{[}2\mbox{]} = \{90, 270\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a7021ecbd16faf72e542d525bb746e68a}{}\label{definitions_8h_a7021ecbd16faf72e542d525bb746e68a}
+\index{definitions.\+h@{definitions.\+h}!y\+Probe\+Lims@{y\+Probe\+Lims}}
+\index{y\+Probe\+Lims@{y\+Probe\+Lims}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{y\+Probe\+Lims}{yProbeLims}}]{\setlength{\rightskip}{0pt plus 5cm}const int y\+Probe\+Lims\mbox{[}2\mbox{]} = \{15, 45\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a092e97faaf1b8f28c21b17c7f9b16c28}{}\label{definitions_8h_a092e97faaf1b8f28c21b17c7f9b16c28}
+\index{definitions.\+h@{definitions.\+h}!z\+Probe\+Lims@{z\+Probe\+Lims}}
+\index{z\+Probe\+Lims@{z\+Probe\+Lims}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{z\+Probe\+Lims}{zProbeLims}}]{\setlength{\rightskip}{0pt plus 5cm}const int z\+Probe\+Lims\mbox{[}2\mbox{]} = \{30, 120\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a81cea29fb5fa116286e8305f4984d833}{}\label{definitions_8h_a81cea29fb5fa116286e8305f4984d833}

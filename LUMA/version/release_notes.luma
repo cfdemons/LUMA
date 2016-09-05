@@ -1,5 +1,6 @@
-version=1.1.1 (WORKING VERSION)
+version=1.1.1-alpha
 
+Issue #73: Doxygen framework introduced.
 Issue #39: TL automatic exclusion and resuse of C utility rather than C++ API for HDF5.
 Issue #79: Fixed bug which allowed serial calls of a utility only compatible with MPI builds; also fixes for writing out IBB to restart correctly.
 Issue #69: Patch to fix new point cloud reader where solid bodies were not being inserted correctly.

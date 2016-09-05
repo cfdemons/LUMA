@@ -247,7 +247,6 @@ const static int zProbeLims[2] = {30, 120};
 #define L_FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
 
-
 // Inlets
 #define L_INLET_ON				// Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	// Specify the inlet to be a regularised inlet condition (Latt & Chopard)

@@ -1,0 +1,438 @@
+\hypertarget{class_grid_utils}{}\section{Grid\+Utils Class Reference}
+\label{class_grid_utils}\index{Grid\+Utils@{Grid\+Utils}}
+
+
+{\ttfamily \#include $<$Grid\+Utils.\+h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static int \hyperlink{class_grid_utils_ae2c829e8787d4aa03ec961dc84213b0d}{create\+Output\+Directory} (std\+::string \hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{path\+\_\+str})
+\item 
+static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}{onespace} (int min, int max)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a2f172a6dd8b2749ca1c8336a64a07e29}{linspace} (double min, double max, int n)
+\item 
+static double \hyperlink{class_grid_utils_ab51d52eb381ac0b27e3522e101922428}{vecnorm} (double vec\mbox{[}$\,$\mbox{]})
+\item 
+static double \hyperlink{class_grid_utils_ae7d797edf50b3c3a448d59684a135aee}{vecnorm} (double val1, double val2)
+\item 
+static double \hyperlink{class_grid_utils_a6caced99b15b01746c1fb5828c447034}{vecnorm} (double val1, double val2, double val3)
+\item 
+static double \hyperlink{class_grid_utils_a45167f9bde2e34d868a4ccc64f588ab2}{vecnorm} (std\+::vector$<$ double $>$ vec)
+\item 
+static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_aee47fe58eccee5fffd67bb489fd1c315}{get\+Fine\+Indices} (int coarse\+\_\+i, int x\+\_\+start, int coarse\+\_\+j, int y\+\_\+start, int coarse\+\_\+k, int z\+\_\+start)
+\item 
+static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a4d3973d2b60fe6cac6e49e8640307958}{get\+Coarse\+Indices} (int fine\+\_\+i, int x\+\_\+start, int fine\+\_\+j, int y\+\_\+start, int fine\+\_\+k, int z\+\_\+start)
+\item 
+static double \hyperlink{class_grid_utils_a47d5c12d681b275441029744febbb520}{index\+To\+Position} (int index, double dx)
+\item 
+static double \hyperlink{class_grid_utils_af374256beaf42d97b23f7d98af93a3f1}{dotprod} (std\+::vector$<$ double $>$ vec1, std\+::vector$<$ double $>$ vec2)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a6f5af65d6bb25e0d34be50670b41514f}{subtract} (std\+::vector$<$ double $>$ a, std\+::vector$<$ double $>$ b)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a4e9fc081a19660e9db39428014c04a9c}{add} (std\+::vector$<$ double $>$ a, std\+::vector$<$ double $>$ b)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a01eba1d90d3414637d5031850ad89ce3}{vecmultiply} (double scalar, std\+::vector$<$ double $>$ vec)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_aeb315c03a681483339de9f60ab2964d6}{crossprod} (std\+::vector$<$ double $>$ vec1, std\+::vector$<$ double $>$ vec2)
+\item 
+static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a0051918813c63802d79bd7d172e8ad8a}{matrix\+\_\+multiply} (const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&A, const std\+::vector$<$ double $>$ \&x)
+\item 
+static int \hyperlink{class_grid_utils_af3c54e468658879756c71b01abd028d5}{get\+Opposite} (int direction)
+\item 
+static void \hyperlink{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{get\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&Grids, int level, int region, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&ptr)
+\item 
+static bool \hyperlink{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{is\+Overlap\+Periodic} (int i, int j, int k, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+static bool \hyperlink{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}{is\+On\+This\+Rank} (int gi, int gj, int gk, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+static bool \hyperlink{class_grid_utils_a1d9558846f757c6f60fa61f104b63071}{is\+On\+This\+Rank} (int gl, enum \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} xyz, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+static bool \hyperlink{class_grid_utils_a0863e64842ddc907d0a2ab22b9624e07}{has\+This\+Sub\+Grid} (const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid, int Reg\+Num)
+\item 
+static bool \hyperlink{class_grid_utils_af0692236725709af2d98872805fc84ae}{is\+On\+Sender\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)
+\item 
+static bool \hyperlink{class_grid_utils_abfec29d90b6942de2f3c52c225a4d888}{is\+On\+Recv\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)
+\item 
+static bool \hyperlink{class_grid_utils_a70a234125350fca607d3943e0f1edd7c}{is\+On\+Sender\+Layer} (double site\+\_\+position, enum \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} xyz, enum \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax)
+\item 
+static bool \hyperlink{class_grid_utils_af2b6e1225cab2a840110e2a70f6bd23c}{is\+On\+Recv\+Layer} (double site\+\_\+position, enum \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} xyz, enum \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax)
+\item 
+static bool \hyperlink{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}{is\+Off\+Grid} (int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{vecnorm} (Num\+Type a1, Num\+Type a2, Num\+Type a3)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a7a169fc043a585f20936b314def45fe7}{vecnorm} (Num\+Type a1, Num\+Type a2)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{up\+To\+Zero} (Num\+Type x)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{down\+To\+Limit} (Num\+Type x, Num\+Type limit)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}{factorial} (Num\+Type n)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}{strided\+Copy} (Num\+Type $\ast$dest, Num\+Type $\ast$src, size\+\_\+t block, size\+\_\+t offset, size\+\_\+t stride, size\+\_\+t count, size\+\_\+t buf\+\_\+offset=0)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}{global\+\_\+to\+\_\+local} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ Num\+Type $>$ \&locals)
+\item 
+{\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}{local\+\_\+to\+\_\+global} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ Num\+Type $>$ \&globals)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::ofstream $\ast$ \hyperlink{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}{logfile}
+\item 
+static std\+::string \hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{path\+\_\+str}
+\item 
+static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{dir\+\_\+reflect} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims} $\ast$2\mbox{]}\mbox{[}\hyperlink{definitions_8h_a920e69a22e5f925675c5c77c521d586d}{L\+\_\+n\+Vels}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{class_grid_utils}{Grid\+Utils} Class is a utility class to hold all the general methods used by the \hyperlink{class_grid_obj}{Grid\+Obj} and others. Everything about this is static as no need to instantiate it for every grid on a process. 
+
+\subsection{Member Function Documentation}
+\index{Grid\+Utils@{Grid\+Utils}!add@{add}}
+\index{add@{add}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{add(std\+::vector$<$ double $>$ a, std\+::vector$<$ double $>$ b)}{add(std::vector< double > a, std::vector< double > b)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::add (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{a, }
+\item[{std\+::vector$<$ double $>$}]{b}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a4e9fc081a19660e9db39428014c04a9c}{}\label{class_grid_utils_a4e9fc081a19660e9db39428014c04a9c}
+\index{Grid\+Utils@{Grid\+Utils}!create\+Output\+Directory@{create\+Output\+Directory}}
+\index{create\+Output\+Directory@{create\+Output\+Directory}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{create\+Output\+Directory(std\+::string path\+\_\+str)}{createOutputDirectory(std::string path_str)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Utils\+::create\+Output\+Directory (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{path\+\_\+str}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae2c829e8787d4aa03ec961dc84213b0d}{}\label{class_grid_utils_ae2c829e8787d4aa03ec961dc84213b0d}
+\index{Grid\+Utils@{Grid\+Utils}!crossprod@{crossprod}}
+\index{crossprod@{crossprod}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{crossprod(std\+::vector$<$ double $>$ vec1, std\+::vector$<$ double $>$ vec2)}{crossprod(std::vector< double > vec1, std::vector< double > vec2)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::crossprod (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{vec1, }
+\item[{std\+::vector$<$ double $>$}]{vec2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_aeb315c03a681483339de9f60ab2964d6}{}\label{class_grid_utils_aeb315c03a681483339de9f60ab2964d6}
+\index{Grid\+Utils@{Grid\+Utils}!dotprod@{dotprod}}
+\index{dotprod@{dotprod}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{dotprod(std\+::vector$<$ double $>$ vec1, std\+::vector$<$ double $>$ vec2)}{dotprod(std::vector< double > vec1, std::vector< double > vec2)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::dotprod (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{vec1, }
+\item[{std\+::vector$<$ double $>$}]{vec2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af374256beaf42d97b23f7d98af93a3f1}{}\label{class_grid_utils_af374256beaf42d97b23f7d98af93a3f1}
+\index{Grid\+Utils@{Grid\+Utils}!down\+To\+Limit@{down\+To\+Limit}}
+\index{down\+To\+Limit@{down\+To\+Limit}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{down\+To\+Limit(\+Num\+Type x, Num\+Type limit)}{downToLimit(NumType x, NumType limit)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::down\+To\+Limit (
+\begin{DoxyParamCaption}
+\item[{Num\+Type}]{x, }
+\item[{Num\+Type}]{limit}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{}\label{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}
+\index{Grid\+Utils@{Grid\+Utils}!factorial@{factorial}}
+\index{factorial@{factorial}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{factorial(\+Num\+Type n)}{factorial(NumType n)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::factorial (
+\begin{DoxyParamCaption}
+\item[{Num\+Type}]{n}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}{}\label{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Coarse\+Indices@{get\+Coarse\+Indices}}
+\index{get\+Coarse\+Indices@{get\+Coarse\+Indices}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Coarse\+Indices(int fine\+\_\+i, int x\+\_\+start, int fine\+\_\+j, int y\+\_\+start, int fine\+\_\+k, int z\+\_\+start)}{getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Coarse\+Indices (
+\begin{DoxyParamCaption}
+\item[{int}]{fine\+\_\+i, }
+\item[{int}]{x\+\_\+start, }
+\item[{int}]{fine\+\_\+j, }
+\item[{int}]{y\+\_\+start, }
+\item[{int}]{fine\+\_\+k, }
+\item[{int}]{z\+\_\+start}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a4d3973d2b60fe6cac6e49e8640307958}{}\label{class_grid_utils_a4d3973d2b60fe6cac6e49e8640307958}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Fine\+Indices@{get\+Fine\+Indices}}
+\index{get\+Fine\+Indices@{get\+Fine\+Indices}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Fine\+Indices(int coarse\+\_\+i, int x\+\_\+start, int coarse\+\_\+j, int y\+\_\+start, int coarse\+\_\+k, int z\+\_\+start)}{getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Fine\+Indices (
+\begin{DoxyParamCaption}
+\item[{int}]{coarse\+\_\+i, }
+\item[{int}]{x\+\_\+start, }
+\item[{int}]{coarse\+\_\+j, }
+\item[{int}]{y\+\_\+start, }
+\item[{int}]{coarse\+\_\+k, }
+\item[{int}]{z\+\_\+start}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_aee47fe58eccee5fffd67bb489fd1c315}{}\label{class_grid_utils_aee47fe58eccee5fffd67bb489fd1c315}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Grid@{get\+Grid}}
+\index{get\+Grid@{get\+Grid}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Grid(\+Grid\+Obj $\ast$\&\+Grids, int level, int region, Grid\+Obj $\ast$\&ptr)}{getGrid(GridObj *&Grids, int level, int region, GridObj *&ptr)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Grid (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$\&}]{Grids, }
+\item[{int}]{level, }
+\item[{int}]{region, }
+\item[{{\bf Grid\+Obj} $\ast$\&}]{ptr}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{}\label{class_grid_utils_afac10170d3f6f96a32da6a783b815954}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Opposite@{get\+Opposite}}
+\index{get\+Opposite@{get\+Opposite}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Opposite(int direction)}{getOpposite(int direction)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Utils\+::get\+Opposite (
+\begin{DoxyParamCaption}
+\item[{int}]{direction}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af3c54e468658879756c71b01abd028d5}{}\label{class_grid_utils_af3c54e468658879756c71b01abd028d5}
+\index{Grid\+Utils@{Grid\+Utils}!global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}}
+\index{global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{global\+\_\+to\+\_\+local(int i, int j, int k, Grid\+Obj $\ast$g, std\+::vector$<$ Num\+Type $>$ \&locals)}{global_to_local(int i, int j, int k, GridObj *g, std::vector< NumType > &locals)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static void Grid\+Utils\+::global\+\_\+to\+\_\+local (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g, }
+\item[{std\+::vector$<$ Num\+Type $>$ \&}]{locals}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}{}\label{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}
+\index{Grid\+Utils@{Grid\+Utils}!has\+This\+Sub\+Grid@{has\+This\+Sub\+Grid}}
+\index{has\+This\+Sub\+Grid@{has\+This\+Sub\+Grid}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{has\+This\+Sub\+Grid(const Grid\+Obj \&p\+Grid, int Reg\+Num)}{hasThisSubGrid(const GridObj &pGrid, int RegNum)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::has\+This\+Sub\+Grid (
+\begin{DoxyParamCaption}
+\item[{const {\bf Grid\+Obj} \&}]{p\+Grid, }
+\item[{int}]{Reg\+Num}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a0863e64842ddc907d0a2ab22b9624e07}{}\label{class_grid_utils_a0863e64842ddc907d0a2ab22b9624e07}
+\index{Grid\+Utils@{Grid\+Utils}!index\+To\+Position@{index\+To\+Position}}
+\index{index\+To\+Position@{index\+To\+Position}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{index\+To\+Position(int index, double dx)}{indexToPosition(int index, double dx)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::index\+To\+Position (
+\begin{DoxyParamCaption}
+\item[{int}]{index, }
+\item[{double}]{dx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a47d5c12d681b275441029744febbb520}{}\label{class_grid_utils_a47d5c12d681b275441029744febbb520}
+\index{Grid\+Utils@{Grid\+Utils}!is\+Off\+Grid@{is\+Off\+Grid}}
+\index{is\+Off\+Grid@{is\+Off\+Grid}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+Off\+Grid(int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, Grid\+Obj \&g)}{isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Off\+Grid (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{N\+\_\+lim, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}{}\label{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}}
+\index{is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+Recv\+Layer(double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)}{isOnRecvLayer(double pos_x, double pos_y, double pos_z)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Recv\+Layer (
+\begin{DoxyParamCaption}
+\item[{double}]{pos\+\_\+x, }
+\item[{double}]{pos\+\_\+y, }
+\item[{double}]{pos\+\_\+z}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_abfec29d90b6942de2f3c52c225a4d888}{}\label{class_grid_utils_abfec29d90b6942de2f3c52c225a4d888}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}}
+\index{is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+Recv\+Layer(double site\+\_\+position, enum e\+Cartesian\+Direction xyz, enum e\+Min\+Max minmax)}{isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Recv\+Layer (
+\begin{DoxyParamCaption}
+\item[{double}]{site\+\_\+position, }
+\item[{enum {\bf e\+Cartesian\+Direction}}]{xyz, }
+\item[{enum {\bf e\+Min\+Max}}]{minmax}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af2b6e1225cab2a840110e2a70f6bd23c}{}\label{class_grid_utils_af2b6e1225cab2a840110e2a70f6bd23c}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}}
+\index{is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+Sender\+Layer(double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)}{isOnSenderLayer(double pos_x, double pos_y, double pos_z)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Sender\+Layer (
+\begin{DoxyParamCaption}
+\item[{double}]{pos\+\_\+x, }
+\item[{double}]{pos\+\_\+y, }
+\item[{double}]{pos\+\_\+z}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af0692236725709af2d98872805fc84ae}{}\label{class_grid_utils_af0692236725709af2d98872805fc84ae}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}}
+\index{is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+Sender\+Layer(double site\+\_\+position, enum e\+Cartesian\+Direction xyz, enum e\+Min\+Max minmax)}{isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Sender\+Layer (
+\begin{DoxyParamCaption}
+\item[{double}]{site\+\_\+position, }
+\item[{enum {\bf e\+Cartesian\+Direction}}]{xyz, }
+\item[{enum {\bf e\+Min\+Max}}]{minmax}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a70a234125350fca607d3943e0f1edd7c}{}\label{class_grid_utils_a70a234125350fca607d3943e0f1edd7c}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+This\+Rank@{is\+On\+This\+Rank}}
+\index{is\+On\+This\+Rank@{is\+On\+This\+Rank}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(int gi, int gj, int gk, const Grid\+Obj \&p\+Grid)}{isOnThisRank(int gi, int gj, int gk, const GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
+\begin{DoxyParamCaption}
+\item[{int}]{gi, }
+\item[{int}]{gj, }
+\item[{int}]{gk, }
+\item[{const {\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}{}\label{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}
+\index{Grid\+Utils@{Grid\+Utils}!is\+On\+This\+Rank@{is\+On\+This\+Rank}}
+\index{is\+On\+This\+Rank@{is\+On\+This\+Rank}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(int gl, enum e\+Cartesian\+Direction xyz, const Grid\+Obj \&p\+Grid)}{isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
+\begin{DoxyParamCaption}
+\item[{int}]{gl, }
+\item[{enum {\bf e\+Cartesian\+Direction}}]{xyz, }
+\item[{const {\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a1d9558846f757c6f60fa61f104b63071}{}\label{class_grid_utils_a1d9558846f757c6f60fa61f104b63071}
+\index{Grid\+Utils@{Grid\+Utils}!is\+Overlap\+Periodic@{is\+Overlap\+Periodic}}
+\index{is\+Overlap\+Periodic@{is\+Overlap\+Periodic}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{is\+Overlap\+Periodic(int i, int j, int k, const Grid\+Obj \&p\+Grid)}{isOverlapPeriodic(int i, int j, int k, const GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Overlap\+Periodic (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{const {\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{}\label{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}
+\index{Grid\+Utils@{Grid\+Utils}!linspace@{linspace}}
+\index{linspace@{linspace}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{linspace(double min, double max, int n)}{linspace(double min, double max, int n)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::linspace (
+\begin{DoxyParamCaption}
+\item[{double}]{min, }
+\item[{double}]{max, }
+\item[{int}]{n}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a2f172a6dd8b2749ca1c8336a64a07e29}{}\label{class_grid_utils_a2f172a6dd8b2749ca1c8336a64a07e29}
+\index{Grid\+Utils@{Grid\+Utils}!local\+\_\+to\+\_\+global@{local\+\_\+to\+\_\+global}}
+\index{local\+\_\+to\+\_\+global@{local\+\_\+to\+\_\+global}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{local\+\_\+to\+\_\+global(int i, int j, int k, Grid\+Obj $\ast$g, std\+::vector$<$ Num\+Type $>$ \&globals)}{local_to_global(int i, int j, int k, GridObj *g, std::vector< NumType > &globals)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static void Grid\+Utils\+::local\+\_\+to\+\_\+global (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g, }
+\item[{std\+::vector$<$ Num\+Type $>$ \&}]{globals}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}{}\label{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}
+\index{Grid\+Utils@{Grid\+Utils}!matrix\+\_\+multiply@{matrix\+\_\+multiply}}
+\index{matrix\+\_\+multiply@{matrix\+\_\+multiply}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{matrix\+\_\+multiply(const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&\+A, const std\+::vector$<$ double $>$ \&x)}{matrix_multiply(const std::vector< std::vector< double > > &A, const std::vector< double > &x)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::matrix\+\_\+multiply (
+\begin{DoxyParamCaption}
+\item[{const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{A, }
+\item[{const std\+::vector$<$ double $>$ \&}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a0051918813c63802d79bd7d172e8ad8a}{}\label{class_grid_utils_a0051918813c63802d79bd7d172e8ad8a}
+\index{Grid\+Utils@{Grid\+Utils}!onespace@{onespace}}
+\index{onespace@{onespace}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{onespace(int min, int max)}{onespace(int min, int max)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::onespace (
+\begin{DoxyParamCaption}
+\item[{int}]{min, }
+\item[{int}]{max}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}{}\label{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}
+\index{Grid\+Utils@{Grid\+Utils}!strided\+Copy@{strided\+Copy}}
+\index{strided\+Copy@{strided\+Copy}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{strided\+Copy(\+Num\+Type $\ast$dest, Num\+Type $\ast$src, size\+\_\+t block, size\+\_\+t offset, size\+\_\+t stride, size\+\_\+t count, size\+\_\+t buf\+\_\+offset=0)}{stridedCopy(NumType *dest, NumType *src, size_t block, size_t offset, size_t stride, size_t count, size_t buf_offset=0)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static void Grid\+Utils\+::strided\+Copy (
+\begin{DoxyParamCaption}
+\item[{Num\+Type $\ast$}]{dest, }
+\item[{Num\+Type $\ast$}]{src, }
+\item[{size\+\_\+t}]{block, }
+\item[{size\+\_\+t}]{offset, }
+\item[{size\+\_\+t}]{stride, }
+\item[{size\+\_\+t}]{count, }
+\item[{size\+\_\+t}]{buf\+\_\+offset = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}{}\label{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}
+\index{Grid\+Utils@{Grid\+Utils}!subtract@{subtract}}
+\index{subtract@{subtract}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{subtract(std\+::vector$<$ double $>$ a, std\+::vector$<$ double $>$ b)}{subtract(std::vector< double > a, std::vector< double > b)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::subtract (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{a, }
+\item[{std\+::vector$<$ double $>$}]{b}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a6f5af65d6bb25e0d34be50670b41514f}{}\label{class_grid_utils_a6f5af65d6bb25e0d34be50670b41514f}
+\index{Grid\+Utils@{Grid\+Utils}!up\+To\+Zero@{up\+To\+Zero}}
+\index{up\+To\+Zero@{up\+To\+Zero}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{up\+To\+Zero(\+Num\+Type x)}{upToZero(NumType x)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::up\+To\+Zero (
+\begin{DoxyParamCaption}
+\item[{Num\+Type}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{}\label{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}
+\index{Grid\+Utils@{Grid\+Utils}!vecmultiply@{vecmultiply}}
+\index{vecmultiply@{vecmultiply}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecmultiply(double scalar, std\+::vector$<$ double $>$ vec)}{vecmultiply(double scalar, std::vector< double > vec)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::vecmultiply (
+\begin{DoxyParamCaption}
+\item[{double}]{scalar, }
+\item[{std\+::vector$<$ double $>$}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a01eba1d90d3414637d5031850ad89ce3}{}\label{class_grid_utils_a01eba1d90d3414637d5031850ad89ce3}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(double vec[])}{vecnorm(double vec[])}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{double}]{vec\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ab51d52eb381ac0b27e3522e101922428}{}\label{class_grid_utils_ab51d52eb381ac0b27e3522e101922428}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(double val1, double val2)}{vecnorm(double val1, double val2)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{double}]{val1, }
+\item[{double}]{val2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae7d797edf50b3c3a448d59684a135aee}{}\label{class_grid_utils_ae7d797edf50b3c3a448d59684a135aee}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(double val1, double val2, double val3)}{vecnorm(double val1, double val2, double val3)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{double}]{val1, }
+\item[{double}]{val2, }
+\item[{double}]{val3}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a6caced99b15b01746c1fb5828c447034}{}\label{class_grid_utils_a6caced99b15b01746c1fb5828c447034}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(std\+::vector$<$ double $>$ vec)}{vecnorm(std::vector< double > vec)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a45167f9bde2e34d868a4ccc64f588ab2}{}\label{class_grid_utils_a45167f9bde2e34d868a4ccc64f588ab2}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(\+Num\+Type a1, Num\+Type a2, Num\+Type a3)}{vecnorm(NumType a1, NumType a2, NumType a3)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{Num\+Type}]{a1, }
+\item[{Num\+Type}]{a2, }
+\item[{Num\+Type}]{a3}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{}\label{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}
+\index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
+\index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{vecnorm(\+Num\+Type a1, Num\+Type a2)}{vecnorm(NumType a1, NumType a2)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::vecnorm (
+\begin{DoxyParamCaption}
+\item[{Num\+Type}]{a1, }
+\item[{Num\+Type}]{a2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a7a169fc043a585f20936b314def45fe7}{}\label{class_grid_utils_a7a169fc043a585f20936b314def45fe7}
+
+
+\subsection{Member Data Documentation}
+\index{Grid\+Utils@{Grid\+Utils}!dir\+\_\+reflect@{dir\+\_\+reflect}}
+\index{dir\+\_\+reflect@{dir\+\_\+reflect}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{dir\+\_\+reflect}{dir_reflect}}]{\setlength{\rightskip}{0pt plus 5cm}const int Grid\+Utils\+::dir\+\_\+reflect\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{}\label{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= 
+    \{
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\}, 
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\}
+    \}
+\end{DoxyCode}
+\index{Grid\+Utils@{Grid\+Utils}!logfile@{logfile}}
+\index{logfile@{logfile}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{logfile}{logfile}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::ofstream $\ast$ Grid\+Utils\+::logfile\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}{}\label{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}
+\index{Grid\+Utils@{Grid\+Utils}!path\+\_\+str@{path\+\_\+str}}
+\index{path\+\_\+str@{path\+\_\+str}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{path\+\_\+str}{path_str}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Grid\+Utils\+::path\+\_\+str\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{}\label{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_grid_utils_8h}{Grid\+Utils.\+h}\item 
+\hyperlink{_grid_obj_8cpp}{Grid\+Obj.\+cpp}\item 
+\hyperlink{_grid_utils_8cpp}{Grid\+Utils.\+cpp}\item 
+\hyperlink{main__lbm_8cpp}{main\+\_\+lbm.\+cpp}\end{DoxyCompactItemize}

@@ -15,16 +15,30 @@
 
 #pragma once
 
+// Enumeration for directional options
+enum eCartesianDirection
+{
+	eXDirection,
+	eYDirection,
+	eZDirection
+};
+
+// Enumeration for minimum and maximum
+enum eMinMax
+{
+	eMinimum,
+	eMaximum
+};
+
 /** GridUtils Class is a utility class to hold all the general
  *  methods used by the GridObj and others. Everything about this is static
  *  as no need to instantiate it for every grid on a process.
  */
 
-#include <vector>
-#include <iostream>
-#include <fstream>
+#include "stdafx.h"
 #include "definitions.h"
 #include "GridObj.h"
+#include "hdf5luma.h"
 
 class GridUtils {
 
@@ -33,7 +47,7 @@ class GridUtils {
 public:
 	static std::ofstream* logfile;			// Handle to output file
 	static std::string path_str;            // Static string representing output path
-	static const int dir_reflect[dims * 2][nVels];
+	static const int dir_reflect[L_dims * 2][L_nVels];	
 
 	// Methods //
 
@@ -53,8 +67,10 @@ public:
 	static double vecnorm(double val1, double val2);
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double> vec);
-	static std::vector<int> getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
-	static std::vector<int> getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
+	static std::vector<int> getFineIndices(
+		int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
+	static std::vector<int> getCoarseIndices(
+		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
 	static double indexToPosition(int index, double dx);	// Function: indexToPosition
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
@@ -64,19 +80,19 @@ public:
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
 
 	// LBM-specific utilities
-	static size_t getOpposite(size_t direction);	// Function: getOpposite
+	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
 	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
-	static bool isOnThisRank(int gl, int xyz, const GridObj& pGrid);
+	static bool isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid);
 	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
-	static bool isOnSenderLayer(double site_position, int dir, int maxmin);		// Is site on specified sender layer
-	static bool isOnRecvLayer(double site_position, int dir, int maxmin);		// Is site on speicfied recv layer
+	static bool isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);	// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);		// Is site on speicfied recv layer
 	static bool isOffGrid(int i, int j, int k, 
 		int N_lim, int M_lim, int K_lim, GridObj& g);							// Is site off supplied grid
 
@@ -114,6 +130,18 @@ public:
 			return static_cast<NumType>(1);
 		else
 			return n * GridUtils::factorial(n - 1);
+	};
+
+	// Function: stridedCopy
+	template <typename NumType>
+	static void stridedCopy(NumType *dest, NumType *src, size_t block, 
+		size_t offset, size_t stride, size_t count,
+		size_t buf_offset = 0) {
+
+		for (size_t i = 0; i < count; i++) {
+			memcpy(dest + buf_offset, src + offset + (stride * i), block * sizeof(NumType));
+			buf_offset += block;
+		}
 	};
 
 

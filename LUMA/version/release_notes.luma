@@ -1,11 +1,25 @@
-version=1.0.4
+version=1.1.1-alpha
 
-Issue #59: Added lift and drag calculation for BB objects
+Issue #73: Doxygen framework introduced.
+Issue #39: TL automatic exclusion and resuse of C utility rather than C++ API for HDF5.
+Issue #79: Fixed bug which allowed serial calls of a utility only compatible with MPI builds; also fixes for writing out IBB to restart correctly.
+Issue #69: Patch to fix new point cloud reader where solid bodies were not being inserted correctly.
+Issue #77: Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.
+Issue #76: Fixed crash when using solid block due to erroneous Re definition.
 
+version=1.1.0
+
+Issue #75: New tool for inlet profile generator -- add a tab for your own type of profile.
+Issue #69: Unification of point cloud readers and added capability for IBB construction from point clouds.
+Issue #39: Removal of VTK and Tecplot writers and implementation of HDF5 writer instead.
+Issue #72: Added enumeration for common options in utility routines, boundary methods and LatTyp for ease of use.
+Issue #70: Explicit casting of unsigned and signed integer types to remove compilation warnings on 64-bit systems.
+Issue #68: Macro convention redefined to avoid current and future conflicts.
+Issue #63: KBC collision operator added in place of MRT operator, Zou-He velocity inlet removed, Uniform Inlet setting removed.
 
 version=1.0.3
 
-Issue #63: Fixed output directory segmentation for large MPI jobs
+Issue #64: Fixed output directory segmentation for large MPI jobs
 Issue #62: Fixed Reynolds number definition for pointcloud/BFL objects
 
 version=1.0.2

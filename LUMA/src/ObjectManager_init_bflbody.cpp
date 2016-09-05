@@ -25,8 +25,7 @@ void ObjectManager::bfl_build_body(int body_type) {
 }
 
 // Overloaded builder for building from point cloud data
-void ObjectManager::bfl_build_body(PCpts* _PCpts) {
-	
+void ObjectManager::bfl_build_body(PCpts* _PCpts) {	
 
 	// Call body constructor and pass on pointer to hierarchy
 	pBody.emplace_back(_PCpts, _Grids);

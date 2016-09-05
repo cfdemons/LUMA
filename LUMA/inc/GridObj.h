@@ -22,6 +22,35 @@
 #include "IBBody.h"
 #include <iostream>
 #include <fstream>
+#include "hdf5luma.h"
+
+// Enumeration for Lattice Typing
+enum eType
+{
+	eSolid,
+	eFluid,
+	eRefined,
+	eTransitionToCoarser,
+	eTransitionToFiner,
+	eBFL,
+	eSymmetry,
+	eInlet,
+	eOutlet,
+	eRefinedSolid,
+	eRefinedSymmetry,
+	eRefinedInlet
+};
+
+// Enumeration for BC application type
+enum eBCType
+{
+	eBCAll,
+	eBCSolidSymmetry,
+	eBCInlet,
+	eBCOutlet,
+	eBCInletOutlet,
+	eBCBFL
+};
 
 // Base class
 class GridObj
@@ -53,14 +82,14 @@ public:
 
 private :
 
-	// 1D subgrid array (size = NumReg)
+	// 1D subgrid array (size = L_NumReg)
 	std::vector<GridObj> subGrid;
 
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
-	size_t CoarseLimsX[2];
-	size_t CoarseLimsY[2];
-	size_t CoarseLimsZ[2];
+	int CoarseLimsX[2];
+	int CoarseLimsY[2];
+	int CoarseLimsZ[2];
 
 	// 1D arrays
 public :
@@ -91,27 +120,21 @@ private :
 	double dx, dy, dz;		// Physical spacing
 	int region_number;		// ID of region at a particular level in the embedded grid hierarchy
 
-	// Lift and drag forces history on a BB object	
-	double force_on_object_x = 0.0;
-	double force_on_object_y = 0.0;
-	double force_on_object_z = 0.0;
-
 	// Time averaged statistics
 	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
-	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,dims)
-	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,2*dims)
+	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,L_dims)
+	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
 
 
 	// Public data members
 public :
 
-	IVector<int> LatTyp;			// Flattened 3D array of site labels
+	IVector<eType> LatTyp;			// Flattened 3D array of site labels
 	int level;						// Level in embedded grid hierarchy
 	double dt;						// Physical time step size
-	int t;					// Number of completed iterations
+	int t;							// Number of completed iterations
 	double nu;						// Kinematic viscosity (in lattice units)
 	double omega;					// Relaxation frequency
-	std::vector<double> mrt_omega;	// Relaxation frequencies in moment space (for MRT)
 
 	// Timing variables
 	double timeav_mpi_overhead;		// Time of MPI communication
@@ -143,7 +166,7 @@ public :
 	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
-	void LBM_mrtCollide(IVector<double>& f_new, int i, int j, int k, int M_lim, int K_lim);	// MRT collision operation
+	void LBM_kbcCollide(int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new);		// KBC collision operator
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
@@ -161,7 +184,6 @@ public :
 	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
 	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
 		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
-	void bc_computeLiftDrag(int i, int j, int k, int M_lim, int K_lim);		// Compute lift and drag of objects
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
@@ -172,11 +194,8 @@ public :
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	void io_probeOutput();						// Output routine for point probes
-	void io_vtkwriter(double tval);				// VTK writer
-	//void io_tecplot(double tval);				// TecPlot write out
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
-	void io_lite(double tval);					// Generic writer to individual files
-	void io_writeForceOnObject(double tval);    // Write out Lift and drag forces on object
+	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
 
 };
 

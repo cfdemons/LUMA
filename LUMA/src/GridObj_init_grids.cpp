@@ -82,12 +82,12 @@ void GridObj::LBM_init_getInletProfile() {
 
 
 	// Resize vectors
-	ux_in.resize(YPos.size());
-	uy_in.resize(YPos.size());
-	uz_in.resize(YPos.size());
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
 
 	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < YPos.size(); j++) {
+	for (j = 0; j < M_lim; j++) {
 
 		// Get Y-position
 		y = YPos[j];
@@ -157,11 +157,6 @@ void GridObj::LBM_init_getInletProfile() {
 // Initialise velocity method
 void GridObj::LBM_initVelocity ( ) {
 
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -202,11 +197,6 @@ void GridObj::LBM_initVelocity ( ) {
 
 // Initialise density method
 void GridObj::LBM_initRho ( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -339,12 +329,12 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	///////////////////
 
 	// Get local grid sizes (includes overlap)
-	int N_lim = local_size[0];
-	int M_lim = local_size[1];
+	N_lim = local_size[0];
+	M_lim = local_size[1];
 #if (L_dims == 3)
-	int K_lim = local_size[2];
+	K_lim = local_size[2];
 #else
-	int K_lim = 1;
+	K_lim = 1;
 #endif
 	
 
@@ -495,7 +485,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 				for (int v = 0; v < L_nVels; v++) {
 
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
+					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 				}
 			}
@@ -740,9 +730,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Generate TYPING MATRICES
 	
 	// Get local grid sizes
-	int N_lim = static_cast<int>(XInd.size());
-	int M_lim = static_cast<int>(YInd.size());
-	int K_lim = static_cast<int>(ZInd.size());
+	N_lim = static_cast<int>(XInd.size());
+	M_lim = static_cast<int>(YInd.size());
+	K_lim = static_cast<int>(ZInd.size());
 	
 	// Resize
 	LatTyp.resize( N_lim * M_lim * K_lim );
@@ -797,7 +787,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 				for (int v = 0; v < L_nVels; v++) {
 					
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
+					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 				}
 			}
@@ -816,11 +806,6 @@ void GridObj::LBM_initSolidLab() {
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
 	if (L_block_on_grid_lev != level || L_block_on_grid_reg != region_number) return;
-
-	// Get local grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Declarations
 	int i, j, k, local_i, local_j, local_k;
@@ -904,11 +889,6 @@ void GridObj::LBM_initSolidLab() {
 // ***************************************************************************************************
 // Initialise wall and object labels method (L0 only)
 void GridObj::LBM_initBoundLab ( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 #if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON
 	int i, j, k;
@@ -1071,9 +1051,9 @@ void GridObj::LBM_initBoundLab ( ) {
 void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 
 	// Get parent local grid sizes
-	size_t Np_lim = pGrid.XPos.size();
-	size_t Mp_lim = pGrid.YPos.size();
-	size_t Kp_lim = pGrid.ZPos.size();
+	size_t Np_lim = pGrid.N_lim;
+	size_t Mp_lim = pGrid.M_lim;
+	size_t Kp_lim = pGrid.K_lim;
 	
 	// Declare indices global and local
 	int i, j, k, local_i, local_j, local_k;
@@ -1134,11 +1114,6 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
     
 
 	// Generate grid type matrices for this level //
-	
-	// Get local grid sizes (includes overlap)
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
 
 	// Declare array for parent site indices
 	std::vector<int> p;

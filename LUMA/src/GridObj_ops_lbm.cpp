@@ -333,11 +333,6 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 	} else {
 	// Else, compute forces
 
-		// Get grid sizes
-		size_t N_lim = XPos.size();
-		size_t M_lim = YPos.size();
-		size_t K_lim = ZPos.size();
-
 		// Declarations
 		double lambda_v;
 
@@ -418,11 +413,6 @@ void GridObj::LBM_collide( ) {
 	       rho * w * (1 + c_ia u_a / cs^2 + Q_iab u_a u_b / 2*cs^4)
 	*/
 
-	// Declarations and Grid size
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
 	// Create temporary lattice to prevent overwriting useful populations and initialise with same values as
 	// pre-collision f grid. Initialise with current f values.
 	IVector<double> f_new( f );
@@ -444,7 +434,7 @@ void GridObj::LBM_collide( ) {
 #ifdef L_USE_KBC_COLLISION
 
 					// KBC collision
-					LBM_kbcCollide(i, j, k, M_lim, K_lim, f_new);
+					LBM_kbcCollide(i, j, k, f_new);
 
 #else
 
@@ -452,7 +442,7 @@ void GridObj::LBM_collide( ) {
 					for (int v = 0; v < L_nVels; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+						feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 						// LBGK collision
 						f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
@@ -479,7 +469,7 @@ void GridObj::LBM_collide( ) {
 
 // ***************************************************************************************************
 // Overload of collision function to allow calculation of feq only for initialisation
-double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) {
+double GridObj::LBM_collide(int i, int j, int k, int v) {
 
 	/* LBGK equilibrium function is represented as:
 		feq_i = rho * w_i * ( 1 + u_a c_ia / cs^2 + Q_iab u_a u_b / 2*cs^4 )
@@ -530,7 +520,7 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 
 // ***************************************************************************************************
 // KBC collision operator
-void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
+void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	
 	// Declarations
 	double ds[L_nVels], dh[L_nVels], gamma;
@@ -560,7 +550,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	for (int v = 0; v < L_nVels; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXXX but no point in dividing to multiply later
 		M200 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
@@ -664,7 +654,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	for (int v = 0; v < L_nVels; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXX but no point in dividing to multiply later
 		M20 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
@@ -762,9 +752,6 @@ void GridObj::LBM_stream( ) {
 	 */
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	int dest_x, dest_y, dest_z;
 	int v_opp;
 
@@ -1045,9 +1032,6 @@ void GridObj::LBM_stream( ) {
 void GridObj::LBM_macro( ) {
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	double rho_temp = 0.0;
 	double fux_temp = 0.0;
 	double fuy_temp = 0.0;
@@ -1162,9 +1146,6 @@ void GridObj::LBM_macro( ) {
 void GridObj::LBM_macro( int i, int j, int k ) {
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	double rho_temp = 0.0;
 	double fux_temp = 0.0;
 	double fuy_temp = 0.0;
@@ -1243,10 +1224,10 @@ void GridObj::LBM_explode( int RegionNumber ) {
 	GridObj* fGrid = NULL;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = static_cast<int>(fGrid->YPos.size());
-	int M_coarse = static_cast<int>(YPos.size());
-	int K_coarse = static_cast<int>(ZPos.size());
-	int K_fine = static_cast<int>(fGrid->ZPos.size());
+	int M_fine = static_cast<int>(fGrid->M_lim);
+	int M_coarse = static_cast<int>(M_lim);
+	int K_coarse = static_cast<int>(K_lim);
+	int K_fine = static_cast<int>(fGrid->K_lim);
 
 	// Loop over coarse grid (just region of interest)
 	for (int i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
@@ -1322,11 +1303,11 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 	GridObj* fGrid;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = static_cast<int>(fGrid->YPos.size());
-	int M_coarse = static_cast<int>(YPos.size());
-	int K_coarse = static_cast<int>(ZPos.size());
+	int M_fine = static_cast<int>(fGrid->M_lim);
+	int M_coarse = static_cast<int>(M_lim);
+	int K_coarse = static_cast<int>(K_lim);
 #if (L_dims == 3)
-	int K_fine = static_cast<int>(fGrid->ZPos.size());
+	int K_fine = static_cast<int>(fGrid->K_lim);
 #else
 	int K_fine = 0;
 #endif

@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.1.1 (WORKING VERSION)"
+#define LUMA_VERSION "1.1.1-alpha"
 
 
 // Header guard
@@ -43,11 +43,11 @@
 //#define L_MPI_VERBOSE				// Write out the buffers used by MPI plus more setup data
 //#define L_IBM_DEBUG				// Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			// Write out IBBody positions
-//#define L_LD_OUT					// Write out lift and drag (sum x and y forces on Lagrange markers of IBBody)
 //#define L_BFL_DEBUG				// Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				// Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				// Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				// Write some HDF5 debugging information
+//#define L_TEXTOUT					// Verbose grid information
 
 
 /*
@@ -61,15 +61,17 @@
 #define L_PI 3.14159265358979323846
 
 // Using MPI?
-#define L_BUILD_FOR_MPI
+//#define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 100			// How many timesteps before whole grid output
-#define L_output_precision 3		// Precision of output (for text writers)
+#define L_out_every 1			// How many timesteps before whole grid output
+#define L_out_every_forces 10	// Specific output frequency of body forces
+#define L_output_precision 4	// Precision of output (for text writers)
 
 // Types of output
-//#define L_TEXTOUT
-#define L_HDF5_OUTPUT
+#define L_IO_LITE					// ASCII dump
+//#define L_HDF5_OUTPUT				// HDF5 writer
+//#define L_LD_OUT					// Write out lift and drag (all bodies)
 
 // High frequency output options
 //#define L_PROBE_OUTPUT
@@ -102,7 +104,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_Timesteps 500	// Number of time steps
+#define L_Timesteps 100	// Number of time steps
 
 
 /*
@@ -128,19 +130,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3	// Number of dimensions to the problem
-#define L_N 100		// Number of x lattice sites
-#define L_M 60		// Number of y lattice sites
-#define L_K 60		// Number of z lattice sites
+#define L_dims 2	// Number of dimensions to the problem
+#define L_N 128		// Number of x lattice sites
+#define L_M 64		// Number of y lattice sites
+#define L_K 64		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0		// Start of domain-x
-#define L_b_x 5		// End of domain-x
+#define L_b_x 2		// End of domain-x
 #define L_a_y 0		// Start of domain-y
-#define L_b_y 3		// End of domain-y
+#define L_b_y 1		// End of domain-y
 #define L_a_z 0		// Start of domain-z
-#define L_b_z 3		// End of domain-z
+#define L_b_z 1		// End of domain-z
 
 
 /*
@@ -160,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};
 #define L_u_0z 0			// Initial z-velocity
 
 #define L_rho_in 1			// Initial density
-#define L_Re 5000			// Desired Reynolds number
+#define L_Re 1000			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -278,26 +280,26 @@ const static int zProbeLims[2] = {30, 120};
 // Bounce-back solids
 #define L_SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
-	#define L_block_on_grid_lev 2		// Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		// Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 20		// Index of start of object/wall in x-direction
-	#define L_block_x_max 60		// Index of end of object/wall in x-direction
-	#define L_block_y_min 4			// Index of start of object/wall in y-direction
-	#define L_block_y_max 44		// Index of end of object/wall in y-direction
-	#define L_block_z_min 10		// Index of start of object/wall in z-direction
-	#define L_block_z_max 50		// Index of end of object/wall in z-direction
+	#define L_block_x_min 32		// Index of start of object/wall in x-direction
+	#define L_block_x_max 64		// Index of end of object/wall in x-direction
+	#define L_block_y_min 16			// Index of start of object/wall in y-direction
+	#define L_block_y_max 48		// Index of end of object/wall in y-direction
+	#define L_block_z_min 16		// Index of start of object/wall in z-direction
+	#define L_block_z_max 48		// Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
 //#define L_SOLID_FROM_FILE
 
-	#define L_object_on_grid_lev 2		// Provide grid level on which object should be added 
+	#define L_object_on_grid_lev 3		// Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 20
-	#define L_start_object_y 4
+	#define L_start_object_x 40
+	#define L_start_object_y 20
 	#define L_centre_object_z 30
 	#define L_object_length 80				// The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection		// Scale in this direction (Specify as enumeration)
@@ -325,7 +327,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 2		// Levels of refinement
+#define L_NumLev 0		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -370,10 +372,10 @@ const static int zProbeLims[2] = {30, 120};
 	static size_t RefZend[NumLev][NumReg]		= { {30},	{52},	{88} };
 
 #elif (L_NumReg == 1 && L_NumLev == 3)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {8},	{4},	{8} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {34},	{48},	{80} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {9},	{4},	{8} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {23},	{24},	{32} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {190},	{10},	{10} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {270},	{90},	{90} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {240},	{10},	{10} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {270},	{50},	{70} };
 	// If doing 2D, these can be arbitrary values
 	static int RefZstart[L_NumLev][L_NumReg]		= { {2},	{4},	{8} };
 	static int RefZend[L_NumLev][L_NumReg]			= { {30},	{52},	{88} };

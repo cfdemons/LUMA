@@ -207,9 +207,9 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	r_min = abs(L_b_x-L_a_x) / g.dx;	// Initial minimum distance (in lu) taken from problem geometry
 
 	// Loop over the grid to find closest node first
-	for (size_t i = 0; i < g.XPos.size(); i++) {
-		for (size_t j = 0; j < g.YPos.size(); j++) {
-			for (size_t k = 0; k < g.ZPos.size(); k++) {
+	for (size_t i = 0; i < g.N_lim; i++) {
+		for (size_t j = 0; j < g.M_lim; j++) {
+			for (size_t k = 0; k < g.K_lim; k++) {
 
 #if (L_dims == 3)
 				// Find r = sqrt(x^2 + y^2 + z^2)
@@ -259,17 +259,17 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	// Test to see if required support nodes are available
 #if (L_dims == 3)
 
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.N_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.M_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= g.ZPos.size() ) {
+	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= g.K_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -316,12 +316,12 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #else
 
 	// 2D check support region
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.XPos.size() ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.N_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.YPos.size() ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.M_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -367,9 +367,9 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 
 	// Get grid sizes
-	size_t M_lim = g.YPos.size();
+	size_t M_lim = g.M_lim;
 #if (L_dims == 3)
-	size_t K_lim = g.ZPos.size();
+	size_t K_lim = g.K_lim;
 #endif
 
 
@@ -447,8 +447,8 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 
 			// Get size of grid
-			size_t M_lim = g.YPos.size();
-			size_t K_lim = g.ZPos.size();
+			size_t M_lim = g.M_lim;
+			size_t K_lim = g.K_lim;
 
 			for (size_t dir = 0; dir < L_dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
@@ -465,8 +465,8 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 		testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		testout << "\nNEW TIME STEP" << std::endl;
 		// Get size of grid
-		size_t M_lim = g.YPos.size();
-		size_t K_lim = g.ZPos.size();
+		size_t M_lim = g.M_lim;
+		size_t K_lim = g.K_lim;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 				testout << g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_dims) << "\t"

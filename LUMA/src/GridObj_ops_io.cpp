@@ -31,11 +31,6 @@ using namespace std;
 // subgrids. Writes to text file "Grids.out" by default.
 void GridObj::io_textout(std::string output_tag) {
 
-	// Get limits for current level
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
-
 	// Create stream and open text file
 	ofstream gridoutput;
 	gridoutput.precision(L_output_precision);
@@ -81,7 +76,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 		// Print Grid Size header
 		gridoutput << "L0 Grid Size = " << L_N << " x " << L_M << " x " << L_K << endl;
-		gridoutput << "Local Grid Size = " << XPos.size() << " x " << YPos.size() << " x " << ZPos.size() << " (including any MPI overlap)" << std::endl;
+		gridoutput << "Local Grid Size = " << N_lim << " x " << M_lim << " x " << K_lim << " (including any MPI overlap)" << std::endl;
 
 		if (level == 0) {
 			// If refined levels exist, print refinement ratio
@@ -372,9 +367,6 @@ void GridObj::io_restart(bool IO_flag) {
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
-		int N_lim = static_cast<int>(XInd.size());
-		int M_lim = static_cast<int>(YInd.size());
-		int K_lim = static_cast<int>(ZInd.size());
 		int gi, gj, gk;
 		int in_level, in_regnum;
 		std::vector<int> ind;
@@ -690,11 +682,6 @@ int GridObj::io_hdf5(double tval) {
 
 	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
-
-	// Get local grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Get modified local grid size (minus TL cells)
 	int TL_thickness = 0;

@@ -286,6 +286,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
+	int a = 0;
 
 	// Case-specific variables
 	int on_grid_lev, on_grid_reg, body_length, body_start_x, body_start_y, body_centre_z;
@@ -344,6 +345,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Get grid pointer
 	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 
+	// Return if this process does not have this grid
+	if (g == NULL) return;
+
 	// Loop over lines in file
 	while (!file.eof()) {
 
@@ -371,7 +375,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->z.push_back(0);
 #endif
 
-		}
+	}
 	file.close();
 
 	// Error if no data
@@ -408,7 +412,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		) );
 
 	// Apply to each point
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
@@ -422,7 +426,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
 #endif
-	int a = 0;
+	a = 0;
 	do {
 
 		// Get global voxel index
@@ -431,10 +435,11 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		global_k = getVoxInd(_PCpts->z[a]);
 
 		// If on this rank
-		if ( GridUtils::isOnThisRank(global_i, global_j, global_k, *g) ) {
+		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
 			// Increment counter
 			a++;
-		} 
+
+		}
 		// If not, erase
 		else {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
@@ -442,7 +447,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->z.erase(_PCpts->z.begin() + a);
 		}
 
-	} while (a < (int)_PCpts->x.size());
+	} while (a < static_cast<int>(_PCpts->x.size()));
 
 
 	// Write out the points remaining in for debugging purposes
@@ -459,7 +464,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// If solid then call labeller
+	// If there are points left
 	if (!_PCpts->x.empty())	{
 
 		// Perform a different post-processing action depending on the type of body
@@ -467,18 +472,15 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		{
 
 		case eBBBCloud:
-
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
 			// Label the grid sites
-			for (size_t a = 0; a < _PCpts->x.size(); a++) {
-
+			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 				// Get globals
 				global_i = getVoxInd(_PCpts->x[a]);
 				global_j = getVoxInd(_PCpts->y[a]);
 				global_k = getVoxInd(_PCpts->z[a]);
-
 				// Get local indices
 				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
 
@@ -489,7 +491,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 				}
 			}
 			break;
-
 		case eBFLCloud:
 
 #ifdef L_CLOUD_DEBUG
@@ -500,6 +501,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			break;
 
 		case eIBBCloud:
+			global_j = getVoxInd(_PCpts->y[a]);
+			global_k = getVoxInd(_PCpts->z[a]);
 
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
@@ -511,5 +514,44 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		}
 
 	}
+}
+// *****************************************************************************
+// Routine for writing out the lift and drag forces on a BB object 
+void ObjectManager::io_writeForceOnObject(double tval) {
+	// Get grid on which object resides
+	GridObj *g = NULL;
+	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);
+	// If this grid exists on this process
+	if (g != NULL)
+	{
+		// Create stream
+		std::ofstream fout;
+		fout.precision(L_output_precision);
+		// Filename
+		std::stringstream fileName;
+		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << MpiManager::my_rank << ".csv";
+		// Open file
+		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+		// Write out the header (first time step only)
+		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
+
+		fout << std::to_string(tval) << ","
+			<< std::to_string(force_on_object_x / pow(2, L_object_on_grid_lev)) << ","
+			<< std::to_string(force_on_object_y / pow(2, L_object_on_grid_lev)) << ","
+#if (dims == 3)
+			<< std::to_string(force_on_object_z / pow(2, L_object_on_grid_lev))
+#else
+			<< std::to_string(0.0)
+#endif
+			<< std::endl;
+
+		fout.close();
+
+		// Reset for next time step
+		force_on_object_x = 0.0;
+		force_on_object_y = 0.0;
+		force_on_object_z = 0.0;
+	}
 
 }
+// *****************************************************************************

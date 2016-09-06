@@ -20,6 +20,7 @@
 #include "Body.h"
 #include "BFLBody.h"
 #include "IVector.h"
+#include "globalvars.h"
 
 enum eObjectType {
 	eBBBCloud,	// Bounce-back body
@@ -38,14 +39,9 @@ class ObjectManager
 private:
 
 	// Bounce-back object fields
-	double obj_start_x;
-	double obj_end_x;
-	double obj_start_y;
-	double obj_end_y;
-	double obj_start_z;
-	double obj_end_z;
-	std::vector<double> Cl;
-	std::vector<double> Cd;
+	double force_on_object_x = 0.0;
+	double force_on_object_y = 0.0;
+	double force_on_object_z = 0.0;
 
 	// Objects
 	std::vector<IBBody> iBody;				// Array of immersed boundary bodies
@@ -119,11 +115,15 @@ public:
 	std::vector<int> getVoxInd(double x, double y, double z);
 	int getVoxInd(double p);
 
+	// Force calculation
+	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB
+
 	// IO methods //
 	void io_vtk_IBwriter(double tval);				// VTK body writer
 	void io_write_body_pos(int timestep);			// Write out IBBody positions at specified timestep to text files
 	void io_write_lift_drag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(bool IO_flag, int level);		// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts* _PCpts, eObjectType objtype);	// Method to read in Point Cloud data
+	void io_writeForceOnObject(double tval);			// Method to write object forces to a csv file
 };
 

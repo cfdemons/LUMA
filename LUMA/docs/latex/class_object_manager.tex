@@ -1,0 +1,329 @@
+\hypertarget{class_object_manager}{}\section{Object\+Manager Class Reference}
+\label{class_object_manager}\index{Object\+Manager@{Object\+Manager}}
+
+
+{\ttfamily \#include $<$Object\+Manager.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_object_manager_a83174cbaabd95639f8b4f652ad398183}{ibm\+\_\+apply} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{ibm\+\_\+build\+\_\+body} (int body\+\_\+type)
+\item 
+void \hyperlink{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{ibm\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$owner)
+\item 
+void \hyperlink{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}{ibm\+\_\+initialise} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+double \hyperlink{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{ibm\+\_\+deltakernel} (double rad, double dilation)
+\item 
+void \hyperlink{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}{ibm\+\_\+interpol} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}{ibm\+\_\+spread} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}{ibm\+\_\+findsupport} (int ib, int m, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}{ibm\+\_\+computeforce} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+double \hyperlink{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}{ibm\+\_\+findepsilon} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}{ibm\+\_\+move\+\_\+bodies} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+double \hyperlink{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{ibm\+\_\+bicgstab} (std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&Amatrix, std\+::vector$<$ double $>$ \&b\+Vector, std\+::vector$<$ double $>$ \&epsilon, double tolerance, int maxiterations)
+\item 
+void \hyperlink{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}{ibm\+\_\+jacowire} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_a07a4a328974705e440dd303c5c2e0472}{ibm\+\_\+position\+\_\+update} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}{ibm\+\_\+position\+\_\+update\+\_\+grp} (int group, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+\item 
+void \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double b\mbox{[}$\,$\mbox{]})
+\item 
+void \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double $\ast$d)
+\item 
+void \hyperlink{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{bfl\+\_\+build\+\_\+body} (int body\+\_\+type)
+\item 
+void \hyperlink{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{bfl\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\item 
+std\+::vector$<$ int $>$ \hyperlink{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{get\+Vox\+Ind} (double x, double y, double z)
+\item 
+int \hyperlink{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{get\+Vox\+Ind} (double p)
+\item 
+void \hyperlink{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{io\+\_\+vtk\+\_\+\+I\+Bwriter} (double tval)
+\item 
+void \hyperlink{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{io\+\_\+write\+\_\+body\+\_\+pos} (int timestep)
+\item 
+void \hyperlink{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{io\+\_\+write\+\_\+lift\+\_\+drag} (int timestep)
+\item 
+void \hyperlink{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{io\+\_\+restart} (bool I\+O\+\_\+flag, int level)
+\item 
+void \hyperlink{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{io\+\_\+read\+In\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{_object_manager_8h_a7b78fa3db30dfb9c1efc82bf886fe184}{e\+Object\+Type} objtype)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{class_object_manager}{Object\+Manager} $\ast$ \hyperlink{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}{get\+Instance} ()
+\item 
+static void \hyperlink{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}{destroy\+Instance} ()
+\item 
+static \hyperlink{class_object_manager}{Object\+Manager} $\ast$ \hyperlink{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}{get\+Instance} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+Obj}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
+\index{bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{bfl\+\_\+build\+\_\+body(int body\+\_\+type)}{bfl_build_body(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+\_\+body (
+\begin{DoxyParamCaption}
+\item[{int}]{body\+\_\+type}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{}\label{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}
+\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
+\index{bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{bfl\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{bfl_build_body(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+\_\+body (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{}\label{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}
+\index{Object\+Manager@{Object\+Manager}!destroy\+Instance@{destroy\+Instance}}
+\index{destroy\+Instance@{destroy\+Instance}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{destroy\+Instance()}{destroyInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::destroy\+Instance (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}{}\label{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}
+\index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
+\index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{get\+Instance()}{getInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}{}\label{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}
+\index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
+\index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{get\+Instance(\+Grid\+Obj $\ast$g)}{getInstance(GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}{}\label{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}
+\index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
+\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Object\+Manager\+::get\+Vox\+Ind (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{y, }
+\item[{double}]{z}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{}\label{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}
+\index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
+\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double p)}{getVoxInd(double p)}}]{\setlength{\rightskip}{0pt plus 5cm}int Object\+Manager\+::get\+Vox\+Ind (
+\begin{DoxyParamCaption}
+\item[{double}]{p}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{}\label{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+apply@{ibm\+\_\+apply}}
+\index{ibm\+\_\+apply@{ibm\+\_\+apply}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+apply(\+Grid\+Obj \&g)}{ibm_apply(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+apply (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a83174cbaabd95639f8b4f652ad398183}{}\label{class_object_manager_a83174cbaabd95639f8b4f652ad398183}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+banbks@{ibm\+\_\+banbks}}
+\index{ibm\+\_\+banbks@{ibm\+\_\+banbks}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+banbks(double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx[], double b[])}{ibm_banbks(double **a, long n, int m1, int m2, double **al, unsigned long indx[], double b[])}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+banbks (
+\begin{DoxyParamCaption}
+\item[{double $\ast$$\ast$}]{a, }
+\item[{long}]{n, }
+\item[{int}]{m1, }
+\item[{int}]{m2, }
+\item[{double $\ast$$\ast$}]{al, }
+\item[{unsigned long}]{indx\mbox{[}$\,$\mbox{]}, }
+\item[{double}]{b\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{}\label{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+bandec@{ibm\+\_\+bandec}}
+\index{ibm\+\_\+bandec@{ibm\+\_\+bandec}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+bandec(double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx[], double $\ast$d)}{ibm_bandec(double **a, long n, int m1, int m2, double **al, unsigned long indx[], double *d)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+bandec (
+\begin{DoxyParamCaption}
+\item[{double $\ast$$\ast$}]{a, }
+\item[{long}]{n, }
+\item[{int}]{m1, }
+\item[{int}]{m2, }
+\item[{double $\ast$$\ast$}]{al, }
+\item[{unsigned long}]{indx\mbox{[}$\,$\mbox{]}, }
+\item[{double $\ast$}]{d}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{}\label{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+bicgstab@{ibm\+\_\+bicgstab}}
+\index{ibm\+\_\+bicgstab@{ibm\+\_\+bicgstab}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+bicgstab(std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&\+Amatrix, std\+::vector$<$ double $>$ \&b\+Vector, std\+::vector$<$ double $>$ \&epsilon, double tolerance, int maxiterations)}{ibm_bicgstab(std::vector< std::vector< double > > &Amatrix, std::vector< double > &bVector, std::vector< double > &epsilon, double tolerance, int maxiterations)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+bicgstab (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{Amatrix, }
+\item[{std\+::vector$<$ double $>$ \&}]{b\+Vector, }
+\item[{std\+::vector$<$ double $>$ \&}]{epsilon, }
+\item[{double}]{tolerance, }
+\item[{int}]{maxiterations}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{}\label{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
+\index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(int body\+\_\+type)}{ibm_build_body(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
+\begin{DoxyParamCaption}
+\item[{int}]{body\+\_\+type}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{}\label{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
+\index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$owner)}{ibm_build_body(PCpts *_PCpts, GridObj *owner)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts, }
+\item[{{\bf Grid\+Obj} $\ast$}]{owner}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{}\label{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+computeforce@{ibm\+\_\+computeforce}}
+\index{ibm\+\_\+computeforce@{ibm\+\_\+computeforce}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+computeforce(int ib, Grid\+Obj \&g)}{ibm_computeforce(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+computeforce (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}{}\label{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}}
+\index{ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+deltakernel(double rad, double dilation)}{ibm_deltakernel(double rad, double dilation)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+deltakernel (
+\begin{DoxyParamCaption}
+\item[{double}]{rad, }
+\item[{double}]{dilation}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{}\label{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}}
+\index{ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+findepsilon(int ib, Grid\+Obj \&g)}{ibm_findepsilon(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+findepsilon (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}{}\label{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findsupport@{ibm\+\_\+findsupport}}
+\index{ibm\+\_\+findsupport@{ibm\+\_\+findsupport}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+findsupport(int ib, int m, Grid\+Obj \&g)}{ibm_findsupport(int ib, int m, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+findsupport (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{int}]{m, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}{}\label{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+initialise@{ibm\+\_\+initialise}}
+\index{ibm\+\_\+initialise@{ibm\+\_\+initialise}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+initialise(\+Grid\+Obj \&g)}{ibm_initialise(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+initialise (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}{}\label{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+interpol@{ibm\+\_\+interpol}}
+\index{ibm\+\_\+interpol@{ibm\+\_\+interpol}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+interpol(int ib, Grid\+Obj \&g)}{ibm_interpol(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+interpol (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}{}\label{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+jacowire@{ibm\+\_\+jacowire}}
+\index{ibm\+\_\+jacowire@{ibm\+\_\+jacowire}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+jacowire(int ib, Grid\+Obj \&g)}{ibm_jacowire(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+jacowire (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}{}\label{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}}
+\index{ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+move\+\_\+bodies(\+Grid\+Obj \&g)}{ibm_move_bodies(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+move\+\_\+bodies (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}{}\label{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}}
+\index{ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update(int ib, Grid\+Obj \&g)}{ibm_position_update(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a07a4a328974705e440dd303c5c2e0472}{}\label{class_object_manager_a07a4a328974705e440dd303c5c2e0472}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}}
+\index{ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update\+\_\+grp(int group, Grid\+Obj \&g)}{ibm_position_update_grp(int group, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update\+\_\+grp (
+\begin{DoxyParamCaption}
+\item[{int}]{group, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}{}\label{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+spread@{ibm\+\_\+spread}}
+\index{ibm\+\_\+spread@{ibm\+\_\+spread}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+spread(int ib, Grid\+Obj \&g)}{ibm_spread(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+spread (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{{\bf Grid\+Obj} \&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}{}\label{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+read\+In\+Cloud@{io\+\_\+read\+In\+Cloud}}
+\index{io\+\_\+read\+In\+Cloud@{io\+\_\+read\+In\+Cloud}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+read\+In\+Cloud(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, e\+Object\+Type objtype)}{io_readInCloud(PCpts *_PCpts, eObjectType objtype)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+read\+In\+Cloud (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts, }
+\item[{{\bf e\+Object\+Type}}]{objtype}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{}\label{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+restart@{io\+\_\+restart}}
+\index{io\+\_\+restart@{io\+\_\+restart}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+restart(bool I\+O\+\_\+flag, int level)}{io_restart(bool IO_flag, int level)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+restart (
+\begin{DoxyParamCaption}
+\item[{bool}]{I\+O\+\_\+flag, }
+\item[{int}]{level}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{}\label{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}}
+\index{io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+vtk\+\_\+\+I\+Bwriter(double tval)}{io_vtk_IBwriter(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+vtk\+\_\+\+I\+Bwriter (
+\begin{DoxyParamCaption}
+\item[{double}]{tval}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{}\label{class_object_manager_a39aa351c7b338473be4871111da5c5bd}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}}
+\index{io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+body\+\_\+pos(int timestep)}{io_write_body_pos(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+body\+\_\+pos (
+\begin{DoxyParamCaption}
+\item[{int}]{timestep}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{}\label{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}}
+\index{io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+lift\+\_\+drag(int timestep)}{io_write_lift_drag(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+lift\+\_\+drag (
+\begin{DoxyParamCaption}
+\item[{int}]{timestep}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{}\label{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{Object\+Manager@{Object\+Manager}!Grid\+Obj@{Grid\+Obj}}
+\index{Grid\+Obj@{Grid\+Obj}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{Grid\+Obj}{GridObj}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Grid\+Obj}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{}\label{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_object_manager_8h}{Object\+Manager.\+h}\item 
+\hyperlink{_object_manager_8cpp}{Object\+Manager.\+cpp}\item 
+\hyperlink{_object_manager__init__bflbody_8cpp}{Object\+Manager\+\_\+init\+\_\+bflbody.\+cpp}\item 
+\hyperlink{_object_manager__init__ibmbody_8cpp}{Object\+Manager\+\_\+init\+\_\+ibmbody.\+cpp}\item 
+\hyperlink{_object_manager__ops__ibm_8cpp}{Object\+Manager\+\_\+ops\+\_\+ibm.\+cpp}\item 
+\hyperlink{_object_manager__ops__ibmflex_8cpp}{Object\+Manager\+\_\+ops\+\_\+ibmflex.\+cpp}\item 
+\hyperlink{_object_manager__ops__io_8cpp}{Object\+Manager\+\_\+ops\+\_\+io.\+cpp}\end{DoxyCompactItemize}

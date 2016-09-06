@@ -116,7 +116,7 @@ public:
 	int getVoxInd(double p);
 
 	// Force calculation
-	void computeLiftDrag(int i, int j, int k, int M_lim, int K_lim, GridObj *g);		// Compute force for BBB or BFLB
+	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB
 
 	// IO methods //
 	void io_vtk_IBwriter(double tval);				// VTK body writer

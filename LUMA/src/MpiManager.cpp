@@ -748,9 +748,9 @@ int MpiManager::mpi_buildCommunicators() {
 	p_data.back().region = 0;
 
 	// Get local grid sizes
-	int N_lim = static_cast<int>(Grids->XPos.size());
-	int M_lim = static_cast<int>(Grids->YPos.size());
-	int K_lim = static_cast<int>(Grids->ZPos.size());
+	int N_lim = static_cast<int>(Grids->N_lim);
+	int M_lim = static_cast<int>(Grids->M_lim);
+	int K_lim = static_cast<int>(Grids->K_lim);
 
 	// Halo exists on all edges on L0 and there are no transition layers
 	p_data.back().i_end = N_lim - 2;
@@ -789,9 +789,9 @@ int MpiManager::mpi_buildCommunicators() {
 				 * data by checking the buffers versus the grid size. */
 
 				// Get local grid sizes
-				N_lim = static_cast<int>(targetGrid->XPos.size());
-				M_lim = static_cast<int>(targetGrid->YPos.size());
-				K_lim = static_cast<int>(targetGrid->ZPos.size());
+				N_lim = static_cast<int>(targetGrid->N_lim);
+				M_lim = static_cast<int>(targetGrid->M_lim);
+				K_lim = static_cast<int>(targetGrid->K_lim);
 
 				// Get global grid sizes
 				N_global = 2 * (RefXend[lev - 1][reg] - RefXstart[lev - 1][reg] + 1);

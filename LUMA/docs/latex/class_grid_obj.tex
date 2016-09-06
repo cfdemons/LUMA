@@ -1,0 +1,548 @@
+\hypertarget{class_grid_obj}{}\section{Grid\+Obj Class Reference}
+\label{class_grid_obj}\index{Grid\+Obj@{Grid\+Obj}}
+
+
+{\ttfamily \#include $<$Grid\+Obj.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_grid_obj_acc3416599b59236e87b6b60a07e678af}{Grid\+Obj} ()
+\item 
+\hyperlink{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}{Grid\+Obj} (int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level})
+\item 
+\hyperlink{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}{Grid\+Obj} (int Region\+Number, \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+\hyperlink{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}{Grid\+Obj} (int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level}, std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)
+\item 
+\hyperlink{class_grid_obj_ace563099d85c330ac48f35b515422522}{$\sim$\+Grid\+Obj} ()
+\item 
+void \hyperlink{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}{L\+B\+M\+\_\+init\+Velocity} ()
+\item 
+void \hyperlink{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{L\+B\+M\+\_\+init\+Rho} ()
+\item 
+void \hyperlink{class_grid_obj_aeea74cc13001620abec1ba819233f714}{L\+B\+M\+\_\+init\+Grid} ()
+\item 
+void \hyperlink{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{L\+B\+M\+\_\+init\+Grid} (std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)
+\item 
+void \hyperlink{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{L\+B\+M\+\_\+init\+Sub\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+void \hyperlink{class_grid_obj_a4b6edceeda49496365e725eb67931961}{L\+B\+M\+\_\+init\+Bound\+Lab} ()
+\item 
+void \hyperlink{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}{L\+B\+M\+\_\+init\+Solid\+Lab} ()
+\item 
+void \hyperlink{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{L\+B\+M\+\_\+init\+Refined\+Lab} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\item 
+void \hyperlink{class_grid_obj_a023713976673d029103690a91c5415f9}{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile} ()
+\item 
+void \hyperlink{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{L\+B\+M\+\_\+multi} (bool I\+B\+M\+\_\+flag)
+\item 
+void \hyperlink{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{L\+B\+M\+\_\+collide} ()
+\item 
+double \hyperlink{class_grid_obj_ab24eba4c29917ea98cc48b53c2a03a25}{L\+B\+M\+\_\+collide} (int i, int j, int k, int v, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_a9f98bf9f34b1b1f2fb31a25fb3061f49}{L\+B\+M\+\_\+kbc\+Collide} (int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim, \hyperlink{class_i_vector}{I\+Vector}$<$ double $>$ \&f\+\_\+new)
+\item 
+void \hyperlink{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}{L\+B\+M\+\_\+stream} ()
+\item 
+void \hyperlink{class_grid_obj_a25382158b7747da7c0639aed513ae39c}{L\+B\+M\+\_\+macro} ()
+\item 
+void \hyperlink{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{L\+B\+M\+\_\+macro} (int i, int j, int k)
+\item 
+void \hyperlink{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}{L\+B\+M\+\_\+boundary} (int bc\+\_\+type\+\_\+flag)
+\item 
+void \hyperlink{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{L\+B\+M\+\_\+forcegrid} (bool reset\+\_\+flag)
+\item 
+void \hyperlink{class_grid_obj_ae10eccc72ee3ef9a9bb730f548b55c89}{bc\+\_\+apply\+Bounce\+Back} (int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_aa91e3f8ae700ac9525f0ad063b1da084}{bc\+\_\+apply\+Spec\+Reflect} (int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_a47ce1726eff9ce4f1d5fd2b1c3f7c237}{bc\+\_\+apply\+Zou\+He} (int label, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_af36e2349c2520b34649de94dcb860838}{bc\+\_\+apply\+Regularised} (int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_ad6306470f559f995c441034c28e9d944}{bc\+\_\+apply\+Extrapolation} (int label, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{bc\+\_\+apply\+Bfl} (int i, int j, int k)
+\item 
+void \hyperlink{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{bc\+\_\+apply\+Nrbc} (int i, int j, int k)
+\item 
+void \hyperlink{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}{bc\+\_\+solid\+Site\+Reset} ()
+\item 
+double \hyperlink{class_grid_obj_ace9fef8d2c583ea5805b77c999b0684c}{bc\+\_\+get\+Wall\+Density\+For\+R\+BC} (std\+::vector$<$ double $>$ \&ftmp, int normal, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)
+\item 
+void \hyperlink{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}{L\+B\+M\+\_\+explode} (int Region\+Number)
+\item 
+void \hyperlink{class_grid_obj_a5832081a70e8990be62317034bb975c6}{L\+B\+M\+\_\+coalesce} (int Region\+Number)
+\item 
+void \hyperlink{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{L\+B\+M\+\_\+add\+Sub\+Grid} (int Region\+Number)
+\item 
+void \hyperlink{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}{io\+\_\+textout} (std\+::string output\+\_\+tag)
+\item 
+void \hyperlink{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}{io\+\_\+restart} (bool I\+O\+\_\+flag)
+\item 
+void \hyperlink{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{io\+\_\+probe\+Output} ()
+\item 
+void \hyperlink{class_grid_obj_acf311bbf350fd48104663eaabebca835}{io\+\_\+lite} (double tval, std\+::string Tag)
+\item 
+int \hyperlink{class_grid_obj_adc960ac818748b839e81d1375782caa7}{io\+\_\+hdf5} (double tval)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ int $>$ \hyperlink{class_grid_obj_ad9bb2153aec972c499ce969a76d908fd}{X\+Ind}
+\item 
+std\+::vector$<$ int $>$ \hyperlink{class_grid_obj_acf1d07b290887f0d380d046a1d698f0e}{Y\+Ind}
+\item 
+std\+::vector$<$ int $>$ \hyperlink{class_grid_obj_aef85a27cb2bca6b268469ee96470bb35}{Z\+Ind}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_grid_obj_af31df133bf9419da6222a0dbb4e54bab}{X\+Pos}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_grid_obj_a2bd4e9b575377b8e76e5ebe7a3a31194}{Y\+Pos}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_grid_obj_af859d35bf0a03cee8965ce3e22e651c6}{Z\+Pos}
+\item 
+\hyperlink{class_i_vector}{I\+Vector}$<$ \hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60e}{e\+Type} $>$ \hyperlink{class_grid_obj_a8ce077fba648f767361039eb924c45ae}{Lat\+Typ}
+\item 
+int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level}
+\item 
+double \hyperlink{class_grid_obj_afd504b39f12eb0a237bc6313de94e094}{dt}
+\item 
+int \hyperlink{class_grid_obj_a783b18a053e244ae7b7b436ab21c0592}{t}
+\item 
+double \hyperlink{class_grid_obj_a755f85eb5480d959211e00937a478ae9}{nu}
+\item 
+double \hyperlink{class_grid_obj_a21461e5d39c5ae83ae42170c829e9da3}{omega}
+\item 
+double \hyperlink{class_grid_obj_a147cfb80b653ca4432432e8185cf38ef}{timeav\+\_\+mpi\+\_\+overhead}
+\item 
+double \hyperlink{class_grid_obj_a2ad670e6b9bdd28b5060397800170310}{timeav\+\_\+timestep}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_grid_obj_a831466b4226dde3791b04756e4cfa6fc}{Mpi\+Manager}
+\item 
+class \hyperlink{class_grid_obj_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manager}
+\item 
+class \hyperlink{class_grid_obj_a8891d532b9568ad83535721b0e6b79c9}{Grid\+Utils}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Grid\+Obj()}{GridObj()}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_acc3416599b59236e87b6b60a07e678af}{}\label{class_grid_obj_acc3416599b59236e87b6b60a07e678af}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Grid\+Obj(int level)}{GridObj(int level)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
+\begin{DoxyParamCaption}
+\item[{int}]{level}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}{}\label{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Grid\+Obj(int Region\+Number, Grid\+Obj \&p\+Grid)}{GridObj(int RegionNumber, GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
+\begin{DoxyParamCaption}
+\item[{int}]{Region\+Number, }
+\item[{{\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}{}\label{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Grid\+Obj(int level, std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)}{GridObj(int level, std::vector< int > local_size, std::vector< std::vector< int > > GlobalLimsInd, std::vector< std::vector< double > > GlobalLimsPos)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
+\begin{DoxyParamCaption}
+\item[{int}]{level, }
+\item[{std\+::vector$<$ int $>$}]{local\+\_\+size, }
+\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$}]{Global\+Lims\+Ind, }
+\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{Global\+Lims\+Pos}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}{}\label{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}
+\index{Grid\+Obj@{Grid\+Obj}!````~Grid\+Obj@{$\sim$\+Grid\+Obj}}
+\index{````~Grid\+Obj@{$\sim$\+Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{$\sim$\+Grid\+Obj()}{~GridObj()}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::$\sim$\+Grid\+Obj (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ace563099d85c330ac48f35b515422522}{}\label{class_grid_obj_ace563099d85c330ac48f35b515422522}
+
+
+\subsection{Member Function Documentation}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bfl@{bc\+\_\+apply\+Bfl}}
+\index{bc\+\_\+apply\+Bfl@{bc\+\_\+apply\+Bfl}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Bfl(int i, int j, int k)}{bc_applyBfl(int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Bfl (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{}\label{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}
+Apply BC in pairs -- BC 1
+
+Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Back@{bc\+\_\+apply\+Bounce\+Back}}
+\index{bc\+\_\+apply\+Bounce\+Back@{bc\+\_\+apply\+Bounce\+Back}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Bounce\+Back(int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)}{bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Bounce\+Back (
+\begin{DoxyParamCaption}
+\item[{int}]{label, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{N\+\_\+lim, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ae10eccc72ee3ef9a9bb730f548b55c89}{}\label{class_grid_obj_ae10eccc72ee3ef9a9bb730f548b55c89}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Extrapolation@{bc\+\_\+apply\+Extrapolation}}
+\index{bc\+\_\+apply\+Extrapolation@{bc\+\_\+apply\+Extrapolation}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Extrapolation(int label, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)}{bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Extrapolation (
+\begin{DoxyParamCaption}
+\item[{int}]{label, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ad6306470f559f995c441034c28e9d944}{}\label{class_grid_obj_ad6306470f559f995c441034c28e9d944}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Nrbc@{bc\+\_\+apply\+Nrbc}}
+\index{bc\+\_\+apply\+Nrbc@{bc\+\_\+apply\+Nrbc}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Nrbc(int i, int j, int k)}{bc_applyNrbc(int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Nrbc (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{}\label{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Regularised@{bc\+\_\+apply\+Regularised}}
+\index{bc\+\_\+apply\+Regularised@{bc\+\_\+apply\+Regularised}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Regularised(int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)}{bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Regularised (
+\begin{DoxyParamCaption}
+\item[{int}]{label, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{N\+\_\+lim, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_af36e2349c2520b34649de94dcb860838}{}\label{class_grid_obj_af36e2349c2520b34649de94dcb860838}
+To allow a generalised application of the regularised BC we need to implement the following\+:
+\begin{DoxyEnumerate}
+\item Check normal directions to find orientation of normal wall;
+\item Store the unknown and known directions in two vectors
+\item Apply the boundary condition. Note\+: for the corners, the unknown distributions are too numerous to evaluate the density so must use extrapolation for the 4 corners (2D) or 8 corners (3D) from the bulk flow to find the density. Hence, we handle this case after the normal cases.
+
+If it reaches here and has gone through all the directions then the wall orientation cannot be found based on the fact that it cannot find an adjacent site within the centre of the domain on which to base the BC. In this case it must be a buffered layer of inlet sites (the \char`\"{}second row\char`\"{} of sites you get when embedding a sub-\/grid in the inlet) so just set it to default values as it doesn\textquotesingle{}t affect the domain anyway. 
+\end{DoxyEnumerate}\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Spec\+Reflect@{bc\+\_\+apply\+Spec\+Reflect}}
+\index{bc\+\_\+apply\+Spec\+Reflect@{bc\+\_\+apply\+Spec\+Reflect}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Spec\+Reflect(int label, int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim)}{bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Spec\+Reflect (
+\begin{DoxyParamCaption}
+\item[{int}]{label, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{N\+\_\+lim, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aa91e3f8ae700ac9525f0ad063b1da084}{}\label{class_grid_obj_aa91e3f8ae700ac9525f0ad063b1da084}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Zou\+He@{bc\+\_\+apply\+Zou\+He}}
+\index{bc\+\_\+apply\+Zou\+He@{bc\+\_\+apply\+Zou\+He}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+apply\+Zou\+He(int label, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)}{bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Zou\+He (
+\begin{DoxyParamCaption}
+\item[{int}]{label, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a47ce1726eff9ce4f1d5fd2b1c3f7c237}{}\label{class_grid_obj_a47ce1726eff9ce4f1d5fd2b1c3f7c237}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+get\+Wall\+Density\+For\+R\+BC@{bc\+\_\+get\+Wall\+Density\+For\+R\+BC}}
+\index{bc\+\_\+get\+Wall\+Density\+For\+R\+BC@{bc\+\_\+get\+Wall\+Density\+For\+R\+BC}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+get\+Wall\+Density\+For\+R\+B\+C(std\+::vector$<$ double $>$ \&ftmp, int normal, int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim)}{bc_getWallDensityForRBC(std::vector< double > &ftmp, int normal, int i, int j, int k, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::bc\+\_\+get\+Wall\+Density\+For\+R\+BC (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$ \&}]{ftmp, }
+\item[{int}]{normal, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ace9fef8d2c583ea5805b77c999b0684c}{}\label{class_grid_obj_ace9fef8d2c583ea5805b77c999b0684c}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+solid\+Site\+Reset@{bc\+\_\+solid\+Site\+Reset}}
+\index{bc\+\_\+solid\+Site\+Reset@{bc\+\_\+solid\+Site\+Reset}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{bc\+\_\+solid\+Site\+Reset()}{bc_solidSiteReset()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+solid\+Site\+Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}{}\label{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}
+\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+hdf5@{io\+\_\+hdf5}}
+\index{io\+\_\+hdf5@{io\+\_\+hdf5}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+hdf5(double tval)}{io_hdf5(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::io\+\_\+hdf5 (
+\begin{DoxyParamCaption}
+\item[{double}]{tval}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_adc960ac818748b839e81d1375782caa7}{}\label{class_grid_obj_adc960ac818748b839e81d1375782caa7}
+\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+lite@{io\+\_\+lite}}
+\index{io\+\_\+lite@{io\+\_\+lite}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+lite(double tval, std\+::string Tag)}{io_lite(double tval, std::string Tag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+lite (
+\begin{DoxyParamCaption}
+\item[{double}]{tval, }
+\item[{std\+::string}]{Tag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_acf311bbf350fd48104663eaabebca835}{}\label{class_grid_obj_acf311bbf350fd48104663eaabebca835}
+\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+probe\+Output@{io\+\_\+probe\+Output}}
+\index{io\+\_\+probe\+Output@{io\+\_\+probe\+Output}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+probe\+Output()}{io_probeOutput()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+probe\+Output (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{}\label{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}
+\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+restart@{io\+\_\+restart}}
+\index{io\+\_\+restart@{io\+\_\+restart}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+restart(bool I\+O\+\_\+flag)}{io_restart(bool IO_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+restart (
+\begin{DoxyParamCaption}
+\item[{bool}]{I\+O\+\_\+flag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}{}\label{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}
+\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+textout@{io\+\_\+textout}}
+\index{io\+\_\+textout@{io\+\_\+textout}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+textout(std\+::string output\+\_\+tag)}{io_textout(std::string output_tag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+textout (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{output\+\_\+tag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}{}\label{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+add\+Sub\+Grid@{L\+B\+M\+\_\+add\+Sub\+Grid}}
+\index{L\+B\+M\+\_\+add\+Sub\+Grid@{L\+B\+M\+\_\+add\+Sub\+Grid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+add\+Sub\+Grid(int Region\+Number)}{LBM_addSubGrid(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+add\+Sub\+Grid (
+\begin{DoxyParamCaption}
+\item[{int}]{Region\+Number}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{}\label{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+boundary@{L\+B\+M\+\_\+boundary}}
+\index{L\+B\+M\+\_\+boundary@{L\+B\+M\+\_\+boundary}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+boundary(int bc\+\_\+type\+\_\+flag)}{LBM_boundary(int bc_type_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+boundary (
+\begin{DoxyParamCaption}
+\item[{int}]{bc\+\_\+type\+\_\+flag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}{}\label{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+coalesce@{L\+B\+M\+\_\+coalesce}}
+\index{L\+B\+M\+\_\+coalesce@{L\+B\+M\+\_\+coalesce}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+coalesce(int Region\+Number)}{LBM_coalesce(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+coalesce (
+\begin{DoxyParamCaption}
+\item[{int}]{Region\+Number}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a5832081a70e8990be62317034bb975c6}{}\label{class_grid_obj_a5832081a70e8990be62317034bb975c6}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}}
+\index{L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+collide()}{LBM_collide()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+collide (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{}\label{class_grid_obj_a0feb0f9406f626e90c57045350161b22}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}}
+\index{L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+collide(int i, int j, int k, int v, int M\+\_\+lim, int K\+\_\+lim)}{LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::\+L\+B\+M\+\_\+collide (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{v, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ab24eba4c29917ea98cc48b53c2a03a25}{}\label{class_grid_obj_ab24eba4c29917ea98cc48b53c2a03a25}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+explode@{L\+B\+M\+\_\+explode}}
+\index{L\+B\+M\+\_\+explode@{L\+B\+M\+\_\+explode}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+explode(int Region\+Number)}{LBM_explode(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+explode (
+\begin{DoxyParamCaption}
+\item[{int}]{Region\+Number}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}{}\label{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}}
+\index{L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+forcegrid(bool reset\+\_\+flag)}{LBM_forcegrid(bool reset_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+forcegrid (
+\begin{DoxyParamCaption}
+\item[{bool}]{reset\+\_\+flag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{}\label{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}}
+\index{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile()}{LBM_init_getInletProfile()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a023713976673d029103690a91c5415f9}{}\label{class_grid_obj_a023713976673d029103690a91c5415f9}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Bound\+Lab@{L\+B\+M\+\_\+init\+Bound\+Lab}}
+\index{L\+B\+M\+\_\+init\+Bound\+Lab@{L\+B\+M\+\_\+init\+Bound\+Lab}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Bound\+Lab()}{LBM_initBoundLab()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Bound\+Lab (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a4b6edceeda49496365e725eb67931961}{}\label{class_grid_obj_a4b6edceeda49496365e725eb67931961}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
+\index{L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Grid()}{LBM_initGrid()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Grid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aeea74cc13001620abec1ba819233f714}{}\label{class_grid_obj_aeea74cc13001620abec1ba819233f714}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
+\index{L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Grid(std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)}{LBM_initGrid(std::vector< int > local_size, std::vector< std::vector< int > > GlobalLimsInd, std::vector< std::vector< double > > GlobalLimsPos)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Grid (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ int $>$}]{local\+\_\+size, }
+\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$}]{Global\+Lims\+Ind, }
+\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{Global\+Lims\+Pos}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{}\label{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Refined\+Lab@{L\+B\+M\+\_\+init\+Refined\+Lab}}
+\index{L\+B\+M\+\_\+init\+Refined\+Lab@{L\+B\+M\+\_\+init\+Refined\+Lab}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Refined\+Lab(\+Grid\+Obj \&p\+Grid)}{LBM_initRefinedLab(GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Refined\+Lab (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{}\label{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Rho@{L\+B\+M\+\_\+init\+Rho}}
+\index{L\+B\+M\+\_\+init\+Rho@{L\+B\+M\+\_\+init\+Rho}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Rho()}{LBM_initRho()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Rho (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{}\label{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}}
+\index{L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Solid\+Lab()}{LBM_initSolidLab()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Solid\+Lab (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}{}\label{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Sub\+Grid@{L\+B\+M\+\_\+init\+Sub\+Grid}}
+\index{L\+B\+M\+\_\+init\+Sub\+Grid@{L\+B\+M\+\_\+init\+Sub\+Grid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Sub\+Grid(\+Grid\+Obj \&p\+Grid)}{LBM_initSubGrid(GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Sub\+Grid (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{}\label{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Velocity@{L\+B\+M\+\_\+init\+Velocity}}
+\index{L\+B\+M\+\_\+init\+Velocity@{L\+B\+M\+\_\+init\+Velocity}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Velocity()}{LBM_initVelocity()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Velocity (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}{}\label{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+kbc\+Collide@{L\+B\+M\+\_\+kbc\+Collide}}
+\index{L\+B\+M\+\_\+kbc\+Collide@{L\+B\+M\+\_\+kbc\+Collide}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+kbc\+Collide(int i, int j, int k, int M\+\_\+lim, int K\+\_\+lim, I\+Vector$<$ double $>$ \&f\+\_\+new)}{LBM_kbcCollide(int i, int j, int k, int M_lim, int K_lim, IVector< double > &f_new)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+kbc\+Collide (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{int}]{M\+\_\+lim, }
+\item[{int}]{K\+\_\+lim, }
+\item[{{\bf I\+Vector}$<$ double $>$ \&}]{f\+\_\+new}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a9f98bf9f34b1b1f2fb31a25fb3061f49}{}\label{class_grid_obj_a9f98bf9f34b1b1f2fb31a25fb3061f49}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}}
+\index{L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+macro()}{LBM_macro()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+macro (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a25382158b7747da7c0639aed513ae39c}{}\label{class_grid_obj_a25382158b7747da7c0639aed513ae39c}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}}
+\index{L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+macro(int i, int j, int k)}{LBM_macro(int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+macro (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{}\label{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}}
+\index{L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi(bool I\+B\+M\+\_\+flag)}{LBM_multi(bool IBM_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi (
+\begin{DoxyParamCaption}
+\item[{bool}]{I\+B\+M\+\_\+flag}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{}\label{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}}
+\index{L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+stream()}{LBM_stream()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+stream (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}{}\label{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{Grid\+Obj@{Grid\+Obj}!Grid\+Utils@{Grid\+Utils}}
+\index{Grid\+Utils@{Grid\+Utils}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Grid\+Utils}{GridUtils}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Grid\+Utils}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_grid_obj_a8891d532b9568ad83535721b0e6b79c9}{}\label{class_grid_obj_a8891d532b9568ad83535721b0e6b79c9}
+\index{Grid\+Obj@{Grid\+Obj}!Mpi\+Manager@{Mpi\+Manager}}
+\index{Mpi\+Manager@{Mpi\+Manager}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Mpi\+Manager}{MpiManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Mpi\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_grid_obj_a831466b4226dde3791b04756e4cfa6fc}{}\label{class_grid_obj_a831466b4226dde3791b04756e4cfa6fc}
+\index{Grid\+Obj@{Grid\+Obj}!Object\+Manager@{Object\+Manager}}
+\index{Object\+Manager@{Object\+Manager}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Object\+Manager}{ObjectManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Object\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_grid_obj_a8b86bdcdb7c54a536293d8632363e114}{}\label{class_grid_obj_a8b86bdcdb7c54a536293d8632363e114}
+
+
+\subsection{Member Data Documentation}
+\index{Grid\+Obj@{Grid\+Obj}!dt@{dt}}
+\index{dt@{dt}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{dt}{dt}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::dt}\hypertarget{class_grid_obj_afd504b39f12eb0a237bc6313de94e094}{}\label{class_grid_obj_afd504b39f12eb0a237bc6313de94e094}
+\index{Grid\+Obj@{Grid\+Obj}!Lat\+Typ@{Lat\+Typ}}
+\index{Lat\+Typ@{Lat\+Typ}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Lat\+Typ}{LatTyp}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Vector}$<${\bf e\+Type}$>$ Grid\+Obj\+::\+Lat\+Typ}\hypertarget{class_grid_obj_a8ce077fba648f767361039eb924c45ae}{}\label{class_grid_obj_a8ce077fba648f767361039eb924c45ae}
+\index{Grid\+Obj@{Grid\+Obj}!level@{level}}
+\index{level@{level}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{level}{level}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::level}\hypertarget{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{}\label{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}
+\index{Grid\+Obj@{Grid\+Obj}!nu@{nu}}
+\index{nu@{nu}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{nu}{nu}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::nu}\hypertarget{class_grid_obj_a755f85eb5480d959211e00937a478ae9}{}\label{class_grid_obj_a755f85eb5480d959211e00937a478ae9}
+\index{Grid\+Obj@{Grid\+Obj}!omega@{omega}}
+\index{omega@{omega}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{omega}{omega}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::omega}\hypertarget{class_grid_obj_a21461e5d39c5ae83ae42170c829e9da3}{}\label{class_grid_obj_a21461e5d39c5ae83ae42170c829e9da3}
+\index{Grid\+Obj@{Grid\+Obj}!t@{t}}
+\index{t@{t}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{t}{t}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::t}\hypertarget{class_grid_obj_a783b18a053e244ae7b7b436ab21c0592}{}\label{class_grid_obj_a783b18a053e244ae7b7b436ab21c0592}
+\index{Grid\+Obj@{Grid\+Obj}!timeav\+\_\+mpi\+\_\+overhead@{timeav\+\_\+mpi\+\_\+overhead}}
+\index{timeav\+\_\+mpi\+\_\+overhead@{timeav\+\_\+mpi\+\_\+overhead}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{timeav\+\_\+mpi\+\_\+overhead}{timeav_mpi_overhead}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::timeav\+\_\+mpi\+\_\+overhead}\hypertarget{class_grid_obj_a147cfb80b653ca4432432e8185cf38ef}{}\label{class_grid_obj_a147cfb80b653ca4432432e8185cf38ef}
+\index{Grid\+Obj@{Grid\+Obj}!timeav\+\_\+timestep@{timeav\+\_\+timestep}}
+\index{timeav\+\_\+timestep@{timeav\+\_\+timestep}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{timeav\+\_\+timestep}{timeav_timestep}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::timeav\+\_\+timestep}\hypertarget{class_grid_obj_a2ad670e6b9bdd28b5060397800170310}{}\label{class_grid_obj_a2ad670e6b9bdd28b5060397800170310}
+\index{Grid\+Obj@{Grid\+Obj}!X\+Ind@{X\+Ind}}
+\index{X\+Ind@{X\+Ind}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{X\+Ind}{XInd}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ Grid\+Obj\+::\+X\+Ind}\hypertarget{class_grid_obj_ad9bb2153aec972c499ce969a76d908fd}{}\label{class_grid_obj_ad9bb2153aec972c499ce969a76d908fd}
+\index{Grid\+Obj@{Grid\+Obj}!X\+Pos@{X\+Pos}}
+\index{X\+Pos@{X\+Pos}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{X\+Pos}{XPos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ Grid\+Obj\+::\+X\+Pos}\hypertarget{class_grid_obj_af31df133bf9419da6222a0dbb4e54bab}{}\label{class_grid_obj_af31df133bf9419da6222a0dbb4e54bab}
+\index{Grid\+Obj@{Grid\+Obj}!Y\+Ind@{Y\+Ind}}
+\index{Y\+Ind@{Y\+Ind}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Y\+Ind}{YInd}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ Grid\+Obj\+::\+Y\+Ind}\hypertarget{class_grid_obj_acf1d07b290887f0d380d046a1d698f0e}{}\label{class_grid_obj_acf1d07b290887f0d380d046a1d698f0e}
+\index{Grid\+Obj@{Grid\+Obj}!Y\+Pos@{Y\+Pos}}
+\index{Y\+Pos@{Y\+Pos}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Y\+Pos}{YPos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ Grid\+Obj\+::\+Y\+Pos}\hypertarget{class_grid_obj_a2bd4e9b575377b8e76e5ebe7a3a31194}{}\label{class_grid_obj_a2bd4e9b575377b8e76e5ebe7a3a31194}
+\index{Grid\+Obj@{Grid\+Obj}!Z\+Ind@{Z\+Ind}}
+\index{Z\+Ind@{Z\+Ind}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Z\+Ind}{ZInd}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ Grid\+Obj\+::\+Z\+Ind}\hypertarget{class_grid_obj_aef85a27cb2bca6b268469ee96470bb35}{}\label{class_grid_obj_aef85a27cb2bca6b268469ee96470bb35}
+\index{Grid\+Obj@{Grid\+Obj}!Z\+Pos@{Z\+Pos}}
+\index{Z\+Pos@{Z\+Pos}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Z\+Pos}{ZPos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ Grid\+Obj\+::\+Z\+Pos}\hypertarget{class_grid_obj_af859d35bf0a03cee8965ce3e22e651c6}{}\label{class_grid_obj_af859d35bf0a03cee8965ce3e22e651c6}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_grid_obj_8h}{Grid\+Obj.\+h}\item 
+\hyperlink{_grid_obj_8cpp}{Grid\+Obj.\+cpp}\item 
+\hyperlink{_grid_obj__init__grids_8cpp}{Grid\+Obj\+\_\+init\+\_\+grids.\+cpp}\item 
+\hyperlink{_grid_obj__ops__boundary_8cpp}{Grid\+Obj\+\_\+ops\+\_\+boundary.\+cpp}\item 
+\hyperlink{_grid_obj__ops__io_8cpp}{Grid\+Obj\+\_\+ops\+\_\+io.\+cpp}\item 
+\hyperlink{_grid_obj__ops__lbm_8cpp}{Grid\+Obj\+\_\+ops\+\_\+lbm.\+cpp}\end{DoxyCompactItemize}

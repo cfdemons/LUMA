@@ -1,0 +1,189 @@
+\hypertarget{class_i_b_body}{}\section{I\+B\+Body Class Reference}
+\label{class_i_b_body}\index{I\+B\+Body@{I\+B\+Body}}
+
+
+{\ttfamily \#include $<$I\+B\+Body.\+h$>$}
+
+Inheritance diagram for I\+B\+Body\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_i_b_body}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}{I\+B\+Body} (void)
+\item 
+\hyperlink{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{$\sim$\+I\+B\+Body} (void)
+\item 
+\hyperlink{class_i_b_body_a6ed4dfc0a45739239193b51f415ac5db}{I\+B\+Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\item 
+void \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker} (double x, double y, double z, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
+\item 
+void \hyperlink{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}{make\+Body} (double radius, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool moving, int group)
+\item 
+void \hyperlink{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length\+\_\+depth, std\+::vector$<$ double $>$ angles, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
+\item 
+void \hyperlink{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}{make\+Body} (int numbermarkers, std\+::vector$<$ double $>$ start\+\_\+point, double fil\+\_\+length, std\+::vector$<$ double $>$ angles, std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
+\item 
+double \hyperlink{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length, double angle, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group, bool plate)
+\item 
+void \hyperlink{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{make\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}
+\item 
+bool \hyperlink{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{deformable}
+\item 
+int \hyperlink{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{group\+ID}
+\item 
+double \hyperlink{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{delta\+\_\+rho}
+\item 
+double \hyperlink{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{flexural\+\_\+rigidity}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{tension}
+\item 
+std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manager}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Represents an IB body 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Body(void)}{IBBody(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}{}\label{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}
+\index{I\+B\+Body@{I\+B\+Body}!````~I\+B\+Body@{$\sim$\+I\+B\+Body}}
+\index{````~I\+B\+Body@{$\sim$\+I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{$\sim$\+I\+B\+Body(void)}{~IBBody(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::$\sim$\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{}\label{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Body(\+Grid\+Obj $\ast$g)}{IBBody(GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a6ed4dfc0a45739239193b51f415ac5db}{}\label{class_i_b_body_a6ed4dfc0a45739239193b51f415ac5db}
+
+
+\subsection{Member Function Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!add\+Marker@{add\+Marker}}
+\index{add\+Marker@{add\+Marker}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{add\+Marker(double x, double y, double z, bool flex\+\_\+rigid)}{addMarker(double x, double y, double z, bool flex_rigid)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::add\+Marker (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{y, }
+\item[{double}]{z, }
+\item[{bool}]{flex\+\_\+rigid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{}\label{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(double radius, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool moving, int group)}{makeBody(double radius, std::vector< double > centre, bool flex_rigid, bool moving, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{double}]{radius, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{moving, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}{}\label{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(std\+::vector$<$ double $>$ width\+\_\+length\+\_\+depth, std\+::vector$<$ double $>$ angles, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool deform, int group)}{makeBody(std::vector< double > width_length_depth, std::vector< double > angles, std::vector< double > centre, bool flex_rigid, bool deform, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{width\+\_\+length\+\_\+depth, }
+\item[{std\+::vector$<$ double $>$}]{angles, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{}\label{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(int numbermarkers, std\+::vector$<$ double $>$ start\+\_\+point, double fil\+\_\+length, std\+::vector$<$ double $>$ angles, std\+::vector$<$ int $>$ B\+Cs, bool flex\+\_\+rigid, bool deform, int group)}{makeBody(int numbermarkers, std::vector< double > start_point, double fil_length, std::vector< double > angles, std::vector< int > BCs, bool flex_rigid, bool deform, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{int}]{numbermarkers, }
+\item[{std\+::vector$<$ double $>$}]{start\+\_\+point, }
+\item[{double}]{fil\+\_\+length, }
+\item[{std\+::vector$<$ double $>$}]{angles, }
+\item[{std\+::vector$<$ int $>$}]{B\+Cs, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}{}\label{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(std\+::vector$<$ double $>$ width\+\_\+length, double angle, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool deform, int group, bool plate)}{makeBody(std::vector< double > width_length, double angle, std::vector< double > centre, bool flex_rigid, bool deform, int group, bool plate)}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{width\+\_\+length, }
+\item[{double}]{angle, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group, }
+\item[{bool}]{plate}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}{}\label{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{makeBody(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{}\label{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!Object\+Manager@{Object\+Manager}}
+\index{Object\+Manager@{Object\+Manager}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{Object\+Manager}{ObjectManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Object\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{}\label{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}
+
+
+\subsection{Member Data Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!B\+Cs@{B\+Cs}}
+\index{B\+Cs@{B\+Cs}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{B\+Cs}{BCs}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ I\+B\+Body\+::\+B\+Cs\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{}\label{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}
+\index{I\+B\+Body@{I\+B\+Body}!deformable@{deformable}}
+\index{deformable@{deformable}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{deformable}{deformable}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::deformable\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{}\label{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}
+\index{I\+B\+Body@{I\+B\+Body}!delta\+\_\+rho@{delta\+\_\+rho}}
+\index{delta\+\_\+rho@{delta\+\_\+rho}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{delta\+\_\+rho}{delta_rho}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::delta\+\_\+rho\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{}\label{class_i_b_body_a18cd092961f02ecde55363a4d342d098}
+\index{I\+B\+Body@{I\+B\+Body}!flex\+\_\+rigid@{flex\+\_\+rigid}}
+\index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{}\label{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}
+\index{I\+B\+Body@{I\+B\+Body}!flexural\+\_\+rigidity@{flexural\+\_\+rigidity}}
+\index{flexural\+\_\+rigidity@{flexural\+\_\+rigidity}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{flexural\+\_\+rigidity}{flexural_rigidity}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::flexural\+\_\+rigidity\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{}\label{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}
+\index{I\+B\+Body@{I\+B\+Body}!group\+ID@{group\+ID}}
+\index{group\+ID@{group\+ID}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{group\+ID}{groupID}}]{\setlength{\rightskip}{0pt plus 5cm}int I\+B\+Body\+::group\+ID\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{}\label{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}
+\index{I\+B\+Body@{I\+B\+Body}!tension@{tension}}
+\index{tension@{tension}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{tension}{tension}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Body\+::tension\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{}\label{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_i_b_body_8h}{I\+B\+Body.\+h}\item 
+\hyperlink{_i_b_body_8cpp}{I\+B\+Body.\+cpp}\end{DoxyCompactItemize}

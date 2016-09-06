@@ -427,7 +427,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IO_LITE
 	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-	Grids.io_lite(Grids.t);
+	Grids.io_lite(Grids.t, "INITIALISATION");
 #endif
 
 #ifdef L_HDF5_OUTPUT
@@ -483,7 +483,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IO_LITE
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-		Grids.io_lite(Grids.t);
+		Grids.io_lite(Grids.t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT

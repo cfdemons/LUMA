@@ -27,11 +27,6 @@
 // Method to apply suitable boundary conditions
 void GridObj::LBM_boundary (int bc_type_flag) {
 
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
@@ -50,18 +45,18 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) ) {
 
 					// Apply half-way bounce-back
-					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
 
 #ifdef L_LD_OUT
 					// Compute lift and drag contribution of this site
-					objman->computeLiftDrag(i, j, k, M_lim, K_lim, this);
+					objman->computeLiftDrag(i, j, k, this);
 #endif
 
 				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eSymmetry || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSymmetry)
 					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry)) {
 
 					// Apply half-way specular reflection
-					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
 
 
 				/*	******************************************************************************************
@@ -74,7 +69,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// Choose option
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
 					// Apply regularised BC
-					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k, N_lim, M_lim, K_lim);
+					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
 #endif
 					// Do-Nothing BC is applied by default in a different way
 
@@ -89,7 +84,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// !! RIGHT HAND WALL ONLY !!
 #ifdef L_OUTLET_ON
 					// Apply extrapolation
-					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
 #endif
 
 
@@ -114,7 +109,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 
 // ***************************************************************************************************
 // Routine to apply half-way bounceback boundary condition
-void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+void GridObj::bc_applyBounceBack(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z;
 
@@ -181,7 +176,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 
 // ***************************************************************************************************
 // Routine to apply Extrapolation outlet boundary condition
-void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim) {
+void GridObj::bc_applyExtrapolation(int label, int i, int j, int k) {
 
 	/* When using MPI, an outlet may appear at an edge of the grid which 
 	 * is not the right-hand edge. As a remedy to this we first check
@@ -204,30 +199,10 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, i
 
 #if L_dims == 3
 
-		// In 3D, extrapolate populations [1 7 9 15 16]
-		for (size_t v = 1; v < 17; v++) {
-                
-			// Make all this generic in future release
-			if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
-
-				/*
-				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,L_nVels);
-				float x1 = 0.0;
-				float x2 = (float)dx;
-				float x3 = 2 * x2;
-                
-				float lin_m = (y2 - y1) / (x2 - x1);
-				float lin_c = y1;
-                
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = lin_m * x3 + lin_c;
-				*/
-
-				// Just copy value for now as the linear extrapolation doesn't work
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-
-			}
-		}
+		// TODO: should be updated for D3Q27 -- ticket #80 //
+		std::cout << "Error: See Log File." << std::endl;
+		*GridUtils::logfile << "Extrapolation is not a vlaid choice in 3D at the moment. Exiting." << std::endl;
+		exit(LUMA_FAILED);		
 
 #else
 		// In 2D, extrapolate populations [7 1 5]
@@ -235,18 +210,6 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, i
 
 			if (v == 7 || v == 1 || v == 5) {
                 
-				/*
-				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,L_nVels);
-				float x1 = 0.0;
-				float x2 = (float)dx;
-				float x3 = 2 * x2;
-                
-				float lin_m = (y2 - y1) / (x2 - x1);
-				float lin_c = y1;
-                
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = lin_m * x3 + lin_c;
-				*/
 
 				// Just copy value for now as the linear extrapolation doesn't work
 				f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
@@ -262,7 +225,7 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, i
 
 // ***************************************************************************************************
 // Routine to apply Regularised boundary conditions
-void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z, n;
 
@@ -293,7 +256,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 		dest_z = k+c[2][v_outgoing];
 
 		// If this site is off-grid then cannot determine orientation of wall
-		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,N_lim,M_lim,K_lim,*this)) {
+		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,*this)) {
 
 			continue;
 
@@ -404,7 +367,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 			// Update feq to match the desired density and velocity and
 			// apply off-equilibrium bounce-back to unknown populations
 			for (n = 0; n < L_nVels; n++) {
-				feq(i,j,k,n,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,n,M_lim,K_lim);
+				feq(i,j,k,n,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,n);
 
 
 				// Different "if conditions" for corners/edges and normal walls
@@ -444,7 +407,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 				f(i,j,k,v,M_lim,K_lim,L_nVels) = 
 
-					LBM_collide(i,j,k,v,M_lim,K_lim) +
+					LBM_collide(i,j,k,v) +
 						
 					(w[v] / (2 * pow(cs,4))) * (
 					( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
@@ -480,7 +443,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 			// Set f to default values
 			for (int v = 0; v < L_nVels; v++) {
-				feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,v,M_lim,K_lim);
+				feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,v);
 				f(i,j,k,v,M_lim,K_lim,L_nVels) = feq(i,j,k,v,M_lim,K_lim,L_nVels);
 			}
 		}
@@ -495,9 +458,6 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 void GridObj::bc_applyBfl(int i, int j, int k) {
 
 	// Declarations
-	int N_lim = static_cast<int>( XInd.size() );
-	int M_lim = static_cast<int>( YInd.size() );
-	int K_lim = static_cast<int>( ZInd.size() );
 	MarkerData* m_data;
 	ObjectManager* objMan = ObjectManager::getInstance();
 
@@ -625,7 +585,7 @@ void GridObj::bc_applyNrbc(int i, int j, int k) {
 
 // ***************************************************************************************************
 // Routine to apply half-way specular reflection condition for free-slip
-void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+void GridObj::bc_applySpecReflect(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z;
 
@@ -697,12 +657,6 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int
 // ***************************************************************************************************
 // Routine to reset the velocity at solid sites to zero
 void GridObj::bc_solidSiteReset( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {

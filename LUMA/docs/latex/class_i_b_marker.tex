@@ -1,0 +1,122 @@
+\hypertarget{class_i_b_marker}{}\section{I\+B\+Marker Class Reference}
+\label{class_i_b_marker}\index{I\+B\+Marker@{I\+B\+Marker}}
+
+
+{\ttfamily \#include $<$I\+B\+Marker.\+h$>$}
+
+Inheritance diagram for I\+B\+Marker\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_i_b_marker}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}{I\+B\+Marker} (void)
+\item 
+\hyperlink{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}{$\sim$\+I\+B\+Marker} (void)
+\item 
+\hyperlink{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}{I\+B\+Marker} (double x\+Pos, double y\+Pos, double z\+Pos, bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}=false)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}{fluid\+\_\+vel}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}{desired\+\_\+vel}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}{force\+\_\+xyz}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}{position\+\_\+old}
+\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a82296e15048c55bd121245d85b076168}{deltaval}
+\item 
+bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}
+\item 
+double \hyperlink{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}{epsilon}
+\item 
+double \hyperlink{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}{local\+\_\+area}
+\item 
+double \hyperlink{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}{dilation}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_i_b_marker_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manager}
+\item 
+class \hyperlink{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{I\+B\+Body}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
+\index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{I\+B\+Marker(void)}{IBMarker(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::\+I\+B\+Marker (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}{}\label{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}
+\index{I\+B\+Marker@{I\+B\+Marker}!````~I\+B\+Marker@{$\sim$\+I\+B\+Marker}}
+\index{````~I\+B\+Marker@{$\sim$\+I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{$\sim$\+I\+B\+Marker(void)}{~IBMarker(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::$\sim$\+I\+B\+Marker (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}{}\label{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}
+\index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
+\index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{I\+B\+Marker(double x\+Pos, double y\+Pos, double z\+Pos, bool flex\+\_\+rigid=false)}{IBMarker(double xPos, double yPos, double zPos, bool flex_rigid=false)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::\+I\+B\+Marker (
+\begin{DoxyParamCaption}
+\item[{double}]{x\+Pos, }
+\item[{double}]{y\+Pos, }
+\item[{double}]{z\+Pos, }
+\item[{bool}]{flex\+\_\+rigid = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}{}\label{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{I\+B\+Body}{IBBody}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf I\+B\+Body}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{}\label{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}
+\index{I\+B\+Marker@{I\+B\+Marker}!Object\+Manager@{Object\+Manager}}
+\index{Object\+Manager@{Object\+Manager}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{Object\+Manager}{ObjectManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Object\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_marker_a8b86bdcdb7c54a536293d8632363e114}{}\label{class_i_b_marker_a8b86bdcdb7c54a536293d8632363e114}
+
+
+\subsection{Member Data Documentation}
+\index{I\+B\+Marker@{I\+B\+Marker}!deltaval@{deltaval}}
+\index{deltaval@{deltaval}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{deltaval}{deltaval}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::deltaval\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a82296e15048c55bd121245d85b076168}{}\label{class_i_b_marker_a82296e15048c55bd121245d85b076168}
+\index{I\+B\+Marker@{I\+B\+Marker}!desired\+\_\+vel@{desired\+\_\+vel}}
+\index{desired\+\_\+vel@{desired\+\_\+vel}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{desired\+\_\+vel}{desired_vel}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::desired\+\_\+vel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}{}\label{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}
+\index{I\+B\+Marker@{I\+B\+Marker}!dilation@{dilation}}
+\index{dilation@{dilation}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{dilation}{dilation}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::dilation\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}{}\label{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}
+\index{I\+B\+Marker@{I\+B\+Marker}!epsilon@{epsilon}}
+\index{epsilon@{epsilon}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{epsilon}{epsilon}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::epsilon\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}{}\label{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}
+\index{I\+B\+Marker@{I\+B\+Marker}!flex\+\_\+rigid@{flex\+\_\+rigid}}
+\index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Marker\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{}\label{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}
+\index{I\+B\+Marker@{I\+B\+Marker}!fluid\+\_\+vel@{fluid\+\_\+vel}}
+\index{fluid\+\_\+vel@{fluid\+\_\+vel}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{fluid\+\_\+vel}{fluid_vel}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::fluid\+\_\+vel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}{}\label{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}
+\index{I\+B\+Marker@{I\+B\+Marker}!force\+\_\+xyz@{force\+\_\+xyz}}
+\index{force\+\_\+xyz@{force\+\_\+xyz}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{force\+\_\+xyz}{force_xyz}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::force\+\_\+xyz\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}{}\label{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}
+\index{I\+B\+Marker@{I\+B\+Marker}!local\+\_\+area@{local\+\_\+area}}
+\index{local\+\_\+area@{local\+\_\+area}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{local\+\_\+area}{local_area}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::local\+\_\+area\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}{}\label{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}
+\index{I\+B\+Marker@{I\+B\+Marker}!position\+\_\+old@{position\+\_\+old}}
+\index{position\+\_\+old@{position\+\_\+old}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{position\+\_\+old}{position_old}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::position\+\_\+old\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}{}\label{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_i_b_marker_8h}{I\+B\+Marker.\+h}\item 
+\hyperlink{_i_b_marker_8cpp}{I\+B\+Marker.\+cpp}\end{DoxyCompactItemize}

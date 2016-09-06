@@ -140,6 +140,11 @@ public :
 	double timeav_mpi_overhead;		// Time of MPI communication
 	double timeav_timestep;			// Time of a timestep
 
+	// Local grid sizes
+	int N_lim;
+	int M_lim;
+	int K_lim;
+
 
 	/*
 	***************************************************************************************************************
@@ -165,8 +170,8 @@ public :
 	// LBM operations
 	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
-	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
-	void LBM_kbcCollide(int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new);		// KBC collision operator
+	double LBM_collide(int i, int j, int k, int v);
+	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
@@ -174,16 +179,15 @@ public :
 	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
 
 	// Boundary operations
-	void bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWBB BC
-	void bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWSR BC
-	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);					// Application of Zou-He BC
-	void bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Extrapolation BC
+	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
+	void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
+	void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
+	void bc_applyExtrapolation(int label, int i, int j, int k);			// Application of Extrapolation BC
 	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
 	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
 	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
-		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
+		int i, int j, int k);		// Gets wall density for generalised, regularised velocity BC
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine

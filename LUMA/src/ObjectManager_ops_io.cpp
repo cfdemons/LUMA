@@ -286,6 +286,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
+	int a = 0;
 
 	// Case-specific variables
 	int on_grid_lev, on_grid_reg, body_length, body_start_x, body_start_y, body_centre_z;
@@ -374,7 +375,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->z.push_back(0);
 #endif
 
-		}
+	}
 	file.close();
 
 	// Error if no data
@@ -411,7 +412,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		) );
 
 	// Apply to each point
-	for (size_t a = 0; a < _PCpts->x.size(); a++) {
+	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
@@ -425,7 +426,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
 #endif
-	int a = 0;
+	a = 0;
 	do {
 
 		// Get global voxel index
@@ -446,7 +447,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->z.erase(_PCpts->z.begin() + a);
 		}
 
-	} while (a < (int)_PCpts->x.size());
+	} while (a < static_cast<int>(_PCpts->x.size()));
 
 
 	// Write out the points remaining in for debugging purposes
@@ -463,7 +464,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// If solid then call labeller
+	// If there are points left
 	if (!_PCpts->x.empty())	{
 
 		// Perform a different post-processing action depending on the type of body
@@ -475,7 +476,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
 			// Label the grid sites
-			for (size_t a = 0; a < _PCpts->x.size(); a++) {
+			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 				// Get globals
 				global_i = getVoxInd(_PCpts->x[a]);
 				global_j = getVoxInd(_PCpts->y[a]);
@@ -500,27 +501,19 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			break;
 
 		case eIBBCloud:
-				global_j = getVoxInd(_PCpts->y[a]);
-				global_k = getVoxInd(_PCpts->z[a]);
+			global_j = getVoxInd(_PCpts->y[a]);
+			global_k = getVoxInd(_PCpts->z[a]);
 
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
+#endif
 			// Call IBM body builder
 			ibm_build_body(_PCpts, g);
 			break;
 
-				// Update Typing Matrix
-				if (g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid)
-				{
-					g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid;
-				}
-			}
-			break;
+		}
 
-		case eBFLCloud:
-			// Call BFL body builder
-			bfl_build_body(_PCpts);
-			break;
+	}
 }
 // *****************************************************************************
 // Routine for writing out the lift and drag forces on a BB object 

@@ -86,10 +86,14 @@ int ObjectManager::getVoxInd(double p) {
 
 /*******************************************************************************/
 // Lift and drag calculation (Mei's formula)
-void ObjectManager::computeLiftDrag(int i, int j, int k, int M_lim, int K_lim, GridObj *g) {
+void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 
 	// TODO: Need abounding box for object if we have walls in the domain otherwise they will also be counted
 	// TODO: Also need to be able to identify which body this site relates to so we can differentiate
+
+	int N_lim = g->N_lim;
+	int M_lim = g->M_lim;
+	int K_lim = g->K_lim;
 
 	// For MPI builds, ignore if part of object is in halo region
 #ifdef L_BUILD_FOR_MPI

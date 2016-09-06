@@ -740,11 +740,11 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 
 // ***************************************************************************************************
 // Tests whether a site is on a given grid
-bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj& g) {
+bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 
-	if (	(i >= N_lim || i < 0) ||
-			(j >= M_lim || j < 0) ||
-			(k >= K_lim || k < 0)
+	if (	(i >= g.N_lim || i < 0) ||
+			(j >= g.M_lim || j < 0) ||
+			(k >= g.K_lim || k < 0)
 			) {
 				return true;
 

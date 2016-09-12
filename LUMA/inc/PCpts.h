@@ -14,16 +14,21 @@
 */
 #pragma once
 #include "stdafx.h"
-
-// Class representing Point Cloud data
+/// \brief	Class to hold point cloud data.
+///
+///			A container class for hold the X, Y and Z positions of 
+///			points in a point cloud.
 class PCpts {
 
 public:
 
+	/// Default constructor
 	PCpts(void) {};
+
+	/// Default destructor
 	~PCpts(void) {};
 
-	std::vector<double> x;
-	std::vector<double> y;
-	std::vector<double> z;
+	std::vector<double> x;		///< Vector of X positions
+	std::vector<double> y;		///< Vector of Y positions
+	std::vector<double> z;		///< Vector of Z positions
 };

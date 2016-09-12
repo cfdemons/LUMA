@@ -2,6 +2,11 @@
 \label{class_b_f_l_body}\index{B\+F\+L\+Body@{B\+F\+L\+Body}}
 
 
+B\+FL body.  
+
+
+
+
 {\ttfamily \#include $<$B\+F\+L\+Body.\+h$>$}
 
 Inheritance diagram for B\+F\+L\+Body\+:\begin{figure}[H]
@@ -30,13 +35,18 @@ void \hyperlink{class_b_f_l_body_a2c98a2521ad9c1a3831a6004f867a307}{computeQ} (i
 \begin{DoxyCompactItemize}
 \item 
 std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_b_f_l_body_a77b97a6b61e16616ab718c56c3a34622}{Q}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Distance between adjacent lattice site and the surface of the body. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{class_b_f_l_body_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+Obj}
 \end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+B\+FL body. 
+
+A B\+FL body is made up of a collection of B\+F\+L\+Markers. 
 
 \subsection{Constructor \& Destructor Documentation}
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
@@ -101,6 +111,10 @@ class \hyperlink{class_b_f_l_body_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+Obj}
 \index{Q@{Q}!B\+F\+L\+Body@{B\+F\+L\+Body}}
 \subsubsection[{\texorpdfstring{Q}{Q}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$double$>$ $>$ B\+F\+L\+Body\+::Q\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_b_f_l_body_a77b97a6b61e16616ab718c56c3a34622}{}\label{class_b_f_l_body_a77b97a6b61e16616ab718c56c3a34622}
 
+
+Distance between adjacent lattice site and the surface of the body. 
+
+There are two stores of values. Store 1 is the distance on one side of the wall and store 2 the distance on the other side. One store is appended to the other in this structure. 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 

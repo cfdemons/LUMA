@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -88,8 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">stdafx.h File Reference</div>  </div>
 </div><!--header-->
@@ -109,15 +108,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a785727f822adc2d7112e0158817a88ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a785727f822adc2d7112e0158817a88ba">LUMA_FAILED</a>&#160;&#160;&#160;12345</td></tr>
+<tr class="memdesc:a785727f822adc2d7112e0158817a88ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error definition.  <a href="#a785727f822adc2d7112e0158817a88ba">More...</a><br /></td></tr>
 <tr class="separator:a785727f822adc2d7112e0158817a88ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:ab85c4ec06d7b86a781606f47b781c69e"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
-<tr class="memitem:ab85c4ec06d7b86a781606f47b781c69e"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#ab85c4ec06d7b86a781606f47b781c69e">is_nan</a> (NumType n)</td></tr>
-<tr class="separator:ab85c4ec06d7b86a781606f47b781c69e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a997b38125dd4556b664304fb414ac7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a7a997b38125dd4556b664304fb414ac7">L_IS_NAN</a>&#160;&#160;&#160;std::isnan</td></tr>
+<tr class="memdesc:a7a997b38125dd4556b664304fb414ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not a Number declaration (Unix)  <a href="#a7a997b38125dd4556b664304fb414ac7">More...</a><br /></td></tr>
+<tr class="separator:a7a997b38125dd4556b664304fb414ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a7a997b38125dd4556b664304fb414ac7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define L_IS_NAN&#160;&#160;&#160;std::isnan</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Not a Number declaration (Unix) </p>
+
+</div>
+</div>
 <a class="anchor" id="a785727f822adc2d7112e0158817a88ba"></a>
 <div class="memitem">
 <div class="memproto">
@@ -128,32 +139,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ab85c4ec06d7b86a781606f47b781c69e"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename NumType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool is_nan </td>
-          <td>(</td>
-          <td class="paramtype">NumType&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Error definition. </p>
 
 </div>
 </div>

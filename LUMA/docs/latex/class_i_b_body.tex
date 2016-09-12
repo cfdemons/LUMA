@@ -2,6 +2,11 @@
 \label{class_i_b_body}\index{I\+B\+Body@{I\+B\+Body}}
 
 
+Immersed boundary body.  
+
+
+
+
 {\ttfamily \#include $<$I\+B\+Body.\+h$>$}
 
 Inheritance diagram for I\+B\+Body\+:\begin{figure}[H]
@@ -35,19 +40,19 @@ void \hyperlink{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{make\+Body} (\
 \begin{DoxyCompactItemize}
 \item 
 bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}
-\item 
+\begin{DoxyCompactList}\small\item\em Flag to indicate flexibility\+: false == rigid body; true == flexible filament. \end{DoxyCompactList}\item 
 bool \hyperlink{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{deformable}
-\item 
+\begin{DoxyCompactList}\small\item\em Flag to indicate deformable body\+: false == rigid; true == deformable. \end{DoxyCompactList}\item 
 int \hyperlink{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{group\+ID}
-\item 
+\begin{DoxyCompactList}\small\item\em ID of I\+Bbody group -- position updates can be driven from a flexible body in a group. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{delta\+\_\+rho}
-\item 
+\begin{DoxyCompactList}\small\item\em Difference in density between fluid and solid in lattice units. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{flexural\+\_\+rigidity}
-\item 
+\begin{DoxyCompactList}\small\item\em Young\textquotesingle{}s modulus E $\ast$ Second moment of area I. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{tension}
-\item 
+\begin{DoxyCompactList}\small\item\em Tension between the current marker and its neighbour. \end{DoxyCompactList}\item 
 std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em B\+Cs type flags (flexible bodies) \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
@@ -57,7 +62,7 @@ class \hyperlink{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manag
 
 
 \subsection{Detailed Description}
-Represents an IB body 
+Immersed boundary body. 
 
 \subsection{Constructor \& Destructor Documentation}
 \index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
@@ -163,24 +168,52 @@ Represents an IB body
 \index{I\+B\+Body@{I\+B\+Body}!B\+Cs@{B\+Cs}}
 \index{B\+Cs@{B\+Cs}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{B\+Cs}{BCs}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ I\+B\+Body\+::\+B\+Cs\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{}\label{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}
+
+
+B\+Cs type flags (flexible bodies) 
+
 \index{I\+B\+Body@{I\+B\+Body}!deformable@{deformable}}
 \index{deformable@{deformable}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{deformable}{deformable}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::deformable\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{}\label{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}
+
+
+Flag to indicate deformable body\+: false == rigid; true == deformable. 
+
 \index{I\+B\+Body@{I\+B\+Body}!delta\+\_\+rho@{delta\+\_\+rho}}
 \index{delta\+\_\+rho@{delta\+\_\+rho}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{delta\+\_\+rho}{delta_rho}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::delta\+\_\+rho\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{}\label{class_i_b_body_a18cd092961f02ecde55363a4d342d098}
+
+
+Difference in density between fluid and solid in lattice units. 
+
 \index{I\+B\+Body@{I\+B\+Body}!flex\+\_\+rigid@{flex\+\_\+rigid}}
 \index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{}\label{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}
+
+
+Flag to indicate flexibility\+: false == rigid body; true == flexible filament. 
+
 \index{I\+B\+Body@{I\+B\+Body}!flexural\+\_\+rigidity@{flexural\+\_\+rigidity}}
 \index{flexural\+\_\+rigidity@{flexural\+\_\+rigidity}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{flexural\+\_\+rigidity}{flexural_rigidity}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::flexural\+\_\+rigidity\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{}\label{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}
+
+
+Young\textquotesingle{}s modulus E $\ast$ Second moment of area I. 
+
 \index{I\+B\+Body@{I\+B\+Body}!group\+ID@{group\+ID}}
 \index{group\+ID@{group\+ID}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{group\+ID}{groupID}}]{\setlength{\rightskip}{0pt plus 5cm}int I\+B\+Body\+::group\+ID\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{}\label{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}
+
+
+ID of I\+Bbody group -- position updates can be driven from a flexible body in a group. 
+
 \index{I\+B\+Body@{I\+B\+Body}!tension@{tension}}
 \index{tension@{tension}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{tension}{tension}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Body\+::tension\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{}\label{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}
+
+
+Tension between the current marker and its neighbour. 
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

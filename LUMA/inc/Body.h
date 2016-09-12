@@ -18,11 +18,19 @@
 
 class GridObj;
 
-// Class representing return structure for marker query
+/// \brief	Container class to hold marker information.
 class MarkerData {
 
 public:
 
+	/// \brief Constructor.
+	/// \param i i-index of primary support site
+	/// \param j j-index of primary support site
+	/// \param k k-index of primary support site
+	/// \param x x-position of marker
+	/// \param y y-position of marker
+	/// \param z z-position of marker
+	/// \param ID marker number in a given body
 	MarkerData(int i, int j, int k, double x, double y, double z, int ID) {
 
 		// Custom constructor
@@ -35,47 +43,59 @@ public:
 		this->ID = ID;
 
 	};
+
+	/// \brief	Default Constructor.
+	///
+	///			Initialise with invalid marker indicator which 
+	///			is to set the x position to NaN.
 	MarkerData(void) {
 
 		// Essentially null a double in the store making it invalid
 		this->x = std::numeric_limits<double>::quiet_NaN();
 
 	};
+
+	/// Default destructor
 	~MarkerData(void) {};
 
 	// Voxel indices
-	int i;
-	int j;
-	int k;
+	int i;	///< i-index of primary support site
+	int j;	///< j-index of primary support site
+	int k;	///< k-index of primary support site
 
-	// Marker ID (position in array of markers)
+	/// Marker ID (position in array of markers)
 	int ID;
 
 	// Marker position
-	double x;
-	double y;
-	double z;
+	double x;	///< x-position of marker
+	double y;	///< y-position of marker
+	double z;	///< z-position of marker
 
 };
 
 
 
-// Markers may be of different types depending on the body
+/// \brief	Generic body class.
+///
+///			Can consist of any type of Marker so templated.
 template <typename MarkerType>
-
-// Class representing a general body
 class Body
 {
 
-	// Default Constructor / Destructor //
+
 public:
+	///< Default Constructor
 	Body(void)
 	{
 	};
+	///< Default destructor
 	~Body(void)
 	{
 	};
 
+	/// \brief Custom constructor setting owning grid.
+	///
+	/// \param g pointer to grid which owns this body.
 	Body(GridObj* g)
 	{
 		this->_Owner = g;
@@ -84,22 +104,33 @@ public:
 	// Protected Members //
 	
 protected:
-	double spacing;						// Spacing of the markers in physical units
-	std::vector<MarkerType> markers;	// Array of markers which make up the body
-	bool closed_surface;				// Flag to specify whether or not it is a closed surface (for output)
-	GridObj* _Owner;					// Pointer to owning grid
+	double spacing;						///< Spacing of the markers in physical units
+	std::vector<MarkerType> markers;	///< Array of markers which make up the body
+	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (for output)
+	GridObj* _Owner;					///< Pointer to owning grid
 	
 
 	// ************************ Methods ************************ //
 
-	// Add marker to the body //
+	/// \brief Add marker to the body.
+	/// \param x X-position of marker.
+	/// \param y Y-position of marker.
+	/// \param z Z-position of marker.
 	void addMarker(double x, double y, double z)
 	{
 		markers.emplace_back(x, y, z);	// Add a new marker object to the array
 	}
 
 	/*********************************************/
-	// Return marker and voxel data associated with global position supplied //
+	/// \brief	Retrieve marker data.
+	///
+	///			Return marker and voxel/primary support data associated with
+	///			supplied global position.
+	///
+	/// \param x X-position nearest to marker to be retrieved.
+	/// \param y Y-position nearest to marker to be retrieved.
+	/// \param z Z-position nearest to marker to be retrieved.
+	/// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid.
 	MarkerData* getMarkerData(double x, double y, double z) {
 
 		// Get indices of voxel associated with the supplied position
@@ -132,8 +163,18 @@ protected:
 	}
 
 	/*********************************************/
-	// Routine to add markers to the current body //
-	// (pass the marker index and the counter by reference so they are updated in the calling scope) //
+	/// \brief	Downsampling marker adding method
+	///
+	///			This method tries to add a marker to body at the location given
+	///			but obeys the rules of a voxel-grid filter to ensure markers are
+	///			distributed such that their spacing roughly matches the 
+	///			background lattice.
+	///
+	/// \param x desired X-position of new marker.
+	/// \param y desired Y-position of new marker.
+	/// \param z desired Z-position of new marker.
+	/// \param curr_mark is a reference to the ID of last marker.
+	///	\param counter is a reference to the total number of markers in the body.
 	void markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
 
 		// If point in current voxel
@@ -189,7 +230,12 @@ protected:
 	}
 
 	/*********************************************/
-	// Returns boolean as to whether a given point is in the voxel associated with <curr_mark>
+	/// \brief	Determines whether a point is inside another marker's support voxel.
+	/// \param x X-position of point.
+	/// \param y Y-position of point.
+	/// \param z Z-position of point.
+	/// \param curr_mark ID of the marker.
+	/// \return true of false
 	bool isInVoxel(double x, double y, double z, int curr_mark) {
 
 		try {
@@ -220,6 +266,11 @@ protected:
 	}
 
 	/*********************************************/
+	/// \brief	Determines whether a point is inside an existing marker's support voxel.
+	/// \param x X-position of point.
+	/// \param y Y-position of point.
+	/// \param z Z-position of point.
+	/// \return true of false
 	// Returns boolean as to whether a given point is in an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z) {
 

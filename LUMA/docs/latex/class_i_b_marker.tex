@@ -2,6 +2,11 @@
 \label{class_i_b_marker}\index{I\+B\+Marker@{I\+B\+Marker}}
 
 
+Immersed boundary marker.  
+
+
+
+
 {\ttfamily \#include $<$I\+B\+Marker.\+h$>$}
 
 Inheritance diagram for I\+B\+Marker\+:\begin{figure}[H]
@@ -14,32 +19,32 @@ Inheritance diagram for I\+B\+Marker\+:\begin{figure}[H]
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}{I\+B\+Marker} (void)
-\item 
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}{$\sim$\+I\+B\+Marker} (void)
-\item 
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
 \hyperlink{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}{I\+B\+Marker} (double x\+Pos, double y\+Pos, double z\+Pos, bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}=false)
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}{fluid\+\_\+vel}
-\item 
+\begin{DoxyCompactList}\small\item\em Fluid velocity interpolated from lattice nodes. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}{desired\+\_\+vel}
-\item 
+\begin{DoxyCompactList}\small\item\em Desired velocity at marker. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}{force\+\_\+xyz}
-\item 
+\begin{DoxyCompactList}\small\item\em Restorative force vector on marker. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}{position\+\_\+old}
-\item 
+\begin{DoxyCompactList}\small\item\em Vector containing the physical coordinates (x,y,z) of the marker at t-\/1. Used for moving bodies. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a82296e15048c55bd121245d85b076168}{deltaval}
-\item 
+\begin{DoxyCompactList}\small\item\em Value of delta function for a given support node. \end{DoxyCompactList}\item 
 bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}
-\item 
+\begin{DoxyCompactList}\small\item\em Indication as to whether marker is part of a moving or flexible body\+: false == rigid/fixed; true == flexible/moving. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}{epsilon}
-\item 
+\begin{DoxyCompactList}\small\item\em Scaling parameter. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}{local\+\_\+area}
-\item 
+\begin{DoxyCompactList}\small\item\em Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like L\+BM) \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}{dilation}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Dilation parameter in lattice units (same in all directions for uniform Eulerian grid) \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
@@ -50,6 +55,11 @@ class \hyperlink{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{I\+B\+Body}
 \subsection*{Additional Inherited Members}
 
 
+\subsection{Detailed Description}
+Immersed boundary marker. 
+
+This class declaration is for an immersed boundary Lagrange point. A collection of these points form an immersed boundary body. 
+
 \subsection{Constructor \& Destructor Documentation}
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
@@ -58,6 +68,10 @@ class \hyperlink{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{I\+B\+Body}
 \item[{void}]{}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}{}\label{class_i_b_marker_ab45e9679ae96b75ab7655e738807bb41}
+
+
+Default constructor. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!````~I\+B\+Marker@{$\sim$\+I\+B\+Marker}}
 \index{````~I\+B\+Marker@{$\sim$\+I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{$\sim$\+I\+B\+Marker(void)}{~IBMarker(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::$\sim$\+I\+B\+Marker (
@@ -65,6 +79,10 @@ class \hyperlink{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{I\+B\+Body}
 \item[{void}]{}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}{}\label{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}
+
+
+Default destructor. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{I\+B\+Marker(double x\+Pos, double y\+Pos, double z\+Pos, bool flex\+\_\+rigid=false)}{IBMarker(double xPos, double yPos, double zPos, bool flex_rigid=false)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::\+I\+B\+Marker (
@@ -90,30 +108,66 @@ class \hyperlink{class_i_b_marker_a5d93aa5aec680a2b395a71266fe4ac92}{I\+B\+Body}
 \index{I\+B\+Marker@{I\+B\+Marker}!deltaval@{deltaval}}
 \index{deltaval@{deltaval}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{deltaval}{deltaval}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::deltaval\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a82296e15048c55bd121245d85b076168}{}\label{class_i_b_marker_a82296e15048c55bd121245d85b076168}
+
+
+Value of delta function for a given support node. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!desired\+\_\+vel@{desired\+\_\+vel}}
 \index{desired\+\_\+vel@{desired\+\_\+vel}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{desired\+\_\+vel}{desired_vel}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::desired\+\_\+vel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}{}\label{class_i_b_marker_ad9535b494684533ace9a9523c4df26bf}
+
+
+Desired velocity at marker. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!dilation@{dilation}}
 \index{dilation@{dilation}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{dilation}{dilation}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::dilation\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}{}\label{class_i_b_marker_a5c908a7e52fc0b2dccbaa277f37b7c22}
+
+
+Dilation parameter in lattice units (same in all directions for uniform Eulerian grid) 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!epsilon@{epsilon}}
 \index{epsilon@{epsilon}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{epsilon}{epsilon}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::epsilon\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}{}\label{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}
+
+
+Scaling parameter. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!flex\+\_\+rigid@{flex\+\_\+rigid}}
 \index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Marker\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{}\label{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}
+
+
+Indication as to whether marker is part of a moving or flexible body\+: false == rigid/fixed; true == flexible/moving. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!fluid\+\_\+vel@{fluid\+\_\+vel}}
 \index{fluid\+\_\+vel@{fluid\+\_\+vel}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{fluid\+\_\+vel}{fluid_vel}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::fluid\+\_\+vel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}{}\label{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}
+
+
+Fluid velocity interpolated from lattice nodes. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!force\+\_\+xyz@{force\+\_\+xyz}}
 \index{force\+\_\+xyz@{force\+\_\+xyz}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{force\+\_\+xyz}{force_xyz}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::force\+\_\+xyz\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}{}\label{class_i_b_marker_aa8b8b23e64a8bfc4051b95ebf9ccb767}
+
+
+Restorative force vector on marker. 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!local\+\_\+area@{local\+\_\+area}}
 \index{local\+\_\+area@{local\+\_\+area}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{local\+\_\+area}{local_area}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Marker\+::local\+\_\+area\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}{}\label{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}
+
+
+Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like L\+BM) 
+
 \index{I\+B\+Marker@{I\+B\+Marker}!position\+\_\+old@{position\+\_\+old}}
 \index{position\+\_\+old@{position\+\_\+old}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{position\+\_\+old}{position_old}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::position\+\_\+old\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}{}\label{class_i_b_marker_a6a55fe2293f288ae339036ea4a3bc7df}
+
+
+Vector containing the physical coordinates (x,y,z) of the marker at t-\/1. Used for moving bodies. 
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

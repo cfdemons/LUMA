@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -95,6 +95,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Grid class.  
+ <a href="class_grid_obj.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_grid_obj_8h_source.html">GridObj.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -131,10 +134,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af9f81ad6b70fb16997ef88f0c19de5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0feb0f9406f626e90c57045350161b22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a0feb0f9406f626e90c57045350161b22">LBM_collide</a> ()</td></tr>
 <tr class="separator:a0feb0f9406f626e90c57045350161b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab24eba4c29917ea98cc48b53c2a03a25"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ab24eba4c29917ea98cc48b53c2a03a25">LBM_collide</a> (int i, int j, int k, int v, int M_lim, int K_lim)</td></tr>
-<tr class="separator:ab24eba4c29917ea98cc48b53c2a03a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f98bf9f34b1b1f2fb31a25fb3061f49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a9f98bf9f34b1b1f2fb31a25fb3061f49">LBM_kbcCollide</a> (int i, int j, int k, int M_lim, int K_lim, <a class="el" href="class_i_vector.html">IVector</a>&lt; double &gt; &amp;f_new)</td></tr>
-<tr class="separator:a9f98bf9f34b1b1f2fb31a25fb3061f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1540c0d77a47e60a7fd55f51e5a98451"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a1540c0d77a47e60a7fd55f51e5a98451">LBM_collide</a> (int i, int j, int k, int v)</td></tr>
+<tr class="separator:a1540c0d77a47e60a7fd55f51e5a98451"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4ca0327a53171fe8e1c3076e9f1353f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac4ca0327a53171fe8e1c3076e9f1353f">LBM_kbcCollide</a> (int i, int j, int k, <a class="el" href="class_i_vector.html">IVector</a>&lt; double &gt; &amp;f_new)</td></tr>
+<tr class="separator:ac4ca0327a53171fe8e1c3076e9f1353f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5b5cb1f3136da8cbff96955d9c6d9e5b">LBM_stream</a> ()</td></tr>
 <tr class="separator:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25382158b7747da7c0639aed513ae39c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a25382158b7747da7c0639aed513ae39c">LBM_macro</a> ()</td></tr>
@@ -145,24 +148,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a884b3fc103cf8035438ea8f144bff5bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a884b3fc103cf8035438ea8f144bff5bb">LBM_forcegrid</a> (bool reset_flag)</td></tr>
 <tr class="separator:a884b3fc103cf8035438ea8f144bff5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae10eccc72ee3ef9a9bb730f548b55c89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae10eccc72ee3ef9a9bb730f548b55c89">bc_applyBounceBack</a> (int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)</td></tr>
-<tr class="separator:ae10eccc72ee3ef9a9bb730f548b55c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa91e3f8ae700ac9525f0ad063b1da084"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aa91e3f8ae700ac9525f0ad063b1da084">bc_applySpecReflect</a> (int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)</td></tr>
-<tr class="separator:aa91e3f8ae700ac9525f0ad063b1da084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47ce1726eff9ce4f1d5fd2b1c3f7c237"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a47ce1726eff9ce4f1d5fd2b1c3f7c237">bc_applyZouHe</a> (int label, int i, int j, int k, int M_lim, int K_lim)</td></tr>
-<tr class="separator:a47ce1726eff9ce4f1d5fd2b1c3f7c237"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af36e2349c2520b34649de94dcb860838"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#af36e2349c2520b34649de94dcb860838">bc_applyRegularised</a> (int label, int i, int j, int k, int N_lim, int M_lim, int K_lim)</td></tr>
-<tr class="separator:af36e2349c2520b34649de94dcb860838"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6306470f559f995c441034c28e9d944"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ad6306470f559f995c441034c28e9d944">bc_applyExtrapolation</a> (int label, int i, int j, int k, int M_lim, int K_lim)</td></tr>
-<tr class="separator:ad6306470f559f995c441034c28e9d944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2dc94b1d2e3f14a1a086b8bfa078839b">bc_applyBounceBack</a> (int label, int i, int j, int k)</td></tr>
+<tr class="separator:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae1d63a43d1dee6c7b25880c8a9bb97c9">bc_applySpecReflect</a> (int label, int i, int j, int k)</td></tr>
+<tr class="separator:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5602705b2575b09e27dd0065de3542f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5602705b2575b09e27dd0065de3542f6">bc_applyRegularised</a> (int label, int i, int j, int k)</td></tr>
+<tr class="separator:a5602705b2575b09e27dd0065de3542f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a385c4803f4803e380a520ac9b3dcb31d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a385c4803f4803e380a520ac9b3dcb31d">bc_applyExtrapolation</a> (int label, int i, int j, int k)</td></tr>
+<tr class="separator:a385c4803f4803e380a520ac9b3dcb31d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeff3b54617b7ae65f08c96e653f9035f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aeff3b54617b7ae65f08c96e653f9035f">bc_applyBfl</a> (int i, int j, int k)</td></tr>
 <tr class="separator:aeff3b54617b7ae65f08c96e653f9035f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae4fd999e7334c8ec8e1118c92e0c7338">bc_applyNrbc</a> (int i, int j, int k)</td></tr>
 <tr class="separator:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac86a233f9475084226e6bf651ffe398f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac86a233f9475084226e6bf651ffe398f">bc_solidSiteReset</a> ()</td></tr>
 <tr class="separator:ac86a233f9475084226e6bf651ffe398f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace9fef8d2c583ea5805b77c999b0684c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ace9fef8d2c583ea5805b77c999b0684c">bc_getWallDensityForRBC</a> (std::vector&lt; double &gt; &amp;ftmp, int normal, int i, int j, int k, int M_lim, int K_lim)</td></tr>
-<tr class="separator:ace9fef8d2c583ea5805b77c999b0684c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8780d80f2868e9444349e518bd40a198"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a8780d80f2868e9444349e518bd40a198">bc_getWallDensityForRBC</a> (std::vector&lt; double &gt; &amp;ftmp, int normal, int i, int j, int k)</td></tr>
+<tr class="separator:a8780d80f2868e9444349e518bd40a198"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8086651bd7b978e0b9c48d56c3d0595"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ad8086651bd7b978e0b9c48d56c3d0595">LBM_explode</a> (int RegionNumber)</td></tr>
 <tr class="separator:ad8086651bd7b978e0b9c48d56c3d0595"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5832081a70e8990be62317034bb975c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5832081a70e8990be62317034bb975c6">LBM_coalesce</a> (int RegionNumber)</td></tr>
@@ -183,33 +184,56 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ad9bb2153aec972c499ce969a76d908fd"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ad9bb2153aec972c499ce969a76d908fd">XInd</a></td></tr>
+<tr class="memdesc:ad9bb2153aec972c499ce969a76d908fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global X indices of each site.  <a href="#ad9bb2153aec972c499ce969a76d908fd">More...</a><br /></td></tr>
 <tr class="separator:ad9bb2153aec972c499ce969a76d908fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf1d07b290887f0d380d046a1d698f0e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#acf1d07b290887f0d380d046a1d698f0e">YInd</a></td></tr>
+<tr class="memdesc:acf1d07b290887f0d380d046a1d698f0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global Y indices of each site.  <a href="#acf1d07b290887f0d380d046a1d698f0e">More...</a><br /></td></tr>
 <tr class="separator:acf1d07b290887f0d380d046a1d698f0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef85a27cb2bca6b268469ee96470bb35"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aef85a27cb2bca6b268469ee96470bb35">ZInd</a></td></tr>
+<tr class="memdesc:aef85a27cb2bca6b268469ee96470bb35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global Z indices of each site.  <a href="#aef85a27cb2bca6b268469ee96470bb35">More...</a><br /></td></tr>
 <tr class="separator:aef85a27cb2bca6b268469ee96470bb35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af31df133bf9419da6222a0dbb4e54bab"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#af31df133bf9419da6222a0dbb4e54bab">XPos</a></td></tr>
+<tr class="memdesc:af31df133bf9419da6222a0dbb4e54bab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global X positions of each site.  <a href="#af31df133bf9419da6222a0dbb4e54bab">More...</a><br /></td></tr>
 <tr class="separator:af31df133bf9419da6222a0dbb4e54bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bd4e9b575377b8e76e5ebe7a3a31194"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2bd4e9b575377b8e76e5ebe7a3a31194">YPos</a></td></tr>
+<tr class="memdesc:a2bd4e9b575377b8e76e5ebe7a3a31194"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global Y positions of each site.  <a href="#a2bd4e9b575377b8e76e5ebe7a3a31194">More...</a><br /></td></tr>
 <tr class="separator:a2bd4e9b575377b8e76e5ebe7a3a31194"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af859d35bf0a03cee8965ce3e22e651c6"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#af859d35bf0a03cee8965ce3e22e651c6">ZPos</a></td></tr>
+<tr class="memdesc:af859d35bf0a03cee8965ce3e22e651c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of global Z positions of each site.  <a href="#af859d35bf0a03cee8965ce3e22e651c6">More...</a><br /></td></tr>
 <tr class="separator:af859d35bf0a03cee8965ce3e22e651c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ce077fba648f767361039eb924c45ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_vector.html">IVector</a>&lt; <a class="el" href="_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60e">eType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a8ce077fba648f767361039eb924c45ae">LatTyp</a></td></tr>
+<tr class="memdesc:a8ce077fba648f767361039eb924c45ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flattened 3D array of site labels.  <a href="#a8ce077fba648f767361039eb924c45ae">More...</a><br /></td></tr>
 <tr class="separator:a8ce077fba648f767361039eb924c45ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dfedc4442a386ec15c8b03ca899c1a9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a7dfedc4442a386ec15c8b03ca899c1a9">level</a></td></tr>
+<tr class="memdesc:a7dfedc4442a386ec15c8b03ca899c1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Level in embedded grid hierarchy.  <a href="#a7dfedc4442a386ec15c8b03ca899c1a9">More...</a><br /></td></tr>
 <tr class="separator:a7dfedc4442a386ec15c8b03ca899c1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd504b39f12eb0a237bc6313de94e094"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#afd504b39f12eb0a237bc6313de94e094">dt</a></td></tr>
+<tr class="memdesc:afd504b39f12eb0a237bc6313de94e094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Physical time step size.  <a href="#afd504b39f12eb0a237bc6313de94e094">More...</a><br /></td></tr>
 <tr class="separator:afd504b39f12eb0a237bc6313de94e094"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a783b18a053e244ae7b7b436ab21c0592"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a783b18a053e244ae7b7b436ab21c0592">t</a></td></tr>
+<tr class="memdesc:a783b18a053e244ae7b7b436ab21c0592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of completed iterations on this level.  <a href="#a783b18a053e244ae7b7b436ab21c0592">More...</a><br /></td></tr>
 <tr class="separator:a783b18a053e244ae7b7b436ab21c0592"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a755f85eb5480d959211e00937a478ae9"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a755f85eb5480d959211e00937a478ae9">nu</a></td></tr>
+<tr class="memdesc:a755f85eb5480d959211e00937a478ae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kinematic viscosity (in lattice units)  <a href="#a755f85eb5480d959211e00937a478ae9">More...</a><br /></td></tr>
 <tr class="separator:a755f85eb5480d959211e00937a478ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21461e5d39c5ae83ae42170c829e9da3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a21461e5d39c5ae83ae42170c829e9da3">omega</a></td></tr>
+<tr class="memdesc:a21461e5d39c5ae83ae42170c829e9da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relaxation frequency.  <a href="#a21461e5d39c5ae83ae42170c829e9da3">More...</a><br /></td></tr>
 <tr class="separator:a21461e5d39c5ae83ae42170c829e9da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a147cfb80b653ca4432432e8185cf38ef"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a147cfb80b653ca4432432e8185cf38ef">timeav_mpi_overhead</a></td></tr>
+<tr class="memdesc:a147cfb80b653ca4432432e8185cf38ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Time-averaged time of MPI communication.  <a href="#a147cfb80b653ca4432432e8185cf38ef">More...</a><br /></td></tr>
 <tr class="separator:a147cfb80b653ca4432432e8185cf38ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ad670e6b9bdd28b5060397800170310"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2ad670e6b9bdd28b5060397800170310">timeav_timestep</a></td></tr>
+<tr class="memdesc:a2ad670e6b9bdd28b5060397800170310"><td class="mdescLeft">&#160;</td><td class="mdescRight">Time-averaged time of a timestep.  <a href="#a2ad670e6b9bdd28b5060397800170310">More...</a><br /></td></tr>
 <tr class="separator:a2ad670e6b9bdd28b5060397800170310"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eb35752a7c0741510975d9ee6aa3ce1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5eb35752a7c0741510975d9ee6aa3ce1">N_lim</a></td></tr>
+<tr class="memdesc:a5eb35752a7c0741510975d9ee6aa3ce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local size of grid in X-direction.  <a href="#a5eb35752a7c0741510975d9ee6aa3ce1">More...</a><br /></td></tr>
+<tr class="separator:a5eb35752a7c0741510975d9ee6aa3ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01d3f362634c896ecdb80f0e6304c12f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a01d3f362634c896ecdb80f0e6304c12f">M_lim</a></td></tr>
+<tr class="memdesc:a01d3f362634c896ecdb80f0e6304c12f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local size of grid in Y-direction.  <a href="#a01d3f362634c896ecdb80f0e6304c12f">More...</a><br /></td></tr>
+<tr class="separator:a01d3f362634c896ecdb80f0e6304c12f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaccc404f2fbdbaef8c5dd134f7d9e17f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aaccc404f2fbdbaef8c5dd134f7d9e17f">K_lim</a></td></tr>
+<tr class="memdesc:aaccc404f2fbdbaef8c5dd134f7d9e17f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local size of grid in Z-direction.  <a href="#aaccc404f2fbdbaef8c5dd134f7d9e17f">More...</a><br /></td></tr>
+<tr class="separator:aaccc404f2fbdbaef8c5dd134f7d9e17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -220,7 +244,10 @@ Friends</h2></td></tr>
 <tr class="memitem:a8891d532b9568ad83535721b0e6b79c9"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a8891d532b9568ad83535721b0e6b79c9">GridUtils</a></td></tr>
 <tr class="separator:a8891d532b9568ad83535721b0e6b79c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Grid class. </p>
+<p>This class represents a grid (lattice) and is capable of owning a nested hierarchy of child grids. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="acc3416599b59236e87b6b60a07e678af"></a>
 <div class="memitem">
 <div class="memproto">
@@ -368,7 +395,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae10eccc72ee3ef9a9bb730f548b55c89"></a>
+<a class="anchor" id="a2dc94b1d2e3f14a1a086b8bfa078839b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -394,25 +421,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>N_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>k</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -424,7 +433,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad6306470f559f995c441034c28e9d944"></a>
+<a class="anchor" id="a385c4803f4803e380a520ac9b3dcb31d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -450,19 +459,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>k</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -506,7 +503,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af36e2349c2520b34649de94dcb860838"></a>
+<a class="anchor" id="a5602705b2575b09e27dd0065de3542f6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -532,25 +529,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>N_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>k</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -569,7 +548,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa91e3f8ae700ac9525f0ad063b1da084"></a>
+<a class="anchor" id="ae1d63a43d1dee6c7b25880c8a9bb97c9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -595,25 +574,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>N_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>k</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -625,57 +586,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a47ce1726eff9ce4f1d5fd2b1c3f7c237"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GridObj::bc_applyZouHe </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>label</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ace9fef8d2c583ea5805b77c999b0684c"></a>
+<a class="anchor" id="a8780d80f2868e9444349e518bd40a198"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -707,19 +618,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>k</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -898,7 +797,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab24eba4c29917ea98cc48b53c2a03a25"></a>
+<a class="anchor" id="a1540c0d77a47e60a7fd55f51e5a98451"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -924,19 +823,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1134,7 +1021,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9f98bf9f34b1b1f2fb31a25fb3061f49"></a>
+<a class="anchor" id="ac4ca0327a53171fe8e1c3076e9f1353f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1155,18 +1042,6 @@ Friends</h2></td></tr>
           <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1334,6 +1209,22 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Physical time step size. </p>
+
+</div>
+</div>
+<a class="anchor" id="aaccc404f2fbdbaef8c5dd134f7d9e17f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridObj::K_lim</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Local size of grid in Z-direction. </p>
+
 </div>
 </div>
 <a class="anchor" id="a8ce077fba648f767361039eb924c45ae"></a>
@@ -1345,6 +1236,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Flattened 3D array of site labels. </p>
 
 </div>
 </div>
@@ -1358,6 +1251,36 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Level in embedded grid hierarchy. </p>
+
+</div>
+</div>
+<a class="anchor" id="a01d3f362634c896ecdb80f0e6304c12f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridObj::M_lim</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Local size of grid in Y-direction. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5eb35752a7c0741510975d9ee6aa3ce1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridObj::N_lim</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Local size of grid in X-direction. </p>
+
 </div>
 </div>
 <a class="anchor" id="a755f85eb5480d959211e00937a478ae9"></a>
@@ -1369,6 +1292,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Kinematic viscosity (in lattice units) </p>
 
 </div>
 </div>
@@ -1382,6 +1307,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Relaxation frequency. </p>
+
 </div>
 </div>
 <a class="anchor" id="a783b18a053e244ae7b7b436ab21c0592"></a>
@@ -1393,6 +1320,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Number of completed iterations on this level. </p>
 
 </div>
 </div>
@@ -1406,6 +1335,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Time-averaged time of MPI communication. </p>
+
 </div>
 </div>
 <a class="anchor" id="a2ad670e6b9bdd28b5060397800170310"></a>
@@ -1417,6 +1348,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Time-averaged time of a timestep. </p>
 
 </div>
 </div>
@@ -1430,6 +1363,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Vector of global X indices of each site. </p>
+
 </div>
 </div>
 <a class="anchor" id="af31df133bf9419da6222a0dbb4e54bab"></a>
@@ -1441,6 +1376,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Vector of global X positions of each site. </p>
 
 </div>
 </div>
@@ -1454,6 +1391,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Vector of global Y indices of each site. </p>
+
 </div>
 </div>
 <a class="anchor" id="a2bd4e9b575377b8e76e5ebe7a3a31194"></a>
@@ -1465,6 +1404,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Vector of global Y positions of each site. </p>
 
 </div>
 </div>
@@ -1478,6 +1419,8 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Vector of global Z indices of each site. </p>
+
 </div>
 </div>
 <a class="anchor" id="af859d35bf0a03cee8965ce3e22e651c6"></a>
@@ -1489,6 +1432,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Vector of global Z positions of each site. </p>
 
 </div>
 </div>

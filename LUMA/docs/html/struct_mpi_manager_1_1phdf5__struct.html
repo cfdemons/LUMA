@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -97,34 +97,51 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Structure for storing halo information for HDF5.  
+ <a href="struct_mpi_manager_1_1phdf5__struct.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_mpi_manager_8h_source.html">MpiManager.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a971e8f56e0d69005cb639a74250bbb70"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a971e8f56e0d69005cb639a74250bbb70">i_start</a></td></tr>
+<tr class="memdesc:a971e8f56e0d69005cb639a74250bbb70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starting i-index for writable region.  <a href="#a971e8f56e0d69005cb639a74250bbb70">More...</a><br /></td></tr>
 <tr class="separator:a971e8f56e0d69005cb639a74250bbb70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28567c9488624c7de401c9ee5c5fa13e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a28567c9488624c7de401c9ee5c5fa13e">i_end</a></td></tr>
+<tr class="memdesc:a28567c9488624c7de401c9ee5c5fa13e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ending i-index for writable region.  <a href="#a28567c9488624c7de401c9ee5c5fa13e">More...</a><br /></td></tr>
 <tr class="separator:a28567c9488624c7de401c9ee5c5fa13e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff0715d84f3e46f8cca3a380add110e3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#aff0715d84f3e46f8cca3a380add110e3">j_start</a></td></tr>
+<tr class="memdesc:aff0715d84f3e46f8cca3a380add110e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starting j-index for writable region.  <a href="#aff0715d84f3e46f8cca3a380add110e3">More...</a><br /></td></tr>
 <tr class="separator:aff0715d84f3e46f8cca3a380add110e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8869bc50d30230032e13dd5bfe7d1fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#ac8869bc50d30230032e13dd5bfe7d1fe">j_end</a></td></tr>
+<tr class="memdesc:ac8869bc50d30230032e13dd5bfe7d1fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ending j-index for writable region.  <a href="#ac8869bc50d30230032e13dd5bfe7d1fe">More...</a><br /></td></tr>
 <tr class="separator:ac8869bc50d30230032e13dd5bfe7d1fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94d1c88859049aa2b37c9b659e071760"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a94d1c88859049aa2b37c9b659e071760">k_start</a></td></tr>
+<tr class="memdesc:a94d1c88859049aa2b37c9b659e071760"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starting k-index for writable region.  <a href="#a94d1c88859049aa2b37c9b659e071760">More...</a><br /></td></tr>
 <tr class="separator:a94d1c88859049aa2b37c9b659e071760"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2490c17798ca6cf4db002fa521f170c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a2490c17798ca6cf4db002fa521f170c0">k_end</a></td></tr>
+<tr class="memdesc:a2490c17798ca6cf4db002fa521f170c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ending k-index for writable region.  <a href="#a2490c17798ca6cf4db002fa521f170c0">More...</a><br /></td></tr>
 <tr class="separator:a2490c17798ca6cf4db002fa521f170c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ea3307d7dac34273ee8a7b1014273fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a1ea3307d7dac34273ee8a7b1014273fe">halo_min</a></td></tr>
+<tr class="memdesc:a1ea3307d7dac34273ee8a7b1014273fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of halo on the top end of a 1D block.  <a href="#a1ea3307d7dac34273ee8a7b1014273fe">More...</a><br /></td></tr>
 <tr class="separator:a1ea3307d7dac34273ee8a7b1014273fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6509514433ef18c04217b54ce4614a0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#af6509514433ef18c04217b54ce4614a0">halo_max</a></td></tr>
+<tr class="memdesc:af6509514433ef18c04217b54ce4614a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of halo on the bottom end of a 1D block.  <a href="#af6509514433ef18c04217b54ce4614a0">More...</a><br /></td></tr>
 <tr class="separator:af6509514433ef18c04217b54ce4614a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3f8cc807724b61ef3a37509f71100ab"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#aa3f8cc807724b61ef3a37509f71100ab">level</a></td></tr>
+<tr class="memdesc:aa3f8cc807724b61ef3a37509f71100ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grid level to which these data correspond.  <a href="#aa3f8cc807724b61ef3a37509f71100ab">More...</a><br /></td></tr>
 <tr class="separator:aa3f8cc807724b61ef3a37509f71100ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a9978693d5b50cb83b8ccc78fb23a6d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a1a9978693d5b50cb83b8ccc78fb23a6d">region</a></td></tr>
+<tr class="memdesc:a1a9978693d5b50cb83b8ccc78fb23a6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Region number to which these data correspond.  <a href="#a1a9978693d5b50cb83b8ccc78fb23a6d">More...</a><br /></td></tr>
 <tr class="separator:a1a9978693d5b50cb83b8ccc78fb23a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b487966cec847dfba96a869e9adb7f0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a5b487966cec847dfba96a869e9adb7f0">writable_data_count</a> = 0</td></tr>
+<tr class="memdesc:a5b487966cec847dfba96a869e9adb7f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writable data count.  <a href="#a5b487966cec847dfba96a869e9adb7f0">More...</a><br /></td></tr>
 <tr class="separator:a5b487966cec847dfba96a869e9adb7f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Data Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Structure for storing halo information for HDF5. </p>
+<p>Structure also stores the amount of writable data on the grid. </p>
+</div><h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="af6509514433ef18c04217b54ce4614a0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -134,6 +151,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Size of halo on the bottom end of a 1D block. </p>
 
 </div>
 </div>
@@ -147,6 +166,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Size of halo on the top end of a 1D block. </p>
+
 </div>
 </div>
 <a class="anchor" id="a28567c9488624c7de401c9ee5c5fa13e"></a>
@@ -158,6 +179,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Ending i-index for writable region. </p>
 
 </div>
 </div>
@@ -171,6 +194,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Starting i-index for writable region. </p>
+
 </div>
 </div>
 <a class="anchor" id="ac8869bc50d30230032e13dd5bfe7d1fe"></a>
@@ -182,6 +207,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Ending j-index for writable region. </p>
 
 </div>
 </div>
@@ -195,6 +222,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Starting j-index for writable region. </p>
+
 </div>
 </div>
 <a class="anchor" id="a2490c17798ca6cf4db002fa521f170c0"></a>
@@ -206,6 +235,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Ending k-index for writable region. </p>
 
 </div>
 </div>
@@ -219,6 +250,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Starting k-index for writable region. </p>
+
 </div>
 </div>
 <a class="anchor" id="aa3f8cc807724b61ef3a37509f71100ab"></a>
@@ -230,6 +263,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Grid level to which these data correspond. </p>
 
 </div>
 </div>
@@ -243,6 +278,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Region number to which these data correspond. </p>
+
 </div>
 </div>
 <a class="anchor" id="a5b487966cec847dfba96a869e9adb7f0"></a>
@@ -254,6 +291,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Writable data count. </p>
 
 </div>
 </div>

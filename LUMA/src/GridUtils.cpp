@@ -24,6 +24,8 @@
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
 #if (L_dims == 3)
+
+// THIS IS WRONG AS WE HAVE CHANGED TO D3Q27 NOW!!!!
 const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
@@ -134,6 +136,9 @@ std::vector<double> GridUtils::linspace(double min, double max, int n)
 // ***************************************************************************************************
 
 // Like linspace but spaces elements by 1
+/// \brief	Creates a integer-spaced vector.
+///
+///			Details...
 std::vector<int> GridUtils::onespace(int min, int max)
 {
 	// Declare resulting array

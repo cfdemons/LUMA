@@ -55,14 +55,13 @@
 
 #include <stdio.h>
 
-// Error definition
+/// Error definition
 #define LUMA_FAILED 12345
 
-// Not a Number declaration
 #ifdef _WIN32
-#define L_IS_NAN _isnan
+	#define L_IS_NAN _isnan		///< Not a Number declaration (Windows)
 #else
-#define L_IS_NAN isnan
+#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
 #endif
 
 // Grid utilities class definition (available to all parts of code)

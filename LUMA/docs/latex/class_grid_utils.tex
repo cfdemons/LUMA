@@ -2,6 +2,11 @@
 \label{class_grid_utils}\index{Grid\+Utils@{Grid\+Utils}}
 
 
+Grid utility class.  
+
+
+
+
 {\ttfamily \#include $<$Grid\+Utils.\+h$>$}
 
 \subsection*{Static Public Member Functions}
@@ -10,7 +15,7 @@
 static int \hyperlink{class_grid_utils_ae2c829e8787d4aa03ec961dc84213b0d}{create\+Output\+Directory} (std\+::string \hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{path\+\_\+str})
 \item 
 static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}{onespace} (int min, int max)
-\item 
+\begin{DoxyCompactList}\small\item\em Creates a integer-\/spaced vector. \end{DoxyCompactList}\item 
 static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a2f172a6dd8b2749ca1c8336a64a07e29}{linspace} (double min, double max, int n)
 \item 
 static double \hyperlink{class_grid_utils_ab51d52eb381ac0b27e3522e101922428}{vecnorm} (double vec\mbox{[}$\,$\mbox{]})
@@ -59,37 +64,39 @@ static bool \hyperlink{class_grid_utils_a70a234125350fca607d3943e0f1edd7c}{is\+O
 \item 
 static bool \hyperlink{class_grid_utils_af2b6e1225cab2a840110e2a70f6bd23c}{is\+On\+Recv\+Layer} (double site\+\_\+position, enum \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} xyz, enum \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax)
 \item 
-static bool \hyperlink{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}{is\+Off\+Grid} (int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
+static bool \hyperlink{class_grid_utils_a48709fd0b88db1e79bbc3a12026fe33a}{is\+Off\+Grid} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
 \item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{vecnorm} (Num\+Type a1, Num\+Type a2, Num\+Type a3)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the L2-\/norm. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a7a169fc043a585f20936b314def45fe7}{vecnorm} (Num\+Type a1, Num\+Type a2)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the L2-\/norm. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{up\+To\+Zero} (Num\+Type x)
-\item 
+\begin{DoxyCompactList}\small\item\em Rounds a negative value up to zero. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{down\+To\+Limit} (Num\+Type x, Num\+Type limit)
-\item 
+\begin{DoxyCompactList}\small\item\em Rounds a value greater than a limit down to this value. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}{factorial} (Num\+Type n)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the factorial of the supplied value. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}{strided\+Copy} (Num\+Type $\ast$dest, Num\+Type $\ast$src, size\+\_\+t block, size\+\_\+t offset, size\+\_\+t stride, size\+\_\+t count, size\+\_\+t buf\+\_\+offset=0)
-\item 
+\begin{DoxyCompactList}\small\item\em Performs a strided memcpy. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}{global\+\_\+to\+\_\+local} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ Num\+Type $>$ \&locals)
-\item 
+\begin{DoxyCompactList}\small\item\em Maps global indices to local indices. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static void \hyperlink{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}{local\+\_\+to\+\_\+global} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ Num\+Type $>$ \&globals)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Maps local indices to global indices. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Static Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
 static std\+::ofstream $\ast$ \hyperlink{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}{logfile}
-\item 
+\begin{DoxyCompactList}\small\item\em Handle to output file. \end{DoxyCompactList}\item 
 static std\+::string \hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{path\+\_\+str}
-\item 
+\begin{DoxyCompactList}\small\item\em Static string representing output path. \end{DoxyCompactList}\item 
 static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{dir\+\_\+reflect} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims} $\ast$2\mbox{]}\mbox{[}\hyperlink{definitions_8h_a920e69a22e5f925675c5c77c521d586d}{L\+\_\+n\+Vels}\mbox{]}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Array with hardcoded direction numbering for specular reflection. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-\hyperlink{class_grid_utils}{Grid\+Utils} Class is a utility class to hold all the general methods used by the \hyperlink{class_grid_obj}{Grid\+Obj} and others. Everything about this is static as no need to instantiate it for every grid on a process. 
+Grid utility class. 
+
+Class provides grid utilities including commonly used logical tests. This is a static class and so there is no need to instantiate it. 
 
 \subsection{Member Function Documentation}
 \index{Grid\+Utils@{Grid\+Utils}!add@{add}}
@@ -131,6 +138,22 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{Num\+Type}]{limit}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{}\label{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}
+
+
+Rounds a value greater than a limit down to this value. 
+
+If value is less than or equal to the limit, return the value unchanged.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & value to be rounded \\
+\hline
+{\em limit} & value to be rounded down to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Num\+Type rounded value 
+\end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!factorial@{factorial}}
 \index{factorial@{factorial}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{factorial(\+Num\+Type n)}{factorial(NumType n)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::factorial (
@@ -138,6 +161,20 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{Num\+Type}]{n}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}{}\label{class_grid_utils_a57edeaeba2d67d187a9edd0b560fe0c2}
+
+
+Computes the factorial of the supplied value. 
+
+If n == 0 then returns 1.
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & factorial \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Num\+Type n factorial 
+\end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Coarse\+Indices@{get\+Coarse\+Indices}}
 \index{get\+Coarse\+Indices@{get\+Coarse\+Indices}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{get\+Coarse\+Indices(int fine\+\_\+i, int x\+\_\+start, int fine\+\_\+j, int y\+\_\+start, int fine\+\_\+k, int z\+\_\+start)}{getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Coarse\+Indices (
@@ -190,6 +227,25 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{std\+::vector$<$ Num\+Type $>$ \&}]{locals}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}{}\label{class_grid_utils_a28cba8aa8cbe5dd20fa3405e2f46eeb2}
+
+
+Maps global indices to local indices. 
+
+Takes a vector container and populates it with the local indices where the supplied global site can be found on the grid supplied. If global indicies are not found on the supplied grid then local index of -\/1 is returned.
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em i} & global index \\
+\hline
+ & {\em j} & global index \\
+\hline
+ & {\em k} & global index \\
+\hline
+ & {\em g} & grid on which local indices are required \\
+\hline
+\mbox{\tt out}  & {\em locals} & vector container for local indices \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Utils@{Grid\+Utils}!has\+This\+Sub\+Grid@{has\+This\+Sub\+Grid}}
 \index{has\+This\+Sub\+Grid@{has\+This\+Sub\+Grid}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{has\+This\+Sub\+Grid(const Grid\+Obj \&p\+Grid, int Reg\+Num)}{hasThisSubGrid(const GridObj &pGrid, int RegNum)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::has\+This\+Sub\+Grid (
@@ -208,17 +264,14 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a47d5c12d681b275441029744febbb520}{}\label{class_grid_utils_a47d5c12d681b275441029744febbb520}
 \index{Grid\+Utils@{Grid\+Utils}!is\+Off\+Grid@{is\+Off\+Grid}}
 \index{is\+Off\+Grid@{is\+Off\+Grid}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+Off\+Grid(int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, Grid\+Obj \&g)}{isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Off\+Grid (
+\subsubsection[{\texorpdfstring{is\+Off\+Grid(int i, int j, int k, Grid\+Obj \&g)}{isOffGrid(int i, int j, int k, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Off\+Grid (
 \begin{DoxyParamCaption}
 \item[{int}]{i, }
 \item[{int}]{j, }
 \item[{int}]{k, }
-\item[{int}]{N\+\_\+lim, }
-\item[{int}]{M\+\_\+lim, }
-\item[{int}]{K\+\_\+lim, }
 \item[{{\bf Grid\+Obj} \&}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}{}\label{class_grid_utils_a991a0072d0ee644ce636718b191f97b1}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a48709fd0b88db1e79bbc3a12026fe33a}{}\label{class_grid_utils_a48709fd0b88db1e79bbc3a12026fe33a}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}}
 \index{is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{is\+On\+Recv\+Layer(double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)}{isOnRecvLayer(double pos_x, double pos_y, double pos_z)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Recv\+Layer (
@@ -304,6 +357,25 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{std\+::vector$<$ Num\+Type $>$ \&}]{globals}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}{}\label{class_grid_utils_ac3e122b19b2ee0e159b3025b2858d895}
+
+
+Maps local indices to global indices. 
+
+Takes a vector container and populates it with the global indices of the supplied local site
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em i} & local index \\
+\hline
+ & {\em j} & local index \\
+\hline
+ & {\em k} & local index \\
+\hline
+ & {\em g} & grid on which global indices are required \\
+\hline
+\mbox{\tt out}  & {\em globals} & vector container for global indices \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Utils@{Grid\+Utils}!matrix\+\_\+multiply@{matrix\+\_\+multiply}}
 \index{matrix\+\_\+multiply@{matrix\+\_\+multiply}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{matrix\+\_\+multiply(const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&\+A, const std\+::vector$<$ double $>$ \&x)}{matrix_multiply(const std::vector< std::vector< double > > &A, const std::vector< double > &x)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::matrix\+\_\+multiply (
@@ -320,7 +392,11 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{int}]{max}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}{}\label{class_grid_utils_a1f0d4a76be76a743c368c9a1d4d46cbc}
-\index{Grid\+Utils@{Grid\+Utils}!strided\+Copy@{strided\+Copy}}
+
+
+Creates a integer-\/spaced vector. 
+
+Details... \index{Grid\+Utils@{Grid\+Utils}!strided\+Copy@{strided\+Copy}}
 \index{strided\+Copy@{strided\+Copy}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{strided\+Copy(\+Num\+Type $\ast$dest, Num\+Type $\ast$src, size\+\_\+t block, size\+\_\+t offset, size\+\_\+t stride, size\+\_\+t count, size\+\_\+t buf\+\_\+offset=0)}{stridedCopy(NumType *dest, NumType *src, size_t block, size_t offset, size_t stride, size_t count, size_t buf_offset=0)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static void Grid\+Utils\+::strided\+Copy (
 \begin{DoxyParamCaption}
@@ -333,6 +409,29 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{size\+\_\+t}]{buf\+\_\+offset = {\ttfamily 0}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}{}\label{class_grid_utils_aa3ca6e20ef4fa927cb845956d7565b1e}
+
+
+Performs a strided memcpy. 
+
+Memcpy() is designed to copy blocks of contiguous memory. Strided copy copies a pattern of contiguous blocks.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dest} & pointer to start of destination memory \\
+\hline
+{\em src} & pointer to start of source memory \\
+\hline
+{\em block} & size of contiguous block \\
+\hline
+{\em offset} & offset from the start of the soruce array \\
+\hline
+{\em stride} & number of elements between start of first block and start of second \\
+\hline
+{\em count} & number of blocks in pattern \\
+\hline
+{\em buf\+\_\+offset} & offset from start of destination buffer to start writing. Default is zero if not supplied. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Utils@{Grid\+Utils}!subtract@{subtract}}
 \index{subtract@{subtract}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{subtract(std\+::vector$<$ double $>$ a, std\+::vector$<$ double $>$ b)}{subtract(std::vector< double > a, std::vector< double > b)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::subtract (
@@ -348,6 +447,20 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{Num\+Type}]{x}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{}\label{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}
+
+
+Rounds a negative value up to zero. 
+
+If value is positive, return the value unchanged.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & value to be rounded \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Num\+Type rounded value 
+\end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!vecmultiply@{vecmultiply}}
 \index{vecmultiply@{vecmultiply}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{vecmultiply(double scalar, std\+::vector$<$ double $>$ vec)}{vecmultiply(double scalar, std::vector< double > vec)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ double $>$ Grid\+Utils\+::vecmultiply (
@@ -396,6 +509,22 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{Num\+Type}]{a3}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{}\label{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}
+
+
+Computes the L2-\/norm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a1} & first component of the vector \\
+\hline
+{\em a2} & second component of the vector \\
+\hline
+{\em a3} & third component of the vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Num\+Type scalar quantity 
+\end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
 \index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{vecnorm(\+Num\+Type a1, Num\+Type a2)}{vecnorm(NumType a1, NumType a2)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static Num\+Type Grid\+Utils\+::vecnorm (
@@ -404,6 +533,20 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
 \item[{Num\+Type}]{a2}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_utils_a7a169fc043a585f20936b314def45fe7}{}\label{class_grid_utils_a7a169fc043a585f20936b314def45fe7}
+
+
+Computes the L2-\/norm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a1} & first component of the vector \\
+\hline
+{\em a2} & second component of the vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Num\+Type scalar quantity 
+\end{DoxyReturn}
 
 
 \subsection{Member Data Documentation}
@@ -422,12 +565,24 @@ static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{
         \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\}
     \}
 \end{DoxyCode}
+
+
+Array with hardcoded direction numbering for specular reflection. 
+
 \index{Grid\+Utils@{Grid\+Utils}!logfile@{logfile}}
 \index{logfile@{logfile}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{logfile}{logfile}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::ofstream $\ast$ Grid\+Utils\+::logfile\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}{}\label{class_grid_utils_a298239096e929c1ba4eba925e351c1b3}
+
+
+Handle to output file. 
+
 \index{Grid\+Utils@{Grid\+Utils}!path\+\_\+str@{path\+\_\+str}}
 \index{path\+\_\+str@{path\+\_\+str}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{path\+\_\+str}{path_str}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Grid\+Utils\+::path\+\_\+str\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{}\label{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}
+
+
+Static string representing output path. 
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

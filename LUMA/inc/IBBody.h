@@ -19,7 +19,7 @@
 #include "PCpts.h"
 #include "BFLBody.h"	// Need this because we use the Voxelising routine in makeBody()
 
-/** Represents an IB body **/
+/// \brief	Immersed boundary body.
 class IBBody : public Body<IBMarker> {
 
 	// Make ObjectManager a friend class so it can access the protected data of IBBody objects
@@ -39,15 +39,15 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
-	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
-	int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
+	bool flex_rigid;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
+	bool deformable;					///< Flag to indicate deformable body: false == rigid; true == deformable
+	int groupID;						///< ID of IBbody group -- position updates can be driven from a flexible body in a group
 
 	// Flexible body properties
-	double delta_rho;					// Difference in density between fluid and solid in lattice units
-	double flexural_rigidity;			// Young's modulus E * Second moment of area I
-	std::vector<double> tension;		// Tension between the current marker and its neighbour
-	std::vector<int> BCs;				// BCs type flags (flexible bodies)
+	double delta_rho;					///< Difference in density between fluid and solid in lattice units
+	double flexural_rigidity;			///< Young's modulus E * Second moment of area I
+	std::vector<double> tension;		///< Tension between the current marker and its neighbour
+	std::vector<int> BCs;				///< BCs type flags (flexible bodies)
 
 
 	/*

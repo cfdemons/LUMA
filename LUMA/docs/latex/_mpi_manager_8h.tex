@@ -6,46 +6,70 @@
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{class_mpi_manager}{Mpi\+Manager}
-\item 
+\begin{DoxyCompactList}\small\item\em M\+PI Manager class. \end{DoxyCompactList}\item 
 struct \hyperlink{struct_mpi_manager_1_1phdf5__struct}{Mpi\+Manager\+::phdf5\+\_\+struct}
-\item 
+\begin{DoxyCompactList}\small\item\em Structure for storing halo information for H\+D\+F5. \end{DoxyCompactList}\item 
 struct \hyperlink{struct_mpi_manager_1_1layer__edges}{Mpi\+Manager\+::layer\+\_\+edges}
-\item 
+\begin{DoxyCompactList}\small\item\em Structure containing global positions of the edges of halos. \end{DoxyCompactList}\item 
 struct \hyperlink{struct_mpi_manager_1_1buffer__struct}{Mpi\+Manager\+::buffer\+\_\+struct}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Structure storing buffers sizes in each direction for particular grid. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{_mpi_manager_8h_a7f74dd70a9343d7863b99db1ee7aaa93}{range\+\_\+i\+\_\+left}~i = 0; i $<$ \hyperlink{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), N\+\_\+lim); i++
-\item 
+\begin{DoxyCompactList}\small\item\em For loop definition for left halo. \end{DoxyCompactList}\item 
 \#define \hyperlink{_mpi_manager_8h_ae102b5fbba39bb67ac10aa46bbeb32db}{range\+\_\+j\+\_\+down}~j = 0; j $<$ \hyperlink{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), M\+\_\+lim); j++
-\item 
+\begin{DoxyCompactList}\small\item\em For loop definition for bottom halo. \end{DoxyCompactList}\item 
 \#define \hyperlink{_mpi_manager_8h_a9c6ba3d0187cb34497c53d9681351208}{range\+\_\+k\+\_\+front}~k = 0; k $<$ \hyperlink{class_grid_utils_abd4068e22339d5272ca551f8cbddec26}{Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), K\+\_\+lim); k++
-\item 
+\begin{DoxyCompactList}\small\item\em For loop definition for front halo. \end{DoxyCompactList}\item 
 \#define \hyperlink{_mpi_manager_8h_a1550e57af2adbabce125ddc9569affef}{range\+\_\+i\+\_\+right}~i = \hyperlink{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{Grid\+Utils\+::up\+To\+Zero}(N\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); i $<$ N\+\_\+lim; i++
-\item 
+\begin{DoxyCompactList}\small\item\em For loop definition for right halo. \end{DoxyCompactList}\item 
 \#define \hyperlink{_mpi_manager_8h_a55c6cd14f59f8e96f73b1ef8b9d506f4}{range\+\_\+j\+\_\+up}~j = \hyperlink{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{Grid\+Utils\+::up\+To\+Zero}(M\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); j $<$ M\+\_\+lim; j++
-\item 
+\begin{DoxyCompactList}\small\item\em For loop definition for top halo. \end{DoxyCompactList}\item 
 \#define \hyperlink{_mpi_manager_8h_ab9b93ffe85b6880a37f61734f78fa5fc}{range\+\_\+k\+\_\+back}~k = \hyperlink{class_grid_utils_a5a3e26a94e62833f0a9e5a4bda066dac}{Grid\+Utils\+::up\+To\+Zero}(K\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); k $<$ K\+\_\+lim; k++
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em For loop definition for back halo. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Macro Definition Documentation}
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+i\+\_\+left@{range\+\_\+i\+\_\+left}}
 \index{range\+\_\+i\+\_\+left@{range\+\_\+i\+\_\+left}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+i\+\_\+left}{range_i_left}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+i\+\_\+left~i = 0; i $<$ {\bf Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), N\+\_\+lim); i++}\hypertarget{_mpi_manager_8h_a7f74dd70a9343d7863b99db1ee7aaa93}{}\label{_mpi_manager_8h_a7f74dd70a9343d7863b99db1ee7aaa93}
+
+
+For loop definition for left halo. 
+
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+i\+\_\+right@{range\+\_\+i\+\_\+right}}
 \index{range\+\_\+i\+\_\+right@{range\+\_\+i\+\_\+right}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+i\+\_\+right}{range_i_right}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+i\+\_\+right~i = {\bf Grid\+Utils\+::up\+To\+Zero}(N\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); i $<$ N\+\_\+lim; i++}\hypertarget{_mpi_manager_8h_a1550e57af2adbabce125ddc9569affef}{}\label{_mpi_manager_8h_a1550e57af2adbabce125ddc9569affef}
+
+
+For loop definition for right halo. 
+
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+j\+\_\+down@{range\+\_\+j\+\_\+down}}
 \index{range\+\_\+j\+\_\+down@{range\+\_\+j\+\_\+down}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+j\+\_\+down}{range_j_down}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+j\+\_\+down~j = 0; j $<$ {\bf Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), M\+\_\+lim); j++}\hypertarget{_mpi_manager_8h_ae102b5fbba39bb67ac10aa46bbeb32db}{}\label{_mpi_manager_8h_ae102b5fbba39bb67ac10aa46bbeb32db}
+
+
+For loop definition for bottom halo. 
+
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+j\+\_\+up@{range\+\_\+j\+\_\+up}}
 \index{range\+\_\+j\+\_\+up@{range\+\_\+j\+\_\+up}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+j\+\_\+up}{range_j_up}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+j\+\_\+up~j = {\bf Grid\+Utils\+::up\+To\+Zero}(M\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); j $<$ M\+\_\+lim; j++}\hypertarget{_mpi_manager_8h_a55c6cd14f59f8e96f73b1ef8b9d506f4}{}\label{_mpi_manager_8h_a55c6cd14f59f8e96f73b1ef8b9d506f4}
+
+
+For loop definition for top halo. 
+
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+k\+\_\+back@{range\+\_\+k\+\_\+back}}
 \index{range\+\_\+k\+\_\+back@{range\+\_\+k\+\_\+back}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+k\+\_\+back}{range_k_back}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+k\+\_\+back~k = {\bf Grid\+Utils\+::up\+To\+Zero}(K\+\_\+lim -\/ (int)pow(2, g-\/$>$level + 1)); k $<$ K\+\_\+lim; k++}\hypertarget{_mpi_manager_8h_ab9b93ffe85b6880a37f61734f78fa5fc}{}\label{_mpi_manager_8h_ab9b93ffe85b6880a37f61734f78fa5fc}
+
+
+For loop definition for back halo. 
+
 \index{Mpi\+Manager.\+h@{Mpi\+Manager.\+h}!range\+\_\+k\+\_\+front@{range\+\_\+k\+\_\+front}}
 \index{range\+\_\+k\+\_\+front@{range\+\_\+k\+\_\+front}!Mpi\+Manager.\+h@{Mpi\+Manager.\+h}}
 \subsubsection[{\texorpdfstring{range\+\_\+k\+\_\+front}{range_k_front}}]{\setlength{\rightskip}{0pt plus 5cm}\#define range\+\_\+k\+\_\+front~k = 0; k $<$ {\bf Grid\+Utils\+::down\+To\+Limit}((int)pow(2, g-\/$>$level + 1), K\+\_\+lim); k++}\hypertarget{_mpi_manager_8h_a9c6ba3d0187cb34497c53d9681351208}{}\label{_mpi_manager_8h_a9c6ba3d0187cb34497c53d9681351208}
+
+
+For loop definition for front halo. 
+

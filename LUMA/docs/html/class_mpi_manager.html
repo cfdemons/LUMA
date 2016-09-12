@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -97,15 +97,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>MPI Manager class.  
+ <a href="class_mpi_manager.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_mpi_manager_8h_source.html">MpiManager.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1buffer__struct.html">buffer_struct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure storing buffers sizes in each direction for particular grid.  <a href="struct_mpi_manager_1_1buffer__struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html">layer_edges</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing global positions of the edges of halos.  <a href="struct_mpi_manager_1_1layer__edges.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">phdf5_struct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for storing halo information for HDF5.  <a href="struct_mpi_manager_1_1phdf5__struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -143,18 +149,25 @@ Static Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#aec1ed834d1a8fa19f87499fb0d5cd332">world_comm</a></td></tr>
+<tr class="memdesc:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global MPI communicator.  <a href="#aec1ed834d1a8fa19f87499fb0d5cd332">More...</a><br /></td></tr>
 <tr class="separator:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e2e923e656c338148d42517323c9586"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a8e2e923e656c338148d42517323c9586">MPI_dims</a> [<a class="el" href="definitions_8h.html#a11cd469956bf6689c2bc034ee698e0b7">L_dims</a>]</td></tr>
+<tr class="memdesc:a8e2e923e656c338148d42517323c9586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of MPI Cartesian topology.  <a href="#a8e2e923e656c338148d42517323c9586">More...</a><br /></td></tr>
 <tr class="separator:a8e2e923e656c338148d42517323c9586"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f3db562bc7ba8871180c5c9ac388c13"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a3f3db562bc7ba8871180c5c9ac388c13">neighbour_rank</a> [<a class="el" href="definitions_8h.html#a3310be18f0cfda9ca2a17c51518a97e9">L_MPI_dir</a>]</td></tr>
+<tr class="memdesc:a3f3db562bc7ba8871180c5c9ac388c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Neighbour rank number for each direction in Cartesian topology.  <a href="#a3f3db562bc7ba8871180c5c9ac388c13">More...</a><br /></td></tr>
 <tr class="separator:a3f3db562bc7ba8871180c5c9ac388c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6db3764ecc637f90afded1f783acb244"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a6db3764ecc637f90afded1f783acb244">neighbour_coords</a> [<a class="el" href="definitions_8h.html#a11cd469956bf6689c2bc034ee698e0b7">L_dims</a>][<a class="el" href="definitions_8h.html#a3310be18f0cfda9ca2a17c51518a97e9">L_MPI_dir</a>]</td></tr>
+<tr class="memdesc:a6db3764ecc637f90afded1f783acb244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates in MPI topology of neighbour ranks.  <a href="#a6db3764ecc637f90afded1f783acb244">More...</a><br /></td></tr>
 <tr class="separator:a6db3764ecc637f90afded1f783acb244"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c65695e5dd2cca3ccb76e83715226f8"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a1c65695e5dd2cca3ccb76e83715226f8">subGrid_comm</a> [<a class="el" href="definitions_8h.html#aad79fd4a1a3f4399bc6b6b8410886cc6">L_NumLev</a> *<a class="el" href="definitions_8h.html#ae2c190fd969f872dea6af9cb4e31e1e2">L_NumReg</a>]</td></tr>
+<tr class="memdesc:a1c65695e5dd2cca3ccb76e83715226f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Communicators for sub-grid / region combinations.  <a href="#a1c65695e5dd2cca3ccb76e83715226f8">More...</a><br /></td></tr>
 <tr class="separator:a1c65695e5dd2cca3ccb76e83715226f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03972530e718d5b0a7f119e9c6132179"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">phdf5_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a03972530e718d5b0a7f119e9c6132179">p_data</a></td></tr>
+<tr class="memdesc:a03972530e718d5b0a7f119e9c6132179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of structures containing halo descriptors for block writing (HDF5)  <a href="#a03972530e718d5b0a7f119e9c6132179">More...</a><br /></td></tr>
 <tr class="separator:a03972530e718d5b0a7f119e9c6132179"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae41fb382e17680a49821077167bf1905"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ae41fb382e17680a49821077167bf1905">global_dims</a> [3]</td></tr>
+<tr class="memdesc:ae41fb382e17680a49821077167bf1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dimensions of problem coarse lattice.  <a href="#ae41fb382e17680a49821077167bf1905">More...</a><br /></td></tr>
 <tr class="separator:ae41fb382e17680a49821077167bf1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ad4a918a4cd19e644ff3295b2854fc6af">local_size</a></td></tr>
 <tr class="separator:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,36 +180,51 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a998340f11dea2614b477e463a1bec543"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_mpi_manager_1_1layer__edges.html">MpiManager::layer_edges</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a998340f11dea2614b477e463a1bec543">recv_layer_pos</a></td></tr>
 <tr class="separator:a998340f11dea2614b477e463a1bec543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafbb74832f69a915927b9bf252bd971d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#aafbb74832f69a915927b9bf252bd971d">f_buffer_send</a></td></tr>
+<tr class="memdesc:aafbb74832f69a915927b9bf252bd971d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of resizeable outgoing buffers used for data transfer.  <a href="#aafbb74832f69a915927b9bf252bd971d">More...</a><br /></td></tr>
 <tr class="separator:aafbb74832f69a915927b9bf252bd971d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8f1eeab50fd4812b3a51af1a6c43713"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ab8f1eeab50fd4812b3a51af1a6c43713">f_buffer_recv</a></td></tr>
+<tr class="memdesc:ab8f1eeab50fd4812b3a51af1a6c43713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of resizeable incoming buffers used for data transfer.  <a href="#ab8f1eeab50fd4812b3a51af1a6c43713">More...</a><br /></td></tr>
 <tr class="separator:ab8f1eeab50fd4812b3a51af1a6c43713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a257bc27e8099f1cbf5ac70b80d8eadaa"><td class="memItemLeft" align="right" valign="top">MPI_Status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a257bc27e8099f1cbf5ac70b80d8eadaa">recv_stat</a></td></tr>
+<tr class="memdesc:a257bc27e8099f1cbf5ac70b80d8eadaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status structure for Receive return information.  <a href="#a257bc27e8099f1cbf5ac70b80d8eadaa">More...</a><br /></td></tr>
 <tr class="separator:a257bc27e8099f1cbf5ac70b80d8eadaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af096663b094d919caba62d4bdf8e7d88"><td class="memItemLeft" align="right" valign="top">MPI_Request&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#af096663b094d919caba62d4bdf8e7d88">send_requests</a> [<a class="el" href="definitions_8h.html#a3310be18f0cfda9ca2a17c51518a97e9">L_MPI_dir</a>]</td></tr>
+<tr class="memdesc:af096663b094d919caba62d4bdf8e7d88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of request structures for handles to posted ISends.  <a href="#af096663b094d919caba62d4bdf8e7d88">More...</a><br /></td></tr>
 <tr class="separator:af096663b094d919caba62d4bdf8e7d88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab129fdffa1925677841f25bcd4507b5e"><td class="memItemLeft" align="right" valign="top">MPI_Status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ab129fdffa1925677841f25bcd4507b5e">send_stat</a> [<a class="el" href="definitions_8h.html#a3310be18f0cfda9ca2a17c51518a97e9">L_MPI_dir</a>]</td></tr>
+<tr class="memdesc:ab129fdffa1925677841f25bcd4507b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of statuses for each Isend.  <a href="#ab129fdffa1925677841f25bcd4507b5e">More...</a><br /></td></tr>
 <tr class="separator:ab129fdffa1925677841f25bcd4507b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a91c2e8cfb15027a0681c198f82d257"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1buffer__struct.html">buffer_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a3a91c2e8cfb15027a0681c198f82d257">buffer_send_info</a></td></tr>
 <tr class="separator:a3a91c2e8cfb15027a0681c198f82d257"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e769fa077d24d62d10a9a0d303009d1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1buffer__struct.html">buffer_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a5e769fa077d24d62d10a9a0d303009d1">buffer_recv_info</a></td></tr>
+<tr class="memdesc:a5e769fa077d24d62d10a9a0d303009d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vectors of buffer_info structures holding buffer size information.  <a href="#a5e769fa077d24d62d10a9a0d303009d1">More...</a><br /></td></tr>
 <tr class="separator:a5e769fa077d24d62d10a9a0d303009d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a2c3010f87e6a8a6c65e6f975e37fb7d5">MPI_cartlab</a> [3][26]</td></tr>
+<tr class="memdesc:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cartesian unit vectors pointing to each neighbour in Cartesian topology.  <a href="#a2c3010f87e6a8a6c65e6f975e37fb7d5">More...</a><br /></td></tr>
 <tr class="separator:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8329212abc23e5fa3e32e961b7823b5b"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a8329212abc23e5fa3e32e961b7823b5b">my_rank</a></td></tr>
+<tr class="memdesc:a8329212abc23e5fa3e32e961b7823b5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rank number.  <a href="#a8329212abc23e5fa3e32e961b7823b5b">More...</a><br /></td></tr>
 <tr class="separator:a8329212abc23e5fa3e32e961b7823b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5156a5e4519f43230b6b84792464e48"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#af5156a5e4519f43230b6b84792464e48">num_ranks</a></td></tr>
+<tr class="memdesc:af5156a5e4519f43230b6b84792464e48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of ranks in MPI Cartesian topology.  <a href="#af5156a5e4519f43230b6b84792464e48">More...</a><br /></td></tr>
 <tr class="separator:af5156a5e4519f43230b6b84792464e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a677a39e98470d3945248a66cf0bc3ec3"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a677a39e98470d3945248a66cf0bc3ec3">MPI_coords</a> [<a class="el" href="definitions_8h.html#a11cd469956bf6689c2bc034ee698e0b7">L_dims</a>]</td></tr>
+<tr class="memdesc:a677a39e98470d3945248a66cf0bc3ec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates in MPI Cartesian topolgy.  <a href="#a677a39e98470d3945248a66cf0bc3ec3">More...</a><br /></td></tr>
 <tr class="separator:a677a39e98470d3945248a66cf0bc3ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1520da6b8a663cba25a1a9822dd81543"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a1520da6b8a663cba25a1a9822dd81543">Grids</a></td></tr>
+<tr class="memdesc:a1520da6b8a663cba25a1a9822dd81543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to grid hierarchy.  <a href="#a1520da6b8a663cba25a1a9822dd81543">More...</a><br /></td></tr>
 <tr class="separator:a1520da6b8a663cba25a1a9822dd81543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbd3a2866235c1d4a32e6806318061fd"><td class="memItemLeft" align="right" valign="top">static std::ofstream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#afbd3a2866235c1d4a32e6806318061fd">logout</a></td></tr>
+<tr class="memdesc:afbd3a2866235c1d4a32e6806318061fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logfile handle.  <a href="#afbd3a2866235c1d4a32e6806318061fd">More...</a><br /></td></tr>
 <tr class="separator:afbd3a2866235c1d4a32e6806318061fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>MPI Manager class. </p>
+<p>Class to manage all MPI apsects of the code. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a03b7914615ccb6e7b8a285f50860d503"></a>
 <div class="memitem">
 <div class="memproto">
@@ -466,6 +494,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Vectors of buffer_info structures holding buffer size information. </p>
+
 </div>
 </div>
 <a class="anchor" id="a3a91c2e8cfb15027a0681c198f82d257"></a>
@@ -490,6 +520,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Array of resizeable incoming buffers used for data transfer. </p>
+
 </div>
 </div>
 <a class="anchor" id="aafbb74832f69a915927b9bf252bd971d"></a>
@@ -501,6 +533,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Array of resizeable outgoing buffers used for data transfer. </p>
 
 </div>
 </div>
@@ -514,6 +548,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Dimensions of problem coarse lattice. </p>
+
 </div>
 </div>
 <a class="anchor" id="a0f994471f9c2986b2c8606b7b716566a"></a>
@@ -525,6 +561,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer). Rows are x,y,z start and end pairs and columns are rank number. </p>
 
 </div>
 </div>
@@ -537,6 +574,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Global positions of coarse lattice nodes represented on this rank (excluding outer overlapping layer). Rows are x,y,z start and end pairs and columns are rank number. </p>
 
 </div>
 </div>
@@ -558,6 +596,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Pointer to grid hierarchy. </p>
+
 </div>
 </div>
 <a class="anchor" id="ad4a918a4cd19e644ff3295b2854fc6af"></a>
@@ -569,6 +609,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Dimensions of coarse lattice represented on this rank (includes inner and outer halos) </p>
 
 </div>
 </div>
@@ -590,6 +631,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Logfile handle. </p>
+
 </div>
 </div>
 <a class="anchor" id="a2c3010f87e6a8a6c65e6f975e37fb7d5"></a>
@@ -610,6 +653,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">    {</div><div class="line">        {1, -1,  1, -1,  0,  0, -1,  1,     0,  0,      1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},</div><div class="line">        {0,  0,  1, -1,  1, -1,  1, -1,     0,  0,      0,  0,  1, -1,  1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1},</div><div class="line">        {0,  0,  0,  0,  0,  0,  0,  0,     1, -1,      1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}</div><div class="line">    }</div></div><!-- fragment -->
+<p>Cartesian unit vectors pointing to each neighbour in Cartesian topology. </p>
+
 </div>
 </div>
 <a class="anchor" id="a677a39e98470d3945248a66cf0bc3ec3"></a>
@@ -630,6 +675,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Coordinates in MPI Cartesian topolgy. </p>
+
 </div>
 </div>
 <a class="anchor" id="a8e2e923e656c338148d42517323c9586"></a>
@@ -641,6 +688,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Size of MPI Cartesian topology. </p>
 
 </div>
 </div>
@@ -662,6 +711,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Rank number. </p>
+
 </div>
 </div>
 <a class="anchor" id="a6db3764ecc637f90afded1f783acb244"></a>
@@ -674,6 +725,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Coordinates in MPI topology of neighbour ranks. </p>
+
 </div>
 </div>
 <a class="anchor" id="a3f3db562bc7ba8871180c5c9ac388c13"></a>
@@ -685,6 +738,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Neighbour rank number for each direction in Cartesian topology. </p>
 
 </div>
 </div>
@@ -706,6 +761,8 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Total number of ranks in MPI Cartesian topology. </p>
+
 </div>
 </div>
 <a class="anchor" id="a03972530e718d5b0a7f119e9c6132179"></a>
@@ -717,6 +774,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Vector of structures containing halo descriptors for block writing (HDF5) </p>
 
 </div>
 </div>
@@ -742,6 +801,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Status structure for Receive return information. </p>
+
 </div>
 </div>
 <a class="anchor" id="af096663b094d919caba62d4bdf8e7d88"></a>
@@ -754,6 +815,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Array of request structures for handles to posted ISends. </p>
+
 </div>
 </div>
 <a class="anchor" id="ab129fdffa1925677841f25bcd4507b5e"></a>
@@ -765,6 +828,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Array of statuses for each Isend. </p>
 
 </div>
 </div>
@@ -790,6 +855,8 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Communicators for sub-grid / region combinations. </p>
+
 </div>
 </div>
 <a class="anchor" id="aec1ed834d1a8fa19f87499fb0d5cd332"></a>
@@ -801,6 +868,8 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Global MPI communicator. </p>
 
 </div>
 </div>

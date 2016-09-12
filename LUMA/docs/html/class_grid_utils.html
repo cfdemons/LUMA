@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -94,6 +94,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Grid utility class.  
+ <a href="class_grid_utils.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_grid_utils_8h_source.html">GridUtils.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
@@ -101,6 +104,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae2c829e8787d4aa03ec961dc84213b0d"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ae2c829e8787d4aa03ec961dc84213b0d">createOutputDirectory</a> (std::string <a class="el" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">path_str</a>)</td></tr>
 <tr class="separator:ae2c829e8787d4aa03ec961dc84213b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a1f0d4a76be76a743c368c9a1d4d46cbc">onespace</a> (int min, int max)</td></tr>
+<tr class="memdesc:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a integer-spaced vector.  <a href="#a1f0d4a76be76a743c368c9a1d4d46cbc">More...</a><br /></td></tr>
 <tr class="separator:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f172a6dd8b2749ca1c8336a64a07e29"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a2f172a6dd8b2749ca1c8336a64a07e29">linspace</a> (double min, double max, int n)</td></tr>
 <tr class="separator:a2f172a6dd8b2749ca1c8336a64a07e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,44 +154,56 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a70a234125350fca607d3943e0f1edd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2b6e1225cab2a840110e2a70f6bd23c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af2b6e1225cab2a840110e2a70f6bd23c">isOnRecvLayer</a> (double site_position, enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> xyz, enum <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax)</td></tr>
 <tr class="separator:af2b6e1225cab2a840110e2a70f6bd23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a991a0072d0ee644ce636718b191f97b1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a991a0072d0ee644ce636718b191f97b1">isOffGrid</a> (int i, int j, int k, int N_lim, int M_lim, int K_lim, <a class="el" href="class_grid_obj.html">GridObj</a> &amp;g)</td></tr>
-<tr class="separator:a991a0072d0ee644ce636718b191f97b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48709fd0b88db1e79bbc3a12026fe33a"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a48709fd0b88db1e79bbc3a12026fe33a">isOffGrid</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> &amp;g)</td></tr>
+<tr class="separator:a48709fd0b88db1e79bbc3a12026fe33a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a78aa4876d7066bce253c52457e7b901d">vecnorm</a> (NumType a1, NumType a2, NumType a3)</td></tr>
+<tr class="memdesc:a78aa4876d7066bce253c52457e7b901d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the L2-norm.  <a href="#a78aa4876d7066bce253c52457e7b901d">More...</a><br /></td></tr>
 <tr class="separator:a78aa4876d7066bce253c52457e7b901d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a169fc043a585f20936b314def45fe7"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a7a169fc043a585f20936b314def45fe7"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a7a169fc043a585f20936b314def45fe7">vecnorm</a> (NumType a1, NumType a2)</td></tr>
+<tr class="memdesc:a7a169fc043a585f20936b314def45fe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the L2-norm.  <a href="#a7a169fc043a585f20936b314def45fe7">More...</a><br /></td></tr>
 <tr class="separator:a7a169fc043a585f20936b314def45fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a3e26a94e62833f0a9e5a4bda066dac"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a5a3e26a94e62833f0a9e5a4bda066dac"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a5a3e26a94e62833f0a9e5a4bda066dac">upToZero</a> (NumType x)</td></tr>
+<tr class="memdesc:a5a3e26a94e62833f0a9e5a4bda066dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rounds a negative value up to zero.  <a href="#a5a3e26a94e62833f0a9e5a4bda066dac">More...</a><br /></td></tr>
 <tr class="separator:a5a3e26a94e62833f0a9e5a4bda066dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd4068e22339d5272ca551f8cbddec26"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:abd4068e22339d5272ca551f8cbddec26"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#abd4068e22339d5272ca551f8cbddec26">downToLimit</a> (NumType x, NumType limit)</td></tr>
+<tr class="memdesc:abd4068e22339d5272ca551f8cbddec26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rounds a value greater than a limit down to this value.  <a href="#abd4068e22339d5272ca551f8cbddec26">More...</a><br /></td></tr>
 <tr class="separator:abd4068e22339d5272ca551f8cbddec26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57edeaeba2d67d187a9edd0b560fe0c2"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a57edeaeba2d67d187a9edd0b560fe0c2"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a57edeaeba2d67d187a9edd0b560fe0c2">factorial</a> (NumType n)</td></tr>
+<tr class="memdesc:a57edeaeba2d67d187a9edd0b560fe0c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the factorial of the supplied value.  <a href="#a57edeaeba2d67d187a9edd0b560fe0c2">More...</a><br /></td></tr>
 <tr class="separator:a57edeaeba2d67d187a9edd0b560fe0c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#aa3ca6e20ef4fa927cb845956d7565b1e">stridedCopy</a> (NumType *dest, NumType *src, size_t block, size_t offset, size_t stride, size_t count, size_t buf_offset=0)</td></tr>
+<tr class="memdesc:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a strided memcpy.  <a href="#aa3ca6e20ef4fa927cb845956d7565b1e">More...</a><br /></td></tr>
 <tr class="separator:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a28cba8aa8cbe5dd20fa3405e2f46eeb2">global_to_local</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; NumType &gt; &amp;locals)</td></tr>
+<tr class="memdesc:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps global indices to local indices.  <a href="#a28cba8aa8cbe5dd20fa3405e2f46eeb2">More...</a><br /></td></tr>
 <tr class="separator:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3e122b19b2ee0e159b3025b2858d895"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:ac3e122b19b2ee0e159b3025b2858d895"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ac3e122b19b2ee0e159b3025b2858d895">local_to_global</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; NumType &gt; &amp;globals)</td></tr>
+<tr class="memdesc:ac3e122b19b2ee0e159b3025b2858d895"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps local indices to global indices.  <a href="#ac3e122b19b2ee0e159b3025b2858d895">More...</a><br /></td></tr>
 <tr class="separator:ac3e122b19b2ee0e159b3025b2858d895"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a298239096e929c1ba4eba925e351c1b3"><td class="memItemLeft" align="right" valign="top">static std::ofstream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a298239096e929c1ba4eba925e351c1b3">logfile</a></td></tr>
+<tr class="memdesc:a298239096e929c1ba4eba925e351c1b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle to output file.  <a href="#a298239096e929c1ba4eba925e351c1b3">More...</a><br /></td></tr>
 <tr class="separator:a298239096e929c1ba4eba925e351c1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b58748e9e05e84852962d7abc7942e3"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">path_str</a></td></tr>
+<tr class="memdesc:a9b58748e9e05e84852962d7abc7942e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Static string representing output path.  <a href="#a9b58748e9e05e84852962d7abc7942e3">More...</a><br /></td></tr>
 <tr class="separator:a9b58748e9e05e84852962d7abc7942e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a609ef43c9476067a52ee238cd3d594f2"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a609ef43c9476067a52ee238cd3d594f2">dir_reflect</a> [<a class="el" href="definitions_8h.html#a11cd469956bf6689c2bc034ee698e0b7">L_dims</a> *2][<a class="el" href="definitions_8h.html#a920e69a22e5f925675c5c77c521d586d">L_nVels</a>]</td></tr>
+<tr class="memdesc:a609ef43c9476067a52ee238cd3d594f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array with hardcoded direction numbering for specular reflection.  <a href="#a609ef43c9476067a52ee238cd3d594f2">More...</a><br /></td></tr>
 <tr class="separator:a609ef43c9476067a52ee238cd3d594f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="class_grid_utils.html">GridUtils</a> Class is a utility class to hold all the general methods used by the <a class="el" href="class_grid_obj.html">GridObj</a> and others. Everything about this is static as no need to instantiate it for every grid on a process. </p>
+<div class="textblock"><p>Grid utility class. </p>
+<p>Class provides grid utilities including commonly used logical tests. This is a static class and so there is no need to instantiate it. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a4e9fc081a19660e9db39428014c04a9c"></a>
 <div class="memitem">
@@ -349,6 +365,17 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Rounds a value greater than a limit down to this value. </p>
+<p>If value is less than or equal to the limit, return the value unchanged.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>value to be rounded </td></tr>
+    <tr><td class="paramname">limit</td><td>value to be rounded down to </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NumType rounded value </dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="a57edeaeba2d67d187a9edd0b560fe0c2"></a>
@@ -374,6 +401,16 @@ template&lt;typename NumType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Computes the factorial of the supplied value. </p>
+<p>If n == 0 then returns 1.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>factorial </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NumType n factorial </dd></dl>
 
 </div>
 </div>
@@ -615,6 +652,19 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Maps global indices to local indices. </p>
+<p>Takes a vector container and populates it with the local indices where the supplied global site can be found on the grid supplied. If global indicies are not found on the supplied grid then local index of -1 is returned.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">i</td><td>global index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">j</td><td>global index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">k</td><td>global index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">g</td><td>grid on which local indices are required </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">locals</td><td>vector container for local indices </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a class="anchor" id="a0863e64842ddc907d0a2ab22b9624e07"></a>
@@ -685,7 +735,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a991a0072d0ee644ce636718b191f97b1"></a>
+<a class="anchor" id="a48709fd0b88db1e79bbc3a12026fe33a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -709,24 +759,6 @@ template&lt;typename NumType &gt; </div>
           <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>N_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>M_lim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>K_lim</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1133,6 +1165,19 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Maps local indices to global indices. </p>
+<p>Takes a vector container and populates it with the global indices of the supplied local site</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">i</td><td>local index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">j</td><td>local index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">k</td><td>local index </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">g</td><td>grid on which global indices are required </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">globals</td><td>vector container for global indices </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a class="anchor" id="a0051918813c63802d79bd7d172e8ad8a"></a>
@@ -1201,6 +1246,9 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Creates a integer-spaced vector. </p>
+<p>Details... </p>
+
 </div>
 </div>
 <a class="anchor" id="aa3ca6e20ef4fa927cb845956d7565b1e"></a>
@@ -1267,6 +1315,21 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Performs a strided memcpy. </p>
+<p>Memcpy() is designed to copy blocks of contiguous memory. Strided copy copies a pattern of contiguous blocks.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dest</td><td>pointer to start of destination memory </td></tr>
+    <tr><td class="paramname">src</td><td>pointer to start of source memory </td></tr>
+    <tr><td class="paramname">block</td><td>size of contiguous block </td></tr>
+    <tr><td class="paramname">offset</td><td>offset from the start of the soruce array </td></tr>
+    <tr><td class="paramname">stride</td><td>number of elements between start of first block and start of second </td></tr>
+    <tr><td class="paramname">count</td><td>number of blocks in pattern </td></tr>
+    <tr><td class="paramname">buf_offset</td><td>offset from start of destination buffer to start writing. Default is zero if not supplied. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a class="anchor" id="a6f5af65d6bb25e0d34be50670b41514f"></a>
@@ -1326,6 +1389,16 @@ template&lt;typename NumType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Rounds a negative value up to zero. </p>
+<p>If value is positive, return the value unchanged.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>value to be rounded </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NumType rounded value </dd></dl>
 
 </div>
 </div>
@@ -1525,6 +1598,17 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Computes the L2-norm. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a1</td><td>first component of the vector </td></tr>
+    <tr><td class="paramname">a2</td><td>second component of the vector </td></tr>
+    <tr><td class="paramname">a3</td><td>third component of the vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NumType scalar quantity </dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="a7a169fc043a585f20936b314def45fe7"></a>
@@ -1561,6 +1645,16 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Computes the L2-norm. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a1</td><td>first component of the vector </td></tr>
+    <tr><td class="paramname">a2</td><td>second component of the vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NumType scalar quantity </dd></dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -1582,6 +1676,8 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= </div><div class="line">    {</div><div class="line">        {1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, </div><div class="line">        {1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},</div><div class="line">        {0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},</div><div class="line">        {0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},</div><div class="line">        {0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18},</div><div class="line">        {0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}</div><div class="line">    }</div></div><!-- fragment -->
+<p>Array with hardcoded direction numbering for specular reflection. </p>
+
 </div>
 </div>
 <a class="anchor" id="a298239096e929c1ba4eba925e351c1b3"></a>
@@ -1602,6 +1698,8 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Handle to output file. </p>
+
 </div>
 </div>
 <a class="anchor" id="a9b58748e9e05e84852962d7abc7942e3"></a>
@@ -1621,6 +1719,8 @@ template&lt;typename NumType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Static string representing output path. </p>
 
 </div>
 </div>

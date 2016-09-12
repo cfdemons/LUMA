@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -106,6 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html">GridObj</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grid class.  <a href="class_grid_obj.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -126,7 +127,8 @@ Enumerations</h2></td></tr>
 <a class="el" href="_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60ea48c21d5907cf7bb1e78688f3a65872b4">eRefinedSymmetry</a>, 
 <a class="el" href="_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7">eRefinedInlet</a>
 <br />
- }</td></tr>
+ }<tr class="memdesc:a12f8ec8f0e7a4584b9fe481bb53fa60e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lattice typing labels.  <a href="_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60e">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:a12f8ec8f0e7a4584b9fe481bb53fa60e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab64098317c22cd5811ee40bf763eabd4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_grid_obj_8h.html#ab64098317c22cd5811ee40bf763eabd4">eBCType</a> { <br />
 &#160;&#160;<a class="el" href="_grid_obj_8h.html#ab64098317c22cd5811ee40bf763eabd4a1c4fe8bab13350da43faf7a72e9a7695">eBCAll</a>, 
@@ -137,7 +139,8 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="_grid_obj_8h.html#ab64098317c22cd5811ee40bf763eabd4a2e1cf58b6b03ea9bc0a021337618adfe">eBCInletOutlet</a>, 
 <a class="el" href="_grid_obj_8h.html#ab64098317c22cd5811ee40bf763eabd4a0d8ec81b5c5cb2f0493f21c03b759ef1">eBCBFL</a>
 <br />
- }</td></tr>
+ }<tr class="memdesc:ab64098317c22cd5811ee40bf763eabd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag for indicating which BCs to apply.  <a href="_grid_obj_8h.html#ab64098317c22cd5811ee40bf763eabd4">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:ab64098317c22cd5811ee40bf763eabd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
@@ -150,18 +153,26 @@ Enumerations</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Flag for indicating which BCs to apply. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4a1c4fe8bab13350da43faf7a72e9a7695"></a>eBCAll&#160;</td><td class="fielddoc">
+<p>Apply all BCs. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4abfed92ed6e40fe8ba941b58d535efe5d"></a>eBCSolidSymmetry&#160;</td><td class="fielddoc">
+<p>Apply just solid and symmetry BCs. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4aabd9c986b6805adda5fcb0c1469dc967"></a>eBCInlet&#160;</td><td class="fielddoc">
+<p>Apply just inlet BCs. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4aa7864078971f6ed79bcf4bf24205fa79"></a>eBCOutlet&#160;</td><td class="fielddoc">
+<p>Apply just outlet BCs. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4a2e1cf58b6b03ea9bc0a021337618adfe"></a>eBCInletOutlet&#160;</td><td class="fielddoc">
+<p>Apply inlet and outlet BCs. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab64098317c22cd5811ee40bf763eabd4a0d8ec81b5c5cb2f0493f21c03b759ef1"></a>eBCBFL&#160;</td><td class="fielddoc">
+<p>Apply just BFL BCs. </p>
 </td></tr>
 </table>
 
@@ -176,31 +187,44 @@ Enumerations</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p><a class="el" href="class_grid_obj.html">GridObj</a> class which represents a lattice </p>
+
+<p>Lattice typing labels. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eafd92f3348822d4af8e98ab34e83c3fd9"></a>eSolid&#160;</td><td class="fielddoc">
+<p>Rigid, solid site. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60ea6e00543f96c72680ac501ac6e636f2cd"></a>eFluid&#160;</td><td class="fielddoc">
+<p>Fluid site. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eaaf00ee0534b31719f0d98692daaaaa3d"></a>eRefined&#160;</td><td class="fielddoc">
+<p>Fluid site which is represented on a finer grid. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60ea48785d8c55a865a753d1cc6f8c19ef45"></a>eTransitionToCoarser&#160;</td><td class="fielddoc">
+<p>Fluid site coupled to a coarser grid. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60ea2d9407ad92b1a90101ab85d57385db78"></a>eTransitionToFiner&#160;</td><td class="fielddoc">
+<p>Fluid site coupled to a finer grid. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eab383600f3c9e0afd5a6e6aa74a354cbe"></a>eBFL&#160;</td><td class="fielddoc">
+<p>Site containing a BFL marker. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eabbc8cdb4bd9f4373d6c53c07ca197968"></a>eSymmetry&#160;</td><td class="fielddoc">
+<p>Symmetry boundary. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60ea9d6c3aa304c07e89d3a2a04709f2ad58"></a>eInlet&#160;</td><td class="fielddoc">
+<p>Inlet boundary. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eaaf6079cc83d05221106f2250e5ec065b"></a>eOutlet&#160;</td><td class="fielddoc">
+<p>Outlet boundary. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eaf8f58615760e2a6fcf179064f09e6b8f"></a>eRefinedSolid&#160;</td><td class="fielddoc">
+<p>Rigid, solid site represented on a finer grid. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60ea48c21d5907cf7bb1e78688f3a65872b4"></a>eRefinedSymmetry&#160;</td><td class="fielddoc">
+<p>Symmtery boundary represented on a finer grid. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7"></a>eRefinedInlet&#160;</td><td class="fielddoc">
+<p>Inlet site represented on a finer grid. </p>
 </td></tr>
 </table>
 

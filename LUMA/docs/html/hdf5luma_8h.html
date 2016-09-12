@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -120,13 +120,15 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827a597cd6cec91bff703fda89142d03b238">ePosY</a>, 
 <a class="el" href="hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61">ePosZ</a>
 <br />
- }</td></tr>
+ }<tr class="memdesc:aeb801087dd3059ef3a744ba98ed90827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the type of storage arrangement of the variable in memory.  <a href="hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:aeb801087dd3059ef3a744ba98ed90827"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a4ee29a9ff13d50dbd028587437297263"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a4ee29a9ff13d50dbd028587437297263"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="hdf5luma_8h.html#a4ee29a9ff13d50dbd028587437297263">hdf5_writeDataSet</a> (hid_t &amp;memspace, hid_t &amp;filespace, hid_t &amp;dataset_id, <a class="el" href="hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827">eHdf5SlabType</a> slab_type, int N_lim, int M_lim, int K_lim, int N_mod, int M_mod, int K_mod, <a class="el" href="class_grid_obj.html">GridObj</a> *g, T *data, hid_t hdf_datatype, int TL_thickness, <a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">MpiManager::phdf5_struct</a> hdf_data)</td></tr>
+<tr class="memdesc:a4ee29a9ff13d50dbd028587437297263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to write out using HDF5.  <a href="#a4ee29a9ff13d50dbd028587437297263">More...</a><br /></td></tr>
 <tr class="separator:a4ee29a9ff13d50dbd028587437297263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -176,18 +178,27 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Defines the type of storage arrangement of the variable in memory. </p>
+<p>The write wrapper can then extract the data from memeory and write it to an HDF5 file using a particular hyperslab selection. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827a3a5dd65dfe6ec49968f76885b28a40e3"></a>eScalar&#160;</td><td class="fielddoc">
+<p>2/3D data &ndash; One variable per grid site </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827a0cb24ca4f528f9ee7efe120eaf3ad303"></a>eVector&#160;</td><td class="fielddoc">
+<p>2/3D data &ndash; L_dims variables per grid site </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827ab7c51b08bef16bbff8d6eb5d778b2fae"></a>eProductVector&#160;</td><td class="fielddoc">
+<p>1D data &ndash; 3*L_dims-3 variables per grid site </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827a765af6d80c8591a52c18f24c0c24614e"></a>ePosX&#160;</td><td class="fielddoc">
+<p>1D data &ndash; Single L_dim vector per dimension </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827a597cd6cec91bff703fda89142d03b238"></a>ePosY&#160;</td><td class="fielddoc">
+<p>1D data &ndash; Single L_dim vector per dimension </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61"></a>ePosZ&#160;</td><td class="fielddoc">
+<p>1D data &ndash; Single L_dim vector per dimension </p>
 </td></tr>
 </table>
 
@@ -297,6 +308,28 @@ template&lt;typename T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Helper method to write out using HDF5. </p>
+<p>Automatically selects the correct slab arrangement and buffers the data accordingly before writing to structured file. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">memspace</td><td>memory dataspace id </td></tr>
+    <tr><td class="paramname">filespace</td><td>file dataspace id </td></tr>
+    <tr><td class="paramname">dataset_id</td><td>dataset id </td></tr>
+    <tr><td class="paramname">slab_type</td><td>slab type enum </td></tr>
+    <tr><td class="paramname">N_lim</td><td>number of X-direction sites on the local grid </td></tr>
+    <tr><td class="paramname">M_lim</td><td>number of Y-direction sites on the local grid </td></tr>
+    <tr><td class="paramname">K_lim</td><td>number of Z-direction sites on the local grid </td></tr>
+    <tr><td class="paramname">N_mod</td><td>number of X-direction sites excluding TL sites </td></tr>
+    <tr><td class="paramname">M_mod</td><td>number of Y-direction sites excluding TL sites </td></tr>
+    <tr><td class="paramname">K_mod</td><td>number of Z-direction sites excluding TL sites </td></tr>
+    <tr><td class="paramname">g</td><td>pointer to grid which we are writing out </td></tr>
+    <tr><td class="paramname">data</td><td>pointer to the start of the array to be written </td></tr>
+    <tr><td class="paramname">hdf_datatype</td><td>HDF5 datatype being written </td></tr>
+    <tr><td class="paramname">TL_thickness</td><td>the thickness of the TL on this grid level in local lattice units </td></tr>
+    <tr><td class="paramname">hdf_data</td><td>the data structure containing information about local halos </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

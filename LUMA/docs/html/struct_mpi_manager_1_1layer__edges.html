@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -97,18 +97,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Structure containing global positions of the edges of halos.  
+ <a href="struct_mpi_manager_1_1layer__edges.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_mpi_manager_8h_source.html">MpiManager.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a9f79fa4b504f2d4418f2bc4747cc908c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html#a9f79fa4b504f2d4418f2bc4747cc908c">X</a> [4]</td></tr>
+<tr class="memdesc:a9f79fa4b504f2d4418f2bc4747cc908c"><td class="mdescLeft">&#160;</td><td class="mdescRight">X limits.  <a href="#a9f79fa4b504f2d4418f2bc4747cc908c">More...</a><br /></td></tr>
 <tr class="separator:a9f79fa4b504f2d4418f2bc4747cc908c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4d880e027a6410ff4b34e28dcd1f9d4"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html#aa4d880e027a6410ff4b34e28dcd1f9d4">Y</a> [4]</td></tr>
+<tr class="memdesc:aa4d880e027a6410ff4b34e28dcd1f9d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Y limits.  <a href="#aa4d880e027a6410ff4b34e28dcd1f9d4">More...</a><br /></td></tr>
 <tr class="separator:aa4d880e027a6410ff4b34e28dcd1f9d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25eea1176a0c06c1e25a7a08b8840283"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html#a25eea1176a0c06c1e25a7a08b8840283">Z</a> [4]</td></tr>
+<tr class="memdesc:a25eea1176a0c06c1e25a7a08b8840283"><td class="mdescLeft">&#160;</td><td class="mdescRight">Z limits.  <a href="#a25eea1176a0c06c1e25a7a08b8840283">More...</a><br /></td></tr>
 <tr class="separator:a25eea1176a0c06c1e25a7a08b8840283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Data Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Structure containing global positions of the edges of halos. </p>
+<p>Sender (inner) and receiver (outer) parts of halo are located using the convention [left_min left_max right_min right_max] for X,Y and Z. </p>
+</div><h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="a9f79fa4b504f2d4418f2bc4747cc908c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -118,6 +127,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>X limits. </p>
 
 </div>
 </div>
@@ -131,6 +142,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Y limits. </p>
+
 </div>
 </div>
 <a class="anchor" id="a25eea1176a0c06c1e25a7a08b8840283"></a>
@@ -142,6 +155,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Z limits. </p>
 
 </div>
 </div>

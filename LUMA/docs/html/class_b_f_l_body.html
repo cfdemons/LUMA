@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -96,6 +96,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>BFL body.  
+ <a href="class_b_f_l_body.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_b_f_l_body_8h_source.html">BFLBody.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for BFLBody:</div>
@@ -117,10 +120,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5dc2907ac609b0fb0a89347b4f66f2ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_body"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_body')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_body.html">Body&lt; BFLMarker &gt;</a></td></tr>
 <tr class="memitem:a684a431c9215429149f36949ab007353 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a684a431c9215429149f36949ab007353">Body</a> (void)</td></tr>
+<tr class="memdesc:a684a431c9215429149f36949ab007353 inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">&lt; Default Constructor  <a href="#a684a431c9215429149f36949ab007353">More...</a><br /></td></tr>
 <tr class="separator:a684a431c9215429149f36949ab007353 inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a939c580274ddf89d1a7e8c6b12ea70ca inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a939c580274ddf89d1a7e8c6b12ea70ca">Body</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
+<tr class="memdesc:a939c580274ddf89d1a7e8c6b12ea70ca inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor setting owning grid.  <a href="#a939c580274ddf89d1a7e8c6b12ea70ca">More...</a><br /></td></tr>
 <tr class="separator:a939c580274ddf89d1a7e8c6b12ea70ca inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a62fb64b91f20eeef2d454994bdbc8b37">~Body</a> (void)</td></tr>
+<tr class="memdesc:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor.  <a href="#a62fb64b91f20eeef2d454994bdbc8b37">More...</a><br /></td></tr>
 <tr class="separator:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -131,28 +137,38 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a2c98a2521ad9c1a3831a6004f867a307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_class_body"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_body')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_body.html">Body&lt; BFLMarker &gt;</a></td></tr>
 <tr class="memitem:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa965f7b498528230aa2f56a9abf6bf06">addMarker</a> (double x, double y, double z)</td></tr>
+<tr class="memdesc:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add marker to the body.  <a href="#aa965f7b498528230aa2f56a9abf6bf06">More...</a><br /></td></tr>
 <tr class="separator:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebc3c7911b4ad10b1f9853d3f5fc7514 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_marker_data.html">MarkerData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aebc3c7911b4ad10b1f9853d3f5fc7514">getMarkerData</a> (double x, double y, double z)</td></tr>
+<tr class="memdesc:aebc3c7911b4ad10b1f9853d3f5fc7514 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve marker data.  <a href="#aebc3c7911b4ad10b1f9853d3f5fc7514">More...</a><br /></td></tr>
 <tr class="separator:aebc3c7911b4ad10b1f9853d3f5fc7514 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a3a1ba74da8020cc3ee7f4fffde0b4477">markerAdder</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter)</td></tr>
+<tr class="memdesc:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling marker adding method.  <a href="#a3a1ba74da8020cc3ee7f4fffde0b4477">More...</a><br /></td></tr>
 <tr class="separator:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa7733bbcd85af5fa4e8822889fba7b33">isInVoxel</a> (double x, double y, double z, int curr_mark)</td></tr>
+<tr class="memdesc:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether a point is inside another marker's support voxel.  <a href="#aa7733bbcd85af5fa4e8822889fba7b33">More...</a><br /></td></tr>
 <tr class="separator:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a3ed926c01461f32d64b4a5405e920e36">isVoxelMarkerVoxel</a> (double x, double y, double z)</td></tr>
+<tr class="memdesc:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether a point is inside an existing marker's support voxel.  <a href="#a3ed926c01461f32d64b4a5405e920e36">More...</a><br /></td></tr>
 <tr class="separator:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a77b97a6b61e16616ab718c56c3a34622"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_f_l_body.html#a77b97a6b61e16616ab718c56c3a34622">Q</a></td></tr>
+<tr class="memdesc:a77b97a6b61e16616ab718c56c3a34622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance between adjacent lattice site and the surface of the body.  <a href="#a77b97a6b61e16616ab718c56c3a34622">More...</a><br /></td></tr>
 <tr class="separator:a77b97a6b61e16616ab718c56c3a34622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_body"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_body')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="class_body.html">Body&lt; BFLMarker &gt;</a></td></tr>
 <tr class="memitem:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a1d4ac2e6fdbc946d5eab0973fd78770b">spacing</a></td></tr>
+<tr class="memdesc:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spacing of the markers in physical units.  <a href="#a1d4ac2e6fdbc946d5eab0973fd78770b">More...</a><br /></td></tr>
 <tr class="separator:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_b_f_l_marker.html">BFLMarker</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a4e0ac821f2331ec67793a44e36c855e3">markers</a></td></tr>
+<tr class="memdesc:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of markers which make up the body.  <a href="#a4e0ac821f2331ec67793a44e36c855e3">More...</a><br /></td></tr>
 <tr class="separator:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a2701bdb00789d26ed72d6138d2e21bcb">closed_surface</a></td></tr>
+<tr class="memdesc:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to specify whether or not it is a closed surface (for output)  <a href="#a2701bdb00789d26ed72d6138d2e21bcb">More...</a><br /></td></tr>
 <tr class="separator:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a5197f31e50222c32adefb795a93d7156">_Owner</a></td></tr>
+<tr class="memdesc:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to owning grid.  <a href="#a5197f31e50222c32adefb795a93d7156">More...</a><br /></td></tr>
 <tr class="separator:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -160,7 +176,10 @@ Friends</h2></td></tr>
 <tr class="memitem:a55cfec1721fb1b9d9e7592bd6288c998"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_f_l_body.html#a55cfec1721fb1b9d9e7592bd6288c998">GridObj</a></td></tr>
 <tr class="separator:a55cfec1721fb1b9d9e7592bd6288c998"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>BFL body. </p>
+<p>A BFL body is made up of a collection of BFLMarkers. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ab7b3b9f55b59b977401bcf8dead8cfce"></a>
 <div class="memitem">
 <div class="memproto">
@@ -375,6 +394,9 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Distance between adjacent lattice site and the surface of the body. </p>
+<p>There are two stores of values. Store 1 is the distance on one side of the wall and store 2 the distance on the other side. One store is appended to the other in this structure. </p>
 
 </div>
 </div>

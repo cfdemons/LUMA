@@ -22,13 +22,13 @@ enum \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Ty
 \\*
 \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a597cd6cec91bff703fda89142d03b238}{e\+PosY}, 
 \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61}{e\+PosZ}
- \}
+ \}\begin{DoxyCompactList}\small\item\em Defines the type of storage arrangement of the variable in memory. \end{DoxyCompactList}
 \end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
 {\footnotesize template$<$typename T $>$ }\\void \hyperlink{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}{hdf5\+\_\+write\+Data\+Set} (hid\+\_\+t \&memspace, hid\+\_\+t \&filespace, hid\+\_\+t \&dataset\+\_\+id, \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Type} slab\+\_\+type, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, int N\+\_\+mod, int M\+\_\+mod, int K\+\_\+mod, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, T $\ast$data, hid\+\_\+t hdf\+\_\+datatype, int T\+L\+\_\+thickness, \hyperlink{struct_mpi_manager_1_1phdf5__struct}{Mpi\+Manager\+::phdf5\+\_\+struct} hdf\+\_\+data)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Helper method to write out using H\+D\+F5. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Macro Definition Documentation}
@@ -47,22 +47,26 @@ enum \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Ty
 \index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Hdf5\+Slab\+Type@{e\+Hdf5\+Slab\+Type}}
 \index{e\+Hdf5\+Slab\+Type@{e\+Hdf5\+Slab\+Type}!hdf5luma.\+h@{hdf5luma.\+h}}
 \subsubsection[{\texorpdfstring{e\+Hdf5\+Slab\+Type}{eHdf5SlabType}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+Hdf5\+Slab\+Type}}\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}
-\begin{Desc}
+
+
+Defines the type of storage arrangement of the variable in memory. 
+
+The write wrapper can then extract the data from memeory and write it to an H\+D\+F5 file using a particular hyperslab selection. \begin{Desc}
 \item[Enumerator]\par
 \begin{description}
 \index{e\+Scalar@{e\+Scalar}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Scalar@{e\+Scalar}}\item[{\em 
 e\+Scalar\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a3a5dd65dfe6ec49968f76885b28a40e3}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a3a5dd65dfe6ec49968f76885b28a40e3}
-}]\index{e\+Vector@{e\+Vector}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Vector@{e\+Vector}}\item[{\em 
+}]2/3D data -- One variable per grid site \index{e\+Vector@{e\+Vector}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Vector@{e\+Vector}}\item[{\em 
 e\+Vector\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a0cb24ca4f528f9ee7efe120eaf3ad303}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a0cb24ca4f528f9ee7efe120eaf3ad303}
-}]\index{e\+Product\+Vector@{e\+Product\+Vector}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Product\+Vector@{e\+Product\+Vector}}\item[{\em 
+}]2/3D data -- L\+\_\+dims variables per grid site \index{e\+Product\+Vector@{e\+Product\+Vector}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+Product\+Vector@{e\+Product\+Vector}}\item[{\em 
 e\+Product\+Vector\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ab7c51b08bef16bbff8d6eb5d778b2fae}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ab7c51b08bef16bbff8d6eb5d778b2fae}
-}]\index{e\+PosX@{e\+PosX}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosX@{e\+PosX}}\item[{\em 
+}]1D data -- 3$\ast$\+L\+\_\+dims-\/3 variables per grid site \index{e\+PosX@{e\+PosX}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosX@{e\+PosX}}\item[{\em 
 e\+PosX\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a765af6d80c8591a52c18f24c0c24614e}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a765af6d80c8591a52c18f24c0c24614e}
-}]\index{e\+PosY@{e\+PosY}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosY@{e\+PosY}}\item[{\em 
+}]1D data -- Single L\+\_\+dim vector per dimension \index{e\+PosY@{e\+PosY}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosY@{e\+PosY}}\item[{\em 
 e\+PosY\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a597cd6cec91bff703fda89142d03b238}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827a597cd6cec91bff703fda89142d03b238}
-}]\index{e\+PosZ@{e\+PosZ}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosZ@{e\+PosZ}}\item[{\em 
+}]1D data -- Single L\+\_\+dim vector per dimension \index{e\+PosZ@{e\+PosZ}!hdf5luma.\+h@{hdf5luma.\+h}}\index{hdf5luma.\+h@{hdf5luma.\+h}!e\+PosZ@{e\+PosZ}}\item[{\em 
 e\+PosZ\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61}{}\label{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61}
-}]\end{description}
+}]1D data -- Single L\+\_\+dim vector per dimension \end{description}
 \end{Desc}
 
 
@@ -88,3 +92,40 @@ e\+PosZ\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d01300493
 \item[{{\bf Mpi\+Manager\+::phdf5\+\_\+struct}}]{hdf\+\_\+data}
 \end{DoxyParamCaption}
 )}\hypertarget{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}{}\label{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}
+
+
+Helper method to write out using H\+D\+F5. 
+
+Automatically selects the correct slab arrangement and buffers the data accordingly before writing to structured file. 
+\begin{DoxyParams}{Parameters}
+{\em memspace} & memory dataspace id \\
+\hline
+{\em filespace} & file dataspace id \\
+\hline
+{\em dataset\+\_\+id} & dataset id \\
+\hline
+{\em slab\+\_\+type} & slab type enum \\
+\hline
+{\em N\+\_\+lim} & number of X-\/direction sites on the local grid \\
+\hline
+{\em M\+\_\+lim} & number of Y-\/direction sites on the local grid \\
+\hline
+{\em K\+\_\+lim} & number of Z-\/direction sites on the local grid \\
+\hline
+{\em N\+\_\+mod} & number of X-\/direction sites excluding TL sites \\
+\hline
+{\em M\+\_\+mod} & number of Y-\/direction sites excluding TL sites \\
+\hline
+{\em K\+\_\+mod} & number of Z-\/direction sites excluding TL sites \\
+\hline
+{\em g} & pointer to grid which we are writing out \\
+\hline
+{\em data} & pointer to the start of the array to be written \\
+\hline
+{\em hdf\+\_\+datatype} & H\+D\+F5 datatype being written \\
+\hline
+{\em T\+L\+\_\+thickness} & the thickness of the TL on this grid level in local lattice units \\
+\hline
+{\em hdf\+\_\+data} & the data structure containing information about local halos \\
+\hline
+\end{DoxyParams}

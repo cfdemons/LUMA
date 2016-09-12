@@ -14,7 +14,7 @@
 */
 
 #if (defined L_BUILD_FOR_MPI && !defined H5_HAVE_PARALLEL)
-	#define H5_HAVE_PARALLEL
+	#define H5_HAVE_PARALLEL	///< Enable parallel HDF5
 #endif
 
 #include "hdf5.h"	// Load C API
@@ -25,19 +25,40 @@
 #define HDF5_EXT_SZIP
 
 #pragma once	// Just define the enumerated type once
+/// \enum	eHdf5SlabType
+///	\brief	Defines the type of storage arrangement of the variable in memory.
+///
+///			The write wrapper can then extract the data from memeory and write it
+///			to an HDF5 file using a particular hyperslab selection.
 enum eHdf5SlabType {
-	eScalar,		/* 2/3D data	-- One variable per grid site			*/
-	eVector,		/* 2/3D data	-- L_dims variables per grid site		*/
-	eProductVector,	/* 1D data		-- 3*L_dims-3 variables per grid site	*/
-	ePosX,			/* 1D data		-- Single L_dim vector per dimension	*/
-	ePosY,			/* 1D data		-- Single L_dim vector per dimension	*/
-	ePosZ			/* 1D data		-- Single L_dim vector per dimension	*/
+	eScalar,		///< 2/3D data	-- One variable per grid site
+	eVector,		///< 2/3D data	-- L_dims variables per grid site
+	eProductVector,	///< 1D data	-- 3*L_dims-3 variables per grid site
+	ePosX,			///< 1D data	-- Single L_dim vector per dimension
+	ePosY,			///< 1D data	-- Single L_dim vector per dimension
+	ePosZ			///< 1D data	-- Single L_dim vector per dimension
 };
 
-// ***************************************************************************//
-// Helper method to write out using HDF5 which automatically selects the 
-// correct slab arrangement and buffers the data accordingly.
-
+//***************************************************************************//
+/// \brief	Helper method to write out using HDF5.
+///
+///			Automatically selects the correct slab arrangement and buffers the 
+///			data accordingly before writing to structured file.
+/// \param memspace memory dataspace id
+/// \param filespace file dataspace id
+/// \param dataset_id dataset id
+/// \param slab_type slab type enum
+/// \param N_lim number of X-direction sites on the local grid
+/// \param M_lim number of Y-direction sites on the local grid
+/// \param K_lim number of Z-direction sites on the local grid
+/// \param N_mod number of X-direction sites excluding TL sites
+/// \param M_mod number of Y-direction sites excluding TL sites
+/// \param K_mod number of Z-direction sites excluding TL sites
+/// \param g pointer to grid which we are writing out
+/// \param data pointer to the start of the array to be written
+/// \param hdf_datatype HDF5 datatype being written
+/// \param TL_thickness the thickness of the TL on this grid level in local lattice units
+/// \param hdf_data the data structure containing information about local halos
 template <typename T>
 void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	eHdf5SlabType slab_type,

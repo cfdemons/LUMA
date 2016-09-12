@@ -2,6 +2,11 @@
 \label{class_object_manager}\index{Object\+Manager@{Object\+Manager}}
 
 
+Object Manager class.  
+
+
+
+
 {\ttfamily \#include $<$Object\+Manager.\+h$>$}
 
 \subsection*{Public Member Functions}
@@ -49,6 +54,8 @@ std\+::vector$<$ int $>$ \hyperlink{class_object_manager_a68230ad49b979c2fe963cb
 \item 
 int \hyperlink{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{get\+Vox\+Ind} (double p)
 \item 
+void \hyperlink{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{compute\+Lift\+Drag} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\item 
 void \hyperlink{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{io\+\_\+vtk\+\_\+\+I\+Bwriter} (double tval)
 \item 
 void \hyperlink{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{io\+\_\+write\+\_\+body\+\_\+pos} (int timestep)
@@ -58,22 +65,29 @@ void \hyperlink{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{io\+\_\+
 void \hyperlink{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{io\+\_\+restart} (bool I\+O\+\_\+flag, int level)
 \item 
 void \hyperlink{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{io\+\_\+read\+In\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{_object_manager_8h_a7b78fa3db30dfb9c1efc82bf886fe184}{e\+Object\+Type} objtype)
+\item 
+void \hyperlink{class_object_manager_adf65260d81584613fa33f2e7658f1b36}{io\+\_\+write\+Force\+On\+Object} (double tval)
 \end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
 static \hyperlink{class_object_manager}{Object\+Manager} $\ast$ \hyperlink{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}{get\+Instance} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Get instance method. \end{DoxyCompactList}\item 
 static void \hyperlink{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}{destroy\+Instance} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Destroy instance method. \end{DoxyCompactList}\item 
 static \hyperlink{class_object_manager}{Object\+Manager} $\ast$ \hyperlink{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}{get\+Instance} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Overloaded get instance passing in pointer to grid hierarchy. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+Obj}
 \end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+Object Manager class. 
+
+Class to manage all objects in the domain from creation through manipulation to destruction. 
 
 \subsection{Member Function Documentation}
 \index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
@@ -90,6 +104,16 @@ class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+O
 \item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{}\label{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}
+\index{Object\+Manager@{Object\+Manager}!compute\+Lift\+Drag@{compute\+Lift\+Drag}}
+\index{compute\+Lift\+Drag@{compute\+Lift\+Drag}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{compute\+Lift\+Drag(int i, int j, int k, Grid\+Obj $\ast$g)}{computeLiftDrag(int i, int j, int k, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::compute\+Lift\+Drag (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{}\label{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}
 \index{Object\+Manager@{Object\+Manager}!destroy\+Instance@{destroy\+Instance}}
 \index{destroy\+Instance@{destroy\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{destroy\+Instance()}{destroyInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::destroy\+Instance (
@@ -97,6 +121,10 @@ class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+O
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}{}\label{class_object_manager_a5945decc43eb5fdeaaad101fa7aa282f}
+
+
+Destroy instance method. 
+
 \index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
 \index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Instance()}{getInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
@@ -104,6 +132,10 @@ class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+O
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}{}\label{class_object_manager_acf7a2f12f034c76d9e3a5aa5837dddb5}
+
+
+Get instance method. 
+
 \index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
 \index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Instance(\+Grid\+Obj $\ast$g)}{getInstance(GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
@@ -111,6 +143,10 @@ class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+O
 \item[{{\bf Grid\+Obj} $\ast$}]{g}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}{}\label{class_object_manager_a3c648f3d7388df47db0db9fcb4b8b618}
+
+
+Overloaded get instance passing in pointer to grid hierarchy. 
+
 \index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
 \index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Object\+Manager\+::get\+Vox\+Ind (
@@ -310,6 +346,13 @@ class \hyperlink{class_object_manager_a55cfec1721fb1b9d9e7592bd6288c998}{Grid\+O
 \item[{int}]{timestep}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{}\label{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+Force\+On\+Object@{io\+\_\+write\+Force\+On\+Object}}
+\index{io\+\_\+write\+Force\+On\+Object@{io\+\_\+write\+Force\+On\+Object}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+write\+Force\+On\+Object(double tval)}{io_writeForceOnObject(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+Force\+On\+Object (
+\begin{DoxyParamCaption}
+\item[{double}]{tval}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_adf65260d81584613fa33f2e7658f1b36}{}\label{class_object_manager_adf65260d81584613fa33f2e7658f1b36}
 
 
 \subsection{Friends And Related Function Documentation}

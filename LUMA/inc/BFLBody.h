@@ -19,7 +19,9 @@
 #include "PCpts.h"
 #include "ObjectManager.h"
 
-// Definition of the BFL body class representing a BFL body made up of BFLMarkers //
+/// \brief	BFL body.
+///
+///			A BFL body is made up of a collection of BFLMarkers.
 class BFLBody :
 	public Body<BFLMarker>
 {
@@ -41,7 +43,11 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	// Q values (append store 2 onto store 1)
+	/// \brief	Distance between adjacent lattice site and the surface of the body.
+	///
+	///			There are two stores of values. Store 1 is the distance on one 
+	///			side of the wall and store 2 the distance on the other side. 
+	///			One store is appended to the other in this structure.
 	std::vector< std::vector<double> > Q;
 
 

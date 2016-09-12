@@ -8,18 +8,18 @@
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{class_grid_utils}{Grid\+Utils}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Grid utility class. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
 enum \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} \{ \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}, 
 \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}{e\+Y\+Direction}, 
 \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}{e\+Z\+Direction}
- \}
+ \}\begin{DoxyCompactList}\small\item\em Enumeration for directional options. \end{DoxyCompactList}
 \item 
 enum \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} \{ \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fa685aa113e3d0e867795042b26fb1f96a}{e\+Minimum}, 
 \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fad7a43efd0c24ef3b2cacd24bb5ffe684}{e\+Maximum}
- \}
+ \}\begin{DoxyCompactList}\small\item\em Enumeration for minimum and maximum. \end{DoxyCompactList}
 \end{DoxyCompactItemize}
 
 
@@ -27,26 +27,34 @@ enum \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} \
 \index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Cartesian\+Direction@{e\+Cartesian\+Direction}}
 \index{e\+Cartesian\+Direction@{e\+Cartesian\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}
 \subsubsection[{\texorpdfstring{e\+Cartesian\+Direction}{eCartesianDirection}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+Cartesian\+Direction}}\hypertarget{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{}\label{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}
+
+
+Enumeration for directional options. 
+
 \begin{Desc}
 \item[Enumerator]\par
 \begin{description}
 \index{e\+X\+Direction@{e\+X\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+X\+Direction@{e\+X\+Direction}}\item[{\em 
 e\+X\+Direction\hypertarget{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{}\label{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}
-}]\index{e\+Y\+Direction@{e\+Y\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Y\+Direction@{e\+Y\+Direction}}\item[{\em 
+}]X-\/direction. \index{e\+Y\+Direction@{e\+Y\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Y\+Direction@{e\+Y\+Direction}}\item[{\em 
 e\+Y\+Direction\hypertarget{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}{}\label{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}
-}]\index{e\+Z\+Direction@{e\+Z\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Z\+Direction@{e\+Z\+Direction}}\item[{\em 
+}]Y-\/direction. \index{e\+Z\+Direction@{e\+Z\+Direction}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Z\+Direction@{e\+Z\+Direction}}\item[{\em 
 e\+Z\+Direction\hypertarget{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}{}\label{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}
-}]\end{description}
+}]Z-\/direction. \end{description}
 \end{Desc}
 \index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Min\+Max@{e\+Min\+Max}}
 \index{e\+Min\+Max@{e\+Min\+Max}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}
 \subsubsection[{\texorpdfstring{e\+Min\+Max}{eMinMax}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+Min\+Max}}\hypertarget{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{}\label{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}
-\begin{Desc}
+
+
+Enumeration for minimum and maximum. 
+
+Some utility methods need to know whether they should be looking at or for a maximum or minimum edge of a grid so we use this enumeration to specify. \begin{Desc}
 \item[Enumerator]\par
 \begin{description}
 \index{e\+Minimum@{e\+Minimum}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Minimum@{e\+Minimum}}\item[{\em 
 e\+Minimum\hypertarget{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fa685aa113e3d0e867795042b26fb1f96a}{}\label{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fa685aa113e3d0e867795042b26fb1f96a}
-}]\index{e\+Maximum@{e\+Maximum}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Maximum@{e\+Maximum}}\item[{\em 
+}]Minimum. \index{e\+Maximum@{e\+Maximum}!Grid\+Utils.\+h@{Grid\+Utils.\+h}}\index{Grid\+Utils.\+h@{Grid\+Utils.\+h}!e\+Maximum@{e\+Maximum}}\item[{\em 
 e\+Maximum\hypertarget{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fad7a43efd0c24ef3b2cacd24bb5ffe684}{}\label{_grid_utils_8h_a8e005b039da2246588381c4feeeac43fad7a43efd0c24ef3b2cacd24bb5ffe684}
-}]\end{description}
+}]Maximum. \end{description}
 \end{Desc}

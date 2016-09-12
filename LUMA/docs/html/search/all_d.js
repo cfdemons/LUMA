@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['m_5flim',['M_lim',['../class_grid_obj.html#a01d3f362634c896ecdb80f0e6304c12f',1,'GridObj']]],
   ['main',['main',['../main__lbm_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main_lbm.cpp']]],
   ['main_5flbm_2ecpp',['main_lbm.cpp',['../main__lbm_8cpp.html',1,'']]],
   ['makebody',['makeBody',['../class_i_b_body.html#af26b0107e612dab7cd1e73bac1f4f234',1,'IBBody::makeBody(double radius, std::vector&lt; double &gt; centre, bool flex_rigid, bool moving, int group)'],['../class_i_b_body.html#a5c3f3da65bdaca7bee4ebea5a06b8bdd',1,'IBBody::makeBody(std::vector&lt; double &gt; width_length_depth, std::vector&lt; double &gt; angles, std::vector&lt; double &gt; centre, bool flex_rigid, bool deform, int group)'],['../class_i_b_body.html#ab83346d555202a5cf669c7e309dc856a',1,'IBBody::makeBody(int numbermarkers, std::vector&lt; double &gt; start_point, double fil_length, std::vector&lt; double &gt; angles, std::vector&lt; int &gt; BCs, bool flex_rigid, bool deform, int group)'],['../class_i_b_body.html#a34380e523aef0978495d52bc91f3d74b',1,'IBBody::makeBody(std::vector&lt; double &gt; width_length, double angle, std::vector&lt; double &gt; centre, bool flex_rigid, bool deform, int group, bool plate)'],['../class_i_b_body.html#aad21167e57221cb4faf5a15ffebc438d',1,'IBBody::makeBody(PCpts *_PCpts)']]],

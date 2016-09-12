@@ -21,13 +21,18 @@
 #include "BFLBody.h"
 #include "IVector.h"
 #include "globalvars.h"
-
+/// \enum  eObjectType
+/// \brief Specifies the type of body being processed.
 enum eObjectType {
-	eBBBCloud,	// Bounce-back body
-	eBFLCloud,	// BFL body
-	eIBBCloud	// Immersed boundary body
+	eBBBCloud,	///< Bounce-back body
+	eBFLCloud,	///< BFL body
+	eIBBCloud	///< Immersed boundary body
 };
 
+/// \brief	Object Manager class.
+///
+///			Class to manage all objects in the domain from creation through 
+///			manipulation to destruction.
 class ObjectManager
 {
 
@@ -39,39 +44,38 @@ class ObjectManager
 private:
 
 	// Bounce-back object fields
-	double force_on_object_x = 0.0;
-	double force_on_object_y = 0.0;
-	double force_on_object_z = 0.0;
+	double force_on_object_x = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
+	double force_on_object_y = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
+	double force_on_object_z = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
 
 	// Objects
-	std::vector<IBBody> iBody;				// Array of immersed boundary bodies
-	std::vector<Body<Marker>> bBody;		// Array of default bodies
-	std::vector<BFLBody> pBody;				// Array of BFL bodies
+	std::vector<Body<Marker>> bBody;		///< Array of default bodies
+	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
+	std::vector<BFLBody> pBody;				///< Array of BFL bodies
 
-	// Grid hierarchy
+	/// Pointer to grid hierarchy
 	GridObj* _Grids;
 
-	// Pre-Stream distribution functions for applying BFL BCs
+	/// Pre-stream distribution functions for applying BFL BCs
 	IVector<double> f_prestream;
 
-	// Pointer to self
+	/// Pointer to self
 	static ObjectManager* me;
 
 
 	/** Methods **/
 
 private:
-	// Constructor and Destructor
-	ObjectManager(void);
-	~ObjectManager(void);
-	// Overloaded constructor to set pointer to grid hierarchy
+	ObjectManager(void);		///< Private constructor
+	~ObjectManager(void);		///< Private destructor
+	/// Overloaded constructor to set pointer to grid hierarchy
 	ObjectManager(GridObj* _Grids);		
 
 public:
 	// Singleton design
-	static ObjectManager *getInstance();
-	static void destroyInstance();
-	static ObjectManager *getInstance(GridObj* g);
+	static ObjectManager *getInstance();		///< Get instance method
+	static void destroyInstance();				///< Destroy instance method
+	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
 	void ibm_apply(GridObj& g);					// Apply interpolate, compute and spread operations for all bodies and with GridObj g

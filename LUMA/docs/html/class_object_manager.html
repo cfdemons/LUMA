@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -95,6 +95,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Object Manager class.  
+ <a href="class_object_manager.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_object_manager_8h_source.html">ObjectManager.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -141,6 +144,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a68230ad49b979c2fe963cb3632a60c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e8e70f60dfb9d35d2e320c7c2b3b33c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a8e8e70f60dfb9d35d2e320c7c2b3b33c">getVoxInd</a> (double p)</td></tr>
 <tr class="separator:a8e8e70f60dfb9d35d2e320c7c2b3b33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a35b34d77e7cd56060a6953d0d0860a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a6a35b34d77e7cd56060a6953d0d0860a">computeLiftDrag</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
+<tr class="separator:a6a35b34d77e7cd56060a6953d0d0860a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39aa351c7b338473be4871111da5c5bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a39aa351c7b338473be4871111da5c5bd">io_vtk_IBwriter</a> (double tval)</td></tr>
 <tr class="separator:a39aa351c7b338473be4871111da5c5bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f9a40c58bdb3bd9797f7c44864835ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a1f9a40c58bdb3bd9797f7c44864835ec">io_write_body_pos</a> (int timestep)</td></tr>
@@ -151,14 +156,19 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aaa1b7e2a3392c2a8d85606041b986b4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c11d747c3df9e91d5fc2dac836d7b7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a5c11d747c3df9e91d5fc2dac836d7b7e">io_readInCloud</a> (<a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts, <a class="el" href="_object_manager_8h.html#a7b78fa3db30dfb9c1efc82bf886fe184">eObjectType</a> objtype)</td></tr>
 <tr class="separator:a5c11d747c3df9e91d5fc2dac836d7b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf65260d81584613fa33f2e7658f1b36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#adf65260d81584613fa33f2e7658f1b36">io_writeForceOnObject</a> (double tval)</td></tr>
+<tr class="separator:adf65260d81584613fa33f2e7658f1b36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:acf7a2f12f034c76d9e3a5aa5837dddb5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_object_manager.html">ObjectManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#acf7a2f12f034c76d9e3a5aa5837dddb5">getInstance</a> ()</td></tr>
+<tr class="memdesc:acf7a2f12f034c76d9e3a5aa5837dddb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get instance method.  <a href="#acf7a2f12f034c76d9e3a5aa5837dddb5">More...</a><br /></td></tr>
 <tr class="separator:acf7a2f12f034c76d9e3a5aa5837dddb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5945decc43eb5fdeaaad101fa7aa282f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a5945decc43eb5fdeaaad101fa7aa282f">destroyInstance</a> ()</td></tr>
+<tr class="memdesc:a5945decc43eb5fdeaaad101fa7aa282f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy instance method.  <a href="#a5945decc43eb5fdeaaad101fa7aa282f">More...</a><br /></td></tr>
 <tr class="separator:a5945decc43eb5fdeaaad101fa7aa282f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c648f3d7388df47db0db9fcb4b8b618"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_object_manager.html">ObjectManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a3c648f3d7388df47db0db9fcb4b8b618">getInstance</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
+<tr class="memdesc:a3c648f3d7388df47db0db9fcb4b8b618"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded get instance passing in pointer to grid hierarchy.  <a href="#a3c648f3d7388df47db0db9fcb4b8b618">More...</a><br /></td></tr>
 <tr class="separator:a3c648f3d7388df47db0db9fcb4b8b618"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -166,7 +176,10 @@ Friends</h2></td></tr>
 <tr class="memitem:a55cfec1721fb1b9d9e7592bd6288c998"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a55cfec1721fb1b9d9e7592bd6288c998">GridObj</a></td></tr>
 <tr class="separator:a55cfec1721fb1b9d9e7592bd6288c998"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Object Manager class. </p>
+<p>Class to manage all objects in the domain from creation through manipulation to destruction. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a099a446ac7f045d11d6be6babd0a31ab"></a>
 <div class="memitem">
 <div class="memproto">
@@ -199,6 +212,44 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a6a35b34d77e7cd56060a6953d0d0860a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ObjectManager::computeLiftDrag </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>g</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a5945decc43eb5fdeaaad101fa7aa282f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -219,6 +270,8 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroy instance method. </p>
 
 </div>
 </div>
@@ -243,6 +296,8 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Get instance method. </p>
+
 </div>
 </div>
 <a class="anchor" id="a3c648f3d7388df47db0db9fcb4b8b618"></a>
@@ -266,6 +321,8 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Overloaded get instance passing in pointer to grid hierarchy. </p>
 
 </div>
 </div>
@@ -896,6 +953,22 @@ Friends</h2></td></tr>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>timestep</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adf65260d81584613fa33f2e7658f1b36"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ObjectManager::io_writeForceOnObject </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tval</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

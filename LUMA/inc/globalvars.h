@@ -21,8 +21,8 @@
 #include "definitions.h"
 
 // Global variable references
-extern const int c[3][L_nVels];				// Lattice velocities
-extern const double w[L_nVels];				// Weights
-extern const double cs;						// Lattice sound speed for lattice
+extern const int c[3][L_nVels];				///< Lattice velocities
+extern const double w[L_nVels];				///< Quadrature weights
+extern const double cs;						///< Lattice sound speed
 
 #endif

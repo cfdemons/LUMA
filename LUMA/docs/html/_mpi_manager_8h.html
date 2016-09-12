@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.1.1-alpha</span>
+   &#160;<span id="projectnumber">1.2.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -102,27 +102,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html">MpiManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">MPI Manager class.  <a href="class_mpi_manager.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">MpiManager::phdf5_struct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for storing halo information for HDF5.  <a href="struct_mpi_manager_1_1phdf5__struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html">MpiManager::layer_edges</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing global positions of the edges of halos.  <a href="struct_mpi_manager_1_1layer__edges.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1buffer__struct.html">MpiManager::buffer_struct</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure storing buffers sizes in each direction for particular grid.  <a href="struct_mpi_manager_1_1buffer__struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a7f74dd70a9343d7863b99db1ee7aaa93"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#a7f74dd70a9343d7863b99db1ee7aaa93">range_i_left</a>&#160;&#160;&#160;i = 0; i &lt; <a class="el" href="class_grid_utils.html#abd4068e22339d5272ca551f8cbddec26">GridUtils::downToLimit</a>((int)pow(2, g-&gt;level + 1), N_lim); i++</td></tr>
+<tr class="memdesc:a7f74dd70a9343d7863b99db1ee7aaa93"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for left halo.  <a href="#a7f74dd70a9343d7863b99db1ee7aaa93">More...</a><br /></td></tr>
 <tr class="separator:a7f74dd70a9343d7863b99db1ee7aaa93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae102b5fbba39bb67ac10aa46bbeb32db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#ae102b5fbba39bb67ac10aa46bbeb32db">range_j_down</a>&#160;&#160;&#160;j = 0; j &lt; <a class="el" href="class_grid_utils.html#abd4068e22339d5272ca551f8cbddec26">GridUtils::downToLimit</a>((int)pow(2, g-&gt;level + 1), M_lim); j++</td></tr>
+<tr class="memdesc:ae102b5fbba39bb67ac10aa46bbeb32db"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for bottom halo.  <a href="#ae102b5fbba39bb67ac10aa46bbeb32db">More...</a><br /></td></tr>
 <tr class="separator:ae102b5fbba39bb67ac10aa46bbeb32db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c6ba3d0187cb34497c53d9681351208"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#a9c6ba3d0187cb34497c53d9681351208">range_k_front</a>&#160;&#160;&#160;k = 0; k &lt; <a class="el" href="class_grid_utils.html#abd4068e22339d5272ca551f8cbddec26">GridUtils::downToLimit</a>((int)pow(2, g-&gt;level + 1), K_lim); k++</td></tr>
+<tr class="memdesc:a9c6ba3d0187cb34497c53d9681351208"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for front halo.  <a href="#a9c6ba3d0187cb34497c53d9681351208">More...</a><br /></td></tr>
 <tr class="separator:a9c6ba3d0187cb34497c53d9681351208"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1550e57af2adbabce125ddc9569affef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#a1550e57af2adbabce125ddc9569affef">range_i_right</a>&#160;&#160;&#160;i = <a class="el" href="class_grid_utils.html#a5a3e26a94e62833f0a9e5a4bda066dac">GridUtils::upToZero</a>(N_lim - (int)pow(2, g-&gt;level + 1)); i &lt; N_lim; i++</td></tr>
+<tr class="memdesc:a1550e57af2adbabce125ddc9569affef"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for right halo.  <a href="#a1550e57af2adbabce125ddc9569affef">More...</a><br /></td></tr>
 <tr class="separator:a1550e57af2adbabce125ddc9569affef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55c6cd14f59f8e96f73b1ef8b9d506f4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#a55c6cd14f59f8e96f73b1ef8b9d506f4">range_j_up</a>&#160;&#160;&#160;j = <a class="el" href="class_grid_utils.html#a5a3e26a94e62833f0a9e5a4bda066dac">GridUtils::upToZero</a>(M_lim - (int)pow(2, g-&gt;level + 1)); j &lt; M_lim; j++</td></tr>
+<tr class="memdesc:a55c6cd14f59f8e96f73b1ef8b9d506f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for top halo.  <a href="#a55c6cd14f59f8e96f73b1ef8b9d506f4">More...</a><br /></td></tr>
 <tr class="separator:a55c6cd14f59f8e96f73b1ef8b9d506f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9b93ffe85b6880a37f61734f78fa5fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_mpi_manager_8h.html#ab9b93ffe85b6880a37f61734f78fa5fc">range_k_back</a>&#160;&#160;&#160;k = <a class="el" href="class_grid_utils.html#a5a3e26a94e62833f0a9e5a4bda066dac">GridUtils::upToZero</a>(K_lim - (int)pow(2, g-&gt;level + 1)); k &lt; K_lim; k++</td></tr>
+<tr class="memdesc:ab9b93ffe85b6880a37f61734f78fa5fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">For loop definition for back halo.  <a href="#ab9b93ffe85b6880a37f61734f78fa5fc">More...</a><br /></td></tr>
 <tr class="separator:ab9b93ffe85b6880a37f61734f78fa5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -136,6 +146,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>For loop definition for left halo. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1550e57af2adbabce125ddc9569affef"></a>
@@ -147,6 +159,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>For loop definition for right halo. </p>
 
 </div>
 </div>
@@ -160,6 +174,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>For loop definition for bottom halo. </p>
+
 </div>
 </div>
 <a class="anchor" id="a55c6cd14f59f8e96f73b1ef8b9d506f4"></a>
@@ -171,6 +187,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>For loop definition for top halo. </p>
 
 </div>
 </div>
@@ -184,6 +202,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>For loop definition for back halo. </p>
+
 </div>
 </div>
 <a class="anchor" id="a9c6ba3d0187cb34497c53d9681351208"></a>
@@ -195,6 +215,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>For loop definition for front halo. </p>
 
 </div>
 </div>

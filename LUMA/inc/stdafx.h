@@ -55,27 +55,17 @@
 
 #include <stdio.h>
 
-// Grid utilities class definition (available to all parts of code)
-#include "../inc/GridUtils.h"
-
 // Error definition
 #define LUMA_FAILED 12345
 
-// Function: is_nan
-template <typename NumType>
-inline static bool is_nan(NumType n) {
-
-	// Try test so it is platform independent
-	if (
+// Not a Number declaration
 #ifdef _WIN32
-		_isnan(n)
+#define L_IS_NAN _isnan
 #else
-		isnan(n)
+#define L_IS_NAN isnan
 #endif
-	) return true;
-				
-	else return false;
 
-};
+// Grid utilities class definition (available to all parts of code)
+#include "../inc/GridUtils.h"
 
 #endif

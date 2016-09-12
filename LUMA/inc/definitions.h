@@ -12,7 +12,7 @@
  * distribution without written consent.
  *
  */
-#define LUMA_VERSION "1.1.1-alpha"
+#define LUMA_VERSION "1.2.0-alpha"
 
 
 // Header guard
@@ -61,16 +61,16 @@
 #define L_PI 3.14159265358979323846
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI
+#define L_BUILD_FOR_MPI
 
 // Output Options
-#define L_out_every 1			// How many timesteps before whole grid output
+#define L_out_every 100			// How many timesteps before whole grid output
 #define L_out_every_forces 10	// Specific output frequency of body forces
 #define L_output_precision 4	// Precision of output (for text writers)
 
 // Types of output
-#define L_IO_LITE					// ASCII dump
-//#define L_HDF5_OUTPUT				// HDF5 writer
+//#define L_IO_LITE					// ASCII dump
+#define L_HDF5_OUTPUT				// HDF5 writer
 //#define L_LD_OUT					// Write out lift and drag (all bodies)
 
 // High frequency output options
@@ -115,7 +115,7 @@ const static int zProbeLims[2] = {30, 120};
 
 // MPI Data
 #define L_Xcores 2
-#define L_Ycores 2
+#define L_Ycores 3
 #define L_Zcores 2	// Set to 1 if doing a 2D problem when using custom MPI sizes
 
 //#define L_USE_CUSTOM_MPI_SIZES
@@ -130,19 +130,19 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2	// Number of dimensions to the problem
-#define L_N 128		// Number of x lattice sites
-#define L_M 64		// Number of y lattice sites
-#define L_K 64		// Number of z lattice sites
+#define L_dims 3	// Number of dimensions to the problem
+#define L_N 80		// Number of x lattice sites
+#define L_M 30		// Number of y lattice sites
+#define L_K 60		// Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0		// Start of domain-x
-#define L_b_x 2		// End of domain-x
+#define L_b_x 8		// End of domain-x
 #define L_a_y 0		// Start of domain-y
-#define L_b_y 1		// End of domain-y
+#define L_b_y 3		// End of domain-y
 #define L_a_z 0		// Start of domain-z
-#define L_b_z 1		// End of domain-z
+#define L_b_z 6		// End of domain-z
 
 
 /*
@@ -162,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};
 #define L_u_0z 0			// Initial z-velocity
 
 #define L_rho_in 1			// Initial density
-#define L_Re 1000			// Desired Reynolds number
+#define L_Re 10000			// Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -249,7 +249,6 @@ const static int zProbeLims[2] = {30, 120};
 #define L_FREESTREAM_TUNNEL			// Adds a inlet to all faces
 
 
-
 // Inlets
 #define L_INLET_ON				// Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	// Specify the inlet to be a regularised inlet condition (Latt & Chopard)
@@ -279,7 +278,7 @@ const static int zProbeLims[2] = {30, 120};
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
+//#define L_SOLID_BLOCK_ON			// Turn on solid object (bounce-back) specified below
 
 	#define L_block_on_grid_lev 0		// Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		// Provide grid region on which block should be added 
@@ -294,17 +293,17 @@ const static int zProbeLims[2] = {30, 120};
 
 
 // Bounce-back objects from point clouds
-//#define L_SOLID_FROM_FILE
+#define L_SOLID_FROM_FILE
 
-	#define L_object_on_grid_lev 3		// Provide grid level on which object should be added 
+	#define L_object_on_grid_lev 4		// Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		// Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
 	#define L_start_object_x 40
-	#define L_start_object_y 20
-	#define L_centre_object_z 30
-	#define L_object_length 80				// The object input is scaled based on this dimension
+	#define L_start_object_y 16
+	#define L_centre_object_z 121
+	#define L_object_length 160				// The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection		// Scale in this direction (Specify as enumeration)
-	#define L_object_length_ref 80			// Reference length to be used in the definition of Reynolds number
+	#define L_object_length_ref 160			// Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
@@ -328,7 +327,7 @@ const static int zProbeLims[2] = {30, 120};
 *******************************************************************************
 */
 
-#define L_NumLev 0		// Levels of refinement
+#define L_NumLev 4		// Levels of refinement
 #define L_NumReg 1		// Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -382,13 +381,13 @@ const static int zProbeLims[2] = {30, 120};
 	static int RefZend[L_NumLev][L_NumReg]			= { {30},	{52},	{88} };
 
 #elif (L_NumReg == 1 && L_NumLev == 4)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5},	{3},	{5},	{10} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {25},	{35},	{55},	{80} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {10},	{5},	{10},	{20} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {50},	{70},	{110},	{160} };
 	const static int RefYstart[L_NumLev][L_NumReg]	= { {0},	{0},	{0},	{0} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {8},	{13},	{20},	{30} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {15},	{25},	{40},	{60} };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {7},	{3},	{5},	{10} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {22},	{28},	{45},	{70} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {15},	{5},	{10},	{20} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {45},	{55},	{90},	{140} };
 
 #endif
 

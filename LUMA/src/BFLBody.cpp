@@ -199,7 +199,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 #endif
 
 					// If data valid, then store ID
-					if (!is_nan(m_data->x)) V.push_back(m_data->ID);
+					if (!L_IS_NAN(m_data->x)) V.push_back(m_data->ID);
 				}
 
 			}
@@ -390,7 +390,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 #endif
 
 				// If data valid, then store ID
-				if (!is_nan(m_data->x)) V.push_back(m_data->ID);
+				if (!L_IS_NAN(m_data->x)) V.push_back(m_data->ID);
 
 			}
 

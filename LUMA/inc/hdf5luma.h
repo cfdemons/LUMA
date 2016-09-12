@@ -13,7 +13,7 @@
 *
 */
 
-#ifdef L_BUILD_FOR_MPI
+#if (defined L_BUILD_FOR_MPI && !defined H5_HAVE_PARALLEL)
 	#define H5_HAVE_PARALLEL
 #endif
 

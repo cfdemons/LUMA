@@ -1,5 +1,6 @@
-version=1.1.1-alpha
+version=1.2.0-alpha
 
+Issue #80: Model-independent version of extrapolation exit on right-hand wall.
 Issue #81: Added grid sizes as GridObj property.
 Issue #73: Basic Doxygen documentation added and will involve throughout the releases to contain more information.
 Issue #59: Force calculation for BB objects.

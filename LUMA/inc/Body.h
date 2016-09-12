@@ -13,8 +13,8 @@
  *
  */
 
+#include "stdafx.h"
 #pragma once
-#include <vector>
 
 class GridObj;
 
@@ -227,7 +227,7 @@ protected:
 		MarkerData* m_data = getMarkerData(x, y, z);
 
 		// True if the data store is not empty
-		if (!is_nan(m_data->x)) {
+		if (!L_IS_NAN(m_data->x)) {
 
 			delete m_data;	// Deallocate the store
 			return true;

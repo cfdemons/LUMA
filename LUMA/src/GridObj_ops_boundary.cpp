@@ -187,37 +187,17 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k) {
 	 * Furthermore, the erroneous values will likely stream to an inlet 
 	 * or other boundary site where the incoming values are assumed 
 	 * unknown and are overwritten by the boundary condition at this site.
-	 * Therefore, the impact of not updating these sites is anticipated to
-	 * be zero.
+	 * Therefore, there is no impact of not updating these sites.
 	 */
 
-	if (i-1 < 0 || i-2 < 0) {
+	if (i - 1 >= 0 && i - 2 >= 0)
+	{
+		for (size_t v = 0; v < L_nVels; v++) {
 
-		// Cannot update the outlet using extrapolation
+			// If right-hand wall incoming population then copy value of f from the upstream site
+			if (c[0][v] == -1) f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
 
-	} else {
-
-#if L_dims == 3
-
-		// TODO: should be updated for D3Q27 -- ticket #80 //
-		std::cout << "Error: See Log File." << std::endl;
-		*GridUtils::logfile << "Extrapolation is not a vlaid choice in 3D at the moment. Exiting." << std::endl;
-		exit(LUMA_FAILED);		
-
-#else
-		// In 2D, extrapolate populations [7 1 5]
-		for (size_t v = 1; v < 8; v++) {
-
-			if (v == 7 || v == 1 || v == 5) {
-                
-
-				// Just copy value for now as the linear extrapolation doesn't work
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-
-			}
 		}
-#endif
-
 	}
 
 }

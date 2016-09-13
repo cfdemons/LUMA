@@ -32,7 +32,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
     double residual = 100;			// Set to arbitrary large number to being with
-	int max_iterations = iBody[ib].markers.size();	// Set maximum number of iterations
+	int max_iterations = static_cast<int>(iBody[ib].markers.size());	// Set maximum number of iterations
 	double Froude;					// Ri g_vec / g = (Fr,0) and Fr = u^2 / gL
 	size_t n = iBody[ib].markers.size() - 1;	// Number of markers - 1
 	size_t i = 0;								// Iterator
@@ -64,7 +64,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = ibb_length / g.dx;
+	double length_lu = L_ibb_filament_length / g.dx;
 
 
 	// Marker spacing in normalised instrinsic coordinates
@@ -74,13 +74,13 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef GRAVITY_ON
-	Froude = grav_force * length_lu / pow(u_ref,2); // Note that this is not the typical definition you see in the literature
+	Froude = pow(L_u_ref,2) / L_grav_force * length_lu;
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( (1 / pow(2,g.level)) / (length_lu / u_ref) , 2);
+	double beta = ds_sqrd / pow( (1 / pow(2,g.level)) / (length_lu / L_u_ref) , 2);
 
 
 
@@ -100,7 +100,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(u_ref, 2);
+	double Fref = iBody[ib].delta_rho * pow(L_u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
@@ -175,7 +175,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     G[ii + 2] = EI * (ystar[i - 2] - 4 * ystar[i - 1] + 6 * ystar[i] - 4 * ysp1 + ysp2) / ds_sqrd - ds_sqrd * Fy[i + 1] - beta * ystar[i];
 
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out G vector
 		std::ofstream Gout;
 		Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -291,8 +291,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 
 
-        ibm_bandec(AA, 3 * n + 1, m1, m2, AL, indx, d); // LU decomposition
-        ibm_banbks(AA, 3 * n + 1, m1, m2, AL, indx, res); // solve banded problem
+		ibm_bandec(AA, static_cast<long>(3 * n + 1), m1, m2, AL, indx, d); // LU decomposition
+		ibm_banbks(AA, static_cast<long>(3 * n + 1), m1, m2, AL, indx, res); // solve banded problem
 
 
 
@@ -312,8 +312,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         if (iBody[ib].BCs[0] == 2) {
 
         	// Apply clamped BC to first flexible marker
-        	x[0] = x0 + ds_nondim * cos(ibb_angle_vert * PI / 180.0);
-        	y[0] = y0 + ds_nondim * sin(ibb_angle_vert * PI / 180.0);
+        	x[0] = x0 + ds_nondim * cos(L_ibb_angle_vert * L_PI / 180.0);
+        	y[0] = y0 + ds_nondim * sin(L_ibb_angle_vert * L_PI / 180.0);
 
         }
 
@@ -332,7 +332,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	Using the output from the above we update the marker positions and desired velocities
 	*/
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
 		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -359,7 +359,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     }
 
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out pos vector
 		std::ofstream posout;
 		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -370,7 +370,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 		posout.close();
 #endif
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out ten vector
 		std::ofstream tenout;
 		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -388,7 +388,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
     }
 
-#ifdef IBM_DEBUG
+#ifdef L_IBM_DEBUG
 		// DEBUG -- write out desired vel vector
 		std::ofstream velout;
 		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
@@ -556,7 +556,7 @@ void ObjectManager::ibm_position_update(int ib, GridObj& g) {
 	}
 
 	// Recompute support for new marker positions
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+	for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 
 		// Erase support vectors
 		// Note:	Fixing the number of support sites to 9 negates
@@ -581,7 +581,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 
 	// Find flexible body in group and store index
 	int ib_flex = 0;
-	for (size_t i = 0; i < iBody.size(); i++) {
+	for (int i = 0; i < static_cast<int>(iBody.size()); i++) {
 
 		if (iBody[i].flex_rigid && iBody[i].groupID == group) {
 			ib_flex = i;
@@ -591,7 +591,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 	}
 
 	// Loop over bodies in group
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
+	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
 		// If body is deformable but not flexible give it a positional update from flexible
 		if (iBody[ib].groupID == group &&
@@ -609,7 +609,7 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 			}
 
 			// Recompute support for new marker positions
-			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 
 				// Erase support vectors
 				// Note:	Fixing the number of support sites to 9 negates

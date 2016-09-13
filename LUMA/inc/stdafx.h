@@ -18,6 +18,9 @@
 // are changed infrequently
 //
 
+#ifndef STDAFX_H
+#define STDAFX_H
+
 #ifdef _DEBUG
 	#define _CRTDBG_MAP_ALLOC
 	#include <stdlib.h>
@@ -28,12 +31,12 @@
 	#endif
 #endif  // _DEBUG
 
-#pragma once
-
 // Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 // Check OS is Windows or not
 #ifdef _WIN32
@@ -67,7 +70,7 @@ inline static bool is_nan(NumType n) {
 #ifdef _WIN32
 		_isnan(n)
 #else
-		std::isnan(n)
+		isnan(n)
 #endif
 	) return true;
 				

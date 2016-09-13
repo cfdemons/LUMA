@@ -16,6 +16,8 @@
 #pragma once
 #include "IBMarker.h"
 #include "Body.h"
+#include "PCpts.h"
+#include "BFLBody.h"	// Need this because we use the Voxelising routine in makeBody()
 
 /** Represents an IB body **/
 class IBBody : public Body<IBMarker> {
@@ -56,7 +58,8 @@ protected:
 
 public:
 
-	void addMarker(double x, double y, double z, bool flex_rigid);		// Add marker to the body (overload parent addMarker method)
+	// Add marker to the body (overload parent addMarker method)
+	void addMarker(double x, double y, double z, bool flex_rigid);
 
 	//////////////////////////////////
 	// Prefab body building methods //
@@ -73,6 +76,8 @@ public:
 	// Method to construct a 3D plate
 	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 		bool flex_rigid, bool deform, int group, bool plate);
+	// Method to construct body from points read in from file
+	void makeBody(PCpts* _PCpts);
 
 };
 

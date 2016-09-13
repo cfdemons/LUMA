@@ -23,8 +23,8 @@
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
-#if (dims == 3)
-const int GridUtils::dir_reflect[dims * 2][nVels] = 
+#if (L_dims == 3)
+const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},
@@ -34,7 +34,7 @@ const int GridUtils::dir_reflect[dims * 2][nVels] =
 		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}
 	};
 #else
-const int GridUtils::dir_reflect[dims * 2][nVels] = 
+const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 7, 6, 5, 4, 8}, 
 		{1, 0, 2, 3, 4, 6, 5, 4, 8},
@@ -178,7 +178,7 @@ double GridUtils::vecnorm( double vec[] )
 {
 	double result;
 
-#if (dims == 3)
+#if (L_dims == 3)
 
 		result = sqrt( pow(vec[0],2) + pow(vec[1],2) + pow(vec[2],2) );
 
@@ -214,10 +214,10 @@ std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse
 	std::vector<int> fine_ind;
 
 	// Map indices
-	fine_ind.insert(fine_ind.begin(), 2*(coarse_i - x_start + 1) - 2 );
-	fine_ind.insert(fine_ind.begin() + 1, 2*(coarse_j - y_start + 1) - 2 );
-#if (dims == 3)
-	fine_ind.insert(fine_ind.begin() + 2, 2*(coarse_k - z_start + 1) - 2 );
+	fine_ind.insert( fine_ind.begin(), 2 * (coarse_i - x_start + 1) - 2 );
+	fine_ind.insert( fine_ind.begin() + 1, 2 * (coarse_j - y_start + 1) - 2 );
+#if (L_dims == 3)
+	fine_ind.insert( fine_ind.begin() + 2, 2 * (coarse_k - z_start + 1) - 2 );
 #else
 	fine_ind.insert(fine_ind.begin() + 2, 0 );
 #endif
@@ -246,7 +246,7 @@ std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j
 	// Reverse map indices
 	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
 	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
-#if (dims == 3)
+#if (L_dims == 3)
 	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
 #else
 	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
@@ -308,12 +308,12 @@ double GridUtils::indexToPosition(int index, double dx) {
 
 // ***************************************************************************************************
 // Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
-size_t GridUtils::getOpposite(size_t direction) {
+int GridUtils::getOpposite(int direction) {
 
-	size_t direction_opposite;
+	int direction_opposite;
 
 	// If rest particle then opposite is simply itself
-	if (direction == nVels-1) {
+	if (direction == L_nVels-1) {
 
 		direction_opposite = direction;
 
@@ -340,43 +340,43 @@ size_t GridUtils::getOpposite(size_t direction) {
 bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 
 	// Local declarations
-	int exp_MPI_coords[dims], act_MPI_coords[dims], MPI_dims[dims];
+	int exp_MPI_coords[L_dims], act_MPI_coords[L_dims], MPI_dims[L_dims];
 	int shift[3] = {0, 0, 0};
 
 	// Initialise local variables
-	MPI_dims[0] = Xcores;
-	MPI_dims[1] = Ycores;
-#if (dims == 3)
-	MPI_dims[2] = Zcores;
+	MPI_dims[0] = L_Xcores;
+	MPI_dims[1] = L_Ycores;
+#if (L_dims == 3)
+	MPI_dims[2] = L_Zcores;
 #endif
 
 	// Define shifts based on which overlap we are on
 
 	// X
-	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMaximum)) {
 		shift[0] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],0,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMinimum)) {
 		shift[0] = -1;
 	}
 
 	// Y
-	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMaximum)) {
 		shift[1] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],1,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMinimum)) {
 		shift[1] = -1;
 	}
 
-#if (dims == 3)
+#if (L_dims == 3)
 	// Z
-	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,1)) {
+	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMaximum)) {
 		shift[2] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],2,0)) {
+	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMinimum)) {
 		shift[2] = -1;
 	}
 #endif
 
 	// Loop over each Cartesian direction
-	for (int d = 0; d < dims; d++) {
+	for (int d = 0; d < L_dims; d++) {
 		// Define expected (non-periodic) MPI coordinates of neighbour rank
 		exp_MPI_coords[d] = MpiManager::MPI_coords[d] + shift[d];
 
@@ -406,7 +406,7 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 	if (	found_x != pGrid.XInd.end() && found_y != pGrid.YInd.end()
 
 
-#if (dims == 3)
+#if (L_dims == 3)
 		&& found_z != pGrid.ZInd.end()
 #endif
 		) {
@@ -422,11 +422,11 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 
 // ***************************************************************************************************
 // Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
+bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid) {
 
 	switch (xyz) {
 
-	case 0:
+	case eXDirection:
 		{
 		// X direction
 		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
@@ -435,7 +435,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 		else return false;
 		}
 
-	case 1:
+	case eYDirection:
 		{
 		// Y direction
 		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
@@ -444,7 +444,7 @@ bool GridUtils::isOnThisRank(int gl, int xyz, const GridObj& pGrid) {
 		else return false;
 		}
 
-	case 2:
+	case eZDirection:
 		{
 		// Z direction
 		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
@@ -477,7 +477,7 @@ bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
 	}
 
-#if (dims == 3)
+#if (L_dims == 3)
 	// Loop over over Z range
 	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
 		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
@@ -541,31 +541,31 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 	if (
 	(
 		// X on sender
-		(GridUtils::isOnSenderLayer(pos_x,0,0) || GridUtils::isOnSenderLayer(pos_x,0,1)) &&
+		(GridUtils::isOnSenderLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_x,eXDirection,eMaximum)) &&
 
 		// Y and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
-#if (dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
+		(!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
+#if (L_dims == 3)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		)
 	) || (
 		// Y on sender
-		(GridUtils::isOnSenderLayer(pos_y,1,0) || GridUtils::isOnSenderLayer(pos_y,1,1)) &&
+		(GridUtils::isOnSenderLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_y,eYDirection,eMaximum)) &&
 
 		// X and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)
-#if (dims == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,2,0) && !GridUtils::isOnRecvLayer(pos_z,2,1)
+		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)
+#if (L_dims == 3)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 
 		)
 	) || (
 		// Z on sender
-		(GridUtils::isOnSenderLayer(pos_z,2,0) || GridUtils::isOnSenderLayer(pos_z,2,1)) &&
+		(GridUtils::isOnSenderLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_z,eZDirection,eMaximum)) &&
 
 		// X and Y not recv
-		(!GridUtils::isOnRecvLayer(pos_x,0,0) && !GridUtils::isOnRecvLayer(pos_x,0,1)	&& 
-		!GridUtils::isOnRecvLayer(pos_y,1,0) && !GridUtils::isOnRecvLayer(pos_y,1,1)
+		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)	&& 
+		!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
 #endif
 		)
 	)
@@ -579,40 +579,39 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
-// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
-// either "min" = 0 or "max" = 1.
-bool GridUtils::isOnSenderLayer(double site_position, int dir, int maxmin) {
+// whether it is an X, Y or Z coordinate and which edge of the rank you are checking either Min or Max.
+bool GridUtils::isOnSenderLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank inner overlap regions dictated by the coarsest rank
-	if (dir == 0) {
+	if (dir == eXDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.X[0] && site_position < mpim->sender_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (dir == 1) {
+	} else if (dir == eYDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.Y[2] && site_position < mpim->sender_layer_pos.Y[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.Y[0] && site_position < mpim->sender_layer_pos.Y[1] ) return true;
 
 		}
 
-	} else if (dir == 2) {
+	} else if (dir == eZDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->sender_layer_pos.Z[2] && site_position < mpim->sender_layer_pos.Z[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->sender_layer_pos.Z[0] && site_position < mpim->sender_layer_pos.Z[1] ) return true;
 
 		}
@@ -640,10 +639,10 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
-	if (	GridUtils::isOnRecvLayer(pos_x,0,0) || GridUtils::isOnRecvLayer(pos_x,0,1) ||
-			GridUtils::isOnRecvLayer(pos_y,1,0) || GridUtils::isOnRecvLayer(pos_y,1,1)
-#if (dims == 3)
-			|| GridUtils::isOnRecvLayer(pos_z,2,0) || GridUtils::isOnRecvLayer(pos_z,2,1)
+	if (	GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum) ||
+			GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
+#if (L_dims == 3)
+			|| GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		) {
 			return true;
@@ -655,40 +654,39 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 // ***************************************************************************************************
 // Routine to check whether a site is in the outer MPI overlap of the coarsest grid based on its position,
-// whether it is an "x" = 0, "y" = 1 or "z" = 2 coordinate and which edge of the rank you are checking 
-// either "min" = 0 or "max" = 1.
-bool GridUtils::isOnRecvLayer(double site_position, int dir, int maxmin) {
+// whether it is an X, Y or Z coordinate and which edge of the rank you are checking Min or Max.
+bool GridUtils::isOnRecvLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank outer overlap regions dictated by the coarsest rank
-	if (dir == 0) {
+	if (dir == eXDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.X[2] && site_position < mpim->recv_layer_pos.X[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.X[0] && site_position < mpim->recv_layer_pos.X[1] ) return true;
 
 		}
 
-	} else if (dir == 1) {
+	} else if (dir == eYDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.Y[2] && site_position < mpim->recv_layer_pos.Y[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.Y[0] && site_position < mpim->recv_layer_pos.Y[1] ) return true;
 
 		}
 		
-	} else if (dir == 2) {
+	} else if (dir == eZDirection) {
 
-		if (maxmin == 1) {
+		if (maxmin == eMaximum) {
 			if (site_position > mpim->recv_layer_pos.Z[2] && site_position < mpim->recv_layer_pos.Z[3] ) return true;
 
-		} else if (maxmin == 0) {
+		} else if (maxmin == eMinimum) {
 			if (site_position > mpim->recv_layer_pos.Z[0] && site_position < mpim->recv_layer_pos.Z[1] ) return true;
 
 		}
@@ -717,7 +715,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 	std::string command = "mkdir -p " + path_str;
 
 	// Only get rank 0 to create output directory
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 
 	#ifdef _WIN32   // Running on Windows
 		if (MpiManager::my_rank == 0)
@@ -727,7 +725,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 			result = system(command.c_str());
 	#endif // _WIN32
 
-#else // BUILD_FOR_MPI
+#else // L_BUILD_FOR_MPI
 
 	#ifdef _WIN32   // Running on Windows
 		result = CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
@@ -735,7 +733,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 		result = system(command.c_str());
 	#endif // _WIN32
 
-#endif // BUILD_FOR_MPI
+#endif // L_BUILD_FOR_MPI
 
 	return result;
 }
@@ -750,7 +748,7 @@ bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, 
 			) {
 				return true;
 
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 		// When using MPI, equivalent to off-grid is when destination is in 
 		// periodic recv layer with periodic boundaries disabled.
 		} else if ( GridUtils::isOnRecvLayer(g.XPos[i],g.YPos[j],g.ZPos[k]) 
@@ -758,7 +756,7 @@ bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, 
 
 			return true;		
 
-#endif	// BUILD_FOR_MPI
+#endif	// L_BUILD_FOR_MPI
 
 		}
 

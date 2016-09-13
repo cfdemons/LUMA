@@ -29,14 +29,15 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 	// Copy received information back to grid using the EXACT
 	// reverse algorithm of the copying procedure
 	int i, j , k, v, idx;
-	int N_lim = g->XInd.size(), M_lim = g->YInd.size()		// Local grid sizes for read/writing arrays
-#if (dims == 3)
-		, K_lim = g->ZInd.size();
+	// Local grid sizes for read/writing arrays
+	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
+#if (L_dims == 3)
+		, K_lim = static_cast<int>(g->ZInd.size());
 #else
 		, K_lim = 1;
 #endif
 
-#ifdef MPI_VERBOSE
+#ifdef L_MPI_VERBOSE
 	*MpiManager::logout << "Unpacking direction " << dir << std::endl;
 #endif
 
@@ -51,23 +52,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right
 		
 		// Examine possible inner and outer buffer locations
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,0) && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1))
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum))
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -84,23 +85,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left
 		
 
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,1) && 
-							(!GridUtils::isOnRecvLayer(g->YPos[j],1,0) && !GridUtils::isOnRecvLayer(g->YPos[j],1,1))
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
+							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum))
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -117,23 +118,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Up
 		
 
-		for (i_left) {
-			for (j_down) {
+		for (range_i_left) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,0) && 
-							GridUtils::isOnRecvLayer(g->YPos[j],1,0)
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -150,23 +151,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Down
 		
 
-		for (i_right) {
-			for (j_up) {
+		for (range_i_right) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,1) && 
-							GridUtils::isOnRecvLayer(g->YPos[j],1,1)
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -184,22 +185,22 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) &&
-							GridUtils::isOnRecvLayer(g->YPos[j],1,0)
-#if (dims == 3)
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -218,22 +219,22 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) &&
-							GridUtils::isOnRecvLayer(g->YPos[j],1,1)
-#if (dims == 3)
+						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) &&
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -250,23 +251,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Up
 		
 
-		for (i_right) {
-			for (j_down) {
+		for (range_i_right) {
+			for (range_j_down) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,1) && 
-							GridUtils::isOnRecvLayer(g->YPos[j],1,0)
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -283,23 +284,23 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Down
 		
 
-		for (i_left) {
-			for (j_up) {
+		for (range_i_left) {
+			for (range_j_up) {
 				for (k = 0; k < K_lim; k++) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if (  GridUtils::isOnRecvLayer(g->XPos[i],0,0) && 
-							GridUtils::isOnRecvLayer(g->YPos[j],1,1)
-#if (dims == 3)
+						if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
+							GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
+#if (L_dims == 3)
 							&&
-							(!GridUtils::isOnRecvLayer(g->ZPos[k],2,0) && !GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 #endif
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -323,18 +324,18 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 
 		for (i = 0; i < N_lim; i++) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -353,18 +354,18 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 
 		for (i = 0; i < N_lim; i++) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -381,20 +382,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Back
 		
 
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -411,20 +412,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Front
 		
 
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -441,20 +442,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Up-Back
 		
 
-		for (i_left) {
-			for (j_down) {
-				for (k_front) {
+		for (range_i_left) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -471,20 +472,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Down-Front
 		
 
-		for (i_right) {
-			for (j_up) {
-				for (k_back) {
+		for (range_i_right) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -502,19 +503,19 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
-				for (k_front) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -532,19 +533,19 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
-				for (k_back) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -561,20 +562,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Up-Back
 		
 
-		for (i_right) {
-			for (j_down) {
-				for (k_front) {
+		for (range_i_right) {
+			for (range_j_down) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -591,20 +592,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Down-Front
 		
 
-		for (i_left) {
-			for (j_up) {
-				for (k_back) {
+		for (range_i_left) {
+			for (range_j_up) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -621,20 +622,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Back
 		
 
-		for (i_right) {
+		for (range_i_right) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_front) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -651,20 +652,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Front
 		
 
-		for (i_left) {
+		for (range_i_left) {
 			for (j = 0; j < M_lim; j++) {
-				for (k_back) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],1,1) && !GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -681,20 +682,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Down-Back
 		
 
-		for (i_right) {
-			for (j_up) {
-				for (k_front) {
+		for (range_i_right) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -711,20 +712,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Up-Front
 		
 
-		for (i_left) {
-			for (j_down) {
-				for (k_back) {
+		for (range_i_left) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -742,19 +743,19 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_up) {
-				for (k_front) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -772,19 +773,19 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		
 
 		for (i = 0; i < N_lim; i++) {
-			for (j_down) {
-				for (k_back) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],0,1) && !GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -801,20 +802,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Right-Down-Back
 		
 
-		for (i_left) {
-			for (j_up) {
-				for (k_front) {
+		for (range_i_left) {
+			for (range_j_up) {
+				for (range_k_front) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,0)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,1)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,0))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -831,20 +832,20 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		// Left-Up-Front
 		
 
-		for (i_right) {
-			for (j_down) {
-				for (k_back) {
+		for (range_i_right) {
+			for (range_j_down) {
+				for (range_k_back) {
 
 					// Check conditions for receiver
-					if (g->LatTyp(i,j,k,M_lim,K_lim) != 2)	// Refined sites are not passed
+					if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Refined sites are not passed
 					{
-						if ( (GridUtils::isOnRecvLayer(g->XPos[i],0,1)) && 
-								(GridUtils::isOnRecvLayer(g->YPos[j],1,0)) &&
-								(GridUtils::isOnRecvLayer(g->ZPos[k],2,1))
+						if ( (GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
+								(GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)) &&
+								(GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be suitable receiver site
-							for (v = 0; v < nVels; v++) {
-								g->f(i,j,k,v,M_lim,K_lim,nVels) = f_buffer_recv[dir][idx];
+							for (v = 0; v < L_nVels; v++) {
+								g->f(i,j,k,v,M_lim,K_lim,L_nVels) = f_buffer_recv[dir][idx];
 								idx++;
 							}
 							// Update macroscopic (but not time-averaged quantities)
@@ -862,7 +863,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 		break;
 	}
 
-#ifdef MPI_VERBOSE
+#ifdef L_MPI_VERBOSE
 	*MpiManager::logout << "Unpacking direction " << dir << " complete." << std::endl;
 #endif
 

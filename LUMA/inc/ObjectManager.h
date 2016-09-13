@@ -39,7 +39,7 @@ class ObjectManager
 	// Make Grid a friend so boundary conditions can access the body data
 	friend class GridObj;
 
-	/** Members **/
+	/* Members */
 
 private:
 
@@ -63,7 +63,7 @@ private:
 	static ObjectManager* me;
 
 
-	/** Methods **/
+	/* Methods */
 
 private:
 	ObjectManager(void);		///< Private constructor

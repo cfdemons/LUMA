@@ -28,8 +28,13 @@
 
 using namespace std;
 
-// ***************************************************************************************************
-// Method to get left-hand wall inlet profile from the input file (data may be over- or under-sampled)
+// ****************************************************************************
+/// \brief	Method to import an input profile from a file.
+///
+///			Input data may be over- or under-sampled but it must span the 
+///			physical dimensions of the inlet otherwise the software does
+///			not known how to scale the data to fit. Inlet profile is always
+///			assumed to be oriented vertically (y-direction).
 void GridObj::LBM_init_getInletProfile() {
 
 	size_t i, j;
@@ -152,9 +157,12 @@ void GridObj::LBM_init_getInletProfile() {
 
 }
 
-// ***************************************************************************************************
-
-// Initialise velocity method
+// ****************************************************************************
+/// \brief	Method to initialise the lattice velocity.
+///
+///			Unless the L_NO_FLOW macro is defined, the initial velocity 
+///			everywhere will be set to the values specified in the definitions 
+///			file.
 void GridObj::LBM_initVelocity ( ) {
 
 
@@ -193,9 +201,8 @@ void GridObj::LBM_initVelocity ( ) {
 }
 
 
-// ***************************************************************************************************
-
-// Initialise density method
+// ****************************************************************************
+/// \brief	Method to initialise the lattice density.
 void GridObj::LBM_initRho ( ) {
 
 	// Loop over grid
@@ -211,9 +218,12 @@ void GridObj::LBM_initRho ( ) {
 
 }
 
-// ***************************************************************************************************
-
-// Non-MPI initialise level 0 grid wrapper
+// ****************************************************************************
+/// \brief	Wrapper to initialise all L0 lattice quantities.
+///
+///			This method wraps the MPI-specific version. It is called by the 
+///			serial build and sets the MPI-specific arguments to default values
+///			before calling the full initialiser.
 void GridObj::LBM_initGrid( ) {
 
 	// Set default value for the following MPI-specific settings
@@ -238,9 +248,11 @@ void GridObj::LBM_initGrid( ) {
 }
 
 
-// ***************************************************************************************************
-
-// Initialise level 0 grid method
+// ****************************************************************************
+/// \brief	Method to initialise all L0 lattice quantities.
+/// \param	local_size	local grid size on this rank including halo.
+/// \param	global_edge_ind	global indices of the rank edges.
+/// \param	global_edge_pos	global positions of the rank edges.
 void GridObj::LBM_initGrid( std::vector<int> local_size, 
 							std::vector< std::vector<int> > global_edge_ind, 
 							std::vector< std::vector<double> > global_edge_pos ) {
@@ -532,9 +544,9 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 
 
-// ***************************************************************************************************
-
-// Method to initialise the quantities for a refined subgrid assuming a volumetric configuration. Parent grid is passed by reference
+// ****************************************************************************
+/// \brief	Method to initialise all sub-grid quantities.
+/// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	
 	// Declarations
@@ -800,7 +812,8 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
+/// \brief	Method to initialise label-based solids
 void GridObj::LBM_initSolidLab() {
 
 #ifdef L_SOLID_BLOCK_ON
@@ -886,8 +899,10 @@ void GridObj::LBM_initSolidLab() {
 
 }
 
-// ***************************************************************************************************
-// Initialise wall and object labels method (L0 only)
+// ****************************************************************************
+/// \brief	Method to initialise wall and object labels on L0.
+///
+///			The virtual wind tunnel definitions are implemented by this method.
 void GridObj::LBM_initBoundLab ( ) {
 
 #if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON
@@ -932,7 +947,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XInd[i] == L_N-1) {		// Wall found
+		if (XInd[i] == L_N - 1) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {
@@ -977,7 +992,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if BACK wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] == L_K-1) {		// Wall found
+		if (ZInd[k] == L_K - 1) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1024,7 +1039,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] == L_M-1) {		// Wall found
+		if (YInd[j] == L_M - 1) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1045,9 +1060,13 @@ void GridObj::LBM_initBoundLab ( ) {
 
 }
 
-// ***************************************************************************************************
-
-// Initialise refined labels method
+// ****************************************************************************
+/// \brief	Method to initialise all labels on sub-grids.
+///
+///			Boundary labels are set by considering parent labels on overlapping
+///			sites and then assigning child labels appropriately.
+///
+/// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 
 	// Get parent local grid sizes

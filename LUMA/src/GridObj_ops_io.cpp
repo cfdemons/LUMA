@@ -27,8 +27,12 @@
 using namespace std;
 
 // *****************************************************************************
-// Writes all the contents of the class at time t and call recursviely for any 
-// subgrids. Writes to text file "Grids.out" by default.
+/// \brief	Verbose ASCII writer.
+///
+///			Writes all the contents of the grid class at time t and call recursviely
+///			for any sub-grids. Writes to text file "Grids.out" by default.
+///
+/// \param output_tag	text string added to top of output for identification.
 void GridObj::io_textout(std::string output_tag) {
 
 	// Create stream and open text file
@@ -269,8 +273,13 @@ void GridObj::io_textout(std::string output_tag) {
 }
 
 // *****************************************************************************
-// This routine writes/reads the current rank's data in the custom restart file 
-// format to the file whose handle is provided.
+/// \brief	Restart file read-writer.
+///
+///			This routine writes/reads the current rank's data in the custom restart 
+///			file format. If the file already exists, data is appended. IB body data
+///			are also written out but no other body information at present. 
+///
+/// \param IO_flag	flag to indicate whether a write (true) or read (false) is required.
 void GridObj::io_restart(bool IO_flag) {
 
 	if (IO_flag) {
@@ -447,9 +456,12 @@ void GridObj::io_restart(bool IO_flag) {
 
 
 }
+
 // *****************************************************************************
-// Custom routine for writing out point probes or other high frequency, low 
-// volume data
+/// \brief	Probe writer.
+///
+///			This routine writes the quantities at hte probe locations to a single 
+///			file.
 void GridObj::io_probeOutput() {
 
 	// Declarations
@@ -532,10 +544,14 @@ void GridObj::io_probeOutput() {
 
 }
 
-// ************************************************************** //
-// Generic writer for each rank to write out all data row-wise to be 
-// processed using a new post-processing application into a suitable 
-// output format.
+// *****************************************************************************
+/// \brief	ASCII dump of grid data.
+///
+///			Generic ASCII writer for each rank to write out all grid data in rows 
+///			into a single, unsorted file.
+///
+/// \param tval	time value being written out.
+/// \param TAG	text identifier for the data.
 void GridObj::io_lite(double tval, std::string TAG) {
 
 	std::ofstream litefile;
@@ -652,8 +668,13 @@ void GridObj::io_lite(double tval, std::string TAG) {
 
 }
 
-// ***************************************************************************//
-// HDF5 writer which writes quantities on grid out as scalar arrays
+// *****************************************************************************
+/// \brief	HDF5 writer.
+///
+///			Useful grid quantities written out as scalar arrays. One *.h5 file
+///			per grid and data is grouped into timesteps within each file.
+///
+/// \param tval	time value being written out.
 int GridObj::io_hdf5(double tval) {
 
 #ifdef L_MPI_VERBOSE

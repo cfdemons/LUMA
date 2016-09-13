@@ -27,9 +27,16 @@ streaming and macroscopic calulcation.
 
 using namespace std;
 
-// ***************************************************************************************************
-// LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
-// IBM_flag dictates whether we need the predictor step or not
+// *****************************************************************************
+/// \brief	LBM multi-grid kernel.
+///
+///			The LBM kernel manages the calling of all IBM and LBM methods on a 
+///			given grid. In addition, this method also manages the recursive calling
+///			of the method on sub-grids and manages the framework for grid-grid 
+///			interaction.
+///
+/// \param IBM_flag	flag to indicate whether this kernel is a predictor (true) 
+///					or corrector (false) step when using IBM.
 void GridObj::LBM_multi ( bool IBM_flag ) {
 
 	// Start the clock to time the kernel
@@ -288,9 +295,14 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 }
 
-// ***************************************************************************************************
-// Takes Cartesian force vector and populates forces for each lattice direction.
-// If reset_flag is true, resets the force vectors.
+// *****************************************************************************
+/// \brief	Method to compute or reset body forces.
+///
+///			Takes Cartesian force vector and populates forces for each lattice 
+///			direction. If reset_flag is true, then resets the force vectors to zero.
+///
+/// \param reset_flag	flag to indicate whether force vectors should simply be
+///						reset. 
 void GridObj::LBM_forcegrid(bool reset_flag) {
 
 	/* This routine computes the forces applied along each direction on the lattice
@@ -403,8 +415,8 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 }
 
 
-// ***************************************************************************************************
-// Collision operator
+// *****************************************************************************
+/// Apply collision operator.
 void GridObj::LBM_collide( ) {
 
 	/*
@@ -467,8 +479,17 @@ void GridObj::LBM_collide( ) {
 
 }
 
-// ***************************************************************************************************
-// Overload of collision function to allow calculation of feq only for initialisation
+// *****************************************************************************
+/// \brief	Equilibrium calculation.
+///
+///			Computes the equilibrium distribution in direction supplied at the 
+///			given lattice site and returns the value.
+///
+/// \param i	i-index of lattice site. 
+/// \param j	j-index of lattice site.
+/// \param k	k-index of lattice site.
+/// \param v	lattice direction.
+/// \return		equilibrium function.
 double GridObj::LBM_collide(int i, int j, int k, int v) {
 
 	/* LBGK equilibrium function is represented as:
@@ -518,8 +539,16 @@ double GridObj::LBM_collide(int i, int j, int k, int v) {
 
 }
 
-// ***************************************************************************************************
-// KBC collision operator
+// *****************************************************************************
+/// \brief	KBC collision operator.
+///
+///			Applies KBC collision operator using the KBC-N4 and KBC-D models in 
+///			3D and 2D, respectively.
+///
+/// \param i		i-index of lattice site. 
+/// \param j		j-index of lattice site.
+/// \param k		k-index of lattice site.
+/// \param f_new	reference to the temporary, post-collision grid.
 void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	
 	// Declarations
@@ -732,9 +761,11 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 }
 
 
-// ***************************************************************************************************
-// Streaming operator
-// Applies periodic BCs on level 0
+// *****************************************************************************
+/// \brief	Streaming operator.
+///
+///			Currently, periodic BCs are only applied on L0. Considers site typing
+///			as well as grid location when determining viable streaming.
 void GridObj::LBM_stream( ) {
 
 	/* This streaming operation obeys the following logic process:
@@ -1027,8 +1058,11 @@ void GridObj::LBM_stream( ) {
 }
 
 
-// ***************************************************************************************************
-// Macroscopic quantity calculation and update of time-averaged quantities
+// *****************************************************************************
+/// \brief	Macroscopic update.
+///
+///			Updates macroscopic quantities over the lattice. Also updates 
+///			time-averaged quantities.
 void GridObj::LBM_macro( ) {
 
 	// Declarations
@@ -1139,10 +1173,17 @@ void GridObj::LBM_macro( ) {
 }
 
 
-// ***************************************************************************************************
-// Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by
-// the MPI unpacking routine to update the values for the next collision step. This routine does not
-// update the time-averaged quantities.
+// *****************************************************************************
+/// \brief	Site-specific macroscopic update.
+///
+///			Overload of macroscopic quantity calculation to allow it to be 
+///			applied to a single site as used by the MPI unpacking routine to 
+///			update the values for the next collision step. This routine does not
+///			update the time-averaged quantities.
+///
+/// \param i		i-index of lattice site. 
+/// \param j		j-index of lattice site.
+/// \param k		k-index of lattice site.
 void GridObj::LBM_macro( int i, int j, int k ) {
 
 	// Declarations
@@ -1216,8 +1257,13 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 }
 
 
-// ***************************************************************************************************
-// Explosion operation
+// ****************************************************************************
+/// \brief	Explosion operation for pushing information to finer grids.
+///
+///			Uses the algorithm of Rohde et al. 2006 to pass information from
+///			a coarse grid TL to a fine grid TL.
+///
+/// \param	RegionNumber	region number of the sub-grid.
 void GridObj::LBM_explode( int RegionNumber ) {
 
 	// Declarations
@@ -1295,8 +1341,13 @@ void GridObj::LBM_explode( int RegionNumber ) {
 }
 
 
-// ***************************************************************************************************
-// Coalesce operation -- called from coarse level
+// ****************************************************************************
+/// \brief	Coalesce operation for pulling information from finer grids.
+///
+///			Uses the algorithm of Rohde et al. 2006 to pull information from
+///			a fine grid TL to a coarse grid TL.
+///
+/// \param	RegionNumber	region number of the sub-grid.
 void GridObj::LBM_coalesce( int RegionNumber ) {
 
 	// Declarations
@@ -1381,4 +1432,4 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 }
 
-// ***************************************************************************************************
+// *****************************************************************************

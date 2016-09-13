@@ -58,7 +58,7 @@ protected:
 	*/
 
 	// Compute Q routine + overload
-	void computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj* g);
-	void computeQ(int i, int j, int N_lim, int M_lim, GridObj* g);
+	void computeQ(int i, int j, int k, GridObj* g);
+	void computeQ(int i, int j, GridObj* g);
 
 };

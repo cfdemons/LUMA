@@ -189,12 +189,10 @@ public :
 	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
 	void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
 	void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k);			// Application of Extrapolation BC
-	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
-	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
-	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
-	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
-		int i, int j, int k);		// Gets wall density for generalised, regularised velocity BC
+	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
+	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
+	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
+	void bc_solidSiteReset();									// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine

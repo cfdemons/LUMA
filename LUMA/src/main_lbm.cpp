@@ -13,7 +13,8 @@
  *
  */
 
-// LUMA.cpp : Defines the entry point for the console application.
+/// \file main_lbm.cpp
+/// \brief Defines the entry point for the LUMA application.
 
 #include "../inc/stdafx.h"			// Precompiled header
 #include "../inc/definitions.h"		// Definitions file
@@ -28,7 +29,7 @@ using namespace std;	// Use the standard namespace
 std::string GridUtils::path_str;
 int MpiManager::MPI_coords[L_dims];
 
-// Entry point
+/// Entry point
 int main( int argc, char* argv[] )
 {
 
@@ -577,9 +578,9 @@ int main( int argc, char* argv[] )
 
 #ifdef L_LOG_TIMINGS
 	// TIMINGS FILE //
-	/** Format is as follows:
+	/* Format is as follows:
 	 * Mpi Init Time --- Obj Init Time --- Time Step Time L0 --- MPI Time L0 --- etc.
-	 **/
+	 */
 
 	std::ofstream timings;
 

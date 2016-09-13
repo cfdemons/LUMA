@@ -84,11 +84,11 @@ class Body
 
 
 public:
-	///< Default Constructor
+	/// Default Constructor
 	Body(void)
 	{
 	};
-	///< Default destructor
+	/// Default destructor
 	~Body(void)
 	{
 	};

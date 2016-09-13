@@ -24,19 +24,21 @@ class GridObj;
 // Implementation of BFL body class //
 
 /*********************************************/
-// Default constructor / destructor
+/// Default constructor
 BFLBody::BFLBody(void)
 {
 }
 
-
+/// Default destructor
 BFLBody::~BFLBody(void)
 {
 }
 
 
 /*********************************************/
-// Custom constructor to populate body from array of points
+/// \brief Custom constructor to populate body from array of points.
+/// \param _PCpts pointer to point cloud data
+/// \param g_hierarchy pointer to grid hierarchy
 BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy) {
 
 	// Assign pointer to owning grid
@@ -116,9 +118,9 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (L_dims == 3)
-					computeQ(i,j,k,N_lim,M_lim,K_lim,_Owner);
+					computeQ(i,j,k,_Owner);
 #else
-					computeQ(i,j,N_lim,M_lim,_Owner);
+					computeQ(i,j,_Owner);
 #endif
 
 				}
@@ -145,8 +147,18 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy) {
 }
 
 /*********************************************/
-// Routine to compute Q values at a given local voxel for each application of the BFL BC.
-void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj* g) {
+/// \brief	Routine to compute wall distance Q.
+///
+///			Computes Q values in 3D at a given local voxel for each application of 
+///			the BFL BC. Performs a line-plane intersection algorithm for every 
+///			possible triangular plane constructed out of the marker in the voxel
+///			and its nearest neighbours.
+///
+/// \param i local i-index of BFL voxel
+/// \param j local j-index of BFL voxel
+/// \param k local k-index of BFL voxel
+/// \param g pointer to owner grid
+void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 
 	// Declarations
 	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
@@ -187,7 +199,7 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 			for (int kk = kb - 1; kk <= kb + 1; kk++) {
 
 				// If indices are valid
-				if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim && kb >= 0 && kb < K_lim) {
+				if (ib >= 0 && ib < g->N_lim && jb >= 0 && jb < g->M_lim && kb >= 0 && kb < g->K_lim) {
 
 					// Fetch data if available //
 #ifdef L_BUILD_FOR_MPI
@@ -264,9 +276,9 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 			for (int vel = 0; vel < L_nVels - 1; vel+=2) {
 
 				// Compute destination coordinates
-				dest_i = (i + c[0][vel] + N_lim) % N_lim;
-				dest_j = (j + c[1][vel] + M_lim) % M_lim;
-				dest_k = (k + c[2][vel] + K_lim) % K_lim;
+				dest_i = (i + c[0][vel] + g->N_lim) % g->N_lim;
+				dest_j = (j + c[1][vel] + g->M_lim) % g->M_lim;
+				dest_k = (k + c[2][vel] + g->K_lim) % g->K_lim;
 
 				// Define vectors
 				std::vector<double> u, v, local_origin;
@@ -342,8 +354,16 @@ void BFLBody::computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, Gri
 
 }
 
-// Overloaded compute Q routine for 2D
-void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
+/// \brief	Routine to compute wall distance Q.
+///
+///			Computes Q values in 2D at a given local voxel for each application of 
+///			the BFL BC. Performs a line-line intersection algorithm for each line 
+///			segment either side of the voxel marker.
+///
+/// \param i local i-index of BFL voxel
+/// \param j local j-index of BFL voxel
+/// \param g pointer to owner grid
+void BFLBody::computeQ(int i, int j, GridObj* g) {
 
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
@@ -377,7 +397,7 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 		for (int jj = jb - 1; jj <= jb + 1; jj++) {
 
 			// If indices are valid
-			if (ib >= 0 && ib < N_lim && jb >= 0 && jb < M_lim) {
+			if (ib >= 0 && ib < g->N_lim && jb >= 0 && jb < g->M_lim) {
 			
 
 				// Fetch data if available //
@@ -449,8 +469,8 @@ void BFLBody::computeQ(int i, int j, int N_lim, int M_lim, GridObj* g) {
 			for (int vel = 0; vel < L_nVels - 1; vel++) {
 
 				// Compute destination coordinates
-				dest_i = (i + c[0][vel] + N_lim) % N_lim;
-				dest_j = (j + c[1][vel] + M_lim) % M_lim;
+				dest_i = (i + c[0][vel] + g->N_lim) % g->N_lim;
+				dest_j = (j + c[1][vel] + g->M_lim) % g->M_lim;
 
 				// Compute vectors
 				std::vector<double> p;

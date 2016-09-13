@@ -19,18 +19,18 @@ Inheritance diagram for B\+F\+L\+Body\+:\begin{figure}[H]
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{class_b_f_l_body_ab7b3b9f55b59b977401bcf8dead8cfce}{B\+F\+L\+Body} (void)
-\item 
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_b_f_l_body_ad6d343eed8481d8b652261642e184c43}{$\sim$\+B\+F\+L\+Body} (void)
-\item 
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
 \hyperlink{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}{B\+F\+L\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g\+\_\+hierarchy)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Custom constructor to populate body from array of points. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{class_b_f_l_body_ac220c45e09a037a1f8c596d09d71e3a0}{computeQ} (int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
-\item 
-void \hyperlink{class_b_f_l_body_a2c98a2521ad9c1a3831a6004f867a307}{computeQ} (int i, int j, int N\+\_\+lim, int M\+\_\+lim, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
-\end{DoxyCompactItemize}
+void \hyperlink{class_b_f_l_body_a4b85b779da9755b508dab3130b8c1843}{computeQ} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\begin{DoxyCompactList}\small\item\em Routine to compute wall distance Q. \end{DoxyCompactList}\item 
+void \hyperlink{class_b_f_l_body_a6ed2553f1a73ad34b00474b5c2ebee0c}{computeQ} (int i, int j, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\begin{DoxyCompactList}\small\item\em Routine to compute wall distance Q. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -56,6 +56,10 @@ A B\+FL body is made up of a collection of B\+F\+L\+Markers.
 \item[{void}]{}
 \end{DoxyParamCaption}
 )}\hypertarget{class_b_f_l_body_ab7b3b9f55b59b977401bcf8dead8cfce}{}\label{class_b_f_l_body_ab7b3b9f55b59b977401bcf8dead8cfce}
+
+
+Default constructor. 
+
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!````~B\+F\+L\+Body@{$\sim$\+B\+F\+L\+Body}}
 \index{````~B\+F\+L\+Body@{$\sim$\+B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
 \subsubsection[{\texorpdfstring{$\sim$\+B\+F\+L\+Body(void)}{~BFLBody(void)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Body\+::$\sim$\+B\+F\+L\+Body (
@@ -63,6 +67,10 @@ A B\+FL body is made up of a collection of B\+F\+L\+Markers.
 \item[{void}]{}
 \end{DoxyParamCaption}
 )}\hypertarget{class_b_f_l_body_ad6d343eed8481d8b652261642e184c43}{}\label{class_b_f_l_body_ad6d343eed8481d8b652261642e184c43}
+
+
+Default destructor. 
+
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
 \subsubsection[{\texorpdfstring{B\+F\+L\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$g\+\_\+hierarchy)}{BFLBody(PCpts *_PCpts, GridObj *g_hierarchy)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Body\+::\+B\+F\+L\+Body (
@@ -73,31 +81,69 @@ A B\+FL body is made up of a collection of B\+F\+L\+Markers.
 )}\hypertarget{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}{}\label{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}
 
 
+Custom constructor to populate body from array of points. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & pointer to point cloud data \\
+\hline
+{\em g\+\_\+hierarchy} & pointer to grid hierarchy \\
+\hline
+\end{DoxyParams}
+
+
 \subsection{Member Function Documentation}
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!computeQ@{computeQ}}
 \index{computeQ@{computeQ}!B\+F\+L\+Body@{B\+F\+L\+Body}}
-\subsubsection[{\texorpdfstring{compute\+Q(int i, int j, int k, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, Grid\+Obj $\ast$g)}{computeQ(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void B\+F\+L\+Body\+::computeQ (
+\subsubsection[{\texorpdfstring{compute\+Q(int i, int j, int k, Grid\+Obj $\ast$g)}{computeQ(int i, int j, int k, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void B\+F\+L\+Body\+::computeQ (
 \begin{DoxyParamCaption}
 \item[{int}]{i, }
 \item[{int}]{j, }
 \item[{int}]{k, }
-\item[{int}]{N\+\_\+lim, }
-\item[{int}]{M\+\_\+lim, }
-\item[{int}]{K\+\_\+lim, }
 \item[{{\bf Grid\+Obj} $\ast$}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_b_f_l_body_ac220c45e09a037a1f8c596d09d71e3a0}{}\label{class_b_f_l_body_ac220c45e09a037a1f8c596d09d71e3a0}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_b_f_l_body_a4b85b779da9755b508dab3130b8c1843}{}\label{class_b_f_l_body_a4b85b779da9755b508dab3130b8c1843}
+
+
+Routine to compute wall distance Q. 
+
+Computes Q values in 3D at a given local voxel for each application of the B\+FL BC. Performs a line-\/plane intersection algorithm for every possible triangular plane constructed out of the marker in the voxel and its nearest neighbours.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & local i-\/index of B\+FL voxel \\
+\hline
+{\em j} & local j-\/index of B\+FL voxel \\
+\hline
+{\em k} & local k-\/index of B\+FL voxel \\
+\hline
+{\em g} & pointer to owner grid \\
+\hline
+\end{DoxyParams}
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!computeQ@{computeQ}}
 \index{computeQ@{computeQ}!B\+F\+L\+Body@{B\+F\+L\+Body}}
-\subsubsection[{\texorpdfstring{compute\+Q(int i, int j, int N\+\_\+lim, int M\+\_\+lim, Grid\+Obj $\ast$g)}{computeQ(int i, int j, int N_lim, int M_lim, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void B\+F\+L\+Body\+::computeQ (
+\subsubsection[{\texorpdfstring{compute\+Q(int i, int j, Grid\+Obj $\ast$g)}{computeQ(int i, int j, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void B\+F\+L\+Body\+::computeQ (
 \begin{DoxyParamCaption}
 \item[{int}]{i, }
 \item[{int}]{j, }
-\item[{int}]{N\+\_\+lim, }
-\item[{int}]{M\+\_\+lim, }
 \item[{{\bf Grid\+Obj} $\ast$}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_b_f_l_body_a2c98a2521ad9c1a3831a6004f867a307}{}\label{class_b_f_l_body_a2c98a2521ad9c1a3831a6004f867a307}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_b_f_l_body_a6ed2553f1a73ad34b00474b5c2ebee0c}{}\label{class_b_f_l_body_a6ed2553f1a73ad34b00474b5c2ebee0c}
+
+
+Routine to compute wall distance Q. 
+
+Computes Q values in 2D at a given local voxel for each application of the B\+FL BC. Performs a line-\/line intersection algorithm for each line segment either side of the voxel marker.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & local i-\/index of B\+FL voxel \\
+\hline
+{\em j} & local j-\/index of B\+FL voxel \\
+\hline
+{\em g} & pointer to owner grid \\
+\hline
+\end{DoxyParams}
 
 
 \subsection{Friends And Related Function Documentation}

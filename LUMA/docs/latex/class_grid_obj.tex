@@ -13,83 +13,87 @@ Grid class.
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{class_grid_obj_acc3416599b59236e87b6b60a07e678af}{Grid\+Obj} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Default Constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}{Grid\+Obj} (int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level})
-\item 
+\begin{DoxyCompactList}\small\item\em Constructor for top level grid. \end{DoxyCompactList}\item 
 \hyperlink{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}{Grid\+Obj} (int Region\+Number, \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
-\item 
+\begin{DoxyCompactList}\small\item\em Constructor for a sub-\/grid. \end{DoxyCompactList}\item 
 \hyperlink{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}{Grid\+Obj} (int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level}, std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)
-\item 
+\begin{DoxyCompactList}\small\item\em M\+PI constructor for top level grid. \end{DoxyCompactList}\item 
 \hyperlink{class_grid_obj_ace563099d85c330ac48f35b515422522}{$\sim$\+Grid\+Obj} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Default Destructor. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}{L\+B\+M\+\_\+init\+Velocity} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise the lattice velocity. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{L\+B\+M\+\_\+init\+Rho} ()
-\item 
+\begin{DoxyCompactList}\small\item\em \begin{quote}
+Initialise the velocity field \end{quote}
+\end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aeea74cc13001620abec1ba819233f714}{L\+B\+M\+\_\+init\+Grid} ()
-\item 
+\begin{DoxyCompactList}\small\item\em \begin{quote}
+Initialise the density field \end{quote}
+\end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{L\+B\+M\+\_\+init\+Grid} (std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)
-\item 
+\begin{DoxyCompactList}\small\item\em \begin{quote}
+Non-\/\+M\+PI wrapper for initialiser \end{quote}
+\end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{L\+B\+M\+\_\+init\+Sub\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise all sub-\/grid quantities. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a4b6edceeda49496365e725eb67931961}{L\+B\+M\+\_\+init\+Bound\+Lab} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise wall and object labels on L0. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}{L\+B\+M\+\_\+init\+Solid\+Lab} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise label-\/based solids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{L\+B\+M\+\_\+init\+Refined\+Lab} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise all labels on sub-\/grids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a023713976673d029103690a91c5415f9}{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Method to import an input profile from a file. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{L\+B\+M\+\_\+multi} (bool I\+B\+M\+\_\+flag)
-\item 
+\begin{DoxyCompactList}\small\item\em L\+BM multi-\/grid kernel. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{L\+B\+M\+\_\+collide} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Apply collision operator. \end{DoxyCompactList}\item 
 double \hyperlink{class_grid_obj_a1540c0d77a47e60a7fd55f51e5a98451}{L\+B\+M\+\_\+collide} (int i, int j, int k, int v)
-\item 
+\begin{DoxyCompactList}\small\item\em Equilibrium calculation. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ac4ca0327a53171fe8e1c3076e9f1353f}{L\+B\+M\+\_\+kbc\+Collide} (int i, int j, int k, \hyperlink{class_i_vector}{I\+Vector}$<$ double $>$ \&f\+\_\+new)
-\item 
+\begin{DoxyCompactList}\small\item\em K\+BC collision operator. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}{L\+B\+M\+\_\+stream} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Streaming operator. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a25382158b7747da7c0639aed513ae39c}{L\+B\+M\+\_\+macro} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Macroscopic update. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{L\+B\+M\+\_\+macro} (int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Site-\/specific macroscopic update. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}{L\+B\+M\+\_\+boundary} (int bc\+\_\+type\+\_\+flag)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply boundary conditions on lattice. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{L\+B\+M\+\_\+forcegrid} (bool reset\+\_\+flag)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to compute or reset body forces. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}{bc\+\_\+apply\+Bounce\+Back} (int label, int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply half-\/way bounce-\/back. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}{bc\+\_\+apply\+Spec\+Reflect} (int label, int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply half-\/way specular reflection. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5602705b2575b09e27dd0065de3542f6}{bc\+\_\+apply\+Regularised} (int label, int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply regularised velocity inlet. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a385c4803f4803e380a520ac9b3dcb31d}{bc\+\_\+apply\+Extrapolation} (int label, int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply extrapolation outlet. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{bc\+\_\+apply\+Bfl} (int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply B\+FL bounce-\/back. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{bc\+\_\+apply\+Nrbc} (int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to apply N\+R\+BC. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}{bc\+\_\+solid\+Site\+Reset} ()
-\item 
-double \hyperlink{class_grid_obj_a8780d80f2868e9444349e518bd40a198}{bc\+\_\+get\+Wall\+Density\+For\+R\+BC} (std\+::vector$<$ double $>$ \&ftmp, int normal, int i, int j, int k)
-\item 
+\begin{DoxyCompactList}\small\item\em Helper method to set macroscopic quantities of solid sites. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}{L\+B\+M\+\_\+explode} (int Region\+Number)
-\item 
+\begin{DoxyCompactList}\small\item\em Explosion operation for pushing information to finer grids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5832081a70e8990be62317034bb975c6}{L\+B\+M\+\_\+coalesce} (int Region\+Number)
-\item 
+\begin{DoxyCompactList}\small\item\em Coalesce operation for pulling information from finer grids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{L\+B\+M\+\_\+add\+Sub\+Grid} (int Region\+Number)
-\item 
+\begin{DoxyCompactList}\small\item\em Wrapper method to add sub-\/grid to this grid. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}{io\+\_\+textout} (std\+::string output\+\_\+tag)
-\item 
+\begin{DoxyCompactList}\small\item\em Verbose A\+S\+C\+II writer. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}{io\+\_\+restart} (bool I\+O\+\_\+flag)
-\item 
+\begin{DoxyCompactList}\small\item\em Restart file read-\/writer. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{io\+\_\+probe\+Output} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Probe writer. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_acf311bbf350fd48104663eaabebca835}{io\+\_\+lite} (double tval, std\+::string Tag)
-\item 
+\begin{DoxyCompactList}\small\item\em A\+S\+C\+II dump of grid data. \end{DoxyCompactList}\item 
 int \hyperlink{class_grid_obj_adc960ac818748b839e81d1375782caa7}{io\+\_\+hdf5} (double tval)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em H\+D\+F5 writer. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -151,6 +155,10 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{void}]{}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_acc3416599b59236e87b6b60a07e678af}{}\label{class_grid_obj_acc3416599b59236e87b6b60a07e678af}
+
+
+Default Constructor. 
+
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{Grid\+Obj(int level)}{GridObj(int level)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
@@ -158,6 +166,17 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{int}]{level}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}{}\label{class_grid_obj_aaadde3417da5f31e1b8b33635487b56e}
+
+
+Constructor for top level grid. 
+
+Coarse limits are set to zero and then L0-\/specific initialiser called.
+
+
+\begin{DoxyParams}{Parameters}
+{\em level} & always should be zero astop level grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{Grid\+Obj(int Region\+Number, Grid\+Obj \&p\+Grid)}{GridObj(int RegionNumber, GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
@@ -166,6 +185,17 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{{\bf Grid\+Obj} \&}]{p\+Grid}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}{}\label{class_grid_obj_a40600a8b8a286b8299bca8265b62f51b}
+
+
+Constructor for a sub-\/grid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Region\+Number} & ID indicating the region of nested refinement to which this sub-\/grid belongs. \\
+\hline
+{\em p\+Grid} & pointer to parent grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{Grid\+Obj(int level, std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)}{GridObj(int level, std::vector< int > local_size, std::vector< std::vector< int > > GlobalLimsInd, std::vector< std::vector< double > > GlobalLimsPos)}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::\+Grid\+Obj (
@@ -176,6 +206,23 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{Global\+Lims\+Pos}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}{}\label{class_grid_obj_abc1ce149816c2f96870a859ce28c598d}
+
+
+M\+PI constructor for top level grid. 
+
+When using M\+PI, this constructors a local grid which represents an appropriate portion of the top-\/level grid as dictated by the extent of this rank.
+
+
+\begin{DoxyParams}{Parameters}
+{\em level} & always should be zero astop level grid. \\
+\hline
+{\em local\+\_\+size} & vector indicating dimensions of local grid including halo. \\
+\hline
+{\em Global\+Lims\+Ind} & vector indicating the global indices of the edges of this local grid. \\
+\hline
+{\em Global\+Lims\+Pos} & vector indicating the global positions of the edges of this local grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!````~Grid\+Obj@{$\sim$\+Grid\+Obj}}
 \index{````~Grid\+Obj@{$\sim$\+Grid\+Obj}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{$\sim$\+Grid\+Obj()}{~GridObj()}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Obj\+::$\sim$\+Grid\+Obj (
@@ -183,6 +230,10 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{void}]{}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ace563099d85c330ac48f35b515422522}{}\label{class_grid_obj_ace563099d85c330ac48f35b515422522}
+
+
+Default Destructor. 
+
 
 
 \subsection{Member Function Documentation}
@@ -195,9 +246,22 @@ This class represents a grid (lattice) and is capable of owning a nested hierarc
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{}\label{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}
-Apply BC in pairs -- BC 1
 
-Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Back@{bc\+\_\+apply\+Bounce\+Back}}
+
+Method to apply B\+FL bounce-\/back. 
+
+Currently, assumes only 1 B\+FL body present on the grid.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Back@{bc\+\_\+apply\+Bounce\+Back}}
 \index{bc\+\_\+apply\+Bounce\+Back@{bc\+\_\+apply\+Bounce\+Back}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+apply\+Bounce\+Back(int label, int i, int j, int k)}{bc_applyBounceBack(int label, int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Bounce\+Back (
 \begin{DoxyParamCaption}
@@ -207,6 +271,21 @@ Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Ba
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}{}\label{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}
+
+
+Method to apply half-\/way bounce-\/back. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em label} & current site label. \\
+\hline
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Extrapolation@{bc\+\_\+apply\+Extrapolation}}
 \index{bc\+\_\+apply\+Extrapolation@{bc\+\_\+apply\+Extrapolation}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+apply\+Extrapolation(int label, int i, int j, int k)}{bc_applyExtrapolation(int label, int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Extrapolation (
@@ -217,6 +296,23 @@ Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Ba
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a385c4803f4803e380a520ac9b3dcb31d}{}\label{class_grid_obj_a385c4803f4803e380a520ac9b3dcb31d}
+
+
+Method to apply extrapolation outlet. 
+
+Can only be applied on right-\/hand wall.
+
+
+\begin{DoxyParams}{Parameters}
+{\em label} & current site label. \\
+\hline
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Nrbc@{bc\+\_\+apply\+Nrbc}}
 \index{bc\+\_\+apply\+Nrbc@{bc\+\_\+apply\+Nrbc}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+apply\+Nrbc(int i, int j, int k)}{bc_applyNrbc(int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Nrbc (
@@ -226,6 +322,21 @@ Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Ba
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{}\label{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}
+
+
+Method to apply N\+R\+BC. 
+
+Not implemented in this version.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Regularised@{bc\+\_\+apply\+Regularised}}
 \index{bc\+\_\+apply\+Regularised@{bc\+\_\+apply\+Regularised}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+apply\+Regularised(int label, int i, int j, int k)}{bc_applyRegularised(int label, int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Regularised (
@@ -236,14 +347,24 @@ Apply BC in pairs -- BC 2 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Bounce\+Ba
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a5602705b2575b09e27dd0065de3542f6}{}\label{class_grid_obj_a5602705b2575b09e27dd0065de3542f6}
-To allow a generalised application of the regularised BC we need to implement the following\+:
-\begin{DoxyEnumerate}
-\item Check normal directions to find orientation of normal wall;
-\item Store the unknown and known directions in two vectors
-\item Apply the boundary condition. Note\+: for the corners, the unknown distributions are too numerous to evaluate the density so must use extrapolation for the 4 corners (2D) or 8 corners (3D) from the bulk flow to find the density. Hence, we handle this case after the normal cases.
 
-If it reaches here and has gone through all the directions then the wall orientation cannot be found based on the fact that it cannot find an adjacent site within the centre of the domain on which to base the BC. In this case it must be a buffered layer of inlet sites (the \char`\"{}second row\char`\"{} of sites you get when embedding a sub-\/grid in the inlet) so just set it to default values as it doesn\textquotesingle{}t affect the domain anyway. 
-\end{DoxyEnumerate}\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Spec\+Reflect@{bc\+\_\+apply\+Spec\+Reflect}}
+
+Method to apply regularised velocity inlet. 
+
+Can be applied on any wall.
+
+
+\begin{DoxyParams}{Parameters}
+{\em label} & current site label. \\
+\hline
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
+\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+apply\+Spec\+Reflect@{bc\+\_\+apply\+Spec\+Reflect}}
 \index{bc\+\_\+apply\+Spec\+Reflect@{bc\+\_\+apply\+Spec\+Reflect}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+apply\+Spec\+Reflect(int label, int i, int j, int k)}{bc_applySpecReflect(int label, int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+apply\+Spec\+Reflect (
 \begin{DoxyParamCaption}
@@ -253,17 +374,23 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}{}\label{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}
-\index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+get\+Wall\+Density\+For\+R\+BC@{bc\+\_\+get\+Wall\+Density\+For\+R\+BC}}
-\index{bc\+\_\+get\+Wall\+Density\+For\+R\+BC@{bc\+\_\+get\+Wall\+Density\+For\+R\+BC}!Grid\+Obj@{Grid\+Obj}}
-\subsubsection[{\texorpdfstring{bc\+\_\+get\+Wall\+Density\+For\+R\+B\+C(std\+::vector$<$ double $>$ \&ftmp, int normal, int i, int j, int k)}{bc_getWallDensityForRBC(std::vector< double > &ftmp, int normal, int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::bc\+\_\+get\+Wall\+Density\+For\+R\+BC (
-\begin{DoxyParamCaption}
-\item[{std\+::vector$<$ double $>$ \&}]{ftmp, }
-\item[{int}]{normal, }
-\item[{int}]{i, }
-\item[{int}]{j, }
-\item[{int}]{k}
-\end{DoxyParamCaption}
-)}\hypertarget{class_grid_obj_a8780d80f2868e9444349e518bd40a198}{}\label{class_grid_obj_a8780d80f2868e9444349e518bd40a198}
+
+
+Method to apply half-\/way specular reflection. 
+
+Symmetry boundary condition for free-\/slip walls.
+
+
+\begin{DoxyParams}{Parameters}
+{\em label} & current site label. \\
+\hline
+{\em i} & current site i-\/index. \\
+\hline
+{\em j} & current site j-\/index. \\
+\hline
+{\em k} & current site k-\/index. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!bc\+\_\+solid\+Site\+Reset@{bc\+\_\+solid\+Site\+Reset}}
 \index{bc\+\_\+solid\+Site\+Reset@{bc\+\_\+solid\+Site\+Reset}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{bc\+\_\+solid\+Site\+Reset()}{bc_solidSiteReset()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::bc\+\_\+solid\+Site\+Reset (
@@ -271,21 +398,49 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}{}\label{class_grid_obj_ac86a233f9475084226e6bf651ffe398f}
-\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+hdf5@{io\+\_\+hdf5}}
+
+
+Helper method to set macroscopic quantities of solid sites. 
+
+Velocity is set to zero and density is set to initial density. Applies to e\+Solid and e\+Refined\+Solid sites only. \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+hdf5@{io\+\_\+hdf5}}
 \index{io\+\_\+hdf5@{io\+\_\+hdf5}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+hdf5(double tval)}{io_hdf5(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::io\+\_\+hdf5 (
 \begin{DoxyParamCaption}
 \item[{double}]{tval}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_adc960ac818748b839e81d1375782caa7}{}\label{class_grid_obj_adc960ac818748b839e81d1375782caa7}
+
+
+H\+D\+F5 writer. 
+
+Useful grid quantities written out as scalar arrays. One $\ast$.h5 file per grid and data is grouped into timesteps within each file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tval} & time value being written out. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+lite@{io\+\_\+lite}}
 \index{io\+\_\+lite@{io\+\_\+lite}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+lite(double tval, std\+::string Tag)}{io_lite(double tval, std::string Tag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+lite (
 \begin{DoxyParamCaption}
 \item[{double}]{tval, }
-\item[{std\+::string}]{Tag}
+\item[{std\+::string}]{T\+AG}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_acf311bbf350fd48104663eaabebca835}{}\label{class_grid_obj_acf311bbf350fd48104663eaabebca835}
+
+
+A\+S\+C\+II dump of grid data. 
+
+Generic A\+S\+C\+II writer for each rank to write out all grid data in rows into a single, unsorted file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tval} & time value being written out. \\
+\hline
+{\em T\+AG} & text identifier for the data. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+probe\+Output@{io\+\_\+probe\+Output}}
 \index{io\+\_\+probe\+Output@{io\+\_\+probe\+Output}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+probe\+Output()}{io_probeOutput()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+probe\+Output (
@@ -293,13 +448,28 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{}\label{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}
-\index{Grid\+Obj@{Grid\+Obj}!io\+\_\+restart@{io\+\_\+restart}}
+
+
+Probe writer. 
+
+This routine writes the quantities at hte probe locations to a single file. \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+restart@{io\+\_\+restart}}
 \index{io\+\_\+restart@{io\+\_\+restart}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+restart(bool I\+O\+\_\+flag)}{io_restart(bool IO_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+restart (
 \begin{DoxyParamCaption}
 \item[{bool}]{I\+O\+\_\+flag}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}{}\label{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}
+
+
+Restart file read-\/writer. 
+
+This routine writes/reads the current rank\textquotesingle{}s data in the custom restart file format. If the file already exists, data is appended. IB body data are also written out but no other body information at present.
+
+
+\begin{DoxyParams}{Parameters}
+{\em I\+O\+\_\+flag} & flag to indicate whether a write (true) or read (false) is required. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+textout@{io\+\_\+textout}}
 \index{io\+\_\+textout@{io\+\_\+textout}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+textout(std\+::string output\+\_\+tag)}{io_textout(std::string output_tag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+textout (
@@ -307,6 +477,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{std\+::string}]{output\+\_\+tag}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}{}\label{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}
+
+
+Verbose A\+S\+C\+II writer. 
+
+Writes all the contents of the grid class at time t and call recursviely for any sub-\/grids. Writes to text file \char`\"{}\+Grids.\+out\char`\"{} by default.
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+\_\+tag} & text string added to top of output for identification. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+add\+Sub\+Grid@{L\+B\+M\+\_\+add\+Sub\+Grid}}
 \index{L\+B\+M\+\_\+add\+Sub\+Grid@{L\+B\+M\+\_\+add\+Sub\+Grid}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+add\+Sub\+Grid(int Region\+Number)}{LBM_addSubGrid(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+add\+Sub\+Grid (
@@ -314,6 +495,15 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{Region\+Number}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{}\label{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}
+
+
+Wrapper method to add sub-\/grid to this grid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Region\+Number} & ID indicating the region of nested refinement to which this sub-\/grid belongs. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+boundary@{L\+B\+M\+\_\+boundary}}
 \index{L\+B\+M\+\_\+boundary@{L\+B\+M\+\_\+boundary}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+boundary(int bc\+\_\+type\+\_\+flag)}{LBM_boundary(int bc_type_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+boundary (
@@ -321,6 +511,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{bc\+\_\+type\+\_\+flag}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}{}\label{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}
+
+
+Method to apply boundary conditions on lattice. 
+
+This method will exmaine the entire lattice for sites which require a boundary condition but only apply the boundary condition requested in the bc\+\_\+type\+\_\+flag argument.
+
+
+\begin{DoxyParams}{Parameters}
+{\em bc\+\_\+type\+\_\+flag} & Flag indicating which set of B\+Cs to apply. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+coalesce@{L\+B\+M\+\_\+coalesce}}
 \index{L\+B\+M\+\_\+coalesce@{L\+B\+M\+\_\+coalesce}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+coalesce(int Region\+Number)}{LBM_coalesce(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+coalesce (
@@ -328,6 +529,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{Region\+Number}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a5832081a70e8990be62317034bb975c6}{}\label{class_grid_obj_a5832081a70e8990be62317034bb975c6}
+
+
+Coalesce operation for pulling information from finer grids. 
+
+Uses the algorithm of Rohde et al. 2006 to pull information from a fine grid TL to a coarse grid TL.
+
+
+\begin{DoxyParams}{Parameters}
+{\em Region\+Number} & region number of the sub-\/grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}}
 \index{L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+collide()}{LBM_collide()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+collide (
@@ -335,6 +547,10 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{}\label{class_grid_obj_a0feb0f9406f626e90c57045350161b22}
+
+
+Apply collision operator. 
+
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}}
 \index{L\+B\+M\+\_\+collide@{L\+B\+M\+\_\+collide}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+collide(int i, int j, int k, int v)}{LBM_collide(int i, int j, int k, int v)}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::\+L\+B\+M\+\_\+collide (
@@ -345,6 +561,26 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{v}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a1540c0d77a47e60a7fd55f51e5a98451}{}\label{class_grid_obj_a1540c0d77a47e60a7fd55f51e5a98451}
+
+
+Equilibrium calculation. 
+
+Computes the equilibrium distribution in direction supplied at the given lattice site and returns the value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & i-\/index of lattice site. \\
+\hline
+{\em j} & j-\/index of lattice site. \\
+\hline
+{\em k} & k-\/index of lattice site. \\
+\hline
+{\em v} & lattice direction. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+equilibrium function. 
+\end{DoxyReturn}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+explode@{L\+B\+M\+\_\+explode}}
 \index{L\+B\+M\+\_\+explode@{L\+B\+M\+\_\+explode}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+explode(int Region\+Number)}{LBM_explode(int RegionNumber)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+explode (
@@ -352,6 +588,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{Region\+Number}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}{}\label{class_grid_obj_ad8086651bd7b978e0b9c48d56c3d0595}
+
+
+Explosion operation for pushing information to finer grids. 
+
+Uses the algorithm of Rohde et al. 2006 to pass information from a coarse grid TL to a fine grid TL.
+
+
+\begin{DoxyParams}{Parameters}
+{\em Region\+Number} & region number of the sub-\/grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}}
 \index{L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+forcegrid(bool reset\+\_\+flag)}{LBM_forcegrid(bool reset_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+forcegrid (
@@ -359,6 +606,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{bool}]{reset\+\_\+flag}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{}\label{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}
+
+
+Method to compute or reset body forces. 
+
+Takes Cartesian force vector and populates forces for each lattice direction. If reset\+\_\+flag is true, then resets the force vectors to zero.
+
+
+\begin{DoxyParams}{Parameters}
+{\em reset\+\_\+flag} & flag to indicate whether force vectors should simply be reset. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}}
 \index{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile()}{LBM_init_getInletProfile()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile (
@@ -366,29 +624,62 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a023713976673d029103690a91c5415f9}{}\label{class_grid_obj_a023713976673d029103690a91c5415f9}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Bound\+Lab@{L\+B\+M\+\_\+init\+Bound\+Lab}}
+
+
+Method to import an input profile from a file. 
+
+Input data may be over-\/ or under-\/sampled but it must span the physical dimensions of the inlet otherwise the software does not known how to scale the data to fit. Inlet profile is always assumed to be oriented vertically (y-\/direction). \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Bound\+Lab@{L\+B\+M\+\_\+init\+Bound\+Lab}}
 \index{L\+B\+M\+\_\+init\+Bound\+Lab@{L\+B\+M\+\_\+init\+Bound\+Lab}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Bound\+Lab()}{LBM_initBoundLab()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Bound\+Lab (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a4b6edceeda49496365e725eb67931961}{}\label{class_grid_obj_a4b6edceeda49496365e725eb67931961}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
+
+
+Method to initialise wall and object labels on L0. 
+
+The virtual wind tunnel definitions are implemented by this method. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
 \index{L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Grid()}{LBM_initGrid()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Grid (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_aeea74cc13001620abec1ba819233f714}{}\label{class_grid_obj_aeea74cc13001620abec1ba819233f714}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
+
+
+\begin{quote}
+Initialise the density field \end{quote}
+
+
+Wrapper to initialise all L0 lattice quantities.
+
+This method wraps the M\+P\+I-\/specific version. It is called by the serial build and sets the M\+P\+I-\/specific arguments to default values before calling the full initialiser. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
 \index{L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Grid(std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)}{LBM_initGrid(std::vector< int > local_size, std::vector< std::vector< int > > GlobalLimsInd, std::vector< std::vector< double > > GlobalLimsPos)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Grid (
 \begin{DoxyParamCaption}
 \item[{std\+::vector$<$ int $>$}]{local\+\_\+size, }
-\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$}]{Global\+Lims\+Ind, }
-\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{Global\+Lims\+Pos}
+\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$}]{global\+\_\+edge\+\_\+ind, }
+\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{global\+\_\+edge\+\_\+pos}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{}\label{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}
+
+
+\begin{quote}
+Non-\/\+M\+PI wrapper for initialiser \end{quote}
+
+
+Method to initialise all L0 lattice quantities.
+
+
+\begin{DoxyParams}{Parameters}
+{\em local\+\_\+size} & local grid size on this rank including halo. \\
+\hline
+{\em global\+\_\+edge\+\_\+ind} & global indices of the rank edges. \\
+\hline
+{\em global\+\_\+edge\+\_\+pos} & global positions of the rank edges. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Refined\+Lab@{L\+B\+M\+\_\+init\+Refined\+Lab}}
 \index{L\+B\+M\+\_\+init\+Refined\+Lab@{L\+B\+M\+\_\+init\+Refined\+Lab}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Refined\+Lab(\+Grid\+Obj \&p\+Grid)}{LBM_initRefinedLab(GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Refined\+Lab (
@@ -396,6 +687,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{{\bf Grid\+Obj} \&}]{p\+Grid}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{}\label{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}
+
+
+Method to initialise all labels on sub-\/grids. 
+
+Boundary labels are set by considering parent labels on overlapping sites and then assigning child labels appropriately.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Grid} & reference to parent grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Rho@{L\+B\+M\+\_\+init\+Rho}}
 \index{L\+B\+M\+\_\+init\+Rho@{L\+B\+M\+\_\+init\+Rho}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Rho()}{LBM_initRho()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Rho (
@@ -403,13 +705,23 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{}\label{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}}
+
+
+\begin{quote}
+Initialise the velocity field \end{quote}
+
+
+Method to initialise the lattice density. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}}
 \index{L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Solid\+Lab()}{LBM_initSolidLab()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Solid\+Lab (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}{}\label{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}
+
+
+Method to initialise label-\/based solids. 
+
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Sub\+Grid@{L\+B\+M\+\_\+init\+Sub\+Grid}}
 \index{L\+B\+M\+\_\+init\+Sub\+Grid@{L\+B\+M\+\_\+init\+Sub\+Grid}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Sub\+Grid(\+Grid\+Obj \&p\+Grid)}{LBM_initSubGrid(GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Sub\+Grid (
@@ -417,6 +729,15 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{{\bf Grid\+Obj} \&}]{p\+Grid}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{}\label{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}
+
+
+Method to initialise all sub-\/grid quantities. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Grid} & reference to parent grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Velocity@{L\+B\+M\+\_\+init\+Velocity}}
 \index{L\+B\+M\+\_\+init\+Velocity@{L\+B\+M\+\_\+init\+Velocity}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Velocity()}{LBM_initVelocity()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Velocity (
@@ -424,7 +745,11 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}{}\label{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+kbc\+Collide@{L\+B\+M\+\_\+kbc\+Collide}}
+
+
+Method to initialise the lattice velocity. 
+
+Unless the L\+\_\+\+N\+O\+\_\+\+F\+L\+OW macro is defined, the initial velocity everywhere will be set to the values specified in the definitions file. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+kbc\+Collide@{L\+B\+M\+\_\+kbc\+Collide}}
 \index{L\+B\+M\+\_\+kbc\+Collide@{L\+B\+M\+\_\+kbc\+Collide}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+kbc\+Collide(int i, int j, int k, I\+Vector$<$ double $>$ \&f\+\_\+new)}{LBM_kbcCollide(int i, int j, int k, IVector< double > &f_new)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+kbc\+Collide (
 \begin{DoxyParamCaption}
@@ -434,6 +759,23 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{{\bf I\+Vector}$<$ double $>$ \&}]{f\+\_\+new}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ac4ca0327a53171fe8e1c3076e9f1353f}{}\label{class_grid_obj_ac4ca0327a53171fe8e1c3076e9f1353f}
+
+
+K\+BC collision operator. 
+
+Applies K\+BC collision operator using the K\+B\+C-\/\+N4 and K\+B\+C-\/D models in 3D and 2D, respectively.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & i-\/index of lattice site. \\
+\hline
+{\em j} & j-\/index of lattice site. \\
+\hline
+{\em k} & k-\/index of lattice site. \\
+\hline
+{\em f\+\_\+new} & reference to the temporary, post-\/collision grid. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}}
 \index{L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+macro()}{LBM_macro()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+macro (
@@ -441,7 +783,11 @@ If it reaches here and has gone through all the directions then the wall orienta
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a25382158b7747da7c0639aed513ae39c}{}\label{class_grid_obj_a25382158b7747da7c0639aed513ae39c}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}}
+
+
+Macroscopic update. 
+
+Updates macroscopic quantities over the lattice. Also updates time-\/averaged quantities. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}}
 \index{L\+B\+M\+\_\+macro@{L\+B\+M\+\_\+macro}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+macro(int i, int j, int k)}{LBM_macro(int i, int j, int k)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+macro (
 \begin{DoxyParamCaption}
@@ -450,6 +796,21 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{int}]{k}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{}\label{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}
+
+
+Site-\/specific macroscopic update. 
+
+Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by the M\+PI unpacking routine to update the values for the next collision step. This routine does not update the time-\/averaged quantities.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & i-\/index of lattice site. \\
+\hline
+{\em j} & j-\/index of lattice site. \\
+\hline
+{\em k} & k-\/index of lattice site. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}}
 \index{L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi(bool I\+B\+M\+\_\+flag)}{LBM_multi(bool IBM_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi (
@@ -457,6 +818,17 @@ If it reaches here and has gone through all the directions then the wall orienta
 \item[{bool}]{I\+B\+M\+\_\+flag}
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{}\label{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}
+
+
+L\+BM multi-\/grid kernel. 
+
+The L\+BM kernel manages the calling of all I\+BM and L\+BM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-\/grids and manages the framework for grid-\/grid interaction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em I\+B\+M\+\_\+flag} & flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using I\+BM. \\
+\hline
+\end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}}
 \index{L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+stream()}{LBM_stream()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+stream (
@@ -465,6 +837,10 @@ If it reaches here and has gone through all the directions then the wall orienta
 \end{DoxyParamCaption}
 )}\hypertarget{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}{}\label{class_grid_obj_a5b5cb1f3136da8cbff96955d9c6d9e5b}
 
+
+Streaming operator. 
+
+Currently, periodic B\+Cs are only applied on L0. Considers site typing as well as grid location when determining viable streaming. 
 
 \subsection{Friends And Related Function Documentation}
 \index{Grid\+Obj@{Grid\+Obj}!Grid\+Utils@{Grid\+Utils}}

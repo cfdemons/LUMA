@@ -24,20 +24,35 @@
 class GridObj;
 
 // ***************************************************************************************************
-// Constructor and destructor
+/// \brief Constructor which sets group ID to zero by default.
 IBBody::IBBody()
 {
 	this->groupID = 0;	// Default ID
 }
+
+/// \brief	Constructor which assigns the owner grid.
+///
+///			Also sets the group ID to zero.
+///
+/// \param g pointer to owner grid
 IBBody::IBBody(GridObj* g)
 {
 	this->_Owner = g;
 	this->groupID = 0;	// Default ID
 };
+
+/// Default destructor
 IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************
-// Method to add an IB marker
+/// \brief	Method to add an IB marker to the body.
+///
+///			Adds marker at the given position with the given moving/non-moving flag.
+///
+/// \param x x-position of marker.
+/// \param y y-position of marker.
+/// \param z z-position of marker.
+/// \param flex_rigid flag to indicate whether marker is movable or not.
 void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
@@ -46,7 +61,12 @@ void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a sphere / circle
+/// \brief	Method to seed markers for a sphere / circle.
+/// \param radius radius of circle/sphere.
+/// \param centre position vector of circle/sphere centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(double radius, std::vector<double> centre,
 					   bool flex_rigid, bool deform, int group) {
 
@@ -110,7 +130,13 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a cuboid/rectangle
+/// \brief	Method to seed markers for a cuboid / rectangle.
+/// \param width_length_depth principal dimensions of cuboid / rectangle.
+/// \param angles principal orientation of cuboid / rectangle w.r.t. domain axes.
+/// \param centre position vector of cuboid / rectangle centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
 					   bool flex_rigid, bool deform, int group) {
 
@@ -331,7 +357,16 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a flexible filament
+/// \brief	Method to seed markers for a flexible filament.
+/// \param nummarkers number of markers to use for filament.
+/// \param start_point 3D position vector of the start of the filament.
+/// \param fil_length length of filament in physical units.
+/// \param angles two angles representing filament inclination w.r.t. domain axes 
+///			(horizontal plane and vertical plane).
+/// \param BCs vector containing start and end boundary condition types (see class definition for valid values).
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
 					   std::vector<int> BCs, bool flex_rigid, bool deform, int group) {
 
@@ -396,7 +431,14 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 }
 // ***************************************************************************************************
-// Method to seed markers for a 3D plate inclined from the xz plane
+/// \brief	Method to seed markers for a 3D plate inclined from the XZ plane.
+/// \param width_length 2D vector of principal dimensions of thin plate.
+/// \param angle inclination angle from horizontal.
+/// \param centre position vector of the plate centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
+/// \param plate arbitrary argument to allow overload otherwise would have the same signature as a filament builder.
 double IBBody::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 	bool flex_rigid, bool deform, int group, bool plate) {
 
@@ -506,6 +548,11 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 }
 
 // ***************************************************************************************************
+/// \brief	Method to build a body from a point cloud.
+///
+///			Flexibility and deformable properties taken from definitions.
+///
+/// \param _PCpts pointer to pointer cloud data.
 void IBBody::makeBody(PCpts* _PCpts) {
 
 

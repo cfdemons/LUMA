@@ -21,17 +21,20 @@
 // Implementation for the BFLMarker class //
 
 
-// Default constructor / destructor
+/// Default constructor
 BFLMarker::BFLMarker(void)
 {
 }
 
-
+/// Default destructor
 BFLMarker::~BFLMarker(void)
 {
 }
 
-
+/// \brief Custom constructor with position.
+/// \param x x-position of marker
+/// \param y y-position of marker
+/// \param z z-position of marker
 BFLMarker::BFLMarker(double x, double y, double z)
 {
 	// Add its position

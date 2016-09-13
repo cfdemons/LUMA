@@ -18,8 +18,9 @@
 #include "../inc/MpiManager.h"
 #include <sstream>
 
-// ***************************************************************************************************
-// Routine to write out the coordinates of IBBodies at a given time step
+// ************************************************************************** //
+/// \brief Write out position of immersed boundary bodies.
+/// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_write_body_pos(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
@@ -50,8 +51,9 @@ void ObjectManager::io_write_body_pos(int timestep) {
 }
 
 
-// ***************************************************************************************************
-// Routine to write out the coordinates of IBbodies at a given time step
+// ************************************************************************** //
+/// \brief Write out forces on the markers of immersed boundary bodies.
+/// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_write_lift_drag(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
@@ -81,7 +83,10 @@ void ObjectManager::io_write_lift_drag(int timestep) {
 
 }
 
-// ***************************************************************************************************
+// ************************************************************************** //
+/// \brief	Read/write IB body information to restart file.
+/// \param	IO_flag	flag indicating write (true) or read (false).
+/// \param	level	level of the grid begin written/read
 void ObjectManager::io_restart(bool IO_flag, int level) {
 
 	if (IO_flag) {
@@ -221,8 +226,12 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 
 }
 
-// ***************************************************************************************************
-// Routine to write out the vtk (position) for each IB body at time step t (current capability is for unclosed objects only)
+// ************************************************************************** //
+/// \brief	Write IB body data to VTK file.
+///
+///			Currently can only write out un-closed bodies like filaments.
+///
+/// \param	tval	time value at which the write out is being performed.
 void ObjectManager::io_vtk_IBwriter(double tval) {
 
     // Loop through each iBody
@@ -280,8 +289,14 @@ void ObjectManager::io_vtk_IBwriter(double tval) {
 }
 
 
-// ***************************************************************************************************
-// Routine to read in point cloud data in tab separated, 3-column format from the input directory
+// ************************************************************************** //
+/// \brief	Read in point cloud data.
+///
+///			Input data must be in tab separated, 3-column format in the input 
+///			directory.
+///
+/// \param	_PCpts	pointer to empty point cloud data container.
+/// \param	objtype	type of object to be read in.
 void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Temporary variables
@@ -516,8 +531,13 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 }
 // *****************************************************************************
-// Routine for writing out the lift and drag forces on a BB object 
+/// \brief	Write out the forces on a solid object.
+///
+///			Writes out the forces on solid objects in the domain computed using
+///			momentum exchange. Each rank writes its own file. Output is a CSV file.
+/// \param	tval	time value at which write out is taking place.
 void ObjectManager::io_writeForceOnObject(double tval) {
+
 	// Get grid on which object resides
 	GridObj *g = NULL;
 	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);

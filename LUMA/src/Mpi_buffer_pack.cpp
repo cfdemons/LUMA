@@ -22,7 +22,15 @@
 #include "../inc/GridObj.h"
 
 
-// Routine to pack the buffer on the supplied grid to be passed in the indicated direction.
+// ****************************************************************************
+/// \brief	Method to pack the communication buffer.
+///
+///			Communication buffer is packed with distribution values from the 
+///			supplied grid. Amount of information is dictated by the direction 
+///			of the communication being prepared.
+///
+/// \param	dir	communication direction.
+/// \param	g	grid doing the communication.
 void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	
 	/* Imagine every grid overlap has an inner region with complete information post-stream

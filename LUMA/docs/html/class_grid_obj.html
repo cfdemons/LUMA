@@ -121,22 +121,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa8041f7344af6cf9732199aa107fdbc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise the lattice velocity.  <a href="#aa8041f7344af6cf9732199aa107fdbc6">More...</a><br /></td></tr>
 <tr class="separator:aa8041f7344af6cf9732199aa107fdbc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac0e8a3fe74c69b3308ef3e19100f95c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aac0e8a3fe74c69b3308ef3e19100f95c">LBM_initRho</a> ()</td></tr>
-<tr class="memdesc:aac0e8a3fe74c69b3308ef3e19100f95c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><blockquote class="doxtable">
-<p>Initialise the velocity field </p>
-</blockquote>
- <a href="#aac0e8a3fe74c69b3308ef3e19100f95c">More...</a><br /></td></tr>
+<tr class="memdesc:aac0e8a3fe74c69b3308ef3e19100f95c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise the lattice density.  <a href="#aac0e8a3fe74c69b3308ef3e19100f95c">More...</a><br /></td></tr>
 <tr class="separator:aac0e8a3fe74c69b3308ef3e19100f95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeea74cc13001620abec1ba819233f714"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aeea74cc13001620abec1ba819233f714">LBM_initGrid</a> ()</td></tr>
-<tr class="memdesc:aeea74cc13001620abec1ba819233f714"><td class="mdescLeft">&#160;</td><td class="mdescRight"><blockquote class="doxtable">
-<p>Initialise the density field </p>
-</blockquote>
- <a href="#aeea74cc13001620abec1ba819233f714">More...</a><br /></td></tr>
+<tr class="memdesc:aeea74cc13001620abec1ba819233f714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper to initialise all L0 lattice quantities.  <a href="#aeea74cc13001620abec1ba819233f714">More...</a><br /></td></tr>
 <tr class="separator:aeea74cc13001620abec1ba819233f714"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfbe5c22b6b6f076615ea7b77c2d7cc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#adfbe5c22b6b6f076615ea7b77c2d7cc4">LBM_initGrid</a> (std::vector&lt; int &gt; local_size, std::vector&lt; std::vector&lt; int &gt; &gt; GlobalLimsInd, std::vector&lt; std::vector&lt; double &gt; &gt; GlobalLimsPos)</td></tr>
-<tr class="memdesc:adfbe5c22b6b6f076615ea7b77c2d7cc4"><td class="mdescLeft">&#160;</td><td class="mdescRight"><blockquote class="doxtable">
-<p>Non-MPI wrapper for initialiser </p>
-</blockquote>
- <a href="#adfbe5c22b6b6f076615ea7b77c2d7cc4">More...</a><br /></td></tr>
+<tr class="memdesc:adfbe5c22b6b6f076615ea7b77c2d7cc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise all L0 lattice quantities.  <a href="#adfbe5c22b6b6f076615ea7b77c2d7cc4">More...</a><br /></td></tr>
 <tr class="separator:adfbe5c22b6b6f076615ea7b77c2d7cc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a697f4d7fc6c9ed18e609528847b1e175"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a697f4d7fc6c9ed18e609528847b1e175">LBM_initSubGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
 <tr class="memdesc:a697f4d7fc6c9ed18e609528847b1e175"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise all sub-grid quantities.  <a href="#a697f4d7fc6c9ed18e609528847b1e175">More...</a><br /></td></tr>
@@ -1113,11 +1104,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><blockquote class="doxtable">
-<p>Initialise the density field </p>
-</blockquote>
-</p>
-<p>Wrapper to initialise all L0 lattice quantities.</p>
+<p>Wrapper to initialise all L0 lattice quantities. </p>
 <p>This method wraps the MPI-specific version. It is called by the serial build and sets the MPI-specific arguments to default values before calling the full initialiser. </p>
 
 </div>
@@ -1152,11 +1139,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><blockquote class="doxtable">
-<p>Non-MPI wrapper for initialiser </p>
-</blockquote>
-</p>
-<p>Method to initialise all L0 lattice quantities.</p>
+<p>Method to initialise all L0 lattice quantities. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">local_size</td><td>local grid size on this rank including halo. </td></tr>
@@ -1206,10 +1189,6 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><blockquote class="doxtable">
-<p>Initialise the velocity field </p>
-</blockquote>
-</p>
 <p>Method to initialise the lattice density. </p>
 
 </div>

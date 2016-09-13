@@ -14,7 +14,19 @@
  */
 
 /// \file main_lbm.cpp
-/// \brief Defines the entry point for the LUMA application.
+/// \mainpage
+///
+/// --------------------------------------------------------------
+///
+/// ------ Lattice Boltzmann @ The University of Manchester ------
+///
+/// -------------------------- L-U-M-A ---------------------------
+///
+///  Copyright (C) 2015, 2016
+///  E-mail contact: info@luma.manchester.ac.uk
+///
+/// This software is for academic use only and not available for
+/// distribution without written consent.
 
 #include "../inc/stdafx.h"			// Precompiled header
 #include "../inc/definitions.h"		// Definitions file
@@ -29,7 +41,7 @@ using namespace std;	// Use the standard namespace
 std::string GridUtils::path_str;
 int MpiManager::MPI_coords[L_dims];
 
-/// Entry point
+/// Entry point for the application
 int main( int argc, char* argv[] )
 {
 

@@ -21,9 +21,15 @@
 #include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 
-// ********************************************************************************************************
-
-// Routine to unpack the buffer and update the macroscopic quantities at that site based on the new values.
+// ****************************************************************************
+/// \brief	Method to unpack the communication buffer.
+///
+///			Communication buffer is unpacked onto the supplied grid. Amount and
+///			region of unpacking is dictated by the direction of the communication 
+///			taking place.
+///
+/// \param	dir	communication direction.
+/// \param	g	grid doing the communication.
 void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 	
 	// Copy received information back to grid using the EXACT

@@ -20,8 +20,8 @@
 // Static declarations
 ObjectManager* ObjectManager::me;
 
-// *************************************************************************************************** //
-// Instance creator
+// ************************************************************************* //
+/// Instance creator
 ObjectManager* ObjectManager::getInstance() {
 
 	if (!me) me = new ObjectManager;	// Private construction
@@ -29,7 +29,8 @@ ObjectManager* ObjectManager::getInstance() {
 
 }
 
-// Instance creator (only works the first time obj
+/// \brief Instance creator with grid hierarchy assignment.
+/// \param	g	pointer to grid hierarchy.
 ObjectManager* ObjectManager::getInstance(GridObj* g) {
 
 	if (!me) me = new ObjectManager(g);	// Private construction
@@ -37,28 +38,43 @@ ObjectManager* ObjectManager::getInstance(GridObj* g) {
 
 }
 
-// Instance destuctor
+/// Instance destuctor
 void ObjectManager::destroyInstance() {
 
 	if (me)	delete me;			// Delete pointer from static context not destructor
 
 }
 
-// *************************************************************************************************** //
-// Constructor & destructor
+// ************************************************************************* //
+/// Default constructor
 ObjectManager::ObjectManager(void) { };
+
+/// Default destructor
 ObjectManager::~ObjectManager(void) {
 	me = nullptr;
 };
+
+/// \brief Constructor with grid hierarchy assignment.
+/// \param	g	pointer to grid hierarchy.
 ObjectManager::ObjectManager(GridObj* g) {
 	this->_Grids = g;
 };
 
 
-// *************************************************************************************************** //
+// ************************************************************************* //
 // Voxelisation Utilities
+// ************************************************************************* //
 
-// Return global voxel indices for a given point in global space
+/// \brief	Get global voxel indices
+///
+///			Will return the voxel indices of the nearest voxel on the lattice 
+///			for a given point in global space. Can also be used to map positions
+///			to indices.
+///
+/// \param	x	global x-position.
+/// \param	y	global y-position.
+/// \param	z	global z-position.
+/// \return vector of indices of the nearest voxel.
 std::vector<int> ObjectManager::getVoxInd(double x, double y, double z) {
 
 	std::vector<int> vox;
@@ -76,6 +92,14 @@ std::vector<int> ObjectManager::getVoxInd(double x, double y, double z) {
 
 }
 
+/// \brief	Get global voxel index
+///
+///			Will return the voxel index of the nearest voxel on the lattice 
+///			for a given point in global space in a given direction.
+///
+/// \param	p	global position.
+/// \return corresponding global index.
+
 // Overload of above for a single index
 int ObjectManager::getVoxInd(double p) {
 
@@ -84,8 +108,21 @@ int ObjectManager::getVoxInd(double p) {
 
 }
 
-/*******************************************************************************/
-// Lift and drag calculation (Mei's formula)
+// ************************************************************************* //
+
+/// \brief	Compute forces on a rigid object.
+///
+///			Uses momentum exchange to compute forces on rigid bodies.
+///			Currently working with bounce-back objects only. There is no 
+///			bounding box so if we have walls in the domain they will be counted 
+///			as well. Also only possible to differentiate between bodies. Lumps 
+///			all bodies together.identify which body this site relates to so 
+///			we can differentiate.
+///
+/// \param	i	local i-index of solid site.
+/// \param	j	local j-index of solid site.
+/// \param	k	local k-index of solid site.
+/// \param	g	pointer to grid on which object resides.
 void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 
 	// TODO: Need abounding box for object if we have walls in the domain otherwise they will also be counted

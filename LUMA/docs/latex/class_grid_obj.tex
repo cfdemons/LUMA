@@ -25,17 +25,11 @@ Grid class.
 void \hyperlink{class_grid_obj_aa8041f7344af6cf9732199aa107fdbc6}{L\+B\+M\+\_\+init\+Velocity} ()
 \begin{DoxyCompactList}\small\item\em Method to initialise the lattice velocity. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{L\+B\+M\+\_\+init\+Rho} ()
-\begin{DoxyCompactList}\small\item\em \begin{quote}
-Initialise the velocity field \end{quote}
-\end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise the lattice density. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_aeea74cc13001620abec1ba819233f714}{L\+B\+M\+\_\+init\+Grid} ()
-\begin{DoxyCompactList}\small\item\em \begin{quote}
-Initialise the density field \end{quote}
-\end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Wrapper to initialise all L0 lattice quantities. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{L\+B\+M\+\_\+init\+Grid} (std\+::vector$<$ int $>$ local\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Global\+Lims\+Ind, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Global\+Lims\+Pos)
-\begin{DoxyCompactList}\small\item\em \begin{quote}
-Non-\/\+M\+PI wrapper for initialiser \end{quote}
-\end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Method to initialise all L0 lattice quantities. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{L\+B\+M\+\_\+init\+Sub\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
 \begin{DoxyCompactList}\small\item\em Method to initialise all sub-\/grid quantities. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a4b6edceeda49496365e725eb67931961}{L\+B\+M\+\_\+init\+Bound\+Lab} ()
@@ -648,11 +642,7 @@ The virtual wind tunnel definitions are implemented by this method. \index{Grid\
 )}\hypertarget{class_grid_obj_aeea74cc13001620abec1ba819233f714}{}\label{class_grid_obj_aeea74cc13001620abec1ba819233f714}
 
 
-\begin{quote}
-Initialise the density field \end{quote}
-
-
-Wrapper to initialise all L0 lattice quantities.
+Wrapper to initialise all L0 lattice quantities. 
 
 This method wraps the M\+P\+I-\/specific version. It is called by the serial build and sets the M\+P\+I-\/specific arguments to default values before calling the full initialiser. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}}
 \index{L\+B\+M\+\_\+init\+Grid@{L\+B\+M\+\_\+init\+Grid}!Grid\+Obj@{Grid\+Obj}}
@@ -665,11 +655,7 @@ This method wraps the M\+P\+I-\/specific version. It is called by the serial bui
 )}\hypertarget{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}{}\label{class_grid_obj_adfbe5c22b6b6f076615ea7b77c2d7cc4}
 
 
-\begin{quote}
-Non-\/\+M\+PI wrapper for initialiser \end{quote}
-
-
-Method to initialise all L0 lattice quantities.
+Method to initialise all L0 lattice quantities. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -707,11 +693,9 @@ Boundary labels are set by considering parent labels on overlapping sites and th
 )}\hypertarget{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}{}\label{class_grid_obj_aac0e8a3fe74c69b3308ef3e19100f95c}
 
 
-\begin{quote}
-Initialise the velocity field \end{quote}
+Method to initialise the lattice density. 
 
-
-Method to initialise the lattice density. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}}
 \index{L\+B\+M\+\_\+init\+Solid\+Lab@{L\+B\+M\+\_\+init\+Solid\+Lab}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Solid\+Lab()}{LBM_initSolidLab()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Solid\+Lab (
 \begin{DoxyParamCaption}

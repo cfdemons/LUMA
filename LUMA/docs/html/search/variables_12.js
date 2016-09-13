@@ -2,7 +2,7 @@ var searchData=
 [
   ['send_5frequests',['send_requests',['../class_mpi_manager.html#af096663b094d919caba62d4bdf8e7d88',1,'MpiManager']]],
   ['send_5fstat',['send_stat',['../class_mpi_manager.html#ab129fdffa1925677841f25bcd4507b5e',1,'MpiManager']]],
-  ['sender_5flayer_5fpos',['sender_layer_pos',['../class_mpi_manager.html#a7201074f50eab0d0d667394e04a7cf24',1,'MpiManager']]],
+  ['sender_5flayer_5fpos',['sender_layer_pos',['../class_mpi_manager.html#a0cb9f8f024ec0a186374995fb203ea1e',1,'MpiManager']]],
   ['size',['size',['../struct_mpi_manager_1_1buffer__struct.html#aea0037fce808f601ae9c1e48926dbd0e',1,'MpiManager::buffer_struct']]],
   ['spacing',['spacing',['../class_body.html#a1d4ac2e6fdbc946d5eab0973fd78770b',1,'Body']]],
   ['subgrid_5fcomm',['subGrid_comm',['../class_mpi_manager.html#a1c65695e5dd2cca3ccb76e83715226f8',1,'MpiManager']]],

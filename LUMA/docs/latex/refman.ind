@@ -1,1287 +1,1299 @@
 \begin{theindex}
 
   \item {\+\_\+\+Owner}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{16}
   \item {$\sim$\+B\+F\+L\+Body}
-    \subitem {B\+F\+L\+Body}, \hyperpage{8}
+    \subitem {B\+F\+L\+Body}, \hyperpage{10}
   \item {$\sim$\+B\+F\+L\+Marker}
-    \subitem {B\+F\+L\+Marker}, \hyperpage{9}
+    \subitem {B\+F\+L\+Marker}, \hyperpage{12}
   \item {$\sim$\+Body}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{14}
   \item {$\sim$\+Grid\+Obj}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{21}
   \item {$\sim$\+I\+B\+Body}
-    \subitem {I\+B\+Body}, \hyperpage{20}
+    \subitem {I\+B\+Body}, \hyperpage{38}
   \item {$\sim$\+I\+B\+Marker}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
   \item {$\sim$\+I\+Vector}
-    \subitem {I\+Vector}, \hyperpage{24}
+    \subitem {I\+Vector}, \hyperpage{44}
   \item {$\sim$\+Marker}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
   \item {$\sim$\+Marker\+Data}
-    \subitem {Marker\+Data}, \hyperpage{26}
+    \subitem {Marker\+Data}, \hyperpage{50}
   \item {$\sim$\+P\+Cpts}
-    \subitem {P\+Cpts}, \hyperpage{33}
+    \subitem {P\+Cpts}, \hyperpage{65}
 
   \indexspace
 
   \item {add}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {add\+Marker}
-    \subitem {Body}, \hyperpage{10}
-    \subitem {I\+B\+Body}, \hyperpage{20}
+    \subitem {Body}, \hyperpage{14}
+    \subitem {I\+B\+Body}, \hyperpage{38}
 
   \indexspace
 
   \item {B\+Cs}
-    \subitem {I\+B\+Body}, \hyperpage{21}
-  \item {B\+F\+L\+Body}, \hyperpage{7}
-    \subitem {$\sim$\+B\+F\+L\+Body}, \hyperpage{8}
-    \subitem {B\+F\+L\+Body}, \hyperpage{8}
-    \subitem {B\+F\+L\+Marker}, \hyperpage{9}
-    \subitem {computeQ}, \hyperpage{8}
-    \subitem {Grid\+Obj}, \hyperpage{8}
-    \subitem {Q}, \hyperpage{8}
-  \item {B\+F\+L\+Body.\+cpp}, \hyperpage{35}
-  \item {B\+F\+L\+Body.\+h}, \hyperpage{35}
-  \item {B\+F\+L\+Marker}, \hyperpage{8}
-    \subitem {$\sim$\+B\+F\+L\+Marker}, \hyperpage{9}
-    \subitem {B\+F\+L\+Body}, \hyperpage{9}
-    \subitem {B\+F\+L\+Marker}, \hyperpage{9}
-  \item {B\+F\+L\+Marker.\+cpp}, \hyperpage{35}
-  \item {B\+F\+L\+Marker.\+h}, \hyperpage{35}
+    \subitem {I\+B\+Body}, \hyperpage{40}
+  \item {B\+F\+L\+Body}, \hyperpage{9}
+    \subitem {$\sim$\+B\+F\+L\+Body}, \hyperpage{10}
+    \subitem {B\+F\+L\+Body}, \hyperpage{10}
+    \subitem {B\+F\+L\+Marker}, \hyperpage{12}
+    \subitem {computeQ}, \hyperpage{10, 11}
+    \subitem {Grid\+Obj}, \hyperpage{11}
+    \subitem {Q}, \hyperpage{11}
+  \item {B\+F\+L\+Body.\+cpp}, \hyperpage{69}
+  \item {B\+F\+L\+Body.\+h}, \hyperpage{69}
+  \item {B\+F\+L\+Marker}, \hyperpage{11}
+    \subitem {$\sim$\+B\+F\+L\+Marker}, \hyperpage{12}
+    \subitem {B\+F\+L\+Body}, \hyperpage{12}
+    \subitem {B\+F\+L\+Marker}, \hyperpage{12}
+  \item {B\+F\+L\+Marker.\+cpp}, \hyperpage{69}
+  \item {B\+F\+L\+Marker.\+h}, \hyperpage{70}
   \item {bc\+\_\+apply\+Bfl}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{21}
   \item {bc\+\_\+apply\+Bounce\+Back}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{21}
   \item {bc\+\_\+apply\+Extrapolation}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{21}
   \item {bc\+\_\+apply\+Nrbc}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+apply\+Regularised}
-    \subitem {Grid\+Obj}, \hyperpage{13}
+    \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+apply\+Spec\+Reflect}
-    \subitem {Grid\+Obj}, \hyperpage{13}
-  \item {bc\+\_\+apply\+Zou\+He}
-    \subitem {Grid\+Obj}, \hyperpage{14}
-  \item {bc\+\_\+get\+Wall\+Density\+For\+R\+BC}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+solid\+Site\+Reset}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bfl\+\_\+build\+\_\+body}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{60}
   \item {Body}
-    \subitem {\+\_\+\+Owner}, \hyperpage{10}
-    \subitem {$\sim$\+Body}, \hyperpage{10}
-    \subitem {add\+Marker}, \hyperpage{10}
-    \subitem {Body}, \hyperpage{10}
-    \subitem {closed\+\_\+surface}, \hyperpage{10}
-    \subitem {get\+Marker\+Data}, \hyperpage{10}
-    \subitem {is\+In\+Voxel}, \hyperpage{10}
-    \subitem {is\+Voxel\+Marker\+Voxel}, \hyperpage{10}
-    \subitem {marker\+Adder}, \hyperpage{10}
-    \subitem {markers}, \hyperpage{10}
-    \subitem {spacing}, \hyperpage{10}
-  \item {Body$<$ Marker\+Type $>$}, \hyperpage{9}
-  \item {Body.\+h}, \hyperpage{36}
+    \subitem {\+\_\+\+Owner}, \hyperpage{16}
+    \subitem {$\sim$\+Body}, \hyperpage{14}
+    \subitem {add\+Marker}, \hyperpage{14}
+    \subitem {Body}, \hyperpage{14}
+    \subitem {closed\+\_\+surface}, \hyperpage{16}
+    \subitem {get\+Marker\+Data}, \hyperpage{14}
+    \subitem {is\+In\+Voxel}, \hyperpage{15}
+    \subitem {is\+Voxel\+Marker\+Voxel}, \hyperpage{15}
+    \subitem {marker\+Adder}, \hyperpage{15}
+    \subitem {markers}, \hyperpage{16}
+    \subitem {spacing}, \hyperpage{16}
+  \item {Body$<$ Marker\+Type $>$}, \hyperpage{13}
+  \item {Body.\+h}, \hyperpage{70}
   \item {buffer\+\_\+recv\+\_\+info}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {buffer\+\_\+send\+\_\+info}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
 
   \indexspace
 
   \item {c}
-    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{43}
-    \subitem {globalvars.\+h}, \hyperpage{44}
+    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{85}
+    \subitem {globalvars.\+h}, \hyperpage{86}
   \item {closed\+\_\+surface}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{16}
+  \item {compute\+Lift\+Drag}
+    \subitem {Object\+Manager}, \hyperpage{60}
   \item {computeQ}
-    \subitem {B\+F\+L\+Body}, \hyperpage{8}
+    \subitem {B\+F\+L\+Body}, \hyperpage{10, 11}
   \item {create\+Output\+Directory}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {crossprod}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {cs}
-    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{43}
-    \subitem {globalvars.\+h}, \hyperpage{44}
+    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{85}
+    \subitem {globalvars.\+h}, \hyperpage{86}
 
   \indexspace
 
-  \item {definitions.\+h}, \hyperpage{36}
+  \item {definitions.\+h}, \hyperpage{70}
     \subitem {L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}, 
-		\hyperpage{39}
+		\hyperpage{76}
     \subitem {L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}, 
-		\hyperpage{39}
+		\hyperpage{77}
     \subitem {L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}, 
-		\hyperpage{39}
-    \subitem {L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}, \hyperpage{39}
-    \subitem {L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}, \hyperpage{40}
-    \subitem {L\+\_\+\+M\+P\+I\+\_\+dir}, \hyperpage{41}
-    \subitem {L\+\_\+\+Num\+Lev}, \hyperpage{41}
-    \subitem {L\+\_\+\+Num\+Reg}, \hyperpage{41}
-    \subitem {L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}, \hyperpage{41}
-    \subitem {L\+\_\+\+PI}, \hyperpage{41}
-    \subitem {L\+\_\+\+Re}, \hyperpage{41}
-    \subitem {L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}, 
-		\hyperpage{41}
-    \subitem {L\+\_\+\+Timesteps}, \hyperpage{42}
+		\hyperpage{77}
+    \subitem {L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}, \hyperpage{77}
+    \subitem {L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}, \hyperpage{80}
+    \subitem {L\+\_\+\+M\+P\+I\+\_\+dir}, \hyperpage{80}
+    \subitem {L\+\_\+\+Num\+Lev}, \hyperpage{80}
+    \subitem {L\+\_\+\+Num\+Reg}, \hyperpage{80}
+    \subitem {L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}, \hyperpage{81}
+    \subitem {L\+\_\+\+PI}, \hyperpage{81}
+    \subitem {L\+\_\+\+Re}, \hyperpage{82}
+    \subitem {L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}, 
+		\hyperpage{82}
+    \subitem {L\+\_\+\+Timesteps}, \hyperpage{83}
     \subitem {L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}, 
-		\hyperpage{42}
-    \subitem {L\+\_\+\+Xcores}, \hyperpage{42}
-    \subitem {L\+\_\+\+Ycores}, \hyperpage{42}
-    \subitem {L\+\_\+\+Zcores}, \hyperpage{42}
-    \subitem {L\+\_\+a\+\_\+x}, \hyperpage{38}
-    \subitem {L\+\_\+a\+\_\+y}, \hyperpage{38}
-    \subitem {L\+\_\+a\+\_\+z}, \hyperpage{38}
-    \subitem {L\+\_\+b\+\_\+x}, \hyperpage{38}
-    \subitem {L\+\_\+b\+\_\+y}, \hyperpage{38}
-    \subitem {L\+\_\+b\+\_\+z}, \hyperpage{38}
-    \subitem {L\+\_\+bfl\+\_\+length}, \hyperpage{38}
-    \subitem {L\+\_\+bfl\+\_\+length\+\_\+ref}, \hyperpage{38}
-    \subitem {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{38}
-    \subitem {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{39}
-    \subitem {L\+\_\+bfl\+\_\+scale\+\_\+direction}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+x\+\_\+max}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+x\+\_\+min}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+y\+\_\+max}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+y\+\_\+min}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+z\+\_\+max}, \hyperpage{39}
-    \subitem {L\+\_\+block\+\_\+z\+\_\+min}, \hyperpage{39}
-    \subitem {L\+\_\+centre\+\_\+bfl\+\_\+z}, \hyperpage{39}
-    \subitem {L\+\_\+centre\+\_\+ibb\+\_\+z}, \hyperpage{39}
-    \subitem {L\+\_\+centre\+\_\+object\+\_\+z}, \hyperpage{39}
-    \subitem {L\+\_\+dims}, \hyperpage{39}
-    \subitem {L\+\_\+end\+\_\+\+BC}, \hyperpage{39}
-    \subitem {L\+\_\+grav\+\_\+direction}, \hyperpage{39}
-    \subitem {L\+\_\+grav\+\_\+force}, \hyperpage{39}
-    \subitem {L\+\_\+ibb\+\_\+\+EI}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+angle\+\_\+horz}, \hyperpage{39}
-    \subitem {L\+\_\+ibb\+\_\+angle\+\_\+vert}, \hyperpage{39}
-    \subitem {L\+\_\+ibb\+\_\+d}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+deform}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+delta\+\_\+rho}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+filament\+\_\+length}, \hyperpage{40}
+		\hyperpage{83}
+    \subitem {L\+\_\+\+Xcores}, \hyperpage{83}
+    \subitem {L\+\_\+\+Ycores}, \hyperpage{84}
+    \subitem {L\+\_\+\+Zcores}, \hyperpage{84}
+    \subitem {L\+\_\+a\+\_\+x}, \hyperpage{74}
+    \subitem {L\+\_\+a\+\_\+y}, \hyperpage{74}
+    \subitem {L\+\_\+a\+\_\+z}, \hyperpage{75}
+    \subitem {L\+\_\+b\+\_\+x}, \hyperpage{75}
+    \subitem {L\+\_\+b\+\_\+y}, \hyperpage{75}
+    \subitem {L\+\_\+b\+\_\+z}, \hyperpage{75}
+    \subitem {L\+\_\+bfl\+\_\+length}, \hyperpage{75}
+    \subitem {L\+\_\+bfl\+\_\+length\+\_\+ref}, \hyperpage{75}
+    \subitem {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{75}
+    \subitem {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{75}
+    \subitem {L\+\_\+bfl\+\_\+scale\+\_\+direction}, \hyperpage{75}
+    \subitem {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{75}
+    \subitem {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+x\+\_\+max}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+x\+\_\+min}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+y\+\_\+max}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+y\+\_\+min}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+z\+\_\+max}, \hyperpage{76}
+    \subitem {L\+\_\+block\+\_\+z\+\_\+min}, \hyperpage{76}
+    \subitem {L\+\_\+centre\+\_\+bfl\+\_\+z}, \hyperpage{76}
+    \subitem {L\+\_\+centre\+\_\+ibb\+\_\+z}, \hyperpage{76}
+    \subitem {L\+\_\+centre\+\_\+object\+\_\+z}, \hyperpage{77}
+    \subitem {L\+\_\+dims}, \hyperpage{77}
+    \subitem {L\+\_\+end\+\_\+\+BC}, \hyperpage{77}
+    \subitem {L\+\_\+grav\+\_\+direction}, \hyperpage{77}
+    \subitem {L\+\_\+grav\+\_\+force}, \hyperpage{77}
+    \subitem {L\+\_\+ibb\+\_\+\+EI}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+angle\+\_\+horz}, \hyperpage{77}
+    \subitem {L\+\_\+ibb\+\_\+angle\+\_\+vert}, \hyperpage{77}
+    \subitem {L\+\_\+ibb\+\_\+d}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+deform}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+delta\+\_\+rho}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+filament\+\_\+length}, \hyperpage{78}
     \subitem {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}, 
-		\hyperpage{40}
+		\hyperpage{78}
     \subitem {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}, 
-		\hyperpage{40}
+		\hyperpage{78}
     \subitem {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}, 
-		\hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+flex\+\_\+rigid}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+l}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+length}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+length\+\_\+ref}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+r}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+scale\+\_\+direction}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+w}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+x}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+y}, \hyperpage{40}
-    \subitem {L\+\_\+ibb\+\_\+z}, \hyperpage{40}
-    \subitem {L\+\_\+K}, \hyperpage{40}
-    \subitem {L\+\_\+M}, \hyperpage{40}
-    \subitem {L\+\_\+N}, \hyperpage{41}
-    \subitem {L\+\_\+n\+Vels}, \hyperpage{41}
-    \subitem {L\+\_\+num\+\_\+markers}, \hyperpage{41}
-    \subitem {L\+\_\+object\+\_\+length}, \hyperpage{41}
-    \subitem {L\+\_\+object\+\_\+length\+\_\+ref}, \hyperpage{41}
-    \subitem {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{41}
-    \subitem {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{41}
-    \subitem {L\+\_\+object\+\_\+scale\+\_\+direction}, \hyperpage{41}
-    \subitem {L\+\_\+out\+\_\+every}, \hyperpage{41}
-    \subitem {L\+\_\+out\+\_\+every\+\_\+probe}, \hyperpage{41}
-    \subitem {L\+\_\+output\+\_\+precision}, \hyperpage{41}
-    \subitem {L\+\_\+restart\+\_\+out\+\_\+every}, \hyperpage{41}
-    \subitem {L\+\_\+rho\+\_\+in}, \hyperpage{41}
-    \subitem {L\+\_\+start\+\_\+\+BC}, \hyperpage{41}
-    \subitem {L\+\_\+start\+\_\+bfl\+\_\+x}, \hyperpage{41}
-    \subitem {L\+\_\+start\+\_\+bfl\+\_\+y}, \hyperpage{41}
-    \subitem {L\+\_\+start\+\_\+ibb\+\_\+x}, \hyperpage{42}
-    \subitem {L\+\_\+start\+\_\+ibb\+\_\+y}, \hyperpage{42}
-    \subitem {L\+\_\+start\+\_\+object\+\_\+x}, \hyperpage{42}
-    \subitem {L\+\_\+start\+\_\+object\+\_\+y}, \hyperpage{42}
-    \subitem {L\+\_\+u\+\_\+0x}, \hyperpage{42}
-    \subitem {L\+\_\+u\+\_\+0y}, \hyperpage{42}
-    \subitem {L\+\_\+u\+\_\+0z}, \hyperpage{42}
-    \subitem {L\+\_\+u\+\_\+max}, \hyperpage{42}
-    \subitem {L\+\_\+u\+\_\+ref}, \hyperpage{42}
-    \subitem {L\+\_\+wall\+\_\+thickness}, \hyperpage{42}
-    \subitem {L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}, \hyperpage{42}
-    \subitem {n\+Probes}, \hyperpage{42}
-    \subitem {Ref\+Xend}, \hyperpage{42}
-    \subitem {Ref\+Xstart}, \hyperpage{42}
-    \subitem {Ref\+Yend}, \hyperpage{42}
-    \subitem {Ref\+Ystart}, \hyperpage{42}
-    \subitem {Ref\+Zend}, \hyperpage{42}
-    \subitem {Ref\+Zstart}, \hyperpage{43}
-    \subitem {x\+Probe\+Lims}, \hyperpage{43}
-    \subitem {y\+Probe\+Lims}, \hyperpage{43}
-    \subitem {z\+Probe\+Lims}, \hyperpage{43}
+		\hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+flex\+\_\+rigid}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+l}, \hyperpage{78}
+    \subitem {L\+\_\+ibb\+\_\+length}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+length\+\_\+ref}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+r}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+scale\+\_\+direction}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+w}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+x}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+y}, \hyperpage{79}
+    \subitem {L\+\_\+ibb\+\_\+z}, \hyperpage{79}
+    \subitem {L\+\_\+K}, \hyperpage{80}
+    \subitem {L\+\_\+M}, \hyperpage{80}
+    \subitem {L\+\_\+N}, \hyperpage{80}
+    \subitem {L\+\_\+n\+Vels}, \hyperpage{80}
+    \subitem {L\+\_\+num\+\_\+markers}, \hyperpage{80}
+    \subitem {L\+\_\+object\+\_\+length}, \hyperpage{80}
+    \subitem {L\+\_\+object\+\_\+length\+\_\+ref}, \hyperpage{81}
+    \subitem {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}, \hyperpage{81}
+    \subitem {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}, \hyperpage{81}
+    \subitem {L\+\_\+object\+\_\+scale\+\_\+direction}, \hyperpage{81}
+    \subitem {L\+\_\+out\+\_\+every}, \hyperpage{81}
+    \subitem {L\+\_\+out\+\_\+every\+\_\+forces}, \hyperpage{81}
+    \subitem {L\+\_\+out\+\_\+every\+\_\+probe}, \hyperpage{81}
+    \subitem {L\+\_\+output\+\_\+precision}, \hyperpage{81}
+    \subitem {L\+\_\+restart\+\_\+out\+\_\+every}, \hyperpage{82}
+    \subitem {L\+\_\+rho\+\_\+in}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+\+BC}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+bfl\+\_\+x}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+bfl\+\_\+y}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+ibb\+\_\+x}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+ibb\+\_\+y}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+object\+\_\+x}, \hyperpage{82}
+    \subitem {L\+\_\+start\+\_\+object\+\_\+y}, \hyperpage{83}
+    \subitem {L\+\_\+u\+\_\+0x}, \hyperpage{83}
+    \subitem {L\+\_\+u\+\_\+0y}, \hyperpage{83}
+    \subitem {L\+\_\+u\+\_\+0z}, \hyperpage{83}
+    \subitem {L\+\_\+u\+\_\+max}, \hyperpage{83}
+    \subitem {L\+\_\+u\+\_\+ref}, \hyperpage{83}
+    \subitem {L\+\_\+wall\+\_\+thickness}, \hyperpage{83}
+    \subitem {L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}, \hyperpage{84}
+    \subitem {n\+Probes}, \hyperpage{84}
+    \subitem {Ref\+Xend}, \hyperpage{84}
+    \subitem {Ref\+Xstart}, \hyperpage{84}
+    \subitem {Ref\+Yend}, \hyperpage{84}
+    \subitem {Ref\+Ystart}, \hyperpage{84}
+    \subitem {Ref\+Zend}, \hyperpage{84}
+    \subitem {Ref\+Zstart}, \hyperpage{84}
+    \subitem {x\+Probe\+Lims}, \hyperpage{84}
+    \subitem {y\+Probe\+Lims}, \hyperpage{84}
+    \subitem {z\+Probe\+Lims}, \hyperpage{84}
   \item {deformable}
-    \subitem {I\+B\+Body}, \hyperpage{21}
+    \subitem {I\+B\+Body}, \hyperpage{40}
   \item {delta\+\_\+rho}
-    \subitem {I\+B\+Body}, \hyperpage{21}
+    \subitem {I\+B\+Body}, \hyperpage{40}
   \item {deltaval}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
   \item {desired\+\_\+vel}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
   \item {destroy\+Instance}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Mpi\+Manager}, \hyperpage{53}
+    \subitem {Object\+Manager}, \hyperpage{61}
   \item {dilation}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
   \item {dir\+\_\+reflect}
-    \subitem {Grid\+Utils}, \hyperpage{19}
+    \subitem {Grid\+Utils}, \hyperpage{35}
   \item {dotprod}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {down\+To\+Limit}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {dt}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{28}
 
   \indexspace
 
   \item {e\+B\+B\+B\+Cloud}
-    \subitem {Object\+Manager.\+h}, \hyperpage{53}
+    \subitem {Object\+Manager.\+h}, \hyperpage{96}
   \item {e\+B\+C\+All}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+B\+FL}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+Inlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+Inlet\+Outlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+Outlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+Solid\+Symmetry}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+C\+Type}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+B\+F\+L\+Cloud}
-    \subitem {Object\+Manager.\+h}, \hyperpage{53}
+    \subitem {Object\+Manager.\+h}, \hyperpage{96}
   \item {e\+B\+FL}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Cartesian\+Direction}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{89}
   \item {e\+Fluid}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Hdf5\+Slab\+Type}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+I\+B\+B\+Cloud}
-    \subitem {Object\+Manager.\+h}, \hyperpage{53}
+    \subitem {Object\+Manager.\+h}, \hyperpage{96}
   \item {e\+Inlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Maximum}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{90}
   \item {e\+Min\+Max}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{89}
   \item {e\+Minimum}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{90}
   \item {e\+Object\+Type}
-    \subitem {Object\+Manager.\+h}, \hyperpage{53}
+    \subitem {Object\+Manager.\+h}, \hyperpage{96}
   \item {e\+Outlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+PosX}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+PosY}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+PosZ}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+Product\+Vector}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+Refined}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Refined\+Inlet}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Refined\+Solid}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Refined\+Symmetry}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Scalar}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+Solid}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Symmetry}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Transition\+To\+Coarser}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Transition\+To\+Finer}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Type}
-    \subitem {Grid\+Obj.\+h}, \hyperpage{45}
+    \subitem {Grid\+Obj.\+h}, \hyperpage{87}
   \item {e\+Vector}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {e\+X\+Direction}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{89}
   \item {e\+Y\+Direction}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{89}
   \item {e\+Z\+Direction}
-    \subitem {Grid\+Utils.\+h}, \hyperpage{47}
+    \subitem {Grid\+Utils.\+h}, \hyperpage{89}
   \item {epsilon}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
 
   \indexspace
 
   \item {f\+\_\+buffer\+\_\+recv}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {f\+\_\+buffer\+\_\+send}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {factorial}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {flex\+\_\+rigid}
-    \subitem {I\+B\+Body}, \hyperpage{21}
-    \subitem {I\+B\+Marker}, \hyperpage{23}
+    \subitem {I\+B\+Body}, \hyperpage{40}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
   \item {flexural\+\_\+rigidity}
-    \subitem {I\+B\+Body}, \hyperpage{21}
+    \subitem {I\+B\+Body}, \hyperpage{40}
   \item {fluid\+\_\+vel}
-    \subitem {I\+B\+Marker}, \hyperpage{23}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
   \item {force\+\_\+xyz}
-    \subitem {I\+B\+Marker}, \hyperpage{23}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
 
   \indexspace
 
-  \item {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{43}
-    \subitem {c}, \hyperpage{43}
-    \subitem {cs}, \hyperpage{43}
-    \subitem {w}, \hyperpage{43}
+  \item {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{85}
+    \subitem {c}, \hyperpage{85}
+    \subitem {cs}, \hyperpage{85}
+    \subitem {w}, \hyperpage{85}
   \item {get\+Coarse\+Indices}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {get\+Fine\+Indices}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {get\+Grid}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{32}
   \item {get\+Instance}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Mpi\+Manager}, \hyperpage{53}
+    \subitem {Object\+Manager}, \hyperpage{61}
   \item {get\+Marker\+Data}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{14}
   \item {get\+Opposite}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {get\+Vox\+Ind}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{61}
   \item {global\+\_\+dims}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {global\+\_\+edge\+\_\+ind}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {global\+\_\+edge\+\_\+pos}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {global\+\_\+to\+\_\+local}
-    \subitem {Grid\+Utils}, \hyperpage{17}
-  \item {globalvars.\+h}, \hyperpage{44}
-    \subitem {c}, \hyperpage{44}
-    \subitem {cs}, \hyperpage{44}
-    \subitem {w}, \hyperpage{44}
-  \item {Grid\+Obj}, \hyperpage{11}
-    \subitem {$\sim$\+Grid\+Obj}, \hyperpage{13}
-    \subitem {B\+F\+L\+Body}, \hyperpage{8}
-    \subitem {bc\+\_\+apply\+Bfl}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Bounce\+Back}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Extrapolation}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Nrbc}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Regularised}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Spec\+Reflect}, \hyperpage{13}
-    \subitem {bc\+\_\+apply\+Zou\+He}, \hyperpage{14}
-    \subitem {bc\+\_\+get\+Wall\+Density\+For\+R\+BC}, \hyperpage{14}
-    \subitem {bc\+\_\+solid\+Site\+Reset}, \hyperpage{14}
-    \subitem {dt}, \hyperpage{15}
-    \subitem {Grid\+Obj}, \hyperpage{13}
-    \subitem {Grid\+Utils}, \hyperpage{15}
-    \subitem {io\+\_\+hdf5}, \hyperpage{14}
-    \subitem {io\+\_\+lite}, \hyperpage{14}
-    \subitem {io\+\_\+probe\+Output}, \hyperpage{14}
-    \subitem {io\+\_\+restart}, \hyperpage{14}
-    \subitem {io\+\_\+textout}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+add\+Sub\+Grid}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+boundary}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+coalesce}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+collide}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+explode}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+forcegrid}, \hyperpage{14}
+    \subitem {Grid\+Utils}, \hyperpage{33}
+  \item {globalvars.\+h}, \hyperpage{86}
+    \subitem {c}, \hyperpage{86}
+    \subitem {cs}, \hyperpage{86}
+    \subitem {w}, \hyperpage{86}
+  \item {Grid\+Obj}, \hyperpage{17}
+    \subitem {$\sim$\+Grid\+Obj}, \hyperpage{21}
+    \subitem {B\+F\+L\+Body}, \hyperpage{11}
+    \subitem {bc\+\_\+apply\+Bfl}, \hyperpage{21}
+    \subitem {bc\+\_\+apply\+Bounce\+Back}, \hyperpage{21}
+    \subitem {bc\+\_\+apply\+Extrapolation}, \hyperpage{21}
+    \subitem {bc\+\_\+apply\+Nrbc}, \hyperpage{22}
+    \subitem {bc\+\_\+apply\+Regularised}, \hyperpage{22}
+    \subitem {bc\+\_\+apply\+Spec\+Reflect}, \hyperpage{22}
+    \subitem {bc\+\_\+solid\+Site\+Reset}, \hyperpage{22}
+    \subitem {dt}, \hyperpage{28}
+    \subitem {Grid\+Obj}, \hyperpage{20}
+    \subitem {Grid\+Utils}, \hyperpage{28}
+    \subitem {io\+\_\+hdf5}, \hyperpage{23}
+    \subitem {io\+\_\+lite}, \hyperpage{23}
+    \subitem {io\+\_\+probe\+Output}, \hyperpage{23}
+    \subitem {io\+\_\+restart}, \hyperpage{23}
+    \subitem {io\+\_\+textout}, \hyperpage{23}
+    \subitem {K\+\_\+lim}, \hyperpage{28}
+    \subitem {L\+B\+M\+\_\+add\+Sub\+Grid}, \hyperpage{24}
+    \subitem {L\+B\+M\+\_\+boundary}, \hyperpage{24}
+    \subitem {L\+B\+M\+\_\+coalesce}, \hyperpage{24}
+    \subitem {L\+B\+M\+\_\+collide}, \hyperpage{24}
+    \subitem {L\+B\+M\+\_\+explode}, \hyperpage{25}
+    \subitem {L\+B\+M\+\_\+forcegrid}, \hyperpage{25}
     \subitem {L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}, 
-		\hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Bound\+Lab}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Grid}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Refined\+Lab}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Rho}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Solid\+Lab}, \hyperpage{14}
-    \subitem {L\+B\+M\+\_\+init\+Sub\+Grid}, \hyperpage{15}
-    \subitem {L\+B\+M\+\_\+init\+Velocity}, \hyperpage{15}
-    \subitem {L\+B\+M\+\_\+kbc\+Collide}, \hyperpage{15}
-    \subitem {L\+B\+M\+\_\+macro}, \hyperpage{15}
-    \subitem {L\+B\+M\+\_\+multi}, \hyperpage{15}
-    \subitem {L\+B\+M\+\_\+stream}, \hyperpage{15}
-    \subitem {Lat\+Typ}, \hyperpage{15}
-    \subitem {level}, \hyperpage{15}
-    \subitem {Mpi\+Manager}, \hyperpage{15}
-    \subitem {nu}, \hyperpage{15}
-    \subitem {Object\+Manager}, \hyperpage{15}, \hyperpage{32}
-    \subitem {omega}, \hyperpage{15}
-    \subitem {t}, \hyperpage{15}
-    \subitem {timeav\+\_\+mpi\+\_\+overhead}, \hyperpage{15}
-    \subitem {timeav\+\_\+timestep}, \hyperpage{15}
-    \subitem {X\+Ind}, \hyperpage{15}
-    \subitem {X\+Pos}, \hyperpage{15}
-    \subitem {Y\+Ind}, \hyperpage{15}
-    \subitem {Y\+Pos}, \hyperpage{15}
-    \subitem {Z\+Ind}, \hyperpage{15}
-    \subitem {Z\+Pos}, \hyperpage{15}
-  \item {Grid\+Obj.\+cpp}, \hyperpage{44}
-  \item {Grid\+Obj.\+h}, \hyperpage{44}
-    \subitem {e\+B\+C\+All}, \hyperpage{45}
-    \subitem {e\+B\+C\+B\+FL}, \hyperpage{45}
-    \subitem {e\+B\+C\+Inlet}, \hyperpage{45}
-    \subitem {e\+B\+C\+Inlet\+Outlet}, \hyperpage{45}
-    \subitem {e\+B\+C\+Outlet}, \hyperpage{45}
-    \subitem {e\+B\+C\+Solid\+Symmetry}, \hyperpage{45}
-    \subitem {e\+B\+C\+Type}, \hyperpage{45}
-    \subitem {e\+B\+FL}, \hyperpage{45}
-    \subitem {e\+Fluid}, \hyperpage{45}
-    \subitem {e\+Inlet}, \hyperpage{45}
-    \subitem {e\+Outlet}, \hyperpage{45}
-    \subitem {e\+Refined}, \hyperpage{45}
-    \subitem {e\+Refined\+Inlet}, \hyperpage{45}
-    \subitem {e\+Refined\+Solid}, \hyperpage{45}
-    \subitem {e\+Refined\+Symmetry}, \hyperpage{45}
-    \subitem {e\+Solid}, \hyperpage{45}
-    \subitem {e\+Symmetry}, \hyperpage{45}
-    \subitem {e\+Transition\+To\+Coarser}, \hyperpage{45}
-    \subitem {e\+Transition\+To\+Finer}, \hyperpage{45}
-    \subitem {e\+Type}, \hyperpage{45}
-  \item {Grid\+Obj\+\_\+init\+\_\+grids.\+cpp}, \hyperpage{46}
-  \item {Grid\+Obj\+\_\+ops\+\_\+boundary.\+cpp}, \hyperpage{46}
-  \item {Grid\+Obj\+\_\+ops\+\_\+io.\+cpp}, \hyperpage{46}
-  \item {Grid\+Obj\+\_\+ops\+\_\+lbm.\+cpp}, \hyperpage{46}
-  \item {Grid\+Utils}, \hyperpage{16}
-    \subitem {add}, \hyperpage{17}
-    \subitem {create\+Output\+Directory}, \hyperpage{17}
-    \subitem {crossprod}, \hyperpage{17}
-    \subitem {dir\+\_\+reflect}, \hyperpage{19}
-    \subitem {dotprod}, \hyperpage{17}
-    \subitem {down\+To\+Limit}, \hyperpage{17}
-    \subitem {factorial}, \hyperpage{17}
-    \subitem {get\+Coarse\+Indices}, \hyperpage{17}
-    \subitem {get\+Fine\+Indices}, \hyperpage{17}
-    \subitem {get\+Grid}, \hyperpage{17}
-    \subitem {get\+Opposite}, \hyperpage{17}
-    \subitem {global\+\_\+to\+\_\+local}, \hyperpage{17}
-    \subitem {Grid\+Obj}, \hyperpage{15}
-    \subitem {has\+This\+Sub\+Grid}, \hyperpage{17}
-    \subitem {index\+To\+Position}, \hyperpage{18}
-    \subitem {is\+Off\+Grid}, \hyperpage{18}
-    \subitem {is\+On\+Recv\+Layer}, \hyperpage{18}
-    \subitem {is\+On\+Sender\+Layer}, \hyperpage{18}
-    \subitem {is\+On\+This\+Rank}, \hyperpage{18}
-    \subitem {is\+Overlap\+Periodic}, \hyperpage{18}
-    \subitem {linspace}, \hyperpage{18}
-    \subitem {local\+\_\+to\+\_\+global}, \hyperpage{18}
-    \subitem {logfile}, \hyperpage{19}
-    \subitem {matrix\+\_\+multiply}, \hyperpage{18}
-    \subitem {onespace}, \hyperpage{18}
-    \subitem {path\+\_\+str}, \hyperpage{19}
-    \subitem {strided\+Copy}, \hyperpage{18}
-    \subitem {subtract}, \hyperpage{18}
-    \subitem {up\+To\+Zero}, \hyperpage{18}
-    \subitem {vecmultiply}, \hyperpage{18}
-    \subitem {vecnorm}, \hyperpage{18, 19}
-  \item {Grid\+Utils.\+cpp}, \hyperpage{47}
-  \item {Grid\+Utils.\+h}, \hyperpage{47}
-    \subitem {e\+Cartesian\+Direction}, \hyperpage{47}
-    \subitem {e\+Maximum}, \hyperpage{47}
-    \subitem {e\+Min\+Max}, \hyperpage{47}
-    \subitem {e\+Minimum}, \hyperpage{47}
-    \subitem {e\+X\+Direction}, \hyperpage{47}
-    \subitem {e\+Y\+Direction}, \hyperpage{47}
-    \subitem {e\+Z\+Direction}, \hyperpage{47}
+		\hyperpage{25}
+    \subitem {L\+B\+M\+\_\+init\+Bound\+Lab}, \hyperpage{25}
+    \subitem {L\+B\+M\+\_\+init\+Grid}, \hyperpage{26}
+    \subitem {L\+B\+M\+\_\+init\+Refined\+Lab}, \hyperpage{26}
+    \subitem {L\+B\+M\+\_\+init\+Rho}, \hyperpage{26}
+    \subitem {L\+B\+M\+\_\+init\+Solid\+Lab}, \hyperpage{26}
+    \subitem {L\+B\+M\+\_\+init\+Sub\+Grid}, \hyperpage{26}
+    \subitem {L\+B\+M\+\_\+init\+Velocity}, \hyperpage{27}
+    \subitem {L\+B\+M\+\_\+kbc\+Collide}, \hyperpage{27}
+    \subitem {L\+B\+M\+\_\+macro}, \hyperpage{27}
+    \subitem {L\+B\+M\+\_\+multi}, \hyperpage{27}
+    \subitem {L\+B\+M\+\_\+stream}, \hyperpage{28}
+    \subitem {Lat\+Typ}, \hyperpage{28}
+    \subitem {level}, \hyperpage{28}
+    \subitem {M\+\_\+lim}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {N\+\_\+lim}, \hyperpage{29}
+    \subitem {nu}, \hyperpage{29}
+    \subitem {Object\+Manager}, \hyperpage{28}, \hyperpage{64}
+    \subitem {omega}, \hyperpage{29}
+    \subitem {t}, \hyperpage{29}
+    \subitem {timeav\+\_\+mpi\+\_\+overhead}, \hyperpage{29}
+    \subitem {timeav\+\_\+timestep}, \hyperpage{29}
+    \subitem {X\+Ind}, \hyperpage{29}
+    \subitem {X\+Pos}, \hyperpage{29}
+    \subitem {Y\+Ind}, \hyperpage{29}
+    \subitem {Y\+Pos}, \hyperpage{29}
+    \subitem {Z\+Ind}, \hyperpage{30}
+    \subitem {Z\+Pos}, \hyperpage{30}
+  \item {Grid\+Obj.\+cpp}, \hyperpage{86}
+  \item {Grid\+Obj.\+h}, \hyperpage{86}
+    \subitem {e\+B\+C\+All}, \hyperpage{87}
+    \subitem {e\+B\+C\+B\+FL}, \hyperpage{87}
+    \subitem {e\+B\+C\+Inlet}, \hyperpage{87}
+    \subitem {e\+B\+C\+Inlet\+Outlet}, \hyperpage{87}
+    \subitem {e\+B\+C\+Outlet}, \hyperpage{87}
+    \subitem {e\+B\+C\+Solid\+Symmetry}, \hyperpage{87}
+    \subitem {e\+B\+C\+Type}, \hyperpage{87}
+    \subitem {e\+B\+FL}, \hyperpage{87}
+    \subitem {e\+Fluid}, \hyperpage{87}
+    \subitem {e\+Inlet}, \hyperpage{87}
+    \subitem {e\+Outlet}, \hyperpage{87}
+    \subitem {e\+Refined}, \hyperpage{87}
+    \subitem {e\+Refined\+Inlet}, \hyperpage{87}
+    \subitem {e\+Refined\+Solid}, \hyperpage{87}
+    \subitem {e\+Refined\+Symmetry}, \hyperpage{87}
+    \subitem {e\+Solid}, \hyperpage{87}
+    \subitem {e\+Symmetry}, \hyperpage{87}
+    \subitem {e\+Transition\+To\+Coarser}, \hyperpage{87}
+    \subitem {e\+Transition\+To\+Finer}, \hyperpage{87}
+    \subitem {e\+Type}, \hyperpage{87}
+  \item {Grid\+Obj\+\_\+init\+\_\+grids.\+cpp}, \hyperpage{88}
+  \item {Grid\+Obj\+\_\+ops\+\_\+boundary.\+cpp}, \hyperpage{88}
+  \item {Grid\+Obj\+\_\+ops\+\_\+io.\+cpp}, \hyperpage{88}
+  \item {Grid\+Obj\+\_\+ops\+\_\+lbm.\+cpp}, \hyperpage{88}
+  \item {Grid\+Utils}, \hyperpage{30}
+    \subitem {add}, \hyperpage{32}
+    \subitem {create\+Output\+Directory}, \hyperpage{32}
+    \subitem {crossprod}, \hyperpage{32}
+    \subitem {dir\+\_\+reflect}, \hyperpage{35}
+    \subitem {dotprod}, \hyperpage{32}
+    \subitem {down\+To\+Limit}, \hyperpage{32}
+    \subitem {factorial}, \hyperpage{32}
+    \subitem {get\+Coarse\+Indices}, \hyperpage{32}
+    \subitem {get\+Fine\+Indices}, \hyperpage{32}
+    \subitem {get\+Grid}, \hyperpage{32}
+    \subitem {get\+Opposite}, \hyperpage{33}
+    \subitem {global\+\_\+to\+\_\+local}, \hyperpage{33}
+    \subitem {Grid\+Obj}, \hyperpage{28}
+    \subitem {has\+This\+Sub\+Grid}, \hyperpage{33}
+    \subitem {index\+To\+Position}, \hyperpage{33}
+    \subitem {is\+Off\+Grid}, \hyperpage{33}
+    \subitem {is\+On\+Recv\+Layer}, \hyperpage{33}
+    \subitem {is\+On\+Sender\+Layer}, \hyperpage{33}
+    \subitem {is\+On\+This\+Rank}, \hyperpage{33}
+    \subitem {is\+Overlap\+Periodic}, \hyperpage{33}
+    \subitem {linspace}, \hyperpage{33}
+    \subitem {local\+\_\+to\+\_\+global}, \hyperpage{33}
+    \subitem {logfile}, \hyperpage{36}
+    \subitem {matrix\+\_\+multiply}, \hyperpage{34}
+    \subitem {onespace}, \hyperpage{34}
+    \subitem {path\+\_\+str}, \hyperpage{36}
+    \subitem {strided\+Copy}, \hyperpage{34}
+    \subitem {subtract}, \hyperpage{34}
+    \subitem {up\+To\+Zero}, \hyperpage{34}
+    \subitem {vecmultiply}, \hyperpage{35}
+    \subitem {vecnorm}, \hyperpage{35}
+  \item {Grid\+Utils.\+cpp}, \hyperpage{89}
+  \item {Grid\+Utils.\+h}, \hyperpage{89}
+    \subitem {e\+Cartesian\+Direction}, \hyperpage{89}
+    \subitem {e\+Maximum}, \hyperpage{90}
+    \subitem {e\+Min\+Max}, \hyperpage{89}
+    \subitem {e\+Minimum}, \hyperpage{90}
+    \subitem {e\+X\+Direction}, \hyperpage{89}
+    \subitem {e\+Y\+Direction}, \hyperpage{89}
+    \subitem {e\+Z\+Direction}, \hyperpage{89}
   \item {Grids}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {group\+ID}
-    \subitem {I\+B\+Body}, \hyperpage{21}
+    \subitem {I\+B\+Body}, \hyperpage{40}
 
   \indexspace
 
   \item {H5\+\_\+\+B\+U\+I\+L\+T\+\_\+\+A\+S\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+L\+IB}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+S\+Z\+IP}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+Z\+L\+IB}
-    \subitem {hdf5luma.\+h}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
   \item {halo\+\_\+max}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
   \item {halo\+\_\+min}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
   \item {has\+This\+Sub\+Grid}
-    \subitem {Grid\+Utils}, \hyperpage{17}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {hdf5\+\_\+write\+Data\+Set}
-    \subitem {hdf5luma.\+h}, \hyperpage{49}
-  \item {hdf5luma.\+h}, \hyperpage{48}
-    \subitem {e\+Hdf5\+Slab\+Type}, \hyperpage{48}
-    \subitem {e\+PosX}, \hyperpage{48}
-    \subitem {e\+PosY}, \hyperpage{48}
-    \subitem {e\+PosZ}, \hyperpage{48}
-    \subitem {e\+Product\+Vector}, \hyperpage{48}
-    \subitem {e\+Scalar}, \hyperpage{48}
-    \subitem {e\+Vector}, \hyperpage{48}
+    \subitem {hdf5luma.\+h}, \hyperpage{91}
+  \item {hdf5luma.\+h}, \hyperpage{90}
+    \subitem {e\+Hdf5\+Slab\+Type}, \hyperpage{91}
+    \subitem {e\+PosX}, \hyperpage{91}
+    \subitem {e\+PosY}, \hyperpage{91}
+    \subitem {e\+PosZ}, \hyperpage{91}
+    \subitem {e\+Product\+Vector}, \hyperpage{91}
+    \subitem {e\+Scalar}, \hyperpage{91}
+    \subitem {e\+Vector}, \hyperpage{91}
     \subitem {H5\+\_\+\+B\+U\+I\+L\+T\+\_\+\+A\+S\+\_\+\+D\+Y\+N\+A\+M\+I\+C\+\_\+\+L\+IB}, 
-		\hyperpage{48}
-    \subitem {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+S\+Z\+IP}, \hyperpage{48}
-    \subitem {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+Z\+L\+IB}, \hyperpage{48}
-    \subitem {hdf5\+\_\+write\+Data\+Set}, \hyperpage{49}
+		\hyperpage{91}
+    \subitem {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+S\+Z\+IP}, \hyperpage{91}
+    \subitem {H\+D\+F5\+\_\+\+E\+X\+T\+\_\+\+Z\+L\+IB}, \hyperpage{91}
+    \subitem {hdf5\+\_\+write\+Data\+Set}, \hyperpage{91}
 
   \indexspace
 
   \item {i}
-    \subitem {Marker\+Data}, \hyperpage{26}
+    \subitem {Marker\+Data}, \hyperpage{50}
   \item {i\+\_\+end}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
   \item {i\+\_\+start}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
-  \item {I\+B\+Body}, \hyperpage{19}
-    \subitem {$\sim$\+I\+B\+Body}, \hyperpage{20}
-    \subitem {add\+Marker}, \hyperpage{20}
-    \subitem {B\+Cs}, \hyperpage{21}
-    \subitem {deformable}, \hyperpage{21}
-    \subitem {delta\+\_\+rho}, \hyperpage{21}
-    \subitem {flex\+\_\+rigid}, \hyperpage{21}
-    \subitem {flexural\+\_\+rigidity}, \hyperpage{21}
-    \subitem {group\+ID}, \hyperpage{21}
-    \subitem {I\+B\+Body}, \hyperpage{20}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
-    \subitem {make\+Body}, \hyperpage{20, 21}
-    \subitem {Object\+Manager}, \hyperpage{21}
-    \subitem {tension}, \hyperpage{21}
-  \item {I\+B\+Body.\+cpp}, \hyperpage{49}
-  \item {I\+B\+Body.\+h}, \hyperpage{49}
-  \item {I\+B\+Marker}, \hyperpage{21}
-    \subitem {$\sim$\+I\+B\+Marker}, \hyperpage{22}
-    \subitem {deltaval}, \hyperpage{22}
-    \subitem {desired\+\_\+vel}, \hyperpage{22}
-    \subitem {dilation}, \hyperpage{22}
-    \subitem {epsilon}, \hyperpage{22}
-    \subitem {flex\+\_\+rigid}, \hyperpage{23}
-    \subitem {fluid\+\_\+vel}, \hyperpage{23}
-    \subitem {force\+\_\+xyz}, \hyperpage{23}
-    \subitem {I\+B\+Body}, \hyperpage{22}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
-    \subitem {local\+\_\+area}, \hyperpage{23}
-    \subitem {Object\+Manager}, \hyperpage{22}
-    \subitem {position\+\_\+old}, \hyperpage{23}
-  \item {I\+B\+Marker.\+cpp}, \hyperpage{49}
-  \item {I\+B\+Marker.\+h}, \hyperpage{49}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
+  \item {I\+B\+Body}, \hyperpage{36}
+    \subitem {$\sim$\+I\+B\+Body}, \hyperpage{38}
+    \subitem {add\+Marker}, \hyperpage{38}
+    \subitem {B\+Cs}, \hyperpage{40}
+    \subitem {deformable}, \hyperpage{40}
+    \subitem {delta\+\_\+rho}, \hyperpage{40}
+    \subitem {flex\+\_\+rigid}, \hyperpage{40}
+    \subitem {flexural\+\_\+rigidity}, \hyperpage{40}
+    \subitem {group\+ID}, \hyperpage{40}
+    \subitem {I\+B\+Body}, \hyperpage{38}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
+    \subitem {make\+Body}, \hyperpage{38, 39}
+    \subitem {Object\+Manager}, \hyperpage{40}
+    \subitem {tension}, \hyperpage{40}
+  \item {I\+B\+Body.\+cpp}, \hyperpage{92}
+  \item {I\+B\+Body.\+h}, \hyperpage{92}
+  \item {I\+B\+Marker}, \hyperpage{41}
+    \subitem {$\sim$\+I\+B\+Marker}, \hyperpage{42}
+    \subitem {deltaval}, \hyperpage{42}
+    \subitem {desired\+\_\+vel}, \hyperpage{42}
+    \subitem {dilation}, \hyperpage{43}
+    \subitem {epsilon}, \hyperpage{43}
+    \subitem {flex\+\_\+rigid}, \hyperpage{43}
+    \subitem {fluid\+\_\+vel}, \hyperpage{43}
+    \subitem {force\+\_\+xyz}, \hyperpage{43}
+    \subitem {I\+B\+Body}, \hyperpage{42}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
+    \subitem {local\+\_\+area}, \hyperpage{43}
+    \subitem {Object\+Manager}, \hyperpage{42}
+    \subitem {position\+\_\+old}, \hyperpage{43}
+  \item {I\+B\+Marker.\+cpp}, \hyperpage{92}
+  \item {I\+B\+Marker.\+h}, \hyperpage{92}
   \item {I\+Vector}
-    \subitem {$\sim$\+I\+Vector}, \hyperpage{24}
-    \subitem {I\+Vector}, \hyperpage{24}
-    \subitem {operator()}, \hyperpage{24}
-  \item {I\+Vector$<$ Gen\+Typ $>$}, \hyperpage{23}
-  \item {I\+Vector.\+h}, \hyperpage{50}
+    \subitem {$\sim$\+I\+Vector}, \hyperpage{44}
+    \subitem {I\+Vector}, \hyperpage{44}
+    \subitem {operator()}, \hyperpage{45}
+  \item {I\+Vector$<$ Gen\+Typ $>$}, \hyperpage{44}
+  \item {I\+Vector.\+h}, \hyperpage{92}
   \item {ibm\+\_\+apply}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+banbks}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+bandec}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+bicgstab}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+build\+\_\+body}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+computeforce}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+deltakernel}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{62}
   \item {ibm\+\_\+findepsilon}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+findsupport}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+initialise}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+interpol}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+jacowire}
-    \subitem {Object\+Manager}, \hyperpage{31}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+move\+\_\+bodies}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+position\+\_\+update}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+position\+\_\+update\+\_\+grp}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ibm\+\_\+spread}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {ID}
-    \subitem {Marker\+Data}, \hyperpage{26}
+    \subitem {Marker\+Data}, \hyperpage{50}
   \item {index\+To\+Position}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {io\+\_\+hdf5}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{23}
   \item {io\+\_\+lite}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{23}
   \item {io\+\_\+probe\+Output}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{23}
   \item {io\+\_\+read\+In\+Cloud}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {io\+\_\+restart}
-    \subitem {Grid\+Obj}, \hyperpage{14}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Grid\+Obj}, \hyperpage{23}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {io\+\_\+textout}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{23}
   \item {io\+\_\+vtk\+\_\+\+I\+Bwriter}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{63}
   \item {io\+\_\+write\+\_\+body\+\_\+pos}
-    \subitem {Object\+Manager}, \hyperpage{32}
+    \subitem {Object\+Manager}, \hyperpage{64}
   \item {io\+\_\+write\+\_\+lift\+\_\+drag}
-    \subitem {Object\+Manager}, \hyperpage{32}
-  \item {is\+\_\+nan}
-    \subitem {stdafx.\+h}, \hyperpage{55}
+    \subitem {Object\+Manager}, \hyperpage{64}
+  \item {io\+\_\+write\+Force\+On\+Object}
+    \subitem {Object\+Manager}, \hyperpage{64}
   \item {is\+In\+Voxel}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{15}
   \item {is\+Off\+Grid}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {is\+On\+Recv\+Layer}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {is\+On\+Sender\+Layer}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {is\+On\+This\+Rank}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {is\+Overlap\+Periodic}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {is\+Voxel\+Marker\+Voxel}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{15}
 
   \indexspace
 
   \item {j}
-    \subitem {Marker\+Data}, \hyperpage{26}
+    \subitem {Marker\+Data}, \hyperpage{50}
   \item {j\+\_\+end}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
   \item {j\+\_\+start}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
 
   \indexspace
 
   \item {k}
-    \subitem {Marker\+Data}, \hyperpage{26}
+    \subitem {Marker\+Data}, \hyperpage{50}
   \item {k\+\_\+end}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
+  \item {K\+\_\+lim}
+    \subitem {Grid\+Obj}, \hyperpage{28}
   \item {k\+\_\+start}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
 
   \indexspace
 
   \item {L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+\+C\+H\+E\+A\+P\+\_\+\+N\+E\+A\+R\+E\+S\+T\+\_\+\+N\+O\+D\+E\+\_\+\+D\+E\+T\+E\+C\+T\+I\+ON}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+\+F\+R\+E\+E\+S\+T\+R\+E\+A\+M\+\_\+\+T\+U\+N\+N\+EL}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{80}
+  \item {L\+\_\+\+I\+S\+\_\+\+N\+AN}
+    \subitem {stdafx.\+h}, \hyperpage{98}
   \item {L\+\_\+\+M\+P\+I\+\_\+dir}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+\+Num\+Lev}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+\+Num\+Reg}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+\+PI}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+\+Re}
-    \subitem {definitions.\+h}, \hyperpage{41}
-  \item {L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+ON}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
+  \item {L\+\_\+\+S\+O\+L\+I\+D\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+\+Timesteps}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+\+U\+S\+E\+\_\+\+K\+B\+C\+\_\+\+C\+O\+L\+L\+I\+S\+I\+ON}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+\+Xcores}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+\+Ycores}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {L\+\_\+\+Zcores}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {L\+\_\+a\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{74}
   \item {L\+\_\+a\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{74}
   \item {L\+\_\+a\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+b\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+b\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+b\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+bfl\+\_\+length}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+bfl\+\_\+length\+\_\+ref}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+lev}
-    \subitem {definitions.\+h}, \hyperpage{38}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+bfl\+\_\+on\+\_\+grid\+\_\+reg}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+bfl\+\_\+scale\+\_\+direction}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+lev}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{75}
   \item {L\+\_\+block\+\_\+on\+\_\+grid\+\_\+reg}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+x\+\_\+max}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+x\+\_\+min}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+y\+\_\+max}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+y\+\_\+min}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+z\+\_\+max}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+block\+\_\+z\+\_\+min}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+centre\+\_\+bfl\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+centre\+\_\+ibb\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{76}
   \item {L\+\_\+centre\+\_\+object\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+dims}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+end\+\_\+\+BC}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+grav\+\_\+direction}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+grav\+\_\+force}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+ibb\+\_\+\+EI}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+angle\+\_\+horz}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+ibb\+\_\+angle\+\_\+vert}
-    \subitem {definitions.\+h}, \hyperpage{39}
+    \subitem {definitions.\+h}, \hyperpage{77}
   \item {L\+\_\+ibb\+\_\+d}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+deform}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+delta\+\_\+rho}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+filament\+\_\+length}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+filament\+\_\+start\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+flex\+\_\+rigid}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+l}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{78}
   \item {L\+\_\+ibb\+\_\+length}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+length\+\_\+ref}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+lev}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+on\+\_\+grid\+\_\+reg}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+r}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+scale\+\_\+direction}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+w}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+ibb\+\_\+z}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{79}
   \item {L\+\_\+K}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+M}
-    \subitem {definitions.\+h}, \hyperpage{40}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+N}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+n\+Vels}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+num\+\_\+markers}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+object\+\_\+length}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{80}
   \item {L\+\_\+object\+\_\+length\+\_\+ref}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+lev}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+object\+\_\+on\+\_\+grid\+\_\+reg}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+object\+\_\+scale\+\_\+direction}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+out\+\_\+every}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
+  \item {L\+\_\+out\+\_\+every\+\_\+forces}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+out\+\_\+every\+\_\+probe}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+output\+\_\+precision}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{81}
   \item {L\+\_\+restart\+\_\+out\+\_\+every}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+rho\+\_\+in}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+\+BC}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+bfl\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+bfl\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{41}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+ibb\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+ibb\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+object\+\_\+x}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{82}
   \item {L\+\_\+start\+\_\+object\+\_\+y}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+u\+\_\+0x}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+u\+\_\+0y}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+u\+\_\+0z}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+u\+\_\+max}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+u\+\_\+ref}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+\_\+wall\+\_\+thickness}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{83}
   \item {L\+B\+M\+\_\+add\+Sub\+Grid}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{24}
   \item {L\+B\+M\+\_\+boundary}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{24}
   \item {L\+B\+M\+\_\+coalesce}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{24}
   \item {L\+B\+M\+\_\+collide}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{24}
   \item {L\+B\+M\+\_\+explode}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{25}
   \item {L\+B\+M\+\_\+forcegrid}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{25}
   \item {L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{25}
   \item {L\+B\+M\+\_\+init\+Bound\+Lab}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{25}
   \item {L\+B\+M\+\_\+init\+Grid}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{26}
   \item {L\+B\+M\+\_\+init\+Refined\+Lab}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{26}
   \item {L\+B\+M\+\_\+init\+Rho}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{26}
   \item {L\+B\+M\+\_\+init\+Solid\+Lab}
-    \subitem {Grid\+Obj}, \hyperpage{14}
+    \subitem {Grid\+Obj}, \hyperpage{26}
   \item {L\+B\+M\+\_\+init\+Sub\+Grid}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{26}
   \item {L\+B\+M\+\_\+init\+Velocity}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{27}
   \item {L\+B\+M\+\_\+kbc\+Collide}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{27}
   \item {L\+B\+M\+\_\+macro}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{27}
   \item {L\+B\+M\+\_\+multi}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{27}
   \item {L\+B\+M\+\_\+stream}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{28}
   \item {L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}
-    \subitem {stdafx.\+h}, \hyperpage{55}
+    \subitem {stdafx.\+h}, \hyperpage{98}
   \item {L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Lat\+Typ}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{28}
   \item {level}
-    \subitem {Grid\+Obj}, \hyperpage{15}
-    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{11}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Grid\+Obj}, \hyperpage{28}
+    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{17}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
   \item {linspace}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {local\+\_\+area}
-    \subitem {I\+B\+Marker}, \hyperpage{23}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
   \item {local\+\_\+size}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
   \item {local\+\_\+to\+\_\+global}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{33}
   \item {logfile}
-    \subitem {Grid\+Utils}, \hyperpage{19}
+    \subitem {Grid\+Utils}, \hyperpage{36}
   \item {logout}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{56}
 
   \indexspace
 
+  \item {M\+\_\+lim}
+    \subitem {Grid\+Obj}, \hyperpage{28}
   \item {M\+P\+I\+\_\+cartlab}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
   \item {M\+P\+I\+\_\+coords}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
   \item {M\+P\+I\+\_\+dims}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
   \item {main}
-    \subitem {main\+\_\+lbm.\+cpp}, \hyperpage{50}
-  \item {main\+\_\+lbm.\+cpp}, \hyperpage{50}
-    \subitem {main}, \hyperpage{50}
+    \subitem {main\+\_\+lbm.\+cpp}, \hyperpage{93}
+  \item {main\+\_\+lbm.\+cpp}, \hyperpage{93}
+    \subitem {main}, \hyperpage{93}
   \item {make\+Body}
-    \subitem {I\+B\+Body}, \hyperpage{20, 21}
-  \item {Marker}, \hyperpage{25}
-    \subitem {$\sim$\+Marker}, \hyperpage{25}
-    \subitem {Marker}, \hyperpage{25}
-    \subitem {position}, \hyperpage{25}
-    \subitem {supp\+\_\+i}, \hyperpage{25}
-    \subitem {supp\+\_\+j}, \hyperpage{25}
-    \subitem {supp\+\_\+k}, \hyperpage{25}
-    \subitem {support\+\_\+rank}, \hyperpage{25}
-  \item {Marker.\+h}, \hyperpage{50}
+    \subitem {I\+B\+Body}, \hyperpage{38, 39}
+  \item {Marker}, \hyperpage{47}
+    \subitem {$\sim$\+Marker}, \hyperpage{48}
+    \subitem {Marker}, \hyperpage{48}
+    \subitem {position}, \hyperpage{48}
+    \subitem {supp\+\_\+i}, \hyperpage{48}
+    \subitem {supp\+\_\+j}, \hyperpage{48}
+    \subitem {supp\+\_\+k}, \hyperpage{48}
+    \subitem {support\+\_\+rank}, \hyperpage{48}
+  \item {Marker.\+h}, \hyperpage{93}
   \item {marker\+Adder}
-    \subitem {Body}, \hyperpage{10}
-  \item {Marker\+Data}, \hyperpage{26}
-    \subitem {$\sim$\+Marker\+Data}, \hyperpage{26}
-    \subitem {i}, \hyperpage{26}
-    \subitem {ID}, \hyperpage{26}
-    \subitem {j}, \hyperpage{26}
-    \subitem {k}, \hyperpage{26}
-    \subitem {Marker\+Data}, \hyperpage{26}
-    \subitem {x}, \hyperpage{26}
-    \subitem {y}, \hyperpage{26}
-    \subitem {z}, \hyperpage{26}
+    \subitem {Body}, \hyperpage{15}
+  \item {Marker\+Data}, \hyperpage{49}
+    \subitem {$\sim$\+Marker\+Data}, \hyperpage{50}
+    \subitem {i}, \hyperpage{50}
+    \subitem {ID}, \hyperpage{50}
+    \subitem {j}, \hyperpage{50}
+    \subitem {k}, \hyperpage{50}
+    \subitem {Marker\+Data}, \hyperpage{49, 50}
+    \subitem {x}, \hyperpage{50}
+    \subitem {y}, \hyperpage{50}
+    \subitem {z}, \hyperpage{51}
   \item {markers}
-    \subitem {Body}, \hyperpage{10}
+    \subitem {Body}, \hyperpage{16}
   \item {matrix\+\_\+multiply}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{34}
   \item {mpi\+\_\+buffer\+\_\+pack}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-  \item {Mpi\+\_\+buffer\+\_\+pack.\+cpp}, \hyperpage{50}
+    \subitem {Mpi\+Manager}, \hyperpage{53}
+  \item {Mpi\+\_\+buffer\+\_\+pack.\+cpp}, \hyperpage{93}
   \item {mpi\+\_\+buffer\+\_\+size}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{53}
   \item {mpi\+\_\+buffer\+\_\+size\+\_\+recv}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-  \item {Mpi\+\_\+buffer\+\_\+size\+\_\+recv.\+cpp}, \hyperpage{51}
+    \subitem {Mpi\+Manager}, \hyperpage{54}
+  \item {Mpi\+\_\+buffer\+\_\+size\+\_\+recv.\+cpp}, \hyperpage{94}
   \item {mpi\+\_\+buffer\+\_\+size\+\_\+send}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-  \item {Mpi\+\_\+buffer\+\_\+size\+\_\+send.\+cpp}, \hyperpage{51}
+    \subitem {Mpi\+Manager}, \hyperpage{54}
+  \item {Mpi\+\_\+buffer\+\_\+size\+\_\+send.\+cpp}, \hyperpage{94}
   \item {mpi\+\_\+buffer\+\_\+unpack}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-  \item {Mpi\+\_\+buffer\+\_\+unpk.\+cpp}, \hyperpage{51}
+    \subitem {Mpi\+Manager}, \hyperpage{54}
+  \item {Mpi\+\_\+buffer\+\_\+unpk.\+cpp}, \hyperpage{94}
   \item {mpi\+\_\+build\+Communicators}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{54}
   \item {mpi\+\_\+communicate}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{55}
   \item {mpi\+\_\+get\+Opposite}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{55}
   \item {mpi\+\_\+gridbuild}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{55}
   \item {mpi\+\_\+init}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
+    \subitem {Mpi\+Manager}, \hyperpage{55}
   \item {mpi\+\_\+writeout\+\_\+buf}
-    \subitem {Mpi\+Manager}, \hyperpage{28}
-  \item {Mpi\+Manager}, \hyperpage{27}
-    \subitem {buffer\+\_\+recv\+\_\+info}, \hyperpage{28}
-    \subitem {buffer\+\_\+send\+\_\+info}, \hyperpage{28}
-    \subitem {destroy\+Instance}, \hyperpage{28}
-    \subitem {f\+\_\+buffer\+\_\+recv}, \hyperpage{28}
-    \subitem {f\+\_\+buffer\+\_\+send}, \hyperpage{28}
-    \subitem {get\+Instance}, \hyperpage{28}
-    \subitem {global\+\_\+dims}, \hyperpage{28}
-    \subitem {global\+\_\+edge\+\_\+ind}, \hyperpage{29}
-    \subitem {global\+\_\+edge\+\_\+pos}, \hyperpage{29}
-    \subitem {Grid\+Obj}, \hyperpage{15}
-    \subitem {Grids}, \hyperpage{29}
-    \subitem {local\+\_\+size}, \hyperpage{29}
-    \subitem {logout}, \hyperpage{29}
-    \subitem {M\+P\+I\+\_\+cartlab}, \hyperpage{29}
-    \subitem {M\+P\+I\+\_\+coords}, \hyperpage{29}
-    \subitem {M\+P\+I\+\_\+dims}, \hyperpage{29}
-    \subitem {mpi\+\_\+buffer\+\_\+pack}, \hyperpage{28}
-    \subitem {mpi\+\_\+buffer\+\_\+size}, \hyperpage{28}
-    \subitem {mpi\+\_\+buffer\+\_\+size\+\_\+recv}, \hyperpage{28}
-    \subitem {mpi\+\_\+buffer\+\_\+size\+\_\+send}, \hyperpage{28}
-    \subitem {mpi\+\_\+buffer\+\_\+unpack}, \hyperpage{28}
-    \subitem {mpi\+\_\+build\+Communicators}, \hyperpage{28}
-    \subitem {mpi\+\_\+communicate}, \hyperpage{28}
-    \subitem {mpi\+\_\+get\+Opposite}, \hyperpage{28}
-    \subitem {mpi\+\_\+gridbuild}, \hyperpage{28}
-    \subitem {mpi\+\_\+init}, \hyperpage{28}
-    \subitem {mpi\+\_\+writeout\+\_\+buf}, \hyperpage{28}
-    \subitem {my\+\_\+rank}, \hyperpage{29}
-    \subitem {neighbour\+\_\+coords}, \hyperpage{29}
-    \subitem {neighbour\+\_\+rank}, \hyperpage{29}
-    \subitem {num\+\_\+ranks}, \hyperpage{29}
-    \subitem {p\+\_\+data}, \hyperpage{29}
-    \subitem {recv\+\_\+layer\+\_\+pos}, \hyperpage{29}
-    \subitem {recv\+\_\+stat}, \hyperpage{29}
-    \subitem {send\+\_\+requests}, \hyperpage{29}
-    \subitem {send\+\_\+stat}, \hyperpage{29}
-    \subitem {sender\+\_\+layer\+\_\+pos}, \hyperpage{29}
-    \subitem {sub\+Grid\+\_\+comm}, \hyperpage{29}
-    \subitem {world\+\_\+comm}, \hyperpage{29}
-  \item {Mpi\+Manager.\+cpp}, \hyperpage{51}
-  \item {Mpi\+Manager.\+h}, \hyperpage{51}
-    \subitem {range\+\_\+i\+\_\+left}, \hyperpage{52}
-    \subitem {range\+\_\+i\+\_\+right}, \hyperpage{52}
-    \subitem {range\+\_\+j\+\_\+down}, \hyperpage{52}
-    \subitem {range\+\_\+j\+\_\+up}, \hyperpage{52}
-    \subitem {range\+\_\+k\+\_\+back}, \hyperpage{52}
-    \subitem {range\+\_\+k\+\_\+front}, \hyperpage{52}
-  \item {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{10}
-    \subitem {level}, \hyperpage{11}
-    \subitem {region}, \hyperpage{11}
-    \subitem {size}, \hyperpage{11}
-  \item {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{24}
-    \subitem {X}, \hyperpage{24}
-    \subitem {Y}, \hyperpage{24}
-    \subitem {Z}, \hyperpage{24}
-  \item {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{33}
-    \subitem {halo\+\_\+max}, \hyperpage{34}
-    \subitem {halo\+\_\+min}, \hyperpage{34}
-    \subitem {i\+\_\+end}, \hyperpage{34}
-    \subitem {i\+\_\+start}, \hyperpage{34}
-    \subitem {j\+\_\+end}, \hyperpage{34}
-    \subitem {j\+\_\+start}, \hyperpage{34}
-    \subitem {k\+\_\+end}, \hyperpage{34}
-    \subitem {k\+\_\+start}, \hyperpage{34}
-    \subitem {level}, \hyperpage{34}
-    \subitem {region}, \hyperpage{34}
-    \subitem {writable\+\_\+data\+\_\+count}, \hyperpage{34}
+    \subitem {Mpi\+Manager}, \hyperpage{55}
+  \item {Mpi\+Manager}, \hyperpage{51}
+    \subitem {buffer\+\_\+recv\+\_\+info}, \hyperpage{56}
+    \subitem {buffer\+\_\+send\+\_\+info}, \hyperpage{56}
+    \subitem {destroy\+Instance}, \hyperpage{53}
+    \subitem {f\+\_\+buffer\+\_\+recv}, \hyperpage{56}
+    \subitem {f\+\_\+buffer\+\_\+send}, \hyperpage{56}
+    \subitem {get\+Instance}, \hyperpage{53}
+    \subitem {global\+\_\+dims}, \hyperpage{56}
+    \subitem {global\+\_\+edge\+\_\+ind}, \hyperpage{56}
+    \subitem {global\+\_\+edge\+\_\+pos}, \hyperpage{56}
+    \subitem {Grid\+Obj}, \hyperpage{28}
+    \subitem {Grids}, \hyperpage{56}
+    \subitem {local\+\_\+size}, \hyperpage{56}
+    \subitem {logout}, \hyperpage{56}
+    \subitem {M\+P\+I\+\_\+cartlab}, \hyperpage{57}
+    \subitem {M\+P\+I\+\_\+coords}, \hyperpage{57}
+    \subitem {M\+P\+I\+\_\+dims}, \hyperpage{57}
+    \subitem {mpi\+\_\+buffer\+\_\+pack}, \hyperpage{53}
+    \subitem {mpi\+\_\+buffer\+\_\+size}, \hyperpage{53}
+    \subitem {mpi\+\_\+buffer\+\_\+size\+\_\+recv}, \hyperpage{54}
+    \subitem {mpi\+\_\+buffer\+\_\+size\+\_\+send}, \hyperpage{54}
+    \subitem {mpi\+\_\+buffer\+\_\+unpack}, \hyperpage{54}
+    \subitem {mpi\+\_\+build\+Communicators}, \hyperpage{54}
+    \subitem {mpi\+\_\+communicate}, \hyperpage{55}
+    \subitem {mpi\+\_\+get\+Opposite}, \hyperpage{55}
+    \subitem {mpi\+\_\+gridbuild}, \hyperpage{55}
+    \subitem {mpi\+\_\+init}, \hyperpage{55}
+    \subitem {mpi\+\_\+writeout\+\_\+buf}, \hyperpage{55}
+    \subitem {my\+\_\+rank}, \hyperpage{57}
+    \subitem {neighbour\+\_\+coords}, \hyperpage{57}
+    \subitem {neighbour\+\_\+rank}, \hyperpage{57}
+    \subitem {num\+\_\+ranks}, \hyperpage{57}
+    \subitem {p\+\_\+data}, \hyperpage{57}
+    \subitem {recv\+\_\+layer\+\_\+pos}, \hyperpage{58}
+    \subitem {recv\+\_\+stat}, \hyperpage{58}
+    \subitem {send\+\_\+requests}, \hyperpage{58}
+    \subitem {send\+\_\+stat}, \hyperpage{58}
+    \subitem {sender\+\_\+layer\+\_\+pos}, \hyperpage{58}
+    \subitem {sub\+Grid\+\_\+comm}, \hyperpage{58}
+    \subitem {world\+\_\+comm}, \hyperpage{58}
+  \item {Mpi\+Manager.\+cpp}, \hyperpage{94}
+  \item {Mpi\+Manager.\+h}, \hyperpage{94}
+    \subitem {range\+\_\+i\+\_\+left}, \hyperpage{95}
+    \subitem {range\+\_\+i\+\_\+right}, \hyperpage{95}
+    \subitem {range\+\_\+j\+\_\+down}, \hyperpage{95}
+    \subitem {range\+\_\+j\+\_\+up}, \hyperpage{95}
+    \subitem {range\+\_\+k\+\_\+back}, \hyperpage{95}
+    \subitem {range\+\_\+k\+\_\+front}, \hyperpage{96}
+  \item {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{16}
+    \subitem {level}, \hyperpage{17}
+    \subitem {region}, \hyperpage{17}
+    \subitem {size}, \hyperpage{17}
+  \item {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{46}
+    \subitem {X}, \hyperpage{46}
+    \subitem {Y}, \hyperpage{46}
+    \subitem {Z}, \hyperpage{47}
+  \item {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{66}
+    \subitem {halo\+\_\+max}, \hyperpage{67}
+    \subitem {halo\+\_\+min}, \hyperpage{67}
+    \subitem {i\+\_\+end}, \hyperpage{67}
+    \subitem {i\+\_\+start}, \hyperpage{67}
+    \subitem {j\+\_\+end}, \hyperpage{67}
+    \subitem {j\+\_\+start}, \hyperpage{67}
+    \subitem {k\+\_\+end}, \hyperpage{67}
+    \subitem {k\+\_\+start}, \hyperpage{67}
+    \subitem {level}, \hyperpage{67}
+    \subitem {region}, \hyperpage{67}
+    \subitem {writable\+\_\+data\+\_\+count}, \hyperpage{67}
   \item {my\+\_\+rank}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
 
   \indexspace
 
+  \item {N\+\_\+lim}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {n\+Probes}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {neighbour\+\_\+coords}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
   \item {neighbour\+\_\+rank}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
   \item {nu}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {num\+\_\+ranks}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
 
   \indexspace
 
-  \item {Object\+Manager}, \hyperpage{30}
-    \subitem {bfl\+\_\+build\+\_\+body}, \hyperpage{31}
-    \subitem {destroy\+Instance}, \hyperpage{31}
-    \subitem {get\+Instance}, \hyperpage{31}
-    \subitem {get\+Vox\+Ind}, \hyperpage{31}
-    \subitem {Grid\+Obj}, \hyperpage{15}, \hyperpage{32}
-    \subitem {I\+B\+Body}, \hyperpage{21}
-    \subitem {I\+B\+Marker}, \hyperpage{22}
-    \subitem {ibm\+\_\+apply}, \hyperpage{31}
-    \subitem {ibm\+\_\+banbks}, \hyperpage{31}
-    \subitem {ibm\+\_\+bandec}, \hyperpage{31}
-    \subitem {ibm\+\_\+bicgstab}, \hyperpage{31}
-    \subitem {ibm\+\_\+build\+\_\+body}, \hyperpage{31}
-    \subitem {ibm\+\_\+computeforce}, \hyperpage{31}
-    \subitem {ibm\+\_\+deltakernel}, \hyperpage{31}
-    \subitem {ibm\+\_\+findepsilon}, \hyperpage{31}
-    \subitem {ibm\+\_\+findsupport}, \hyperpage{31}
-    \subitem {ibm\+\_\+initialise}, \hyperpage{31}
-    \subitem {ibm\+\_\+interpol}, \hyperpage{31}
-    \subitem {ibm\+\_\+jacowire}, \hyperpage{31}
-    \subitem {ibm\+\_\+move\+\_\+bodies}, \hyperpage{32}
-    \subitem {ibm\+\_\+position\+\_\+update}, \hyperpage{32}
-    \subitem {ibm\+\_\+position\+\_\+update\+\_\+grp}, \hyperpage{32}
-    \subitem {ibm\+\_\+spread}, \hyperpage{32}
-    \subitem {io\+\_\+read\+In\+Cloud}, \hyperpage{32}
-    \subitem {io\+\_\+restart}, \hyperpage{32}
-    \subitem {io\+\_\+vtk\+\_\+\+I\+Bwriter}, \hyperpage{32}
-    \subitem {io\+\_\+write\+\_\+body\+\_\+pos}, \hyperpage{32}
-    \subitem {io\+\_\+write\+\_\+lift\+\_\+drag}, \hyperpage{32}
-  \item {Object\+Manager.\+cpp}, \hyperpage{52}
-  \item {Object\+Manager.\+h}, \hyperpage{52}
-    \subitem {e\+B\+B\+B\+Cloud}, \hyperpage{53}
-    \subitem {e\+B\+F\+L\+Cloud}, \hyperpage{53}
-    \subitem {e\+I\+B\+B\+Cloud}, \hyperpage{53}
-    \subitem {e\+Object\+Type}, \hyperpage{53}
-  \item {Object\+Manager\+\_\+init\+\_\+bflbody.\+cpp}, \hyperpage{53}
-  \item {Object\+Manager\+\_\+init\+\_\+ibmbody.\+cpp}, \hyperpage{53}
-  \item {Object\+Manager\+\_\+ops\+\_\+ibm.\+cpp}, \hyperpage{53}
-  \item {Object\+Manager\+\_\+ops\+\_\+ibmflex.\+cpp}, \hyperpage{53}
-    \subitem {S\+W\+AP}, \hyperpage{54}
-    \subitem {T\+I\+NY}, \hyperpage{54}
-  \item {Object\+Manager\+\_\+ops\+\_\+io.\+cpp}, \hyperpage{54}
+  \item {Object\+Manager}, \hyperpage{59}
+    \subitem {bfl\+\_\+build\+\_\+body}, \hyperpage{60}
+    \subitem {compute\+Lift\+Drag}, \hyperpage{60}
+    \subitem {destroy\+Instance}, \hyperpage{61}
+    \subitem {get\+Instance}, \hyperpage{61}
+    \subitem {get\+Vox\+Ind}, \hyperpage{61}
+    \subitem {Grid\+Obj}, \hyperpage{28}, \hyperpage{64}
+    \subitem {I\+B\+Body}, \hyperpage{40}
+    \subitem {I\+B\+Marker}, \hyperpage{42}
+    \subitem {ibm\+\_\+apply}, \hyperpage{62}
+    \subitem {ibm\+\_\+banbks}, \hyperpage{62}
+    \subitem {ibm\+\_\+bandec}, \hyperpage{62}
+    \subitem {ibm\+\_\+bicgstab}, \hyperpage{62}
+    \subitem {ibm\+\_\+build\+\_\+body}, \hyperpage{62}
+    \subitem {ibm\+\_\+computeforce}, \hyperpage{62}
+    \subitem {ibm\+\_\+deltakernel}, \hyperpage{62}
+    \subitem {ibm\+\_\+findepsilon}, \hyperpage{63}
+    \subitem {ibm\+\_\+findsupport}, \hyperpage{63}
+    \subitem {ibm\+\_\+initialise}, \hyperpage{63}
+    \subitem {ibm\+\_\+interpol}, \hyperpage{63}
+    \subitem {ibm\+\_\+jacowire}, \hyperpage{63}
+    \subitem {ibm\+\_\+move\+\_\+bodies}, \hyperpage{63}
+    \subitem {ibm\+\_\+position\+\_\+update}, \hyperpage{63}
+    \subitem {ibm\+\_\+position\+\_\+update\+\_\+grp}, \hyperpage{63}
+    \subitem {ibm\+\_\+spread}, \hyperpage{63}
+    \subitem {io\+\_\+read\+In\+Cloud}, \hyperpage{63}
+    \subitem {io\+\_\+restart}, \hyperpage{63}
+    \subitem {io\+\_\+vtk\+\_\+\+I\+Bwriter}, \hyperpage{63}
+    \subitem {io\+\_\+write\+\_\+body\+\_\+pos}, \hyperpage{64}
+    \subitem {io\+\_\+write\+\_\+lift\+\_\+drag}, \hyperpage{64}
+    \subitem {io\+\_\+write\+Force\+On\+Object}, \hyperpage{64}
+  \item {Object\+Manager.\+cpp}, \hyperpage{96}
+  \item {Object\+Manager.\+h}, \hyperpage{96}
+    \subitem {e\+B\+B\+B\+Cloud}, \hyperpage{96}
+    \subitem {e\+B\+F\+L\+Cloud}, \hyperpage{96}
+    \subitem {e\+I\+B\+B\+Cloud}, \hyperpage{96}
+    \subitem {e\+Object\+Type}, \hyperpage{96}
+  \item {Object\+Manager\+\_\+init\+\_\+bflbody.\+cpp}, \hyperpage{97}
+  \item {Object\+Manager\+\_\+init\+\_\+ibmbody.\+cpp}, \hyperpage{97}
+  \item {Object\+Manager\+\_\+ops\+\_\+ibm.\+cpp}, \hyperpage{97}
+  \item {Object\+Manager\+\_\+ops\+\_\+ibmflex.\+cpp}, \hyperpage{97}
+    \subitem {S\+W\+AP}, \hyperpage{97}
+    \subitem {T\+I\+NY}, \hyperpage{97}
+  \item {Object\+Manager\+\_\+ops\+\_\+io.\+cpp}, \hyperpage{97}
   \item {omega}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {onespace}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{34}
   \item {operator()}
-    \subitem {I\+Vector}, \hyperpage{24}
+    \subitem {I\+Vector}, \hyperpage{45}
 
   \indexspace
 
   \item {p\+\_\+data}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
-  \item {P\+Cpts}, \hyperpage{32}
-    \subitem {$\sim$\+P\+Cpts}, \hyperpage{33}
-    \subitem {P\+Cpts}, \hyperpage{33}
-    \subitem {x}, \hyperpage{33}
-    \subitem {y}, \hyperpage{33}
-    \subitem {z}, \hyperpage{33}
-  \item {P\+Cpts.\+h}, \hyperpage{54}
+    \subitem {Mpi\+Manager}, \hyperpage{57}
+  \item {P\+Cpts}, \hyperpage{65}
+    \subitem {$\sim$\+P\+Cpts}, \hyperpage{65}
+    \subitem {P\+Cpts}, \hyperpage{65}
+    \subitem {x}, \hyperpage{65}
+    \subitem {y}, \hyperpage{65}
+    \subitem {z}, \hyperpage{66}
+  \item {P\+Cpts.\+h}, \hyperpage{98}
   \item {path\+\_\+str}
-    \subitem {Grid\+Utils}, \hyperpage{19}
+    \subitem {Grid\+Utils}, \hyperpage{36}
   \item {position}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
   \item {position\+\_\+old}
-    \subitem {I\+B\+Marker}, \hyperpage{23}
+    \subitem {I\+B\+Marker}, \hyperpage{43}
 
   \indexspace
 
   \item {Q}
-    \subitem {B\+F\+L\+Body}, \hyperpage{8}
+    \subitem {B\+F\+L\+Body}, \hyperpage{11}
 
   \indexspace
 
   \item {range\+\_\+i\+\_\+left}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{95}
   \item {range\+\_\+i\+\_\+right}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{95}
   \item {range\+\_\+j\+\_\+down}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{95}
   \item {range\+\_\+j\+\_\+up}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{95}
   \item {range\+\_\+k\+\_\+back}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{95}
   \item {range\+\_\+k\+\_\+front}
-    \subitem {Mpi\+Manager.\+h}, \hyperpage{52}
+    \subitem {Mpi\+Manager.\+h}, \hyperpage{96}
   \item {recv\+\_\+layer\+\_\+pos}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {recv\+\_\+stat}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {Ref\+Xend}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Ref\+Xstart}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Ref\+Yend}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Ref\+Ystart}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Ref\+Zend}
-    \subitem {definitions.\+h}, \hyperpage{42}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {Ref\+Zstart}
-    \subitem {definitions.\+h}, \hyperpage{43}
+    \subitem {definitions.\+h}, \hyperpage{84}
   \item {region}
-    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{11}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{17}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
 
   \indexspace
 
   \item {S\+W\+AP}
     \subitem {Object\+Manager\+\_\+ops\+\_\+ibmflex.\+cpp}, 
-		\hyperpage{54}
+		\hyperpage{97}
   \item {send\+\_\+requests}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {send\+\_\+stat}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {sender\+\_\+layer\+\_\+pos}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {size}
-    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{11}
+    \subitem {Mpi\+Manager\+::buffer\+\_\+struct}, \hyperpage{17}
   \item {spacing}
-    \subitem {Body}, \hyperpage{10}
-  \item {stdafx.\+cpp}, \hyperpage{54}
-  \item {stdafx.\+h}, \hyperpage{54}
-    \subitem {is\+\_\+nan}, \hyperpage{55}
-    \subitem {L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}, \hyperpage{55}
+    \subitem {Body}, \hyperpage{16}
+  \item {stdafx.\+cpp}, \hyperpage{98}
+  \item {stdafx.\+h}, \hyperpage{98}
+    \subitem {L\+\_\+\+I\+S\+\_\+\+N\+AN}, \hyperpage{98}
+    \subitem {L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}, \hyperpage{98}
   \item {strided\+Copy}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{34}
   \item {sub\+Grid\+\_\+comm}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {subtract}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{34}
   \item {supp\+\_\+i}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
   \item {supp\+\_\+j}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
   \item {supp\+\_\+k}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
   \item {support\+\_\+rank}
-    \subitem {Marker}, \hyperpage{25}
+    \subitem {Marker}, \hyperpage{48}
 
   \indexspace
 
   \item {t}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {T\+I\+NY}
     \subitem {Object\+Manager\+\_\+ops\+\_\+ibmflex.\+cpp}, 
-		\hyperpage{54}
-  \item {targetver.\+h}, \hyperpage{55}
+		\hyperpage{97}
+  \item {targetver.\+h}, \hyperpage{98}
   \item {tension}
-    \subitem {I\+B\+Body}, \hyperpage{21}
+    \subitem {I\+B\+Body}, \hyperpage{40}
   \item {timeav\+\_\+mpi\+\_\+overhead}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {timeav\+\_\+timestep}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
 
   \indexspace
 
   \item {up\+To\+Zero}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{34}
 
   \indexspace
 
   \item {vecmultiply}
-    \subitem {Grid\+Utils}, \hyperpage{18}
+    \subitem {Grid\+Utils}, \hyperpage{35}
   \item {vecnorm}
-    \subitem {Grid\+Utils}, \hyperpage{18, 19}
+    \subitem {Grid\+Utils}, \hyperpage{35}
 
   \indexspace
 
   \item {w}
-    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{43}
-    \subitem {globalvars.\+h}, \hyperpage{44}
+    \subitem {Gen\+\_\+init\+\_\+globalvars.\+cpp}, \hyperpage{85}
+    \subitem {globalvars.\+h}, \hyperpage{86}
   \item {world\+\_\+comm}
-    \subitem {Mpi\+Manager}, \hyperpage{29}
+    \subitem {Mpi\+Manager}, \hyperpage{58}
   \item {writable\+\_\+data\+\_\+count}
-    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{34}
+    \subitem {Mpi\+Manager\+::phdf5\+\_\+struct}, \hyperpage{67}
 
   \indexspace
 
   \item {X}
-    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{24}
+    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{46}
   \item {x}
-    \subitem {Marker\+Data}, \hyperpage{26}
-    \subitem {P\+Cpts}, \hyperpage{33}
+    \subitem {Marker\+Data}, \hyperpage{50}
+    \subitem {P\+Cpts}, \hyperpage{65}
   \item {X\+Ind}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {X\+Pos}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {x\+Probe\+Lims}
-    \subitem {definitions.\+h}, \hyperpage{43}
+    \subitem {definitions.\+h}, \hyperpage{84}
 
   \indexspace
 
   \item {Y}
-    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{24}
+    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{46}
   \item {y}
-    \subitem {Marker\+Data}, \hyperpage{26}
-    \subitem {P\+Cpts}, \hyperpage{33}
+    \subitem {Marker\+Data}, \hyperpage{50}
+    \subitem {P\+Cpts}, \hyperpage{65}
   \item {Y\+Ind}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {Y\+Pos}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{29}
   \item {y\+Probe\+Lims}
-    \subitem {definitions.\+h}, \hyperpage{43}
+    \subitem {definitions.\+h}, \hyperpage{84}
 
   \indexspace
 
   \item {Z}
-    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{24}
+    \subitem {Mpi\+Manager\+::layer\+\_\+edges}, \hyperpage{47}
   \item {z}
-    \subitem {Marker\+Data}, \hyperpage{26}
-    \subitem {P\+Cpts}, \hyperpage{33}
+    \subitem {Marker\+Data}, \hyperpage{51}
+    \subitem {P\+Cpts}, \hyperpage{66}
   \item {Z\+Ind}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{30}
   \item {Z\+Pos}
-    \subitem {Grid\+Obj}, \hyperpage{15}
+    \subitem {Grid\+Obj}, \hyperpage{30}
   \item {z\+Probe\+Lims}
-    \subitem {definitions.\+h}, \hyperpage{43}
+    \subitem {definitions.\+h}, \hyperpage{84}
 
 \end{theindex}

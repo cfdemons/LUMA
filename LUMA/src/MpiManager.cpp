@@ -27,8 +27,8 @@ MpiManager* MpiManager::me;
 std::ofstream* MpiManager::logout;
 GridObj* MpiManager::Grids;
 
-// *************************************************************************************************** //
-// Constructor (private)
+// ****************************************************************************
+/// Default constructor
 MpiManager::MpiManager(void)
 {
 	// Resize buffer arrays based on number of MPI directions
@@ -36,7 +36,10 @@ MpiManager::MpiManager(void)
 	f_buffer_recv.resize(L_MPI_dir, std::vector<double>(0));
 }
 
-// Destructor
+/// \brief	Default destructor.
+///
+///			Also closes the MPI logfile.
+///
 MpiManager::~MpiManager(void)
 {
 
@@ -47,8 +50,7 @@ MpiManager::~MpiManager(void)
 	if(me) delete(me);
 }
 
-// *************************************************************************************************** //
-// Instance creator
+/// Instance creator
 MpiManager* MpiManager::getInstance() {
 
 	if (!me) me = new MpiManager;	// Private construction
@@ -56,16 +58,16 @@ MpiManager* MpiManager::getInstance() {
 
 }
 
-// Instance destroyer
+/// Instance destroyer
 void MpiManager::destroyInstance() {
 
 	if (me)	delete me;			// Delete pointer from static context not destructor
 
 }
 
-// *************************************************************************************************** //
+// ************************************************************************ //
 // Const data member initialised outside class definition
-// Define for 3D where first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.
+/// Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.
 const int MpiManager::MPI_cartlab[3][26] =
 	{
 		{1, -1,  1, -1,	 0,  0, -1,  1,		0,  0,		1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},
@@ -73,9 +75,11 @@ const int MpiManager::MPI_cartlab[3][26] =
 		{0,  0,  0,  0,  0,  0,  0,  0,		1, -1,		1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}
 	};
 
-// *************************************************************************************************** //
-
-// Initialisation routines
+// ************************************************************************* //
+/// \brief	Initialisation routine.
+///
+///			Method is responsible for initialising the MPI topolgy and 
+///			associated data. Must be called immediately after MPI_init().
 void MpiManager::mpi_init() {
 	
 	// Create communicator and topology
@@ -187,8 +191,11 @@ void MpiManager::mpi_init() {
 	return;
 }
 
-// *************************************************************************************************** //
-// Routine to do the domain decomposition and generate parameters for GridObj constructors
+// ************************************************************************* //
+/// \brief	Domain decomposition.
+///
+///			Method to decompose the domain and identify local grid sizes.
+///			Parameters defined here are used in GridObj construction.
 void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
@@ -437,8 +444,11 @@ void MpiManager::mpi_gridbuild( ) {
 
 }
 
-// *************************************************************************************************** //
-// Writes out f-buffers
+// ************************************************************************* //
+/// \brief	Buffer ASCII writer.
+///
+///			When verbose MPI logging is turned on this method will write out 
+///			the communication buffer to an ASCII file.
 void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 
 	std::ofstream rankout;
@@ -458,7 +468,17 @@ void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 
 	return;
 }
-// *************************************************************************************************** //
+
+// ************************************************************************* //
+/// \brief	Communication routine.
+///
+///			This method implements the communication between grids of the same
+///			level and region across MPI processes. Each call effects
+///			communication in all valid directions for the grid of the supplied
+///			level and region.
+///
+/// \param	lev	level of grid to communicate.
+/// \param	reg	region number of grid to communicate.
 void MpiManager::mpi_communicate(int lev, int reg) {
 
 	// Wall clock variables
@@ -638,9 +658,11 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 }
 
-// *************************************************************************************************** //
-// Sets pointer to grid hierarchy and finds sizes of buffers for this rank across all grids -- 
-// to be called post-initialisation.
+// ************************************************************************* //
+/// \brief	Pre-calcualtion of the buffer sizes.
+///
+///			Wrapper method for computing the buffer sizes for every grid on the
+///			rank, both sender and receiver. Must be called post-initialisation.
 void MpiManager::mpi_buffer_size() {
 
 	*GridUtils::logfile << "Pre-computing buffer sizes for MPI...";
@@ -715,8 +737,15 @@ void MpiManager::mpi_buffer_size() {
 	*GridUtils::logfile << "Complete." << std::endl;
 
 }
-// *************************************************************************************************** //
-// Get opposite direction in MPI cartesian topology
+
+// ************************************************************************* //
+/// \brief	Helper method to find opposite direction in MPI topology.
+///
+///			The MPI directional vectors do not necessarily correspond to the 
+///			lattice model direction. The MPI directional vectors are defined 
+///			separately and hence there is a separate opposite finding method.
+///
+/// \param	direction	the outgoing direction whose opposite you wish to find.
 int MpiManager::mpi_getOpposite(int direction) {
 
 	/*	If direction is even, then opposite is direction+1.
@@ -729,17 +758,22 @@ int MpiManager::mpi_getOpposite(int direction) {
 		return direction + (int)pow(-1,direction);
 
 }
-// *************************************************************************************************** //
-// Build sub-grid communicator including only ranks with HDF5 writable data.
-// Must be called AFTER the grids and buffers have been initialised.
+// ************************************************************************* //
+/// \brief	Define writable sub-grid communicators.
+///
+///			When using HDF5 in parallel, collective IO operations require all
+///			processes to write a non-zero amount of data to the same file.
+///			This method examines availability of sub-grid and writable data on
+///			the grid (if found) and ensures it is added to a new communicator. 
+///			Must be called AFTER the grids and buffers have been initialised.
 int MpiManager::mpi_buildCommunicators() {
 
 	*GridUtils::logfile << "Creating sub-grid communicators for HDF5...";
 
 	// Declarations
 	int status;
-	int colour;		// Colour indicates which new communicator this process belongs to
-	int key = MpiManager::my_rank;	// Global rank as key (dictates numbering in new communicator)
+	int colour;							// Colour indicates which new communicator this process belongs to
+	int key = MpiManager::my_rank;		// Global rank as key (dictates numbering in new communicator)
 	int N_global, M_global, K_global;	// Global grid sizes
 
 	// Start by adding the L0 details
@@ -973,4 +1007,4 @@ int MpiManager::mpi_buildCommunicators() {
 
 	return status;
 }
-// *************************************************************************************************** //
+// ************************************************************************** //

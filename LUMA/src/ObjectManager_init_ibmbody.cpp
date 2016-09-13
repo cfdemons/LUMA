@@ -13,15 +13,17 @@
  *
  */
 
-/* This file contains the body building methods for GridObj which in turn call a suitable IBBody.makebody constructor.
-*/
+/* This file contains the body wrapper building methods for GridObj which in turn call
+ * a suitable IBBody.makebody constructor.
+ */
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/definitions.h"
 
-// ***************************************************************************************************
-// Method to call body building routine for IBM
+// ************************************************************************** //
+/// \brief Builds a prefab immersed boundary body.
+/// \param	body_type	type of boday to be built.
 void ObjectManager::ibm_build_body(int body_type) {
 
 	// Declarations
@@ -352,8 +354,10 @@ void ObjectManager::ibm_build_body(int body_type) {
 	}
 
 }
-// ***************************************************************************************************
-// Overloaded builder for building from point cloud data
+// ************************************************************************** //
+/// \brief Wrapper for building a body from a point cloud.
+/// \param	_PCpts	pointer to point cloud data.
+/// \param	owner	pointer to the grid on which the body is to be placed.
 void ObjectManager::ibm_build_body(PCpts* _PCpts, GridObj *owner) {
 
 	// Add new body
@@ -361,4 +365,4 @@ void ObjectManager::ibm_build_body(PCpts* _PCpts, GridObj *owner) {
 	iBody.back().makeBody(_PCpts);
 
 }
-// ***************************************************************************************************
+// ************************************************************************** //

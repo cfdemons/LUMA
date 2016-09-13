@@ -91,13 +91,17 @@ public :
 
 
 	// Grid data
-	int global_dims[3];				///< Dimensions of problem coarse lattice
-	std::vector<int> local_size;	///< Dimensions of coarse lattice represented on this rank (includes inner and outer halos)
-	/// Global indices of cooarse lattice nodes represented on this rank (excluding outer overlapping layer).
-	/// Rows are x,y,z start and end pairs and columns are rank number.
+	int global_dims[3];				///< Global dimensions of problem coarse lattice.
+	std::vector<int> local_size;	///< Dimensions of coarse lattice represented on this rank (includes inner and outer halos).
+
+	/// \brief	Global indices of coarse lattice nodes represented on this rank.
+	///
+	///			Excludes outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number.
 	std::vector< std::vector<int> > global_edge_ind;	
-	/// Global positions of coarse lattice nodes represented on this rank (excluding outer overlapping layer).
-	/// Rows are x,y,z start and end pairs and columns are rank number.
+
+	/// \brief	Global positions of coarse lattice nodes represented on this rank.
+	///
+	///			Excluding outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number.
 	std::vector< std::vector<double> > global_edge_pos;
 
 	/// \struct layer_edges
@@ -110,7 +114,9 @@ public :
 		double X[4];	///< X limits
 		double Y[4];	///< Y limits
 		double Z[4];	///< Z limits
-	} sender_layer_pos, recv_layer_pos;
+	};
+	layer_edges sender_layer_pos;	///< Structure containing sender layer edge positions.
+	layer_edges recv_layer_pos;		///< Structure containing receiver layer edge positions.
 	
 	/// Pointer to grid hierarchy
 	static GridObj* Grids;
@@ -130,7 +136,8 @@ public :
 		int level;				///< Grid level
 		int region;				///< Region number
 	};
-	std::vector<buffer_struct> buffer_send_info, buffer_recv_info;	///< Vectors of buffer_info structures holding buffer size information
+	std::vector<buffer_struct> buffer_send_info;	///< Vectors of buffer_info structures holding sender layer size info.
+	std::vector<buffer_struct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.
 
 	/// Logfile handle
 	static std::ofstream* logout;

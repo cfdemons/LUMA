@@ -25,19 +25,19 @@ std::ofstream* GridUtils::logfile;
 int MpiManager::my_rank;
 int MpiManager::num_ranks;
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// Default Constructor
 GridObj::GridObj(void)
 {
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// Default Destructor
 GridObj::~GridObj(void)
 {
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// \brief	Constructor for top level grid.
 ///
 ///			Coarse limits are set to zero and then L0-specific initialiser called.
@@ -69,7 +69,7 @@ GridObj::GridObj(int level)
 
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// \brief	MPI constructor for top level grid.
 ///
 ///			When using MPI, this constructors a local grid which represents an 
@@ -108,7 +108,7 @@ GridObj::GridObj(int level, std::vector<int> local_size,
 
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// \brief Constructor for a sub-grid.
 /// \param RegionNumber ID indicating the region of nested refinement to which 
 ///			this sub-grid belongs.
@@ -129,7 +129,7 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 /// \brief Wrapper method to add sub-grid to this grid.
 /// \param RegionNumber ID indicating the region of nested refinement to which 
 ///			this sub-grid belongs.
@@ -151,6 +151,6 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 
 }
 
-// ***************************************************************************************************
-// ***************************************************************************************************
+// ****************************************************************************
+// ****************************************************************************
 // Other member methods are in their own files prefixed GridObj_

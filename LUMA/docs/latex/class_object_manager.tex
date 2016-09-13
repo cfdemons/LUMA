@@ -15,9 +15,9 @@ Object Manager class.
 void \hyperlink{class_object_manager_a83174cbaabd95639f8b4f652ad398183}{ibm\+\_\+apply} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
 \item 
 void \hyperlink{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{ibm\+\_\+build\+\_\+body} (int body\+\_\+type)
-\item 
+\begin{DoxyCompactList}\small\item\em Builds a prefab immersed boundary body. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{ibm\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$owner)
-\item 
+\begin{DoxyCompactList}\small\item\em Wrapper for building a body from a point cloud. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}{ibm\+\_\+initialise} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
 \item 
 double \hyperlink{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{ibm\+\_\+deltakernel} (double rad, double dilation)
@@ -47,27 +47,27 @@ void \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\
 void \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double $\ast$d)
 \item 
 void \hyperlink{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{bfl\+\_\+build\+\_\+body} (int body\+\_\+type)
-\item 
+\begin{DoxyCompactList}\small\item\em Prefab body building routine. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{bfl\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
-\item 
+\begin{DoxyCompactList}\small\item\em Wrapper for building B\+FL body from point cloud. \end{DoxyCompactList}\item 
 std\+::vector$<$ int $>$ \hyperlink{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{get\+Vox\+Ind} (double x, double y, double z)
-\item 
+\begin{DoxyCompactList}\small\item\em Get global voxel indices. \end{DoxyCompactList}\item 
 int \hyperlink{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{get\+Vox\+Ind} (double p)
-\item 
+\begin{DoxyCompactList}\small\item\em Get global voxel index. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{compute\+Lift\+Drag} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
-\item 
+\begin{DoxyCompactList}\small\item\em Compute forces on a rigid object. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{io\+\_\+vtk\+\_\+\+I\+Bwriter} (double tval)
-\item 
+\begin{DoxyCompactList}\small\item\em Write IB body data to V\+TK file. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{io\+\_\+write\+\_\+body\+\_\+pos} (int timestep)
-\item 
+\begin{DoxyCompactList}\small\item\em Write out position of immersed boundary bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{io\+\_\+write\+\_\+lift\+\_\+drag} (int timestep)
-\item 
+\begin{DoxyCompactList}\small\item\em Write out forces on the markers of immersed boundary bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{io\+\_\+restart} (bool I\+O\+\_\+flag, int level)
-\item 
+\begin{DoxyCompactList}\small\item\em Read/write IB body information to restart file. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{io\+\_\+read\+In\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{_object_manager_8h_a7b78fa3db30dfb9c1efc82bf886fe184}{e\+Object\+Type} objtype)
-\item 
+\begin{DoxyCompactList}\small\item\em Read in point cloud data. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_adf65260d81584613fa33f2e7658f1b36}{io\+\_\+write\+Force\+On\+Object} (double tval)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Write out the forces on a solid object. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -97,6 +97,17 @@ Class to manage all objects in the domain from creation through manipulation to 
 \item[{int}]{body\+\_\+type}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{}\label{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}
+
+
+Prefab body building routine. 
+
+Not implemented in this version.
+
+
+\begin{DoxyParams}{Parameters}
+{\em body\+\_\+type} & type of prefab body to be built. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
 \index{bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{bfl\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{bfl_build_body(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+\_\+body (
@@ -104,6 +115,15 @@ Class to manage all objects in the domain from creation through manipulation to 
 \item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{}\label{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}
+
+
+Wrapper for building B\+FL body from point cloud. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & pointer to point cloud data. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!compute\+Lift\+Drag@{compute\+Lift\+Drag}}
 \index{compute\+Lift\+Drag@{compute\+Lift\+Drag}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{compute\+Lift\+Drag(int i, int j, int k, Grid\+Obj $\ast$g)}{computeLiftDrag(int i, int j, int k, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::compute\+Lift\+Drag (
@@ -114,6 +134,23 @@ Class to manage all objects in the domain from creation through manipulation to 
 \item[{{\bf Grid\+Obj} $\ast$}]{g}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{}\label{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}
+
+
+Compute forces on a rigid object. 
+
+Uses momentum exchange to compute forces on rigid bodies. Currently working with bounce-\/back objects only. There is no bounding box so if we have walls in the domain they will be counted as well. Also only possible to differentiate between bodies. Lumps all bodies together.\+identify which body this site relates to so we can differentiate.
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & local i-\/index of solid site. \\
+\hline
+{\em j} & local j-\/index of solid site. \\
+\hline
+{\em k} & local k-\/index of solid site. \\
+\hline
+{\em g} & pointer to grid on which object resides. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!destroy\+Instance@{destroy\+Instance}}
 \index{destroy\+Instance@{destroy\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{destroy\+Instance()}{destroyInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::destroy\+Instance (
@@ -125,7 +162,7 @@ Class to manage all objects in the domain from creation through manipulation to 
 
 Destroy instance method. 
 
-\index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
+Instance destuctor. \index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
 \index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Instance()}{getInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
 \begin{DoxyParamCaption}
@@ -136,7 +173,7 @@ Destroy instance method.
 
 Get instance method. 
 
-\index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
+Instance creator. \index{Object\+Manager@{Object\+Manager}!get\+Instance@{get\+Instance}}
 \index{get\+Instance@{get\+Instance}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Instance(\+Grid\+Obj $\ast$g)}{getInstance(GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Object\+Manager} $\ast$ Object\+Manager\+::get\+Instance (
 \begin{DoxyParamCaption}
@@ -147,6 +184,13 @@ Get instance method.
 
 Overloaded get instance passing in pointer to grid hierarchy. 
 
+Instance creator with grid hierarchy assignment.
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & pointer to grid hierarchy. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
 \index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Object\+Manager\+::get\+Vox\+Ind (
@@ -156,6 +200,24 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{double}]{z}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{}\label{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}
+
+
+Get global voxel indices. 
+
+Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Can also be used to map positions to indices.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & global x-\/position. \\
+\hline
+{\em y} & global y-\/position. \\
+\hline
+{\em z} & global z-\/position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of indices of the nearest voxel. 
+\end{DoxyReturn}
 \index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
 \index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{get\+Vox\+Ind(double p)}{getVoxInd(double p)}}]{\setlength{\rightskip}{0pt plus 5cm}int Object\+Manager\+::get\+Vox\+Ind (
@@ -163,6 +225,20 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{double}]{p}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{}\label{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}
+
+
+Get global voxel index. 
+
+Will return the voxel index of the nearest voxel on the lattice for a given point in global space in a given direction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p} & global position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+corresponding global index. 
+\end{DoxyReturn}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+apply@{ibm\+\_\+apply}}
 \index{ibm\+\_\+apply@{ibm\+\_\+apply}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+apply(\+Grid\+Obj \&g)}{ibm_apply(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+apply (
@@ -214,6 +290,15 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{int}]{body\+\_\+type}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{}\label{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}
+
+
+Builds a prefab immersed boundary body. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em body\+\_\+type} & type of boday to be built. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
 \index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$owner)}{ibm_build_body(PCpts *_PCpts, GridObj *owner)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
@@ -222,6 +307,17 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{{\bf Grid\+Obj} $\ast$}]{owner}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{}\label{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}
+
+
+Wrapper for building a body from a point cloud. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & pointer to point cloud data. \\
+\hline
+{\em owner} & pointer to the grid on which the body is to be placed. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+computeforce@{ibm\+\_\+computeforce}}
 \index{ibm\+\_\+computeforce@{ibm\+\_\+computeforce}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+computeforce(int ib, Grid\+Obj \&g)}{ibm_computeforce(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+computeforce (
@@ -317,6 +413,19 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{{\bf e\+Object\+Type}}]{objtype}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{}\label{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}
+
+
+Read in point cloud data. 
+
+Input data must be in tab separated, 3-\/column format in the input directory.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & pointer to empty point cloud data container. \\
+\hline
+{\em objtype} & type of object to be read in. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+restart@{io\+\_\+restart}}
 \index{io\+\_\+restart@{io\+\_\+restart}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+restart(bool I\+O\+\_\+flag, int level)}{io_restart(bool IO_flag, int level)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+restart (
@@ -325,6 +434,17 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{int}]{level}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{}\label{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}
+
+
+Read/write IB body information to restart file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em I\+O\+\_\+flag} & flag indicating write (true) or read (false). \\
+\hline
+{\em level} & level of the grid begin written/read \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}}
 \index{io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+vtk\+\_\+\+I\+Bwriter(double tval)}{io_vtk_IBwriter(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+vtk\+\_\+\+I\+Bwriter (
@@ -332,6 +452,17 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{double}]{tval}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{}\label{class_object_manager_a39aa351c7b338473be4871111da5c5bd}
+
+
+Write IB body data to V\+TK file. 
+
+Currently can only write out un-\/closed bodies like filaments.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tval} & time value at which the write out is being performed. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}}
 \index{io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+body\+\_\+pos(int timestep)}{io_write_body_pos(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+body\+\_\+pos (
@@ -339,6 +470,15 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{int}]{timestep}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{}\label{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}
+
+
+Write out position of immersed boundary bodies. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timestep} & timestep at which the write out is being performed. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}}
 \index{io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+lift\+\_\+drag(int timestep)}{io_write_lift_drag(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+lift\+\_\+drag (
@@ -346,6 +486,15 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{int}]{timestep}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{}\label{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}
+
+
+Write out forces on the markers of immersed boundary bodies. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timestep} & timestep at which the write out is being performed. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+Force\+On\+Object@{io\+\_\+write\+Force\+On\+Object}}
 \index{io\+\_\+write\+Force\+On\+Object@{io\+\_\+write\+Force\+On\+Object}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+write\+Force\+On\+Object(double tval)}{io_writeForceOnObject(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+Force\+On\+Object (
@@ -353,6 +502,15 @@ Overloaded get instance passing in pointer to grid hierarchy.
 \item[{double}]{tval}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_adf65260d81584613fa33f2e7658f1b36}{}\label{class_object_manager_adf65260d81584613fa33f2e7658f1b36}
+
+
+Write out the forces on a solid object. 
+
+Writes out the forces on solid objects in the domain computed using momentum exchange. Each rank writes its own file. Output is a C\+SV file. 
+\begin{DoxyParams}{Parameters}
+{\em tval} & time value at which write out is taking place. \\
+\hline
+\end{DoxyParams}
 
 
 \subsection{Friends And Related Function Documentation}

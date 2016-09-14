@@ -141,12 +141,12 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 
 		// Compute support for each marker
 		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
-			ibm_findsupport(ib, m, g);	// Pass body ID, marker ID and Grid
+			ibm_findsupport(ib, m, *iBody[ib]._Owner);	// Pass body ID, marker ID and Grid
 		}
 
 
 		// Find epsilon for the body
-		ibm_findepsilon(ib, g);
+		ibm_findepsilon(ib, *iBody[ib]._Owner);
 
 
 	}
@@ -190,15 +190,15 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 
 #ifdef L_CHEAP_NEAREST_NODE_DETECTION
-	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - L_a_x)/g.dx);	// Simulates std::round
-	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - L_a_y)/g.dy);
+	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - (g.XPos[0] - g.dx / 2.0))/g.dx);	// Simulates std::round
+	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - (g.YPos[0] - g.dy / 2.0))/g.dy);
 
 #if (L_dims == 3)
-	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - L_a_z)/g.dz);
+	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - (g.ZPos[0] - g.dz / 2.0))/g.dz);
 #endif
 
 
-#else
+#else	// TODO Needs removed
 
 	// Declarations
 	double r_min, radius;			// Minimum radius limit and actual radius from centre of kernel
@@ -252,8 +252,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	double h_minus = std::min( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
-	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus
-		+ ( (1.0/9.0) * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
+	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus;	// TODO Find out why this has such a drastic effect on everything
+		//+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units //TODO Think if this needs to change between grids
 
 
 	// Test to see if required support nodes are available
@@ -344,7 +344,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 					iBody[ib].markers[m].supp_k.push_back(k);
 
 					// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
-					iBody[ib].markers[m].local_area = pow( 1 / pow(2,g.level) ,2) ;
+					iBody[ib].markers[m].local_area = 1; //pow( 1 / pow(2,g.level) ,2) ;	//TODO Check if this needs to change between grids
 
 					//  Distance between Lagrange marker and support node in lattice units
 					dist_x = (g.XPos[i]-iBody[ib].markers[m].position[0]) / g.dx;
@@ -432,7 +432,7 @@ void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 		for (int dir = 0; dir < L_dims; dir++) {
 			// Compute restorative force (in lattice units)
 			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
-				1 / pow(2,g.level);	// Time step in lattice units dt = 1 / 2^level = dx
+				1.0;	// Time step in grid-normalised lattice units
 		}
 	}
 }
@@ -453,8 +453,7 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 			for (size_t dir = 0; dir < L_dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
 				g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, L_dims) +=
-					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon;// TODO Check if this extra scaling is required * (iBody[ib].spacing/g.dx);
-
+					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * iBody[ib].spacing/g.dx;
 			}
 		}
 	}
@@ -553,7 +552,7 @@ double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
 	//////////////////
 
 	// Settings
-    double tolerance = 1.0e-4;
+    double tolerance = 1.0e-5;
 	int maxiterations = 2500;
 	double minimum_residual_achieved;
 

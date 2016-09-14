@@ -437,9 +437,8 @@ void GridObj::io_restart(bool IO_flag) {
 		//////////////////////
 
 #ifdef L_IBM_ON
-
-		ObjectManager::getInstance()->io_restart(IO_flag, level);
-
+		if (level == L_IB_Lev)
+			ObjectManager::getInstance()->io_restart(IO_flag, level);
 #endif
 
 

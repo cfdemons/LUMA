@@ -28,8 +28,19 @@ void ObjectManager::ibm_build_body(int body_type) {
 	// Declarations
 	std::vector<double> dimensions, centrepoint, start_position, end_position;
 
+	// Allocate the owning grid level and region for this immersed boundary
+	GridObj* g = NULL;
+	GridUtils::getGrid(this->_Grids, L_IB_Lev, L_IB_Reg, g);
+
 	// Increase the iBody array by single IBBody object
-	iBody.emplace_back();
+	iBody.emplace_back(g);
+
+	// Check that the owning grid was found and exists
+	if ( iBody.back()._Owner == NULL ) {
+		std::cout << "Error: See Log File" << std::endl;
+		*GridUtils::logfile << "Could not find the subgrid where the immersed boundary is meant to lie." << std::endl;
+		exit(LUMA_FAILED);
+	}
 
 
 	if (body_type == 1) {

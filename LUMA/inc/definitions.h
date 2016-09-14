@@ -181,6 +181,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Master IBM switches //
 //#define L_IBM_ON						///< Turn on IBM
+#define L_IB_Lev 1					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
+#define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
 #define L_CHEAP_NEAREST_NODE_DETECTION	///< Perform a nearest-neighbour-type nearest node operation for IBM support calculation
@@ -273,7 +275,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Solids
 //#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_wall_thickness	1		///< Thickness of walls in coarsest lattice units
+#define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
+#define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
+#define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units
+#define L_wall_thickness_back 1			///< Thickness of back (3D) walls in coarsest lattice units
 
 
 
@@ -405,6 +410,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 ************************* Clean-up: NOT FOR EDITING ***************************
 *******************************************************************************
 */
+
+// Set default value for level and region for IB body if no subgrids
+#if (defined L_IBM_ON && L_NumLev == 0)
+	#undef L_IB_Lev
+	#undef L_IB_Reg
+	#define L_IB_Lev 0				// Grid level for immersed boundary object (0 if no refined regions)
+	#define L_IB_Reg 0				// Grid region for immersed boundary object (0 if no refined regions)
+#endif
+
+// Set default value for level and region for IB body if no subgrids
+#ifndef L_IBM_ON
+	#undef L_IB_Lev
+	#undef L_IB_Reg
+	#define L_IB_Lev -1				// Grid level for immersed boundary object (-1 if no IBM)
+	#define L_IB_Reg -1				// Grid region for immersed boundary object (-1 if no IBM)
+#endif
 
 // Set dependent options
 #if L_dims == 3

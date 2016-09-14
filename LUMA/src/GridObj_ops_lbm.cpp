@@ -36,7 +36,7 @@ using namespace std;
 ///
 /// \param IBM_flag	flag to indicate whether this kernel is a predictor (true) 
 ///					or corrector (false) step when using IBM.
-void GridObj::LBM_multi ( bool IBM_flag ) {
+void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 
 	// Start the clock to time the kernel
 	clock_t secs, t_start = clock();
@@ -51,27 +51,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
 	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
-
-	// If IBM on and predictive loop flag true then store initial data and reset forces
-	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
-
-		*GridUtils::logfile << "Prediction step..." << std::endl;
-
-		// Store lattice data
-		f_ibm_initial = f;
-		u_ibm_initial = u;
-		rho_ibm_initial = rho;
-
-		// Reset lattice and Cartesian force vectors at each site
-		LBM_forcegrid(true);
-	}
-#else
-
-	// If not using IBM then just reset the force vectors
-	LBM_forcegrid(true);
-
 #endif
-
 
 
 	////////////////
@@ -82,6 +62,25 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	// Loop twice on refined levels as refinement ratio per level is 2
 	int count = 1;
 	do {
+
+		// Copy distributions prior to IBM predictive step
+#ifdef L_IBM_ON
+
+		// If IBM on and predictive loop flag true then store initial data and reset forces
+		if (level == L_IB_Lev && region_number == L_IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
+
+			*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
+
+			// Store lattice data
+			f_ibm_initial = f;
+			u_ibm_initial = u;
+			rho_ibm_initial = rho;
+		}
+#endif
+
+		// Reset lattice and Cartesian force vectors at each site (don't do this if using IBM and on the corrector step on the sub-grid where IBM exists)
+		if (IBM_flag == true || repeatFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
+			LBM_forcegrid(true);
 
 		// Apply boundary conditions (regularised must be applied before collision)
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
@@ -115,9 +114,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 				LBM_explode(reg);
 
 				// Call same routine for lower level
-				subGrid[reg].LBM_multi(IBM_flag);
-
+				subGrid[reg].LBM_multi(IBM_flag, true);
 			}
+		}
 
 			// Apply boundary conditions
 #if (defined L_SOLID_BLOCK_ON || defined L_WALLS_ON || defined L_SOLID_FROM_FILE)
@@ -147,6 +146,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
+
+		// If there is lower levels then coalesce from them
+		if (L_NumLev > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -158,44 +160,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
-
-
-			///////////////////////
-			// No refined levels //
-			///////////////////////
-
-		} else {
-
-			// Apply boundary conditions
-#if (defined L_SOLID_BLOCK_ON || defined L_WALLS_ON || defined L_SOLID_FROM_FILE)
-			LBM_boundary(1);	// Bounce-back (walls and solids)
-#endif
-
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
-#endif
-
-#ifdef L_BFL_ON
-			// Store the f values pre stream for BFL
-			ObjectManager::getInstance()->f_prestream = f;
-#endif
-
-			// Stream
-			LBM_stream();
-
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
-#endif
-
-
-			// Apply boundary conditions
-#ifdef L_BFL_ON
-			LBM_boundary(5);	// BFL boundary conditions
-#endif
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
-#endif
-
 		}
 
 
@@ -219,51 +183,49 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		/*DEBUG*/ io_lite((t+1)*100 + 7,"AFTER MACRO");
 #endif
 
-		// Check if on L0 and if so drop out as only need to loop once on coarsest level
-		if (level == 0) {
-			// Increment time step counter and break
-			t++;
-			break;
+
+		////////////////////////////////
+		// IBM post-kernel processing //
+		////////////////////////////////
+
+		// Execute IBM procedure using newly computed predicted data
+#ifdef L_IBM_ON
+		if (level == L_IB_Lev && region_number == L_IB_Reg && IBM_flag == true) {
+
+			// Reset force vectors on grid in preparation for spreading step
+			LBM_forcegrid(true);
+
+			// Calculate and apply IBM forcing to fluid
+			ObjectManager::getInstance()->ibm_apply(*this);
+
+			// Restore data to start of time step
+			f = f_ibm_initial;
+			u = u_ibm_initial;
+			rho = rho_ibm_initial;
+
+			// Corrector step does not reset force vectors but uses newly computed vector instead.
+			*GridUtils::logfile << "Correction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
+
+			// Corrector step (no IBM, no repeat)
+			LBM_multi(false, false);
+			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
+
+			// Move the body if necessary
+			ObjectManager::getInstance()->ibm_move_bodies(*this);
+
 		}
+#endif
 
 		// Increment counters
 		t++; count++;
 
+		// Check if on L0 or corrector step and if so drop out as only need to loop once
+		if (repeatFlag == false) {
+			break;
+		}
+
 	} while (count < 3);
 
-
-
-
-	////////////////////////////////
-	// IBM post-kernel processing //
-	////////////////////////////////
-
-	// Execute IBM procedure using newly computed predicted data
-#ifdef L_IBM_ON
-	if (level == 0 && IBM_flag == true) {
-
-		// Reset force vectors on grid in preparation for spreading step
-		LBM_forcegrid(true);
-
-		// Calculate and apply IBM forcing to fluid
-		ObjectManager::getInstance()->ibm_apply(*this);
-
-		// Restore data to start of time step
-		f = f_ibm_initial;
-		u = u_ibm_initial;
-		rho = rho_ibm_initial;
-
-		// Relaunch kernel with IBM flag set to false (corrector step)
-		// Corrector step does not reset force vectors but uses newly computed vector instead.
-		*GridUtils::logfile << "Correction step..." << std::endl;
-		t--;                // Predictor-corrector results in double time step (need to reset back 1)
-		LBM_multi(false);
-
-		// Move the body if necessary
-		ObjectManager::getInstance()->ibm_move_bodies(*this);
-
-	}
-#endif
 
 	// Get time of loop (includes sub-loops)
 	secs = clock() - t_start;
@@ -354,7 +316,7 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 #ifdef GRAVITY_ON
 					// Add gravity to any IBM forces currently stored
-					force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force;
+					force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force * (1 / pow(2,level));
 #endif
 
 					// Now compute force_i components from Cartesian force vector
@@ -1124,10 +1086,10 @@ void GridObj::LBM_macro( ) {
 					rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 					// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-					fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-					fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
+					fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
+					fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
 #if (L_dims == 3)
-					fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+					fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
 #endif
 
 					// Assign velocity
@@ -1238,10 +1200,10 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-		fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-		fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
+		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
+		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
 #if (L_dims == 3)
-		fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
 #endif
 
 		// Assign velocity

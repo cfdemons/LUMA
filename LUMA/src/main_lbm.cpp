@@ -45,7 +45,7 @@ int MpiManager::MPI_coords[L_dims];
 int main( int argc, char* argv[] )
 {
 
-	// Memeory leak checking
+	// Memory leak checking
 #ifdef _DEBUG
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	// Set output to the terminal window
@@ -464,7 +464,7 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0) {
+		if (MpiManager::my_rank == 0 && (Grids.t+1) % out_every == 0) {
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
 		}
 
@@ -473,9 +473,9 @@ int main( int argc, char* argv[] )
 		// Launch LBM Kernel //
 		///////////////////////
 #ifdef L_IBM_ON
-		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
+		Grids.LBM_multi(true, false);	// IBM requires predictor-corrector calls
 #else
-		Grids.LBM_multi(false);	// Just called once as no IBM
+		Grids.LBM_multi(false, false);	// Just called once as no IBM
 #endif
 
 
@@ -493,6 +493,9 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
+
+			// ** TODO Remove this before merging ** //
+			objMan->writeForce();
 
 #ifdef L_IO_LITE
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;

@@ -265,9 +265,9 @@ void ObjectManager::writeForce() {
     fout.open( fileName.str().c_str(), std::ios::app );
 
     // Write out time step, time, drag, list and coefficients
-    if (tval == out_every)
+    if (tval == L_out_every)
     	fout << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << std::endl;
-    fout << tval << "\t" << Dt_0 * tval << "\t" << dragTot << "\t" << liftTot << "\t" << 2.0 * dragTot / (rhoPhys * uPhys * uPhys * 2.0 * ibb_r ) << "\t" << 2.0 * liftTot / (rhoPhys *  uPhys * uPhys * 2.0 * ibb_r) << std::endl;
+    fout << tval << "\t" << Dt_0 * tval << "\t" << dragTot << "\t" << liftTot << "\t" << 2.0 * dragTot / (rhoPhys * uPhys * uPhys * 2.0 * L_ibb_r ) << "\t" << 2.0 * liftTot / (rhoPhys *  uPhys * uPhys * 2.0 * L_ibb_r) << std::endl;
     fout.close();
 }
 

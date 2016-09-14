@@ -69,7 +69,7 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 		// If IBM on and predictive loop flag true then store initial data and reset forces
 		if (level == L_IB_Lev && region_number == L_IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
 
-			*GridUtils::logfile << "Prediction step on level " << IB_Lev << ", region " << IB_Reg << " ..." << std::endl;
+			*GridUtils::logfile << "Prediction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
 
 			// Store lattice data
 			f_ibm_initial = f;

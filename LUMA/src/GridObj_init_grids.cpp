@@ -171,6 +171,7 @@ void GridObj::LBM_initVelocity ( ) {
 
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_dims) = 0.0;
+				}
 
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
@@ -185,7 +186,6 @@ void GridObj::LBM_initVelocity ( ) {
 
 
 #endif
-
 			}
 		}
 	}

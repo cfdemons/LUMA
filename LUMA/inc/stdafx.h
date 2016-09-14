@@ -77,3 +77,5 @@ inline static bool is_nan(NumType n) {
 	else return false;
 
 };
+
+#endif

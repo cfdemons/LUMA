@@ -12,10 +12,10 @@
  * distribution without written consent.
  *
  */
+#ifndef IBMARKER_H
+#define IBMARKER_H
 
-#pragma once
-
-#include <vector>
+#include "stdafx.h"
 #include "Marker.h"
 
 /// \brief	Immersed boundary marker.
@@ -68,3 +68,4 @@ protected:
 
 };
 
+#endif

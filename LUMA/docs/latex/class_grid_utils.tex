@@ -48,6 +48,10 @@ static int \hyperlink{class_grid_utils_af3c54e468658879756c71b01abd028d5}{get\+O
 \item 
 static void \hyperlink{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{get\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&Grids, int level, int region, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&ptr)
 \item 
+static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}{get\+Vox\+Ind} (double x, double y, double z)
+\begin{DoxyCompactList}\small\item\em Get global voxel indices. \end{DoxyCompactList}\item 
+static int \hyperlink{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}{get\+Vox\+Ind} (double p)
+\begin{DoxyCompactList}\small\item\em Get global voxel index. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{is\+Overlap\+Periodic} (int i, int j, int k, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
 \item 
 static bool \hyperlink{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}{is\+On\+This\+Rank} (int gi, int gj, int gk, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
@@ -216,6 +220,54 @@ Num\+Type n factorial
 \item[{int}]{direction}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af3c54e468658879756c71b01abd028d5}{}\label{class_grid_utils_af3c54e468658879756c71b01abd028d5}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Vox\+Ind@{get\+Vox\+Ind}}
+\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Vox\+Ind (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{y, }
+\item[{double}]{z}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}{}\label{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}
+
+
+Get global voxel indices. 
+
+Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Can also be used to map positions to indices.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & global x-\/position. \\
+\hline
+{\em y} & global y-\/position. \\
+\hline
+{\em z} & global z-\/position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of indices of the nearest voxel. 
+\end{DoxyReturn}
+\index{Grid\+Utils@{Grid\+Utils}!get\+Vox\+Ind@{get\+Vox\+Ind}}
+\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double p)}{getVoxInd(double p)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Utils\+::get\+Vox\+Ind (
+\begin{DoxyParamCaption}
+\item[{double}]{p}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}{}\label{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}
+
+
+Get global voxel index. 
+
+Will return the voxel index of the nearest voxel on the lattice for a given point in global space in a given direction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p} & global position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+corresponding global index. 
+\end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}}
 \index{global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}!Grid\+Utils@{Grid\+Utils}}
 \subsubsection[{\texorpdfstring{global\+\_\+to\+\_\+local(int i, int j, int k, Grid\+Obj $\ast$g, std\+::vector$<$ Num\+Type $>$ \&locals)}{global_to_local(int i, int j, int k, GridObj *g, std::vector< NumType > &locals)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Num\+Type $>$ static void Grid\+Utils\+::global\+\_\+to\+\_\+local (

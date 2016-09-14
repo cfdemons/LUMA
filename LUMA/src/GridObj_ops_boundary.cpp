@@ -17,10 +17,9 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
-#include "../inc/definitions.h"
 #include "../inc/BFLBody.h"
 #include "../inc/ObjectManager.h"
-#include <numeric>
+#include "../inc/GridUtils.h"
 
 
 // ****************************************************************************

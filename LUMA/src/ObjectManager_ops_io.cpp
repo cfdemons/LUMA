@@ -15,8 +15,10 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
+#include "../inc/GridUtils.h"
+#include "../inc/PCpts.h"
+#include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
-#include <sstream>
 
 // ************************************************************************** //
 /// \brief Write out position of immersed boundary bodies.
@@ -445,9 +447,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	do {
 
 		// Get global voxel index
-		global_i = getVoxInd(_PCpts->x[a]);
-		global_j = getVoxInd(_PCpts->y[a]);
-		global_k = getVoxInd(_PCpts->z[a]);
+		global_i = GridUtils::getVoxInd(_PCpts->x[a]);
+		global_j = GridUtils::getVoxInd(_PCpts->y[a]);
+		global_k = GridUtils::getVoxInd(_PCpts->z[a]);
 
 		// If on this rank
 		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
@@ -493,9 +495,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			// Label the grid sites
 			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 				// Get globals
-				global_i = getVoxInd(_PCpts->x[a]);
-				global_j = getVoxInd(_PCpts->y[a]);
-				global_k = getVoxInd(_PCpts->z[a]);
+				global_i = GridUtils::getVoxInd(_PCpts->x[a]);
+				global_j = GridUtils::getVoxInd(_PCpts->y[a]);
+				global_k = GridUtils::getVoxInd(_PCpts->z[a]);
 				// Get local indices
 				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
 
@@ -516,8 +518,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			break;
 
 		case eIBBCloud:
-			global_j = getVoxInd(_PCpts->y[a]);
-			global_k = getVoxInd(_PCpts->z[a]);
+			global_j = GridUtils::getVoxInd(_PCpts->y[a]);
+			global_k = GridUtils::getVoxInd(_PCpts->z[a]);
 
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;

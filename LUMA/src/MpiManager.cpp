@@ -15,12 +15,9 @@
 
 #include "../inc/stdafx.h"
 #include <mpi.h>
-#include <iostream>
-#include <fstream>
-#include "../inc/definitions.h"
 #include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/globalvars.h"
+#include "../inc/GridUtils.h"
 
 // Static declarations
 MpiManager* MpiManager::me;

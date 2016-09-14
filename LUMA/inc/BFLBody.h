@@ -12,12 +12,13 @@
  * distribution without written consent.
  *
  */
+#ifndef BFLBODY_H
+#define BFLBODY_H
 
-#pragma once
-#include "BFLMarker.h"
+#include "stdafx.h"
 #include "Body.h"
-#include "PCpts.h"
-#include "ObjectManager.h"
+#include "BFLMarker.h"
+class PCpts;
 
 /// \brief	BFL body.
 ///
@@ -62,3 +63,5 @@ protected:
 	void computeQ(int i, int j, GridObj* g);
 
 };
+
+#endif

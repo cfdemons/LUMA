@@ -13,7 +13,8 @@
  *
  */
 
-#pragma once
+#ifndef GRIDUTILS_H
+#define GRIDUTILS_H
 
 /// \enum eCartesianDirection
 /// \brief Enumeration for directional options.
@@ -37,10 +38,7 @@ enum eMinMax
 };
 
 #include "stdafx.h"
-#include "definitions.h"
 #include "GridObj.h"
-#include "hdf5luma.h"
-
 
 /// \brief	Grid utility class.
 ///
@@ -89,6 +87,10 @@ public:
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
+
+	// Voxel finding utilities
+	static std::vector<int> getVoxInd(double x, double y, double z);
+	static int getVoxInd(double p);
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
@@ -160,7 +162,7 @@ public:
 		if (n == static_cast<NumType>(0)) 
 			return static_cast<NumType>(1);
 		else
-			return n * GridUtils::factorial(n - 1);
+			return n * factorial(n - 1);
 	};
 
 	/// \brief	Performs a strided memcpy.
@@ -255,3 +257,4 @@ public:
 
 };
 
+#endif

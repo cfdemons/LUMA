@@ -12,12 +12,16 @@
  * distribution without written consent.
  *
  */
+#ifndef IBBODY_H
+#define IBBODY_H
 
-#pragma once
-#include "IBMarker.h"
-#include "Body.h"
-#include "PCpts.h"
-#include "BFLBody.h"	// Need this because we use the Voxelising routine in makeBody()
+#include "stdafx.h"
+
+// Forward declarations
+#include "Body.h"	// This is a templated class so include the whole file
+class IBMarker;
+class PCpts;
+class GridObj;
 
 /// \brief	Immersed boundary body.
 class IBBody : public Body<IBMarker> {
@@ -81,3 +85,4 @@ public:
 
 };
 
+#endif

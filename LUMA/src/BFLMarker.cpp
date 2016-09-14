@@ -15,8 +15,7 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/BFLMarker.h"
-#include "../inc/BFLBody.h"
-#include "../inc/ObjectManager.h"
+#include "../inc/GridUtils.h"
 
 // Implementation for the BFLMarker class //
 
@@ -43,7 +42,7 @@ BFLMarker::BFLMarker(double x, double y, double z)
 	position.push_back(z);
 
 	// Add indices (global reference frame)
-	std::vector<int> vox = ObjectManager::getInstance()->getVoxInd(x, y, z);
+	std::vector<int> vox = GridUtils::getVoxInd(x, y, z);
 	this->supp_i.push_back(vox[0]);
 	this->supp_j.push_back(vox[1]);
 	this->supp_k.push_back(vox[2]);

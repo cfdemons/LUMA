@@ -13,10 +13,14 @@
 *
 */
 
+#ifndef HDFLUMA_H
+#define HDFLUMA_H
+
 #if (defined L_BUILD_FOR_MPI && !defined H5_HAVE_PARALLEL)
 	#define H5_HAVE_PARALLEL	///< Enable parallel HDF5
 #endif
 
+#include "stdafx.h"
 #include "hdf5.h"	// Load C API
 #include "MpiManager.h"
 
@@ -24,7 +28,6 @@
 #define HDF5_EXT_ZLIB
 #define HDF5_EXT_SZIP
 
-#pragma once	// Just define the enumerated type once
 /// \enum	eHdf5SlabType
 ///	\brief	Defines the type of storage arrangement of the variable in memory.
 ///
@@ -446,4 +449,6 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	// Free the buffer
 	free(buffer);
 
-}
+};
+
+#endif

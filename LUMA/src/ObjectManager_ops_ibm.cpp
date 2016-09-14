@@ -16,8 +16,8 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/definitions.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridUtils.h"
 
 
 // ***************************************************************************************************

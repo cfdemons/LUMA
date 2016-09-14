@@ -16,12 +16,10 @@
 // Routines for reading and writing operations.
 
 #include "../inc/stdafx.h"
-#include <sstream>
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
+#include "../inc/GridUtils.h"
 #include "../inc/hdf5luma.h"
 
 using namespace std;

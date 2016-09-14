@@ -14,11 +14,11 @@
  */
 
 #include "../inc/stdafx.h"
-#include "../inc/globalvars.h"
-#include "../inc/MpiManager.h"
 #include "../inc/BFLBody.h"
-
-class GridObj;
+#include "../inc/MpiManager.h"
+#include "../inc/PCpts.h"
+#include "../inc/GridObj.h"
+#include "../inc/GridUtils.h"
 
 
 // Implementation of BFL body class //

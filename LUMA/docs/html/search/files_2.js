@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['gen_5finit_5fglobalvars_2ecpp',['Gen_init_globalvars.cpp',['../_gen__init__globalvars_8cpp.html',1,'']]],
-  ['globalvars_2eh',['globalvars.h',['../globalvars_8h.html',1,'']]],
   ['gridobj_2ecpp',['GridObj.cpp',['../_grid_obj_8cpp.html',1,'']]],
   ['gridobj_2eh',['GridObj.h',['../_grid_obj_8h.html',1,'']]],
   ['gridobj_5finit_5fgrids_2ecpp',['GridObj_init_grids.cpp',['../_grid_obj__init__grids_8cpp.html',1,'']]],

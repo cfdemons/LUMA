@@ -15,6 +15,8 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
+#include "../inc/GridObj.h"
+#include "../inc/GridUtils.h"
 
 
 // Static declarations
@@ -59,54 +61,6 @@ ObjectManager::~ObjectManager(void) {
 ObjectManager::ObjectManager(GridObj* g) {
 	this->_Grids = g;
 };
-
-
-// ************************************************************************* //
-// Voxelisation Utilities
-// ************************************************************************* //
-
-/// \brief	Get global voxel indices
-///
-///			Will return the voxel indices of the nearest voxel on the lattice 
-///			for a given point in global space. Can also be used to map positions
-///			to indices.
-///
-/// \param	x	global x-position.
-/// \param	y	global y-position.
-/// \param	z	global z-position.
-/// \return vector of indices of the nearest voxel.
-std::vector<int> ObjectManager::getVoxInd(double x, double y, double z) {
-
-	std::vector<int> vox;
-
-	if (x - (int)std::floor(x) > 0.5) vox.push_back((int)std::ceil(x));
-	else vox.push_back((int)std::floor(x));
-
-	if (y - (int)std::floor(y) > 0.5) vox.push_back((int)std::ceil(y));
-	else vox.push_back((int)std::floor(y));
-
-	if (z - (int)std::floor(z) > 0.5) vox.push_back((int)std::ceil(z));
-	else vox.push_back((int)std::floor(z));
-
-	return vox;
-
-}
-
-/// \brief	Get global voxel index
-///
-///			Will return the voxel index of the nearest voxel on the lattice 
-///			for a given point in global space in a given direction.
-///
-/// \param	p	global position.
-/// \return corresponding global index.
-
-// Overload of above for a single index
-int ObjectManager::getVoxInd(double p) {
-
-	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
-	else return (int)std::floor(p);
-
-}
 
 // ************************************************************************* //
 

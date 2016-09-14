@@ -18,10 +18,9 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBBody.h"
-#include "../inc/definitions.h"
-#include <math.h>
-
-class GridObj;
+#include "../inc/IBMarker.h"
+#include "../inc/PCpts.h"
+#include "../inc/GridUtils.h"
 
 // ***************************************************************************************************
 /// \brief Constructor which sets group ID to zero by default.

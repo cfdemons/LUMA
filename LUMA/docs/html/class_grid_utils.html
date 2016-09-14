@@ -138,6 +138,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:af3c54e468658879756c71b01abd028d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afac10170d3f6f96a32da6a783b815954"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#afac10170d3f6f96a32da6a783b815954">getGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *&amp;Grids, int level, int region, <a class="el" href="class_grid_obj.html">GridObj</a> *&amp;ptr)</td></tr>
 <tr class="separator:afac10170d3f6f96a32da6a783b815954"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee98a0b0967c88230aee8d19497914"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a46ee98a0b0967c88230aee8d19497914">getVoxInd</a> (double x, double y, double z)</td></tr>
+<tr class="memdesc:a46ee98a0b0967c88230aee8d19497914"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get global voxel indices.  <a href="#a46ee98a0b0967c88230aee8d19497914">More...</a><br /></td></tr>
+<tr class="separator:a46ee98a0b0967c88230aee8d19497914"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056e6dc8478f608bc2ab374eee6e8c24"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a056e6dc8478f608bc2ab374eee6e8c24">getVoxInd</a> (double p)</td></tr>
+<tr class="memdesc:a056e6dc8478f608bc2ab374eee6e8c24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get global voxel index.  <a href="#a056e6dc8478f608bc2ab374eee6e8c24">More...</a><br /></td></tr>
+<tr class="separator:a056e6dc8478f608bc2ab374eee6e8c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a7c13884020ab181ee8cb6dd2ea7e4fd7">isOverlapPeriodic</a> (int i, int j, int k, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
 <tr class="separator:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1c2d23d0cdd548368aaaffb4f22502d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ac1c2d23d0cdd548368aaaffb4f22502d">isOnThisRank</a> (int gi, int gj, int gk, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
@@ -597,6 +603,92 @@ template&lt;typename NumType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a46ee98a0b0967c88230aee8d19497914"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; int &gt; GridUtils::getVoxInd </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get global voxel indices. </p>
+<p>Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Can also be used to map positions to indices.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>global x-position. </td></tr>
+    <tr><td class="paramname">y</td><td>global y-position. </td></tr>
+    <tr><td class="paramname">z</td><td>global z-position. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>vector of indices of the nearest voxel. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a056e6dc8478f608bc2ab374eee6e8c24"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridUtils::getVoxInd </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get global voxel index. </p>
+<p>Will return the voxel index of the nearest voxel on the lattice for a given point in global space in a given direction.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p</td><td>global position. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>corresponding global index. </dd></dl>
 
 </div>
 </div>

@@ -13,7 +13,10 @@
  *
  */
 
-#pragma once
+#ifndef BFLMARKER_H
+#define BFLMARKER_H
+
+#include "stdafx.h"
 #include "Marker.h"
 
 /// \brief	BFL marker.
@@ -37,3 +40,4 @@ public:
 
 };
 
+#endif

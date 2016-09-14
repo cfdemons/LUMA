@@ -12,10 +12,10 @@
  * distribution without written consent.
  *
  */
+#ifndef MARKER_H
+#define MARKER_H
 
-#pragma once
-
-#include <vector>
+#include "stdafx.h"
 
 /// \brief	Generic marker class.
 class Marker
@@ -61,3 +61,4 @@ public:
 
 };
 
+#endif

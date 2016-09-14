@@ -16,9 +16,9 @@
 /* This file contains the constructors for the Grid objects. */
 
 #include "../inc/stdafx.h"
-#include "../inc/definitions.h"
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridUtils.h"
 
 // Static declarations
 std::ofstream* GridUtils::logfile;

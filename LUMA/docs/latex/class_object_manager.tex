@@ -50,10 +50,6 @@ void \hyperlink{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{bfl\+\_\
 \begin{DoxyCompactList}\small\item\em Prefab body building routine. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{bfl\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
 \begin{DoxyCompactList}\small\item\em Wrapper for building B\+FL body from point cloud. \end{DoxyCompactList}\item 
-std\+::vector$<$ int $>$ \hyperlink{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{get\+Vox\+Ind} (double x, double y, double z)
-\begin{DoxyCompactList}\small\item\em Get global voxel indices. \end{DoxyCompactList}\item 
-int \hyperlink{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{get\+Vox\+Ind} (double p)
-\begin{DoxyCompactList}\small\item\em Get global voxel index. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{compute\+Lift\+Drag} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
 \begin{DoxyCompactList}\small\item\em Compute forces on a rigid object. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{io\+\_\+vtk\+\_\+\+I\+Bwriter} (double tval)
@@ -191,54 +187,6 @@ Instance creator with grid hierarchy assignment.
 {\em g} & pointer to grid hierarchy. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
-\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Object\+Manager\+::get\+Vox\+Ind (
-\begin{DoxyParamCaption}
-\item[{double}]{x, }
-\item[{double}]{y, }
-\item[{double}]{z}
-\end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}{}\label{class_object_manager_a68230ad49b979c2fe963cb3632a60c3a}
-
-
-Get global voxel indices. 
-
-Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Can also be used to map positions to indices.
-
-
-\begin{DoxyParams}{Parameters}
-{\em x} & global x-\/position. \\
-\hline
-{\em y} & global y-\/position. \\
-\hline
-{\em z} & global z-\/position. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-vector of indices of the nearest voxel. 
-\end{DoxyReturn}
-\index{Object\+Manager@{Object\+Manager}!get\+Vox\+Ind@{get\+Vox\+Ind}}
-\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double p)}{getVoxInd(double p)}}]{\setlength{\rightskip}{0pt plus 5cm}int Object\+Manager\+::get\+Vox\+Ind (
-\begin{DoxyParamCaption}
-\item[{double}]{p}
-\end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}{}\label{class_object_manager_a8e8e70f60dfb9d35d2e320c7c2b3b33c}
-
-
-Get global voxel index. 
-
-Will return the voxel index of the nearest voxel on the lattice for a given point in global space in a given direction.
-
-
-\begin{DoxyParams}{Parameters}
-{\em p} & global position. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-corresponding global index. 
-\end{DoxyReturn}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+apply@{ibm\+\_\+apply}}
 \index{ibm\+\_\+apply@{ibm\+\_\+apply}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+apply(\+Grid\+Obj \&g)}{ibm_apply(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+apply (

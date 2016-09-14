@@ -37,16 +37,18 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <numeric>
 
 // Check OS is Windows or not
 #ifdef _WIN32
 
-#include "targetver.h"
-#define NOMINMAX	// Stop Windows.h redefining min/max
+#include <SDKDDKVer.h>
+#define NOMINMAX		// Stop Windows.h redefining min/max
 #include <Windows.h>
 #include <tchar.h>
 
-#else // Compiling with gcc through Code::Blocks on Linux
+#else // Compiling with gcc through Code::Blocks / Eclipse on Linux
 
 #include <stdlib.h> // Includes exit() function
 #include <cstring>
@@ -59,12 +61,17 @@
 #define LUMA_FAILED 12345
 
 #ifdef _WIN32
-	#define L_IS_NAN _isnan		///< Not a Number declaration (Windows)
+	#define L_IS_NAN _isnan			///< Not a Number declaration (Windows)
 #else
-#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
+	#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
 #endif
 
-// Grid utilities class definition (available to all parts of code)
-#include "../inc/GridUtils.h"
+// Include definitions
+#include "definitions.h"
+
+// Global variable references
+extern const int c[3][L_nVels];				///< Lattice velocities
+extern const double w[L_nVels];				///< Quadrature weights
+extern const double cs;						///< Lattice sound speed
 
 #endif

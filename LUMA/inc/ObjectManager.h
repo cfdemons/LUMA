@@ -12,15 +12,19 @@
  * distribution without written consent.
  *
  */
+#ifndef OBJMAN_H
+#define OBJMAN_H
 
-#pragma once
-
-#include <vector>
-#include "IBBody.h"
-#include "Body.h"
-#include "BFLBody.h"
+#include "stdafx.h"
 #include "IVector.h"
-#include "globalvars.h"
+#include "IBMarker.h"
+#include "IBBody.h"
+#include "BFLBody.h"
+
+class PCpts;
+class GridObj;
+
+
 /// \enum  eObjectType
 /// \brief Specifies the type of body being processed.
 enum eObjectType {
@@ -28,6 +32,7 @@ enum eObjectType {
 	eBFLCloud,	///< BFL body
 	eIBBCloud	///< Immersed boundary body
 };
+
 
 /// \brief	Object Manager class.
 ///
@@ -115,10 +120,6 @@ public:
 	void bfl_build_body(int body_type);		// Build a new pre-fab bounce-back body
 	void bfl_build_body(PCpts* _PCpts);		// Overload to build from point cloud data
 
-	// Voxeliser methods //
-	std::vector<int> getVoxInd(double x, double y, double z);
-	int getVoxInd(double p);
-
 	// Force calculation
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB
 
@@ -131,3 +132,4 @@ public:
 	void io_writeForceOnObject(double tval);			// Method to write object forces to a csv file
 };
 
+#endif

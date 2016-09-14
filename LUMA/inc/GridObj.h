@@ -13,14 +13,11 @@
  *
  */
 
-#pragma once
+#ifndef GRIDOBJ_H
+#define GRIDOBJ_H
 
-#include <vector>
+#include "stdafx.h"
 #include "IVector.h"
-#include "IBBody.h"
-#include <iostream>
-#include <fstream>
-#include "hdf5luma.h"
 
 /// \enum  eType
 /// \brief Lattice typing labels
@@ -208,3 +205,4 @@ public :
 
 };
 
+#endif

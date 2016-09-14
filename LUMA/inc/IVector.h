@@ -13,9 +13,10 @@
  *
  */
 
-#pragma once
+#ifndef IVECTOR_H
+#define IVECTOR_H
 
-#include <vector>
+#include "stdafx.h"
 /// \brief	Index-collapsing vector class.
 ///
 ///			This class has all the behaviour of std::vector but 
@@ -125,3 +126,5 @@ public:
 
 
 };
+
+#endif

@@ -144,12 +144,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a56c65bd5122aa7e7026fb8d2315482f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a56c65bd5122aa7e7026fb8d2315482f3">bfl_build_body</a> (<a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts)</td></tr>
 <tr class="memdesc:a56c65bd5122aa7e7026fb8d2315482f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for building BFL body from point cloud.  <a href="#a56c65bd5122aa7e7026fb8d2315482f3">More...</a><br /></td></tr>
 <tr class="separator:a56c65bd5122aa7e7026fb8d2315482f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68230ad49b979c2fe963cb3632a60c3a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a68230ad49b979c2fe963cb3632a60c3a">getVoxInd</a> (double x, double y, double z)</td></tr>
-<tr class="memdesc:a68230ad49b979c2fe963cb3632a60c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get global voxel indices.  <a href="#a68230ad49b979c2fe963cb3632a60c3a">More...</a><br /></td></tr>
-<tr class="separator:a68230ad49b979c2fe963cb3632a60c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e8e70f60dfb9d35d2e320c7c2b3b33c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a8e8e70f60dfb9d35d2e320c7c2b3b33c">getVoxInd</a> (double p)</td></tr>
-<tr class="memdesc:a8e8e70f60dfb9d35d2e320c7c2b3b33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get global voxel index.  <a href="#a8e8e70f60dfb9d35d2e320c7c2b3b33c">More...</a><br /></td></tr>
-<tr class="separator:a8e8e70f60dfb9d35d2e320c7c2b3b33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a35b34d77e7cd56060a6953d0d0860a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a6a35b34d77e7cd56060a6953d0d0860a">computeLiftDrag</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
 <tr class="memdesc:a6a35b34d77e7cd56060a6953d0d0860a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute forces on a rigid object.  <a href="#a6a35b34d77e7cd56060a6953d0d0860a">More...</a><br /></td></tr>
 <tr class="separator:a6a35b34d77e7cd56060a6953d0d0860a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -374,76 +368,6 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="a68230ad49b979c2fe963cb3632a60c3a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; int &gt; ObjectManager::getVoxInd </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>z</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get global voxel indices. </p>
-<p>Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Can also be used to map positions to indices.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>global x-position. </td></tr>
-    <tr><td class="paramname">y</td><td>global y-position. </td></tr>
-    <tr><td class="paramname">z</td><td>global z-position. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>vector of indices of the nearest voxel. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a8e8e70f60dfb9d35d2e320c7c2b3b33c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int ObjectManager::getVoxInd </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>p</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get global voxel index. </p>
-<p>Will return the voxel index of the nearest voxel on the lattice for a given point in global space in a given direction.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">p</td><td>global position. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>corresponding global index. </dd></dl>
 
 </div>
 </div>

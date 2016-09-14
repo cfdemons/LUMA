@@ -14,12 +14,9 @@
  */
 
 #include "../inc/stdafx.h"
-#include "../inc/GridObj.h"
-#include <sstream>		// String stream package
-#include <iostream>
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
+#include "../inc/GridUtils.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridObj.h"
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
@@ -743,7 +740,7 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 	return result;
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
 // Tests whether a site is on a given grid
 bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 
@@ -766,4 +763,48 @@ bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 		}
 
 		return false;
+}
+
+// ****************************************************************************
+/// \brief	Get global voxel indices
+///
+///			Will return the voxel indices of the nearest voxel on the lattice 
+///			for a given point in global space. Can also be used to map positions
+///			to indices.
+///
+/// \param	x	global x-position.
+/// \param	y	global y-position.
+/// \param	z	global z-position.
+/// \return vector of indices of the nearest voxel.
+std::vector<int> GridUtils::getVoxInd(double x, double y, double z) {
+
+	std::vector<int> vox;
+
+	if (x - (int)std::floor(x) > 0.5) vox.push_back((int)std::ceil(x));
+	else vox.push_back((int)std::floor(x));
+
+	if (y - (int)std::floor(y) > 0.5) vox.push_back((int)std::ceil(y));
+	else vox.push_back((int)std::floor(y));
+
+	if (z - (int)std::floor(z) > 0.5) vox.push_back((int)std::ceil(z));
+	else vox.push_back((int)std::floor(z));
+
+	return vox;
+
+}
+
+/// \brief	Get global voxel index
+///
+///			Will return the voxel index of the nearest voxel on the lattice 
+///			for a given point in global space in a given direction.
+///
+/// \param	p	global position.
+/// \return corresponding global index.
+
+// Overload of above for a single index
+int GridUtils::getVoxInd(double p) {
+
+	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
+	else return (int)std::floor(p);
+
 }

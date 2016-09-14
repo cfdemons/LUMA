@@ -15,7 +15,6 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBMarker.h"
-#include "../inc/definitions.h"
 
 // ***************************************************************************************************
 /// \brief Custom constructor with position.

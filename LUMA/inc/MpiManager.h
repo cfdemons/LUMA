@@ -13,10 +13,11 @@
  *
  */
 
-#pragma once
+#ifndef MPIMAN_H
+#define MPIMAN_H
 
-#include "definitions.h"
-#include "GridObj.h"
+#include "stdafx.h"
+class GridObj;
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
@@ -175,3 +176,4 @@ public :
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 };
 
+#endif

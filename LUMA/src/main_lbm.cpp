@@ -29,11 +29,11 @@
 /// distribution without written consent.
 
 #include "../inc/stdafx.h"			// Precompiled header
-#include "../inc/definitions.h"		// Definitions file
-#include "../inc/globalvars.h"		// Global variable references
 #include "../inc/GridObj.h"			// Grid class definition
 #include "../inc/MpiManager.h"		// MPI manager class definition
 #include "../inc/ObjectManager.h"	// Object manager class definition
+#include "../inc/GridUtils.h"		// Grid utilities
+#include "../inc/PCpts.h"			// Point cloud class
 
 using namespace std;	// Use the standard namespace
 

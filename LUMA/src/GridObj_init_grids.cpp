@@ -19,12 +19,7 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <math.h>
+#include "../inc/GridUtils.h"
 
 using namespace std;
 

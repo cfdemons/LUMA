@@ -19,7 +19,6 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/definitions.h"
 
 // ************************************************************************** //
 /// \brief Builds a prefab immersed boundary body.

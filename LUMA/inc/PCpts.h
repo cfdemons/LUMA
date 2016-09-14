@@ -12,7 +12,9 @@
 * distribution without written consent.
 *
 */
-#pragma once
+#ifndef PCPTS_H
+#define PCPTS_H
+
 #include "stdafx.h"
 /// \brief	Class to hold point cloud data.
 ///
@@ -32,3 +34,5 @@ public:
 	std::vector<double> y;		///< Vector of Y positions
 	std::vector<double> z;		///< Vector of Z positions
 };
+
+#endif

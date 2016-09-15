@@ -36,6 +36,24 @@ void GridObj::LBM_init_getInletProfile() {
 	double y, tmp;
 	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
 
+#ifdef L_PARABOLIC_INLET
+
+	// Resize vectors
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
+
+	// Loop over site positions (for left hand inlet, y positions)
+	for (j = 0; j < M_lim; j++) {
+
+		// Set the inlet velocity profile values
+		ux_in[j] = L_u_max * (1 - pow((YPos[j] - (L_b_y - L_a_y - 2 * dy) / 2) / ((L_b_y - L_a_y - 2 * dy) / 2), 2));
+		uy_in[j] = 0.0;
+		uz_in[j] = 0.0;
+	}
+
+#else
+
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
@@ -148,6 +166,7 @@ void GridObj::LBM_init_getInletProfile() {
 		*GridUtils::logfile << "Failed to read in inlet profile data. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 	}
+#endif // L_PARABOLIC_INLET
 
 
 }

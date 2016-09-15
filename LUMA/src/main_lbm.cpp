@@ -494,9 +494,6 @@ int main( int argc, char* argv[] )
 			Grids.io_textout("START OF TIMESTEP");
 #endif
 
-			// ** TODO Remove this before merging ** //
-			objMan->writeForce();
-
 #ifdef L_IO_LITE
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 		Grids.io_lite(Grids.t,"");

@@ -228,48 +228,6 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 
 }
 
-// ** TODO Remove before merging ** //
-void ObjectManager::writeForce() {
-
-	// Case specific stuff - must change if doing a different case
-	double nuPhys = 0.001, rhoPhys = 1000.0;
-	double uPhys = 0.2;
-
-
-	// Get level 0 values so we write out correct time
-	GridObj* g = NULL;
-	GridUtils::getGrid(this->_Grids, 0, 0, g);
-	double tval = g->t;
-	double nu_0 = g->nu;
-	double Dx_0 = g->dx;
-	double Dt_0 = (Dx_0 * Dx_0) * nu_0 / nuPhys;
-
-	// Calculate properties on the grid where the IB body sits
-	int level = iBody[0]._Owner->level;
-	double Dx_grid = Dx_0 / pow(2, level);
-	double Dt_grid = Dt_0 / pow(2, level);
-	double forceScaling = (1.0 / Dx_grid) * (rhoPhys / 1.0) * Dx_grid * Dx_grid * Dx_grid * Dx_grid / (Dt_grid * Dt_grid);
-	double liftTot = 0.0, dragTot = 0.0;
-
-	// Loop over each lagrange point and add up
-	for (int i = 0; i < iBody[0].markers.size(); i++) {
-		dragTot += (iBody[0].markers[i].force_xyz[0] * 1.0 * iBody[0].markers[i].epsilon * iBody[0].spacing / Dx_grid) * forceScaling;
-		liftTot += (iBody[0].markers[i].force_xyz[1] * 1.0 * iBody[0].markers[i].epsilon * iBody[0].spacing / Dx_grid) * forceScaling;
-	}
-
-    // Create file name then output file stream
-    std::stringstream fileName;
-    fileName << GridUtils::path_str + "/forceOutTime.out";
-
-    std::ofstream fout;
-    fout.open( fileName.str().c_str(), std::ios::app );
-
-    // Write out time step, time, drag, list and coefficients
-    if (tval == L_out_every)
-    	fout << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << "\t" << 0.0 << std::endl;
-    fout << tval << "\t" << Dt_0 * tval << "\t" << dragTot << "\t" << liftTot << "\t" << 2.0 * dragTot / (rhoPhys * uPhys * uPhys * 2.0 * L_ibb_r ) << "\t" << 2.0 * liftTot / (rhoPhys *  uPhys * uPhys * 2.0 * L_ibb_r) << std::endl;
-    fout.close();
-}
 
 // ************************************************************************** //
 /// \brief	Write IB body data to VTK file.

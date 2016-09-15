@@ -253,7 +253,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
 	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus;	// TODO Find out why this has such a drastic effect on everything
-		//+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units //TODO Think if this needs to change between grids
+		//+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
 
 	// Test to see if required support nodes are available
@@ -344,7 +344,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 					iBody[ib].markers[m].supp_k.push_back(k);
 
 					// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
-					iBody[ib].markers[m].local_area = 1; //pow( 1 / pow(2,g.level) ,2) ;	//TODO Check if this needs to change between grids
+					iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
 
 					//  Distance between Lagrange marker and support node in lattice units
 					dist_x = (g.XPos[i]-iBody[ib].markers[m].position[0]) / g.dx;

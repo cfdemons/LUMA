@@ -158,9 +158,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Fluid data in lattice units
-#define L_USE_INLET_PROFILE		///< Use an inlet profile defined in an ASCII file
+#define L_USE_INLET_PROFILE		///< Use an inlet profile
+#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read
 #define L_u_ref (0.0707070707070707)		///< Reference velocity for scaling, can be mean inelt velocity
-#define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
+#define L_u_max L_u_ref*1.5					///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_u_0x L_u_ref		///< Initial/inlet x-velocity
@@ -181,7 +182,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Master IBM switches //
 #define L_IBM_ON						///< Turn on IBM
-#define L_IB_Lev 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
+#define L_IB_Lev 2					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
@@ -202,7 +203,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	#define L_ibb_length_ref 0.5	///< Reference length to be used in the definition of Reynolds number
 
 // Default global properties
-#define L_num_markers 31		///< Number of Lagrange points to use when building a prefab body (approximately)
+#define L_num_markers 124		///< Number of Lagrange points to use when building a prefab body (approximately)
 #define L_ibb_deform false		///< Default deformable property of body to be built (whether it moves or not)
 #define L_ibb_flex_rigid false	///< Whether a structural calculation needs to be performed on the body
 
@@ -338,7 +339,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_NumLev 0		///< Levels of refinement (0 = coarse grid only
+#define L_NumLev 2		///< Levels of refinement (0 = coarse grid only
 #define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -365,10 +366,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {30}, {10} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {70}, {70} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {0}, {0} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {20}, {30} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
 	// If doing 2D, these can be arbitrary values
 	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
 	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };

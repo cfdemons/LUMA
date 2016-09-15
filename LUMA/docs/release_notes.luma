@@ -2,6 +2,12 @@ version		=	1.2.0-alpha
 
 General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.
 				Also IS_NAN() function switched to macro definition.
+				LBM_multi routine has been compacted to improve readability.
+				Restart functionality has been improved allowing IBM on sub-grids.
+				Expensive support node calculation has been removed.
+				Gravity force scaling across sub-grids has been fixed.
+				Wall thickness can be arbitrarily set for front, back, top and bottom walls.
+				Changed the terminal output to be every L_out_every time steps.
 
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
 Issue #81	: 	Added grid sizes as GridObj property.
@@ -12,6 +18,7 @@ Issue #79	: 	Fixed bug which allowed serial calls of a utility only compatible w
 Issue #69	: 	Patch to fix new point cloud reader where solid bodies were not being inserted correctly.
 Issue #77	: 	Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.
 Issue #76	: 	Fixed crash when using solid block due to erroneous Re definition.
+Issue #3	:	Added capability for IBM linking to sub-grids.
 
 version		=	1.1.0
 

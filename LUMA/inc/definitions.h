@@ -159,7 +159,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Fluid data in lattice units
 #define L_USE_INLET_PROFILE		///< Use an inlet profile
-#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read
+#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref (0.0707070707070707)		///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5					///< Max velocity of inlet profile
 
@@ -186,7 +186,6 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
-#define L_CHEAP_NEAREST_NODE_DETECTION	///< Perform a nearest-neighbour-type nearest node operation for IBM support calculation
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // Read in IB Body from File

@@ -189,7 +189,7 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #endif
 
 
-#ifdef L_CHEAP_NEAREST_NODE_DETECTION
+	// Find closest support node
 	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - (g.XPos[0] - g.dx / 2.0))/g.dx);	// Simulates std::round
 	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - (g.YPos[0] - g.dy / 2.0))/g.dy);
 
@@ -197,54 +197,6 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - (g.ZPos[0] - g.dz / 2.0))/g.dz);
 #endif
 
-
-#else	// TODO Needs removed
-
-	// Declarations
-	double r_min, radius;			// Minimum radius limit and actual radius from centre of kernel
-
-	// Following (Pinelli et al. 2010, JCP) we find closest node
-	r_min = abs(L_b_x-L_a_x) / g.dx;	// Initial minimum distance (in lu) taken from problem geometry
-
-	// Loop over the grid to find closest node first
-	for (size_t i = 0; i < g.N_lim; i++) {
-		for (size_t j = 0; j < g.M_lim; j++) {
-			for (size_t k = 0; k < g.K_lim; k++) {
-
-#if (L_dims == 3)
-				// Find r = sqrt(x^2 + y^2 + z^2)
-				radius = vecnorm( g.XPos[i]-iBody[ib].markers[m].position[0],
-							g.YPos[j]-iBody[ib].markers[m].position[1],
-							g.ZPos[k]-iBody[ib].markers[m].position[2]
-						) / g.dx;
-#else
-				// Find r = sqrt(x^2 + y^2)
-				radius = vecnorm ( g.XPos[i]-iBody[ib].markers[m].position[0],
-							g.YPos[j]-iBody[ib].markers[m].position[1]
-						) / g.dx;
-
-#endif
-				// Check that radius is valid otherwise jacowire must have failed
-				if ( _finite(radius) == false ) {
-					std::cout << "Error: See Log File" << std::endl;
-					*GridUtils::logfile << "Jacowire calculation of new position has failed. Exiting." << std::endl;
-					exit(LUMA_FAILED);
-				}
-
-
-				if (radius < r_min) {
-					r_min = radius;	// This node is closer than the last one so update criterion
-					// Store nearest node position
-					inear = static_cast<int>(i);
-					jnear = static_cast<int>(j);
-					knear = static_cast<int>(k);
-
-				}
-
-			}
-		}
-	}
-#endif
 
 	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction

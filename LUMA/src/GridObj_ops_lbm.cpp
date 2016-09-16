@@ -197,7 +197,8 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 			LBM_resetForces();
 
 			// Calculate and apply IBM forcing to fluid
-			ObjectManager::getInstance()->ibm_apply(*this);
+			ObjectManager::getInstance()->ibm_apply();
+
 
 			// Restore data to start of time step
 			f = f_ibm_initial;
@@ -212,7 +213,8 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
 
 			// Move the body if necessary
-			ObjectManager::getInstance()->ibm_move_bodies(*this);
+			ObjectManager::getInstance()->ibm_move_bodies();
+
 
 		}
 #endif

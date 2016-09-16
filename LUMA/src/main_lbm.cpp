@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
 #if !defined L_RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
-	objMan->ibm_initialise(Grids);
+	objMan->ibm_initialise();
 	*GridUtils::logfile << "Number of markers requested for objects = " << L_num_markers << std::endl;
 
 #endif
@@ -497,6 +497,8 @@ int main( int argc, char* argv[] )
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 		Grids.io_lite(Grids.t,"");
 #endif
+
+		objMan->writeForce(); //TODO Get rid
 
 #ifdef L_HDF5_OUTPUT
 		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;

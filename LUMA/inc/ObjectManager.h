@@ -118,6 +118,7 @@ public:
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
 	// IO methods //
+	void writeForce();	//TODO Get rid
 	void io_vtk_IBwriter(double tval);				// VTK body writer
 	void io_write_body_pos(int timestep);			// Write out IBBody positions at specified timestep to text files
 	void io_write_lift_drag(int timestep);			// Write out IBBody lift and drag at specified timestep

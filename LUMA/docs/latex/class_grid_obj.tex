@@ -40,7 +40,7 @@ void \hyperlink{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{L\+B\+M\+\_\+i
 \begin{DoxyCompactList}\small\item\em Method to initialise all labels on sub-\/grids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a023713976673d029103690a91c5415f9}{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile} ()
 \begin{DoxyCompactList}\small\item\em Method to import an input profile from a file. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{L\+B\+M\+\_\+multi} (bool I\+B\+M\+\_\+flag)
+void \hyperlink{class_grid_obj_a51b9e3c7904b1c9422c547cc04d3142d}{L\+B\+M\+\_\+multi} (bool ibm\+Flag, bool repeat\+Flag)
 \begin{DoxyCompactList}\small\item\em L\+BM multi-\/grid kernel. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{L\+B\+M\+\_\+collide} ()
 \begin{DoxyCompactList}\small\item\em Apply collision operator. \end{DoxyCompactList}\item 
@@ -56,8 +56,10 @@ void \hyperlink{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{L\+B\+M\+\_\+m
 \begin{DoxyCompactList}\small\item\em Site-\/specific macroscopic update. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a23d89d6111dd46653b2b1f79a5c7fbf1}{L\+B\+M\+\_\+boundary} (int bc\+\_\+type\+\_\+flag)
 \begin{DoxyCompactList}\small\item\em Method to apply boundary conditions on lattice. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{L\+B\+M\+\_\+forcegrid} (bool reset\+\_\+flag)
-\begin{DoxyCompactList}\small\item\em Method to compute or reset body forces. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_a38db857b219d13ca7b0d35ede87b1536}{L\+B\+M\+\_\+force\+Grid} ()
+\begin{DoxyCompactList}\small\item\em Method to compute body forces. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_a5701631be6333e512c7fc8dd6ecabf85}{L\+B\+M\+\_\+reset\+Forces} ()
+\begin{DoxyCompactList}\small\item\em Method to reset body forces. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}{bc\+\_\+apply\+Bounce\+Back} (int label, int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply half-\/way bounce-\/back. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}{bc\+\_\+apply\+Spec\+Reflect} (int label, int i, int j, int k)
@@ -593,25 +595,18 @@ Uses the algorithm of Rohde et al. 2006 to pass information from a coarse grid T
 {\em Region\+Number} & region number of the sub-\/grid. \\
 \hline
 \end{DoxyParams}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}}
-\index{L\+B\+M\+\_\+forcegrid@{L\+B\+M\+\_\+forcegrid}!Grid\+Obj@{Grid\+Obj}}
-\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+forcegrid(bool reset\+\_\+flag)}{LBM_forcegrid(bool reset_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+forcegrid (
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+force\+Grid@{L\+B\+M\+\_\+force\+Grid}}
+\index{L\+B\+M\+\_\+force\+Grid@{L\+B\+M\+\_\+force\+Grid}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+force\+Grid()}{LBM_forceGrid()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+force\+Grid (
 \begin{DoxyParamCaption}
-\item[{bool}]{reset\+\_\+flag}
+{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}{}\label{class_grid_obj_a884b3fc103cf8035438ea8f144bff5bb}
+)}\hypertarget{class_grid_obj_a38db857b219d13ca7b0d35ede87b1536}{}\label{class_grid_obj_a38db857b219d13ca7b0d35ede87b1536}
 
 
-Method to compute or reset body forces. 
+Method to compute body forces. 
 
-Takes Cartesian force vector and populates forces for each lattice direction. If reset\+\_\+flag is true, then resets the force vectors to zero.
-
-
-\begin{DoxyParams}{Parameters}
-{\em reset\+\_\+flag} & flag to indicate whether force vectors should simply be reset. \\
-\hline
-\end{DoxyParams}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}}
+Takes Cartesian force vector and populates forces for each lattice direction. If reset\+\_\+flag is true, then resets the force vectors to zero. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}}
 \index{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile@{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile()}{LBM_init_getInletProfile()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile (
 \begin{DoxyParamCaption}
@@ -797,11 +792,12 @@ Overload of macroscopic quantity calculation to allow it to be applied to a sing
 \end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}}
 \index{L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}!Grid\+Obj@{Grid\+Obj}}
-\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi(bool I\+B\+M\+\_\+flag)}{LBM_multi(bool IBM_flag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi (
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi(bool ibm\+Flag, bool repeat\+Flag)}{LBM_multi(bool ibmFlag, bool repeatFlag)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi (
 \begin{DoxyParamCaption}
-\item[{bool}]{I\+B\+M\+\_\+flag}
+\item[{bool}]{ibm\+Flag, }
+\item[{bool}]{repeat\+Flag}
 \end{DoxyParamCaption}
-)}\hypertarget{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}{}\label{class_grid_obj_af9f81ad6b70fb16997ef88f0c19de5b8}
+)}\hypertarget{class_grid_obj_a51b9e3c7904b1c9422c547cc04d3142d}{}\label{class_grid_obj_a51b9e3c7904b1c9422c547cc04d3142d}
 
 
 L\+BM multi-\/grid kernel. 
@@ -810,10 +806,21 @@ The L\+BM kernel manages the calling of all I\+BM and L\+BM methods on a given g
 
 
 \begin{DoxyParams}{Parameters}
-{\em I\+B\+M\+\_\+flag} & flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using I\+BM. \\
+{\em ibm\+Flag} & flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using I\+BM. \\
 \hline
 \end{DoxyParams}
-\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+reset\+Forces@{L\+B\+M\+\_\+reset\+Forces}}
+\index{L\+B\+M\+\_\+reset\+Forces@{L\+B\+M\+\_\+reset\+Forces}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+reset\+Forces()}{LBM_resetForces()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+reset\+Forces (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a5701631be6333e512c7fc8dd6ecabf85}{}\label{class_grid_obj_a5701631be6333e512c7fc8dd6ecabf85}
+
+
+Method to reset body forces. 
+
+Resets both Cartesian and Lattice force vectors to zero. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}}
 \index{L\+B\+M\+\_\+stream@{L\+B\+M\+\_\+stream}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{L\+B\+M\+\_\+stream()}{LBM_stream()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+stream (
 \begin{DoxyParamCaption}

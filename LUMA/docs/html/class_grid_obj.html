@@ -144,9 +144,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a023713976673d029103690a91c5415f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a023713976673d029103690a91c5415f9">LBM_init_getInletProfile</a> ()</td></tr>
 <tr class="memdesc:a023713976673d029103690a91c5415f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to import an input profile from a file.  <a href="#a023713976673d029103690a91c5415f9">More...</a><br /></td></tr>
 <tr class="separator:a023713976673d029103690a91c5415f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9f81ad6b70fb16997ef88f0c19de5b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#af9f81ad6b70fb16997ef88f0c19de5b8">LBM_multi</a> (bool IBM_flag)</td></tr>
-<tr class="memdesc:af9f81ad6b70fb16997ef88f0c19de5b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">LBM multi-grid kernel.  <a href="#af9f81ad6b70fb16997ef88f0c19de5b8">More...</a><br /></td></tr>
-<tr class="separator:af9f81ad6b70fb16997ef88f0c19de5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51b9e3c7904b1c9422c547cc04d3142d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a51b9e3c7904b1c9422c547cc04d3142d">LBM_multi</a> (bool ibmFlag, bool repeatFlag)</td></tr>
+<tr class="memdesc:a51b9e3c7904b1c9422c547cc04d3142d"><td class="mdescLeft">&#160;</td><td class="mdescRight">LBM multi-grid kernel.  <a href="#a51b9e3c7904b1c9422c547cc04d3142d">More...</a><br /></td></tr>
+<tr class="separator:a51b9e3c7904b1c9422c547cc04d3142d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0feb0f9406f626e90c57045350161b22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a0feb0f9406f626e90c57045350161b22">LBM_collide</a> ()</td></tr>
 <tr class="memdesc:a0feb0f9406f626e90c57045350161b22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply collision operator.  <a href="#a0feb0f9406f626e90c57045350161b22">More...</a><br /></td></tr>
 <tr class="separator:a0feb0f9406f626e90c57045350161b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,9 +168,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a23d89d6111dd46653b2b1f79a5c7fbf1">LBM_boundary</a> (int bc_type_flag)</td></tr>
 <tr class="memdesc:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply boundary conditions on lattice.  <a href="#a23d89d6111dd46653b2b1f79a5c7fbf1">More...</a><br /></td></tr>
 <tr class="separator:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a884b3fc103cf8035438ea8f144bff5bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a884b3fc103cf8035438ea8f144bff5bb">LBM_forcegrid</a> (bool reset_flag)</td></tr>
-<tr class="memdesc:a884b3fc103cf8035438ea8f144bff5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to compute or reset body forces.  <a href="#a884b3fc103cf8035438ea8f144bff5bb">More...</a><br /></td></tr>
-<tr class="separator:a884b3fc103cf8035438ea8f144bff5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38db857b219d13ca7b0d35ede87b1536"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a38db857b219d13ca7b0d35ede87b1536">LBM_forceGrid</a> ()</td></tr>
+<tr class="memdesc:a38db857b219d13ca7b0d35ede87b1536"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to compute body forces.  <a href="#a38db857b219d13ca7b0d35ede87b1536">More...</a><br /></td></tr>
+<tr class="separator:a38db857b219d13ca7b0d35ede87b1536"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5701631be6333e512c7fc8dd6ecabf85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5701631be6333e512c7fc8dd6ecabf85">LBM_resetForces</a> ()</td></tr>
+<tr class="memdesc:a5701631be6333e512c7fc8dd6ecabf85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to reset body forces.  <a href="#a5701631be6333e512c7fc8dd6ecabf85">More...</a><br /></td></tr>
+<tr class="separator:a5701631be6333e512c7fc8dd6ecabf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2dc94b1d2e3f14a1a086b8bfa078839b">bc_applyBounceBack</a> (int label, int i, int j, int k)</td></tr>
 <tr class="memdesc:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply half-way bounce-back.  <a href="#a2dc94b1d2e3f14a1a086b8bfa078839b">More...</a><br /></td></tr>
 <tr class="separator:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1030,28 +1033,21 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a884b3fc103cf8035438ea8f144bff5bb"></a>
+<a class="anchor" id="a38db857b219d13ca7b0d35ede87b1536"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void GridObj::LBM_forcegrid </td>
+          <td class="memname">void GridObj::LBM_forceGrid </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>reset_flag</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Method to compute or reset body forces. </p>
-<p>Takes Cartesian force vector and populates forces for each lattice direction. If reset_flag is true, then resets the force vectors to zero.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">reset_flag</td><td>flag to indicate whether force vectors should simply be reset. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Method to compute body forces. </p>
+<p>Takes Cartesian force vector and populates forces for each lattice direction. If reset_flag is true, then resets the force vectors to zero. </p>
 
 </div>
 </div>
@@ -1363,7 +1359,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af9f81ad6b70fb16997ef88f0c19de5b8"></a>
+<a class="anchor" id="a51b9e3c7904b1c9422c547cc04d3142d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1371,8 +1367,18 @@ Friends</h2></td></tr>
           <td class="memname">void GridObj::LBM_multi </td>
           <td>(</td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>IBM_flag</em></td><td>)</td>
+          <td class="paramname"><em>ibmFlag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>repeatFlag</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1381,10 +1387,28 @@ Friends</h2></td></tr>
 <p>The LBM kernel manages the calling of all IBM and LBM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-grids and manages the framework for grid-grid interaction.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">IBM_flag</td><td>flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using IBM. </td></tr>
+    <tr><td class="paramname">ibmFlag</td><td>flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using IBM. </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a5701631be6333e512c7fc8dd6ecabf85"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::LBM_resetForces </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Method to reset body forces. </p>
+<p>Resets both Cartesian and Lattice force vectors to zero. </p>
 
 </div>
 </div>

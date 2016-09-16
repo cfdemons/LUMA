@@ -68,7 +68,7 @@ public:
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace
 	static std::vector<double> linspace(double min, double max, int n);		// Function: linspace
-	static double vecnorm(double vec[]);									// Function: vecnorm + overloads
+	static double vecnorm(double vec[L_dims]);								// Function: vecnorm + overloads
 	static double vecnorm(double val1, double val2);
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double> vec);
@@ -76,7 +76,6 @@ public:
 		int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
 	static std::vector<int> getCoarseIndices(
 		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
-	static double indexToPosition(int index, double dx);	// Function: indexToPosition
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add

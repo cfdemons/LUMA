@@ -5,7 +5,7 @@ var searchData=
   ['sender_5flayer_5fpos',['sender_layer_pos',['../class_mpi_manager.html#a0cb9f8f024ec0a186374995fb203ea1e',1,'MpiManager']]],
   ['size',['size',['../struct_mpi_manager_1_1buffer__struct.html#aea0037fce808f601ae9c1e48926dbd0e',1,'MpiManager::buffer_struct']]],
   ['spacing',['spacing',['../class_body.html#a1d4ac2e6fdbc946d5eab0973fd78770b',1,'Body']]],
-  ['subgrid_5fcomm',['subGrid_comm',['../class_mpi_manager.html#a1c65695e5dd2cca3ccb76e83715226f8',1,'MpiManager']]],
+  ['subgrid_5fcomm',['subGrid_comm',['../class_mpi_manager.html#a32921c381b76fb8f27d3334ebd1756cd',1,'MpiManager']]],
   ['supp_5fi',['supp_i',['../class_marker.html#af2b0bab614609f2e9c5bebc1db3f8174',1,'Marker']]],
   ['supp_5fj',['supp_j',['../class_marker.html#a400ae7b896edf2abe0403dde435b0977',1,'Marker']]],
   ['supp_5fk',['supp_k',['../class_marker.html#ab06b6d2cfb7221579cf32538f0c79b82',1,'Marker']]],

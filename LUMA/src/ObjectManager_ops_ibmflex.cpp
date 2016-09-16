@@ -18,15 +18,15 @@
 #include "../inc/ObjectManager.h"
 #include "../inc/MpiManager.h"
 
-/*
-This whole file was originally lifted from the 2D IBLB code.
-It needs completely rewriting to generalise.
-*/
-
-
-// **************************************************************************************** //
-// Jacowire function for flexible cilia with one simply supported end and one free end
-void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Structural calculation of flexible cilia.
+///
+///			Models the structural behaviour of a thin wire using Euler-Bernoulli
+///			beam elements. Only implemented for one simply supported end and 
+///			one free end at present.
+///
+/// \param	ib	index of body to which calculation is to be applied.
+void ObjectManager::ibm_jacowire(int ib) {
 
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
@@ -59,15 +59,15 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 
 	// Reset tension vector
-	//std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0); // **
+	//std::fill(iBody[ib].tension.begin(), iBody[ib].tension.end(), 0.0);
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = L_ibb_filament_length / g.dx;
+	double length_lu = L_ibb_filament_length / iBody[ib]._Owner->dx;
 
 
 	// Marker spacing in normalised instrinsic coordinates
-	double ds_nondim = iBody[ib].spacing / (length_lu * g.dx);
+	double ds_nondim = iBody[ib].spacing / (length_lu * iBody[ib]._Owner->dx);
 
 	// Square of non-dimensional spacing
 	double ds_sqrd = pow(ds_nondim,2);
@@ -79,8 +79,7 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow( (1 / pow(2,g.level)) / (length_lu / L_u_ref) , 2);
-
+	double beta = ds_sqrd / pow((1 / pow(2, iBody[ib]._Owner->level)) / (length_lu / L_u_ref), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -91,8 +90,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	// Get initial positions of markers in filament-normalised coordinates [0,+/-1] for below
 	std::vector<double> x, y;
 	for (i = 0; i < n; i++) {
-		x.push_back( (iBody[ib].markers[i+1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * g.dx) );
-		y.push_back( (iBody[ib].markers[i+1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * g.dy) );
+		x.push_back((iBody[ib].markers[i + 1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * iBody[ib]._Owner->dx));
+		y.push_back((iBody[ib].markers[i + 1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * iBody[ib]._Owner->dy));
 	}
 
 	// Create body force vectors
@@ -101,16 +100,20 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
 	double Fref = iBody[ib].delta_rho * pow(L_u_ref, 2);
 	for (i = 0; i < Fx.size(); i++) {
-		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
-		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing/g.dx) ) );
+		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dx)));
+		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dx)));
 	}
 
 	// Normalised position (x,y,z)/L at t+1 for each marker are computed using extrapolation of the current (t) position
 	// and previous (t-1) position_old at neighbour node of each marker
 	std::vector<double> xstar, ystar;
 	for (i = 0; i < n; i++) {
-		xstar.push_back( ((2 * iBody[ib].markers[i+1].position[0] - iBody[ib].markers[i+1].position_old[0]) - iBody[ib].markers[0].position[0]) / (g.dx * length_lu) );
-		ystar.push_back( ((2 * iBody[ib].markers[i+1].position[1] - iBody[ib].markers[i+1].position_old[1]) - iBody[ib].markers[0].position[1]) / (g.dy * length_lu)  );
+		xstar.push_back( 
+			((2 * iBody[ib].markers[i+1].position[0] - iBody[ib].markers[i+1].position_old[0]) - iBody[ib].markers[0].position[0]) 
+			/ (iBody[ib]._Owner->dx * length_lu));
+		ystar.push_back( 
+			((2 * iBody[ib].markers[i+1].position[1] - iBody[ib].markers[i+1].position_old[1]) - iBody[ib].markers[0].position[1]) 
+			/ (iBody[ib]._Owner->dy * length_lu));
 	}
 
 
@@ -352,8 +355,8 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
         // Current physical position comes from the newly computed positions
 		if (i != 0) { // New position vectors exclude the simply supported end and start from next node in so i-1
 			// Convert filament-normalised coordinates back to lu then to physical spacing then add offset of simply supported end
-			iBody[ib].markers[i].position[0] = (x[i-1] * length_lu * g.dx) + iBody[ib].markers[0].position[0];
-			iBody[ib].markers[i].position[1] = (y[i-1] * length_lu * g.dy) + iBody[ib].markers[0].position[1];
+			iBody[ib].markers[i].position[0] = (x[i - 1] * length_lu * iBody[ib]._Owner->dx) + iBody[ib].markers[0].position[0];
+			iBody[ib].markers[i].position[1] = (y[i - 1] * length_lu * iBody[ib]._Owner->dy) + iBody[ib].markers[0].position[1];
 		}
     }
 
@@ -383,8 +386,12 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
 
 	// Desired velocity (in lattice units) on the makers is computed using a first order estimate based on position change
     for (i = 0; i < iBody[ib].markers.size(); i++) {
-        iBody[ib].markers[i].desired_vel[0] = ( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / g.dx) / (1 / pow(2,g.level));
-        iBody[ib].markers[i].desired_vel[1] = ( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / g.dy) / (1 / pow(2,g.level));
+		iBody[ib].markers[i].desired_vel[0] = 
+			( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / iBody[ib]._Owner->dx ) 
+			/ (1 / pow(2,iBody[ib]._Owner->level));
+		iBody[ib].markers[i].desired_vel[1] = 
+			( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / iBody[ib]._Owner->dy ) 
+			/ (1 / pow(2,iBody[ib]._Owner->level));
     }
 
 #ifdef L_IBM_DEBUG
@@ -411,32 +418,34 @@ void ObjectManager::ibm_jacowire(int ib, GridObj& g) {
     delete [] res;
 }
 
-
-// **************************************************************************************** //
-/*
-* Given an n by n band diagonal matrix A with
-* m1 subdiagonal rows and m2 superdiagonal rows,
-* compactly stored in the array A[1..n][1..m1+m2+1] , this routine
-* constructs an LU decomposition of a rowwise permutation of A. The upper
-* triangular matrix replaces A, while the lower triangular matrix is
-* returned in AL[1..n][1..m1]. INDX[1..n] is an output vector
-* which records the row permutation effected by the partial
-* pivoting; D is output as +/-1 depending on whether the number
-* of row interchanges was even or odd, respectively.
-* This routine is used in combination with ibm_banbks() to solve
-* band-diagonal sets of equations. Once the matrix A has been
-* decomposed, any number of right-hand sides can be solved in
-* turn by repeated calls to ibm_banbks()
-* A		= array of subdiagonal and superdiagonals rows
-* n		= size of the square matrix \f$ A \f$
-* m1	= number of subdiagonal rows
-* m2	= number of superdiagonal rows
-* AL	= lower triangular matrix
-* INDX	= row permutation vector
-* D		= odd or even number of row interchages
-*/
-#define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
-#define TINY 1.0e-20
+// *****************************************************************************
+#define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}	///< Pointer swap definition
+#define TINY 1.0e-20							///< Definition of small number (could use numerics since this is C++ but nevermind)
+// *****************************************************************************
+/// \brief	LU decomposition of band diagonal matrix.
+///
+///			Given an n by n band diagonal matrix A with
+///			m1 subdiagonal rows and m2 superdiagonal rows,
+///			compactly stored in the array A[1..n][1..m1+m2+1] , this routine
+///			constructs an LU decomposition of a rowwise permutation of A. The upper
+///			triangular matrix replaces A, while the lower triangular matrix is
+///			returned in AL[1..n][1..m1]. INDX[1..n] is an output vector
+///			which records the row permutation effected by the partial
+///			pivoting; D is output as +/-1 depending on whether the number
+///			of row interchanges was even or odd, respectively.
+///			This routine is used in combination with ibm_banbks() to solve
+///			band-diagonal sets of equations. Once the matrix A has been
+///			decomposed, any number of right-hand sides can be solved in
+///			turn by repeated calls to ibm_banbks().
+///			(C) Copr. 1986-92 Numerical Recipes Software ?421.1-9.
+///
+/// \param	a		array of subdiagonal and superdiagonals rows
+/// \param	n		size of the square matrix A
+/// \param	m1		number of subdiagonal rows
+/// \param	m2		number of superdiagonal rows
+/// \param	al		lower triangular matrix
+/// \param	indx	row permutation vector
+/// \param	d		odd or even number of row interchages
 void ObjectManager::ibm_bandec(double **a, long n, int m1, int m2, double **al,
 	unsigned long indx[], double *d)
 {
@@ -485,25 +494,26 @@ void ObjectManager::ibm_bandec(double **a, long n, int m1, int m2, double **al,
 }
 #undef SWAP
 #undef TINY
-/* (C) Copr. 1986-92 Numerical Recipes Software ?421.1-9. */
 
-
-// **************************************************************************************** //
-/*
-* Given the arrays A, AL, and INDX as returned from ibm_bandec(),
-* and given a right-hand side vector B[1..n], solves the band diagonal
-* linear equations AX = B. The solution vector X overwrites
-* B. The other input arrays are not modified, and can be left
-* in place for successive calls with different right-hand sides.
-* A		= array of subdiagonal and superdiagonals rows
-* n		= size of the square matrix A
-* m1	= number of subdiagonal rows
-* m2	= number of superdiagonal rows
-* AL	= lower triangular matrix
-* INDX	= row permutation vector
-* B		= right hand side vector
-*/
-#define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
+// *****************************************************************************
+#define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}	///< Pointer swap definition
+// *****************************************************************************
+/// \brief	Solution of a banded diagonal linear system.
+///
+///			Given the arrays A, AL, and INDX as returned from ibm_bandec(),
+///			and given a right-hand side vector B[1..n], solves the band diagonal
+///			linear equations AX = B. The solution vector X overwrites
+///			B. The other input arrays are not modified, and can be left
+///			in place for successive calls with different right-hand sides.
+///			(C) Copr. 1986-92 Numerical Recipes Software ?421.1-9.
+///
+/// \param	a		array of subdiagonal and superdiagonals rows
+///	\param	n		size of the square matrix A
+/// \param	m1		number of subdiagonal rows
+/// \param	m2		number of superdiagonal rows
+/// \param	al		lower triangular matrix
+/// \param	indx	row permutation vector
+/// \param	b		right hand side vector
 void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 	unsigned long indx[], double b[])
 {
@@ -533,17 +543,21 @@ void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 
 }
 #undef SWAP
-/* (C) Copr. 1986-92 Numerical Recipes Software ?421.1-9. */
 
-// **************************************************************************************** //
-// Routine to update the position of deformable bodies
-void ObjectManager::ibm_position_update(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Update the position of a deformable iBody.
+///
+///			Wrapper for applying external forcing or structural calculations to
+///			iBodies marked as deformable. Updates support on completion.
+///
+/// \param	ib	index of body to which calculation is to be applied.
+void ObjectManager::ibm_position_update(int ib) {
 
 	// If a flexible body then launch structural solver to find new positions
 	if (iBody[ib].flex_rigid) {
 
 		// Do jacowire calculation
-		ibm_jacowire(ib, g);
+		ibm_jacowire(ib);
 
 	} else {	// Body is deformable but not flexible so positional update comes from
 				// external forcing
@@ -566,17 +580,22 @@ void ObjectManager::ibm_position_update(int ib, GridObj& g) {
 		iBody[ib].markers[m].deltaval.clear();
 
 		// Recompute support
-		ibm_findsupport(ib, m, g);
+		ibm_findsupport(ib, m);
 	}
 
 
 }
-// **************************************************************************************** //
 
-// Overloaded function to update position of body in a group using the position of the flexible
-// body in the group. Must be called after all previous positional update routines have been called.
-// group_update flag is only there to ensure the overload is defined.
-void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
+// *****************************************************************************
+/// \brief	Update the position of a group of deformable iBodies.
+///
+///			Updates the position of a group of non-flexible moving (deformable) 
+///			bodies by using the first flexible body in the group as the driver.
+///			Must be called after all previous positional update routines have 
+///			been called.
+///
+/// \param	group	group ID to be updated.
+void ObjectManager::ibm_position_update_grp(int group) {
 
 	// Find flexible body in group and store index
 	int ib_flex = 0;
@@ -619,11 +638,11 @@ void ObjectManager::ibm_position_update_grp(int group, GridObj& g) {
 				iBody[ib].markers[m].deltaval.clear();
 
 				// Recompute support
-				ibm_findsupport(ib, m, g);
+				ibm_findsupport(ib, m);
 			}
 		}
 	}
 
 
 }
-// **************************************************************************************** //
+// *****************************************************************************

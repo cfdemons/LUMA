@@ -1,13 +1,18 @@
 version		=	1.2.0-alpha
 
 General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.
-				Also IS_NAN() function switched to macro definition.
+				IS_NAN() function switched to macro definition.
 				LBM_multi routine has been compacted to improve readability.
 				Restart functionality has been improved allowing IBM on sub-grids.
 				Expensive support node calculation has been removed.
 				Gravity force scaling across sub-grids has been fixed.
 				Wall thickness can be arbitrarily set for front, back, top and bottom walls.
 				Changed the terminal output to be every L_out_every time steps.
+				Removed redundant indexToPositon() method.
+				Resetting the force vectors is now a separate routine to get rid of the flag for forceGrid().
+				LBM_forcegrid method renamed to LBM_forceGrid to match convention.
+				IBM_flag renamed to ibmFlag to match convention.
+				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
 
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
 Issue #81	: 	Added grid sizes as GridObj property.

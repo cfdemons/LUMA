@@ -78,37 +78,31 @@ private:
 
 public:
 	// Singleton design
-	static ObjectManager *getInstance();		///< Get instance method
-	static void destroyInstance();				///< Destroy instance method
+	static ObjectManager *getInstance();			///< Get instance method
+	static void destroyInstance();					///< Destroy instance method
 	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
-	void ibm_apply(GridObj& g);					// Apply interpolate, compute and spread operations for all bodies and with GridObj g
-	void ibm_build_body(int body_type);			// Build a new pre-fab IBM body
-	void ibm_build_body(PCpts* _PCpts, GridObj *owner);	// Overloaded build-body to build from point cloud
-	void ibm_initialise(GridObj& g);			// Initialise a built immersed body with support on the supplied grid
-	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation)
-	void ibm_interpol(int ib, GridObj& g);			// Interpolation of velocity field on GridObj g onto markers of ib-th body
-	void ibm_spread(int ib, GridObj& g);			// Spreading of restoring force from ib-th body to GridObj g
-	void ibm_findsupport(int ib, int m, GridObj& g);		// Populates support information for the m-th marker of ib-th body with 
-															// support nodes on GridObj g.
-	void ibm_computeforce(int ib, GridObj& g);		// Compute restorative force at each marker in ib-th body using 
-													// charcteristic time scale of GridObj g.
-	double ibm_findepsilon(int ib, GridObj& g);		// Method to find epsilon weighting parameter for ib-th body given that the 
-													// support points are on GridObj g.
-	void ibm_move_bodies(GridObj& g);		// Update all IBBody positions and support based on GridObj g
+	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_build_body(int body_type);		// Build a new pre-fab IBM body
+	void ibm_build_body(PCpts* _PCpts, GridObj *owner);		// Overloaded build-body to build from point cloud
+	void ibm_initialise();					// Initialise a built immersed body with support.
+	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
+	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
+	void ibm_spread(int ib);				// Spreading of restoring force from ib-th body.
+	void ibm_findsupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
+	void ibm_computeforce(int ib);			// Compute restorative force at each marker in ib-th body.
+	double ibm_findepsilon(int ib);			// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_move_bodies();					// Update all IBBody positions and support.
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
 		std::vector<double>& bVector, std::vector<double>& epsilon,
 						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
 																	// linear system required by finding epsilon
 
 	// Flexible body methods
-	void ibm_jacowire(int ib, GridObj& g);			// Computes the tension and position of a 2D inextensible, flexible iBody 
-													// filament and normailises lengths based on spacing on GridObj g.
-	void ibm_position_update(int ib, GridObj& g);	// Updates the position of deformable body markers and searches for support 
-													// on GridObj g.
-	void ibm_position_update_grp(int group, GridObj& g );	// Updates the positions of deformable bodies in a group based on the 
-															// flexible group member position and searches for support on GridObj g.
+	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
+	void ibm_position_update(int ib);			// Updates the position of deformable body markers.
+	void ibm_position_update_grp(int group);	// Updates the positions of deformable bodies in a group.
 	// Methods to solve the Jacobian system associated with Jacowire
 	void ibm_banbks(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double b[]);
@@ -121,7 +115,7 @@ public:
 	void bfl_build_body(PCpts* _PCpts);		// Overload to build from point cloud data
 
 	// Force calculation
-	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB
+	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
 	// IO methods //
 	void io_vtk_IBwriter(double tval);				// VTK body writer

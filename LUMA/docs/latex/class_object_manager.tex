@@ -12,40 +12,40 @@ Object Manager class.
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{class_object_manager_a83174cbaabd95639f8b4f652ad398183}{ibm\+\_\+apply} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
+void \hyperlink{class_object_manager_a2ec2df889c396d94d2fe1807c10847bb}{ibm\+\_\+apply} ()
+\begin{DoxyCompactList}\small\item\em Perform I\+BM procedure. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{ibm\+\_\+build\+\_\+body} (int body\+\_\+type)
 \begin{DoxyCompactList}\small\item\em Builds a prefab immersed boundary body. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{ibm\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$owner)
 \begin{DoxyCompactList}\small\item\em Wrapper for building a body from a point cloud. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}{ibm\+\_\+initialise} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
+void \hyperlink{class_object_manager_aa4e5e286a6fe1d9fcaf393ffed329250}{ibm\+\_\+initialise} ()
+\begin{DoxyCompactList}\small\item\em Initialise the array of i\+Bodies. \end{DoxyCompactList}\item 
 double \hyperlink{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{ibm\+\_\+deltakernel} (double rad, double dilation)
-\item 
-void \hyperlink{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}{ibm\+\_\+interpol} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}{ibm\+\_\+spread} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}{ibm\+\_\+findsupport} (int ib, int m, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}{ibm\+\_\+computeforce} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-double \hyperlink{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}{ibm\+\_\+findepsilon} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}{ibm\+\_\+move\+\_\+bodies} (\hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
+\begin{DoxyCompactList}\small\item\em Method to evaluate delta kernel at supplied location. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_aff31915ad0effdcc8dc18f602ddd1c20}{ibm\+\_\+interpol} (int ib)
+\begin{DoxyCompactList}\small\item\em Interpolate velocity field onto markers. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a8096f9ec97cf7ce2fc45ebfcbdf3617e}{ibm\+\_\+spread} (int ib)
+\begin{DoxyCompactList}\small\item\em Spread restorative force back onto marker support. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}{ibm\+\_\+findsupport} (int ib, int m)
+\begin{DoxyCompactList}\small\item\em Finds support points for i\+Body. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}{ibm\+\_\+computeforce} (int ib)
+\begin{DoxyCompactList}\small\item\em Compute restorative force at each marker in a body. \end{DoxyCompactList}\item 
+double \hyperlink{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}{ibm\+\_\+findepsilon} (int ib)
+\begin{DoxyCompactList}\small\item\em Compute epsilon for a given i\+Body. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}{ibm\+\_\+move\+\_\+bodies} ()
+\begin{DoxyCompactList}\small\item\em Moves i\+Bodies after applying I\+BM. \end{DoxyCompactList}\item 
 double \hyperlink{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{ibm\+\_\+bicgstab} (std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&Amatrix, std\+::vector$<$ double $>$ \&b\+Vector, std\+::vector$<$ double $>$ \&epsilon, double tolerance, int maxiterations)
-\item 
-void \hyperlink{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}{ibm\+\_\+jacowire} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_a07a4a328974705e440dd303c5c2e0472}{ibm\+\_\+position\+\_\+update} (int ib, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
-void \hyperlink{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}{ibm\+\_\+position\+\_\+update\+\_\+grp} (int group, \hyperlink{class_grid_obj}{Grid\+Obj} \&g)
-\item 
+\begin{DoxyCompactList}\small\item\em Biconjugate gradient method. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a956c12cba071c6b8844371c03433f82c}{ibm\+\_\+jacowire} (int ib)
+\begin{DoxyCompactList}\small\item\em Structural calculation of flexible cilia. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a53eedab20e69a10ae861197b614751db}{ibm\+\_\+position\+\_\+update} (int ib)
+\begin{DoxyCompactList}\small\item\em Update the position of a deformable i\+Body. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}{ibm\+\_\+position\+\_\+update\+\_\+grp} (int group)
+\begin{DoxyCompactList}\small\item\em Update the position of a group of deformable i\+Bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double b\mbox{[}$\,$\mbox{]})
-\item 
+\begin{DoxyCompactList}\small\item\em Solution of a banded diagonal linear system. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double $\ast$d)
-\item 
+\begin{DoxyCompactList}\small\item\em LU decomposition of band diagonal matrix. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{bfl\+\_\+build\+\_\+body} (int body\+\_\+type)
 \begin{DoxyCompactList}\small\item\em Prefab body building routine. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{bfl\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
@@ -189,11 +189,15 @@ Instance creator with grid hierarchy assignment.
 \end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+apply@{ibm\+\_\+apply}}
 \index{ibm\+\_\+apply@{ibm\+\_\+apply}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+apply(\+Grid\+Obj \&g)}{ibm_apply(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+apply (
+\subsubsection[{\texorpdfstring{ibm\+\_\+apply()}{ibm_apply()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+apply (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} \&}]{g}
+{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a83174cbaabd95639f8b4f652ad398183}{}\label{class_object_manager_a83174cbaabd95639f8b4f652ad398183}
+)}\hypertarget{class_object_manager_a2ec2df889c396d94d2fe1807c10847bb}{}\label{class_object_manager_a2ec2df889c396d94d2fe1807c10847bb}
+
+
+Perform I\+BM procedure. 
+
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+banbks@{ibm\+\_\+banbks}}
 \index{ibm\+\_\+banbks@{ibm\+\_\+banbks}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+banbks(double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx[], double b[])}{ibm_banbks(double **a, long n, int m1, int m2, double **al, unsigned long indx[], double b[])}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+banbks (
@@ -207,6 +211,29 @@ Instance creator with grid hierarchy assignment.
 \item[{double}]{b\mbox{[}$\,$\mbox{]}}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{}\label{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}
+
+
+Solution of a banded diagonal linear system. 
+
+Given the arrays A, AL, and I\+N\+DX as returned from \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec()}, and given a right-\/hand side vector B\mbox{[}1..n\mbox{]}, solves the band diagonal linear equations AX = B. The solution vector X overwrites B. The other input arrays are not modified, and can be left in place for successive calls with different right-\/hand sides. (C) Copr. 1986-\/92 Numerical Recipes Software ?421.\+1-\/9.
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & array of subdiagonal and superdiagonals rows \\
+\hline
+{\em n} & size of the square matrix A \\
+\hline
+{\em m1} & number of subdiagonal rows \\
+\hline
+{\em m2} & number of superdiagonal rows \\
+\hline
+{\em al} & lower triangular matrix \\
+\hline
+{\em indx} & row permutation vector \\
+\hline
+{\em b} & right hand side vector \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+bandec@{ibm\+\_\+bandec}}
 \index{ibm\+\_\+bandec@{ibm\+\_\+bandec}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+bandec(double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx[], double $\ast$d)}{ibm_bandec(double **a, long n, int m1, int m2, double **al, unsigned long indx[], double *d)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+bandec (
@@ -220,6 +247,29 @@ Instance creator with grid hierarchy assignment.
 \item[{double $\ast$}]{d}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{}\label{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}
+
+
+LU decomposition of band diagonal matrix. 
+
+Given an n by n band diagonal matrix A with m1 subdiagonal rows and m2 superdiagonal rows, compactly stored in the array A\mbox{[}1..n\mbox{]}\mbox{[}1..m1+m2+1\mbox{]} , this routine constructs an LU decomposition of a rowwise permutation of A. The upper triangular matrix replaces A, while the lower triangular matrix is returned in AL\mbox{[}1..n\mbox{]}\mbox{[}1..m1\mbox{]}. I\+N\+DX\mbox{[}1..n\mbox{]} is an output vector which records the row permutation effected by the partial pivoting; D is output as +/-\/1 depending on whether the number of row interchanges was even or odd, respectively. This routine is used in combination with \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks()} to solve band-\/diagonal sets of equations. Once the matrix A has been decomposed, any number of right-\/hand sides can be solved in turn by repeated calls to \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks()}. (C) Copr. 1986-\/92 Numerical Recipes Software ?421.\+1-\/9.
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & array of subdiagonal and superdiagonals rows \\
+\hline
+{\em n} & size of the square matrix A \\
+\hline
+{\em m1} & number of subdiagonal rows \\
+\hline
+{\em m2} & number of superdiagonal rows \\
+\hline
+{\em al} & lower triangular matrix \\
+\hline
+{\em indx} & row permutation vector \\
+\hline
+{\em d} & odd or even number of row interchages \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+bicgstab@{ibm\+\_\+bicgstab}}
 \index{ibm\+\_\+bicgstab@{ibm\+\_\+bicgstab}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+bicgstab(std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&\+Amatrix, std\+::vector$<$ double $>$ \&b\+Vector, std\+::vector$<$ double $>$ \&epsilon, double tolerance, int maxiterations)}{ibm_bicgstab(std::vector< std::vector< double > > &Amatrix, std::vector< double > &bVector, std::vector< double > &epsilon, double tolerance, int maxiterations)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+bicgstab (
@@ -231,6 +281,28 @@ Instance creator with grid hierarchy assignment.
 \item[{int}]{maxiterations}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{}\label{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}
+
+
+Biconjugate gradient method. 
+
+Biconjugate gradient stabilised method of solving a linear system Ax = b. Solution is performed iteratively.
+
+
+\begin{DoxyParams}{Parameters}
+{\em Amatrix} & the A matrix in the linear system. \\
+\hline
+{\em b\+Vector} & the b vector in the linear system. \\
+\hline
+{\em epsilon} & epsilon paramters for each marker. \\
+\hline
+{\em tolerance} & tolerance of solution. \\
+\hline
+{\em maxiterations} & maximum number of iterations. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the minimum residual achieved by the solver. 
+\end{DoxyReturn}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
 \index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(int body\+\_\+type)}{ibm_build_body(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
@@ -244,7 +316,7 @@ Builds a prefab immersed boundary body.
 
 
 \begin{DoxyParams}{Parameters}
-{\em body\+\_\+type} & type of boday to be built. \\
+{\em body\+\_\+type} & type of body to be built. \\
 \hline
 \end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
@@ -268,91 +340,189 @@ Wrapper for building a body from a point cloud.
 \end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+computeforce@{ibm\+\_\+computeforce}}
 \index{ibm\+\_\+computeforce@{ibm\+\_\+computeforce}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+computeforce(int ib, Grid\+Obj \&g)}{ibm_computeforce(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+computeforce (
+\subsubsection[{\texorpdfstring{ibm\+\_\+computeforce(int ib)}{ibm_computeforce(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+computeforce (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}{}\label{class_object_manager_ab1e4ac7c9e115b8e31e7a89ec32cbee0}
+)}\hypertarget{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}{}\label{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}
+
+
+Compute restorative force at each marker in a body. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & i\+Body being operated on. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}}
 \index{ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+deltakernel(double rad, double dilation)}{ibm_deltakernel(double rad, double dilation)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+deltakernel (
 \begin{DoxyParamCaption}
-\item[{double}]{rad, }
+\item[{double}]{radius, }
 \item[{double}]{dilation}
 \end{DoxyParamCaption}
 )}\hypertarget{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{}\label{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}
+
+
+Method to evaluate delta kernel at supplied location. 
+
+Radius and dilation must be in the same units.
+
+
+\begin{DoxyParams}{Parameters}
+{\em radius} & location at which kernel should be evaluated. \\
+\hline
+{\em dilation} & width of kernel function. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of kernel function. 
+\end{DoxyReturn}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}}
 \index{ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+findepsilon(int ib, Grid\+Obj \&g)}{ibm_findepsilon(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+findepsilon (
+\subsubsection[{\texorpdfstring{ibm\+\_\+findepsilon(int ib)}{ibm_findepsilon(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+findepsilon (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}{}\label{class_object_manager_ab0ef3e60b3ea723d6989c6900107d5ef}
+)}\hypertarget{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}{}\label{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}
+
+
+Compute epsilon for a given i\+Body. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & i\+Body being operated on. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findsupport@{ibm\+\_\+findsupport}}
 \index{ibm\+\_\+findsupport@{ibm\+\_\+findsupport}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+findsupport(int ib, int m, Grid\+Obj \&g)}{ibm_findsupport(int ib, int m, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+findsupport (
+\subsubsection[{\texorpdfstring{ibm\+\_\+findsupport(int ib, int m)}{ibm_findsupport(int ib, int m)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+findsupport (
 \begin{DoxyParamCaption}
 \item[{int}]{ib, }
-\item[{int}]{m, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{m}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}{}\label{class_object_manager_a51772c72562eddaf91b1eabdf74eb4c9}
+)}\hypertarget{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}{}\label{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}
+
+
+Finds support points for i\+Body. 
+
+Support for given marker in given body is sought on the owning grid.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & body under consideration. \\
+\hline
+{\em m} & marker whose support is to be found. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+initialise@{ibm\+\_\+initialise}}
 \index{ibm\+\_\+initialise@{ibm\+\_\+initialise}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+initialise(\+Grid\+Obj \&g)}{ibm_initialise(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+initialise (
+\subsubsection[{\texorpdfstring{ibm\+\_\+initialise()}{ibm_initialise()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+initialise (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} \&}]{g}
+{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}{}\label{class_object_manager_abc6dd6c73900724e7c0025d66e803c95}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+interpol@{ibm\+\_\+interpol}}
+)}\hypertarget{class_object_manager_aa4e5e286a6fe1d9fcaf393ffed329250}{}\label{class_object_manager_aa4e5e286a6fe1d9fcaf393ffed329250}
+
+
+Initialise the array of i\+Bodies. 
+
+Computes support and epsilon values. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+interpol@{ibm\+\_\+interpol}}
 \index{ibm\+\_\+interpol@{ibm\+\_\+interpol}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+interpol(int ib, Grid\+Obj \&g)}{ibm_interpol(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+interpol (
+\subsubsection[{\texorpdfstring{ibm\+\_\+interpol(int ib)}{ibm_interpol(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+interpol (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}{}\label{class_object_manager_a4df9f08d3a47519884afa17f1ecaa1da}
+)}\hypertarget{class_object_manager_aff31915ad0effdcc8dc18f602ddd1c20}{}\label{class_object_manager_aff31915ad0effdcc8dc18f602ddd1c20}
+
+
+Interpolate velocity field onto markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & i\+Body being operated on. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+jacowire@{ibm\+\_\+jacowire}}
 \index{ibm\+\_\+jacowire@{ibm\+\_\+jacowire}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+jacowire(int ib, Grid\+Obj \&g)}{ibm_jacowire(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+jacowire (
+\subsubsection[{\texorpdfstring{ibm\+\_\+jacowire(int ib)}{ibm_jacowire(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+jacowire (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}{}\label{class_object_manager_ae1d5e39f3a837adfc88c4c7ed722c895}
+)}\hypertarget{class_object_manager_a956c12cba071c6b8844371c03433f82c}{}\label{class_object_manager_a956c12cba071c6b8844371c03433f82c}
+
+
+Structural calculation of flexible cilia. 
+
+Models the structural behaviour of a thin wire using Euler-\/\+Bernoulli beam elements. Only implemented for one simply supported end and one free end at present.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & index of body to which calculation is to be applied. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}}
 \index{ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+move\+\_\+bodies(\+Grid\+Obj \&g)}{ibm_move_bodies(GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+move\+\_\+bodies (
+\subsubsection[{\texorpdfstring{ibm\+\_\+move\+\_\+bodies()}{ibm_move_bodies()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+move\+\_\+bodies (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} \&}]{g}
+{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}{}\label{class_object_manager_aef4cfcea354469472c0b25bf74757f2b}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}}
+)}\hypertarget{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}{}\label{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}
+
+
+Moves i\+Bodies after applying I\+BM. 
+
+Wrapper for relocating markers of an i\+Body be calling appropriate positional update routine. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}}
 \index{ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update(int ib, Grid\+Obj \&g)}{ibm_position_update(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update (
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update(int ib)}{ibm_position_update(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a07a4a328974705e440dd303c5c2e0472}{}\label{class_object_manager_a07a4a328974705e440dd303c5c2e0472}
+)}\hypertarget{class_object_manager_a53eedab20e69a10ae861197b614751db}{}\label{class_object_manager_a53eedab20e69a10ae861197b614751db}
+
+
+Update the position of a deformable i\+Body. 
+
+Wrapper for applying external forcing or structural calculations to i\+Bodies marked as deformable. Updates support on completion.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & index of body to which calculation is to be applied. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}}
 \index{ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update\+\_\+grp(int group, Grid\+Obj \&g)}{ibm_position_update_grp(int group, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update\+\_\+grp (
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update\+\_\+grp(int group)}{ibm_position_update_grp(int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update\+\_\+grp (
 \begin{DoxyParamCaption}
-\item[{int}]{group, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{group}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}{}\label{class_object_manager_ae9a0efc0b1d088f90b3b16833f948f12}
+)}\hypertarget{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}{}\label{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}
+
+
+Update the position of a group of deformable i\+Bodies. 
+
+Updates the position of a group of non-\/flexible moving (deformable) bodies by using the first flexible body in the group as the driver. Must be called after all previous positional update routines have been called.
+
+
+\begin{DoxyParams}{Parameters}
+{\em group} & group ID to be updated. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+spread@{ibm\+\_\+spread}}
 \index{ibm\+\_\+spread@{ibm\+\_\+spread}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+spread(int ib, Grid\+Obj \&g)}{ibm_spread(int ib, GridObj &g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+spread (
+\subsubsection[{\texorpdfstring{ibm\+\_\+spread(int ib)}{ibm_spread(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+spread (
 \begin{DoxyParamCaption}
-\item[{int}]{ib, }
-\item[{{\bf Grid\+Obj} \&}]{g}
+\item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}{}\label{class_object_manager_a91d38ea7d0fbc6fd93e8c34559492b48}
+)}\hypertarget{class_object_manager_a8096f9ec97cf7ce2fc45ebfcbdf3617e}{}\label{class_object_manager_a8096f9ec97cf7ce2fc45ebfcbdf3617e}
+
+
+Spread restorative force back onto marker support. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & i\+Body being operated on. \\
+\hline
+\end{DoxyParams}
 \index{Object\+Manager@{Object\+Manager}!io\+\_\+read\+In\+Cloud@{io\+\_\+read\+In\+Cloud}}
 \index{io\+\_\+read\+In\+Cloud@{io\+\_\+read\+In\+Cloud}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{io\+\_\+read\+In\+Cloud(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, e\+Object\+Type objtype)}{io_readInCloud(PCpts *_PCpts, eObjectType objtype)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+read\+In\+Cloud (

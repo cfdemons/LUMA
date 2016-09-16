@@ -172,7 +172,7 @@ public :
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	void LBM_multi(bool IBM_flag, bool repeatFlag);		// Launch the multi-grid kernel
+	void LBM_multi(bool ibmFlag, bool repeatFlag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
@@ -180,7 +180,8 @@ public :
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
 	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
-	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
+	void LBM_forceGrid();						// Apply a force to the grid points
+	void LBM_resetForces();						// Resets the force vectors on the grid
 
 	// Boundary operations
 	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC

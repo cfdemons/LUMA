@@ -464,9 +464,8 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0) {
+		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
-		}
 
 
 		///////////////////////

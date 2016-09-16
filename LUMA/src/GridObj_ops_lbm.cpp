@@ -34,9 +34,9 @@ using namespace std;
 ///			of the method on sub-grids and manages the framework for grid-grid 
 ///			interaction.
 ///
-/// \param IBM_flag	flag to indicate whether this kernel is a predictor (true) 
-///					or corrector (false) step when using IBM.
-void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
+/// \param	ibmFlag		flag to indicate whether this kernel is a predictor (true) 
+///						or corrector (false) step when using IBM.
+void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 
 	// Start the clock to time the kernel
 	clock_t secs, t_start = clock();
@@ -66,8 +66,8 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 		// Copy distributions prior to IBM predictive step
 #ifdef L_IBM_ON
 
-		// If IBM on and predictive loop flag true then store initial data and reset forces
-		if (level == L_IB_Lev && region_number == L_IB_Reg && IBM_flag == true) { // Only store f, u and rho values on grid where IB body lives
+		// If IBM on and predictive loop flag true then store initial data
+		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) { // Only store f, u and rho values on grid where IB body lives
 
 			*GridUtils::logfile << "Prediction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
 
@@ -78,9 +78,10 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 		}
 #endif
 
-		// Reset lattice and Cartesian force vectors at each site (don't do this if using IBM and on the corrector step on the sub-grid where IBM exists)
-		if (IBM_flag == true || repeatFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
-			LBM_forcegrid(true);
+		// Reset lattice and Cartesian force vectors at each site if on repeat.
+		// Don't do this on the sub-grid where IBM exists.
+		if (ibmFlag == true || repeatFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
+			LBM_resetForces();
 
 		// Apply boundary conditions (regularised must be applied before collision)
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
@@ -92,7 +93,7 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 #endif
 
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
-		LBM_forcegrid(false);
+		LBM_forceGrid();
 
 		// Collision on Lr
 		LBM_collide();
@@ -114,7 +115,7 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 				LBM_explode(reg);
 
 				// Call same routine for lower level
-				subGrid[reg].LBM_multi(IBM_flag, true);
+				subGrid[reg].LBM_multi(ibmFlag, true);
 			}
 		}
 
@@ -190,10 +191,10 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 
 		// Execute IBM procedure using newly computed predicted data
 #ifdef L_IBM_ON
-		if (level == L_IB_Lev && region_number == L_IB_Reg && IBM_flag == true) {
+		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) {
 
 			// Reset force vectors on grid in preparation for spreading step
-			LBM_forcegrid(true);
+			LBM_resetForces();
 
 			// Calculate and apply IBM forcing to fluid
 			ObjectManager::getInstance()->ibm_apply(*this);
@@ -219,7 +220,7 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 		// Increment counters
 		t++; count++;
 
-		// Check if on L0 or corrector step and if so drop out as only need to loop once
+		// L0 or corrector always has repeat flag to false so drop out as only one loop needed.
 		if (repeatFlag == false) {
 			break;
 		}
@@ -257,14 +258,11 @@ void GridObj::LBM_multi ( bool IBM_flag, bool repeatFlag ) {
 }
 
 // *****************************************************************************
-/// \brief	Method to compute or reset body forces.
+/// \brief	Method to compute body forces.
 ///
 ///			Takes Cartesian force vector and populates forces for each lattice 
 ///			direction. If reset_flag is true, then resets the force vectors to zero.
-///
-/// \param reset_flag	flag to indicate whether force vectors should simply be
-///						reset. 
-void GridObj::LBM_forcegrid(bool reset_flag) {
+void GridObj::LBM_forceGrid() {
 
 	/* This routine computes the forces applied along each direction on the lattice
 	from Guo's 2002 scheme. The basic LBM must be modified in two ways: 1) the forces
@@ -295,83 +293,85 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 	*/
 
-	if (reset_flag) {
+	// Declarations
+	double lambda_v;
 
-		// Reset lattice force vectors on every grid site
-		std::fill(force_i.begin(), force_i.end(), 0.0);
-
-		// Reset Cartesian force vector on every grid site
-		std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
-
-	} else {
-	// Else, compute forces
-
-		// Declarations
-		double lambda_v;
-
-		// Loop over grid and overwrite forces for each direction
-		for (size_t i = 0; i < N_lim; i++) {
-			for (size_t j = 0; j < M_lim; j++) {
-				for (size_t k = 0; k < K_lim; k++) {
+	// Loop over grid and overwrite forces for each direction
+	for (size_t i = 0; i < N_lim; i++) {
+		for (size_t j = 0; j < M_lim; j++) {
+			for (size_t k = 0; k < K_lim; k++) {
 
 #ifdef GRAVITY_ON
-					// Add gravity to any IBM forces currently stored
-					force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force * (1 / pow(2,level));
+				// Add gravity to any IBM forces currently stored
+				force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force * (1 / pow(2,level));
 #endif
 
-					// Now compute force_i components from Cartesian force vector
-					for (size_t v = 0; v < L_nVels; v++) {
+				// Now compute force_i components from Cartesian force vector
+				for (size_t v = 0; v < L_nVels; v++) {
 
-						// Only apply to non-solid sites
-						if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
+					// Only apply to non-solid sites
+					if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
 
-							// Reset beta_v
-							double beta_v = 0.0;
+						// Reset beta_v
+						double beta_v = 0.0;
 
-							// Compute the lattice forces based on Guo's forcing scheme
-							lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
+						// Compute the lattice forces based on Guo's forcing scheme
+						lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
 
-							// Dot product (sum over d dimensions)
-							for (int d = 0; d < L_dims; d++) {
-								beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_dims));
-							}
-							beta_v = beta_v * (1/(cs*cs));
-
-							// Compute force using shorthand sum described above
-							for (int d = 0; d < L_dims; d++) {
-								force_i(i,j,k,v,M_lim,K_lim,L_nVels) += force_xyz(i,j,k,d,M_lim,K_lim,L_dims) *
-									(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_dims));
-							}
-
-							// Multiply by lambda_v
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels) = force_i(i,j,k,v,M_lim,K_lim,L_nVels) * lambda_v;
-
+						// Dot product (sum over d dimensions)
+						for (int d = 0; d < L_dims; d++) {
+							beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_dims));
 						}
+						beta_v = beta_v * (1/(cs*cs));
+
+						// Compute force using shorthand sum described above
+						for (int d = 0; d < L_dims; d++) {
+							force_i(i,j,k,v,M_lim,K_lim,L_nVels) += force_xyz(i,j,k,d,M_lim,K_lim,L_dims) *
+								(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_dims));
+						}
+
+						// Multiply by lambda_v
+						force_i(i,j,k,v,M_lim,K_lim,L_nVels) = force_i(i,j,k,v,M_lim,K_lim,L_nVels) * lambda_v;
 
 					}
 
 				}
+
 			}
 		}
+	}
 
 
 #ifdef L_IBM_DEBUG
-		// DEBUG -- write out force components
-		std::ofstream testout;
-		testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app);
-		testout << "\nNEW TIME STEP" << std::endl;
-		for (size_t j = 1; j < M_lim - 1; j++) {
-			for (size_t i = 0; i < N_lim; i++) {
-				for (size_t v = 0; v < L_nVels; v++) {
-					testout << force_i(i,j,0,v,M_lim,K_lim,L_nVels) << "\t";
-				}
-				testout << std::endl;
+	// DEBUG -- write out force components
+	std::ofstream testout;
+	testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app);
+	testout << "\nNEW TIME STEP" << std::endl;
+	for (size_t j = 1; j < M_lim - 1; j++) {
+		for (size_t i = 0; i < N_lim; i++) {
+			for (size_t v = 0; v < L_nVels; v++) {
+				testout << force_i(i,j,0,v,M_lim,K_lim,L_nVels) << "\t";
 			}
 			testout << std::endl;
 		}
-		testout.close();
-#endif
+		testout << std::endl;
 	}
+	testout.close();
+#endif
+
+}
+
+// *****************************************************************************
+/// \brief	Method to reset body forces.
+///
+///			Resets both Cartesian and Lattice force vectors to zero.
+void GridObj::LBM_resetForces() {
+
+	// Reset lattice force vectors on every grid site
+	std::fill(force_i.begin(), force_i.end(), 0.0);
+
+	// Reset Cartesian force vector on every grid site
+	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
 
 }
 

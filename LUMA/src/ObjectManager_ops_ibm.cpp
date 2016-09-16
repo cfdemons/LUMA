@@ -20,9 +20,9 @@
 #include "../inc/GridUtils.h"
 
 
-// ***************************************************************************************************
-// Method to perform IBM procedure
-void ObjectManager::ibm_apply(GridObj& g) {
+// *****************************************************************************
+/// Perform IBM procedure.
+void ObjectManager::ibm_apply() {
 
 	// Loop over array of IB_bodies and perform IB operations
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
@@ -57,7 +57,7 @@ void ObjectManager::ibm_apply(GridObj& g) {
 #endif
 
 			// Interpolate velocity
-			ibm_interpol(ib, g);
+			ibm_interpol(ib);
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out interpolate velocity values
@@ -71,7 +71,7 @@ void ObjectManager::ibm_apply(GridObj& g) {
 #endif
 
 			// Compute restorative force
-			ibm_computeforce(ib, g);
+			ibm_computeforce(ib);
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out Lagrange force values
@@ -85,14 +85,18 @@ void ObjectManager::ibm_apply(GridObj& g) {
 #endif
 
 			// Spread force back to lattice (Cartesian vector)
-			ibm_spread(ib, g);
+			ibm_spread(ib);
 
 		}
 }
 
-// ***************************************************************************************************
-// Method to move IBBodies if required after applying IBM
-void ObjectManager::ibm_move_bodies(GridObj& g) {
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_move_bodies() {
 
 	// Loop over bodies launching positional update if deformable to compute new locations of markers
 	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
@@ -102,11 +106,11 @@ void ObjectManager::ibm_move_bodies(GridObj& g) {
 		if (iBody[ib].deformable) {
 
 			// Call structural or forced positional update and recompute support
-			ibm_position_update(ib, g);
+			ibm_position_update(ib);
 
 #ifndef L_STOP_EPSILON_RECOMPUTE
 			// Recompute epsilon
-			ibm_findepsilon(ib, g);
+			ibm_findepsilon(ib);
 #endif
 
 		}
@@ -115,15 +119,18 @@ void ObjectManager::ibm_move_bodies(GridObj& g) {
 #if defined L_INSERT_FILARRAY
 	// Special bit for filament-based plates where flexible centreline is used to update position of others in group
 	*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
-	ibm_position_update_grp(999, g);
+	ibm_position_update_grp(999);
 #endif
 
 }
 
 
-// ***************************************************************************************************
-// Method to initialise array of IB_bodies
-void ObjectManager::ibm_initialise(GridObj& g) {
+// *****************************************************************************
+/// \brief	Initialise the array of iBodies.
+///
+///			Computes support and epsilon values.
+///
+void ObjectManager::ibm_initialise() {
 
 	// Loop over the number of bodies in the iBody array
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
@@ -141,21 +148,24 @@ void ObjectManager::ibm_initialise(GridObj& g) {
 
 		// Compute support for each marker
 		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
-			ibm_findsupport(ib, m, *iBody[ib]._Owner);	// Pass body ID, marker ID and Grid
+			ibm_findsupport(ib, m);	// Pass body ID and marker ID
 		}
 
-
 		// Find epsilon for the body
-		ibm_findepsilon(ib, *iBody[ib]._Owner);
-
+		ibm_findepsilon(ib);
 
 	}
 
 }
 
-// ***************************************************************************************************
-// Method to evaluate delta kernel at supplied location
-// Both radius and dilation are expected in lattice units
+// *****************************************************************************
+/// \brief	Method to evaluate delta kernel at supplied location.
+///
+///			Radius and dilation must be in the same units.
+///
+/// \param	radius		location at which kernel should be evaluated.
+/// \param	dilation	width of kernel function.
+/// \return	value of kernel function.
 double ObjectManager::ibm_deltakernel(double radius, double dilation) {
 
 	double mag_r, value;
@@ -175,9 +185,14 @@ double ObjectManager::ibm_deltakernel(double radius, double dilation) {
 	return value;
 }
 
-// ***************************************************************************************************
-// Method to find the support points in the Eulerian fluid of Lagrange marker m
-void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
+// *****************************************************************************
+/// \brief	Finds support points for iBody.
+///
+///			Support for given marker in given body is sought on the owning grid.
+///
+/// \param	ib	body under consideration.
+/// \param	m	marker whose support is to be found.
+void ObjectManager::ibm_findsupport(int ib, int m) {
 
 	// Declarations
 	int inear, jnear;					// Nearest node indices
@@ -189,39 +204,54 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #endif
 
 
-	// Find closest support node
-	inear = (int)std::floor( (iBody[ib].markers[m].position[0] - (g.XPos[0] - g.dx / 2.0))/g.dx);	// Simulates std::round
-	jnear = (int)std::floor( (iBody[ib].markers[m].position[1] - (g.YPos[0] - g.dy / 2.0))/g.dy);
+	// Find closest support node (simulate std::round as not availble on MSVC2012)
+	inear = (int)std::floor(
+		(iBody[ib].markers[m].position[0] - (iBody[ib]._Owner->XPos[0] - iBody[ib]._Owner->dx / 2.0)) 
+		/ iBody[ib]._Owner->dx
+		);
+	jnear = (int)std::floor(
+		(iBody[ib].markers[m].position[1] - (iBody[ib]._Owner->YPos[0] - iBody[ib]._Owner->dy / 2.0)) 
+		/ iBody[ib]._Owner->dy
+		);
 
 #if (L_dims == 3)
-	knear = (int)std::floor( (iBody[ib].markers[m].position[2] - (g.ZPos[0] - g.dz / 2.0))/g.dz);
+	knear = (int)std::floor(
+		(iBody[ib].markers[m].position[2] - (iBody[ib]._Owner->ZPos[0] - iBody[ib]._Owner->dz / 2.0)) 
+		/ iBody[ib]._Owner->dz
+		);
 #endif
 
 
 	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
 	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
-	double h_plus = std::max( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
-	double h_minus = std::min( std::abs((g.XPos[inear + 1] - g.XPos[inear]) / g.dx ), std::abs((g.XPos[inear] - g.XPos[inear-1]) / g.dx) );
+	double h_plus = std::max(
+		std::abs((iBody[ib]._Owner->XPos[inear + 1] - iBody[ib]._Owner->XPos[inear]) / iBody[ib]._Owner->dx), 
+		std::abs((iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[inear - 1]) / iBody[ib]._Owner->dx)
+		);
+	double h_minus = std::min(
+		std::abs((iBody[ib]._Owner->XPos[inear + 1] - iBody[ib]._Owner->XPos[inear]) / iBody[ib]._Owner->dx), 
+		std::abs((iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[inear - 1]) / iBody[ib]._Owner->dx)
+		);
 
 	// Side length of support region defined as 3 x dilation paramter which is found from:
 	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus;	// TODO Find out why this has such a drastic effect on everything
-		//+ ( (1.0/9.0)); // * (1 / pow(2,g.level)) );	// This last term is a small fraction of the local grid spacing in lattice units
+		//+ ( (1.0/9.0)); // * (1 / pow(2,iBody[ib]._Owner->level)) );	// This last term is a small fraction of the local grid spacing in lattice units
 
 
 	// Test to see if required support nodes are available
 #if (L_dims == 3)
 
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.N_lim ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= iBody[ib]._Owner->N_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.M_lim ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= iBody[ib]._Owner->M_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= g.K_lim ) {
+	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= iBody[ib]._Owner->K_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -234,9 +264,10 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 			for (int k = knear - 5; k <= knear + 5; k++) {
 
 				// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-				if (	( fabs(g.XPos[inear] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
-						( fabs(g.YPos[jnear] - g.YPos[j])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
-						( fabs(g.ZPos[knear] - g.ZPos[k])/g.dx < 1.5*iBody[ib].markers[m].dilation )
+				if (
+					( fabs(iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 					) {
 
 						// Lies within support region so store information
@@ -246,12 +277,12 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 
 						// Store normalised area of support region (actually a volume) computed
 						// from the local grid spacing in lattice units (dx = 1 / 2^level = 1 on L0)
-						iBody[ib].markers[m].local_area = pow( 1 / pow(2,g.level) ,3) ;
+						iBody[ib].markers[m].local_area = pow( 1 / pow(2,iBody[ib]._Owner->level) ,3) ;
 
 						// Distance between Lagrange marker and support node in lattice units
-						dist_x = (g.XPos[i]-iBody[ib].markers[m].position[0]) / g.dx;
-						dist_y = (g.YPos[j]-iBody[ib].markers[m].position[1]) / g.dy;
-						dist_z = (g.ZPos[k]-iBody[ib].markers[m].position[2]) / g.dz;
+						dist_x = (iBody[ib]._Owner->XPos[i]-iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
+						dist_y = (iBody[ib]._Owner->YPos[j]-iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
+						dist_z = (iBody[ib]._Owner->ZPos[k]-iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
 
 						// Store delta function value
 						delta_x = ibm_deltakernel(dist_x, iBody[ib].markers[m].dilation);
@@ -268,12 +299,12 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #else
 
 	// 2D check support region
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= g.N_lim ) {
+	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= iBody[ib]._Owner->N_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= g.M_lim ) {
+	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= iBody[ib]._Owner->M_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -286,8 +317,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 			int k = 0;
 
 			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-			if (	( fabs(iBody[ib].markers[m].position[0] - g.XPos[i])/g.dx < 1.5*iBody[ib].markers[m].dilation ) &&
-					( fabs(iBody[ib].markers[m].position[1] - g.YPos[j])/g.dx < 1.5*iBody[ib].markers[m].dilation )
+			if (	( fabs(iBody[ib].markers[m].position[0] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(iBody[ib].markers[m].position[1] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
 
 					// Lies within support region so store information
@@ -299,8 +330,8 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 					iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
 
 					//  Distance between Lagrange marker and support node in lattice units
-					dist_x = (g.XPos[i]-iBody[ib].markers[m].position[0]) / g.dx;
-					dist_y = (g.YPos[j]-iBody[ib].markers[m].position[1]) / g.dy;
+					dist_x = (iBody[ib]._Owner->XPos[i]-iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
+					dist_y = (iBody[ib]._Owner->YPos[j]-iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
 
 					// Store delta function value
 					delta_x = ibm_deltakernel(dist_x, iBody[ib].markers[m].dilation);
@@ -314,14 +345,15 @@ void ObjectManager::ibm_findsupport(int ib, int m, GridObj& g) {
 #endif
 }
 
-// ***************************************************************************************************
-// Method to interpolate the velocity field onto the Lagrange markers
-void ObjectManager::ibm_interpol(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Interpolate velocity field onto markers
+/// \param	ib	iBody being operated on.
+void ObjectManager::ibm_interpol(int ib) {
 
 	// Get grid sizes
-	size_t M_lim = g.M_lim;
+	size_t M_lim = iBody[ib]._Owner->M_lim;
 #if (L_dims == 3)
-	size_t K_lim = g.K_lim;
+	size_t K_lim = iBody[ib]._Owner->K_lim;
 #endif
 
 
@@ -341,14 +373,14 @@ void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 				// for that support node and sum to get interpolated velocity.
 
 #if (L_dims == 3)
-			iBody[ib].markers[m].fluid_vel[dir] += g.u(	iBody[ib].markers[m].supp_i[i],
+			iBody[ib].markers[m].fluid_vel[dir] += iBody[ib]._Owner->u(	iBody[ib].markers[m].supp_i[i],
 														iBody[ib].markers[m].supp_j[i],
 														iBody[ib].markers[m].supp_k[i],
 														dir,
 														M_lim, K_lim, L_dims
 														) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #else
-			iBody[ib].markers[m].fluid_vel[dir] += g.u(	iBody[ib].markers[m].supp_i[i],
+			iBody[ib].markers[m].fluid_vel[dir] += iBody[ib]._Owner->u(	iBody[ib].markers[m].supp_i[i],
 														iBody[ib].markers[m].supp_j[i],
 														dir,
 														M_lim, L_dims
@@ -365,8 +397,8 @@ void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 		testout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-				testout << g.u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_dims) << "\t"
-									  << g.u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_dims) << std::endl;
+				testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_dims) << "\t"
+									  << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_dims) << std::endl;
 			}
 			testout << std::endl;
 		}
@@ -375,9 +407,10 @@ void ObjectManager::ibm_interpol(int ib, GridObj& g) {
 
 }
 
-// ***************************************************************************************************
-// Method to compute restorative force at each marker in a body
-void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Compute restorative force at each marker in a body.
+/// \param	ib	iBody being operated on.
+void ObjectManager::ibm_computeforce(int ib) {
 
 	// Loop over markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
@@ -389,9 +422,10 @@ void ObjectManager::ibm_computeforce(int ib, GridObj& g) {
 	}
 }
 
-// ***************************************************************************************************
-// Method to spread the restorative force back on to the fluid sites
-void ObjectManager::ibm_spread(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Spread restorative force back onto marker support.
+/// \param	ib	iBody being operated on.
+void ObjectManager::ibm_spread(int ib) {
 
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
@@ -399,13 +433,13 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 
 			// Get size of grid
-			size_t M_lim = g.M_lim;
-			size_t K_lim = g.K_lim;
+			size_t M_lim = iBody[ib]._Owner->M_lim;
+			size_t K_lim = iBody[ib]._Owner->K_lim;
 
 			for (size_t dir = 0; dir < L_dims; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
-				g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, L_dims) +=
-					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * iBody[ib].spacing/g.dx;
+				iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, L_dims) +=
+					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * iBody[ib].spacing/iBody[ib]._Owner->dx;
 			}
 		}
 	}
@@ -416,12 +450,12 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 		testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
 		testout << "\nNEW TIME STEP" << std::endl;
 		// Get size of grid
-		size_t M_lim = g.M_lim;
-		size_t K_lim = g.K_lim;
+		size_t M_lim = iBody[ib]._Owner->M_lim;
+		size_t K_lim = iBody[ib]._Owner->K_lim;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-				testout << g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_dims) << "\t"
-									  << g.force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_dims) << std::endl;
+				testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_dims) << "\t"
+									  << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_dims) << std::endl;
 			}
 			testout << std::endl;
 		}
@@ -430,9 +464,10 @@ void ObjectManager::ibm_spread(int ib, GridObj& g) {
 
 }
 
-// ***************************************************************************************************
-// Method to find epsilon
-double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
+// *****************************************************************************
+/// \brief	Compute epsilon for a given iBody.
+/// \param	ib	iBody being operated on.
+double ObjectManager::ibm_findepsilon(int ib) {
 
 	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
@@ -461,19 +496,36 @@ double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
 
 				Delta_I = iBody[ib].markers[I].deltaval[s];
 #if (L_dims == 3)
-				Delta_J =	ibm_deltakernel( (iBody[ib].markers[J].position[0] - g.XPos[iBody[ib].markers[I].supp_i[s]])/g.dx, iBody[ib].markers[J].dilation ) *
-							ibm_deltakernel( (iBody[ib].markers[J].position[1] - g.YPos[iBody[ib].markers[I].supp_j[s]])/g.dx, iBody[ib].markers[J].dilation ) *
-							ibm_deltakernel( (iBody[ib].markers[J].position[2] - g.ZPos[iBody[ib].markers[I].supp_k[s]])/g.dx, iBody[ib].markers[J].dilation );
+				Delta_J =
+					ibm_deltakernel(
+					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dx, 
+					iBody[ib].markers[J].dilation
+					) *
+					ibm_deltakernel(
+					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dx,
+					iBody[ib].markers[J].dilation
+					) *
+					ibm_deltakernel(
+					(iBody[ib].markers[J].position[2] - iBody[ib]._Owner->ZPos[iBody[ib].markers[I].supp_k[s]]) / iBody[ib]._Owner->dx,
+					iBody[ib].markers[J].dilation
+					);
 #else
-				Delta_J =	ibm_deltakernel( (iBody[ib].markers[J].position[0] - g.XPos[iBody[ib].markers[I].supp_i[s]])/g.dx, iBody[ib].markers[J].dilation ) *
-							ibm_deltakernel( (iBody[ib].markers[J].position[1] - g.YPos[iBody[ib].markers[I].supp_j[s]])/g.dx, iBody[ib].markers[J].dilation );
+				Delta_J =
+					ibm_deltakernel(
+					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dx,
+					iBody[ib].markers[J].dilation
+					) *
+					ibm_deltakernel(
+					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dx,
+					iBody[ib].markers[J].dilation
+					);
 #endif
 				// Multiply by local area (or volume in 3D)
 				A[I][J] += Delta_I * Delta_J * iBody[ib].markers[I].local_area;
 			}
 
 			// Multiply by arc length between markers in lattice units
-			A[I][J] = A[I][J] * (iBody[ib].spacing/g.dx);
+			A[I][J] = A[I][J] * (iBody[ib].spacing / iBody[ib]._Owner->dx);
 
 		}
 
@@ -521,13 +573,22 @@ double ObjectManager::ibm_findepsilon(int ib, GridObj& g) {
 
 }
 
-// ***************************************************************************************************
-// Biconjugate gradient stabilised method of solving a linear system -- not my own code but updated from other codes
-// Passes references to A, b and epsilon in system A*epsilon = b.
-// Tolerance of iterator is tolerance and maximum iterations pursued is maxiterations.
-// Returns the minimum residual achieved.
-double ObjectManager::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector, std::vector<double>& epsilon,
-						   double tolerance, int maxiterations) {
+// *****************************************************************************
+/// \brief	Biconjugate gradient method.
+///
+///			Biconjugate gradient stabilised method of solving a linear system 
+///			Ax = b. Solution is performed iteratively.
+///
+/// \param	Amatrix			the A matrix in the linear system.
+/// \param	bVector			the b vector in the linear system.
+/// \param	epsilon			epsilon paramters for each marker.
+/// \param	tolerance		tolerance of solution.
+/// \param	maxiterations	maximum number of iterations.
+/// \returns the minimum residual achieved by the solver.
+double ObjectManager::ibm_bicgstab(
+	std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector,
+	std::vector<double>& epsilon,
+	double tolerance, int maxiterations) {
 
 	// Declarations //
 
@@ -640,4 +701,4 @@ double ObjectManager::ibm_bicgstab(std::vector< std::vector<double> >& Amatrix, 
 	return res_min;
 }
 
-// ***************************************************************************************************
+// ****************************************************************************

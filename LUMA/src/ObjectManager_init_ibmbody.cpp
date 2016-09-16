@@ -22,7 +22,7 @@
 
 // ************************************************************************** //
 /// \brief Builds a prefab immersed boundary body.
-/// \param	body_type	type of boday to be built.
+/// \param	body_type	type of body to be built.
 void ObjectManager::ibm_build_body(int body_type) {
 
 	// Declarations

@@ -36,7 +36,7 @@ using namespace std;
 ///
 /// \param	ibmFlag		flag to indicate whether this kernel is a predictor (true) 
 ///						or corrector (false) step when using IBM.
-void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
+void GridObj::LBM_multi (bool ibmFlag) {
 
 	// Start the clock to time the kernel
 	clock_t secs, t_start = clock();
@@ -80,7 +80,7 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 
 		// Reset lattice and Cartesian force vectors at each site if on repeat.
 		// Don't do this on the sub-grid where IBM exists.
-		if (ibmFlag == true || repeatFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
+		if (ibmFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
 			LBM_resetForces();
 
 		// Apply boundary conditions (regularised must be applied before collision)
@@ -115,7 +115,7 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 				LBM_explode(reg);
 
 				// Call same routine for lower level
-				subGrid[reg].LBM_multi(ibmFlag, true);
+				subGrid[reg].LBM_multi(ibmFlag);
 			}
 		}
 
@@ -209,7 +209,7 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 			*GridUtils::logfile << "Correction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
 
 			// Corrector step (no IBM, no repeat)
-			LBM_multi(false, false);
+			LBM_multi(false);
 			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
 
 			// Move the body if necessary
@@ -222,8 +222,8 @@ void GridObj::LBM_multi (bool ibmFlag, bool repeatFlag) {
 		// Increment counters
 		t++; count++;
 
-		// L0 or corrector always has repeat flag to false so drop out as only one loop needed.
-		if (repeatFlag == false) {
+		// Always drop out on level 0, or if on corrector step on lower grid level
+		if (level == 0 || (ibmFlag == false && level == L_IB_Lev && region_number == L_IB_Reg)) {
 			break;
 		}
 

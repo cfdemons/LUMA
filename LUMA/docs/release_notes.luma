@@ -13,6 +13,7 @@ General 	: 	Compatibilty between GNU and MSVC compilers has been improved throug
 				LBM_forcegrid method renamed to LBM_forceGrid to match convention.
 				IBM_flag renamed to ibmFlag to match convention.
 				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
+				Removed repeatFlag from LBM_multi routine as unnecessary.
 
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
 Issue #81	: 	Added grid sizes as GridObj property.

@@ -472,9 +472,9 @@ int main( int argc, char* argv[] )
 		// Launch LBM Kernel //
 		///////////////////////
 #ifdef L_IBM_ON
-		Grids.LBM_multi(true, false);	// IBM requires predictor-corrector calls
+		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
 #else
-		Grids.LBM_multi(false, false);	// Just called once as no IBM
+		Grids.LBM_multi(false);	// Just called once as no IBM
 #endif
 
 
@@ -497,8 +497,6 @@ int main( int argc, char* argv[] )
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
 		Grids.io_lite(Grids.t,"");
 #endif
-
-		objMan->writeForce(); //TODO Get rid
 
 #ifdef L_HDF5_OUTPUT
 		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;

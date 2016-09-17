@@ -13,13 +13,12 @@ General 	: 	Compatibilty between GNU and MSVC compilers has been improved throug
 				LBM_forcegrid method renamed to LBM_forceGrid to match convention.
 				IBM_flag renamed to ibmFlag to match convention.
 				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
-				Removed repeatFlag from LBM_multi routine as unnecessary.
 
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
 Issue #81	: 	Added grid sizes as GridObj property.
 Issue #73	: 	Some Doxygen documentation added and will involve throughout the releases to contain more information.
 Issue #59	: 	Force calculation for BB objects.
-Issue #39	: 	TL automatic exclusion and resuse of C utility rather than C++ API for HDF5.
+Issue #39	: 	TL automatic exclusion and resuse of C utility rather than C++ API for HDF5. H5MGM tool v0.1-alpha included in /tools.
 Issue #79	: 	Fixed bug which allowed serial calls of a utility only compatible with MPI builds; also fixes for writing out IBB to restart correctly.
 Issue #69	: 	Patch to fix new point cloud reader where solid bodies were not being inserted correctly.
 Issue #77	: 	Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.

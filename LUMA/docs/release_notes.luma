@@ -12,6 +12,7 @@ General 	: 	Compatibilty between GNU and MSVC compilers has been improved throug
 				Resetting the force vectors is now a separate routine to get rid of the flag for forceGrid().
 				LBM_forcegrid method renamed to LBM_forceGrid to match convention.
 				IBM_flag renamed to ibmFlag to match convention.
+				Removed repeatFlag as unnecessary.
 				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
 
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.

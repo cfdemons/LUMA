@@ -412,24 +412,24 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
 #if (scale_direction == eXDirection)
-	double scale_factor = body_length /
+	double scale_factor = (body_length * g->dx) /
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 #elif (scale_direction == eYDirection)
-	double scale_factor = body_length /
+	double scale_factor = (body_length * g->dy) /
 		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 #elif (scale_direction == eZDirection)
-	double scale_factor = body_length /
+	double scale_factor = (body_length * g->dz) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 #endif
-	double shift_x =  std::floor( body_start_x - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end()) );
-	double shift_y =  std::floor( body_start_y - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end()) );
+	double shift_x =  (body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_y =  (body_start_y * g->dy) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
-	double shift_z =  std::floor( body_centre_z - scale_factor * (
+	double shift_z =  std::floor( (body_centre_z * g->dz) - scale_factor * (
 		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
 		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
 		) );
 
-	// Apply to each point
+	// Apply to each point to convert to global positions
 	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
@@ -447,8 +447,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	a = 0;
 	do {
 
-		// Get global voxel index
-		globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
+		// Get global voxel index from scaled positions
+		globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g);
 
 		// If on this rank
 		if (GridUtils::isOnThisRank(globals[0], globals[1], globals[2], *g)) {
@@ -494,8 +494,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			// Label the grid sites
 			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get globals
-				globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
+				// Get globals from scaled positions
+				globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g);
 
 				// Get local indices
 				GridUtils::global_to_local(globals[0], globals[1], globals[2], g, locals);

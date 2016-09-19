@@ -46,10 +46,8 @@ static int \hyperlink{class_grid_utils_af3c54e468658879756c71b01abd028d5}{get\+O
 \begin{DoxyCompactList}\small\item\em Gets the opposite lattice direction to the one supplied. \end{DoxyCompactList}\item 
 static void \hyperlink{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{get\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&Grids, int level, int region, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&ptr)
 \begin{DoxyCompactList}\small\item\em Get a pointer to a given grid in the hierarchy. \end{DoxyCompactList}\item 
-static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}{get\+Vox\+Ind} (double x, double y, double z)
-\begin{DoxyCompactList}\small\item\em Get global voxel indices. \end{DoxyCompactList}\item 
-static int \hyperlink{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}{get\+Vox\+Ind} (double p)
-\begin{DoxyCompactList}\small\item\em Get global voxel index. \end{DoxyCompactList}\item 
+static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_ad6d26dfc410f88cb0901464a58c594ac}{get\+Vox\+Ind} (double x, double y, double z, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\begin{DoxyCompactList}\small\item\em Get local voxel indices. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{is\+Overlap\+Periodic} (int i, int j, int k, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
 \begin{DoxyCompactList}\small\item\em Finds out whether halo containng i,j,k links to neighbour rank periodically. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}{is\+On\+This\+Rank} (int gi, int gj, int gk, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
@@ -355,18 +353,19 @@ opposite direction in lattice model.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Vox\+Ind@{get\+Vox\+Ind}}
 \index{get\+Vox\+Ind@{get\+Vox\+Ind}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z)}{getVoxInd(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Vox\+Ind (
+\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double x, double y, double z, Grid\+Obj $\ast$g)}{getVoxInd(double x, double y, double z, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ int $>$ Grid\+Utils\+::get\+Vox\+Ind (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
-\item[{double}]{z}
+\item[{double}]{z, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}{}\label{class_grid_utils_a46ee98a0b0967c88230aee8d19497914}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ad6d26dfc410f88cb0901464a58c594ac}{}\label{class_grid_utils_ad6d26dfc410f88cb0901464a58c594ac}
 
 
-Get global voxel indices. 
+Get local voxel indices. 
 
-Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Assumes that the physical lattice size is 1 unit big which relies on the position being scaled. If not, method acts as a natural voxel grid filter.
+Will return the voxel indices of the nearest voxel on the lattice provided for a given point described as a position in global space. Can return global values that are not on this M\+PI rank. Use the \hyperlink{class_grid_utils_ac1c2d23d0cdd548368aaaffb4f22502d}{Grid\+Utils\+::is\+On\+This\+Rank()} method to check the result. This method is used as a position -\/$>$ voxel converter.
 
 
 \begin{DoxyParams}{Parameters}
@@ -376,30 +375,11 @@ Will return the voxel indices of the nearest voxel on the lattice for a given po
 \hline
 {\em z} & global z-\/position. \\
 \hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-vector of indices of the nearest voxel. 
-\end{DoxyReturn}
-\index{Grid\+Utils@{Grid\+Utils}!get\+Vox\+Ind@{get\+Vox\+Ind}}
-\index{get\+Vox\+Ind@{get\+Vox\+Ind}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{get\+Vox\+Ind(double p)}{getVoxInd(double p)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Utils\+::get\+Vox\+Ind (
-\begin{DoxyParamCaption}
-\item[{double}]{p}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}{}\label{class_grid_utils_a056e6dc8478f608bc2ab374eee6e8c24}
-
-
-Get global voxel index. 
-
-Will return the voxel indices of the nearest voxel on the lattice for a given point in global space. Assumes that the physical lattice size is 1 unit big which relies on the position being scaled. If not, method acts as a natural voxel grid filter.
-
-
-\begin{DoxyParams}{Parameters}
-{\em p} & global position. \\
+{\em g} & lattice on which to look for nearest voxel. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-corresponding global index. 
+vector of indices of the nearest voxel on supplied lattice level. 
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}}
 \index{global\+\_\+to\+\_\+local@{global\+\_\+to\+\_\+local}!Grid\+Utils@{Grid\+Utils}}

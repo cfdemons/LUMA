@@ -102,9 +102,10 @@ protected:
 
 	// ************************ Methods ************************ //
 
-	virtual void addMarker(double x, double y, double z);			// Add a marker (can be overridden)
+	void addMarker(double x, double y, double z);					// Add a marker
 	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
-	void markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter);	// Voxelising marker adder
+	virtual void markerAdder(double x, double y, double z,
+		int& curr_mark, std::vector<int>& counter, bool flag);		// Voxelising marker adder (can be overridden)
 	bool isInVoxel(double x, double y, double z, int curr_mark);	// Check a point is inside an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z);			// Check whether nearest voxel is a marker voxel
 
@@ -128,6 +129,7 @@ Body<MarkerType>::~Body(void)
 /// \brief Custom constructor setting owning grid.
 ///
 /// \param g pointer to grid which owns this body.
+/// \param id indicates position of body in array of bodies.
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, size_t id)
 {
@@ -136,9 +138,6 @@ Body<MarkerType>::Body(GridObj* g, size_t id)
 };
 
 /// \brief	Add marker to the body.
-///
-///			Virtual as can be overwritten by sub-class of Body such as IBBody.
-///
 /// \param	x global X-position of marker.
 /// \param	y global Y-position of marker.
 /// \param	z global Z-position of marker.
@@ -149,9 +148,7 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 	markers.emplace_back(x, y, z);
 
 	// Add nearest node as basic support
-	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);	// Global indices
-
-	// Add global support point
+	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
 	this->markers.back().supp_i.push_back(globals[0]);
 	this->markers.back().supp_j.push_back(globals[1]);
 	this->markers.back().supp_k.push_back(globals[2]);
@@ -163,9 +160,9 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 ///			Return marker and voxel/primary support data associated with
 ///			supplied global position.
 ///
-/// \param x X-position nearest to marker to be retrieved.
-/// \param y Y-position nearest to marker to be retrieved.
-/// \param z Z-position nearest to marker to be retrieved.
+/// \param x global X-position nearest to marker to be retrieved.
+/// \param y global Y-position nearest to marker to be retrieved.
+/// \param z global Z-position nearest to marker to be retrieved.
 /// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid.
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
@@ -180,7 +177,8 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 			markers[i].supp_k[0] == vox[2]) {
 
 			// Indice represents the target ID so create new MarkerData store on the heap
-			MarkerData* m_MarkerData = new MarkerData(markers[i].supp_i[0],
+			MarkerData* m_MarkerData = new MarkerData(
+				markers[i].supp_i[0],
 				markers[i].supp_j[0],
 				markers[i].supp_k[0],
 				markers[i].position[0],
@@ -202,18 +200,21 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 /*********************************************/
 /// \brief	Downsampling marker adding method
 ///
-///			This method tries to add a marker to body at the location given
-///			but obeys the rules of a voxel-grid filter to ensure markers are
+///			This method tries to add a marker to body at the global location 
+///			given but obeys the rules of a voxel-grid filter to ensure markers are
 ///			distributed such that their spacing roughly matches the 
-///			background lattice.
+///			background lattice. Making it virtual allows different attirbutes
+///			to be passed to the addMarker() methods to allow for different
+///			marker types.
 ///
-/// \param x desired X-position of new marker.
-/// \param y desired Y-position of new marker.
-/// \param z desired Z-position of new marker.
+/// \param x desired global X-position of new marker.
+/// \param y desired globalY-position of new marker.
+/// \param z desired globalZ-position of new marker.
 /// \param curr_mark is a reference to the ID of last marker.
 ///	\param counter is a reference to the total number of markers in the body.
+/// \param flag is an optional flag argument this is used in overrides of this method.
 template <typename MarkerType>
-void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
+void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flag) {
 
 	// If point in current voxel
 	if (isInVoxel(x, y, z, curr_mark)) {
@@ -286,9 +287,9 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 		int k = markers[curr_mark].supp_k[0];
 
 		// Test within
-		if ((x > i - 0.5 && x <= i + 0.5) &&
-			(y > j - 0.5 && y <= j + 0.5) &&
-			(z > k - 0.5 && z <= k + 0.5)
+		if ((x > i - (_Owner->dx / 2) && x <= i + (_Owner->dx / 2)) &&
+			(y > j - (_Owner->dx / 2) && y <= j + (_Owner->dx / 2)) &&
+			(z > k - (_Owner->dx / 2) && z <= k + (_Owner->dx / 2))
 			) return true;
 
 		// Catch all
@@ -306,9 +307,9 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
 /*********************************************/
 /// \brief	Determines whether a point is inside an existing marker's support voxel.
-/// \param x X-position of point.
-/// \param y Y-position of point.
-/// \param z Z-position of point.
+/// \param x global X-position of point.
+/// \param y global Y-position of point.
+/// \param z global Z-position of point.
 /// \return true of false
 // Returns boolean as to whether a given point is in an existing marker voxel
 template <typename MarkerType>

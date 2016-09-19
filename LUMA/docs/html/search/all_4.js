@@ -10,5 +10,8 @@ var searchData=
   ['dir_5freflect',['dir_reflect',['../class_grid_utils.html#a609ef43c9476067a52ee238cd3d594f2',1,'GridUtils']]],
   ['dotprod',['dotprod',['../class_grid_utils.html#af374256beaf42d97b23f7d98af93a3f1',1,'GridUtils']]],
   ['downtolimit',['downToLimit',['../class_grid_utils.html#abd4068e22339d5272ca551f8cbddec26',1,'GridUtils']]],
-  ['dt',['dt',['../class_grid_obj.html#afd504b39f12eb0a237bc6313de94e094',1,'GridObj']]]
+  ['dt',['dt',['../class_grid_obj.html#afd504b39f12eb0a237bc6313de94e094',1,'GridObj']]],
+  ['dx',['dx',['../class_grid_obj.html#adbd4b9afbd8cf7bb2ccb48e7c5150f6d',1,'GridObj']]],
+  ['dy',['dy',['../class_grid_obj.html#a62b3a2ed35439f36591740d762f6e7a1',1,'GridObj']]],
+  ['dz',['dz',['../class_grid_obj.html#a94a497f1cd79b35741843fcd3817c18f',1,'GridObj']]]
 ];

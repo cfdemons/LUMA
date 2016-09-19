@@ -14,49 +14,49 @@ Object Manager class.
 \item 
 void \hyperlink{class_object_manager_a2ec2df889c396d94d2fe1807c10847bb}{ibm\+\_\+apply} ()
 \begin{DoxyCompactList}\small\item\em Perform I\+BM procedure. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{ibm\+\_\+build\+\_\+body} (int body\+\_\+type)
+void \hyperlink{class_object_manager_a8bb2de460bc99949775266e3c2369dbe}{ibm\+\_\+build\+Body} (int body\+\_\+type)
 \begin{DoxyCompactList}\small\item\em Builds a prefab immersed boundary body. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{ibm\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$owner)
+void \hyperlink{class_object_manager_a0ce3110c9a7f3b55a5b173e09a53010a}{ibm\+\_\+build\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$owner)
 \begin{DoxyCompactList}\small\item\em Wrapper for building a body from a point cloud. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_aa4e5e286a6fe1d9fcaf393ffed329250}{ibm\+\_\+initialise} ()
 \begin{DoxyCompactList}\small\item\em Initialise the array of i\+Bodies. \end{DoxyCompactList}\item 
-double \hyperlink{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{ibm\+\_\+deltakernel} (double rad, double dilation)
+double \hyperlink{class_object_manager_aa3445d1c1bbebc148b6ed634c89ded80}{ibm\+\_\+delta\+Kernel} (double rad, double dilation)
 \begin{DoxyCompactList}\small\item\em Method to evaluate delta kernel at supplied location. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_aff31915ad0effdcc8dc18f602ddd1c20}{ibm\+\_\+interpol} (int ib)
 \begin{DoxyCompactList}\small\item\em Interpolate velocity field onto markers. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a8096f9ec97cf7ce2fc45ebfcbdf3617e}{ibm\+\_\+spread} (int ib)
 \begin{DoxyCompactList}\small\item\em Spread restorative force back onto marker support. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}{ibm\+\_\+findsupport} (int ib, int m)
+void \hyperlink{class_object_manager_ac5e71323491a8c3f38fecc51d1530a04}{ibm\+\_\+find\+Support} (int ib, int m)
 \begin{DoxyCompactList}\small\item\em Finds support points for i\+Body. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}{ibm\+\_\+computeforce} (int ib)
+void \hyperlink{class_object_manager_ada21b4ed1a05af704597fce572142df8}{ibm\+\_\+compute\+Force} (int ib)
 \begin{DoxyCompactList}\small\item\em Compute restorative force at each marker in a body. \end{DoxyCompactList}\item 
-double \hyperlink{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}{ibm\+\_\+findepsilon} (int ib)
+double \hyperlink{class_object_manager_a0538f952cf2d548ff89a3ce058fc1649}{ibm\+\_\+find\+Epsilon} (int ib)
 \begin{DoxyCompactList}\small\item\em Compute epsilon for a given i\+Body. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}{ibm\+\_\+move\+\_\+bodies} ()
+void \hyperlink{class_object_manager_ab93cad4c08e96444eec3278dff84665e}{ibm\+\_\+move\+Bodies} ()
 \begin{DoxyCompactList}\small\item\em Moves i\+Bodies after applying I\+BM. \end{DoxyCompactList}\item 
 double \hyperlink{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{ibm\+\_\+bicgstab} (std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&Amatrix, std\+::vector$<$ double $>$ \&b\+Vector, std\+::vector$<$ double $>$ \&epsilon, double tolerance, int maxiterations)
 \begin{DoxyCompactList}\small\item\em Biconjugate gradient method. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a956c12cba071c6b8844371c03433f82c}{ibm\+\_\+jacowire} (int ib)
 \begin{DoxyCompactList}\small\item\em Structural calculation of flexible cilia. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a53eedab20e69a10ae861197b614751db}{ibm\+\_\+position\+\_\+update} (int ib)
+void \hyperlink{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}{ibm\+\_\+position\+Update} (int ib)
 \begin{DoxyCompactList}\small\item\em Update the position of a deformable i\+Body. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}{ibm\+\_\+position\+\_\+update\+\_\+grp} (int group)
+void \hyperlink{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}{ibm\+\_\+position\+Update\+Group} (int group)
 \begin{DoxyCompactList}\small\item\em Update the position of a group of deformable i\+Bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double b\mbox{[}$\,$\mbox{]})
 \begin{DoxyCompactList}\small\item\em Solution of a banded diagonal linear system. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double $\ast$d)
 \begin{DoxyCompactList}\small\item\em LU decomposition of band diagonal matrix. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{bfl\+\_\+build\+\_\+body} (int body\+\_\+type)
+void \hyperlink{class_object_manager_ab14652a66537fba9f49a68d6e11605e0}{bfl\+\_\+build\+Body} (int body\+\_\+type)
 \begin{DoxyCompactList}\small\item\em Prefab body building routine. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{bfl\+\_\+build\+\_\+body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+void \hyperlink{class_object_manager_a8cd5fa724cbd50bcd00b940e5ae4a687}{bfl\+\_\+build\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
 \begin{DoxyCompactList}\small\item\em Wrapper for building B\+FL body from point cloud. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a6a35b34d77e7cd56060a6953d0d0860a}{compute\+Lift\+Drag} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
 \begin{DoxyCompactList}\small\item\em Compute forces on a rigid object. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{io\+\_\+vtk\+\_\+\+I\+Bwriter} (double tval)
+void \hyperlink{class_object_manager_a9bcee530acc6e99f80a53d7ddb757989}{io\+\_\+vtk\+I\+B\+B\+Writer} (double tval)
 \begin{DoxyCompactList}\small\item\em Write IB body data to V\+TK file. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{io\+\_\+write\+\_\+body\+\_\+pos} (int timestep)
+void \hyperlink{class_object_manager_aca1fa71a37c8e02ebe40fdc932350c15}{io\+\_\+write\+Body\+Position} (int timestep)
 \begin{DoxyCompactList}\small\item\em Write out position of immersed boundary bodies. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{io\+\_\+write\+\_\+lift\+\_\+drag} (int timestep)
+void \hyperlink{class_object_manager_a7f3c0860b78203671cd858532492555d}{io\+\_\+write\+Lift\+Drag} (int timestep)
 \begin{DoxyCompactList}\small\item\em Write out forces on the markers of immersed boundary bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_aaa1b7e2a3392c2a8d85606041b986b4d}{io\+\_\+restart} (bool I\+O\+\_\+flag, int level)
 \begin{DoxyCompactList}\small\item\em Read/write IB body information to restart file. \end{DoxyCompactList}\item 
@@ -86,13 +86,13 @@ Object Manager class.
 Class to manage all objects in the domain from creation through manipulation to destruction. 
 
 \subsection{Member Function Documentation}
-\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
-\index{bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{bfl\+\_\+build\+\_\+body(int body\+\_\+type)}{bfl_build_body(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+\_\+body (
+\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+Body@{bfl\+\_\+build\+Body}}
+\index{bfl\+\_\+build\+Body@{bfl\+\_\+build\+Body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{bfl\+\_\+build\+Body(int body\+\_\+type)}{bfl_buildBody(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+Body (
 \begin{DoxyParamCaption}
 \item[{int}]{body\+\_\+type}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}{}\label{class_object_manager_a099a446ac7f045d11d6be6babd0a31ab}
+)}\hypertarget{class_object_manager_ab14652a66537fba9f49a68d6e11605e0}{}\label{class_object_manager_ab14652a66537fba9f49a68d6e11605e0}
 
 
 Prefab body building routine. 
@@ -104,13 +104,13 @@ Not implemented in this version.
 {\em body\+\_\+type} & type of prefab body to be built. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}}
-\index{bfl\+\_\+build\+\_\+body@{bfl\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{bfl\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{bfl_build_body(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+\_\+body (
+\index{Object\+Manager@{Object\+Manager}!bfl\+\_\+build\+Body@{bfl\+\_\+build\+Body}}
+\index{bfl\+\_\+build\+Body@{bfl\+\_\+build\+Body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{bfl\+\_\+build\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{bfl_buildBody(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::bfl\+\_\+build\+Body (
 \begin{DoxyParamCaption}
 \item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}{}\label{class_object_manager_a56c65bd5122aa7e7026fb8d2315482f3}
+)}\hypertarget{class_object_manager_a8cd5fa724cbd50bcd00b940e5ae4a687}{}\label{class_object_manager_a8cd5fa724cbd50bcd00b940e5ae4a687}
 
 
 Wrapper for building B\+FL body from point cloud. 
@@ -303,13 +303,13 @@ Biconjugate gradient stabilised method of solving a linear system Ax = b. Soluti
 \begin{DoxyReturn}{Returns}
 the minimum residual achieved by the solver. 
 \end{DoxyReturn}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
-\index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(int body\+\_\+type)}{ibm_build_body(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+Body@{ibm\+\_\+build\+Body}}
+\index{ibm\+\_\+build\+Body@{ibm\+\_\+build\+Body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+build\+Body(int body\+\_\+type)}{ibm_buildBody(int body_type)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+Body (
 \begin{DoxyParamCaption}
 \item[{int}]{body\+\_\+type}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}{}\label{class_object_manager_af89336910b6f3157e5b17b4ea6d30a12}
+)}\hypertarget{class_object_manager_a8bb2de460bc99949775266e3c2369dbe}{}\label{class_object_manager_a8bb2de460bc99949775266e3c2369dbe}
 
 
 Builds a prefab immersed boundary body. 
@@ -319,14 +319,14 @@ Builds a prefab immersed boundary body.
 {\em body\+\_\+type} & type of body to be built. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}}
-\index{ibm\+\_\+build\+\_\+body@{ibm\+\_\+build\+\_\+body}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+build\+\_\+body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$owner)}{ibm_build_body(PCpts *_PCpts, GridObj *owner)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+\_\+body (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+build\+Body@{ibm\+\_\+build\+Body}}
+\index{ibm\+\_\+build\+Body@{ibm\+\_\+build\+Body}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+build\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$owner)}{ibm_buildBody(PCpts *_PCpts, GridObj *owner)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+build\+Body (
 \begin{DoxyParamCaption}
 \item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts, }
 \item[{{\bf Grid\+Obj} $\ast$}]{owner}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}{}\label{class_object_manager_ac8270fe5b646e512a34748b5ca51671c}
+)}\hypertarget{class_object_manager_a0ce3110c9a7f3b55a5b173e09a53010a}{}\label{class_object_manager_a0ce3110c9a7f3b55a5b173e09a53010a}
 
 
 Wrapper for building a body from a point cloud. 
@@ -338,13 +338,13 @@ Wrapper for building a body from a point cloud.
 {\em owner} & pointer to the grid on which the body is to be placed. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+computeforce@{ibm\+\_\+computeforce}}
-\index{ibm\+\_\+computeforce@{ibm\+\_\+computeforce}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+computeforce(int ib)}{ibm_computeforce(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+computeforce (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+compute\+Force@{ibm\+\_\+compute\+Force}}
+\index{ibm\+\_\+compute\+Force@{ibm\+\_\+compute\+Force}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+compute\+Force(int ib)}{ibm_computeForce(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+compute\+Force (
 \begin{DoxyParamCaption}
 \item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}{}\label{class_object_manager_a5722d37636b6cd2ab92efdb6fe4bcdfa}
+)}\hypertarget{class_object_manager_ada21b4ed1a05af704597fce572142df8}{}\label{class_object_manager_ada21b4ed1a05af704597fce572142df8}
 
 
 Compute restorative force at each marker in a body. 
@@ -354,14 +354,14 @@ Compute restorative force at each marker in a body.
 {\em ib} & i\+Body being operated on. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}}
-\index{ibm\+\_\+deltakernel@{ibm\+\_\+deltakernel}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+deltakernel(double rad, double dilation)}{ibm_deltakernel(double rad, double dilation)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+deltakernel (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+delta\+Kernel@{ibm\+\_\+delta\+Kernel}}
+\index{ibm\+\_\+delta\+Kernel@{ibm\+\_\+delta\+Kernel}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+delta\+Kernel(double rad, double dilation)}{ibm_deltaKernel(double rad, double dilation)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+delta\+Kernel (
 \begin{DoxyParamCaption}
 \item[{double}]{radius, }
 \item[{double}]{dilation}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}{}\label{class_object_manager_a4e55e3a84bae37a75f8487fd575169fb}
+)}\hypertarget{class_object_manager_aa3445d1c1bbebc148b6ed634c89ded80}{}\label{class_object_manager_aa3445d1c1bbebc148b6ed634c89ded80}
 
 
 Method to evaluate delta kernel at supplied location. 
@@ -378,13 +378,13 @@ Radius and dilation must be in the same units.
 \begin{DoxyReturn}{Returns}
 value of kernel function. 
 \end{DoxyReturn}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}}
-\index{ibm\+\_\+findepsilon@{ibm\+\_\+findepsilon}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+findepsilon(int ib)}{ibm_findepsilon(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+findepsilon (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+find\+Epsilon@{ibm\+\_\+find\+Epsilon}}
+\index{ibm\+\_\+find\+Epsilon@{ibm\+\_\+find\+Epsilon}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+find\+Epsilon(int ib)}{ibm_findEpsilon(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}double Object\+Manager\+::ibm\+\_\+find\+Epsilon (
 \begin{DoxyParamCaption}
 \item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}{}\label{class_object_manager_a2b544fe34e298302f3e5e8b2f981c2d8}
+)}\hypertarget{class_object_manager_a0538f952cf2d548ff89a3ce058fc1649}{}\label{class_object_manager_a0538f952cf2d548ff89a3ce058fc1649}
 
 
 Compute epsilon for a given i\+Body. 
@@ -394,14 +394,14 @@ Compute epsilon for a given i\+Body.
 {\em ib} & i\+Body being operated on. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+findsupport@{ibm\+\_\+findsupport}}
-\index{ibm\+\_\+findsupport@{ibm\+\_\+findsupport}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+findsupport(int ib, int m)}{ibm_findsupport(int ib, int m)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+findsupport (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+find\+Support@{ibm\+\_\+find\+Support}}
+\index{ibm\+\_\+find\+Support@{ibm\+\_\+find\+Support}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+find\+Support(int ib, int m)}{ibm_findSupport(int ib, int m)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+find\+Support (
 \begin{DoxyParamCaption}
 \item[{int}]{ib, }
 \item[{int}]{m}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}{}\label{class_object_manager_a500427b7ac8fc16eac33f804f64abdab}
+)}\hypertarget{class_object_manager_ac5e71323491a8c3f38fecc51d1530a04}{}\label{class_object_manager_ac5e71323491a8c3f38fecc51d1530a04}
 
 
 Finds support points for i\+Body. 
@@ -460,24 +460,24 @@ Models the structural behaviour of a thin wire using Euler-\/\+Bernoulli beam el
 {\em ib} & index of body to which calculation is to be applied. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}}
-\index{ibm\+\_\+move\+\_\+bodies@{ibm\+\_\+move\+\_\+bodies}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+move\+\_\+bodies()}{ibm_move_bodies()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+move\+\_\+bodies (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+move\+Bodies@{ibm\+\_\+move\+Bodies}}
+\index{ibm\+\_\+move\+Bodies@{ibm\+\_\+move\+Bodies}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+move\+Bodies()}{ibm_moveBodies()}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+move\+Bodies (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}{}\label{class_object_manager_ad874ba69d231d4c1720c4e3a68ff3499}
+)}\hypertarget{class_object_manager_ab93cad4c08e96444eec3278dff84665e}{}\label{class_object_manager_ab93cad4c08e96444eec3278dff84665e}
 
 
 Moves i\+Bodies after applying I\+BM. 
 
-Wrapper for relocating markers of an i\+Body be calling appropriate positional update routine. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}}
-\index{ibm\+\_\+position\+\_\+update@{ibm\+\_\+position\+\_\+update}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update(int ib)}{ibm_position_update(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update (
+Wrapper for relocating markers of an i\+Body be calling appropriate positional update routine. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+Update@{ibm\+\_\+position\+Update}}
+\index{ibm\+\_\+position\+Update@{ibm\+\_\+position\+Update}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+Update(int ib)}{ibm_positionUpdate(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+Update (
 \begin{DoxyParamCaption}
 \item[{int}]{ib}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a53eedab20e69a10ae861197b614751db}{}\label{class_object_manager_a53eedab20e69a10ae861197b614751db}
+)}\hypertarget{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}{}\label{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}
 
 
 Update the position of a deformable i\+Body. 
@@ -489,13 +489,13 @@ Wrapper for applying external forcing or structural calculations to i\+Bodies ma
 {\em ib} & index of body to which calculation is to be applied. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}}
-\index{ibm\+\_\+position\+\_\+update\+\_\+grp@{ibm\+\_\+position\+\_\+update\+\_\+grp}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{ibm\+\_\+position\+\_\+update\+\_\+grp(int group)}{ibm_position_update_grp(int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+\_\+update\+\_\+grp (
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+position\+Update\+Group@{ibm\+\_\+position\+Update\+Group}}
+\index{ibm\+\_\+position\+Update\+Group@{ibm\+\_\+position\+Update\+Group}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+position\+Update\+Group(int group)}{ibm_positionUpdateGroup(int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+position\+Update\+Group (
 \begin{DoxyParamCaption}
 \item[{int}]{group}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}{}\label{class_object_manager_ae8f08e2935c8999db99b41a3c97b63c5}
+)}\hypertarget{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}{}\label{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}
 
 
 Update the position of a group of deformable i\+Bodies. 
@@ -563,13 +563,13 @@ Read/write IB body information to restart file.
 {\em level} & level of the grid begin written/read \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}}
-\index{io\+\_\+vtk\+\_\+\+I\+Bwriter@{io\+\_\+vtk\+\_\+\+I\+Bwriter}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{io\+\_\+vtk\+\_\+\+I\+Bwriter(double tval)}{io_vtk_IBwriter(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+vtk\+\_\+\+I\+Bwriter (
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+vtk\+I\+B\+B\+Writer@{io\+\_\+vtk\+I\+B\+B\+Writer}}
+\index{io\+\_\+vtk\+I\+B\+B\+Writer@{io\+\_\+vtk\+I\+B\+B\+Writer}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+vtk\+I\+B\+B\+Writer(double tval)}{io_vtkIBBWriter(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+vtk\+I\+B\+B\+Writer (
 \begin{DoxyParamCaption}
 \item[{double}]{tval}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a39aa351c7b338473be4871111da5c5bd}{}\label{class_object_manager_a39aa351c7b338473be4871111da5c5bd}
+)}\hypertarget{class_object_manager_a9bcee530acc6e99f80a53d7ddb757989}{}\label{class_object_manager_a9bcee530acc6e99f80a53d7ddb757989}
 
 
 Write IB body data to V\+TK file. 
@@ -581,32 +581,16 @@ Currently can only write out un-\/closed bodies like filaments.
 {\em tval} & time value at which the write out is being performed. \\
 \hline
 \end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}}
-\index{io\+\_\+write\+\_\+body\+\_\+pos@{io\+\_\+write\+\_\+body\+\_\+pos}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+body\+\_\+pos(int timestep)}{io_write_body_pos(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+body\+\_\+pos (
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+Body\+Position@{io\+\_\+write\+Body\+Position}}
+\index{io\+\_\+write\+Body\+Position@{io\+\_\+write\+Body\+Position}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+write\+Body\+Position(int timestep)}{io_writeBodyPosition(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+Body\+Position (
 \begin{DoxyParamCaption}
 \item[{int}]{timestep}
 \end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}{}\label{class_object_manager_a1f9a40c58bdb3bd9797f7c44864835ec}
+)}\hypertarget{class_object_manager_aca1fa71a37c8e02ebe40fdc932350c15}{}\label{class_object_manager_aca1fa71a37c8e02ebe40fdc932350c15}
 
 
 Write out position of immersed boundary bodies. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timestep} & timestep at which the write out is being performed. \\
-\hline
-\end{DoxyParams}
-\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}}
-\index{io\+\_\+write\+\_\+lift\+\_\+drag@{io\+\_\+write\+\_\+lift\+\_\+drag}!Object\+Manager@{Object\+Manager}}
-\subsubsection[{\texorpdfstring{io\+\_\+write\+\_\+lift\+\_\+drag(int timestep)}{io_write_lift_drag(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+\_\+lift\+\_\+drag (
-\begin{DoxyParamCaption}
-\item[{int}]{timestep}
-\end{DoxyParamCaption}
-)}\hypertarget{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}{}\label{class_object_manager_ab46e89c9eaf8ca1c9ec264545f39cd7f}
-
-
-Write out forces on the markers of immersed boundary bodies. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -627,6 +611,22 @@ Write out the forces on a solid object.
 Writes out the forces on solid objects in the domain computed using momentum exchange. Each rank writes its own file. Output is a C\+SV file. 
 \begin{DoxyParams}{Parameters}
 {\em tval} & time value at which write out is taking place. \\
+\hline
+\end{DoxyParams}
+\index{Object\+Manager@{Object\+Manager}!io\+\_\+write\+Lift\+Drag@{io\+\_\+write\+Lift\+Drag}}
+\index{io\+\_\+write\+Lift\+Drag@{io\+\_\+write\+Lift\+Drag}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{io\+\_\+write\+Lift\+Drag(int timestep)}{io_writeLiftDrag(int timestep)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::io\+\_\+write\+Lift\+Drag (
+\begin{DoxyParamCaption}
+\item[{int}]{timestep}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a7f3c0860b78203671cd858532492555d}{}\label{class_object_manager_a7f3c0860b78203671cd858532492555d}
+
+
+Write out forces on the markers of immersed boundary bodies. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timestep} & timestep at which the write out is being performed. \\
 \hline
 \end{DoxyParams}
 

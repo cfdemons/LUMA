@@ -904,7 +904,8 @@ bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 ///			Will return the voxel indices of the nearest voxel on the lattice 
 ///			provided for a given point described as a position in global space.
 ///			Can return global values that are not on this MPI rank. Use the
-///			GridUtils::isOnThisRank() method to check the result.
+///			GridUtils::isOnThisRank() method to check the result. This method
+///			is used as a position -> voxel converter.
 ///
 /// \param	x	global x-position.
 /// \param	y	global y-position.
@@ -919,37 +920,6 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) 
 	vox.push_back((int)std::floor((x - (g->XOrigin - g->dx / 2.0))/ g->dx));
 	vox.push_back((int)std::floor((y - (g->YOrigin - g->dy / 2.0)) / g->dy));
 	vox.push_back((int)std::floor((z - (g->ZOrigin - g->dz / 2.0)) / g->dz));
-
-	return vox;
-
-}
-
-// ****************************************************************************
-/// \brief	Get local voxel indices
-///
-///			Will return the indices of the nearest lattice unit to the position
-///			supplied. This version of the function assumes the positions are 
-///			specified in a scaled-global-lattice space. i.e. if the global grid
-///			is indexed 0-40 then the points will be distributed in this range only.
-///
-/// \param	x	scaled x-position.
-/// \param	y	scaled y-position.
-/// \param	z	scaled z-position.
-/// \return vector of indices of the nearest voxel on supplied lattice level.
-std::vector<int> GridUtils::getVoxInd(double x, double y, double z) {
-
-	std::vector<int> vox;
-
-
-	// Check whether point is closer to the floor or the ceiling value and add correct one
-	if (x - (int)std::floor(x) > 0.5) vox.push_back((int)std::ceil(x));
-	else vox.push_back((int)std::floor(x));
-
-	if (y - (int)std::floor(y) > 0.5) vox.push_back((int)std::ceil(y));
-	else vox.push_back((int)std::floor(y));
-
-	if (z - (int)std::floor(z) > 0.5) vox.push_back((int)std::ceil(z));
-	else vox.push_back((int)std::floor(z));
 
 	return vox;
 

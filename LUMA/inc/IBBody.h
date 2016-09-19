@@ -64,6 +64,8 @@ public:
 
 	// Add marker to the body (overload parent addMarker method)
 	void addMarker(double x, double y, double z, bool flex_rigid);
+	// Voxelising marker adder (overridden)
+	virtual void markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid);
 
 	//////////////////////////////////
 	// Prefab body building methods //

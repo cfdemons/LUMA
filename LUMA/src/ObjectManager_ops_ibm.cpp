@@ -257,11 +257,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		exit(LUMA_FAILED);
 	}
 
-	// Add closest marker first
-	iBody[ib].markers[m].supp_i.push_back(inear);
-	iBody[ib].markers[m].supp_j.push_back(jnear);
-	iBody[ib].markers[m].supp_k.push_back(knear);
-
 	// Loop over surrounding 5 nodes to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
@@ -274,7 +269,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 					) {
 
-						// Skip the nearest
+						// Skip the nearest as already added when marker constructed
 						if (i == inear && j == jnear && k == knear) continue;
 
 						// Lies within support region so store information
@@ -318,11 +313,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	}
 
-	// Add closest marker first
-	iBody[ib].markers[m].supp_i.push_back(inear);
-	iBody[ib].markers[m].supp_j.push_back(jnear);
-	iBody[ib].markers[m].supp_k.push_back(0);
-
 	// 2D version to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
@@ -333,7 +323,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 					( fabs(iBody[ib].markers[m].position[1] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
 
-					// Skip the nearest
+					// Skip the nearest as already added when marker constructed
 					if (i == inear && j == jnear) continue;
 
 					// Lies within support region so store information

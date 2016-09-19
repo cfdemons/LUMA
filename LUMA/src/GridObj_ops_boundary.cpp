@@ -505,13 +505,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Get marker ID
-#ifdef L_BUILD_FOR_MPI
-		// Convert locals to global for marker access
-		std::vector<int> globals; GridUtils::local_to_global(i,j,k,this,globals);
-		m_data = objMan->pBody[0].getMarkerData(globals[0],globals[1],globals[2]);
-#else
-		m_data = objMan->pBody[0].getMarkerData(i, j, k);
-#endif
+		m_data = objMan->pBody[0].getMarkerData(XPos[i], YPos[j], ZPos[k]);
 
 		/* Apply BC in pairs  -- BC 1 */
 

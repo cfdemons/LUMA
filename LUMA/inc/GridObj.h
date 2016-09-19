@@ -118,12 +118,6 @@ private :
 	// Flattened 3D arrays (i,j,k)
 	IVector<double> rho;			///< Macroscopic density
 
-	// Grid scalars
-	double dx;			///< Physical lattice X spacing
-	double dy;			///< Physical lattice Y spacing
-	double dz;			///< Physical lattice Z spacing
-	int region_number;	///< Region number
-
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)
 	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_dims)
@@ -134,6 +128,12 @@ private :
 public :
 
 	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
+
+	// Grid Scalars
+	double dx;						///< Physical lattice X spacing
+	double dy;						///< Physical lattice Y spacing
+	double dz;						///< Physical lattice Z spacing
+	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size
 	int t;							///< Number of completed iterations on this level

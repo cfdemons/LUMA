@@ -8,7 +8,7 @@ var searchData=
   ['stdafx_2ecpp',['stdafx.cpp',['../stdafx_8cpp.html',1,'']]],
   ['stdafx_2eh',['stdafx.h',['../stdafx_8h.html',1,'']]],
   ['stridedcopy',['stridedCopy',['../class_grid_utils.html#aa3ca6e20ef4fa927cb845956d7565b1e',1,'GridUtils']]],
-  ['subgrid_5fcomm',['subGrid_comm',['../class_mpi_manager.html#a1c65695e5dd2cca3ccb76e83715226f8',1,'MpiManager']]],
+  ['subgrid_5fcomm',['subGrid_comm',['../class_mpi_manager.html#a32921c381b76fb8f27d3334ebd1756cd',1,'MpiManager']]],
   ['subtract',['subtract',['../class_grid_utils.html#a6f5af65d6bb25e0d34be50670b41514f',1,'GridUtils']]],
   ['supp_5fi',['supp_i',['../class_marker.html#af2b0bab614609f2e9c5bebc1db3f8174',1,'Marker']]],
   ['supp_5fj',['supp_j',['../class_marker.html#a400ae7b896edf2abe0403dde435b0977',1,'Marker']]],

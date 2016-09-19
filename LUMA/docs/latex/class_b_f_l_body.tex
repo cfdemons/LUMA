@@ -22,7 +22,7 @@ Inheritance diagram for B\+F\+L\+Body\+:\begin{figure}[H]
 \begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_b_f_l_body_ad6d343eed8481d8b652261642e184c43}{$\sim$\+B\+F\+L\+Body} (void)
 \begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
-\hyperlink{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}{B\+F\+L\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g\+\_\+hierarchy)
+\hyperlink{class_b_f_l_body_a5753a5dd70064fc3fc2d68eed4590ef8}{B\+F\+L\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g\+\_\+hierarchy, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id})
 \begin{DoxyCompactList}\small\item\em Custom constructor to populate body from array of points. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
@@ -73,12 +73,13 @@ Default destructor.
 
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
 \index{B\+F\+L\+Body@{B\+F\+L\+Body}!B\+F\+L\+Body@{B\+F\+L\+Body}}
-\subsubsection[{\texorpdfstring{B\+F\+L\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$g\+\_\+hierarchy)}{BFLBody(PCpts *_PCpts, GridObj *g_hierarchy)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Body\+::\+B\+F\+L\+Body (
+\subsubsection[{\texorpdfstring{B\+F\+L\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts, Grid\+Obj $\ast$g\+\_\+hierarchy, size\+\_\+t id)}{BFLBody(PCpts *_PCpts, GridObj *g_hierarchy, size_t id)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Body\+::\+B\+F\+L\+Body (
 \begin{DoxyParamCaption}
 \item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts, }
-\item[{{\bf Grid\+Obj} $\ast$}]{g\+\_\+hierarchy}
+\item[{{\bf Grid\+Obj} $\ast$}]{g\+\_\+hierarchy, }
+\item[{size\+\_\+t}]{id}
 \end{DoxyParamCaption}
-)}\hypertarget{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}{}\label{class_b_f_l_body_a5dc2907ac609b0fb0a89347b4f66f2ca}
+)}\hypertarget{class_b_f_l_body_a5753a5dd70064fc3fc2d68eed4590ef8}{}\label{class_b_f_l_body_a5753a5dd70064fc3fc2d68eed4590ef8}
 
 
 Custom constructor to populate body from array of points. 
@@ -88,6 +89,8 @@ Custom constructor to populate body from array of points.
 {\em \+\_\+\+P\+Cpts} & pointer to point cloud data \\
 \hline
 {\em g\+\_\+hierarchy} & pointer to grid hierarchy \\
+\hline
+{\em id} & ID of body in array of bodies. \\
 \hline
 \end{DoxyParams}
 

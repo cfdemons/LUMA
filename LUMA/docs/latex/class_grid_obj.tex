@@ -107,6 +107,14 @@ std\+::vector$<$ double $>$ \hyperlink{class_grid_obj_af859d35bf0a03cee8965ce3e2
 \begin{DoxyCompactList}\small\item\em Vector of global Z positions of each site. \end{DoxyCompactList}\item 
 \hyperlink{class_i_vector}{I\+Vector}$<$ \hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60e}{e\+Type} $>$ \hyperlink{class_grid_obj_a8ce077fba648f767361039eb924c45ae}{Lat\+Typ}
 \begin{DoxyCompactList}\small\item\em Flattened 3D array of site labels. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_adbd4b9afbd8cf7bb2ccb48e7c5150f6d}{dx}
+\begin{DoxyCompactList}\small\item\em Physical lattice X spacing. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_a62b3a2ed35439f36591740d762f6e7a1}{dy}
+\begin{DoxyCompactList}\small\item\em Physical lattice Y spacing. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_a94a497f1cd79b35741843fcd3817c18f}{dz}
+\begin{DoxyCompactList}\small\item\em Physical lattice Z spacing. \end{DoxyCompactList}\item 
+int \hyperlink{class_grid_obj_ae0b724f2d977cfe38df2bb191e2fb042}{region\+\_\+number}
+\begin{DoxyCompactList}\small\item\em Region number. \end{DoxyCompactList}\item 
 int \hyperlink{class_grid_obj_a7dfedc4442a386ec15c8b03ca899c1a9}{level}
 \begin{DoxyCompactList}\small\item\em Level in embedded grid hierarchy. \end{DoxyCompactList}\item 
 double \hyperlink{class_grid_obj_afd504b39f12eb0a237bc6313de94e094}{dt}
@@ -126,7 +134,13 @@ int \hyperlink{class_grid_obj_a5eb35752a7c0741510975d9ee6aa3ce1}{N\+\_\+lim}
 int \hyperlink{class_grid_obj_a01d3f362634c896ecdb80f0e6304c12f}{M\+\_\+lim}
 \begin{DoxyCompactList}\small\item\em Local size of grid in Y-\/direction. \end{DoxyCompactList}\item 
 int \hyperlink{class_grid_obj_aaccc404f2fbdbaef8c5dd134f7d9e17f}{K\+\_\+lim}
-\begin{DoxyCompactList}\small\item\em Local size of grid in Z-\/direction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Local size of grid in Z-\/direction. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_adcd2bcbd5bb4009d7c84097e1356a1fa}{X\+Origin}
+\begin{DoxyCompactList}\small\item\em Global position of grid left edge. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_a30c070fe26def1366db2b3e66b3cd29d}{Y\+Origin}
+\begin{DoxyCompactList}\small\item\em Global position of grid bottom edge. \end{DoxyCompactList}\item 
+double \hyperlink{class_grid_obj_a69d43fd31ba7edd4fc9f02eb0c0fcefd}{Z\+Origin}
+\begin{DoxyCompactList}\small\item\em Global position of grid front edge. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
@@ -852,6 +866,27 @@ Currently, periodic B\+Cs are only applied on L0. Considers site typing as well 
 
 Physical time step size. 
 
+\index{Grid\+Obj@{Grid\+Obj}!dx@{dx}}
+\index{dx@{dx}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{dx}{dx}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::dx}\hypertarget{class_grid_obj_adbd4b9afbd8cf7bb2ccb48e7c5150f6d}{}\label{class_grid_obj_adbd4b9afbd8cf7bb2ccb48e7c5150f6d}
+
+
+Physical lattice X spacing. 
+
+\index{Grid\+Obj@{Grid\+Obj}!dy@{dy}}
+\index{dy@{dy}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{dy}{dy}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::dy}\hypertarget{class_grid_obj_a62b3a2ed35439f36591740d762f6e7a1}{}\label{class_grid_obj_a62b3a2ed35439f36591740d762f6e7a1}
+
+
+Physical lattice Y spacing. 
+
+\index{Grid\+Obj@{Grid\+Obj}!dz@{dz}}
+\index{dz@{dz}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{dz}{dz}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::dz}\hypertarget{class_grid_obj_a94a497f1cd79b35741843fcd3817c18f}{}\label{class_grid_obj_a94a497f1cd79b35741843fcd3817c18f}
+
+
+Physical lattice Z spacing. 
+
 \index{Grid\+Obj@{Grid\+Obj}!K\+\_\+lim@{K\+\_\+lim}}
 \index{K\+\_\+lim@{K\+\_\+lim}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{K\+\_\+lim}{K_lim}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::\+K\+\_\+lim}\hypertarget{class_grid_obj_aaccc404f2fbdbaef8c5dd134f7d9e17f}{}\label{class_grid_obj_aaccc404f2fbdbaef8c5dd134f7d9e17f}
@@ -901,6 +936,13 @@ Kinematic viscosity (in lattice units)
 
 Relaxation frequency. 
 
+\index{Grid\+Obj@{Grid\+Obj}!region\+\_\+number@{region\+\_\+number}}
+\index{region\+\_\+number@{region\+\_\+number}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{region\+\_\+number}{region_number}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::region\+\_\+number}\hypertarget{class_grid_obj_ae0b724f2d977cfe38df2bb191e2fb042}{}\label{class_grid_obj_ae0b724f2d977cfe38df2bb191e2fb042}
+
+
+Region number. 
+
 \index{Grid\+Obj@{Grid\+Obj}!t@{t}}
 \index{t@{t}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{t}{t}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::t}\hypertarget{class_grid_obj_a783b18a053e244ae7b7b436ab21c0592}{}\label{class_grid_obj_a783b18a053e244ae7b7b436ab21c0592}
@@ -929,6 +971,13 @@ Time-\/averaged time of a timestep.
 
 Vector of global X indices of each site. 
 
+\index{Grid\+Obj@{Grid\+Obj}!X\+Origin@{X\+Origin}}
+\index{X\+Origin@{X\+Origin}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{X\+Origin}{XOrigin}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::\+X\+Origin}\hypertarget{class_grid_obj_adcd2bcbd5bb4009d7c84097e1356a1fa}{}\label{class_grid_obj_adcd2bcbd5bb4009d7c84097e1356a1fa}
+
+
+Global position of grid left edge. 
+
 \index{Grid\+Obj@{Grid\+Obj}!X\+Pos@{X\+Pos}}
 \index{X\+Pos@{X\+Pos}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{X\+Pos}{XPos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ Grid\+Obj\+::\+X\+Pos}\hypertarget{class_grid_obj_af31df133bf9419da6222a0dbb4e54bab}{}\label{class_grid_obj_af31df133bf9419da6222a0dbb4e54bab}
@@ -943,6 +992,13 @@ Vector of global X positions of each site.
 
 Vector of global Y indices of each site. 
 
+\index{Grid\+Obj@{Grid\+Obj}!Y\+Origin@{Y\+Origin}}
+\index{Y\+Origin@{Y\+Origin}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Y\+Origin}{YOrigin}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::\+Y\+Origin}\hypertarget{class_grid_obj_a30c070fe26def1366db2b3e66b3cd29d}{}\label{class_grid_obj_a30c070fe26def1366db2b3e66b3cd29d}
+
+
+Global position of grid bottom edge. 
+
 \index{Grid\+Obj@{Grid\+Obj}!Y\+Pos@{Y\+Pos}}
 \index{Y\+Pos@{Y\+Pos}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{Y\+Pos}{YPos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ Grid\+Obj\+::\+Y\+Pos}\hypertarget{class_grid_obj_a2bd4e9b575377b8e76e5ebe7a3a31194}{}\label{class_grid_obj_a2bd4e9b575377b8e76e5ebe7a3a31194}
@@ -956,6 +1012,13 @@ Vector of global Y positions of each site.
 
 
 Vector of global Z indices of each site. 
+
+\index{Grid\+Obj@{Grid\+Obj}!Z\+Origin@{Z\+Origin}}
+\index{Z\+Origin@{Z\+Origin}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{Z\+Origin}{ZOrigin}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Obj\+::\+Z\+Origin}\hypertarget{class_grid_obj_a69d43fd31ba7edd4fc9f02eb0c0fcefd}{}\label{class_grid_obj_a69d43fd31ba7edd4fc9f02eb0c0fcefd}
+
+
+Global position of grid front edge. 
 
 \index{Grid\+Obj@{Grid\+Obj}!Z\+Pos@{Z\+Pos}}
 \index{Z\+Pos@{Z\+Pos}!Grid\+Obj@{Grid\+Obj}}

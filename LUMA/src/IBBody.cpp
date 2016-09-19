@@ -58,7 +58,7 @@ IBBody::~IBBody(void) { }
 void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
-	markers.emplace_back( x, y, z, flex_rigid );
+	markers.emplace_back(x, y, z, flex_rigid);
 
 	// Find support for new marker
 	ObjectManager::getInstance()->ibm_findSupport(static_cast<int>(id), static_cast<int>(markers.size()) - 1);
@@ -583,8 +583,8 @@ void IBBody::makeBody(PCpts* _PCpts) {
 	// Loop over array of points
 	for (size_t a = 1; a < _PCpts->x.size(); a++) {
 
-		// Pass to point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		// Pass to overridden point builder
+		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
 
 	}
 
@@ -606,4 +606,70 @@ void IBBody::makeBody(PCpts* _PCpts) {
 		);
 
 }
-// ***************************************************************************************************
+
+/*********************************************/
+/// \brief	Downsampling marker adding method (override)
+///
+///			This method is an override of the same method in the Body class.
+///			This version uses the optional flag argument to pass extra 
+///			information to IBB marker constructors.
+///
+/// \param x desired global X-position of new marker.
+/// \param y desired globalY-position of new marker.
+/// \param z desired globalZ-position of new marker.
+/// \param curr_mark is a reference to the ID of last marker.
+///	\param counter is a reference to the total number of markers in the body.
+/// \param flex_rigid indicates whether markers added should form part of flexible or rigid body.
+void IBBody::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid) {
+
+	// If point in current voxel
+	if (isInVoxel(x, y, z, curr_mark)) {
+
+		// Increment point counter
+		counter[curr_mark]++;
+
+		// Update position of marker in current voxel
+		markers[curr_mark].position[0] =
+			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
+		markers[curr_mark].position[1] =
+			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
+		markers[curr_mark].position[2] =
+			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
+
+
+		// If point is in an existing voxel
+	}
+	else if (isVoxelMarkerVoxel(x, y, z)) {
+
+		// Recover voxel number
+		MarkerData* m_data = getMarkerData(x, y, z);
+		curr_mark = m_data->ID;
+
+		// Increment point counter
+		counter[curr_mark]++;
+
+		// Update position of marker in current voxel
+		markers[curr_mark].position[0] =
+			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
+		markers[curr_mark].position[1] =
+			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
+		markers[curr_mark].position[2] =
+			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
+
+		delete m_data;
+
+	}
+	// Must be in a new marker voxel
+	else {
+
+		// Reset counter and increment voxel index
+		curr_mark = static_cast<int>(counter.size());
+		counter.push_back(1);
+
+		// Create new marker as this is a new marker voxel
+		addMarker(x, y, z, flex_rigid);
+
+	}
+
+
+};

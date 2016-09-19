@@ -6,7 +6,7 @@ var searchData=
   ['getinstance',['getInstance',['../class_mpi_manager.html#a486e424ae1b9dfa3218d260b0f9a0a2f',1,'MpiManager::getInstance()'],['../class_object_manager.html#acf7a2f12f034c76d9e3a5aa5837dddb5',1,'ObjectManager::getInstance()'],['../class_object_manager.html#a3c648f3d7388df47db0db9fcb4b8b618',1,'ObjectManager::getInstance(GridObj *g)']]],
   ['getmarkerdata',['getMarkerData',['../class_body.html#a530c704d7737af163c9ed06d42a373f0',1,'Body']]],
   ['getopposite',['getOpposite',['../class_grid_utils.html#af3c54e468658879756c71b01abd028d5',1,'GridUtils']]],
-  ['getvoxind',['getVoxInd',['../class_grid_utils.html#a46ee98a0b0967c88230aee8d19497914',1,'GridUtils::getVoxInd(double x, double y, double z)'],['../class_grid_utils.html#a056e6dc8478f608bc2ab374eee6e8c24',1,'GridUtils::getVoxInd(double p)']]],
+  ['getvoxind',['getVoxInd',['../class_grid_utils.html#ad6d26dfc410f88cb0901464a58c594ac',1,'GridUtils']]],
   ['global_5fdims',['global_dims',['../class_mpi_manager.html#ae41fb382e17680a49821077167bf1905',1,'MpiManager']]],
   ['global_5fedge_5find',['global_edge_ind',['../class_mpi_manager.html#a0f994471f9c2986b2c8606b7b716566a',1,'MpiManager']]],
   ['global_5fedge_5fpos',['global_edge_pos',['../class_mpi_manager.html#abd8c87e0a21d31b59d7cc1f7f146d5f4',1,'MpiManager']]],

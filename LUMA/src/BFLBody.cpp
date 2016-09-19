@@ -62,7 +62,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	for (size_t a = 1; a < _PCpts->x.size(); a++) {
 
 		// Pass to point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, false);
 
 	}
 
@@ -184,13 +184,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 	kb = k;
 
 	// Get marker data associated with this local site
-#ifdef L_BUILD_FOR_MPI
-	// Convert to global indices for marker access
-	std::vector<int> globals; GridUtils::local_to_global(i,j,k,g,globals);
-	m_data = getMarkerData(globals[0],globals[1],globals[2]);
-#else
-	m_data = getMarkerData(i,j,k);
-#endif
+	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[k]);
 
 	storeID = m_data->ID;
 
@@ -204,13 +198,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 				if (ib >= 0 && ib < g->N_lim && jb >= 0 && jb < g->M_lim && kb >= 0 && kb < g->K_lim) {
 
 					// Fetch data if available //
-#ifdef L_BUILD_FOR_MPI
-					// Convert to global indices for marker access
-					globals.clear(); GridUtils::local_to_global(ii,jj,kk,g,globals);
-					m_data = getMarkerData(globals[0],globals[1],globals[2]);
-#else
-					m_data = getMarkerData(ii,jj,kk);
-#endif
+					m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[kk]);
 
 					// If data valid, then store ID
 					if (!L_IS_NAN(m_data->x)) V.push_back(m_data->ID);
@@ -382,13 +370,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	int jb = j;
 	
 	// Get marker data associated with this local site
-#ifdef L_BUILD_FOR_MPI
-	// Convert to global indices for marker access
-	std::vector<int> globals; GridUtils::local_to_global(i,j,0,g,globals);
-	m_data = getMarkerData(globals[0],globals[1],0);
-#else
-	m_data = getMarkerData(i,j,0);
-#endif
+	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[0]);
 
 	int storeID = m_data->ID;
 
@@ -403,13 +385,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 			
 
 				// Fetch data if available //
-#ifdef L_BUILD_FOR_MPI
-				// Convert to global indices for marker access
-				globals.clear(); GridUtils::local_to_global(ii,jj,0,g,globals);
-				m_data = getMarkerData(globals[0],globals[1],0);
-#else
-				m_data = getMarkerData(ii,jj,0);
-#endif
+				m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[0]);
 
 				// If data valid, then store ID
 				if (!L_IS_NAN(m_data->x)) V.push_back(m_data->ID);

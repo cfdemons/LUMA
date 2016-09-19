@@ -145,9 +145,12 @@ public :
 	double timeav_timestep;			///< Time-averaged time of a timestep
 
 	// Local grid sizes
-	int N_lim;		///< Local size of grid in X-direction
-	int M_lim;		///< Local size of grid in Y-direction
-	int K_lim;		///< Local size of grid in Z-direction
+	int N_lim;			///< Local size of grid in X-direction
+	int M_lim;			///< Local size of grid in Y-direction
+	int K_lim;			///< Local size of grid in Z-direction
+	double XOrigin;	///< Global position of grid left edge
+	double YOrigin;	///< Global position of grid bottom edge
+	double ZOrigin;	///< Global position of grid front edge
 
 
 	/*

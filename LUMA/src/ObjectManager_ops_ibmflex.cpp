@@ -551,7 +551,7 @@ void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 ///			iBodies marked as deformable. Updates support on completion.
 ///
 /// \param	ib	index of body to which calculation is to be applied.
-void ObjectManager::ibm_position_update(int ib) {
+void ObjectManager::ibm_positionUpdate(int ib) {
 
 	// If a flexible body then launch structural solver to find new positions
 	if (iBody[ib].flex_rigid) {
@@ -580,7 +580,7 @@ void ObjectManager::ibm_position_update(int ib) {
 		iBody[ib].markers[m].deltaval.clear();
 
 		// Recompute support
-		ibm_findsupport(ib, m);
+		ibm_findSupport(ib, m);
 	}
 
 
@@ -595,7 +595,7 @@ void ObjectManager::ibm_position_update(int ib) {
 ///			been called.
 ///
 /// \param	group	group ID to be updated.
-void ObjectManager::ibm_position_update_grp(int group) {
+void ObjectManager::ibm_positionUpdateGroup(int group) {
 
 	// Find flexible body in group and store index
 	int ib_flex = 0;
@@ -638,7 +638,7 @@ void ObjectManager::ibm_position_update_grp(int group) {
 				iBody[ib].markers[m].deltaval.clear();
 
 				// Recompute support
-				ibm_findsupport(ib, m);
+				ibm_findSupport(ib, m);
 			}
 		}
 	}

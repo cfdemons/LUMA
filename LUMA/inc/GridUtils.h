@@ -88,8 +88,8 @@ public:
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
 	// Voxel finding utilities
+	static std::vector<int> getVoxInd(double x, double y, double z, GridObj* g);
 	static std::vector<int> getVoxInd(double x, double y, double z);
-	static int getVoxInd(double p);
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic

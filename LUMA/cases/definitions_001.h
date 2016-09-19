@@ -92,7 +92,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
-//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 100				///< Frequency of write out of restart file
 
 // LBM configuration

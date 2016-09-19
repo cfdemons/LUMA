@@ -213,7 +213,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
 
 			// Move the body if necessary
-			ObjectManager::getInstance()->ibm_move_bodies();
+			ObjectManager::getInstance()->ibm_moveBodies();
 
 
 		}

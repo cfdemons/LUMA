@@ -106,11 +106,11 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
 
-				force_on_object_x += c[0][n_opp] *
+				forceOnObjectX += c[0][n_opp] *
 					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
-				force_on_object_y += c[1][n_opp] *
+				forceOnObjectY += c[1][n_opp] *
 					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
-				force_on_object_z += c[2][n_opp] *
+				forceOnObjectZ += c[2][n_opp] *
 					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
 
 			}

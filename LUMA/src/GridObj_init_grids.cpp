@@ -456,6 +456,11 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	ZPos = GridUtils::linspace( L_a_z + dz/2, L_b_z - dz/2, L_K );
 #endif
 
+	// Global origins
+	XOrigin = L_a_x;
+	YOrigin = L_a_y;
+	ZOrigin = L_a_z;
+
 	
 
 	// Define TYPING MATRICES
@@ -718,10 +723,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Get local grid size of the sub grid based on limits
 	int local_size[L_dims] = {
-		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) + 1,
-		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5)*2) + 1
+		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5) * 2) + 1,
+		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5) * 2) + 1
 #if (L_dims == 3)
-		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5)*2) + 1
+		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5) * 2) + 1
 #endif
 	};
 
@@ -750,6 +755,21 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
+
+	// Global origins
+	XOrigin = 0.0;
+	YOrigin = 0.0;
+	ZOrigin = 0.0;
+
+	// Aggregate offset
+	for (int n = 0; n < level; n++) {
+
+		XOrigin += RefXstart[n][region_number] * dx * pow(2, level - n);
+		YOrigin += RefYstart[n][region_number] * dy * pow(2, level - n);
+#if (L_dims == 3)
+		ZOrigin += RefZstart[n][region_number] * dz * pow(2, level - n);
+#endif
+	}
 
 	
 	// Generate TYPING MATRICES

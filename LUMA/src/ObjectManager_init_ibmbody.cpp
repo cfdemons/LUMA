@@ -23,7 +23,7 @@
 // ************************************************************************** //
 /// \brief Builds a prefab immersed boundary body.
 /// \param	body_type	type of body to be built.
-void ObjectManager::ibm_build_body(int body_type) {
+void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Declarations
 	std::vector<double> dimensions, centrepoint, start_position, end_position;
@@ -33,7 +33,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 	GridUtils::getGrid(this->_Grids, L_IB_Lev, L_IB_Reg, g);
 
 	// Increase the iBody array by single IBBody object
-	iBody.emplace_back(g);
+	iBody.emplace_back(g, iBody.size());
 
 	// Check that the owning grid was found and exists
 	if ( iBody.back()._Owner == NULL ) {
@@ -94,7 +94,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		iBody.back().makeBody(L_ibb_r, centrepoint, false, L_ibb_deform, static_cast<int>(iBody.size() - 1));
 		
 		// Grow vector
-		iBody.emplace_back();
+		iBody.emplace_back(g, iBody.size());
 
 		// Angle vector
 		std::vector<double> angles;
@@ -149,7 +149,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 #if (L_dims == 2)
 		*GridUtils::logfile << "Building plate as a filament as only 2D" << std::endl;
 		iBody.resize(iBody.size()-1); // Reduce size of iBody vector
-		ibm_build_body(4);	// Call add again but as a filament
+		ibm_buildBody(4);	// Call add again but as a filament
 #else
 		// In 3D, build an array of filaments
 		int group = 999;
@@ -198,7 +198,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 
 			if (i != 0) {
 				// Increase the iBody array by single IBBody object when not on first loop
-				iBody.emplace_back();
+				iBody.emplace_back(g, iBody.size());
 			}
 
 			// Build filament with fixed group ID making centre filament flexible
@@ -261,7 +261,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		iBody.back().makeBody(L_num_markers - 1, start_position, L_ibb_filament_length - lspace, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
 
 		// Add flap of half the length (slightly lower resolution)
-		iBody.emplace_back();
+		iBody.emplace_back(g, iBody.size());
 		angles[0] = 0.0;
 		start_position[0] = ( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*cos(-L_ibb_angle_vert * L_PI / 180);
 		start_position[1] = ( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*sin(-L_ibb_angle_vert * L_PI / 180);
@@ -345,7 +345,7 @@ void ObjectManager::ibm_build_body(int body_type) {
 		for (int i = 0; i < lengthwise_fils; i++ ) {
 
 			// Increase the iBody array by single IBBody object
-			iBody.emplace_back();
+			iBody.emplace_back(g, iBody.size());
 
 			// Start point in z
 			start_point[2] = start_z + i*lspace;
@@ -368,10 +368,10 @@ void ObjectManager::ibm_build_body(int body_type) {
 /// \brief Wrapper for building a body from a point cloud.
 /// \param	_PCpts	pointer to point cloud data.
 /// \param	owner	pointer to the grid on which the body is to be placed.
-void ObjectManager::ibm_build_body(PCpts* _PCpts, GridObj *owner) {
+void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner) {
 
 	// Add new body
-	iBody.emplace_back(owner);
+	iBody.emplace_back(owner, iBody.size());
 	iBody.back().makeBody(_PCpts);
 
 }

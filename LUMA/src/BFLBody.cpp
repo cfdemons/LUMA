@@ -39,10 +39,12 @@ BFLBody::~BFLBody(void)
 /// \brief Custom constructor to populate body from array of points.
 /// \param _PCpts pointer to point cloud data
 /// \param g_hierarchy pointer to grid hierarchy
-BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy) {
+/// \param id	ID of body in array of bodies.
+BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 
 	// Assign pointer to owning grid
 	GridUtils::getGrid(g_hierarchy, L_bfl_on_grid_lev, L_bfl_on_grid_reg, this->_Owner);
+	this->id = id;
 
 	// Voxel grid filter //
 

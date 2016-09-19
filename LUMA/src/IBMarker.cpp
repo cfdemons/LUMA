@@ -15,6 +15,7 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBMarker.h"
+#include "../inc/GridUtils.h"
 
 // ***************************************************************************************************
 /// \brief Custom constructor with position.

@@ -23,7 +23,7 @@
 // ************************************************************************** //
 /// \brief Write out position of immersed boundary bodies.
 /// \param	timestep	timestep at which the write out is being performed.
-void ObjectManager::io_write_body_pos(int timestep) {
+void ObjectManager::io_writeBodyPosition(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -56,7 +56,7 @@ void ObjectManager::io_write_body_pos(int timestep) {
 // ************************************************************************** //
 /// \brief Write out forces on the markers of immersed boundary bodies.
 /// \param	timestep	timestep at which the write out is being performed.
-void ObjectManager::io_write_lift_drag(int timestep) {
+void ObjectManager::io_writeLiftDrag(int timestep) {
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -235,7 +235,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 ///			Currently can only write out un-closed bodies like filaments.
 ///
 /// \param	tval	time value at which the write out is being performed.
-void ObjectManager::io_vtk_IBwriter(double tval) {
+void ObjectManager::io_vtkIBBWriter(double tval) {
 
     // Loop through each iBody
     for (size_t ib = 0; ib < iBody.size(); ib++) {
@@ -438,7 +438,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Declare local variables
 	std::vector<int> locals;
-	int global_i, global_j, global_k;
+	std::vector<int> globals;
 
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
@@ -448,12 +448,10 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	do {
 
 		// Get global voxel index
-		global_i = GridUtils::getVoxInd(_PCpts->x[a]);
-		global_j = GridUtils::getVoxInd(_PCpts->y[a]);
-		global_k = GridUtils::getVoxInd(_PCpts->z[a]);
+		globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
 
 		// If on this rank
-		if (GridUtils::isOnThisRank(global_i, global_j, global_k, *g)) {
+		if (GridUtils::isOnThisRank(globals[0], globals[1], globals[2], *g)) {
 			// Increment counter
 			a++;
 
@@ -495,12 +493,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 #endif
 			// Label the grid sites
 			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+
 				// Get globals
-				global_i = GridUtils::getVoxInd(_PCpts->x[a]);
-				global_j = GridUtils::getVoxInd(_PCpts->y[a]);
-				global_k = GridUtils::getVoxInd(_PCpts->z[a]);
+				globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
+
 				// Get local indices
-				GridUtils::global_to_local(global_i, global_j, global_k, g, locals);
+				GridUtils::global_to_local(globals[0], globals[1], globals[2], g, locals);
 
 				// Update Typing Matrix
 				if (g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid)
@@ -515,18 +513,16 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call BFL body builder
-			bfl_build_body(_PCpts);
+			bfl_buildBody(_PCpts);
 			break;
 
 		case eIBBCloud:
-			global_j = GridUtils::getVoxInd(_PCpts->y[a]);
-			global_k = GridUtils::getVoxInd(_PCpts->z[a]);
 
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call IBM body builder
-			ibm_build_body(_PCpts, g);
+			ibm_buildBody(_PCpts, g);
 			break;
 
 		}
@@ -559,10 +555,10 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
 
 		fout << std::to_string(tval) << ","
-			<< std::to_string(force_on_object_x / pow(2, L_object_on_grid_lev)) << ","
-			<< std::to_string(force_on_object_y / pow(2, L_object_on_grid_lev)) << ","
+			<< std::to_string(forceOnObjectX / pow(2, L_object_on_grid_lev)) << ","
+			<< std::to_string(forceOnObjectY / pow(2, L_object_on_grid_lev)) << ","
 #if (dims == 3)
-			<< std::to_string(force_on_object_z / pow(2, L_object_on_grid_lev))
+			<< std::to_string(forceOnObjectZ / pow(2, L_object_on_grid_lev))
 #else
 			<< std::to_string(0.0)
 #endif
@@ -571,9 +567,9 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 		fout.close();
 
 		// Reset for next time step
-		force_on_object_x = 0.0;
-		force_on_object_y = 0.0;
-		force_on_object_z = 0.0;
+		forceOnObjectX = 0.0;
+		forceOnObjectY = 0.0;
+		forceOnObjectZ = 0.0;
 	}
 
 }

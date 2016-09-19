@@ -34,7 +34,7 @@ public:
 	BFLBody(void);
 	~BFLBody(void);
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid hierarchy for the labelling
-	BFLBody(PCpts *_PCpts, GridObj *g_hierarchy);
+	BFLBody(PCpts *_PCpts, GridObj *g_hierarchy, size_t id);
 
 protected:
 

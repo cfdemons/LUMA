@@ -899,17 +899,43 @@ bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 }
 
 // ****************************************************************************
-/// \brief	Get global voxel indices
+/// \brief	Get local voxel indices
 ///
 ///			Will return the voxel indices of the nearest voxel on the lattice 
-///			for a given point in global space. Assumes that the physical lattice 
-///			size is 1 unit big which relies on the position being scaled. If not,
-///			method acts as a natural voxel grid filter.
+///			provided for a given point described as a position in global space.
+///			Can return global values that are not on this MPI rank. Use the
+///			GridUtils::isOnThisRank() method to check the result.
 ///
 /// \param	x	global x-position.
 /// \param	y	global y-position.
 /// \param	z	global z-position.
-/// \return vector of indices of the nearest voxel.
+/// \param	g	lattice on which to look for nearest voxel.
+/// \return vector of indices of the nearest voxel on supplied lattice level.
+std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) {
+
+	std::vector<int> vox;
+
+	// Find how far point is from origin of grid and round to nearest voxel
+	vox.push_back((int)std::floor((x - (g->XOrigin - g->dx / 2.0))/ g->dx));
+	vox.push_back((int)std::floor((y - (g->YOrigin - g->dy / 2.0)) / g->dy));
+	vox.push_back((int)std::floor((z - (g->ZOrigin - g->dz / 2.0)) / g->dz));
+
+	return vox;
+
+}
+
+// ****************************************************************************
+/// \brief	Get local voxel indices
+///
+///			Will return the indices of the nearest lattice unit to the position
+///			supplied. This version of the function assumes the positions are 
+///			specified in a scaled-global-lattice space. i.e. if the global grid
+///			is indexed 0-40 then the points will be distributed in this range only.
+///
+/// \param	x	scaled x-position.
+/// \param	y	scaled y-position.
+/// \param	z	scaled z-position.
+/// \return vector of indices of the nearest voxel on supplied lattice level.
 std::vector<int> GridUtils::getVoxInd(double x, double y, double z) {
 
 	std::vector<int> vox;
@@ -926,22 +952,5 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z) {
 	else vox.push_back((int)std::floor(z));
 
 	return vox;
-
-}
-
-// ****************************************************************************
-/// \brief	Get global voxel index
-///
-////		Will return the voxel indices of the nearest voxel on the lattice
-///			for a given point in global space. Assumes that the physical lattice 
-///			size is 1 unit big which relies on the position being scaled. If not,
-///			method acts as a natural voxel grid filter.
-///
-/// \param	p	global position.
-/// \return corresponding global index.
-int GridUtils::getVoxInd(double p) {
-
-	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
-	else return (int)std::floor(p);
 
 }

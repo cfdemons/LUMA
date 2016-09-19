@@ -49,9 +49,9 @@ class ObjectManager
 private:
 
 	// Bounce-back object fields
-	double force_on_object_x = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
-	double force_on_object_y = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
-	double force_on_object_z = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
+	double forceOnObjectX = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
+	double forceOnObjectY = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
+	double forceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
 
 	// Objects
 	std::vector<Body<Marker>> bBody;		///< Array of default bodies
@@ -84,16 +84,16 @@ public:
 
 	// IBM methods //
 	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
-	void ibm_build_body(int body_type);		// Build a new pre-fab IBM body
-	void ibm_build_body(PCpts* _PCpts, GridObj *owner);		// Overloaded build-body to build from point cloud
+	void ibm_buildBody(int body_type);		// Build a new pre-fab IBM body
+	void ibm_buildBody(PCpts* _PCpts, GridObj *owner);		// Overloaded build-body to build from point cloud
 	void ibm_initialise();					// Initialise a built immersed body with support.
-	double ibm_deltakernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
+	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
 	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
 	void ibm_spread(int ib);				// Spreading of restoring force from ib-th body.
-	void ibm_findsupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
-	void ibm_computeforce(int ib);			// Compute restorative force at each marker in ib-th body.
-	double ibm_findepsilon(int ib);			// Method to find epsilon weighting parameter for ib-th body.
-	void ibm_move_bodies();					// Update all IBBody positions and support.
+	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
+	void ibm_computeForce(int ib);			// Compute restorative force at each marker in ib-th body.
+	double ibm_findEpsilon(int ib);			// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_moveBodies();					// Update all IBBody positions and support.
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
 		std::vector<double>& bVector, std::vector<double>& epsilon,
 						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
@@ -101,8 +101,8 @@ public:
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
-	void ibm_position_update(int ib);			// Updates the position of deformable body markers.
-	void ibm_position_update_grp(int group);	// Updates the positions of deformable bodies in a group.
+	void ibm_positionUpdate(int ib);			// Updates the position of deformable body markers.
+	void ibm_positionUpdateGroup(int group);	// Updates the positions of deformable bodies in a group.
 	// Methods to solve the Jacobian system associated with Jacowire
 	void ibm_banbks(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double b[]);
@@ -111,19 +111,19 @@ public:
 
 
 	// BFL methods //
-	void bfl_build_body(int body_type);		// Build a new pre-fab bounce-back body
-	void bfl_build_body(PCpts* _PCpts);		// Overload to build from point cloud data
+	void bfl_buildBody(int body_type);		// Build a new pre-fab bounce-back body
+	void bfl_buildBody(PCpts* _PCpts);		// Overload to build from point cloud data
 
 	// Force calculation
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
 	// IO methods //
-	void io_vtk_IBwriter(double tval);				// VTK body writer
-	void io_write_body_pos(int timestep);			// Write out IBBody positions at specified timestep to text files
-	void io_write_lift_drag(int timestep);			// Write out IBBody lift and drag at specified timestep
+	void io_vtkIBBWriter(double tval);				// VTK body writer
+	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
+	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(bool IO_flag, int level);		// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts* _PCpts, eObjectType objtype);	// Method to read in Point Cloud data
-	void io_writeForceOnObject(double tval);			// Method to write object forces to a csv file
+	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
 };
 
 #endif

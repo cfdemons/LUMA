@@ -273,39 +273,39 @@ int main( int argc, char* argv[] )
 	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
 
 #if defined L_INSERT_RECTANGLE_CUBOID
-	objMan->ibm_build_body(1);
+	objMan->ibm_buildBody(1);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
 
 #elif defined L_INSERT_CIRCLE_SPHERE
-	objMan->ibm_build_body(2);
+	objMan->ibm_buildBody(2);
 	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
 
 #elif defined L_INSERT_BOTH
-	objMan->ibm_build_body(3);
+	objMan->ibm_buildBody(3);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
 
 #elif defined L_INSERT_FILAMENT
-	objMan->ibm_build_body(4);
+	objMan->ibm_buildBody(4);
 	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
 
 #elif defined L_INSERT_FILARRAY
-	objMan->ibm_build_body(5);
+	objMan->ibm_buildBody(5);
 	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
 
 #elif defined L_2D_RIGID_PLATE_IBM
-	objMan->ibm_build_body(6);
+	objMan->ibm_buildBody(6);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
 
 #elif defined L_2D_PLATE_WITH_FLAP
-	objMan->ibm_build_body(7);
+	objMan->ibm_buildBody(7);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
 
 #elif defined L_3D_RIGID_PLATE_IBM
-	objMan->ibm_build_body(8);
+	objMan->ibm_buildBody(8);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
 
 #elif defined L_3D_PLATE_WITH_FLAP
-	objMan->ibm_build_body(9);
+	objMan->ibm_buildBody(9);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
 
 #endif
@@ -341,7 +341,7 @@ int main( int argc, char* argv[] )
 	objMan->io_readInCloud(_PCpts, eBFLCloud);
 
 	// Call BFL body builder if there are points on this rank
-	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
+	if (!_PCpts->x.empty())	objMan->bfl_buildBody(_PCpts);
 
 	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	delete _PCpts;
@@ -504,14 +504,14 @@ int main( int argc, char* argv[] )
 #endif
 
 #if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
-		objMan->io_vtk_IBwriter(Grids.t);
+		objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
 	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
 	&& defined L_IBM_ON && defined L_IBBODY_TRACER
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
-			objMan->io_write_body_pos(Grids.t);
+			objMan->io_writeBodyPosition(Grids.t);
 #endif
 		}
 
@@ -524,7 +524,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
-			objMan->io_write_lift_drag(Grids.t);
+			objMan->io_writeLiftDrag(Grids.t);
 #endif
 		}
 #endif	

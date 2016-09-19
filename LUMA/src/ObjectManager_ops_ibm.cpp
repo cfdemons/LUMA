@@ -71,7 +71,7 @@ void ObjectManager::ibm_apply() {
 #endif
 
 			// Compute restorative force
-			ibm_computeforce(ib);
+			ibm_computeForce(ib);
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out Lagrange force values
@@ -96,7 +96,7 @@ void ObjectManager::ibm_apply() {
 ///			Wrapper for relocating markers of an iBody be calling appropriate
 ///			positional update routine.
 ///
-void ObjectManager::ibm_move_bodies() {
+void ObjectManager::ibm_moveBodies() {
 
 	// Loop over bodies launching positional update if deformable to compute new locations of markers
 	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
@@ -106,11 +106,11 @@ void ObjectManager::ibm_move_bodies() {
 		if (iBody[ib].deformable) {
 
 			// Call structural or forced positional update and recompute support
-			ibm_position_update(ib);
+			ibm_positionUpdate(ib);
 
 #ifndef L_STOP_EPSILON_RECOMPUTE
 			// Recompute epsilon
-			ibm_findepsilon(ib);
+			ibm_findEpsilon(ib);
 #endif
 
 		}
@@ -119,7 +119,7 @@ void ObjectManager::ibm_move_bodies() {
 #if defined L_INSERT_FILARRAY
 	// Special bit for filament-based plates where flexible centreline is used to update position of others in group
 	*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
-	ibm_position_update_grp(999);
+	ibm_positionUpdateGroup(999);
 #endif
 
 }
@@ -148,11 +148,11 @@ void ObjectManager::ibm_initialise() {
 
 		// Compute support for each marker
 		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
-			ibm_findsupport(ib, m);	// Pass body ID and marker ID
+			ibm_findSupport(ib, m);	// Pass body ID and marker ID
 		}
 
 		// Find epsilon for the body
-		ibm_findepsilon(ib);
+		ibm_findEpsilon(ib);
 
 	}
 
@@ -166,7 +166,7 @@ void ObjectManager::ibm_initialise() {
 /// \param	radius		location at which kernel should be evaluated.
 /// \param	dilation	width of kernel function.
 /// \return	value of kernel function.
-double ObjectManager::ibm_deltakernel(double radius, double dilation) {
+double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 
 	double mag_r, value;
 
@@ -192,7 +192,7 @@ double ObjectManager::ibm_deltakernel(double radius, double dilation) {
 ///
 /// \param	ib	body under consideration.
 /// \param	m	marker whose support is to be found.
-void ObjectManager::ibm_findsupport(int ib, int m) {
+void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Declarations
 	int inear, jnear;					// Nearest node indices
@@ -257,6 +257,10 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 		exit(LUMA_FAILED);
 	}
 
+	// Add closest marker first
+	iBody[ib].markers[m].supp_i.push_back(inear);
+	iBody[ib].markers[m].supp_j.push_back(jnear);
+	iBody[ib].markers[m].supp_k.push_back(knear);
 
 	// Loop over surrounding 5 nodes to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
@@ -269,6 +273,9 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
 					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 					) {
+
+						// Skip the nearest
+						if (i == inear && j == jnear && k == knear) continue;
 
 						// Lies within support region so store information
 						iBody[ib].markers[m].supp_i.push_back(i);
@@ -285,9 +292,9 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 						dist_z = (iBody[ib]._Owner->ZPos[k]-iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
 
 						// Store delta function value
-						delta_x = ibm_deltakernel(dist_x, iBody[ib].markers[m].dilation);
-						delta_y = ibm_deltakernel(dist_y, iBody[ib].markers[m].dilation);
-						delta_z = ibm_deltakernel(dist_z, iBody[ib].markers[m].dilation);
+						delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
+						delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
+						delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
 
 						iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y * delta_z );
 
@@ -311,6 +318,11 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 
 	}
 
+	// Add closest marker first
+	iBody[ib].markers[m].supp_i.push_back(inear);
+	iBody[ib].markers[m].supp_j.push_back(jnear);
+	iBody[ib].markers[m].supp_k.push_back(0);
+
 	// 2D version to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
@@ -320,6 +332,9 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 			if (	( fabs(iBody[ib].markers[m].position[0] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
 					( fabs(iBody[ib].markers[m].position[1] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 				) {
+
+					// Skip the nearest
+					if (i == inear && j == jnear) continue;
 
 					// Lies within support region so store information
 					iBody[ib].markers[m].supp_i.push_back(i);
@@ -334,8 +349,8 @@ void ObjectManager::ibm_findsupport(int ib, int m) {
 					dist_y = (iBody[ib]._Owner->YPos[j]-iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
 
 					// Store delta function value
-					delta_x = ibm_deltakernel(dist_x, iBody[ib].markers[m].dilation);
-					delta_y = ibm_deltakernel(dist_y, iBody[ib].markers[m].dilation);
+					delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
+					delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
 
 					iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y );
 
@@ -410,7 +425,7 @@ void ObjectManager::ibm_interpol(int ib) {
 // *****************************************************************************
 /// \brief	Compute restorative force at each marker in a body.
 /// \param	ib	iBody being operated on.
-void ObjectManager::ibm_computeforce(int ib) {
+void ObjectManager::ibm_computeForce(int ib) {
 
 	// Loop over markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
@@ -467,7 +482,7 @@ void ObjectManager::ibm_spread(int ib) {
 // *****************************************************************************
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
-double ObjectManager::ibm_findepsilon(int ib) {
+double ObjectManager::ibm_findEpsilon(int ib) {
 
 	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
@@ -497,25 +512,25 @@ double ObjectManager::ibm_findepsilon(int ib) {
 				Delta_I = iBody[ib].markers[I].deltaval[s];
 #if (L_dims == 3)
 				Delta_J =
-					ibm_deltakernel(
+					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dx, 
 					iBody[ib].markers[J].dilation
 					) *
-					ibm_deltakernel(
+					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dx,
 					iBody[ib].markers[J].dilation
 					) *
-					ibm_deltakernel(
+					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[2] - iBody[ib]._Owner->ZPos[iBody[ib].markers[I].supp_k[s]]) / iBody[ib]._Owner->dx,
 					iBody[ib].markers[J].dilation
 					);
 #else
 				Delta_J =
-					ibm_deltakernel(
+					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dx,
 					iBody[ib].markers[J].dilation
 					) *
-					ibm_deltakernel(
+					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dx,
 					iBody[ib].markers[J].dilation
 					);

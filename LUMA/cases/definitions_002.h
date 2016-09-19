@@ -85,18 +85,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Gravity
-//#define GRAVITY_ON						///< Turn on gravity force
+#define GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
-#define L_grav_force 0	//( 3 * gUtils.vecnorm(L_u_0x,L_u_0y,L_u_0z) * nu / pow(fabs(L_b_y - L_a_y),2) )
+#define L_grav_force 0.0001
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 100				///< Frequency of write out of restart file
+#define L_restart_out_every 1000			///< Frequency of write out of restart file
 
 // LBM configuration
-//#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
+#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
 
 
 /*
@@ -189,7 +189,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // Read in IB Body from File
-#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
+//#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
 
 	#define L_ibb_on_grid_lev L_IB_Lev		///< Provide grid level on which object should be added
 	#define L_ibb_on_grid_reg L_IB_Reg		///< Provide grid region on which object should be added
@@ -211,7 +211,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 //#define L_INSERT_CIRCLE_SPHERE
 //#define L_INSERT_RECTANGLE_CUBOID
 //#define L_INSERT_BOTH
-//#define L_INSERT_FILAMENT
+#define L_INSERT_FILAMENT
 //#define L_INSERT_FILARRAY
 //#define L_2D_RIGID_PLATE_IBM
 //#define L_2D_PLATE_WITH_FLAP
@@ -254,11 +254,11 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
-#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
@@ -269,12 +269,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Periodicity
-//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
 #define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units

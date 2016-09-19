@@ -33,7 +33,7 @@ public:
 	// Constructor and destructor
 	IBBody(void);
 	~IBBody(void);
-	IBBody(GridObj* g);
+	IBBody(GridObj* g, size_t id);
 
 protected:
 

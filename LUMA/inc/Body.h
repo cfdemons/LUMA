@@ -88,7 +88,7 @@ public:
 
 	Body(void);			// Default Constructor
 	~Body(void);		// Default destructor
-	Body(GridObj* g);	// Custom constructor assigning grid hierarchy
+	Body(GridObj* g, size_t id);	// Custom constructor assigning grid hierarchy
 
 	// ************************ Members ************************ //
 
@@ -97,11 +97,12 @@ protected:
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (for output)
 	GridObj* _Owner;					///< Pointer to owning grid
+	size_t id;							///< ID of body in array of bodies
 
 
 	// ************************ Methods ************************ //
 
-	void addMarker(double x, double y, double z);					// Add a marker
+	virtual void addMarker(double x, double y, double z);			// Add a marker (can be overridden)
 	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
 	void markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter);	// Voxelising marker adder
 	bool isInVoxel(double x, double y, double z, int curr_mark);	// Check a point is inside an existing marker voxel
@@ -128,19 +129,32 @@ Body<MarkerType>::~Body(void)
 ///
 /// \param g pointer to grid which owns this body.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g)
+Body<MarkerType>::Body(GridObj* g, size_t id)
 {
 	this->_Owner = g;
+	this->id = id;
 };
 
-/// \brief Add marker to the body.
-/// \param x X-position of marker.
-/// \param y Y-position of marker.
-/// \param z Z-position of marker.
+/// \brief	Add marker to the body.
+///
+///			Virtual as can be overwritten by sub-class of Body such as IBBody.
+///
+/// \param	x global X-position of marker.
+/// \param	y global Y-position of marker.
+/// \param	z global Z-position of marker.
 template <typename MarkerType>
 void Body<MarkerType>::addMarker(double x, double y, double z)
 {
-	markers.emplace_back(x, y, z);	// Add a new marker object to the array
+	// Add a new marker object to the array
+	markers.emplace_back(x, y, z);
+
+	// Add nearest node as basic support
+	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);	// Global indices
+
+	// Add global support point
+	this->markers.back().supp_i.push_back(globals[0]);
+	this->markers.back().supp_j.push_back(globals[1]);
+	this->markers.back().supp_k.push_back(globals[2]);
 };
 
 /*********************************************/
@@ -156,8 +170,8 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
-	// Get indices of voxel associated with the supplied position
-	std::vector<int> vox = GridUtils::getVoxInd(x, y, z);
+	// Get global indices of voxel associated with the supplied position
+	std::vector<int> vox = GridUtils::getVoxInd(x, y, z, _Owner);
 
 	// Find all marker IDs that match these indices
 	for (int i = 0; i < static_cast<int>(markers.size()); ++i) {

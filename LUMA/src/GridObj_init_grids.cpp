@@ -457,9 +457,13 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 #endif
 
 	// Global origins
-	XOrigin = L_a_x;
-	YOrigin = L_a_y;
-	ZOrigin = L_a_z;
+	XOrigin = L_a_x + dx / 2;
+	YOrigin = L_a_y + dy / 2;
+#if (L_dims == 3)
+	ZOrigin = L_a_z + dz / 2;
+#else
+	ZOrigin = 0.0;
+#endif
 
 	
 
@@ -756,10 +760,15 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
 
-	// Global origins
-	XOrigin = 0.0;
-	YOrigin = 0.0;
+	/* Global edge origins (set to local dx plus L0 edge then use series 
+	 * expression to correct for presence of other grids) */
+	XOrigin = dx + L_a_x;
+	YOrigin = dy + L_a_y;
+#if (L_dims == 3)
+	ZOrigin = dz + L_a_z;
+#else
 	ZOrigin = 0.0;
+#endif
 
 	// Aggregate offset
 	for (int n = 0; n < level; n++) {

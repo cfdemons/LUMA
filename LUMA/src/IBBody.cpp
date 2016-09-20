@@ -60,8 +60,11 @@ void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 	// Extend array of particles by 1 and construct a new IBMarker object
 	markers.emplace_back(x, y, z, flex_rigid);
 
-	// Find support for new marker
-	ObjectManager::getInstance()->ibm_findSupport(static_cast<int>(id), static_cast<int>(markers.size()) - 1);
+	// Add nearest node as basic support
+	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
+	this->markers.back().supp_i.push_back(globals[0]);
+	this->markers.back().supp_j.push_back(globals[1]);
+	this->markers.back().supp_k.push_back(globals[2]);
 
 }
 

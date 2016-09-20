@@ -325,7 +325,6 @@ int main( int argc, char* argv[] )
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
 	objMan->ibm_initialise();
-	*GridUtils::logfile << "Number of markers requested for objects = " << L_num_markers << std::endl;
 
 #endif
 

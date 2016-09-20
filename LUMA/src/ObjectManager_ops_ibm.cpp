@@ -195,10 +195,9 @@ double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Declarations
-	int inear, jnear;					// Nearest node indices
+	int inear, jnear;		// Nearest node indices
 	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
 #if (L_dims == 3)
-	// Extras for 3D
 	double dist_z, delta_z;
 	int knear;
 #endif
@@ -206,24 +205,26 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Find closest support node (simulate std::round as not availble on MSVC2012)
 	inear = (int)std::floor(
-		(iBody[ib].markers[m].position[0] - (iBody[ib]._Owner->XPos[0] - iBody[ib]._Owner->dx / 2.0)) 
+		(iBody[ib].markers[m].position[0] - (iBody[ib]._Owner->XOrigin - iBody[ib]._Owner->dx / 2.0)) 
 		/ iBody[ib]._Owner->dx
 		);
 	jnear = (int)std::floor(
-		(iBody[ib].markers[m].position[1] - (iBody[ib]._Owner->YPos[0] - iBody[ib]._Owner->dy / 2.0)) 
+		(iBody[ib].markers[m].position[1] - (iBody[ib]._Owner->YOrigin - iBody[ib]._Owner->dy / 2.0)) 
 		/ iBody[ib]._Owner->dy
 		);
 
 #if (L_dims == 3)
 	knear = (int)std::floor(
-		(iBody[ib].markers[m].position[2] - (iBody[ib]._Owner->ZPos[0] - iBody[ib]._Owner->dz / 2.0)) 
+		(iBody[ib].markers[m].position[2] - (iBody[ib]._Owner->ZOrigin - iBody[ib]._Owner->dz / 2.0)) 
 		/ iBody[ib]._Owner->dz
 		);
 #endif
 
 
-	// Define limits of support region (only have to do one since lattice is uniformly spaced with dx = dy = dz)
-	// Following protocol for arbitrary grid spacing each marker should have at least 3 support nodes in each direction
+	/* Define limits of support region (only have to do one since lattice is 
+	 * uniformly spaced with dx = dy = dz). Following protocol for arbitrary 
+	 * grid spacing each marker should have at least 3 support nodes in each 
+	 * direction. */
 	double h_plus = std::max(
 		std::abs((iBody[ib]._Owner->XPos[inear + 1] - iBody[ib]._Owner->XPos[inear]) / iBody[ib]._Owner->dx), 
 		std::abs((iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[inear - 1]) / iBody[ib]._Owner->dx)
@@ -239,8 +240,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 
 	// Test to see if required support nodes are available
-#if (L_dims == 3)
-
 	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= iBody[ib]._Owner->N_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
@@ -251,103 +250,84 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 
-	} else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= iBody[ib]._Owner->K_lim ) {
+	}
+
+#if (L_dims == 3)
+	else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= iBody[ib]._Owner->K_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 	}
+#endif
 
 	// Loop over surrounding 5 nodes to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
-			for (int k = knear - 5; k <= knear + 5; k++) {
+#if (L_dims == 3)
+			for (int k = knear - 5; k <= knear + 5; k++)
+#else
+			int k = 0;
+#endif
+			{
 
 				// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-				if (
+				if	(
 					( fabs(iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
-					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
+					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
+#if (L_dims == 3)
+					&&
 					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
-					) {
-
-						// Skip the nearest as already added when marker constructed
-						if (i == inear && j == jnear && k == knear) continue;
-
-						// Lies within support region so store information
-						iBody[ib].markers[m].supp_i.push_back(i);
-						iBody[ib].markers[m].supp_j.push_back(j);
-						iBody[ib].markers[m].supp_k.push_back(k);
-
-						// Store normalised area of support region (actually a volume) computed
-						// from the local grid spacing in lattice units (dx = 1 / 2^level = 1 on L0)
-						iBody[ib].markers[m].local_area = pow( 1 / pow(2,iBody[ib]._Owner->level) ,3) ;
-
-						// Distance between Lagrange marker and support node in lattice units
-						dist_x = (iBody[ib]._Owner->XPos[i]-iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
-						dist_y = (iBody[ib]._Owner->YPos[j]-iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
-						dist_z = (iBody[ib]._Owner->ZPos[k]-iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
-
-						// Store delta function value
-						delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
-						delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
-						delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
-
-						iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y * delta_z );
-
-				}
-			}
-		}
-	}
-
-#else
-
-	// 2D check support region
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= iBody[ib]._Owner->N_lim ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= iBody[ib]._Owner->M_lim ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-
-	}
-
-	// 2D version to find support nodes
-	for (int i = inear - 5; i <= inear + 5; i++) {
-		for (int j = jnear - 5; j <= jnear + 5; j++) {
-			int k = 0;
-
-			// Find distance between Lagrange marker and possible support node and decide whether in cage or not
-			if (	( fabs(iBody[ib].markers[m].position[0] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
-					( fabs(iBody[ib].markers[m].position[1] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
-				) {
+#endif
+					)
+				{
 
 					// Skip the nearest as already added when marker constructed
-					if (i == inear && j == jnear) continue;
+					if (i == inear && j == jnear
+#if (L_dims == 3)
+						&& k == knear
+#endif			
+						) continue;
 
 					// Lies within support region so store information
 					iBody[ib].markers[m].supp_i.push_back(i);
 					iBody[ib].markers[m].supp_j.push_back(j);
 					iBody[ib].markers[m].supp_k.push_back(k);
 
-					// Store normalised area of support region = dx^2 = (1/2^level) ^ 2.
-					iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
-
-					//  Distance between Lagrange marker and support node in lattice units
-					dist_x = (iBody[ib]._Owner->XPos[i]-iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
-					dist_y = (iBody[ib]._Owner->YPos[j]-iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
-
-					// Store delta function value
-					delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
-					delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
-
-					iBody[ib].markers[m].deltaval.push_back( delta_x * delta_y );
-
+				}
 			}
 		}
 	}
+
+	// Store normalised area of support region
+	iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
+
+	// Loop over all nodes for marker m and compute additional data for each
+	for (size_t s = 0; s < iBody[ib].markers[m].supp_i.size(); s++) {
+
+		int i = iBody[ib].markers[m].supp_i[s];
+		int j = iBody[ib].markers[m].supp_j[s];
+		int k = iBody[ib].markers[m].supp_k[s];
+
+		// Distance between Lagrange marker and support node in lattice units
+		dist_x = (iBody[ib]._Owner->XPos[i] - iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
+		dist_y = (iBody[ib]._Owner->YPos[j] - iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
+#if (L_dims == 3)
+		dist_z = (iBody[ib]._Owner->ZPos[k] - iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
 #endif
+
+		// Store delta function value
+		delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
+		delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
+#if (L_dims == 3)
+		delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
+#endif
+
+		iBody[ib].markers[m].deltaval.push_back(delta_x * delta_y
+#if (L_dims == 3)
+			* delta_z
+#endif	
+			);
+	}
 }
 
 // *****************************************************************************

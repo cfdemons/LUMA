@@ -917,9 +917,21 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) 
 	std::vector<int> vox;
 
 	// Find how far point is from origin of grid and round to nearest voxel
-	vox.push_back((int)std::floor((x - (g->XOrigin - g->dx / 2.0))/ g->dx));
-	vox.push_back((int)std::floor((y - (g->YOrigin - g->dy / 2.0)) / g->dy));
-	vox.push_back((int)std::floor((z - (g->ZOrigin - g->dz / 2.0)) / g->dz));
+	vox.push_back(
+		(int)std::floor(
+			(x - (g->XOrigin - g->dx / 2.0))/ g->dx
+		)
+	);
+	vox.push_back(
+		(int)std::floor(
+			(y - (g->YOrigin - g->dy / 2.0)) / g->dy
+		)
+	);
+	vox.push_back(
+		(int)std::floor(
+			(z - (g->ZOrigin - g->dz / 2.0)) / g->dz
+		)
+	);
 
 	return vox;
 

@@ -120,9 +120,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a530c704d7737af163c9ed06d42a373f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_marker_data.html">MarkerData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a530c704d7737af163c9ed06d42a373f0">getMarkerData</a> (double x, double y, double z)</td></tr>
 <tr class="memdesc:a530c704d7737af163c9ed06d42a373f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve marker data.  <a href="#a530c704d7737af163c9ed06d42a373f0">More...</a><br /></td></tr>
 <tr class="separator:a530c704d7737af163c9ed06d42a373f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95f5997b4a076490aca4bc80dfce9eaf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a95f5997b4a076490aca4bc80dfce9eaf">markerAdder</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter, bool flag)</td></tr>
-<tr class="memdesc:a95f5997b4a076490aca4bc80dfce9eaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling marker adding method.  <a href="#a95f5997b4a076490aca4bc80dfce9eaf">More...</a><br /></td></tr>
-<tr class="separator:a95f5997b4a076490aca4bc80dfce9eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a1ba74da8020cc3ee7f4fffde0b4477"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a3a1ba74da8020cc3ee7f4fffde0b4477">markerAdder</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter)</td></tr>
+<tr class="memdesc:a3a1ba74da8020cc3ee7f4fffde0b4477"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling marker adding method.  <a href="#a3a1ba74da8020cc3ee7f4fffde0b4477">More...</a><br /></td></tr>
+<tr class="separator:a3a1ba74da8020cc3ee7f4fffde0b4477"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7733bbcd85af5fa4e8822889fba7b33"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa7733bbcd85af5fa4e8822889fba7b33">isInVoxel</a> (double x, double y, double z, int curr_mark)</td></tr>
 <tr class="memdesc:aa7733bbcd85af5fa4e8822889fba7b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether a point is inside another marker's support voxel.  <a href="#aa7733bbcd85af5fa4e8822889fba7b33">More...</a><br /></td></tr>
 <tr class="separator:aa7733bbcd85af5fa4e8822889fba7b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -452,7 +452,7 @@ template&lt;typename MarkerType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a95f5997b4a076490aca4bc80dfce9eaf"></a>
+<a class="anchor" id="a3a1ba74da8020cc3ee7f4fffde0b4477"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -489,13 +489,7 @@ template&lt;typename MarkerType &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::vector&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>counter</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flag</em>&#160;</td>
+          <td class="paramname"><em>counter</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -505,13 +499,13 @@ template&lt;typename MarkerType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Downsampling marker adding method. </p>
-<p>This method tries to add a marker to body at the global location given but obeys the rules of a voxel-grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice. Making it virtual allows different attirbutes to be passed to the <a class="el" href="class_body.html#aa965f7b498528230aa2f56a9abf6bf06" title="Add marker to the body. ">addMarker()</a> methods to allow for different marker types.</p>
+<p>This method tries to add a marker to body at the global location given but obeys the rules of a voxel-grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>desired global X-position of new marker. </td></tr>
@@ -519,12 +513,9 @@ template&lt;typename MarkerType &gt; </div>
     <tr><td class="paramname">z</td><td>desired globalZ-position of new marker. </td></tr>
     <tr><td class="paramname">curr_mark</td><td>is a reference to the ID of last marker. </td></tr>
     <tr><td class="paramname">counter</td><td>is a reference to the total number of markers in the body. </td></tr>
-    <tr><td class="paramname">flag</td><td>is an optional flag argument this is used in overrides of this method. </td></tr>
   </table>
   </dd>
 </dl>
-
-<p>Reimplemented in <a class="el" href="class_i_b_body.html#a16cf21facacb49727c2e1feda473d080">IBBody</a>.</p>
 
 </div>
 </div>

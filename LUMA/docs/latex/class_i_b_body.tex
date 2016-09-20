@@ -27,7 +27,7 @@ Inheritance diagram for I\+B\+Body\+:\begin{figure}[H]
 void \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker} (double x, double y, double z, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
 \begin{DoxyCompactList}\small\item\em Method to add an IB marker to the body. \end{DoxyCompactList}\item 
 virtual void \hyperlink{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
-\begin{DoxyCompactList}\small\item\em Downsampling marker adding method (override) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Downsampling marker adding method (overload) \end{DoxyCompactList}\item 
 void \hyperlink{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}{make\+Body} (double radius, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool moving, int group)
 \begin{DoxyCompactList}\small\item\em Method to seed markers for a sphere / circle. \end{DoxyCompactList}\item 
 void \hyperlink{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length\+\_\+depth, std\+::vector$<$ double $>$ angles, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
@@ -302,9 +302,9 @@ Flexibility and deformable properties taken from definitions.
 )\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{}\label{class_i_b_body_a16cf21facacb49727c2e1feda473d080}
 
 
-Downsampling marker adding method (override) 
+Downsampling marker adding method (overload) 
 
-This method is an override of the same method in the \hyperlink{class_body}{Body} class. This version uses the optional flag argument to pass extra information to I\+BB marker constructors.
+This method is an overload of the method in the parent class. This version takes the flexible/rigid flag and passes it to the overloaded \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker()} method.
 
 
 \begin{DoxyParams}{Parameters}
@@ -321,10 +321,6 @@ This method is an override of the same method in the \hyperlink{class_body}{Body
 {\em flex\+\_\+rigid} & indicates whether markers added should form part of flexible or rigid body. \\
 \hline
 \end{DoxyParams}
-
-
-Reimplemented from \hyperlink{class_body_a95f5997b4a076490aca4bc80dfce9eaf}{Body$<$ I\+B\+Marker $>$}.
-
 
 
 \subsection{Friends And Related Function Documentation}

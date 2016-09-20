@@ -104,8 +104,8 @@ protected:
 
 	void addMarker(double x, double y, double z);					// Add a marker
 	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
-	virtual void markerAdder(double x, double y, double z,
-		int& curr_mark, std::vector<int>& counter, bool flag);		// Voxelising marker adder (can be overridden)
+	void markerAdder(double x, double y, double z,
+		int& curr_mark, std::vector<int>& counter);					// Voxelising marker adder
 	bool isInVoxel(double x, double y, double z, int curr_mark);	// Check a point is inside an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z);			// Check whether nearest voxel is a marker voxel
 
@@ -203,18 +203,15 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 ///			This method tries to add a marker to body at the global location 
 ///			given but obeys the rules of a voxel-grid filter to ensure markers are
 ///			distributed such that their spacing roughly matches the 
-///			background lattice. Making it virtual allows different attirbutes
-///			to be passed to the addMarker() methods to allow for different
-///			marker types.
+///			background lattice.
 ///
 /// \param x desired global X-position of new marker.
 /// \param y desired globalY-position of new marker.
 /// \param z desired globalZ-position of new marker.
 /// \param curr_mark is a reference to the ID of last marker.
 ///	\param counter is a reference to the total number of markers in the body.
-/// \param flag is an optional flag argument this is used in overrides of this method.
 template <typename MarkerType>
-void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flag) {
+void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
 
 	// If point in current voxel
 	if (isInVoxel(x, y, z, curr_mark)) {

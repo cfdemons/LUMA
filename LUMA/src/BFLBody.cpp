@@ -62,7 +62,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	for (size_t a = 1; a < _PCpts->x.size(); a++) {
 
 		// Pass to point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, false);
+		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
 
 	}
 

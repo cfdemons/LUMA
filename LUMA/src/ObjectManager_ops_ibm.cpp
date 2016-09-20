@@ -146,7 +146,7 @@ void ObjectManager::ibm_initialise() {
 		bodyout.close();
 #endif
 
-		// Compute support for each marker
+		// Compute extended support for each marker
 		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
 			ibm_findSupport(ib, m);	// Pass body ID and marker ID
 		}

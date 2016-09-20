@@ -51,7 +51,7 @@
   \item {B\+F\+L\+Marker.\+cpp}, \hyperpage{81}
   \item {B\+F\+L\+Marker.\+h}, \hyperpage{82}
   \item {bc\+\_\+apply\+Bfl}
-    \subitem {Grid\+Obj}, \hyperpage{22}
+    \subitem {Grid\+Obj}, \hyperpage{21}
   \item {bc\+\_\+apply\+Bounce\+Back}
     \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+apply\+Extrapolation}
@@ -59,7 +59,7 @@
   \item {bc\+\_\+apply\+Nrbc}
     \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+apply\+Regularised}
-    \subitem {Grid\+Obj}, \hyperpage{23}
+    \subitem {Grid\+Obj}, \hyperpage{22}
   \item {bc\+\_\+apply\+Spec\+Reflect}
     \subitem {Grid\+Obj}, \hyperpage{23}
   \item {bc\+\_\+solid\+Site\+Reset}
@@ -376,21 +376,21 @@
     \subitem {Mpi\+Manager}, \hyperpage{66}
   \item {global\+\_\+to\+\_\+local}
     \subitem {Grid\+Utils}, \hyperpage{37}
-  \item {Grid\+Obj}, \hyperpage{18}
+  \item {Grid\+Obj}, \hyperpage{17}
     \subitem {$\sim$\+Grid\+Obj}, \hyperpage{21}
     \subitem {B\+F\+L\+Body}, \hyperpage{11}
-    \subitem {bc\+\_\+apply\+Bfl}, \hyperpage{22}
+    \subitem {bc\+\_\+apply\+Bfl}, \hyperpage{21}
     \subitem {bc\+\_\+apply\+Bounce\+Back}, \hyperpage{22}
     \subitem {bc\+\_\+apply\+Extrapolation}, \hyperpage{22}
     \subitem {bc\+\_\+apply\+Nrbc}, \hyperpage{22}
-    \subitem {bc\+\_\+apply\+Regularised}, \hyperpage{23}
+    \subitem {bc\+\_\+apply\+Regularised}, \hyperpage{22}
     \subitem {bc\+\_\+apply\+Spec\+Reflect}, \hyperpage{23}
     \subitem {bc\+\_\+solid\+Site\+Reset}, \hyperpage{23}
     \subitem {dt}, \hyperpage{29}
     \subitem {dx}, \hyperpage{29}
     \subitem {dy}, \hyperpage{29}
     \subitem {dz}, \hyperpage{29}
-    \subitem {Grid\+Obj}, \hyperpage{21}
+    \subitem {Grid\+Obj}, \hyperpage{20, 21}
     \subitem {Grid\+Utils}, \hyperpage{29}
     \subitem {io\+\_\+hdf5}, \hyperpage{23}
     \subitem {io\+\_\+lite}, \hyperpage{23}

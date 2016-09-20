@@ -608,11 +608,11 @@ void IBBody::makeBody(PCpts* _PCpts) {
 }
 
 /*********************************************/
-/// \brief	Downsampling marker adding method (override)
+/// \brief	Downsampling marker adding method (overload)
 ///
-///			This method is an override of the same method in the Body class.
-///			This version uses the optional flag argument to pass extra 
-///			information to IBB marker constructors.
+///			This method is an overload of the method in the parent class.
+///			This version takes the flexible/rigid flag and passes it to the 
+///			overloaded addMarker() method.
 ///
 /// \param x desired global X-position of new marker.
 /// \param y desired globalY-position of new marker.

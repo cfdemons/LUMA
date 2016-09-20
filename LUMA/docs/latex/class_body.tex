@@ -25,7 +25,7 @@ void \hyperlink{class_body_aa965f7b498528230aa2f56a9abf6bf06}{add\+Marker} (doub
 \begin{DoxyCompactList}\small\item\em Add marker to the body. \end{DoxyCompactList}\item 
 \hyperlink{class_marker_data}{Marker\+Data} $\ast$ \hyperlink{class_body_a530c704d7737af163c9ed06d42a373f0}{get\+Marker\+Data} (double x, double y, double z)
 \begin{DoxyCompactList}\small\item\em Retrieve marker data. \end{DoxyCompactList}\item 
-virtual void \hyperlink{class_body_a95f5997b4a076490aca4bc80dfce9eaf}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool flag)
+void \hyperlink{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)
 \begin{DoxyCompactList}\small\item\em Downsampling marker adding method. \end{DoxyCompactList}\item 
 bool \hyperlink{class_body_aa7733bbcd85af5fa4e8822889fba7b33}{is\+In\+Voxel} (double x, double y, double z, int curr\+\_\+mark)
 \begin{DoxyCompactList}\small\item\em Determines whether a point is inside another marker\textquotesingle{}s support voxel. \end{DoxyCompactList}\item 
@@ -203,21 +203,20 @@ true of false
 \end{DoxyReturn}
 \index{Body@{Body}!marker\+Adder@{marker\+Adder}}
 \index{marker\+Adder@{marker\+Adder}!Body@{Body}}
-\subsubsection[{\texorpdfstring{marker\+Adder(double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool flag)}{markerAdder(double x, double y, double z, int &curr_mark, std::vector< int > &counter, bool flag)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ void {\bf Body}$<$ Marker\+Type $>$\+::marker\+Adder (
+\subsubsection[{\texorpdfstring{marker\+Adder(double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)}{markerAdder(double x, double y, double z, int &curr_mark, std::vector< int > &counter)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ void {\bf Body}$<$ Marker\+Type $>$\+::marker\+Adder (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
 \item[{double}]{z, }
 \item[{int \&}]{curr\+\_\+mark, }
-\item[{std\+::vector$<$ int $>$ \&}]{counter, }
-\item[{bool}]{flag}
+\item[{std\+::vector$<$ int $>$ \&}]{counter}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\hypertarget{class_body_a95f5997b4a076490aca4bc80dfce9eaf}{}\label{class_body_a95f5997b4a076490aca4bc80dfce9eaf}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}{}\label{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}
 
 
 Downsampling marker adding method. 
 
-This method tries to add a marker to body at the global location given but obeys the rules of a voxel-\/grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice. Making it virtual allows different attirbutes to be passed to the \hyperlink{class_body_aa965f7b498528230aa2f56a9abf6bf06}{add\+Marker()} methods to allow for different marker types.
+This method tries to add a marker to body at the global location given but obeys the rules of a voxel-\/grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice.
 
 
 \begin{DoxyParams}{Parameters}
@@ -231,13 +230,7 @@ This method tries to add a marker to body at the global location given but obeys
 \hline
 {\em counter} & is a reference to the total number of markers in the body. \\
 \hline
-{\em flag} & is an optional flag argument this is used in overrides of this method. \\
-\hline
 \end{DoxyParams}
-
-
-Reimplemented in \hyperlink{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{I\+B\+Body}.
-
 
 
 \subsection{Member Data Documentation}

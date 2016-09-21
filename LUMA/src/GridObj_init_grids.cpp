@@ -762,10 +762,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	/* Global edge origins (set to local dx plus L0 edge then use series 
 	 * expression to correct for presence of other grids) */
-	XOrigin = dx + L_a_x;
-	YOrigin = dy + L_a_y;
+	XOrigin = L_a_x + (dx / 2);
+	YOrigin = L_a_y + (dy / 2);
 #if (L_dims == 3)
-	ZOrigin = dz + L_a_z;
+	ZOrigin = L_a_z + (dz / 2);
 #else
 	ZOrigin = 0.0;
 #endif
@@ -773,10 +773,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Aggregate offset
 	for (int n = 0; n < level; n++) {
 
-		XOrigin += RefXstart[n][region_number] * dx * pow(2, level - n);
-		YOrigin += RefYstart[n][region_number] * dy * pow(2, level - n);
+		XOrigin += RefXstart[n][region_number] * (dx * pow(2, level - n));
+		YOrigin += RefYstart[n][region_number] * (dy * pow(2, level - n));
 #if (L_dims == 3)
-		ZOrigin += RefZstart[n][region_number] * dz * pow(2, level - n);
+		ZOrigin += RefZstart[n][region_number] * (dz * pow(2, level - n));
 #endif
 	}
 

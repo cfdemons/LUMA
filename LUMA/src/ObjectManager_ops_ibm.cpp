@@ -36,9 +36,9 @@ void ObjectManager::ibm_apply() {
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
 				if (L_dims == 3) {
-					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << g.ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
+					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
 				} else {
-					suppout << g.XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << g.YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
+					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
 				}
 			}
 			suppout.close();

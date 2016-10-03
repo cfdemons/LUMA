@@ -1,0 +1,37 @@
+../../../src/GridObj_ops_io.cpp: In member function ‘int GridObj::io_hdf5(double)’:
+../../../src/GridObj_ops_io.cpp:689:18: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
+                  ^
+../../../src/GridObj_ops_io.cpp:689:35: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
+                                   ^
+../../../src/GridObj_ops_io.cpp:689:52: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
+                                                    ^
+../../../src/GridObj_ops_io.cpp:690:20: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t filespace = NULL; hsize_t dimsf[L_dims];
+                    ^
+../../../src/GridObj_ops_io.cpp:691:19: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t memspace = NULL; hsize_t dimsm[1];
+                   ^
+../../../src/GridObj_ops_io.cpp:692:19: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t attspace = NULL; hsize_t dimsa[1];
+                   ^
+../../../src/GridObj_ops_io.cpp:693:21: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t dataset_id = NULL; hid_t attrib_id = NULL;
+                     ^
+../../../src/GridObj_ops_io.cpp:693:45: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t dataset_id = NULL; hid_t attrib_id = NULL;
+                                             ^
+../../../src/GridObj_ops_io.cpp:768:17: warning: NULL used in arithmetic [-Wpointer-arith]
+  if (file_id == NULL) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
+                 ^
+In file included from ../../../src/GridObj_ops_io.cpp:23:0:
+../../../src/../inc/hdf5luma.h: In instantiation of ‘void hdf5_writeDataSet(hid_t&, hid_t&, hid_t&, eHdf5SlabType, int, int, int, int, int, int, GridObj*, T*, hid_t, int, MpiManager::phdf5_struct) [with T = eType; hid_t = int]’:
+../../../src/GridObj_ops_io.cpp:916:158:   required from here
+../../../src/../inc/hdf5luma.h:139:19: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]
+  hid_t plist_id = NULL;
+                   ^
+../../../src/../inc/hdf5luma.h: In instantiation of ‘void hdf5_writeDataSet(hid_t&, hid_t&, hid_t&, eHdf5SlabType, int, int, int, int, int, int, GridObj*, T*, hid_t, int, MpiManager::phdf5_struct) [with T = double; hid_t = int]’:
+../../../src/GridObj_ops_io.cpp:923:158:   required from here
+../../../src/../inc/hdf5luma.h:139:19: warning: converting to non-pointer type ‘hid_t {aka int}’ from NULL [-Wconversion-null]

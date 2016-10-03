@@ -73,7 +73,7 @@
 // Types of output
 #define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_LD_OUT					///< Write out lift and drag (all bodies)
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE		///< Use an inlet profile
+#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
@@ -253,13 +253,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Virtual Wind Tunnels
-//#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
+#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
 //#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
 #define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
@@ -273,8 +273,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
 #define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units
@@ -289,22 +289,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 20		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 50		///< Index of end of object/wall in x-direction
-	#define L_block_y_min 1		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 31		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 35		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 65		///< Index of end of object/wall in z-direction
+	#define L_block_x_min 32		///< Index of start of object/wall in x-direction
+	#define L_block_x_max 64		///< Index of end of object/wall in x-direction
+	#define L_block_y_min 16		///< Index of start of object/wall in y-direction
+	#define L_block_y_max 48		///< Index of end of object/wall in y-direction
+	#define L_block_z_min 16		///< Index of start of object/wall in z-direction
+	#define L_block_z_max 48		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
-//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
 	#define L_object_on_grid_lev 0		///< Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
@@ -320,15 +320,15 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // BFL objects
 //#define L_BFL_ON					///< Build BFL body from point cloud
 
-	#define L_bfl_on_grid_lev 0		///< Provide grid level on which BFL body should be added 
+	#define L_bfl_on_grid_lev 1		///< Provide grid level on which BFL body should be added 
 	#define L_bfl_on_grid_reg 0		///< Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_bfl_x 30		///< Index for start of object bounding box in X direction
-	#define L_start_bfl_y 30		///< Index for start of object bounding box in Y direction
-	#define L_centre_bfl_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_bfl_length 40			///< The BFL object input is scaled based on this dimension
+	#define L_start_bfl_x 50		///< Index for start of object bounding box in X direction
+	#define L_start_bfl_y 100		///< Index for start of object bounding box in Y direction
+	#define L_centre_bfl_z 20		///< Index for cetnre of object bounding box in Z direction
+	#define L_bfl_length 50			///< The BFL object input is scaled based on this dimension
 	#define L_bfl_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_bfl_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_bfl_length_ref 10		///< Reference length to be used in the definition of Reynolds number
 
 
 

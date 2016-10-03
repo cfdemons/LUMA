@@ -393,7 +393,7 @@ int main( int argc, char* argv[] )
 #ifdef L_IBM_ON
 
 	// L_Re-initialise the bodies (compute support etc.)
-	Grids.ibm_initialise();
+	ObjectManager::getInstance()->ibm_initialise();
 	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
 
 #endif

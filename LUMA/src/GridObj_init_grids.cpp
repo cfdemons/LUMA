@@ -950,14 +950,14 @@ void GridObj::LBM_initSolidLab() {
 ///			The virtual wind tunnel definitions are implemented by this method.
 void GridObj::LBM_initBoundLab ( ) {
 
-#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON
+#if (defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL)
 	int i, j, k;
 #endif
 
 	// Try to add the solid block
 	LBM_initSolidLab();
 
-#ifdef L_INLET_ON
+#if (defined L_INLET_ON || defined L_FREESTREAM_TUNNEL)
 	// Left hand face only
 
 	// Check for potential singularity in BC
@@ -987,7 +987,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	}
 #endif
 
-#ifdef L_OUTLET_ON
+#if (defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL)
 	// Right hand face only
 
 	// Search index vector to see if right hand wall on this rank
@@ -1012,7 +1012,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	}
 #endif
 
-#if ((defined L_WALLS_ON && !defined L_WALLS_ON_2D) || defined L_FREESTREAM_TUNNEL) && (L_dims == 3)
+#if ((defined L_WALLS_ON && !defined L_WALLS_ON_2D) || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL) && (L_dims == 3)
 
 	// Search index vector to see if FRONT wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
@@ -1056,7 +1056,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #endif
 
-
+#if (defined L_WALLS_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL)
 	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
 		if (YInd[j] < L_wall_thickness_bottom) {		// Wall found
@@ -1096,7 +1096,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			}
 		}
 	}
-
+#endif
 }
 
 // ****************************************************************************

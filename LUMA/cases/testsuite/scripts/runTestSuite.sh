@@ -22,8 +22,23 @@ DIR_INPUT=${DIR_WORKING}/input			# Input directory containing files required for
 DIR_RES=${DIR_WORKING}/results			# Results directory where the data will be written out
 DIR_LUMA=${DIR_WORKING}/../..			# LUMA directory containing the source files to compile
 
+
 # File for diff comparison
 DIFF_FILE=io_lite.Lev0.Reg0.Rnk0.100.dat
+
+
+# If running with the clean option it will just delete the results folder
+while [ ! $# -eq 0 ]
+do
+	case "$1" in
+		--clean | clean | -c)
+			rm -rf ${DIR_RES}
+			exit
+			;;
+	esac
+	shift
+done
+
 
 # Delete results directory if it already exists and create it again
 rm -rf ${DIR_RES}

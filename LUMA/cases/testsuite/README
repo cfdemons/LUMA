@@ -12,3 +12,7 @@ scripts	-> contains the script to run the test suits (test suite should be run f
 3) Check master log file to see overview of results
 4) Check each case directory within the results directory to check a specific case
 5) Compile logs are written as well as a diff log (if required)
+
+
+*** Options ***
+clean | --clean | -c -> will just delete the results directory (should be done before pushing so as to reduce data stored on the repo)

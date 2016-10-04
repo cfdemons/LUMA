@@ -666,8 +666,10 @@ void GridObj::io_lite(double tval, std::string TAG) {
 // *****************************************************************************
 /// \brief	HDF5 writer.
 ///
-///			Useful grid quantities written out as scalar arrays. One *.h5 file
-///			per grid and data is grouped into timesteps within each file.
+///			Useful grid quantities written out as scalar arrays. Creates one 
+///			*.h5 file per grid and data is grouped into timesteps within each 
+///			file. Should be used with the merge tool at post-processing to 
+///			conver to sructured VTK output readable in paraview.
 ///
 /// \param tval	time value being written out.
 int GridObj::io_hdf5(double tval) {
@@ -699,9 +701,9 @@ int GridObj::io_hdf5(double tval) {
 	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
 
-	// Get modified local grid size (minus TL cells)
+	// Get modified local grid size (minus TL cells on both sides of grid)
 	int TL_thickness = 0;
-	if (level != 0) TL_thickness = static_cast<int>(pow(2, level));
+	if (level != 0) TL_thickness = 2;
 	int N_mod = N_lim - (2 * TL_thickness);
 	int M_mod = M_lim - (2 * TL_thickness);
 #if (L_dims == 3)
@@ -794,7 +796,7 @@ int GridObj::io_hdf5(double tval) {
 	}
 	filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
 
-	// Memory space is always 1D scalar sized (ex. halo and TL for MPI builds)
+	// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
 #ifdef L_BUILD_FOR_MPI
 	dimsm[0] = p_data.writable_data_count;
 #else

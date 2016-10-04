@@ -20,7 +20,7 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 	vtkSmartPointer<vtkUnstructuredGrid> grid,
 	std::vector<vtkIdType>& global_ids,
 	std::vector< std::vector<double> >& cell_pts,
-	int *point_count)
+	int *point_count, int dimensions_p)
 {
 
 	// Local declarations
@@ -30,95 +30,120 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 	size_t status = 0;
 
 	// Add new points to global points and assign new id
-	for (int c = 0; c < 27; c++) {
+	for (size_t c = 0; c < cell_pts.size(); c++) {
 		global_pts->InsertNextPoint(cell_pts[c][0], cell_pts[c][1], cell_pts[c][2]);
 		global_ids.push_back(*point_count + c);
 	}
 
-	// Construct one face at a time out of vertices
-	for (int c = 0; c < 27; c++) {
+	/* In 3D we construct a polyhedron out of faces.
+	 * In 2D we simply construct a single polygon. */
 
-		// If it is a face
-		if (abs(e[0][c]) + abs(e[1][c]) + abs(e[2][c]) == 1) {
+	if (dimensions_p == 3) {
 
-			// Get face centre vector
-			int face_centre[3];
-			face_centre[0] = e[0][c];
-			face_centre[1] = e[1][c];
-			face_centre[2] = e[2][c];
+		// Construct one face at a time out of vertices
+		for (int c = 0; c < 27; c++) {
 
-			// Clear temporary storage
-			face_ids.clear();
+			// If it is a face
+			if (abs(e[0][c]) + abs(e[1][c]) + abs(e[2][c]) == 1) {
 
-			// Left face
-			if (face_centre[0] == -1) {
+				// Get face centre vector
+				int face_centre[3];
+				face_centre[0] = e[0][c];
+				face_centre[1] = e[1][c];
+				face_centre[2] = e[2][c];
 
-				face_ids.push_back(*point_count + 0);
-				face_ids.push_back(*point_count + 2);
-				face_ids.push_back(*point_count + 8);
-				face_ids.push_back(*point_count + 6);
+				// Clear temporary storage
+				face_ids.clear();
 
+				// Left face
+				if (face_centre[0] == -1) {
+
+					face_ids.push_back(*point_count + 0);
+					face_ids.push_back(*point_count + 2);
+					face_ids.push_back(*point_count + 8);
+					face_ids.push_back(*point_count + 6);
+
+				}
+				// Right face
+				else if (face_centre[0] == 1) {
+
+					face_ids.push_back(*point_count + 18);
+					face_ids.push_back(*point_count + 20);
+					face_ids.push_back(*point_count + 26);
+					face_ids.push_back(*point_count + 24);
+
+
+				}
+				// Bottom face
+				else if (face_centre[1] == -1) {
+
+					face_ids.push_back(*point_count + 0);
+					face_ids.push_back(*point_count + 2);
+					face_ids.push_back(*point_count + 20);
+					face_ids.push_back(*point_count + 18);
+
+				}
+				// Top face
+				else if (face_centre[1] == 1) {
+
+					face_ids.push_back(*point_count + 6);
+					face_ids.push_back(*point_count + 8);
+					face_ids.push_back(*point_count + 26);
+					face_ids.push_back(*point_count + 24);
+
+				}
+				// Front face
+				else if (face_centre[2] == -1) {
+
+					face_ids.push_back(*point_count + 0);
+					face_ids.push_back(*point_count + 6);
+					face_ids.push_back(*point_count + 24);
+					face_ids.push_back(*point_count + 18);
+
+				}
+				// Back face
+				else if (face_centre[2] == 1) {
+
+
+					face_ids.push_back(*point_count + 2);
+					face_ids.push_back(*point_count + 8);
+					face_ids.push_back(*point_count + 26);
+					face_ids.push_back(*point_count + 20);
+
+				}
+
+				// Add face to array
+				face_array->InsertNextCell(face_ids.size(), &face_ids[0]);
 			}
-			// Right face
-			else if (face_centre[0] == 1) {
-
-				face_ids.push_back(*point_count + 18);
-				face_ids.push_back(*point_count + 20);
-				face_ids.push_back(*point_count + 26);
-				face_ids.push_back(*point_count + 24);
-
-
-			}
-			// Bottom face
-			else if (face_centre[1] == -1) {
-
-				face_ids.push_back(*point_count + 0);
-				face_ids.push_back(*point_count + 2);
-				face_ids.push_back(*point_count + 20);
-				face_ids.push_back(*point_count + 18);
-
-			}
-			// Top face
-			else if (face_centre[1] == 1) {
-
-				face_ids.push_back(*point_count + 6);
-				face_ids.push_back(*point_count + 8);
-				face_ids.push_back(*point_count + 26);
-				face_ids.push_back(*point_count + 24);
-
-			}
-			// Front face
-			else if (face_centre[2] == -1) {
-
-				face_ids.push_back(*point_count + 0);
-				face_ids.push_back(*point_count + 6);
-				face_ids.push_back(*point_count + 24);
-				face_ids.push_back(*point_count + 18);
-
-			}
-			// Back face
-			else if (face_centre[2] == 1) {
-
-				
-				face_ids.push_back(*point_count + 2);
-				face_ids.push_back(*point_count + 8);
-				face_ids.push_back(*point_count + 26);
-				face_ids.push_back(*point_count + 20);				
-
-			}
-
-			// Add face to array
-			face_array->InsertNextCell(face_ids.size(), &face_ids[0]);
 		}
-	}
 
-	// Update offset
-	*point_count += 27;
+		// Update offset
+		*point_count += 27;
+	}
+	else {
+
+		// Specify points that make up face
+		face_ids.push_back(*point_count + 0);
+		face_ids.push_back(*point_count + 2);
+		face_ids.push_back(*point_count + 8);
+		face_ids.push_back(*point_count + 6);
+
+		// Update offset
+		*point_count += 9;
+
+	}
 
 	// Update grid with new point list and add cell
 	grid->SetPoints(global_pts);
-	grid->InsertNextCell(VTK_POLYHEDRON, 27, &global_ids[0],
-		6, face_array->GetPointer());
+
+	if (dimensions_p == 3) {
+		grid->InsertNextCell(VTK_POLYHEDRON, 27, &global_ids[0],
+			6, face_array->GetPointer());
+	}
+	else {
+		grid->InsertNextCell(VTK_POLYGON, 4, &face_ids[0]);
+
+	}
 
 	return status;
 
@@ -215,7 +240,12 @@ int main(int argc, char* argv[])
 
 	// Create cell node position list for VTK
 	std::vector< std::vector<double> > cell_points;
-	cell_points.resize(27, std::vector<double>(3));
+	if (dimensions_p == 3) {
+		cell_points.resize(27, std::vector<double>(3));
+	}
+	else {
+		cell_points.resize(9, std::vector<double>(3));
+	}
 
 	// Create directory
 	std::string command = "mkdir -p " + path_str;
@@ -347,14 +377,19 @@ int main(int argc, char* argv[])
 					}
 					else {
 
-						// Find positions of all 8 possible points and store
-						// TODO
-
+						// Find positions of all 9 possible points and store
+						int vert = 0;
+						for (int p = 1; p < 27; p += 3) {
+							cell_points[vert][0] = X[c] + e[0][p] * (dx / 2);
+							cell_points[vert][1] = Y[c] + e[1][p] * (dx / 2);
+							cell_points[vert][2] = 0.0;
+							vert++;
+						}
 
 					}
 
 					// Build cell from points and add to mesh
-					res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count);
+					res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
 
 				}
 

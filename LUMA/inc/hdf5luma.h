@@ -96,8 +96,8 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	int j_end = M_lim - TL_thickness - 1;
 	int k_start = TL_thickness;
 	int k_end = K_lim - TL_thickness - 1;
-	int halo_min = 1;
-	int halo_max = 1;
+	int halo_min = 2;
+	int halo_max = 2;
 
 	// L0 grids do not have TL
 	if (g->level == 0) {
@@ -233,12 +233,12 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 			m_offset = k_start + j_start * K_lim + i * M_lim * K_lim;
 			m_block = k_end - k_start + 1;
 			m_count = j_end - j_start + 1;
-			m_stride = m_block + (halo_min + halo_max) * static_cast<hsize_t>(pow(2, g->level));
+			m_stride = m_block + (halo_min + halo_max);
 #else
 			m_offset = j_start + i_start * M_lim;
 			m_block = j_end - j_start + 1;
 			m_count = i_end - i_start + 1;
-			m_stride = m_block + (halo_min + halo_max) * static_cast<hsize_t>(pow(2, g->level));
+			m_stride = m_block + (halo_min + halo_max);
 #endif
 			// Copy slab of memory to buffer
 #if (L_dims == 3)

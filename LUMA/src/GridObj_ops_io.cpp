@@ -568,11 +568,14 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	// Write simple header
 	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << " -- " << TAG << std::endl;
 	litefile << "T = " << std::to_string(tval) << std::endl;
-#ifdef L_MEGA_DEBUG
-	litefile << "RANK TYPE X Y Z RHO UX UY UZ F FEQ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
-#else
-	litefile << "RANK TYPE X Y Z RHO UX UY UZ TA_RHO TA_UX TA_UY TA_UZ TA_UXUX TA_UXUY TA_UXUZ TA_UYUY TA_UYUZ TA_UZUZ" << std::endl;
-#endif
+	litefile << "RANK\tTYPE\tX\t\tY\t\tZ\t\tRHO\t\tUX\t\tUY\t\tUZ\t\t";
+	for (int v = 0; v < L_nVels; v++) {
+		litefile << "F" << std::to_string(v) << "\t\t";
+	}
+	for (int v = 0; v < L_nVels; v++) {
+		litefile << "FEQ" << std::to_string(v) << "\t\t";
+	}
+	litefile << "TA_RHO\t\tTA_UX\t\tTA_UY\t\tTA_UZ\t\tTA_UXUX\t\tTA_UXUY\t\tTA_UXUZ\t\tTA_UYUY\t\tTA_UYUZ\t\tTA_UZUZ" << std::endl;
 	
 	// Indices
 	size_t i,j,k,v;
@@ -583,7 +586,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 			for (i = 0; i < XInd.size(); i++) {
 
 
-#if (defined L_MEGA_DEBUG && !defined L_INC_RECV_LAYER && defined L_BUILD_FOR_MPI) || (!defined L_MEGA_DEBUG && defined L_BUILD_FOR_MPI)
+#if (defined L_INC_RECV_LAYER && defined L_BUILD_FOR_MPI)
 				// Don't write out the receiver overlap in MPI
 				if (!GridUtils::isOnRecvLayer(XPos[i],YPos[j],ZPos[k]))
 #endif				
@@ -604,10 +607,9 @@ void GridObj::io_lite(double tval, std::string TAG) {
 						litefile << u(i,j,k,v,YInd.size(),ZInd.size(),L_dims) << "\t";
 					}
 #if (L_dims != 3)
-					litefile << 0 << "\t";
+					litefile << std::to_string(0.0) << "\t";
 #endif
 
-#ifdef L_MEGA_DEBUG
 					// Write out F and Feq
 					for (v = 0; v < L_nVels; v++) {
 						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
@@ -615,7 +617,6 @@ void GridObj::io_lite(double tval, std::string TAG) {
 					for (v = 0; v < L_nVels; v++) {
 						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
 					}
-#endif
 				
 					// Write out time averaged rho and u
 					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";
@@ -623,7 +624,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 						litefile << ui_timeav(i,j,k,v,YInd.size(),ZInd.size(),L_dims) << "\t";
 					}
 #if (L_dims != 3)
-					litefile << 0 << "\t";
+					litefile << std::to_string(0.0) << "\t";
 #endif
 
 					// Write out time averaged u products
@@ -632,7 +633,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 #if (L_dims == 3)
 					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
 #else
-					litefile << 0 << "\t";
+					litefile << std::to_string(0.0) << "\t";
 #endif
 #if (L_dims == 3)
 					litefile << uiuj_timeav(i,j,k,3,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
@@ -640,7 +641,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 					litefile << uiuj_timeav(i,j,k,5,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
 #else
 					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
-					litefile << 0 << "\t" << 0 << "\t";
+					litefile << std::to_string(0.0) << "\t" << std::to_string(0.0) << "\t";
 #endif
 
 					// New line
@@ -653,23 +654,22 @@ void GridObj::io_lite(double tval, std::string TAG) {
 		}
 	}
 
-
-#ifndef L_MEGA_DEBUG
 	// Now do any sub-grids
 	if (L_NumLev > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
 			subGrid[reg].io_lite(tval,"");
 		}
 	}
-#endif
 
 }
 
 // *****************************************************************************
 /// \brief	HDF5 writer.
 ///
-///			Useful grid quantities written out as scalar arrays. One *.h5 file
-///			per grid and data is grouped into timesteps within each file.
+///			Useful grid quantities written out as scalar arrays. Creates one 
+///			*.h5 file per grid and data is grouped into timesteps within each 
+///			file. Should be used with the merge tool at post-processing to 
+///			conver to sructured VTK output readable in paraview.
 ///
 /// \param tval	time value being written out.
 int GridObj::io_hdf5(double tval) {
@@ -701,9 +701,9 @@ int GridObj::io_hdf5(double tval) {
 	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
 
-	// Get modified local grid size (minus TL cells)
+	// Get modified local grid size (minus TL cells on both sides of grid)
 	int TL_thickness = 0;
-	if (level != 0) TL_thickness = static_cast<int>(pow(2, level));
+	if (level != 0) TL_thickness = 2;
 	int N_mod = N_lim - (2 * TL_thickness);
 	int M_mod = M_lim - (2 * TL_thickness);
 #if (L_dims == 3)
@@ -796,7 +796,7 @@ int GridObj::io_hdf5(double tval) {
 	}
 	filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
 
-	// Memory space is always 1D scalar sized (ex. halo and TL for MPI builds)
+	// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
 #ifdef L_BUILD_FOR_MPI
 	dimsm[0] = p_data.writable_data_count;
 #else
@@ -814,6 +814,7 @@ int GridObj::io_hdf5(double tval) {
 		// Create 1D attribute buffers
 		int buffer_int_array[L_dims];
 		int buffer_int = 0;
+		double buffer_double = 0.0;
 		buffer_int_array[0] = static_cast<int>(dimsf[0]);
 		buffer_int_array[1] = static_cast<int>(dimsf[1]);
 	#if (L_dims == 3)
@@ -872,6 +873,14 @@ int GridObj::io_hdf5(double tval) {
 		buffer_int = L_out_every;
 		attrib_id = H5Acreate(file_id, "OutputFrequency", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+		status = H5Aclose(attrib_id);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+		// Write dx
+		buffer_double = dx;
+		attrib_id = H5Acreate(file_id, "Dx", H5T_NATIVE_DOUBLE, attspace, H5P_DEFAULT, H5P_DEFAULT);
+		status = H5Awrite(attrib_id, H5T_NATIVE_DOUBLE, &buffer_double);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
 		status = H5Aclose(attrib_id);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;

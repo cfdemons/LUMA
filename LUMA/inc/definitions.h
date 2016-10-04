@@ -63,10 +63,10 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 50				///< How many timesteps before whole grid output
+#define L_out_every 10				///< How many timesteps before whole grid output
 #define L_out_every_forces 50		///< Specific output frequency of body forces
 #define L_output_precision 6		///< Precision of output (for text writers)
 
@@ -93,10 +93,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 10000			///< Frequency of write out of restart file
+#define L_restart_out_every 1000				///< Frequency of write out of restart file
 
 // LBM configuration
-//#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
+#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
 
 
 /*
@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // MPI Data
 #define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_Ycores 3		///< Number of MPI ranks to divide domain into in Y direction
+#define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_Zcores 2
@@ -136,15 +136,15 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2		///< Number of dimensions to the problem
+#define L_dims 3		///< Number of dimensions to the problem
 #define L_N (1*220+1)			///< Number of x lattice sites
-#define L_M (1*41+2)			///< Number of y lattice sites
-#define L_K 60			///< Number of z lattice sites
+#define L_M 50			///< Number of y lattice sites
+#define L_K 50			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x -0.005			///< Start of domain-x
-#define L_b_x 2.205			///< End of domain-x
+#define L_b_x 2		///< End of domain-x
 #define L_a_y -0.01			///< Start of domain-y
 #define L_b_y 0.42			///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
@@ -181,7 +181,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Master IBM switches //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 #define L_IB_Lev 2					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
@@ -289,18 +289,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 2		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 32		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 64		///< Index of end of object/wall in x-direction
-	#define L_block_y_min 16		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 48		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 16		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 48		///< Index of end of object/wall in z-direction
+	#define L_block_x_min 10		///< Index of start of object/wall in x-direction
+	#define L_block_x_max 30		///< Index of end of object/wall in x-direction
+	#define L_block_y_min 10		///< Index of start of object/wall in y-direction
+	#define L_block_y_max 30		///< Index of end of object/wall in y-direction
+	#define L_block_z_min 10		///< Index of start of object/wall in z-direction
+	#define L_block_z_max 30		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
@@ -356,22 +356,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 5 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 110 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 4 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 38 };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { 20 };
+	const static int RefXend[L_NumLev][L_NumReg]	= { 70 };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { 10 };
+	const static int RefYend[L_NumLev][L_NumReg]	= { 40 };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
-	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
+	static int RefZstart[L_NumLev][L_NumReg]		= { 10 };
+	static int RefZend[L_NumLev][L_NumReg]			= { 40 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {20}, {20} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {70}, {80} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {10}, {20} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {40}, {40} };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {10}, {20} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {40} };
 
 #elif (NumReg == 1 && NumLev == 3)
 	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };

@@ -660,10 +660,10 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 	// Close logfile
 	MpiManager::logout->close();
+
 	// Finalise MPI
 	MPI_Finalize();
-	// Destroy MpiManager
-	MpiManager::destroyInstance();
+
 #endif
 
 	return 0;

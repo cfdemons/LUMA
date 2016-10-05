@@ -45,7 +45,7 @@
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
-//#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
+#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
@@ -136,7 +136,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2		///< Number of dimensions to the problem
+#define L_dims 3		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 100			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites

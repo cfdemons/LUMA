@@ -51,8 +51,8 @@ public:
 	///			is to set the x position to NaN.
 	MarkerData(void) {
 
-		// Essentially null a double in the store making it invalid
-		this->x = std::numeric_limits<double>::quiet_NaN();
+		// Give invalid ID number at construction time
+		this->ID = -1;
 
 	};
 
@@ -316,7 +316,7 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 	MarkerData* m_data = getMarkerData(x, y, z);
 
 	// True if the data store is not empty
-	if (!L_IS_NAN(m_data->x)) {
+	if (m_data->ID != -1) {
 
 		delete m_data;	// Deallocate the store
 		return true;

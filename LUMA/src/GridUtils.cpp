@@ -927,11 +927,16 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) 
 			(y - (g->YOrigin - g->dy / 2.0)) / g->dy
 		)
 	);
+
+#if (L_dims == 3)
 	vox.push_back(
 		(int)std::floor(
 			(z - (g->ZOrigin - g->dz / 2.0)) / g->dz
 		)
 	);
+#else
+	vox.push_back(0);
+#endif
 
 	return vox;
 

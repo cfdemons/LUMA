@@ -318,6 +318,7 @@ int main( int argc, char* argv[] )
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eIBBCloud);
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating IBB Objects..." << endl;
 
 #endif
 
@@ -333,17 +334,13 @@ int main( int argc, char* argv[] )
 #ifdef L_BFL_ON
 
 
-	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
+	*GridUtils::logfile << "Initialising BFL Objects from File..." << endl;
 
 	// Read in input file to arrays
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eBFLCloud);
-
-	// Call BFL body builder if there are points on this rank
-	if (!_PCpts->x.empty())	objMan->bfl_buildBody(_PCpts);
-
-	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	
 
 #endif
@@ -356,6 +353,7 @@ int main( int argc, char* argv[] )
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eBBBCloud);
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating Solid Objects..." << endl;
 
 #endif
 
@@ -463,7 +461,7 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
+		//if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
 
 
@@ -660,10 +658,8 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 	// Close logfile
 	MpiManager::logout->close();
-
 	// Finalise MPI
 	MPI_Finalize();
-
 #endif
 
 	return 0;

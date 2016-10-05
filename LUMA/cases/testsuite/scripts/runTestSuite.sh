@@ -22,6 +22,8 @@ DIR_INPUT=${DIR_WORKING}/input			# Input directory containing files required for
 DIR_RES=${DIR_WORKING}/results			# Results directory where the data will be written out
 DIR_LUMA=${DIR_WORKING}/../..			# LUMA directory containing the source files to compile
 
+# Master log file
+LOG_FILE=testsuite.log
 
 # File for diff comparison
 DIFF_FILE=io_lite.Lev0.Reg0.Rnk0.100.dat
@@ -33,6 +35,7 @@ do
 	case "$1" in
 		--clean | clean | -c)
 			rm -rf ${DIR_RES}
+			rm -f ${DIR_WORKING}/${LOG_FILE}
 			exit
 			;;
 	esac
@@ -43,12 +46,17 @@ done
 # Delete results directory if it already exists and create it again
 rm -rf ${DIR_RES}
 mkdir ${DIR_RES}
+rm -f ${DIR_WORKING}/${LOG_FILE}
 
 
 # Get the number of cases to test and print to screen
 NCASES=`find ${DIR_DEF} -maxdepth 1 -type f | wc -l`
 printf "\n********** LUMA TEST SUITE **********\n"
 printf "Beginning test suite -> there are ${NCASES} cases to test\n\n"
+
+# Print header for master log file
+DATE=`date +%Y-%m-%d:%H:%M:%S`
+printf "\n********** LUMA TEST SUITE - ${DATE} **********\n\n" > ${DIR_WORKING}/${LOG_FILE}
 
 
 # Loop through all cases
@@ -153,6 +161,9 @@ do
 				printf "success!\n"
 				printf "Case ${CASE_NUM_INT} has passed!\n\n"
 
+				# Write to master log file
+				printf "CASE ${CASE_NUM_INT} -> PASS\n" >> ${DIR_WORKING}/${LOG_FILE}
+
 			else
 
 				# Check failed
@@ -164,16 +175,27 @@ do
 
 				# Print status
 				printf "Case ${CASE_NUM_INT} failed!\n\n"
+
+				# Write to master log file
+				printf "CASE ${CASE_NUM_INT} -> FAILED ON DIFF\n" >> ${DIR_WORKING}/${LOG_FILE}
 			fi
 		else
 
 			# LUMA failed during runtime
 			printf "failed (check LUMA log file)...skipping case\n\n"
+
+			# Write to master log file
+			printf "CASE ${CASE_NUM_INT} -> FAILED ON RUN\n" >> ${DIR_WORKING}/${LOG_FILE}
+
 		fi
 	else
 
 		# Case did not compile
 		echo "failed (check compile log file)...skipping case\n\n"
+
+		# Write to master log file
+		printf "CASE ${CASE_NUM_INT} -> FAILED ON COMPILE\n" >> ${DIR_WORKING}/${LOG_FILE}
+
 	fi
 done
 

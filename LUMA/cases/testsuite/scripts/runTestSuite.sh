@@ -52,24 +52,65 @@ printf "Beginning test suite -> there are ${NCASES} cases to test\n\n"
 
 
 # Loop through all cases
-#for CASE_DEF_PATH in ${DIR_DEF}/definitions_000.h
+#for CASE_DEF_PATH in ${DIR_DEF}/definitions_008.h
 for CASE_DEF_PATH in ${DIR_DEF}/*
 do
 
 	# Get the case number by stripping the path
 	CASE_NUM=${CASE_DEF_PATH%.*}
 	CASE_NUM=${CASE_NUM#*_}
+	CASE_NUM_INT=$((10#${CASE_NUM}))
 
 
 	# Inform user we are starting this case (use expansion to treat CASE_NUM as number rather than string)
-	printf "Starting case $((CASE_NUM)) of ${NCASES}...\n"
+	printf "Starting case ${CASE_NUM_INT} of $((NCASES-1))...\n"
 
 
-	# Create a directory for this case in the results directory and copy the definitions file there (in case it needs to be inspected) and the input folder
+	# Create a directory for this case in the results directory and copy the definitions file there (in case it needs to be inspected)
 	CASE_RES_PATH=${DIR_RES}/case${CASE_NUM}
 	mkdir ${CASE_RES_PATH}
 	cp ${CASE_DEF_PATH} ${CASE_RES_PATH}/.
-	cp -r ${DIR_INPUT} ${CASE_RES_PATH}/.
+
+	# Copy the proper inputs to the input directory
+	# IB point cloud cases
+	if [ ${CASE_NUM_INT} -eq 0 ] || [ ${CASE_NUM_INT} -eq 1 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/ibb_input.in ${CASE_RES_PATH}/input/.
+	fi
+
+	# BB point cloud cases
+    if [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 6 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/bbb_input.in ${CASE_RES_PATH}/input/.
+	fi
+
+	# BFL point cloud cases
+    if [ ${CASE_NUM_INT} -eq 4 ] || [ ${CASE_NUM_INT} -eq 7 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/bfl_input.in ${CASE_RES_PATH}/input/.
+	fi
+
+	# Read in inlet profile
+	if [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 6 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/inlet_profile.in ${CASE_RES_PATH}/input/.
+	fi
+
+	# Copy restart data from previous case
+    if [ ${CASE_NUM_INT} -eq 1 ] || [ ${CASE_NUM_INT} -eq 9 ]; then
+	    mkdir -p ${CASE_RES_PATH}/input
+		LAST_CASE=$((${CASE_NUM_INT}-1))			
+		LAST_CASE=$(printf %03d ${LAST_CASE})
+		LAST_DIR_OUT=`find ${DIR_RES}/case${LAST_CASE} -maxdepth 1 -type d -name 'output*'`
+		cp ${LAST_DIR_OUT}/restart* ${CASE_RES_PATH}/input/.
+	fi
+
+	# Number of processes to run on
+	if [ ${CASE_NUM_INT} -eq 0 ] || [ ${CASE_NUM_INT} -eq 1 ] || [ ${CASE_NUM_INT} -eq 2 ] || [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 4 ] || [ ${CASE_NUM_INT} -eq 5 ]; then
+		NPROCS=1
+	elif [ ${CASE_NUM_INT} -eq 6 ] || [ ${CASE_NUM_INT} -eq 7 ] || [ ${CASE_NUM_INT} -eq 8 ] || [ ${CASE_NUM_INT} -eq 9 ]; then
+		NPROCS=8
+	fi
 
 
 	# Copy the definition file into the inc directory in the LUMA source folder
@@ -94,7 +135,7 @@ do
 		printf "Running LUMA..."
 		
 		# Temporailiy change working directory to path where executable is (otherwise LUMA writes output to script folder), run LUMA and test for success
-		if (cd ${CASE_RES_PATH} && ./${EXE}${CASE_NUM} > /dev/null); then
+		if (cd ${CASE_RES_PATH} && mpirun -np ${NPROCS} ./${EXE}${CASE_NUM} > LUMA.log); then
 
 			# LUMA completed sucessfully
 			printf "success!\n"
@@ -110,7 +151,7 @@ do
 
 				# Check passed
 				printf "success!\n"
-				printf "Case $((CASE_NUM)) has passed!\n\n"
+				printf "Case ${CASE_NUM_INT} has passed!\n\n"
 
 			else
 
@@ -122,7 +163,7 @@ do
 				diff -y -W 500 ${DIR_BASE}/case${CASE_NUM}/${DIFF_FILE} ${DIR_OUT}/${DIFF_FILE} > ${CASE_RES_PATH}/diff.log
 
 				# Print status
-				printf "Case $((CASE_NUM)) failed!\n\n"
+				printf "Case ${CASE_NUM_INT} failed!\n\n"
 			fi
 		else
 

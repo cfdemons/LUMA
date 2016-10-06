@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2"
+#define H5MGM_VERSION "0.2.1"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB

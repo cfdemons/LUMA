@@ -63,7 +63,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_out_every 100				///< How many timesteps before whole grid output
@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // MPI Data
 #define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_Ycores 3		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_Zcores 2
@@ -136,7 +136,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
+#define L_dims 2		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 100			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites

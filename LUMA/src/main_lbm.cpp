@@ -474,8 +474,6 @@ int main( int argc, char* argv[] )
 		Grids.LBM_multi(false);	// Just called once as no IBM
 #endif
 
-
-
 		///////////////
 		// Write Out //
 		///////////////

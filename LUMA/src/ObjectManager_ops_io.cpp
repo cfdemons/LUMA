@@ -411,6 +411,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
+
 #if (scale_direction == eXDirection)
 	double scale_factor = (body_length * g->dx) /
 		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
@@ -421,13 +422,13 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	double scale_factor = (body_length * g->dz) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 #endif
+
 	double shift_x =  (body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	double shift_y =  (body_start_y * g->dy) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
-	double shift_z =  std::floor( (body_centre_z * g->dz) - scale_factor * (
-		*std::min_element(_PCpts->z.begin(), _PCpts->z.end()) + 
-		(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end())) / 2
-		) );
+	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
+	double z_start_position = g->ZOrigin + (body_centre_z * g->dx) - (scaled_body_length / 2);
+	double shift_z = z_start_position - *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 
 	// Apply to each point to convert to global positions
 	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
@@ -468,6 +469,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Write out the points remaining in for debugging purposes
 #ifdef L_CLOUD_DEBUG
+	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
@@ -494,7 +496,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			// Label the grid sites
 			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get globals from scaled positions
+				// Get global voxel index from scaled positions
 				globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g);
 
 				// Get local indices

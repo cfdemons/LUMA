@@ -381,7 +381,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	for (int ii = ib - 1; ii <= ib + 1; ii++) {
 		for (int jj = jb - 1; jj <= jb + 1; jj++) {
 
-			// If indices are valid
+			// Check local indices on the grid
 			if (	ib >= 0 && ib < g->N_lim
 				&&	jb >= 0 && jb < g->M_lim
 				) {			

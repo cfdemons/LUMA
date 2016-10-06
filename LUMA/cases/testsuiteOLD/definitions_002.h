@@ -63,7 +63,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_out_every 100				///< How many timesteps before whole grid output
@@ -116,7 +116,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // MPI Data
 #define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_Ycores 3		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_Zcores 2
@@ -136,7 +136,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
+#define L_dims 2		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 100			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites
@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE		///< Use an inlet profile
+//#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
@@ -181,7 +181,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Master IBM switches //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 #define L_IB_Lev 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
@@ -273,8 +273,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
 #define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units
@@ -306,29 +306,29 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Bounce-back objects from point clouds
 //#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_object_on_grid_lev 0		///< Provide grid level on which object should be added 
+	#define L_object_on_grid_lev 4		///< Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 30			///< Index for start of object bounding box in X direction
-	#define L_start_object_y 30			///< Index for start of object bounding box in Y direction
-	#define L_centre_object_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_object_length 40			///< The object input is scaled based on this dimension
+	#define L_start_object_x 40			///< Index for start of object bounding box in X direction
+	#define L_start_object_y 16			///< Index for start of object bounding box in Y direction
+	#define L_centre_object_z 121		///< Index for cetnre of object bounding box in Z direction
+	#define L_object_length 160			///< The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_object_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_object_length_ref 160		///< Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
-#define L_BFL_ON					///< Build BFL body from point cloud
+//#define L_BFL_ON					///< Build BFL body from point cloud
 
-	#define L_bfl_on_grid_lev 0		///< Provide grid level on which BFL body should be added 
+	#define L_bfl_on_grid_lev 1		///< Provide grid level on which BFL body should be added 
 	#define L_bfl_on_grid_reg 0		///< Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_bfl_x 30		///< Index for start of object bounding box in X direction
-	#define L_start_bfl_y 30		///< Index for start of object bounding box in Y direction
-	#define L_centre_bfl_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_bfl_length 40			///< The BFL object input is scaled based on this dimension
+	#define L_start_bfl_x 50		///< Index for start of object bounding box in X direction
+	#define L_start_bfl_y 100		///< Index for start of object bounding box in Y direction
+	#define L_centre_bfl_z 20		///< Index for cetnre of object bounding box in Z direction
+	#define L_bfl_length 50			///< The BFL object input is scaled based on this dimension
 	#define L_bfl_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_bfl_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_bfl_length_ref 10		///< Reference length to be used in the definition of Reynolds number
 
 
 

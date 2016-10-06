@@ -291,7 +291,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 #if (L_dims == 3)
 	// Check that lattice volumes are cubes in 3D
-	if ( (Lx/L_N) != (Ly/L_M) || (Lx/L_N) != (Lz/L_K) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 || abs((Lx/L_N) - (Lz/L_K)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -299,7 +299,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 #else
 	// 2D so need square lattice cells
-	if ( (Lx/L_N) != (Ly/L_M) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);

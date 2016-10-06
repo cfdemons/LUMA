@@ -904,8 +904,8 @@ bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 ///			Will return the voxel indices of the nearest voxel on the lattice 
 ///			provided for a given point described as a position in global space.
 ///			Can return global values that are not on this MPI rank. Use the
-///			GridUtils::isOnThisRank() method to check the result. This method
-///			is used as a position -> voxel converter.
+///			GridUtils::isOnThisRank() method to check the indices before passing 
+///			them in. This method is used as a position -> voxel converter.
 ///
 /// \param	x	global x-position.
 /// \param	y	global y-position.

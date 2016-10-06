@@ -71,9 +71,9 @@
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
-#define L_IO_LITE					///< ASCII dump on output
+//#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
@@ -85,15 +85,15 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Gravity
-#define GRAVITY_ON						///< Turn on gravity force
+//#define GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
 #define L_grav_force 0.0001
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 1000			///< Frequency of write out of restart file
+#define L_restart_out_every 10000			///< Frequency of write out of restart file
 
 // LBM configuration
 #define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100		///< Number of time steps to run simulation for
+#define L_Timesteps 5000		///< Number of time steps to run simulation for
 
 
 /*
@@ -115,7 +115,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // MPI Data
-#define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_Xcores 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
@@ -136,17 +136,17 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
-#define L_N 100			///< Number of x lattice sites
-#define L_M 100			///< Number of y lattice sites
+#define L_dims 2		///< Number of dimensions to the problem
+#define L_N 904			///< Number of x lattice sites
+#define L_M 760			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 1		///< End of domain-x
+#define L_b_x 9.04		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 1		///< End of domain-y
+#define L_b_y 7.6		///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
 #define L_b_z 1		///< End of domain-z
 
@@ -254,22 +254,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
-//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Periodicity
-#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
@@ -318,7 +318,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // BFL objects
-#define L_BFL_ON					///< Build BFL body from point cloud
+//#define L_BFL_ON					///< Build BFL body from point cloud
 
 	#define L_bfl_on_grid_lev 0		///< Provide grid level on which BFL body should be added 
 	#define L_bfl_on_grid_reg 0		///< Provide grid region on which BFL body should be added

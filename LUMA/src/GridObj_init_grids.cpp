@@ -291,7 +291,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 #if (L_dims == 3)
 	// Check that lattice volumes are cubes in 3D
-	if ( (Lx/L_N) != (Ly/L_M) || (Lx/L_N) != (Lz/L_K) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 || abs((Lx/L_N) - (Lz/L_K)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -299,7 +299,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 #else
 	// 2D so need square lattice cells
-	if ( (Lx/L_N) != (Ly/L_M) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -860,6 +860,134 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 // ****************************************************************************
 /// \brief	Method to initialise label-based solids
 void GridObj::LBM_initSolidLab() {
+
+	/*****************************/
+	/* AIRVISION CITYSCAPE ADDER */
+	/*****************************/
+
+	// Dimensions of bounding box of cityscape (as fraction of domain length)
+#define BB_START_X 0.247787610619469
+#define BB_START_Y 0.4210526315789474
+#define BB_LENGTH_X 0.2212389380530973
+#define BB_LENGTH_Y 0.1578947368421053
+	int k = 0;
+
+	// Blocks to make up cityscape -- offsets and sizes (as fraction of city length)
+	const double block_offset_x[17] =
+	{
+		0.0,
+		0.05,
+		0.1,
+		0.05,
+		0.05,
+		0.05,
+		0.25,
+		0.35,
+		0.25,
+		0.43,
+		0.65,
+		0.75,
+		0.85,
+		0.6,
+		0.8,
+		0.8,
+		0.9
+	};
+
+	const double block_offset_y[17] =
+	{
+		0.75,
+		0.5,
+		0.4166666666666667,
+		0.25,
+		0.0833333333333333,
+		0.0,
+		0.7083333333333333,
+		0.7083333333333333,
+		0.3333333333333333,
+		0.9166666666666667,
+		0.9166666666666667,
+		0.8333333333333333,
+		0.8333333333333333,
+		0.0,
+		0.125,
+		0.0,
+		0.125
+	};
+
+	const double block_size_x[17] =
+	{
+		0.13,
+		0.13,
+		0.05,
+		0.13,
+		0.05,
+		0.1,
+		0.1,
+		0.1,
+		0.25,
+		0.12,
+		0.15,
+		0.1,
+		0.05,
+		0.1,
+		0.05,
+		0.2,
+		0.05
+	};
+
+	const double block_size_y[17] =
+	{
+		0.25,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.2916666666666667,
+		0.0833333333333333,
+		0.25,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.075,
+		0.125,
+		0.075
+	};
+
+	// Add AirVision geometry to LatTyp matrix (17 boxes)
+	for (int box = 0; box < 17; box++) {
+
+		int box_start_x = static_cast<int>(std::floor(BB_START_X * L_N + block_offset_x[box] * BB_LENGTH_X * L_N));
+		int box_end_x = static_cast<int>(box_start_x + std::floor(block_size_x[box] * BB_LENGTH_X * L_N));
+		int box_start_y = static_cast<int>(std::floor(BB_START_Y * L_M + block_offset_y[box] * BB_LENGTH_Y * L_M));
+		int box_end_y = static_cast<int>(box_start_y + std::floor(block_size_y[box] * BB_LENGTH_Y * L_M));
+
+		for (int i = box_start_x; i <= box_end_x; i++) {
+			for (int j = box_start_y; j <= box_end_y; j++) {			
+
+#ifdef L_BUILD_FOR_MPI
+				if (!GridUtils::isOnThisRank(i,j,k,*this)) continue;
+				std::vector<int> locals;
+				GridUtils::global_to_local(i, j, k, this, locals);
+				LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eSolid;			
+#else
+
+				LatTyp(i,j,k,M_lim,K_lim) = eSolid;
+#endif
+			}
+		}
+
+	}
+
+
+
+
+
+
+
 
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid

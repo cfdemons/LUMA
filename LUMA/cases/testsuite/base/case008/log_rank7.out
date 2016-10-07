@@ -1,6 +1,6 @@
 LUMA -- Version 1.2.0-alpha
-Simulation started at Tue Oct  4 16:38:04 2016
-MPI Topolgy initialised in 3.548ms.
+Simulation started at Fri Oct  7 17:21:28 2016
+MPI Topolgy initialised in 4.545ms.
 Constructing Grid level 0 on rank 7
 Grid size = 100x100x1
 MPI size = 4x2x2
@@ -12,16 +12,16 @@ L0 relaxation time = 0.536000
 Lattice reference velocity 0.040000
 Reynolds Number = 100
 Object Manager Created.
-Grid & Object Initialisation completed in 1.314ms.
+Grid & Object Initialisation completed in 1.309ms.
 Pre-computing buffer sizes for MPI...Complete.
 Creating sub-grid communicators for HDF5...Complete. Status = 0
 Writing out to IOLite file...
 Writing out to HDF5 file...
 Initialising LBM time-stepping...
-Grid 0: Time stepping taking an average of 1.57031ms
-MPI overhead taking an average of 0.79011ms
+Grid 0: Time stepping taking an average of 1.09683ms
+MPI overhead taking an average of 1.12535ms
 Writing out to IOLite file...
 Writing out to HDF5 file...
 Writing grid level 0 region 0 to restart file...
-Simulation completed at Tue Oct  4 16:38:04 2016
+Simulation completed at Fri Oct  7 17:21:28 2016
 

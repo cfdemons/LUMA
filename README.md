@@ -32,7 +32,7 @@ There is probably a way to execute in parallel directly from Codeblocks, when a 
 Contact Joe for guidance on setting up.
 
 ## SETTING UP VISUAL STUDIO ON WINDOWS ##
-Most of the original cost has been written on Windows and compiled using VC++ 2012. Although platform independence is maintained as best as possible there are limitations to maintain compatibility for VC++ 2012 and MSMPI v7 which we used to develop the code originally.
+Originally, the code was written on Windows and compiled with VC++ 2012. Although platform independence is maintained as best as possible there are limitations to maintain compatibility for the somewhat "wild" VC++ 2012 and MSMPI v7. The software has also been successfully compiled using VC++ 2013 which is the current development platform on Windows. In addition, users will also need Parallel HDF 1.8.17 installed and for the merge tool compilation will need VTK 7.0.
 For advice and guidance setting up the code on Visual Studio contact Adrian.
 
 ## CONTACTS ##

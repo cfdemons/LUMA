@@ -154,19 +154,24 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 int main(int argc, char* argv[])
 {
 
-	// Parse arguments
+	// Parse arguments and handle
 	std::string case_num("000");
-	if (argc > 1)
+	if (argc == 2)
 	{
-		case_num = std::string(argv[1]);
+		std::string arg_str = std::string(argv[1]);
+
+		if (arg_str == "version") {
+			std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << std::endl;
+			return 0;
+		}
+		else {
+			case_num = std::string(argv[1]);
+		}
 	}
 	
 	// Print out to screen
 	std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << std::endl;
-	if (argc > 1) {
-		if (std::string(argv[1]) == "version") return 0;
-	}
-	std::cout << "Merging files..." << std::endl;
+	std::cout << "Reconstructing HDF data..." << std::endl;
 
 	// Turn auto error printing off
 	H5Eset_auto(H5E_DEFAULT, NULL, NULL);

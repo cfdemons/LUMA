@@ -163,7 +163,9 @@ int main(int argc, char* argv[])
 	
 	// Print out to screen
 	std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << std::endl;
-	if (std::string(argv[1]) == "version") return 0;
+	if (argc > 1) {
+		if (std::string(argv[1]) == "version") return 0;
+	}
 	std::cout << "Merging files..." << std::endl;
 
 	// Turn auto error printing off

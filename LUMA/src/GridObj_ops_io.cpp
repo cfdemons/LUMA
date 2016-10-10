@@ -686,11 +686,11 @@ int GridObj::io_hdf5(double tval) {
 	std::string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
 
 	// Declarations
-	hid_t file_id = NULL, plist_id = NULL, group_id = NULL;
-	hid_t filespace = NULL; hsize_t dimsf[L_dims];
-	hid_t memspace = NULL; hsize_t dimsm[1];
-	hid_t attspace = NULL; hsize_t dimsa[1];
-	hid_t dataset_id = NULL; hid_t attrib_id = NULL;
+	hid_t file_id = static_cast<hid_t>(NULL), plist_id = static_cast<hid_t>(NULL), group_id = static_cast<hid_t>(NULL);
+	hid_t filespace = static_cast<hid_t>(NULL); hsize_t dimsf[L_dims];
+	hid_t memspace = static_cast<hid_t>(NULL); hsize_t dimsm[1];
+	hid_t attspace = static_cast<hid_t>(NULL); hsize_t dimsa[1];
+	hid_t dataset_id = static_cast<hid_t>(NULL); hid_t attrib_id = static_cast<hid_t>(NULL);
 	herr_t status = 0;
 	std::string variable_name;
 	MpiManager::phdf5_struct p_data;
@@ -765,7 +765,7 @@ int GridObj::io_hdf5(double tval) {
 	// Create/open file using the property list defined above
 	if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
 	else file_id = H5Fopen(FILE_NAME.c_str(), H5F_ACC_RDWR, plist_id);
-	if (file_id == NULL) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
+	if (file_id == static_cast<hid_t>(NULL)) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
 	status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
 

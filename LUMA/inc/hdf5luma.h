@@ -136,7 +136,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	int i = i_start;
 
 	// Create property list
-	hid_t plist_id = NULL;
+	hid_t plist_id = static_cast<hid_t>(NULL);
 #ifdef L_BUILD_FOR_MPI
 	// Create property template for parallel dataset
 	plist_id = H5Pcreate(H5P_DATASET_XFER);

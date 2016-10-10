@@ -271,6 +271,269 @@ void GridObj::io_textout(std::string output_tag) {
 }
 
 // *****************************************************************************
+/// \brief	.fga file writer.
+///
+///			Writes the components of the macroscopic velocity of the grid at time t and call
+///         recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. 
+///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
+///         VectorField object
+///
+/// \param output_tag	text string added to top of output for identification.
+void GridObj::io_fgaout() {
+
+	// Create stream and open text file
+	ofstream gridoutput;
+	gridoutput.precision(L_output_precision);
+
+	// Construct File Name
+	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank;
+	N_str = to_string((int)L_N);
+	M_str = to_string((int)L_M);
+	K_str = to_string((int)L_K);
+	L_NumLev_str = to_string(level);
+	//if (L_NumLev == 0) ex_str = to_string(0);
+	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
+	if (L_NumLev == 0) NumReg_str = to_string(0);
+	else NumReg_str = to_string(region_number);
+	mpirank = to_string(MpiManager::my_rank);
+	// Build string
+	FNameG = string(GridUtils::path_str + "/Grids")
+		+ string("D") + to_string(L_dims)
+		+ string("x") + N_str
+		+ string("y") + M_str
+		+ string("z") + K_str
+		+ string("Lev") + L_NumLev_str
+		+ string("Reg") + NumReg_str
+		//+ string("P") + ex_str
+		+ string("Rnk") + mpirank
+		+ string(".fga");
+	// Get character pointer
+	const char* FNameG_c = FNameG.c_str();
+
+	// If new simulation then overwrite if old file exists
+	//if (t == 0 && level == 0 && output_tag == "INITIALISATION") gridoutput.open(FNameG_c, ios::out);
+	//else gridoutput.open(FNameG_c, ios::out | ios::app);
+	//Overwrite old file if it exists. 
+	gridoutput.open(FNameG_c, ios::out);
+
+	if (gridoutput.is_open()) {
+
+		//// Draw a line to begin
+		//gridoutput << "\n-------------------------------------------------------------------------------------" << endl;
+		//gridoutput << "-----------------------------------START OF OUTPUT-----------------------------------" << endl;
+		//gridoutput << "-------------------------------------------------------------------------------------" << endl;
+
+		//// Add tag
+		//gridoutput << output_tag << std::endl;
+
+		//// Print Grid Size header
+		//gridoutput << "L0 Grid Size = " << L_N << " x " << L_M << " x " << L_K << endl;
+		//gridoutput << "Local Grid Size = " << N_lim << " x " << M_lim << " x " << K_lim << " (including any MPI overlap)" << std::endl;
+
+		//if (level == 0) {
+		//	// If refined levels exist, print refinement ratio
+		//	if (subGrid.size() != 0) {
+		//		gridoutput << "Grid is refined." << endl;
+		//		// Get size of regions
+		//		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+		//			int finex = subGrid[reg].CoarseLimsX[1] - subGrid[reg].CoarseLimsX[0] + 1;
+		//			int finey = subGrid[reg].CoarseLimsY[1] - subGrid[reg].CoarseLimsY[0] + 1;
+		//			int finez = subGrid[reg].CoarseLimsZ[1] - subGrid[reg].CoarseLimsZ[0] + 1;
+		//			gridoutput << "Local region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez) * 100) / (L_N*L_M*L_K) << "%" << endl;
+		//		}
+		//	}
+		//	// Print time step
+		//	string t_str = to_string(t);
+		//	gridoutput << "Time Step = " << t << endl;
+		//	gridoutput << "-------------------------------------------------------------------------------------" << endl;
+		//}
+
+		//// Print Grid Level
+		//string r_str = to_string(level);
+		//gridoutput << "Grid Level = " << r_str << endl;
+
+		//// Print region number
+		//string reg_str = to_string(region_number);
+		//gridoutput << "Region number = " << reg_str << endl;
+
+		//// Now print omega
+		//gridoutput << "Omega = " << omega << endl;
+
+		//Print number of points (cells) in each direction
+		gridoutput << N_lim << "," << M_lim << "," << K_lim << "," << endl;
+
+		//Write the minimum coordinate of the grid
+		gridoutput << XOrigin << "," << YOrigin << "," << ZOrigin << "," << endl;
+
+		//Write the maximum coordinate of the grid
+		gridoutput << XOrigin + N_lim * dx << "," << YOrigin + M_lim * dy << "," << ZOrigin + K_lim * dz << "," << endl;
+
+
+
+		//// Index Vectors
+		//gridoutput << "X Index: ";
+		//for (size_t i = 0; i < N_lim; i++) {
+		//	gridoutput << XInd[i] << "\t";
+		//}
+		//gridoutput << "\nY Index: ";
+		//for (size_t j = 0; j < M_lim; j++) {
+		//	gridoutput << YInd[j] << "\t";
+		//}
+		//gridoutput << "\nZ Index: ";
+		//for (size_t k = 0; k < K_lim; k++) {
+		//	gridoutput << ZInd[k] << "\t";
+		//}
+
+		//// Position Vectors
+		//gridoutput << "\nX Position: \t";
+		//for (size_t i = 0; i < N_lim; i++) {
+		//	gridoutput << XPos[i] << "\t";
+		//}
+		//gridoutput << "\nY Position: \t";
+		//for (size_t j = 0; j < M_lim; j++) {
+		//	gridoutput << YPos[j] << "\t";
+		//}
+		//gridoutput << "\nZ Position: \t";
+		//for (size_t k = 0; k < K_lim; k++) {
+		//	gridoutput << ZPos[k] << "\t";
+		//}
+
+		//// Typing Matrix
+		//gridoutput << "\n\nTyping Matrix";
+		//for (size_t k = 0; k < K_lim; k++) {
+		//	// New line with z-coordinate
+		//	gridoutput << "\nz = " << ZPos[k] << "\n";
+
+		//	for (size_t j = 0; j < M_lim; j++) {
+		//		// New line
+		//		gridoutput << "\n";
+		//		for (size_t i = 0; i < N_lim; i++) {
+
+		//			// Output
+		//			gridoutput << LatTyp(i, j, k, M_lim, K_lim) << "\t";
+
+		//		}
+		//	}
+		//}
+
+		//// Populations (f, feq)
+		//gridoutput << "\n\nf Values";
+		//for (size_t v = 0; v < L_nVels; v++) {
+		//	// Particular velocity
+		//	gridoutput << "\nc = " << v + 1;
+
+
+		//	for (size_t k = 0; k < K_lim; k++) {
+		//		// New line with z-coordinate
+		//		gridoutput << "\nz = " << ZPos[k] << "\n";
+
+		//		for (size_t j = 0; j < M_lim; j++) {
+		//			// New line
+		//			gridoutput << "\n";
+		//			for (size_t i = 0; i < N_lim; i++) {
+
+		//				// Output
+		//				gridoutput << f(i, j, k, v, M_lim, K_lim, L_nVels) << "\t";
+
+		//			}
+		//		}
+		//	}
+		//}
+
+		//gridoutput << "\n\nfeq Values";
+		//for (size_t v = 0; v < L_nVels; v++) {
+		//	// Particular velocity
+		//	gridoutput << "\nc = " << v + 1;
+
+
+		//	for (size_t k = 0; k < K_lim; k++) {
+		//		// New line with z-coordinate
+		//		gridoutput << "\nz = " << ZPos[k] << "\n";
+
+		//		for (size_t j = 0; j < M_lim; j++) {
+		//			// New line
+		//			gridoutput << "\n";
+		//			for (size_t i = 0; i < N_lim; i++) {
+
+		//				// Output
+		//				gridoutput << feq(i, j, k, v, M_lim, K_lim, L_nVels) << "\t";
+
+		//			}
+		//		}
+		//	}
+		//}
+
+		// Macroscopic (u, rho)
+		//gridoutput << "\n\nVelocity Values";
+		for (size_t n = 0; n < L_dims; n++) {
+			//// Particular component
+			//gridoutput << "\nu(" << n + 1 << ")";
+
+			for (size_t k = 0; k < K_lim; k++) {
+				//// New line with z-coordinate
+				//gridoutput << "\nz = " << ZPos[k] << "\n";
+
+				for (size_t j = 0; j < M_lim; j++) {
+					//// New line
+					//gridoutput << "\n";
+					for (size_t i = 0; i < N_lim; i++) {
+
+						// Output
+						//I LEFT IT HERE!!!!!!
+						gridoutput << u(i, j, k, n, M_lim, K_lim, L_dims) << "\t";
+
+					}
+				}
+			}
+		}
+
+		gridoutput << "\n\nDensity";
+		for (size_t k = 0; k < K_lim; k++) {
+			// New line with z-coordinate
+			gridoutput << "\nz = " << ZPos[k] << "\n";
+
+			for (size_t j = 0; j < M_lim; j++) {
+				// New line
+				gridoutput << "\n";
+				for (size_t i = 0; i < N_lim; i++) {
+
+					// Output
+					gridoutput << rho(i, j, k, M_lim, K_lim) << "\t";
+
+				}
+			}
+		}
+
+		// Draw a line underneath
+		gridoutput << "\n-------------------------------------------------------------------------------------" << endl;
+		gridoutput << "------------------------------------END OF OUTPUT------------------------------------" << endl;
+		gridoutput << "-------------------------------------------------------------------------------------" << endl;
+
+
+		// Call recursively for all child subgrids
+		size_t regions = subGrid.size();
+		if (regions != 0) {
+			for (size_t reg = 0; reg < regions; reg++) {
+
+				subGrid[reg].io_textout(output_tag);
+
+			}
+		}
+
+
+		// Close file
+		gridoutput.close();
+
+	}
+	else {
+
+		*GridUtils::logfile << "Cannot open file" << endl;
+
+	}
+
+}
+
+// *****************************************************************************
 /// \brief	Restart file read-writer.
 ///
 ///			This routine writes/reads the current rank's data in the custom restart 

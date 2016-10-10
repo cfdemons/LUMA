@@ -63,17 +63,17 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 100				///< How many timesteps before whole grid output
+#define L_out_every 1000				///< How many timesteps before whole grid output
 #define L_out_every_forces 100		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
-#define L_IO_LITE					///< ASCII dump on output
+//#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
@@ -85,13 +85,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Gravity
-#define GRAVITY_ON						///< Turn on gravity force
+//#define GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
 #define L_grav_force 0.0001
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 1000			///< Frequency of write out of restart file
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100		///< Number of time steps to run simulation for
+#define L_Timesteps 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,18 +137,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 3		///< Number of dimensions to the problem
-#define L_N 100			///< Number of x lattice sites
-#define L_M 100			///< Number of y lattice sites
-#define L_K 100			///< Number of z lattice sites
+#define L_N 46			///< Number of x lattice sites
+#define L_M 26			///< Number of y lattice sites
+#define L_K 46			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 1		///< End of domain-x
+#define L_b_x 46		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 1		///< End of domain-y
+#define L_b_y 26		///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
-#define L_b_z 1		///< End of domain-z
+#define L_b_z 46		///< End of domain-z
 
 
 /*
@@ -258,22 +258,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Inlets
-//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Periodicity
-#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
@@ -289,18 +289,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 32		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 64		///< Index of end of object/wall in x-direction
-	#define L_block_y_min 16		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 48		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 16		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 48		///< Index of end of object/wall in z-direction
+	#define L_block_x_min 20		///< Index of start of object/wall in x-direction
+	#define L_block_x_max 24		///< Index of end of object/wall in x-direction
+	#define L_block_y_min 1		///< Index of start of object/wall in y-direction
+	#define L_block_y_max 5		///< Index of end of object/wall in y-direction
+	#define L_block_z_min 20		///< Index of start of object/wall in z-direction
+	#define L_block_z_max 25		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
@@ -318,7 +318,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // BFL objects
-#define L_BFL_ON					///< Build BFL body from point cloud
+//#define L_BFL_ON					///< Build BFL body from point cloud
 
 	#define L_bfl_on_grid_lev 0		///< Provide grid level on which BFL body should be added 
 	#define L_bfl_on_grid_reg 0		///< Provide grid region on which BFL body should be added

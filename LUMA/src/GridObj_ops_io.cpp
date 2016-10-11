@@ -276,11 +276,38 @@ void GridObj::io_textout(std::string output_tag) {
 ///			Writes the components of the macroscopic velocity of the grid at time t and call
 ///         recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. 
 ///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
+///         VectorField object.
+///         It doesn't do anything if the model is not 2D or 3D. Since .fga files can only store 3D data
+///
+void GridObj::io_fgaout() {
+	
+	//Write the file only if the model has the correct number of dimensions
+	if ((L_dims == 2) || (L_dims == 3)){
+		io_fgaoutPriv();
+	}
+	else{
+		cout << "Error: See Log File" << endl;
+		*GridUtils::logfile << ".fga output can only be set for 2 or 3 dimensional models" << endl;
+	}
+
+}
+
+
+
+// *****************************************************************************
+/// \brief	.fga file writer.
+///
+///			Writes the components of the macroscopic velocity of the grid at time t and call
+///         recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. 
+///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
 ///         VectorField object
 ///
-/// \param output_tag	text string added to top of output for identification.
-void GridObj::io_fgaout() {
+void GridObj::io_fgaoutPriv() {
 
+	//Error control. Check that L_DIM is less than 4 and more than 1. 
+	//HOW DOES THIS WORKS ON LUMA?
+	
+	
 	// Create stream and open text file
 	ofstream gridoutput;
 	gridoutput.precision(L_output_precision);
@@ -318,47 +345,6 @@ void GridObj::io_fgaout() {
 
 	if (gridoutput.is_open()) {
 
-		//// Draw a line to begin
-		//gridoutput << "\n-------------------------------------------------------------------------------------" << endl;
-		//gridoutput << "-----------------------------------START OF OUTPUT-----------------------------------" << endl;
-		//gridoutput << "-------------------------------------------------------------------------------------" << endl;
-
-		//// Add tag
-		//gridoutput << output_tag << std::endl;
-
-		//// Print Grid Size header
-		//gridoutput << "L0 Grid Size = " << L_N << " x " << L_M << " x " << L_K << endl;
-		//gridoutput << "Local Grid Size = " << N_lim << " x " << M_lim << " x " << K_lim << " (including any MPI overlap)" << std::endl;
-
-		//if (level == 0) {
-		//	// If refined levels exist, print refinement ratio
-		//	if (subGrid.size() != 0) {
-		//		gridoutput << "Grid is refined." << endl;
-		//		// Get size of regions
-		//		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-		//			int finex = subGrid[reg].CoarseLimsX[1] - subGrid[reg].CoarseLimsX[0] + 1;
-		//			int finey = subGrid[reg].CoarseLimsY[1] - subGrid[reg].CoarseLimsY[0] + 1;
-		//			int finez = subGrid[reg].CoarseLimsZ[1] - subGrid[reg].CoarseLimsZ[0] + 1;
-		//			gridoutput << "Local region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez) * 100) / (L_N*L_M*L_K) << "%" << endl;
-		//		}
-		//	}
-		//	// Print time step
-		//	string t_str = to_string(t);
-		//	gridoutput << "Time Step = " << t << endl;
-		//	gridoutput << "-------------------------------------------------------------------------------------" << endl;
-		//}
-
-		//// Print Grid Level
-		//string r_str = to_string(level);
-		//gridoutput << "Grid Level = " << r_str << endl;
-
-		//// Print region number
-		//string reg_str = to_string(region_number);
-		//gridoutput << "Region number = " << reg_str << endl;
-
-		//// Now print omega
-		//gridoutput << "Omega = " << omega << endl;
-
 		//Print number of points (cells) in each direction
 		gridoutput << N_lim << "," << M_lim << "," << K_lim << "," << endl;
 
@@ -368,166 +354,41 @@ void GridObj::io_fgaout() {
 		//Write the maximum coordinate of the grid
 		gridoutput << XOrigin + N_lim * dx << "," << YOrigin + M_lim * dy << "," << ZOrigin + K_lim * dz << "," << endl;
 
+		//Auxiliar array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
+		double v[3] = { 0.0, 0.0, 0.0 };
 
+		for (size_t k = 0; k < K_lim; k++){
 
-		//// Index Vectors
-		//gridoutput << "X Index: ";
-		//for (size_t i = 0; i < N_lim; i++) {
-		//	gridoutput << XInd[i] << "\t";
-		//}
-		//gridoutput << "\nY Index: ";
-		//for (size_t j = 0; j < M_lim; j++) {
-		//	gridoutput << YInd[j] << "\t";
-		//}
-		//gridoutput << "\nZ Index: ";
-		//for (size_t k = 0; k < K_lim; k++) {
-		//	gridoutput << ZInd[k] << "\t";
-		//}
+			for (size_t j = 0; j < M_lim; j++){
 
-		//// Position Vectors
-		//gridoutput << "\nX Position: \t";
-		//for (size_t i = 0; i < N_lim; i++) {
-		//	gridoutput << XPos[i] << "\t";
-		//}
-		//gridoutput << "\nY Position: \t";
-		//for (size_t j = 0; j < M_lim; j++) {
-		//	gridoutput << YPos[j] << "\t";
-		//}
-		//gridoutput << "\nZ Position: \t";
-		//for (size_t k = 0; k < K_lim; k++) {
-		//	gridoutput << ZPos[k] << "\t";
-		//}
+				for (size_t i = 0; i < N_lim; i++){
 
-		//// Typing Matrix
-		//gridoutput << "\n\nTyping Matrix";
-		//for (size_t k = 0; k < K_lim; k++) {
-		//	// New line with z-coordinate
-		//	gridoutput << "\nz = " << ZPos[k] << "\n";
-
-		//	for (size_t j = 0; j < M_lim; j++) {
-		//		// New line
-		//		gridoutput << "\n";
-		//		for (size_t i = 0; i < N_lim; i++) {
-
-		//			// Output
-		//			gridoutput << LatTyp(i, j, k, M_lim, K_lim) << "\t";
-
-		//		}
-		//	}
-		//}
-
-		//// Populations (f, feq)
-		//gridoutput << "\n\nf Values";
-		//for (size_t v = 0; v < L_nVels; v++) {
-		//	// Particular velocity
-		//	gridoutput << "\nc = " << v + 1;
-
-
-		//	for (size_t k = 0; k < K_lim; k++) {
-		//		// New line with z-coordinate
-		//		gridoutput << "\nz = " << ZPos[k] << "\n";
-
-		//		for (size_t j = 0; j < M_lim; j++) {
-		//			// New line
-		//			gridoutput << "\n";
-		//			for (size_t i = 0; i < N_lim; i++) {
-
-		//				// Output
-		//				gridoutput << f(i, j, k, v, M_lim, K_lim, L_nVels) << "\t";
-
-		//			}
-		//		}
-		//	}
-		//}
-
-		//gridoutput << "\n\nfeq Values";
-		//for (size_t v = 0; v < L_nVels; v++) {
-		//	// Particular velocity
-		//	gridoutput << "\nc = " << v + 1;
-
-
-		//	for (size_t k = 0; k < K_lim; k++) {
-		//		// New line with z-coordinate
-		//		gridoutput << "\nz = " << ZPos[k] << "\n";
-
-		//		for (size_t j = 0; j < M_lim; j++) {
-		//			// New line
-		//			gridoutput << "\n";
-		//			for (size_t i = 0; i < N_lim; i++) {
-
-		//				// Output
-		//				gridoutput << feq(i, j, k, v, M_lim, K_lim, L_nVels) << "\t";
-
-		//			}
-		//		}
-		//	}
-		//}
-
-		// Macroscopic (u, rho)
-		//gridoutput << "\n\nVelocity Values";
-		for (size_t n = 0; n < L_dims; n++) {
-			//// Particular component
-			//gridoutput << "\nu(" << n + 1 << ")";
-
-			for (size_t k = 0; k < K_lim; k++) {
-				//// New line with z-coordinate
-				//gridoutput << "\nz = " << ZPos[k] << "\n";
-
-				for (size_t j = 0; j < M_lim; j++) {
-					//// New line
-					//gridoutput << "\n";
-					for (size_t i = 0; i < N_lim; i++) {
-
-						// Output
-						//I LEFT IT HERE!!!!!!
-						gridoutput << u(i, j, k, n, M_lim, K_lim, L_dims) << "\t";
-
+					for (size_t n = 0; n < L_dims; n++){
+						//Fill the v array
+						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
 					}
+					//Write the data to the file. 
+					gridoutput << v[0] << "," << v[1] << "," << v[2] << endl;
 				}
 			}
 		}
 
-		gridoutput << "\n\nDensity";
-		for (size_t k = 0; k < K_lim; k++) {
-			// New line with z-coordinate
-			gridoutput << "\nz = " << ZPos[k] << "\n";
-
-			for (size_t j = 0; j < M_lim; j++) {
-				// New line
-				gridoutput << "\n";
-				for (size_t i = 0; i < N_lim; i++) {
-
-					// Output
-					gridoutput << rho(i, j, k, M_lim, K_lim) << "\t";
-
-				}
-			}
-		}
-
-		// Draw a line underneath
-		gridoutput << "\n-------------------------------------------------------------------------------------" << endl;
-		gridoutput << "------------------------------------END OF OUTPUT------------------------------------" << endl;
-		gridoutput << "-------------------------------------------------------------------------------------" << endl;
-
+		//Close file
+		gridoutput.close();
 
 		// Call recursively for all child subgrids
 		size_t regions = subGrid.size();
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].io_textout(output_tag);
-
+				subGrid[reg].io_fgaout();
 			}
 		}
-
-
-		// Close file
-		gridoutput.close();
 
 	}
 	else {
 
-		*GridUtils::logfile << "Cannot open file" << endl;
+		*GridUtils::logfile << "Cannot open file for .fga output" << endl;
 
 	}
 

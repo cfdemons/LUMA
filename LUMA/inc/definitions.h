@@ -66,7 +66,7 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 1000				///< How many timesteps before whole grid output
+#define L_out_every 1000			///< How many timesteps before whole grid output
 #define L_out_every_forces 100		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
@@ -138,9 +138,9 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 3		///< Number of dimensions to the problem
-#define L_N 46			///< Number of x lattice sites
-#define L_M 26			///< Number of y lattice sites
-#define L_K 46			///< Number of z lattice sites
+#define L_N 69//46			///< Number of x lattice sites
+#define L_M 39//26			///< Number of y lattice sites
+#define L_K 69//46			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
@@ -265,7 +265,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
@@ -296,12 +296,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 20		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 24		///< Index of end of object/wall in x-direction
+	#define L_block_x_min 34		///< Index of start of object/wall in x-direction
+	#define L_block_x_max 42		///< Index of end of object/wall in x-direction
 	#define L_block_y_min 1		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 5		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 20		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 25		///< Index of end of object/wall in z-direction
+	#define L_block_y_max 8		///< Index of end of object/wall in y-direction
+	#define L_block_z_min 34		///< Index of start of object/wall in z-direction
+	#define L_block_z_max 42		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds

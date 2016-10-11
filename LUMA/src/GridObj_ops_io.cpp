@@ -370,7 +370,7 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
 					}
 					//Write the data to the file. 
-					gridoutput << v[0] << "," << v[1] << "," << v[2] << endl;
+					gridoutput << v[0] << "," << v[1] << "," << v[2] << "," << endl;
 				}
 			}
 		}

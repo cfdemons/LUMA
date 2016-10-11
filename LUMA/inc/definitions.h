@@ -74,6 +74,7 @@
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_IO_FGA                    ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4). 
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output

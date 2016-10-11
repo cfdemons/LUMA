@@ -487,6 +487,10 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
 			Grids.io_textout("START OF TIMESTEP");
 #endif
+#ifdef L_IO_FGA
+			*GridUtils::logfile << "Writing out to <.fga>..." << endl;
+			Grids.io_fgaout();
+#endif
 
 #ifdef L_IO_LITE
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;

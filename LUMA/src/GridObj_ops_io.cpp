@@ -283,7 +283,7 @@ void GridObj::io_fgaout() {
 	
 	//Write the file only if the model has the correct number of dimensions
 	if ((L_dims == 2) || (L_dims == 3)){
-		io_fgaoutPriv();
+		io_fgaoutPriv(t);
 	}
 	else{
 		cout << "Error: See Log File" << endl;
@@ -302,7 +302,7 @@ void GridObj::io_fgaout() {
 ///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
 ///         VectorField object
 ///
-void GridObj::io_fgaoutPriv() {
+void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 
 	//Error control. Check that L_DIM is less than 4 and more than 1. 
 	//HOW DOES THIS WORKS ON LUMA?
@@ -313,11 +313,12 @@ void GridObj::io_fgaoutPriv() {
 	gridoutput.precision(L_output_precision);
 
 	// Construct File Name
-	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank;
+	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank,L_timeStep_str;
 	N_str = to_string((int)L_N);
 	M_str = to_string((int)L_M);
 	K_str = to_string((int)L_K);
 	L_NumLev_str = to_string(level);
+	L_timeStep_str = to_string(timeSteplvl0);
 	//if (L_NumLev == 0) ex_str = to_string(0);
 	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
 	if (L_NumLev == 0) NumReg_str = to_string(0);
@@ -329,6 +330,7 @@ void GridObj::io_fgaoutPriv() {
 		+ string("x") + N_str
 		+ string("y") + M_str
 		+ string("z") + K_str
+		+ string("dtNum") + L_timeStep_str
 		+ string("Lev") + L_NumLev_str
 		+ string("Reg") + NumReg_str
 		//+ string("P") + ex_str
@@ -381,7 +383,7 @@ void GridObj::io_fgaoutPriv() {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].io_fgaout();
+				subGrid[reg].io_fgaoutPriv(timeSteplvl0);
 			}
 		}
 

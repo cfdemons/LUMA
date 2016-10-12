@@ -211,6 +211,8 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
+#ifndef L_USE_CUSTOM_MPI_SIZES
+
 		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
 			std::cout << "Error: See Log File" << std::endl;
@@ -218,6 +220,7 @@ void MpiManager::mpi_gridbuild( ) {
 			MpiManager::logout->close();
 			MPI_Finalize();
 			exit(LUMA_FAILED);
+#endif
 
 		} else {
 
@@ -779,11 +782,11 @@ int MpiManager::mpi_buildCommunicators() {
 	p_data.back().region = 0;
 
 	// Get local grid sizes
-	int N_lim = Grids->N_lim;
-	int M_lim = Grids->M_lim;
-	int K_lim = Grids->K_lim;
+	int N_lim = static_cast<int>(Grids->N_lim);
+	int M_lim = static_cast<int>(Grids->M_lim);
+	int K_lim = static_cast<int>(Grids->K_lim);
 
-	// Halo 1 cell thick exists on all edges on L0 and there are no transition layers
+	// Halo exists on all edges on L0 and there are no transition layers
 	p_data.back().i_end = N_lim - 2;
 	p_data.back().i_start = 1;
 	p_data.back().j_end = M_lim - 2;
@@ -820,9 +823,9 @@ int MpiManager::mpi_buildCommunicators() {
 				 * data by checking the buffers versus the grid size. */
 
 				// Get local grid sizes
-				N_lim = targetGrid->N_lim;
-				M_lim = targetGrid->M_lim;
-				K_lim = targetGrid->K_lim;
+				N_lim = static_cast<int>(targetGrid->N_lim);
+				M_lim = static_cast<int>(targetGrid->M_lim);
+				K_lim = static_cast<int>(targetGrid->K_lim);
 
 				// Get global grid sizes
 				N_global = 2 * (RefXend[lev - 1][reg] - RefXstart[lev - 1][reg] + 1);
@@ -844,13 +847,12 @@ int MpiManager::mpi_buildCommunicators() {
 					}
 				}
 
-				// Halo thickness varies with grid level, TL always 2
+				// Halo / TL thickness
 				int halo_thickness = static_cast<int>(pow(2, targetGrid->level));
-				int tl_thickness = 2;
 
 				// Set halo descriptors
-				p_data.back().halo_min = 0, p_data.back().halo_max = 0,
-				p_data.back().i_start = 0, p_data.back().i_end = 0,
+				p_data.back().halo_min = 0, p_data.back().halo_max = 0;	// Boolean flags
+				p_data.back().i_start = 0, p_data.back().i_end = 0,		// Indices
 				p_data.back().j_start = 0, p_data.back().j_end = 0,
 				p_data.back().k_start = 0, p_data.back().k_end = 0;
 
@@ -872,8 +874,8 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check y-directions for halo
 				if (bri.size[5]) {
 					p_data.back().j_end = M_lim - halo_thickness - 1;
-#if (L_dims != 3)
-					p_data.back().halo_max += halo_thickness;	// Increment halo counter for striding
+#if (L_dims != 0)
+					p_data.back().halo_max++;	// Increment halo counter for striding
 #endif
 				}
 				else {
@@ -882,8 +884,8 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[4]) {
 					p_data.back().j_start = halo_thickness;
-#if (L_dims != 3)
-					p_data.back().halo_min += halo_thickness;
+#if (L_dims != 0)
+					p_data.back().halo_min++;
 #endif
 				}
 				else {
@@ -894,7 +896,7 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check z-directions for halo
 				if (bri.size[9]) {
 					p_data.back().k_end = K_lim - halo_thickness - 1;
-					p_data.back().halo_max += halo_thickness;
+					p_data.back().halo_max++;
 				}
 				else {
 					p_data.back().k_end = K_lim - 1;
@@ -902,7 +904,7 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[8]) {
 					p_data.back().k_start = halo_thickness;
-					p_data.back().halo_min += halo_thickness;
+					p_data.back().halo_min++;
 				}
 				else {
 					p_data.back().k_start = 0;
@@ -913,40 +915,39 @@ int MpiManager::mpi_buildCommunicators() {
 #endif
 
 				/* Now account for transition layers -- If the current indices
-				 * defining the writable region have a global index that is inside
-				 * the TL (i.e. within 2 sites of the edge of the grid as TL is always 
-				 * 2 sites thick regardless of the level) then we can shift them off the TL.
-				 * It is possible that this causes indices to be negative or writable 
-				 * regions to have a size < 0 which indicates that the rank has no writable
+				 * defining the writable region have a global index that is in
+				 * the TL then we can shift them off the TL. It is possible that
+				 * this causes indices to be negative or writable regions to
+				 * have a size < 0 which indicates that the rank has no writable
 				 * data. */
-				if (targetGrid->XInd[p_data.back().i_start] < tl_thickness) {
-					p_data.back().i_start += tl_thickness;
+				if (targetGrid->XInd[p_data.back().i_start] < halo_thickness) {
+					p_data.back().i_start += halo_thickness;
 				}
-				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - tl_thickness) {
-					p_data.back().i_end -= tl_thickness;
+				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - halo_thickness) {
+					p_data.back().i_end -= halo_thickness;
 				}
 
-				if (targetGrid->YInd[p_data.back().j_start] < tl_thickness) {
-					p_data.back().j_start += tl_thickness;
+				if (targetGrid->YInd[p_data.back().j_start] < halo_thickness) {
+					p_data.back().j_start += halo_thickness;
 #if (L_dims != 3)
-					p_data.back().halo_min += tl_thickness;		// Account for both halo and TL during striding
+					p_data.back().halo_min++;		// Account for both halo and TL during striding
 #endif
 				}
-				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - tl_thickness) {
-					p_data.back().j_end -= tl_thickness;
+				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - halo_thickness) {
+					p_data.back().j_end -= halo_thickness;
 #if (L_dims != 3)
-					p_data.back().halo_max += tl_thickness;
+					p_data.back().halo_max++;
 #endif
 				}
 
 #if (L_dims == 3)
-				if (targetGrid->ZInd[p_data.back().k_start] < tl_thickness) {
-					p_data.back().k_start += tl_thickness;
-					p_data.back().halo_min += tl_thickness;
+				if (targetGrid->ZInd[p_data.back().k_start] < halo_thickness) {
+					p_data.back().k_start += halo_thickness;
+					p_data.back().halo_min++;
 				}
-				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - tl_thickness) {
-					p_data.back().k_end -= tl_thickness;
-					p_data.back().halo_max += tl_thickness;
+				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - halo_thickness) {
+					p_data.back().k_end -= halo_thickness;
+					p_data.back().halo_max++;
 				}
 #endif
 

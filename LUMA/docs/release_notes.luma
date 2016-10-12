@@ -15,6 +15,7 @@ General 	: 	Compatibilty between GNU and MSVC compilers has been improved throug
 				Removed repeatFlag as unnecessary.
 				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
 
+Issue #88	:	Fixed erroneous error when using custom MPI sizes.
 Issue #87	:	Fixed GNU compiler warnings when using HDF5.
 Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
 Issue #81	: 	Added grid sizes as GridObj property.

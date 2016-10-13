@@ -138,18 +138,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 3		///< Number of dimensions to the problem
-#define L_N 69//46			///< Number of x lattice sites
-#define L_M 39//26			///< Number of y lattice sites
-#define L_K 69//46			///< Number of z lattice sites
+#define L_N 135 //69//46			///< Number of x lattice sites
+#define L_M 45 //39//26			///< Number of y lattice sites
+#define L_K 45 //69//46			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 46		///< End of domain-x
+#define L_b_x 9 //46	///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 26		///< End of domain-y
+#define L_b_y 3 //26	///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
-#define L_b_z 46		///< End of domain-z
+#define L_b_z 3 //26	///< End of domain-z
 
 
 /*
@@ -162,6 +162,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
+#define L_nu    1e-5			///< Viscosity of the real fluid you want to model [m^2/s]
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -296,12 +297,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 34		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 42		///< Index of end of object/wall in x-direction
+	#define L_block_x_min 50 //34		///< Index of start of object/wall in x-direction
+	#define L_block_x_max 60		///< Index of end of object/wall in x-direction
 	#define L_block_y_min 1		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 8		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 34		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 42		///< Index of end of object/wall in z-direction
+	#define L_block_y_max 10		///< Index of end of object/wall in y-direction
+	#define L_block_z_min 17		///< Index of start of object/wall in z-direction
+	#define L_block_z_max 27		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds

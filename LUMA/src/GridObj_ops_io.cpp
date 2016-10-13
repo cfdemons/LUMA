@@ -21,6 +21,7 @@
 #include "../inc/ObjectManager.h"
 #include "../inc/GridUtils.h"
 #include "../inc/hdf5luma.h"
+#include "../inc/GridUnits.h"
 
 using namespace std;
 
@@ -304,9 +305,6 @@ void GridObj::io_fgaout() {
 ///
 void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 
-	//Error control. Check that L_DIM is less than 4 and more than 1. 
-	//HOW DOES THIS WORKS ON LUMA?
-	
 	
 	// Create stream and open text file
 	ofstream gridoutput;
@@ -339,10 +337,6 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 	// Get character pointer
 	const char* FNameG_c = FNameG.c_str();
 
-	// If new simulation then overwrite if old file exists
-	//if (t == 0 && level == 0 && output_tag == "INITIALISATION") gridoutput.open(FNameG_c, ios::out);
-	//else gridoutput.open(FNameG_c, ios::out | ios::app);
-	//Overwrite old file if it exists. 
 	gridoutput.open(FNameG_c, ios::out);
 
 	if (gridoutput.is_open()) {
@@ -350,11 +344,11 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 		//Print number of points (cells) in each direction
 		gridoutput << N_lim << "," << M_lim << "," << K_lim << "," << endl;
 
-		//Write the minimum coordinate of the grid
-		gridoutput << XOrigin << "," << YOrigin << "," << ZOrigin << "," << endl;
+		//Write the minimum coordinate of the grid. Convert the data to cm, since this is the distance unit used by UE4. 
+		gridoutput << GridUnits::m2cm(XOrigin) << "," << GridUnits::m2cm(YOrigin) << "," << GridUnits::m2cm(ZOrigin) << "," << endl;
 
 		//Write the maximum coordinate of the grid
-		gridoutput << XOrigin + N_lim * dx << "," << YOrigin + M_lim * dy << "," << ZOrigin + K_lim * dz << "," << endl;
+		gridoutput <<GridUnits::m2cm(XOrigin + (N_lim - 1) * dx) << "," << GridUnits::m2cm(YOrigin + (M_lim - 1) * dy) << "," << GridUnits::m2cm(ZOrigin + (K_lim - 1) * dz) << "," << endl;
 
 		//Auxiliar array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
 		double v[3] = { 0.0, 0.0, 0.0 };
@@ -370,7 +364,10 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
 					}
 					//Write the data to the file. 
-					gridoutput << v[0] << "," << v[1] << "," << v[2] << "," << endl;
+					gridoutput << GridUnits::m2cm(GridUnits::ulat2uphys(v[0], this)) << "," 
+						       << GridUnits::m2cm(GridUnits::ulat2uphys(v[1], this)) << "," 
+							   << GridUnits::m2cm(GridUnits::ulat2uphys(v[2], this)) << "," 
+							   << endl;
 				}
 			}
 		}

@@ -477,11 +477,6 @@ int main(int argc, char* argv[])
 
 		if (dimensions_p == 3) {
 
-			vtkSmartPointer<vtkDoubleArray> Uz = vtkSmartPointer<vtkDoubleArray>::New();
-			Uz->Allocate(unstructuredGrid->GetNumberOfCells());
-			Uz->SetName("Uz");
-			addDataToGrid("/Uz", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz);
-
 			vtkSmartPointer<vtkDoubleArray> Uz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz_TimeAv->SetName("Uz_TimeAv");

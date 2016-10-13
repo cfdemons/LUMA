@@ -139,7 +139,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
 #endif
-
+			
 			// Apply boundary conditions
 #ifdef L_BFL_ON
 			LBM_boundary(5);	// BFL boundary conditions
@@ -147,7 +147,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
-
+		
 		// If there is lower levels then coalesce from them
 		if (L_NumLev > level) {
 

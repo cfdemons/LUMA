@@ -523,6 +523,12 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
 
+			// Cannot apply BC if require off-grid data
+			if (i - c[0][v_outgoing] < 0 || i - c[0][v_outgoing] >= N_lim ||
+				j - c[1][v_outgoing] < 0 || j - c[1][v_outgoing] >= M_lim ||
+				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
+				continue;
+
 			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
 				(1 - 2 * q) * 
 				objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],v_incoming,M_lim,K_lim,L_nVels) +
@@ -554,6 +560,12 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
+
+			// Cannot apply BC if require off-grid data
+			if (i - c[0][v_outgoing] < 0 || i - c[0][v_outgoing] >= N_lim ||
+				j - c[1][v_outgoing] < 0 || j - c[1][v_outgoing] >= M_lim ||
+				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
+				continue;
 
 			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels) = 
 				(1 - 2 * q) * 

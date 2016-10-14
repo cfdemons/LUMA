@@ -46,7 +46,7 @@ public:
 	{
 		T lphys = (currentGrid->nu*L_Re*currentGrid->dx) / L_u_ref;
 
-		return (L_Re*L_nu) / lphys;
+		return ((L_Re*L_nu) / lphys)*ulat;
 	}
 
 	

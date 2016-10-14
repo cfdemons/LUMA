@@ -138,9 +138,9 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 3		///< Number of dimensions to the problem
-#define L_N 135 //69//46			///< Number of x lattice sites
-#define L_M 45 //39//26			///< Number of y lattice sites
-#define L_K 45 //69//46			///< Number of z lattice sites
+#define L_N 120 //69			///< Number of x lattice sites
+#define L_M 40 //39			///< Number of y lattice sites
+#define L_K 40 //69			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)

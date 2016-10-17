@@ -12,14 +12,18 @@
  * distribution without written consent.
  *
  */
+#ifndef IBBODY_H
+#define IBBODY_H
 
-#pragma once
-#include "IBMarker.h"
-#include "Body.h"
-#include "PCpts.h"
-#include "BFLBody.h"	// Need this because we use the Voxelising routine in makeBody()
+#include "stdafx.h"
 
-/** Represents an IB body **/
+// Forward declarations
+#include "Body.h"	// This is a templated class so include the whole file
+class IBMarker;
+class PCpts;
+class GridObj;
+
+/// \brief	Immersed boundary body.
 class IBBody : public Body<IBMarker> {
 
 	// Make ObjectManager a friend class so it can access the protected data of IBBody objects
@@ -29,7 +33,7 @@ public:
 	// Constructor and destructor
 	IBBody(void);
 	~IBBody(void);
-	IBBody(GridObj* g);
+	IBBody(GridObj* g, size_t id);
 
 protected:
 
@@ -39,15 +43,15 @@ protected:
 	***************************************************************************************************************
 	*/
 
-	bool flex_rigid;					// Set flag for flexibility: false == rigid body; true == flexible filament
-	bool deformable;					// Set flag for deformable body: false == rigid; true == deformable
-	int groupID;				// ID of IBbody group -- position updates can be driven from a flexible body in a group
+	bool flex_rigid;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
+	bool deformable;					///< Flag to indicate deformable body: false == rigid; true == deformable
+	int groupID;						///< ID of IBbody group -- position updates can be driven from a flexible body in a group
 
 	// Flexible body properties
-	double delta_rho;					// Difference in density between fluid and solid in lattice units
-	double flexural_rigidity;			// Young's modulus E * Second moment of area I
-	std::vector<double> tension;		// Tension between the current marker and its neighbour
-	std::vector<int> BCs;				// BCs type flags (flexible bodies)
+	double delta_rho;					///< Difference in density between fluid and solid in lattice units
+	double flexural_rigidity;			///< Young's modulus E * Second moment of area I
+	std::vector<double> tension;		///< Tension between the current marker and its neighbour
+	std::vector<int> BCs;				///< BCs type flags (flexible bodies)
 
 
 	/*
@@ -60,6 +64,8 @@ public:
 
 	// Add marker to the body (overload parent addMarker method)
 	void addMarker(double x, double y, double z, bool flex_rigid);
+	// Voxelising marker adder (overload parent markerAdder method)
+	virtual void markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid);
 
 	//////////////////////////////////
 	// Prefab body building methods //
@@ -81,3 +87,4 @@ public:
 
 };
 
+#endif

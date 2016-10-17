@@ -16,29 +16,33 @@
 /* This file contains the constructors for the Grid objects. */
 
 #include "../inc/stdafx.h"
-#include "../inc/definitions.h"
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridUtils.h"
 
 // Static declarations
 std::ofstream* GridUtils::logfile;
 int MpiManager::my_rank;
 int MpiManager::num_ranks;
 
-// ***************************************************************************************************
-// Default Constructor
+// ****************************************************************************
+/// Default Constructor
 GridObj::GridObj(void)
 {
 }
 
-// ***************************************************************************************************
-// Default Destructor
+// ****************************************************************************
+/// Default Destructor
 GridObj::~GridObj(void)
 {
 }
 
-// ***************************************************************************************************
-// Basic Constructor for top level grid
+// ****************************************************************************
+/// \brief	Constructor for top level grid.
+///
+///			Coarse limits are set to zero and then L0-specific initialiser called.
+///
+/// \param level always should be zero astop level grid.
 GridObj::GridObj(int level)
 {
 	// Defaults
@@ -65,8 +69,19 @@ GridObj::GridObj(int level)
 
 }
 
-// ***************************************************************************************************
-// MPI constructor for level 0 with grid level, rank, local grid size and its global edges
+// ****************************************************************************
+/// \brief	MPI constructor for top level grid.
+///
+///			When using MPI, this constructors a local grid which represents an 
+///			appropriate portion of the top-level grid as dictated by the extent
+///			of this rank.
+///
+/// \param level always should be zero astop level grid.
+/// \param local_size vector indicating dimensions of local grid including halo.
+/// \param GlobalLimsInd vector indicating the global indices of the edges of 
+///			this local grid.
+/// \param GlobalLimsPos vector indicating the global positions of the edges of 
+///			this local grid.
 GridObj::GridObj(int level, std::vector<int> local_size, 
 				 std::vector< std::vector<int> > GlobalLimsInd, 
 				 std::vector< std::vector<double> > GlobalLimsPos)
@@ -93,8 +108,11 @@ GridObj::GridObj(int level, std::vector<int> local_size,
 
 }
 
-// ***************************************************************************************************
-// Overloaded constructor for a sub grid
+// ****************************************************************************
+/// \brief Constructor for a sub-grid.
+/// \param RegionNumber ID indicating the region of nested refinement to which 
+///			this sub-grid belongs.
+/// \param pGrid pointer to parent grid.
 GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 {
 
@@ -111,8 +129,10 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 
 }
 
-// ***************************************************************************************************
-// Method to generate a subgrid
+// ****************************************************************************
+/// \brief Wrapper method to add sub-grid to this grid.
+/// \param RegionNumber ID indicating the region of nested refinement to which 
+///			this sub-grid belongs.
 void GridObj::LBM_addSubGrid(int RegionNumber) {
 
 	// Return if no subgrid required for the current grid
@@ -131,6 +151,6 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 
 }
 
-// ***************************************************************************************************
-// ***************************************************************************************************
+// ****************************************************************************
+// ****************************************************************************
 // Other member methods are in their own files prefixed GridObj_

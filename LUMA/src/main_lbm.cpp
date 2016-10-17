@@ -13,14 +13,27 @@
  *
  */
 
-// LUMA.cpp : Defines the entry point for the console application.
+/// \file main_lbm.cpp
+/// \mainpage
+///
+/// --------------------------------------------------------------
+///
+/// ------ Lattice Boltzmann @ The University of Manchester ------
+///
+/// -------------------------- L-U-M-A ---------------------------
+///
+///  Copyright (C) 2015, 2016
+///  E-mail contact: info@luma.manchester.ac.uk
+///
+/// This software is for academic use only and not available for
+/// distribution without written consent.
 
 #include "../inc/stdafx.h"			// Precompiled header
-#include "../inc/definitions.h"		// Definitions file
-#include "../inc/globalvars.h"		// Global variable references
 #include "../inc/GridObj.h"			// Grid class definition
 #include "../inc/MpiManager.h"		// MPI manager class definition
 #include "../inc/ObjectManager.h"	// Object manager class definition
+#include "../inc/GridUtils.h"		// Grid utilities
+#include "../inc/PCpts.h"			// Point cloud class
 
 using namespace std;	// Use the standard namespace
 
@@ -28,11 +41,11 @@ using namespace std;	// Use the standard namespace
 std::string GridUtils::path_str;
 int MpiManager::MPI_coords[L_dims];
 
-// Entry point
+/// Entry point for the application
 int main( int argc, char* argv[] )
 {
 
-	// Memeory leak checking
+	// Memory leak checking
 #ifdef _DEBUG
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	// Set output to the terminal window
@@ -260,39 +273,39 @@ int main( int argc, char* argv[] )
 	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
 
 #if defined L_INSERT_RECTANGLE_CUBOID
-	objMan->ibm_build_body(1);
+	objMan->ibm_buildBody(1);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
 
 #elif defined L_INSERT_CIRCLE_SPHERE
-	objMan->ibm_build_body(2);
+	objMan->ibm_buildBody(2);
 	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
 
 #elif defined L_INSERT_BOTH
-	objMan->ibm_build_body(3);
+	objMan->ibm_buildBody(3);
 	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
 
 #elif defined L_INSERT_FILAMENT
-	objMan->ibm_build_body(4);
+	objMan->ibm_buildBody(4);
 	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
 
 #elif defined L_INSERT_FILARRAY
-	objMan->ibm_build_body(5);
+	objMan->ibm_buildBody(5);
 	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
 
 #elif defined L_2D_RIGID_PLATE_IBM
-	objMan->ibm_build_body(6);
+	objMan->ibm_buildBody(6);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
 
 #elif defined L_2D_PLATE_WITH_FLAP
-	objMan->ibm_build_body(7);
+	objMan->ibm_buildBody(7);
 	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
 
 #elif defined L_3D_RIGID_PLATE_IBM
-	objMan->ibm_build_body(8);
+	objMan->ibm_buildBody(8);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
 
 #elif defined L_3D_PLATE_WITH_FLAP
-	objMan->ibm_build_body(9);
+	objMan->ibm_buildBody(9);
 	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
 
 #endif
@@ -305,14 +318,14 @@ int main( int argc, char* argv[] )
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eIBBCloud);
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating IBB Objects..." << endl;
 
 #endif
 
 #if !defined L_RESTARTING
 
 	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
-	objMan->ibm_initialise(Grids);
-	*GridUtils::logfile << "Number of markers requested for objects = " << L_num_markers << std::endl;
+	objMan->ibm_initialise();
 
 #endif
 
@@ -321,17 +334,13 @@ int main( int argc, char* argv[] )
 #ifdef L_BFL_ON
 
 
-	*GridUtils::logfile << "Initialising BFL Objects..." << endl;
+	*GridUtils::logfile << "Initialising BFL Objects from File..." << endl;
 
 	// Read in input file to arrays
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eBFLCloud);
-
-	// Call BFL body builder if there are points on this rank
-	if (!_PCpts->x.empty())	objMan->bfl_build_body(_PCpts);
-
-	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
 	
 
 #endif
@@ -344,6 +353,7 @@ int main( int argc, char* argv[] )
 	_PCpts = new PCpts();
 	objMan->io_readInCloud(_PCpts, eBBBCloud);
 	delete _PCpts;
+	*GridUtils::logfile << "Finished creating Solid Objects..." << endl;
 
 #endif
 
@@ -381,7 +391,7 @@ int main( int argc, char* argv[] )
 #ifdef L_IBM_ON
 
 	// L_Re-initialise the bodies (compute support etc.)
-	Grids.ibm_initialise();
+	ObjectManager::getInstance()->ibm_initialise();
 	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
 
 #endif
@@ -409,25 +419,13 @@ int main( int argc, char* argv[] )
 
 
 #ifdef L_BUILD_FOR_MPI
-
-	if (L_NumLev != 0) {
-
-		*GridUtils::logfile << "Creating communicators...";
-
-		// Create communicators for sub-grids
-		mpim->mpi_buildSubGridCommunicators();
-
-		*GridUtils::logfile << "Complete." << std::endl;
-	}
-
+	
 	// Compute buffer sizes
-	MPI_Barrier(mpim->world_comm);
-	t_start = clock();
-	
-	mpim->mpi_buffer_size();	// Call buffer sizing routine
-	
-	secs = clock() - t_start;
-	*GridUtils::logfile << "Preallocating MPI buffers completed in "<< ((double)secs)/CLOCKS_PER_SEC*1000 << "ms." << std::endl;
+	mpim->mpi_buffer_size();
+
+	//  Build halo descriptors and sub-grid communicators
+	mpim->mpi_buildCommunicators();
+
 #endif
 
 
@@ -439,7 +437,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IO_LITE
 	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-	Grids.io_lite(Grids.t);
+	Grids.io_lite(Grids.t, "INITIALISATION");
 #endif
 
 #ifdef L_HDF5_OUTPUT
@@ -463,9 +461,8 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0) {
+		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
-		}
 
 
 		///////////////////////
@@ -476,8 +473,6 @@ int main( int argc, char* argv[] )
 #else
 		Grids.LBM_multi(false);	// Just called once as no IBM
 #endif
-
-
 
 		///////////////
 		// Write Out //
@@ -495,7 +490,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IO_LITE
 		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-		Grids.io_lite(Grids.t);
+		Grids.io_lite(Grids.t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT
@@ -504,21 +499,30 @@ int main( int argc, char* argv[] )
 #endif
 
 #if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
-		objMan->io_vtk_IBwriter(Grids.t);
+		objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
 	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
 	&& defined L_IBM_ON && defined L_IBBODY_TRACER
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
-			objMan->io_write_body_pos(Grids.t);
+			objMan->io_writeBodyPosition(Grids.t);
 #endif
+		}
 
-#if defined L_LD_OUT && defined L_IBM_ON
+		// Write out forces of objects
+#ifdef L_LD_OUT
+		if (Grids.t % L_out_every_forces == 0) {
+
+			*GridUtils::logfile << "Writing out object lift and drag" << endl;
+			objMan->io_writeForceOnObject(Grids.t);
+
+#ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
-			objMan->io_write_lift_drag(Grids.t);
+			objMan->io_writeLiftDrag(Grids.t);
 #endif
-		}		
+		}
+#endif	
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT
@@ -580,9 +584,9 @@ int main( int argc, char* argv[] )
 
 #ifdef L_LOG_TIMINGS
 	// TIMINGS FILE //
-	/** Format is as follows:
+	/* Format is as follows:
 	 * Mpi Init Time --- Obj Init Time --- Time Step Time L0 --- MPI Time L0 --- etc.
-	 **/
+	 */
 
 	std::ofstream timings;
 
@@ -654,8 +658,6 @@ int main( int argc, char* argv[] )
 	MpiManager::logout->close();
 	// Finalise MPI
 	MPI_Finalize();
-	// Destroy MpiManager
-	MpiManager::destroyInstance();
 #endif
 
 	return 0;

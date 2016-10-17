@@ -1,0 +1,513 @@
+\hypertarget{class_mpi_manager}{}\section{Mpi\+Manager Class Reference}
+\label{class_mpi_manager}\index{Mpi\+Manager@{Mpi\+Manager}}
+
+
+M\+PI Manager class.  
+
+
+
+
+{\ttfamily \#include $<$Mpi\+Manager.\+h$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_mpi_manager_1_1buffer__struct}{buffer\+\_\+struct}
+\begin{DoxyCompactList}\small\item\em Structure storing buffers sizes in each direction for particular grid. \end{DoxyCompactList}\item 
+struct \hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges}
+\begin{DoxyCompactList}\small\item\em Structure containing global positions of the edges of halos. \end{DoxyCompactList}\item 
+struct \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct}
+\begin{DoxyCompactList}\small\item\em Structure for storing halo information for H\+D\+F5. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_mpi_manager_a02adaa06e139dfca2bc71e1a1dbf25c7}{mpi\+\_\+init} ()
+\begin{DoxyCompactList}\small\item\em Initialisation routine. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}{mpi\+\_\+gridbuild} ()
+\begin{DoxyCompactList}\small\item\em Domain decomposition. \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}{mpi\+\_\+build\+Communicators} ()
+\begin{DoxyCompactList}\small\item\em Define writable sub-\/grid communicators. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}{mpi\+\_\+buffer\+\_\+pack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\begin{DoxyCompactList}\small\item\em Method to pack the communication buffer. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}{mpi\+\_\+buffer\+\_\+unpack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+\begin{DoxyCompactList}\small\item\em Method to unpack the communication buffer. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_a1bf713399e26a5ffbc03147e0a20c585}{mpi\+\_\+buffer\+\_\+size} ()
+\begin{DoxyCompactList}\small\item\em Pre-\/calcualtion of the buffer sizes. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}{mpi\+\_\+buffer\+\_\+size\+\_\+send} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&g)
+\begin{DoxyCompactList}\small\item\em Method to pre-\/compute the size of the sender layer buffer. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}{mpi\+\_\+buffer\+\_\+size\+\_\+recv} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&g)
+\begin{DoxyCompactList}\small\item\em Method to pre-\/compute the size of the receiver layer buffer. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_ab498bdf0822e2747f83c187d682dd934}{mpi\+\_\+writeout\+\_\+buf} (std\+::string filename, int dir)
+\begin{DoxyCompactList}\small\item\em Buffer A\+S\+C\+II writer. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_aedcf84c06fc3e0486fac61d09ce0a268}{mpi\+\_\+communicate} (int level, int regnum)
+\begin{DoxyCompactList}\small\item\em Communication routine. \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_a3c10ab477c2e4387d6a02104f9b2a2ea}{mpi\+\_\+get\+Opposite} (int direction)
+\begin{DoxyCompactList}\small\item\em Helper method to find opposite direction in M\+PI topology. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{class_mpi_manager}{Mpi\+Manager} $\ast$ \hyperlink{class_mpi_manager_a486e424ae1b9dfa3218d260b0f9a0a2f}{get\+Instance} ()
+\begin{DoxyCompactList}\small\item\em Instance creator. \end{DoxyCompactList}\item 
+static void \hyperlink{class_mpi_manager_a03b7914615ccb6e7b8a285f50860d503}{destroy\+Instance} ()
+\begin{DoxyCompactList}\small\item\em Instance destroyer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}{world\+\_\+comm}
+\begin{DoxyCompactList}\small\item\em Global M\+PI communicator. \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_a8e2e923e656c338148d42517323c9586}{M\+P\+I\+\_\+dims} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Size of M\+PI Cartesian topology. \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}{neighbour\+\_\+rank} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Neighbour rank number for each direction in Cartesian topology. \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}{neighbour\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Coordinates in M\+PI topology of neighbour ranks. \end{DoxyCompactList}\item 
+M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{sub\+Grid\+\_\+comm} \mbox{[}1\mbox{]}
+\begin{DoxyCompactList}\small\item\em Communicators for sub-\/grid / region combinations. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{p\+\_\+data}
+\begin{DoxyCompactList}\small\item\em Vector of structures containing halo descriptors for block writing (H\+D\+F5) \end{DoxyCompactList}\item 
+int \hyperlink{class_mpi_manager_ae41fb382e17680a49821077167bf1905}{global\+\_\+dims} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em Global dimensions of problem coarse lattice. \end{DoxyCompactList}\item 
+std\+::vector$<$ int $>$ \hyperlink{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}{local\+\_\+size}
+\begin{DoxyCompactList}\small\item\em Dimensions of coarse lattice represented on this rank (includes inner and outer halos). \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \hyperlink{class_mpi_manager_a0f994471f9c2986b2c8606b7b716566a}{global\+\_\+edge\+\_\+ind}
+\begin{DoxyCompactList}\small\item\em Global indices of coarse lattice nodes represented on this rank. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_abd8c87e0a21d31b59d7cc1f7f146d5f4}{global\+\_\+edge\+\_\+pos}
+\begin{DoxyCompactList}\small\item\em Global positions of coarse lattice nodes represented on this rank. \end{DoxyCompactList}\item 
+\hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges} \hyperlink{class_mpi_manager_a0cb9f8f024ec0a186374995fb203ea1e}{sender\+\_\+layer\+\_\+pos}
+\begin{DoxyCompactList}\small\item\em Structure containing sender layer edge positions. \end{DoxyCompactList}\item 
+\hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges} \hyperlink{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}{recv\+\_\+layer\+\_\+pos}
+\begin{DoxyCompactList}\small\item\em Structure containing receiver layer edge positions. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_aafbb74832f69a915927b9bf252bd971d}{f\+\_\+buffer\+\_\+send}
+\begin{DoxyCompactList}\small\item\em Array of resizeable outgoing buffers used for data transfer. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_ab8f1eeab50fd4812b3a51af1a6c43713}{f\+\_\+buffer\+\_\+recv}
+\begin{DoxyCompactList}\small\item\em Array of resizeable incoming buffers used for data transfer. \end{DoxyCompactList}\item 
+M\+P\+I\+\_\+\+Status \hyperlink{class_mpi_manager_a257bc27e8099f1cbf5ac70b80d8eadaa}{recv\+\_\+stat}
+\begin{DoxyCompactList}\small\item\em Status structure for Receive return information. \end{DoxyCompactList}\item 
+M\+P\+I\+\_\+\+Request \hyperlink{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}{send\+\_\+requests} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array of request structures for handles to posted I\+Sends. \end{DoxyCompactList}\item 
+M\+P\+I\+\_\+\+Status \hyperlink{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}{send\+\_\+stat} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array of statuses for each Isend. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1buffer__struct}{buffer\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a3a91c2e8cfb15027a0681c198f82d257}{buffer\+\_\+send\+\_\+info}
+\begin{DoxyCompactList}\small\item\em Vectors of buffer\+\_\+info structures holding sender layer size info. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1buffer__struct}{buffer\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a5e769fa077d24d62d10a9a0d303009d1}{buffer\+\_\+recv\+\_\+info}
+\begin{DoxyCompactList}\small\item\em Vectors of buffer\+\_\+info structures holding receiver layer size info. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{class_mpi_manager_a2c3010f87e6a8a6c65e6f975e37fb7d5}{M\+P\+I\+\_\+cartlab} \mbox{[}3\mbox{]}\mbox{[}26\mbox{]}
+\begin{DoxyCompactList}\small\item\em Cartesian unit vectors pointing to each neighbour in Cartesian topology. \end{DoxyCompactList}\item 
+static int \hyperlink{class_mpi_manager_a8329212abc23e5fa3e32e961b7823b5b}{my\+\_\+rank}
+\begin{DoxyCompactList}\small\item\em Rank number. \end{DoxyCompactList}\item 
+static int \hyperlink{class_mpi_manager_af5156a5e4519f43230b6b84792464e48}{num\+\_\+ranks}
+\begin{DoxyCompactList}\small\item\em Total number of ranks in M\+PI Cartesian topology. \end{DoxyCompactList}\item 
+static int \hyperlink{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}{M\+P\+I\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Coordinates in M\+PI Cartesian topolgy. \end{DoxyCompactList}\item 
+static \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$ \hyperlink{class_mpi_manager_a1520da6b8a663cba25a1a9822dd81543}{Grids}
+\begin{DoxyCompactList}\small\item\em Pointer to grid hierarchy. \end{DoxyCompactList}\item 
+static std\+::ofstream $\ast$ \hyperlink{class_mpi_manager_afbd3a2866235c1d4a32e6806318061fd}{logout}
+\begin{DoxyCompactList}\small\item\em Logfile handle. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+M\+PI Manager class. 
+
+Class to manage all M\+PI apsects of the code. 
+
+\subsection{Member Function Documentation}
+\index{Mpi\+Manager@{Mpi\+Manager}!destroy\+Instance@{destroy\+Instance}}
+\index{destroy\+Instance@{destroy\+Instance}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{destroy\+Instance()}{destroyInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::destroy\+Instance (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a03b7914615ccb6e7b8a285f50860d503}{}\label{class_mpi_manager_a03b7914615ccb6e7b8a285f50860d503}
+
+
+Instance destroyer. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!get\+Instance@{get\+Instance}}
+\index{get\+Instance@{get\+Instance}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{get\+Instance()}{getInstance()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Mpi\+Manager} $\ast$ Mpi\+Manager\+::get\+Instance (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a486e424ae1b9dfa3218d260b0f9a0a2f}{}\label{class_mpi_manager_a486e424ae1b9dfa3218d260b0f9a0a2f}
+
+
+Instance creator. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+pack@{mpi\+\_\+buffer\+\_\+pack}}
+\index{mpi\+\_\+buffer\+\_\+pack@{mpi\+\_\+buffer\+\_\+pack}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+pack(int dir, Grid\+Obj $\ast$g)}{mpi_buffer_pack(int dir, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+pack (
+\begin{DoxyParamCaption}
+\item[{int}]{dir, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}{}\label{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}
+
+
+Method to pack the communication buffer. 
+
+Communication buffer is packed with distribution values from the supplied grid. Amount of information is dictated by the direction of the communication being prepared.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & communication direction. \\
+\hline
+{\em g} & grid doing the communication. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size@{mpi\+\_\+buffer\+\_\+size}}
+\index{mpi\+\_\+buffer\+\_\+size@{mpi\+\_\+buffer\+\_\+size}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size()}{mpi_buffer_size()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_a1bf713399e26a5ffbc03147e0a20c585}{}\label{class_mpi_manager_a1bf713399e26a5ffbc03147e0a20c585}
+
+
+Pre-\/calcualtion of the buffer sizes. 
+
+Wrapper method for computing the buffer sizes for every grid on the rank, both sender and receiver. Must be called post-\/initialisation. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size\+\_\+recv@{mpi\+\_\+buffer\+\_\+size\+\_\+recv}}
+\index{mpi\+\_\+buffer\+\_\+size\+\_\+recv@{mpi\+\_\+buffer\+\_\+size\+\_\+recv}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+recv(\+Grid\+Obj $\ast$\&g)}{mpi_buffer_size_recv(GridObj *&g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+recv (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$\&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}{}\label{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}
+
+
+Method to pre-\/compute the size of the receiver layer buffer. 
+
+A halo consists of a receiver (outer) and sender (inner) layer. This method computes the size of the receiver layers in each communication direction (M\+PI directions).
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & grid being inspected. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size\+\_\+send@{mpi\+\_\+buffer\+\_\+size\+\_\+send}}
+\index{mpi\+\_\+buffer\+\_\+size\+\_\+send@{mpi\+\_\+buffer\+\_\+size\+\_\+send}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+send(\+Grid\+Obj $\ast$\&g)}{mpi_buffer_size_send(GridObj *&g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+send (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$\&}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}{}\label{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}
+
+
+Method to pre-\/compute the size of the sender layer buffer. 
+
+A halo consists of a receiver (outer) and sender (inner) layer. This method computes the size of the sender layers in each communication direction (M\+PI directions).
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & grid being inspected. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+unpack@{mpi\+\_\+buffer\+\_\+unpack}}
+\index{mpi\+\_\+buffer\+\_\+unpack@{mpi\+\_\+buffer\+\_\+unpack}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+unpack(int dir, Grid\+Obj $\ast$g)}{mpi_buffer_unpack(int dir, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+unpack (
+\begin{DoxyParamCaption}
+\item[{int}]{dir, }
+\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}{}\label{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}
+
+
+Method to unpack the communication buffer. 
+
+Communication buffer is unpacked onto the supplied grid. Amount and region of unpacking is dictated by the direction of the communication taking place.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & communication direction. \\
+\hline
+{\em g} & grid doing the communication. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+build\+Communicators@{mpi\+\_\+build\+Communicators}}
+\index{mpi\+\_\+build\+Communicators@{mpi\+\_\+build\+Communicators}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+build\+Communicators()}{mpi_buildCommunicators()}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::mpi\+\_\+build\+Communicators (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}{}\label{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}
+
+
+Define writable sub-\/grid communicators. 
+
+When using H\+D\+F5 in parallel, collective IO operations require all processes to write a non-\/zero amount of data to the same file. This method examines availability of sub-\/grid and writable data on the grid (if found) and ensures it is added to a new communicator. Must be called A\+F\+T\+ER the grids and buffers have been initialised. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+communicate@{mpi\+\_\+communicate}}
+\index{mpi\+\_\+communicate@{mpi\+\_\+communicate}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+communicate(int level, int regnum)}{mpi_communicate(int level, int regnum)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+communicate (
+\begin{DoxyParamCaption}
+\item[{int}]{lev, }
+\item[{int}]{reg}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_aedcf84c06fc3e0486fac61d09ce0a268}{}\label{class_mpi_manager_aedcf84c06fc3e0486fac61d09ce0a268}
+
+
+Communication routine. 
+
+This method implements the communication between grids of the same level and region across M\+PI processes. Each call effects communication in all valid directions for the grid of the supplied level and region.
+
+
+\begin{DoxyParams}{Parameters}
+{\em lev} & level of grid to communicate. \\
+\hline
+{\em reg} & region number of grid to communicate. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+get\+Opposite@{mpi\+\_\+get\+Opposite}}
+\index{mpi\+\_\+get\+Opposite@{mpi\+\_\+get\+Opposite}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+get\+Opposite(int direction)}{mpi_getOpposite(int direction)}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::mpi\+\_\+get\+Opposite (
+\begin{DoxyParamCaption}
+\item[{int}]{direction}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_a3c10ab477c2e4387d6a02104f9b2a2ea}{}\label{class_mpi_manager_a3c10ab477c2e4387d6a02104f9b2a2ea}
+
+
+Helper method to find opposite direction in M\+PI topology. 
+
+The M\+PI directional vectors do not necessarily correspond to the lattice model direction. The M\+PI directional vectors are defined separately and hence there is a separate opposite finding method.
+
+
+\begin{DoxyParams}{Parameters}
+{\em direction} & the outgoing direction whose opposite you wish to find. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+gridbuild@{mpi\+\_\+gridbuild}}
+\index{mpi\+\_\+gridbuild@{mpi\+\_\+gridbuild}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+gridbuild()}{mpi_gridbuild()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+gridbuild (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}{}\label{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}
+
+
+Domain decomposition. 
+
+Method to decompose the domain and identify local grid sizes. Parameters defined here are used in \hyperlink{class_grid_obj}{Grid\+Obj} construction. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+init@{mpi\+\_\+init}}
+\index{mpi\+\_\+init@{mpi\+\_\+init}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+init()}{mpi_init()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_a02adaa06e139dfca2bc71e1a1dbf25c7}{}\label{class_mpi_manager_a02adaa06e139dfca2bc71e1a1dbf25c7}
+
+
+Initialisation routine. 
+
+Method is responsible for initialising the M\+PI topolgy and associated data. Must be called immediately after M\+P\+I\+\_\+init(). \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}}
+\index{mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+writeout\+\_\+buf(std\+::string filename, int dir)}{mpi_writeout_buf(std::string filename, int dir)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+writeout\+\_\+buf (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{filename, }
+\item[{int}]{dir}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_ab498bdf0822e2747f83c187d682dd934}{}\label{class_mpi_manager_ab498bdf0822e2747f83c187d682dd934}
+
+
+Buffer A\+S\+C\+II writer. 
+
+When verbose M\+PI logging is turned on this method will write out the communication buffer to an A\+S\+C\+II file. 
+
+\subsection{Member Data Documentation}
+\index{Mpi\+Manager@{Mpi\+Manager}!buffer\+\_\+recv\+\_\+info@{buffer\+\_\+recv\+\_\+info}}
+\index{buffer\+\_\+recv\+\_\+info@{buffer\+\_\+recv\+\_\+info}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{buffer\+\_\+recv\+\_\+info}{buffer_recv_info}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf buffer\+\_\+struct}$>$ Mpi\+Manager\+::buffer\+\_\+recv\+\_\+info}\hypertarget{class_mpi_manager_a5e769fa077d24d62d10a9a0d303009d1}{}\label{class_mpi_manager_a5e769fa077d24d62d10a9a0d303009d1}
+
+
+Vectors of buffer\+\_\+info structures holding receiver layer size info. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!buffer\+\_\+send\+\_\+info@{buffer\+\_\+send\+\_\+info}}
+\index{buffer\+\_\+send\+\_\+info@{buffer\+\_\+send\+\_\+info}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{buffer\+\_\+send\+\_\+info}{buffer_send_info}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf buffer\+\_\+struct}$>$ Mpi\+Manager\+::buffer\+\_\+send\+\_\+info}\hypertarget{class_mpi_manager_a3a91c2e8cfb15027a0681c198f82d257}{}\label{class_mpi_manager_a3a91c2e8cfb15027a0681c198f82d257}
+
+
+Vectors of buffer\+\_\+info structures holding sender layer size info. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!f\+\_\+buffer\+\_\+recv@{f\+\_\+buffer\+\_\+recv}}
+\index{f\+\_\+buffer\+\_\+recv@{f\+\_\+buffer\+\_\+recv}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{f\+\_\+buffer\+\_\+recv}{f_buffer_recv}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$double$>$ $>$ Mpi\+Manager\+::f\+\_\+buffer\+\_\+recv}\hypertarget{class_mpi_manager_ab8f1eeab50fd4812b3a51af1a6c43713}{}\label{class_mpi_manager_ab8f1eeab50fd4812b3a51af1a6c43713}
+
+
+Array of resizeable incoming buffers used for data transfer. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!f\+\_\+buffer\+\_\+send@{f\+\_\+buffer\+\_\+send}}
+\index{f\+\_\+buffer\+\_\+send@{f\+\_\+buffer\+\_\+send}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{f\+\_\+buffer\+\_\+send}{f_buffer_send}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$double$>$ $>$ Mpi\+Manager\+::f\+\_\+buffer\+\_\+send}\hypertarget{class_mpi_manager_aafbb74832f69a915927b9bf252bd971d}{}\label{class_mpi_manager_aafbb74832f69a915927b9bf252bd971d}
+
+
+Array of resizeable outgoing buffers used for data transfer. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+dims@{global\+\_\+dims}}
+\index{global\+\_\+dims@{global\+\_\+dims}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{global\+\_\+dims}{global_dims}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::global\+\_\+dims\mbox{[}3\mbox{]}}\hypertarget{class_mpi_manager_ae41fb382e17680a49821077167bf1905}{}\label{class_mpi_manager_ae41fb382e17680a49821077167bf1905}
+
+
+Global dimensions of problem coarse lattice. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+edge\+\_\+ind@{global\+\_\+edge\+\_\+ind}}
+\index{global\+\_\+edge\+\_\+ind@{global\+\_\+edge\+\_\+ind}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{global\+\_\+edge\+\_\+ind}{global_edge_ind}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$int$>$ $>$ Mpi\+Manager\+::global\+\_\+edge\+\_\+ind}\hypertarget{class_mpi_manager_a0f994471f9c2986b2c8606b7b716566a}{}\label{class_mpi_manager_a0f994471f9c2986b2c8606b7b716566a}
+
+
+Global indices of coarse lattice nodes represented on this rank. 
+
+Excludes outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number. \index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+edge\+\_\+pos@{global\+\_\+edge\+\_\+pos}}
+\index{global\+\_\+edge\+\_\+pos@{global\+\_\+edge\+\_\+pos}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{global\+\_\+edge\+\_\+pos}{global_edge_pos}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$double$>$ $>$ Mpi\+Manager\+::global\+\_\+edge\+\_\+pos}\hypertarget{class_mpi_manager_abd8c87e0a21d31b59d7cc1f7f146d5f4}{}\label{class_mpi_manager_abd8c87e0a21d31b59d7cc1f7f146d5f4}
+
+
+Global positions of coarse lattice nodes represented on this rank. 
+
+Excluding outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number. \index{Mpi\+Manager@{Mpi\+Manager}!Grids@{Grids}}
+\index{Grids@{Grids}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{Grids}{Grids}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Grid\+Obj} $\ast$ Mpi\+Manager\+::\+Grids\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a1520da6b8a663cba25a1a9822dd81543}{}\label{class_mpi_manager_a1520da6b8a663cba25a1a9822dd81543}
+
+
+Pointer to grid hierarchy. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!local\+\_\+size@{local\+\_\+size}}
+\index{local\+\_\+size@{local\+\_\+size}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{local\+\_\+size}{local_size}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ Mpi\+Manager\+::local\+\_\+size}\hypertarget{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}{}\label{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}
+
+
+Dimensions of coarse lattice represented on this rank (includes inner and outer halos). 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!logout@{logout}}
+\index{logout@{logout}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{logout}{logout}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::ofstream $\ast$ Mpi\+Manager\+::logout\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_afbd3a2866235c1d4a32e6806318061fd}{}\label{class_mpi_manager_afbd3a2866235c1d4a32e6806318061fd}
+
+
+Logfile handle. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!M\+P\+I\+\_\+cartlab@{M\+P\+I\+\_\+cartlab}}
+\index{M\+P\+I\+\_\+cartlab@{M\+P\+I\+\_\+cartlab}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+cartlab}{MPI_cartlab}}]{\setlength{\rightskip}{0pt plus 5cm}const int Mpi\+Manager\+::\+M\+P\+I\+\_\+cartlab\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a2c3010f87e6a8a6c65e6f975e37fb7d5}{}\label{class_mpi_manager_a2c3010f87e6a8a6c65e6f975e37fb7d5}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+    \{
+        \{1, -1,  1, -1,  0,  0, -1,  1,     0,  0,      1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0, 
+       0,  1, -1\},
+        \{0,  0,  1, -1,  1, -1,  1, -1,     0,  0,      0,  0,  1, -1,  1, -1,  1, -1,  0,  0, -1,  1, -1, 
+       1, -1,  1\},
+        \{0,  0,  0,  0,  0,  0,  0,  0,     1, -1,      1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, 
+      -1,  1, -1\}
+    \}
+\end{DoxyCode}
+
+
+Cartesian unit vectors pointing to each neighbour in Cartesian topology. 
+
+Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array. \index{Mpi\+Manager@{Mpi\+Manager}!M\+P\+I\+\_\+coords@{M\+P\+I\+\_\+coords}}
+\index{M\+P\+I\+\_\+coords@{M\+P\+I\+\_\+coords}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+coords}{MPI_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+coords\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}{}\label{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}
+
+
+Coordinates in M\+PI Cartesian topolgy. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!M\+P\+I\+\_\+dims@{M\+P\+I\+\_\+dims}}
+\index{M\+P\+I\+\_\+dims@{M\+P\+I\+\_\+dims}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+dims}{MPI_dims}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+dims\mbox{[}{\bf L\+\_\+dims}\mbox{]}}\hypertarget{class_mpi_manager_a8e2e923e656c338148d42517323c9586}{}\label{class_mpi_manager_a8e2e923e656c338148d42517323c9586}
+
+
+Size of M\+PI Cartesian topology. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!my\+\_\+rank@{my\+\_\+rank}}
+\index{my\+\_\+rank@{my\+\_\+rank}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{my\+\_\+rank}{my_rank}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::my\+\_\+rank\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a8329212abc23e5fa3e32e961b7823b5b}{}\label{class_mpi_manager_a8329212abc23e5fa3e32e961b7823b5b}
+
+
+Rank number. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!neighbour\+\_\+coords@{neighbour\+\_\+coords}}
+\index{neighbour\+\_\+coords@{neighbour\+\_\+coords}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{neighbour\+\_\+coords}{neighbour_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+coords\mbox{[}{\bf L\+\_\+dims}\mbox{]}\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}{}\label{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}
+
+
+Coordinates in M\+PI topology of neighbour ranks. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!neighbour\+\_\+rank@{neighbour\+\_\+rank}}
+\index{neighbour\+\_\+rank@{neighbour\+\_\+rank}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{neighbour\+\_\+rank}{neighbour_rank}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+rank\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}{}\label{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}
+
+
+Neighbour rank number for each direction in Cartesian topology. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!num\+\_\+ranks@{num\+\_\+ranks}}
+\index{num\+\_\+ranks@{num\+\_\+ranks}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{num\+\_\+ranks}{num_ranks}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::num\+\_\+ranks\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_af5156a5e4519f43230b6b84792464e48}{}\label{class_mpi_manager_af5156a5e4519f43230b6b84792464e48}
+
+
+Total number of ranks in M\+PI Cartesian topology. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!p\+\_\+data@{p\+\_\+data}}
+\index{p\+\_\+data@{p\+\_\+data}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{p\+\_\+data}{p_data}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf phdf5\+\_\+struct}$>$ Mpi\+Manager\+::p\+\_\+data}\hypertarget{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{}\label{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}
+
+
+Vector of structures containing halo descriptors for block writing (H\+D\+F5) 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!recv\+\_\+layer\+\_\+pos@{recv\+\_\+layer\+\_\+pos}}
+\index{recv\+\_\+layer\+\_\+pos@{recv\+\_\+layer\+\_\+pos}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{recv\+\_\+layer\+\_\+pos}{recv_layer_pos}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf layer\+\_\+edges} Mpi\+Manager\+::recv\+\_\+layer\+\_\+pos}\hypertarget{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}{}\label{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}
+
+
+Structure containing receiver layer edge positions. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!recv\+\_\+stat@{recv\+\_\+stat}}
+\index{recv\+\_\+stat@{recv\+\_\+stat}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{recv\+\_\+stat}{recv_stat}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Status Mpi\+Manager\+::recv\+\_\+stat}\hypertarget{class_mpi_manager_a257bc27e8099f1cbf5ac70b80d8eadaa}{}\label{class_mpi_manager_a257bc27e8099f1cbf5ac70b80d8eadaa}
+
+
+Status structure for Receive return information. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!send\+\_\+requests@{send\+\_\+requests}}
+\index{send\+\_\+requests@{send\+\_\+requests}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{send\+\_\+requests}{send_requests}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Request Mpi\+Manager\+::send\+\_\+requests\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}{}\label{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}
+
+
+Array of request structures for handles to posted I\+Sends. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!send\+\_\+stat@{send\+\_\+stat}}
+\index{send\+\_\+stat@{send\+\_\+stat}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{send\+\_\+stat}{send_stat}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Status Mpi\+Manager\+::send\+\_\+stat\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}{}\label{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}
+
+
+Array of statuses for each Isend. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!sender\+\_\+layer\+\_\+pos@{sender\+\_\+layer\+\_\+pos}}
+\index{sender\+\_\+layer\+\_\+pos@{sender\+\_\+layer\+\_\+pos}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{sender\+\_\+layer\+\_\+pos}{sender_layer_pos}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf layer\+\_\+edges} Mpi\+Manager\+::sender\+\_\+layer\+\_\+pos}\hypertarget{class_mpi_manager_a0cb9f8f024ec0a186374995fb203ea1e}{}\label{class_mpi_manager_a0cb9f8f024ec0a186374995fb203ea1e}
+
+
+Structure containing sender layer edge positions. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}}
+\index{sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{sub\+Grid\+\_\+comm}{subGrid_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::sub\+Grid\+\_\+comm\mbox{[}1\mbox{]}}\hypertarget{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{}\label{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}
+
+
+Communicators for sub-\/grid / region combinations. 
+
+\index{Mpi\+Manager@{Mpi\+Manager}!world\+\_\+comm@{world\+\_\+comm}}
+\index{world\+\_\+comm@{world\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{world\+\_\+comm}{world_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::world\+\_\+comm}\hypertarget{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}{}\label{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}
+
+
+Global M\+PI communicator. 
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_mpi_manager_8h}{Mpi\+Manager.\+h}\item 
+\hyperlink{_grid_obj_8cpp}{Grid\+Obj.\+cpp}\item 
+\hyperlink{main__lbm_8cpp}{main\+\_\+lbm.\+cpp}\item 
+\hyperlink{_mpi__buffer__pack_8cpp}{Mpi\+\_\+buffer\+\_\+pack.\+cpp}\item 
+\hyperlink{_mpi__buffer__size__recv_8cpp}{Mpi\+\_\+buffer\+\_\+size\+\_\+recv.\+cpp}\item 
+\hyperlink{_mpi__buffer__size__send_8cpp}{Mpi\+\_\+buffer\+\_\+size\+\_\+send.\+cpp}\item 
+\hyperlink{_mpi__buffer__unpk_8cpp}{Mpi\+\_\+buffer\+\_\+unpk.\+cpp}\item 
+\hyperlink{_mpi_manager_8cpp}{Mpi\+Manager.\+cpp}\end{DoxyCompactItemize}

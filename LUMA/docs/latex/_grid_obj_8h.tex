@@ -1,0 +1,102 @@
+\hypertarget{_grid_obj_8h}{}\section{Grid\+Obj.\+h File Reference}
+\label{_grid_obj_8h}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}}
+{\ttfamily \#include \char`\"{}stdafx.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+Vector.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_grid_obj}{Grid\+Obj}
+\begin{DoxyCompactList}\small\item\em Grid class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60e}{e\+Type} \{ \\*
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eafd92f3348822d4af8e98ab34e83c3fd9}{e\+Solid}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea6e00543f96c72680ac501ac6e636f2cd}{e\+Fluid}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf00ee0534b31719f0d98692daaaaa3d}{e\+Refined}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48785d8c55a865a753d1cc6f8c19ef45}{e\+Transition\+To\+Coarser}, 
+\\*
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea2d9407ad92b1a90101ab85d57385db78}{e\+Transition\+To\+Finer}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab383600f3c9e0afd5a6e6aa74a354cbe}{e\+B\+FL}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eabbc8cdb4bd9f4373d6c53c07ca197968}{e\+Symmetry}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea9d6c3aa304c07e89d3a2a04709f2ad58}{e\+Inlet}, 
+\\*
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf6079cc83d05221106f2250e5ec065b}{e\+Outlet}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaf8f58615760e2a6fcf179064f09e6b8f}{e\+Refined\+Solid}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48c21d5907cf7bb1e78688f3a65872b4}{e\+Refined\+Symmetry}, 
+\hyperlink{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7}{e\+Refined\+Inlet}
+ \}\begin{DoxyCompactList}\small\item\em Lattice typing labels. \end{DoxyCompactList}
+\item 
+enum \hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4}{e\+B\+C\+Type} \{ \\*
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a1c4fe8bab13350da43faf7a72e9a7695}{e\+B\+C\+All}, 
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4abfed92ed6e40fe8ba941b58d535efe5d}{e\+B\+C\+Solid\+Symmetry}, 
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aabd9c986b6805adda5fcb0c1469dc967}{e\+B\+C\+Inlet}, 
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aa7864078971f6ed79bcf4bf24205fa79}{e\+B\+C\+Outlet}, 
+\\*
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a2e1cf58b6b03ea9bc0a021337618adfe}{e\+B\+C\+Inlet\+Outlet}, 
+\hyperlink{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a0d8ec81b5c5cb2f0493f21c03b759ef1}{e\+B\+C\+B\+FL}
+ \}\begin{DoxyCompactList}\small\item\em Flag for indicating which B\+Cs to apply. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+Type@{e\+B\+C\+Type}}
+\index{e\+B\+C\+Type@{e\+B\+C\+Type}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}
+\subsubsection[{\texorpdfstring{e\+B\+C\+Type}{eBCType}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+B\+C\+Type}}\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4}
+
+
+Flag for indicating which B\+Cs to apply. 
+
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{e\+B\+C\+All@{e\+B\+C\+All}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+All@{e\+B\+C\+All}}\item[{\em 
+e\+B\+C\+All\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a1c4fe8bab13350da43faf7a72e9a7695}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a1c4fe8bab13350da43faf7a72e9a7695}
+}]Apply all B\+Cs. \index{e\+B\+C\+Solid\+Symmetry@{e\+B\+C\+Solid\+Symmetry}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+Solid\+Symmetry@{e\+B\+C\+Solid\+Symmetry}}\item[{\em 
+e\+B\+C\+Solid\+Symmetry\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4abfed92ed6e40fe8ba941b58d535efe5d}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4abfed92ed6e40fe8ba941b58d535efe5d}
+}]Apply just solid and symmetry B\+Cs. \index{e\+B\+C\+Inlet@{e\+B\+C\+Inlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+Inlet@{e\+B\+C\+Inlet}}\item[{\em 
+e\+B\+C\+Inlet\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aabd9c986b6805adda5fcb0c1469dc967}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aabd9c986b6805adda5fcb0c1469dc967}
+}]Apply just inlet B\+Cs. \index{e\+B\+C\+Outlet@{e\+B\+C\+Outlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+Outlet@{e\+B\+C\+Outlet}}\item[{\em 
+e\+B\+C\+Outlet\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aa7864078971f6ed79bcf4bf24205fa79}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4aa7864078971f6ed79bcf4bf24205fa79}
+}]Apply just outlet B\+Cs. \index{e\+B\+C\+Inlet\+Outlet@{e\+B\+C\+Inlet\+Outlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+Inlet\+Outlet@{e\+B\+C\+Inlet\+Outlet}}\item[{\em 
+e\+B\+C\+Inlet\+Outlet\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a2e1cf58b6b03ea9bc0a021337618adfe}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a2e1cf58b6b03ea9bc0a021337618adfe}
+}]Apply inlet and outlet B\+Cs. \index{e\+B\+C\+B\+FL@{e\+B\+C\+B\+FL}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+C\+B\+FL@{e\+B\+C\+B\+FL}}\item[{\em 
+e\+B\+C\+B\+FL\hypertarget{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a0d8ec81b5c5cb2f0493f21c03b759ef1}{}\label{_grid_obj_8h_ab64098317c22cd5811ee40bf763eabd4a0d8ec81b5c5cb2f0493f21c03b759ef1}
+}]Apply just B\+FL B\+Cs. \end{description}
+\end{Desc}
+\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Type@{e\+Type}}
+\index{e\+Type@{e\+Type}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}
+\subsubsection[{\texorpdfstring{e\+Type}{eType}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+Type}}\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60e}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60e}
+
+
+Lattice typing labels. 
+
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{e\+Solid@{e\+Solid}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Solid@{e\+Solid}}\item[{\em 
+e\+Solid\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eafd92f3348822d4af8e98ab34e83c3fd9}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eafd92f3348822d4af8e98ab34e83c3fd9}
+}]Rigid, solid site. \index{e\+Fluid@{e\+Fluid}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Fluid@{e\+Fluid}}\item[{\em 
+e\+Fluid\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea6e00543f96c72680ac501ac6e636f2cd}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea6e00543f96c72680ac501ac6e636f2cd}
+}]Fluid site. \index{e\+Refined@{e\+Refined}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Refined@{e\+Refined}}\item[{\em 
+e\+Refined\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf00ee0534b31719f0d98692daaaaa3d}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf00ee0534b31719f0d98692daaaaa3d}
+}]Fluid site which is represented on a finer grid. \index{e\+Transition\+To\+Coarser@{e\+Transition\+To\+Coarser}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Transition\+To\+Coarser@{e\+Transition\+To\+Coarser}}\item[{\em 
+e\+Transition\+To\+Coarser\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48785d8c55a865a753d1cc6f8c19ef45}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48785d8c55a865a753d1cc6f8c19ef45}
+}]Fluid site coupled to a coarser grid. \index{e\+Transition\+To\+Finer@{e\+Transition\+To\+Finer}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Transition\+To\+Finer@{e\+Transition\+To\+Finer}}\item[{\em 
+e\+Transition\+To\+Finer\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea2d9407ad92b1a90101ab85d57385db78}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea2d9407ad92b1a90101ab85d57385db78}
+}]Fluid site coupled to a finer grid. \index{e\+B\+FL@{e\+B\+FL}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+B\+FL@{e\+B\+FL}}\item[{\em 
+e\+B\+FL\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab383600f3c9e0afd5a6e6aa74a354cbe}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab383600f3c9e0afd5a6e6aa74a354cbe}
+}]Site containing a B\+FL marker. \index{e\+Symmetry@{e\+Symmetry}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Symmetry@{e\+Symmetry}}\item[{\em 
+e\+Symmetry\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eabbc8cdb4bd9f4373d6c53c07ca197968}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eabbc8cdb4bd9f4373d6c53c07ca197968}
+}]Symmetry boundary. \index{e\+Inlet@{e\+Inlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Inlet@{e\+Inlet}}\item[{\em 
+e\+Inlet\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea9d6c3aa304c07e89d3a2a04709f2ad58}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea9d6c3aa304c07e89d3a2a04709f2ad58}
+}]Inlet boundary. \index{e\+Outlet@{e\+Outlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Outlet@{e\+Outlet}}\item[{\em 
+e\+Outlet\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf6079cc83d05221106f2250e5ec065b}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaaf6079cc83d05221106f2250e5ec065b}
+}]Outlet boundary. \index{e\+Refined\+Solid@{e\+Refined\+Solid}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Refined\+Solid@{e\+Refined\+Solid}}\item[{\em 
+e\+Refined\+Solid\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaf8f58615760e2a6fcf179064f09e6b8f}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eaf8f58615760e2a6fcf179064f09e6b8f}
+}]Rigid, solid site represented on a finer grid. \index{e\+Refined\+Symmetry@{e\+Refined\+Symmetry}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Refined\+Symmetry@{e\+Refined\+Symmetry}}\item[{\em 
+e\+Refined\+Symmetry\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48c21d5907cf7bb1e78688f3a65872b4}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60ea48c21d5907cf7bb1e78688f3a65872b4}
+}]Symmtery boundary represented on a finer grid. \index{e\+Refined\+Inlet@{e\+Refined\+Inlet}!Grid\+Obj.\+h@{Grid\+Obj.\+h}}\index{Grid\+Obj.\+h@{Grid\+Obj.\+h}!e\+Refined\+Inlet@{e\+Refined\+Inlet}}\item[{\em 
+e\+Refined\+Inlet\hypertarget{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7}{}\label{_grid_obj_8h_a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7}
+}]Inlet site represented on a finer grid. \end{description}
+\end{Desc}

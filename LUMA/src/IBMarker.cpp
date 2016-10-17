@@ -15,10 +15,14 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBMarker.h"
-#include "../inc/definitions.h"
+#include "../inc/GridUtils.h"
 
 // ***************************************************************************************************
-// Custom constructors
+/// \brief Custom constructor with position.
+/// \param xPos x-position of marker.
+/// \param yPos y-position of marker.
+/// \param zPos z-position of marker.
+/// \param flex_rigid flag to indicate whether marker is movable or not.
 IBMarker::IBMarker(double xPos, double yPos, double zPos, bool flex_rigid) {
 
 	// Assign position and type

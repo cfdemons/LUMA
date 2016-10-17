@@ -15,13 +15,15 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
+#include "../inc/GridObj.h"
+#include "../inc/GridUtils.h"
 
 
 // Static declarations
 ObjectManager* ObjectManager::me;
 
-// *************************************************************************************************** //
-// Instance creator
+// ************************************************************************* //
+/// Instance creator
 ObjectManager* ObjectManager::getInstance() {
 
 	if (!me) me = new ObjectManager;	// Private construction
@@ -29,7 +31,8 @@ ObjectManager* ObjectManager::getInstance() {
 
 }
 
-// Instance creator (only works the first time obj
+/// \brief Instance creator with grid hierarchy assignment.
+/// \param	g	pointer to grid hierarchy.
 ObjectManager* ObjectManager::getInstance(GridObj* g) {
 
 	if (!me) me = new ObjectManager(g);	// Private construction
@@ -37,49 +40,80 @@ ObjectManager* ObjectManager::getInstance(GridObj* g) {
 
 }
 
-// Instance destuctor
+/// Instance destuctor
 void ObjectManager::destroyInstance() {
 
 	if (me)	delete me;			// Delete pointer from static context not destructor
 
 }
 
-// *************************************************************************************************** //
-// Constructor & destructor
+// ************************************************************************* //
+/// Default constructor
 ObjectManager::ObjectManager(void) { };
+
+/// Default destructor
 ObjectManager::~ObjectManager(void) {
 	me = nullptr;
 };
+
+/// \brief Constructor with grid hierarchy assignment.
+/// \param	g	pointer to grid hierarchy.
 ObjectManager::ObjectManager(GridObj* g) {
 	this->_Grids = g;
 };
 
+// ************************************************************************* //
 
-// *************************************************************************************************** //
-// Voxelisation Utilities
+/// \brief	Compute forces on a rigid object.
+///
+///			Uses momentum exchange to compute forces on rigid bodies.
+///			Currently working with bounce-back objects only. There is no 
+///			bounding box so if we have walls in the domain they will be counted 
+///			as well. Also only possible to differentiate between bodies. Lumps 
+///			all bodies together.identify which body this site relates to so 
+///			we can differentiate.
+///
+/// \param	i	local i-index of solid site.
+/// \param	j	local j-index of solid site.
+/// \param	k	local k-index of solid site.
+/// \param	g	pointer to grid on which object resides.
+void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 
-// Return global voxel indices for a given point in global space
-std::vector<int> ObjectManager::getVoxInd(double x, double y, double z) {
+	// TODO: Need abounding box for object if we have walls in the domain otherwise they will also be counted
+	// TODO: Also need to be able to identify which body this site relates to so we can differentiate
 
-	std::vector<int> vox;
+	int N_lim = g->N_lim;
+	int M_lim = g->M_lim;
+	int K_lim = g->K_lim;
 
-	if (x - (int)std::floor(x) > 0.5) vox.push_back((int)std::ceil(x));
-	else vox.push_back((int)std::floor(x));
+	// For MPI builds, ignore if part of object is in halo region
+#ifdef L_BUILD_FOR_MPI
+	if (!GridUtils::isOnRecvLayer(g->XPos[i], g->YPos[j], g->ZPos[k]))
+#endif
+	{
 
-	if (y - (int)std::floor(y) > 0.5) vox.push_back((int)std::ceil(y));
-	else vox.push_back((int)std::floor(y));
+		// Loop over directions from solid site
+		for (int n = 0; n < L_nVels; n++) {
 
-	if (z - (int)std::floor(z) > 0.5) vox.push_back((int)std::ceil(z));
-	else vox.push_back((int)std::floor(z));
+			int n_opp = GridUtils::getOpposite(n); // Get incoming direction
 
-	return vox;
+			// Compute destination coordinates
+			int xdest = i + c[0][n];
+			int ydest = j + c[1][n];
+			int zdest = k + c[2][n];
 
-}
+			// Only apply if streams to a fluid site
+			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
+			{
 
-// Overload of above for a single index
-int ObjectManager::getVoxInd(double p) {
+				forceOnObjectX += c[0][n_opp] *
+					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
+				forceOnObjectY += c[1][n_opp] *
+					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
+				forceOnObjectZ += c[2][n_opp] *
+					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
 
-	if (p - (int)std::floor(p) > 0.5) return (int)std::ceil(p);
-	else return (int)std::floor(p);
-
+			}
+		}
+	}
 }

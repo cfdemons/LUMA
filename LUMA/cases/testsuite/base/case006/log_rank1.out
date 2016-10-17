@@ -1,0 +1,31 @@
+LUMA -- Version 1.2.0-alpha
+Simulation started at Mon Oct 17 14:28:35 2016
+MPI Topolgy initialised in 3ms.
+Constructing Grid level 0 on rank 1
+Loading inlet profile...
+Grid size = 100x100x1
+MPI size = 4x2x2
+Coordinates on rank 1 are (	0	1	)
+Number of time steps = 100
+Physical grid spacing = 0.010000
+Lattice viscosity = 0.016000
+L0 relaxation time = 0.548000
+Lattice reference velocity 0.040000
+Reynolds Number = 100
+Object Manager Created.
+Initialising Solid Objects from File...
+Successfully acquired object data from cloud input file.
+Finished creating Solid Objects...
+Grid & Object Initialisation completed in 11.382ms.
+Pre-computing buffer sizes for MPI...Complete.
+Creating sub-grid communicators for HDF5...Complete. Status = 0
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Initialising LBM time-stepping...
+Grid 0: Time stepping taking an average of 1.31587ms
+MPI overhead taking an average of 0.92466ms
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Writing out object lift and drag
+Simulation completed at Mon Oct 17 14:28:35 2016
+

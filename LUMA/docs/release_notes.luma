@@ -1,0 +1,64 @@
+version		=	1.2.0-alpha
+
+General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.
+				IS_NAN() function switched to macro definition.
+				LBM_multi routine has been compacted to improve readability.
+				Restart functionality has been improved allowing IBM on sub-grids.
+				Expensive support node calculation has been removed.
+				Gravity force scaling across sub-grids has been fixed.
+				Wall thickness can be arbitrarily set for front, back, top and bottom walls.
+				Changed the terminal output to be every L_out_every time steps.
+				Removed redundant indexToPosition() method.
+				Resetting the force vectors is now a separate routine to get rid of the flag for forceGrid().
+				LBM_forcegrid method renamed to LBM_forceGrid to match convention.
+				IBM_flag renamed to ibmFlag to match convention.
+				Removed repeatFlag as unnecessary.
+				Refactored the OM methods to use iBody owner rather than passing a GridObj pointer about.
+				Now need VTK source files to build the H5MGM tool.
+
+Issue #88	:	Fixed erroneous error when using custom MPI sizes.
+Issue #87	:	Fixed GNU compiler warnings when using HDF5.
+Issue #66	:	Test Suite capability added.
+Issue #83	:	Fixed issue with BFL reader not computing Q values correctly.
+Issue #84	:	Fixed MPI crash on exit on Linux.
+Issue #80	: 	Model-independent version of extrapolation exit on right-hand wall.
+Issue #81	: 	Added grid sizes as GridObj property.
+Issue #73	: 	Some Doxygen documentation added and will involve throughout the releases to contain more information.
+Issue #59	: 	Force calculation for BB objects.
+Issue #39	: 	TL automatic exclusion and resuse of C utility rather than C++ API for HDF5. H5MGM tool v0.2 included in /tools and writes VTK.
+Issue #79	: 	Fixed bug which allowed serial calls of a utility only compatible with MPI builds; also fixes for writing out IBB to restart correctly.
+Issue #69	: 	Patch to fix new point cloud reader where solid bodies were not being inserted correctly. Removal of methods reliant on scaled positions.
+Issue #77	: 	Removed unnecessary virtual wind tunnel definitions and fixed HDF5 issue when embedding sub-grids.
+Issue #76	: 	Fixed crash when using solid block due to erroneous Re definition.
+Issue #3	:	Added capability for IBM linking to sub-grids.
+
+version		=	1.1.0
+
+Issue #75	: 	New tool for inlet profile generator -- add a tab for your own type of profile.
+Issue #69	: 	Unification of point cloud readers and added capability for IBB construction from point clouds.
+Issue #39	: 	Removal of VTK and Tecplot writers and implementation of HDF5 writer instead.
+Issue #72	:	Added enumeration for common options in utility routines, boundary methods and LatTyp for ease of use.
+Issue #70	: 	Explicit casting of unsigned and signed integer types to remove compilation warnings on 64-bit systems.
+Issue #68	: 	Macro convention redefined to avoid current and future conflicts.
+Issue #63	: 	KBC collision operator added in place of MRT operator, Zou-He velocity inlet removed, Uniform Inlet setting removed.
+
+version		=	1.0.3
+
+Issue #64	: 	Fixed output directory segmentation for large MPI jobs
+Issue #62	: 	Fixed Reynolds number definition for pointcloud/BFL objects
+
+version		=	1.0.2
+
+Issue #61	: 	Added ability to scale an object with respect to any direction not just x direction
+Issue #60	: 	Fixed issue with BB not being applied when loading an object from a point cloud.
+
+version		=	1.0.1
+
+Issue #57	: 	Fix added to allow generalised regularised on right hand and upper and back walls to impose velocity with correct direction.
+Issue #58	: 	Fixed do nothing inlet from crashing since wall-embedded sub-grid changes.
+Issue #49	: 	Fixed z-direction position initialisation in MPI builds which addresses hangs witnessed in earlier versions.
+
+
+version		=	1.0
+
+General		:	Initial release of the code.

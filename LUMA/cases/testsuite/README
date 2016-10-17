@@ -1,0 +1,19 @@
+*** Directory explanations ***
+base	-> contains the reference data to be compared against
+defs	-> contains the definitions files for each case
+input	-> contains the input files needed for specific cases
+notes	-> contains notes and information about the test suite
+results	-> directory where output from test suite is written (this gets deleted and re-created each time the test suite is run)
+scripts	-> contains the script to run the test suits (test suite should be run from this directory)
+
+
+*** How to run test suite ***
+1) Navigate to scripts directory
+2) Run runTestSuite.sh
+3) Check master log file to see overview of results
+4) Check each case directory within the results directory to check a specific case
+5) The master log is written to the main testsuite directory, compile logs are written as well as a diff log (if required) in each case directory
+
+
+*** Options ***
+clean | --clean | -c -> will just delete the results directory (should be done before pushing so as to reduce data stored on the repo)

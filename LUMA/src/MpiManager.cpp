@@ -15,20 +15,17 @@
 
 #include "../inc/stdafx.h"
 #include <mpi.h>
-#include <iostream>
-#include <fstream>
-#include "../inc/definitions.h"
 #include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/globalvars.h"
+#include "../inc/GridUtils.h"
 
 // Static declarations
 MpiManager* MpiManager::me;
 std::ofstream* MpiManager::logout;
 GridObj* MpiManager::Grids;
 
-// *************************************************************************************************** //
-// Constructor (private)
+// ****************************************************************************
+/// Default constructor
 MpiManager::MpiManager(void)
 {
 	// Resize buffer arrays based on number of MPI directions
@@ -36,7 +33,10 @@ MpiManager::MpiManager(void)
 	f_buffer_recv.resize(L_MPI_dir, std::vector<double>(0));
 }
 
-// Destructor
+/// \brief	Default destructor.
+///
+///			Also closes the MPI logfile.
+///
 MpiManager::~MpiManager(void)
 {
 
@@ -47,8 +47,7 @@ MpiManager::~MpiManager(void)
 	if(me) delete(me);
 }
 
-// *************************************************************************************************** //
-// Instance creator
+/// Instance creator
 MpiManager* MpiManager::getInstance() {
 
 	if (!me) me = new MpiManager;	// Private construction
@@ -56,16 +55,16 @@ MpiManager* MpiManager::getInstance() {
 
 }
 
-// Instance destroyer
+/// Instance destroyer
 void MpiManager::destroyInstance() {
 
 	if (me)	delete me;			// Delete pointer from static context not destructor
 
 }
 
-// *************************************************************************************************** //
+// ************************************************************************ //
 // Const data member initialised outside class definition
-// Define for 3D where first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.
+/// Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array.
 const int MpiManager::MPI_cartlab[3][26] =
 	{
 		{1, -1,  1, -1,	 0,  0, -1,  1,		0,  0,		1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},
@@ -73,9 +72,11 @@ const int MpiManager::MPI_cartlab[3][26] =
 		{0,  0,  0,  0,  0,  0,  0,  0,		1, -1,		1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}
 	};
 
-// *************************************************************************************************** //
-
-// Initialisation routines
+// ************************************************************************* //
+/// \brief	Initialisation routine.
+///
+///			Method is responsible for initialising the MPI topolgy and 
+///			associated data. Must be called immediately after MPI_init().
 void MpiManager::mpi_init() {
 	
 	// Create communicator and topology
@@ -187,8 +188,11 @@ void MpiManager::mpi_init() {
 	return;
 }
 
-// *************************************************************************************************** //
-// Routine to do the domain decomposition and generate parameters for GridObj constructors
+// ************************************************************************* //
+/// \brief	Domain decomposition.
+///
+///			Method to decompose the domain and identify local grid sizes.
+///			Parameters defined here are used in GridObj construction.
 void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
@@ -207,6 +211,8 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
+#ifndef L_USE_CUSTOM_MPI_SIZES
+
 		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
 			std::cout << "Error: See Log File" << std::endl;
@@ -214,6 +220,7 @@ void MpiManager::mpi_gridbuild( ) {
 			MpiManager::logout->close();
 			MPI_Finalize();
 			exit(LUMA_FAILED);
+#endif
 
 		} else {
 
@@ -437,8 +444,11 @@ void MpiManager::mpi_gridbuild( ) {
 
 }
 
-// *************************************************************************************************** //
-// Writes out f-buffers
+// ************************************************************************* //
+/// \brief	Buffer ASCII writer.
+///
+///			When verbose MPI logging is turned on this method will write out 
+///			the communication buffer to an ASCII file.
 void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 
 	std::ofstream rankout;
@@ -458,7 +468,17 @@ void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 
 	return;
 }
-// *************************************************************************************************** //
+
+// ************************************************************************* //
+/// \brief	Communication routine.
+///
+///			This method implements the communication between grids of the same
+///			level and region across MPI processes. Each call effects
+///			communication in all valid directions for the grid of the supplied
+///			level and region.
+///
+/// \param	lev	level of grid to communicate.
+/// \param	reg	region number of grid to communicate.
 void MpiManager::mpi_communicate(int lev, int reg) {
 
 	// Wall clock variables
@@ -638,12 +658,14 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 }
 
-// *************************************************************************************************** //
-// Sets pointer to grid hierarchy and finds sizes of buffers for this rank across all grids -- 
-// to be called post-initialisation.
+// ************************************************************************* //
+/// \brief	Pre-calcualtion of the buffer sizes.
+///
+///			Wrapper method for computing the buffer sizes for every grid on the
+///			rank, both sender and receiver. Must be called post-initialisation.
 void MpiManager::mpi_buffer_size() {
 
-	*GridUtils::logfile << "Pre-computing buffer sizes for MPI..." << std::endl;
+	*GridUtils::logfile << "Pre-computing buffer sizes for MPI...";
 
 	/* For each grid in the hierarchy find communicating edges and store the buffer size.
 	 * The data are arranged:
@@ -712,11 +734,18 @@ void MpiManager::mpi_buffer_size() {
 		}
 	}
 
-	
+	*GridUtils::logfile << "Complete." << std::endl;
 
 }
-// *************************************************************************************************** //
-// Get opposite direction in MPI cartesian topology
+
+// ************************************************************************* //
+/// \brief	Helper method to find opposite direction in MPI topology.
+///
+///			The MPI directional vectors do not necessarily correspond to the 
+///			lattice model direction. The MPI directional vectors are defined 
+///			separately and hence there is a separate opposite finding method.
+///
+/// \param	direction	the outgoing direction whose opposite you wish to find.
 int MpiManager::mpi_getOpposite(int direction) {
 
 	/*	If direction is even, then opposite is direction+1.
@@ -729,13 +758,53 @@ int MpiManager::mpi_getOpposite(int direction) {
 		return direction + (int)pow(-1,direction);
 
 }
-// *************************************************************************************************** //
-int MpiManager::mpi_buildSubGridCommunicators() {
+// ************************************************************************* //
+/// \brief	Define writable sub-grid communicators.
+///
+///			When using HDF5 in parallel, collective IO operations require all
+///			processes to write a non-zero amount of data to the same file.
+///			This method examines availability of sub-grid and writable data on
+///			the grid (if found) and ensures it is added to a new communicator. 
+///			Must be called AFTER the grids and buffers have been initialised.
+int MpiManager::mpi_buildCommunicators() {
 
+	*GridUtils::logfile << "Creating sub-grid communicators for HDF5...";
+
+	// Declarations
 	int status;
-	int colour;		// Colour indicates which new communicator this process belongs to
-	int key = MpiManager::my_rank;	// Global rank as key (dictates numbering in new communicator)
-	
+	int colour;							// Colour indicates which new communicator this process belongs to
+	int key = MpiManager::my_rank;		// Global rank as key (dictates numbering in new communicator)
+	int N_global, M_global, K_global;	// Global grid sizes
+
+	// Start by adding the L0 details
+	p_data.emplace_back();
+	p_data.back().level = 0;
+	p_data.back().region = 0;
+
+	// Get local grid sizes
+	int N_lim = static_cast<int>(Grids->N_lim);
+	int M_lim = static_cast<int>(Grids->M_lim);
+	int K_lim = static_cast<int>(Grids->K_lim);
+
+	// Halo exists on all edges on L0 and there are no transition layers
+	p_data.back().i_end = N_lim - 2;
+	p_data.back().i_start = 1;
+	p_data.back().j_end = M_lim - 2;
+	p_data.back().j_start = 1;
+	p_data.back().halo_max = 1;
+	p_data.back().halo_min = 1;
+#if (L_dims == 3)
+	p_data.back().k_end = K_lim - 2;
+	p_data.back().k_start = 1;
+#else
+	p_data.back().k_start = 0;
+	p_data.back().k_end = 0;
+#endif
+	p_data.back().writable_data_count =
+		(p_data.back().i_end - p_data.back().i_start + 1) *
+		(p_data.back().j_end - p_data.back().j_start + 1) *
+		(p_data.back().k_end - p_data.back().k_start + 1);
+
 	// Loop over the possible sub-grid combinations
 	for (int reg = 0; reg < L_NumReg; reg++) {
 		for (int lev = 1; lev <= L_NumLev; lev++) {
@@ -744,26 +813,198 @@ int MpiManager::mpi_buildSubGridCommunicators() {
 			GridObj *targetGrid = NULL;
 			GridUtils::getGrid(Grids, lev, reg, targetGrid);
 
-			// Change colour if sub-grid found
+			// If sub-grid found
 			if (targetGrid != NULL) {
-				colour = 1;
+
+				/* Since we are doing this only for HDF5 we can exclude those ranks
+				 * which do not contain sub-grid regions that will need to be
+				 * written out. If we didn't, at write-time the buffer size would be
+				 * zero and the HDF5 write would fail. So now we check for writable
+				 * data by checking the buffers versus the grid size. */
+
+				// Get local grid sizes
+				N_lim = static_cast<int>(targetGrid->N_lim);
+				M_lim = static_cast<int>(targetGrid->M_lim);
+				K_lim = static_cast<int>(targetGrid->K_lim);
+
+				// Get global grid sizes
+				N_global = 2 * (RefXend[lev - 1][reg] - RefXstart[lev - 1][reg] + 1);
+				M_global = 2 * (RefYend[lev - 1][reg] - RefYstart[lev - 1][reg] + 1);
+				K_global = 2 * (RefZend[lev - 1][reg] - RefZstart[lev - 1][reg] + 1);
+
+				// Add a new phdf5_struct
+				p_data.emplace_back();
+				p_data.back().level = targetGrid->level;
+				p_data.back().region = targetGrid->region_number;
+
+				// Retrieve corresponding buffer recv size info struct
+				MpiManager::buffer_struct bri;
+				MpiManager* mpim = MpiManager::getInstance();
+				for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
+					if (bs.level == targetGrid->level && bs.region == targetGrid->region_number) {
+						bri = bs;
+						break;
+					}
+				}
+
+				// Halo / TL thickness
+				int halo_thickness = static_cast<int>(pow(2, targetGrid->level));
+
+				// Set halo descriptors
+				p_data.back().halo_min = 0, p_data.back().halo_max = 0;	// Boolean flags
+				p_data.back().i_start = 0, p_data.back().i_end = 0,		// Indices
+				p_data.back().j_start = 0, p_data.back().j_end = 0,
+				p_data.back().k_start = 0, p_data.back().k_end = 0;
+
+				// Check x-directions for halo
+				if (bri.size[1]) {
+					p_data.back().i_end = N_lim - halo_thickness - 1;
+				}
+				else {
+					p_data.back().i_end = N_lim - 1;
+				}
+
+				if (bri.size[0]) {
+					p_data.back().i_start = halo_thickness;
+				}
+				else {
+					p_data.back().i_start = 0;
+				}
+
+				// Check y-directions for halo
+				if (bri.size[5]) {
+					p_data.back().j_end = M_lim - halo_thickness - 1;
+#if (L_dims != 0)
+					p_data.back().halo_max++;	// Increment halo counter for striding
+#endif
+				}
+				else {
+					p_data.back().j_end = M_lim - 1;
+				}
+
+				if (bri.size[4]) {
+					p_data.back().j_start = halo_thickness;
+#if (L_dims != 0)
+					p_data.back().halo_min++;
+#endif
+				}
+				else {
+					p_data.back().j_start = 0;
+				}
+
+#if (L_dims == 3)
+				// Check z-directions for halo
+				if (bri.size[9]) {
+					p_data.back().k_end = K_lim - halo_thickness - 1;
+					p_data.back().halo_max++;
+				}
+				else {
+					p_data.back().k_end = K_lim - 1;
+				}
+
+				if (bri.size[8]) {
+					p_data.back().k_start = halo_thickness;
+					p_data.back().halo_min++;
+				}
+				else {
+					p_data.back().k_start = 0;
+				}
+#else
+				p_data.back().k_start = 0;
+				p_data.back().k_end = 0;
+#endif
+
+				/* Now account for transition layers -- If the current indices
+				 * defining the writable region have a global index that is in
+				 * the TL then we can shift them off the TL. It is possible that
+				 * this causes indices to be negative or writable regions to
+				 * have a size < 0 which indicates that the rank has no writable
+				 * data. */
+				if (targetGrid->XInd[p_data.back().i_start] < halo_thickness) {
+					p_data.back().i_start += halo_thickness;
+				}
+				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - halo_thickness) {
+					p_data.back().i_end -= halo_thickness;
+				}
+
+				if (targetGrid->YInd[p_data.back().j_start] < halo_thickness) {
+					p_data.back().j_start += halo_thickness;
+#if (L_dims != 3)
+					p_data.back().halo_min++;		// Account for both halo and TL during striding
+#endif
+				}
+				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - halo_thickness) {
+					p_data.back().j_end -= halo_thickness;
+#if (L_dims != 3)
+					p_data.back().halo_max++;
+#endif
+				}
+
+#if (L_dims == 3)
+				if (targetGrid->ZInd[p_data.back().k_start] < halo_thickness) {
+					p_data.back().k_start += halo_thickness;
+					p_data.back().halo_min++;
+				}
+				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - halo_thickness) {
+					p_data.back().k_end -= halo_thickness;
+					p_data.back().halo_max++;
+				}
+#endif
+
+
+#ifdef L_MPI_VERBOSE
+				*logout << "Writable data limits computed as: " << std::endl <<
+					p_data.back().i_start << " - " << p_data.back().i_end << std::endl << "\t" <<
+					p_data.back().j_start << " - " << p_data.back().j_end << std::endl << "\t" <<
+					p_data.back().k_start << " - " << p_data.back().k_end << std::endl;
+
+				*logout << "Halo thicknesses are: " <<
+					p_data.back().halo_min << " & " << p_data.back().halo_max << std::endl;
+#endif
+
+				// Test for writable data
+				if	(
+					(p_data.back().i_end - p_data.back().i_start + 1) > 0 &&
+					(p_data.back().j_end - p_data.back().j_start + 1) > 0 &&
+					(p_data.back().k_end - p_data.back().k_start + 1) > 0
+					) {
+
+					// Writable data found to include in communicator
+					colour = 1;
+					p_data.back().writable_data_count =
+						(p_data.back().i_end - p_data.back().i_start + 1) *
+						(p_data.back().j_end - p_data.back().j_start + 1) *
+						(p_data.back().k_end - p_data.back().k_start + 1);
+				}
+				else {
+
+					// No writable data on the grid so exclude from communicator
+					colour = MPI_UNDEFINED;
+					p_data.back().writable_data_count = 0;
+				}
+
+
 			}
 			else {
+				// Grid not on this rank so exclude from communicator
 				colour = MPI_UNDEFINED;
 			}
 			
-			// Define new communicator which contains sub-grids of this level and region
-			// by splitting the global communicator
+			// Define new communicator which contains writable sub-grids of this level and region
+			// by splitting the global communicator using the flags provided.
 			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NumLev]);
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Region " << reg << ", Level " << lev << 
-				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << std::endl;
+				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << 
+				" and writable data size " << p_data.back().writable_data_count << std::endl;
 #endif
 
 		}
 	}
 
+	*GridUtils::logfile << "Complete. Status = " << status << std::endl;
+
 	return status;
 }
-// *************************************************************************************************** //
+// ************************************************************************** //

@@ -19,18 +19,24 @@ streaming and macroscopic calulcation.
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
 #include "../inc/IVector.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridUtils.h"
 
 using namespace std;
 
-// ***************************************************************************************************
-// LBM multi-grid kernel applicable for both single and multi-grid (IBM assumed on coarse grid for now)
-// IBM_flag dictates whether we need the predictor step or not
-void GridObj::LBM_multi ( bool IBM_flag ) {
+// *****************************************************************************
+/// \brief	LBM multi-grid kernel.
+///
+///			The LBM kernel manages the calling of all IBM and LBM methods on a 
+///			given grid. In addition, this method also manages the recursive calling
+///			of the method on sub-grids and manages the framework for grid-grid 
+///			interaction.
+///
+/// \param	ibmFlag		flag to indicate whether this kernel is a predictor (true) 
+///						or corrector (false) step when using IBM.
+void GridObj::LBM_multi (bool ibmFlag) {
 
 	// Start the clock to time the kernel
 	clock_t secs, t_start = clock();
@@ -45,27 +51,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_IBM_ON
 	// Local stores used to hold info prior to IBM predictive step
 	IVector<double> f_ibm_initial, u_ibm_initial, rho_ibm_initial;
-
-	// If IBM on and predictive loop flag true then store initial data and reset forces
-	if (level == 0 && IBM_flag == true) { // Limit to level 0 immersed body for now
-
-		*GridUtils::logfile << "Prediction step..." << std::endl;
-
-		// Store lattice data
-		f_ibm_initial = f;
-		u_ibm_initial = u;
-		rho_ibm_initial = rho;
-
-		// Reset lattice and Cartesian force vectors at each site
-		LBM_forcegrid(true);
-	}
-#else
-
-	// If not using IBM then just reset the force vectors
-	LBM_forcegrid(true);
-
 #endif
-
 
 
 	////////////////
@@ -77,6 +63,26 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 	int count = 1;
 	do {
 
+		// Copy distributions prior to IBM predictive step
+#ifdef L_IBM_ON
+
+		// If IBM on and predictive loop flag true then store initial data
+		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) { // Only store f, u and rho values on grid where IB body lives
+
+			*GridUtils::logfile << "Prediction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
+
+			// Store lattice data
+			f_ibm_initial = f;
+			u_ibm_initial = u;
+			rho_ibm_initial = rho;
+		}
+#endif
+
+		// Reset lattice and Cartesian force vectors at each site if on repeat.
+		// Don't do this on the sub-grid where IBM exists.
+		if (ibmFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
+			LBM_resetForces();
+
 		// Apply boundary conditions (regularised must be applied before collision)
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
 		LBM_boundary(2);
@@ -87,7 +93,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #endif
 
 		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
-		LBM_forcegrid(false);
+		LBM_forceGrid();
 
 		// Collision on Lr
 		LBM_collide();
@@ -109,9 +115,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 				LBM_explode(reg);
 
 				// Call same routine for lower level
-				subGrid[reg].LBM_multi(IBM_flag);
-
+				subGrid[reg].LBM_multi(ibmFlag);
 			}
+		}
 
 			// Apply boundary conditions
 #if (defined L_SOLID_BLOCK_ON || defined L_WALLS_ON || defined L_SOLID_FROM_FILE)
@@ -133,7 +139,7 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
 #endif
-
+			
 			// Apply boundary conditions
 #ifdef L_BFL_ON
 			LBM_boundary(5);	// BFL boundary conditions
@@ -141,6 +147,9 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
 #endif
+		
+		// If there is lower levels then coalesce from them
+		if (L_NumLev > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -152,44 +161,6 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 #ifdef L_MEGA_DEBUG
 			/*DEBUG*/ io_lite((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
 #endif
-
-
-			///////////////////////
-			// No refined levels //
-			///////////////////////
-
-		} else {
-
-			// Apply boundary conditions
-#if (defined L_SOLID_BLOCK_ON || defined L_WALLS_ON || defined L_SOLID_FROM_FILE)
-			LBM_boundary(1);	// Bounce-back (walls and solids)
-#endif
-
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
-#endif
-
-#ifdef L_BFL_ON
-			// Store the f values pre stream for BFL
-			ObjectManager::getInstance()->f_prestream = f;
-#endif
-
-			// Stream
-			LBM_stream();
-
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
-#endif
-
-
-			// Apply boundary conditions
-#ifdef L_BFL_ON
-			LBM_boundary(5);	// BFL boundary conditions
-#endif
-#ifdef L_MEGA_DEBUG
-			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
-#endif
-
 		}
 
 
@@ -213,51 +184,51 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 		/*DEBUG*/ io_lite((t+1)*100 + 7,"AFTER MACRO");
 #endif
 
-		// Check if on L0 and if so drop out as only need to loop once on coarsest level
-		if (level == 0) {
-			// Increment time step counter and break
-			t++;
-			break;
+
+		////////////////////////////////
+		// IBM post-kernel processing //
+		////////////////////////////////
+
+		// Execute IBM procedure using newly computed predicted data
+#ifdef L_IBM_ON
+		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) {
+
+			// Reset force vectors on grid in preparation for spreading step
+			LBM_resetForces();
+
+			// Calculate and apply IBM forcing to fluid
+			ObjectManager::getInstance()->ibm_apply();
+
+
+			// Restore data to start of time step
+			f = f_ibm_initial;
+			u = u_ibm_initial;
+			rho = rho_ibm_initial;
+
+			// Corrector step does not reset force vectors but uses newly computed vector instead.
+			*GridUtils::logfile << "Correction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
+
+			// Corrector step (no IBM, no repeat)
+			LBM_multi(false);
+			t--;                		// Predictor-corrector results in double time step (need to reset back 1)
+
+			// Move the body if necessary
+			ObjectManager::getInstance()->ibm_moveBodies();
+
+
 		}
+#endif
 
 		// Increment counters
 		t++; count++;
 
+		// Always drop out on level 0, or if on corrector step on lower grid level
+		if (level == 0 || (ibmFlag == false && level == L_IB_Lev && region_number == L_IB_Reg)) {
+			break;
+		}
+
 	} while (count < 3);
 
-
-
-
-	////////////////////////////////
-	// IBM post-kernel processing //
-	////////////////////////////////
-
-	// Execute IBM procedure using newly computed predicted data
-#ifdef L_IBM_ON
-	if (level == 0 && IBM_flag == true) {
-
-		// Reset force vectors on grid in preparation for spreading step
-		LBM_forcegrid(true);
-
-		// Calculate and apply IBM forcing to fluid
-		ObjectManager::getInstance()->ibm_apply(*this);
-
-		// Restore data to start of time step
-		f = f_ibm_initial;
-		u = u_ibm_initial;
-		rho = rho_ibm_initial;
-
-		// Relaunch kernel with IBM flag set to false (corrector step)
-		// Corrector step does not reset force vectors but uses newly computed vector instead.
-		*GridUtils::logfile << "Correction step..." << std::endl;
-		t--;                // Predictor-corrector results in double time step (need to reset back 1)
-		LBM_multi(false);
-
-		// Move the body if necessary
-		ObjectManager::getInstance()->ibm_move_bodies(*this);
-
-	}
-#endif
 
 	// Get time of loop (includes sub-loops)
 	secs = clock() - t_start;
@@ -288,10 +259,12 @@ void GridObj::LBM_multi ( bool IBM_flag ) {
 
 }
 
-// ***************************************************************************************************
-// Takes Cartesian force vector and populates forces for each lattice direction.
-// If reset_flag is true, resets the force vectors.
-void GridObj::LBM_forcegrid(bool reset_flag) {
+// *****************************************************************************
+/// \brief	Method to compute body forces.
+///
+///			Takes Cartesian force vector and populates forces for each lattice 
+///			direction. If reset_flag is true, then resets the force vectors to zero.
+void GridObj::LBM_forceGrid() {
 
 	/* This routine computes the forces applied along each direction on the lattice
 	from Guo's 2002 scheme. The basic LBM must be modified in two ways: 1) the forces
@@ -322,94 +295,91 @@ void GridObj::LBM_forcegrid(bool reset_flag) {
 
 	*/
 
-	if (reset_flag) {
+	// Declarations
+	double lambda_v;
 
-		// Reset lattice force vectors on every grid site
-		std::fill(force_i.begin(), force_i.end(), 0.0);
-
-		// Reset Cartesian force vector on every grid site
-		std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
-
-	} else {
-	// Else, compute forces
-
-		// Get grid sizes
-		size_t N_lim = XPos.size();
-		size_t M_lim = YPos.size();
-		size_t K_lim = ZPos.size();
-
-		// Declarations
-		double lambda_v;
-
-		// Loop over grid and overwrite forces for each direction
-		for (size_t i = 0; i < N_lim; i++) {
-			for (size_t j = 0; j < M_lim; j++) {
-				for (size_t k = 0; k < K_lim; k++) {
+	// Loop over grid and overwrite forces for each direction
+	for (size_t i = 0; i < N_lim; i++) {
+		for (size_t j = 0; j < M_lim; j++) {
+			for (size_t k = 0; k < K_lim; k++) {
 
 #ifdef GRAVITY_ON
-					// Add gravity to any IBM forces currently stored
-					force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force;
+				// Add gravity to any IBM forces currently stored
+				force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force * (1 / pow(2,level));
 #endif
 
-					// Now compute force_i components from Cartesian force vector
-					for (size_t v = 0; v < L_nVels; v++) {
+				// Now compute force_i components from Cartesian force vector
+				for (size_t v = 0; v < L_nVels; v++) {
 
-						// Only apply to non-solid sites
-						if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
+					// Only apply to non-solid sites
+					if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
 
-							// Reset beta_v
-							double beta_v = 0.0;
+						// Reset beta_v
+						double beta_v = 0.0;
 
-							// Compute the lattice forces based on Guo's forcing scheme
-							lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
+						// Compute the lattice forces based on Guo's forcing scheme
+						lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
 
-							// Dot product (sum over d dimensions)
-							for (int d = 0; d < L_dims; d++) {
-								beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_dims));
-							}
-							beta_v = beta_v * (1/(cs*cs));
-
-							// Compute force using shorthand sum described above
-							for (int d = 0; d < L_dims; d++) {
-								force_i(i,j,k,v,M_lim,K_lim,L_nVels) += force_xyz(i,j,k,d,M_lim,K_lim,L_dims) *
-									(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_dims));
-							}
-
-							// Multiply by lambda_v
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels) = force_i(i,j,k,v,M_lim,K_lim,L_nVels) * lambda_v;
-
+						// Dot product (sum over d dimensions)
+						for (int d = 0; d < L_dims; d++) {
+							beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_dims));
 						}
+						beta_v = beta_v * (1/(cs*cs));
+
+						// Compute force using shorthand sum described above
+						for (int d = 0; d < L_dims; d++) {
+							force_i(i,j,k,v,M_lim,K_lim,L_nVels) += force_xyz(i,j,k,d,M_lim,K_lim,L_dims) *
+								(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_dims));
+						}
+
+						// Multiply by lambda_v
+						force_i(i,j,k,v,M_lim,K_lim,L_nVels) = force_i(i,j,k,v,M_lim,K_lim,L_nVels) * lambda_v;
 
 					}
 
 				}
+
 			}
 		}
+	}
 
 
 #ifdef L_IBM_DEBUG
-		// DEBUG -- write out force components
-		std::ofstream testout;
-		testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app);
-		testout << "\nNEW TIME STEP" << std::endl;
-		for (size_t j = 1; j < M_lim - 1; j++) {
-			for (size_t i = 0; i < N_lim; i++) {
-				for (size_t v = 0; v < L_nVels; v++) {
-					testout << force_i(i,j,0,v,M_lim,K_lim,L_nVels) << "\t";
-				}
-				testout << std::endl;
+	// DEBUG -- write out force components
+	std::ofstream testout;
+	testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app);
+	testout << "\nNEW TIME STEP" << std::endl;
+	for (size_t j = 1; j < M_lim - 1; j++) {
+		for (size_t i = 0; i < N_lim; i++) {
+			for (size_t v = 0; v < L_nVels; v++) {
+				testout << force_i(i,j,0,v,M_lim,K_lim,L_nVels) << "\t";
 			}
 			testout << std::endl;
 		}
-		testout.close();
-#endif
+		testout << std::endl;
 	}
+	testout.close();
+#endif
+
+}
+
+// *****************************************************************************
+/// \brief	Method to reset body forces.
+///
+///			Resets both Cartesian and Lattice force vectors to zero.
+void GridObj::LBM_resetForces() {
+
+	// Reset lattice force vectors on every grid site
+	std::fill(force_i.begin(), force_i.end(), 0.0);
+
+	// Reset Cartesian force vector on every grid site
+	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
 
 }
 
 
-// ***************************************************************************************************
-// Collision operator
+// *****************************************************************************
+/// Apply collision operator.
 void GridObj::LBM_collide( ) {
 
 	/*
@@ -417,11 +387,6 @@ void GridObj::LBM_collide( ) {
 	Equilibrium based on:
 	       rho * w * (1 + c_ia u_a / cs^2 + Q_iab u_a u_b / 2*cs^4)
 	*/
-
-	// Declarations and Grid size
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Create temporary lattice to prevent overwriting useful populations and initialise with same values as
 	// pre-collision f grid. Initialise with current f values.
@@ -444,7 +409,7 @@ void GridObj::LBM_collide( ) {
 #ifdef L_USE_KBC_COLLISION
 
 					// KBC collision
-					LBM_kbcCollide(i, j, k, M_lim, K_lim, f_new);
+					LBM_kbcCollide(i, j, k, f_new);
 
 #else
 
@@ -452,7 +417,7 @@ void GridObj::LBM_collide( ) {
 					for (int v = 0; v < L_nVels; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+						feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 						// LBGK collision
 						f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
@@ -477,9 +442,18 @@ void GridObj::LBM_collide( ) {
 
 }
 
-// ***************************************************************************************************
-// Overload of collision function to allow calculation of feq only for initialisation
-double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) {
+// *****************************************************************************
+/// \brief	Equilibrium calculation.
+///
+///			Computes the equilibrium distribution in direction supplied at the 
+///			given lattice site and returns the value.
+///
+/// \param i	i-index of lattice site. 
+/// \param j	j-index of lattice site.
+/// \param k	k-index of lattice site.
+/// \param v	lattice direction.
+/// \return		equilibrium function.
+double GridObj::LBM_collide(int i, int j, int k, int v) {
 
 	/* LBGK equilibrium function is represented as:
 		feq_i = rho * w_i * ( 1 + u_a c_ia / cs^2 + Q_iab u_a u_b / 2*cs^4 )
@@ -528,9 +502,17 @@ double GridObj::LBM_collide( int i, int j, int k, int v, int M_lim, int K_lim ) 
 
 }
 
-// ***************************************************************************************************
-// KBC collision operator
-void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new ) {
+// *****************************************************************************
+/// \brief	KBC collision operator.
+///
+///			Applies KBC collision operator using the KBC-N4 and KBC-D models in 
+///			3D and 2D, respectively.
+///
+/// \param i		i-index of lattice site. 
+/// \param j		j-index of lattice site.
+/// \param k		k-index of lattice site.
+/// \param f_new	reference to the temporary, post-collision grid.
+void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	
 	// Declarations
 	double ds[L_nVels], dh[L_nVels], gamma;
@@ -560,7 +542,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	for (int v = 0; v < L_nVels; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXXX but no point in dividing to multiply later
 		M200 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
@@ -664,7 +646,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 	for (int v = 0; v < L_nVels; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v, M_lim, K_lim);
+		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXX but no point in dividing to multiply later
 		M20 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
@@ -738,12 +720,15 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, int M_lim, int K_lim, IVector
 
 	}
 
+
 }
 
 
-// ***************************************************************************************************
-// Streaming operator
-// Applies periodic BCs on level 0
+// *****************************************************************************
+/// \brief	Streaming operator.
+///
+///			Currently, periodic BCs are only applied on L0. Considers site typing
+///			as well as grid location when determining viable streaming.
 void GridObj::LBM_stream( ) {
 
 	/* This streaming operation obeys the following logic process:
@@ -761,9 +746,6 @@ void GridObj::LBM_stream( ) {
 	 */
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	int dest_x, dest_y, dest_z;
 	int v_opp;
 
@@ -1039,14 +1021,14 @@ void GridObj::LBM_stream( ) {
 }
 
 
-// ***************************************************************************************************
-// Macroscopic quantity calculation and update of time-averaged quantities
+// *****************************************************************************
+/// \brief	Macroscopic update.
+///
+///			Updates macroscopic quantities over the lattice. Also updates 
+///			time-averaged quantities.
 void GridObj::LBM_macro( ) {
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	double rho_temp = 0.0;
 	double fux_temp = 0.0;
 	double fuy_temp = 0.0;
@@ -1106,10 +1088,10 @@ void GridObj::LBM_macro( ) {
 					rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 					// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-					fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-					fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
+					fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
+					fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
 #if (L_dims == 3)
-					fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+					fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
 #endif
 
 					// Assign velocity
@@ -1154,16 +1136,20 @@ void GridObj::LBM_macro( ) {
 }
 
 
-// ***************************************************************************************************
-// Overload of macroscopic quantity calculation to allow it to be applied to a single site as used by
-// the MPI unpacking routine to update the values for the next collision step. This routine does not
-// update the time-averaged quantities.
+// *****************************************************************************
+/// \brief	Site-specific macroscopic update.
+///
+///			Overload of macroscopic quantity calculation to allow it to be 
+///			applied to a single site as used by the MPI unpacking routine to 
+///			update the values for the next collision step. This routine does not
+///			update the time-averaged quantities.
+///
+/// \param i		i-index of lattice site. 
+/// \param j		j-index of lattice site.
+/// \param k		k-index of lattice site.
 void GridObj::LBM_macro( int i, int j, int k ) {
 
 	// Declarations
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 	double rho_temp = 0.0;
 	double fux_temp = 0.0;
 	double fuy_temp = 0.0;
@@ -1216,10 +1202,10 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-		fux_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-		fuy_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
+		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
+		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
 #if (L_dims == 3)
-		fuz_temp += rho_temp * (1 / pow(2,level)) * 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
 #endif
 
 		// Assign velocity
@@ -1234,18 +1220,23 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 }
 
 
-// ***************************************************************************************************
-// Explosion operation
+// ****************************************************************************
+/// \brief	Explosion operation for pushing information to finer grids.
+///
+///			Uses the algorithm of Rohde et al. 2006 to pass information from
+///			a coarse grid TL to a fine grid TL.
+///
+/// \param	RegionNumber	region number of the sub-grid.
 void GridObj::LBM_explode( int RegionNumber ) {
 
 	// Declarations
 	GridObj* fGrid = NULL;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = static_cast<int>(fGrid->YPos.size());
-	int M_coarse = static_cast<int>(YPos.size());
-	int K_coarse = static_cast<int>(ZPos.size());
-	int K_fine = static_cast<int>(fGrid->ZPos.size());
+	int M_fine = static_cast<int>(fGrid->M_lim);
+	int M_coarse = static_cast<int>(M_lim);
+	int K_coarse = static_cast<int>(K_lim);
+	int K_fine = static_cast<int>(fGrid->K_lim);
 
 	// Loop over coarse grid (just region of interest)
 	for (int i = fGrid->CoarseLimsX[0]; i <= fGrid->CoarseLimsX[1]; i++) {
@@ -1313,19 +1304,24 @@ void GridObj::LBM_explode( int RegionNumber ) {
 }
 
 
-// ***************************************************************************************************
-// Coalesce operation -- called from coarse level
+// ****************************************************************************
+/// \brief	Coalesce operation for pulling information from finer grids.
+///
+///			Uses the algorithm of Rohde et al. 2006 to pull information from
+///			a fine grid TL to a coarse grid TL.
+///
+/// \param	RegionNumber	region number of the sub-grid.
 void GridObj::LBM_coalesce( int RegionNumber ) {
 
 	// Declarations
 	GridObj* fGrid;
 	GridUtils::getGrid(MpiManager::Grids,level+1,RegionNumber,fGrid);
 	int y_start, x_start, z_start;
-	int M_fine = static_cast<int>(fGrid->YPos.size());
-	int M_coarse = static_cast<int>(YPos.size());
-	int K_coarse = static_cast<int>(ZPos.size());
+	int M_fine = static_cast<int>(fGrid->M_lim);
+	int M_coarse = static_cast<int>(M_lim);
+	int K_coarse = static_cast<int>(K_lim);
 #if (L_dims == 3)
-	int K_fine = static_cast<int>(fGrid->ZPos.size());
+	int K_fine = static_cast<int>(fGrid->K_lim);
 #else
 	int K_fine = 0;
 #endif
@@ -1399,4 +1395,4 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 }
 
-// ***************************************************************************************************
+// *****************************************************************************

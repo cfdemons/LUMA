@@ -18,35 +18,63 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBBody.h"
-#include "../inc/definitions.h"
-#include <math.h>
-
-class GridObj;
+#include "../inc/IBMarker.h"
+#include "../inc/PCpts.h"
+#include "../inc/GridUtils.h"
+#include "../inc/ObjectManager.h"
 
 // ***************************************************************************************************
-// Constructor and destructor
+/// \brief Constructor which sets group ID to zero by default.
 IBBody::IBBody()
 {
 	this->groupID = 0;	// Default ID
 }
-IBBody::IBBody(GridObj* g)
+
+/// \brief	Constructor which assigns the owner grid.
+///
+///			Also sets the group ID to zero.
+///
+/// \param g	pointer to owner grid
+/// \param id	ID of body in array of bodies.
+IBBody::IBBody(GridObj* g, size_t id)
 {
 	this->_Owner = g;
+	this->id = id;
 	this->groupID = 0;	// Default ID
 };
+
+/// Default destructor
 IBBody::~IBBody(void) { }
 
 // ***************************************************************************************************
-// Method to add an IB marker
+/// \brief	Method to add an IB marker to the body.
+///
+///			Adds marker at the given position with the given moving/non-moving flag.
+///
+/// \param x global x-position of marker.
+/// \param y global y-position of marker.
+/// \param z global z-position of marker.
+/// \param flex_rigid flag to indicate whether marker is movable or not.
 void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
-	markers.emplace_back( x, y, z, flex_rigid );
+	markers.emplace_back(x, y, z, flex_rigid);
+
+	// Add nearest node as basic support
+	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
+	this->markers.back().supp_i.push_back(globals[0]);
+	this->markers.back().supp_j.push_back(globals[1]);
+	this->markers.back().supp_k.push_back(globals[2]);
 
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a sphere / circle
+/// \brief	Method to seed markers for a sphere / circle.
+/// \param radius radius of circle/sphere.
+/// \param centre position vector of circle/sphere centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(double radius, std::vector<double> centre,
 					   bool flex_rigid, bool deform, int group) {
 
@@ -110,7 +138,13 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a cuboid/rectangle
+/// \brief	Method to seed markers for a cuboid / rectangle.
+/// \param width_length_depth principal dimensions of cuboid / rectangle.
+/// \param angles principal orientation of cuboid / rectangle w.r.t. domain axes.
+/// \param centre position vector of cuboid / rectangle centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
 					   bool flex_rigid, bool deform, int group) {
 
@@ -331,7 +365,16 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 }
 
 // ***************************************************************************************************
-// Method to seed markers for a flexible filament
+/// \brief	Method to seed markers for a flexible filament.
+/// \param nummarkers number of markers to use for filament.
+/// \param start_point 3D position vector of the start of the filament.
+/// \param fil_length length of filament in physical units.
+/// \param angles two angles representing filament inclination w.r.t. domain axes 
+///			(horizontal plane and vertical plane).
+/// \param BCs vector containing start and end boundary condition types (see class definition for valid values).
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
 					   std::vector<int> BCs, bool flex_rigid, bool deform, int group) {
 
@@ -396,7 +439,14 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 }
 // ***************************************************************************************************
-// Method to seed markers for a 3D plate inclined from the xz plane
+/// \brief	Method to seed markers for a 3D plate inclined from the XZ plane.
+/// \param width_length 2D vector of principal dimensions of thin plate.
+/// \param angle inclination angle from horizontal.
+/// \param centre position vector of the plate centre.
+/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
+/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param group ID indicating which group the body is part of for collective operations.
+/// \param plate arbitrary argument to allow overload otherwise would have the same signature as a filament builder.
 double IBBody::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 	bool flex_rigid, bool deform, int group, bool plate) {
 
@@ -506,6 +556,11 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 }
 
 // ***************************************************************************************************
+/// \brief	Method to build a body from a point cloud.
+///
+///			Flexibility and deformable properties taken from definitions.
+///
+/// \param _PCpts pointer to pointer cloud data.
 void IBBody::makeBody(PCpts* _PCpts) {
 
 
@@ -531,8 +586,8 @@ void IBBody::makeBody(PCpts* _PCpts) {
 	// Loop over array of points
 	for (size_t a = 1; a < _PCpts->x.size(); a++) {
 
-		// Pass to point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		// Pass to overridden point builder
+		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
 
 	}
 
@@ -554,4 +609,70 @@ void IBBody::makeBody(PCpts* _PCpts) {
 		);
 
 }
-// ***************************************************************************************************
+
+/*********************************************/
+/// \brief	Downsampling marker adding method (overload)
+///
+///			This method is an overload of the method in the parent class.
+///			This version takes the flexible/rigid flag and passes it to the 
+///			overloaded addMarker() method.
+///
+/// \param x desired global X-position of new marker.
+/// \param y desired globalY-position of new marker.
+/// \param z desired globalZ-position of new marker.
+/// \param curr_mark is a reference to the ID of last marker.
+///	\param counter is a reference to the total number of markers in the body.
+/// \param flex_rigid indicates whether markers added should form part of flexible or rigid body.
+void IBBody::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid) {
+
+	// If point in current voxel
+	if (isInVoxel(x, y, z, curr_mark)) {
+
+		// Increment point counter
+		counter[curr_mark]++;
+
+		// Update position of marker in current voxel
+		markers[curr_mark].position[0] =
+			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
+		markers[curr_mark].position[1] =
+			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
+		markers[curr_mark].position[2] =
+			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
+
+
+		// If point is in an existing voxel
+	}
+	else if (isVoxelMarkerVoxel(x, y, z)) {
+
+		// Recover voxel number
+		MarkerData* m_data = getMarkerData(x, y, z);
+		curr_mark = m_data->ID;
+
+		// Increment point counter
+		counter[curr_mark]++;
+
+		// Update position of marker in current voxel
+		markers[curr_mark].position[0] =
+			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
+		markers[curr_mark].position[1] =
+			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
+		markers[curr_mark].position[2] =
+			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
+
+		delete m_data;
+
+	}
+	// Must be in a new marker voxel
+	else {
+
+		// Reset counter and increment voxel index
+		curr_mark = static_cast<int>(counter.size());
+		counter.push_back(1);
+
+		// Create new marker as this is a new marker voxel
+		addMarker(x, y, z, flex_rigid);
+
+	}
+
+
+};

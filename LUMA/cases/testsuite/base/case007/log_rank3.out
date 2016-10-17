@@ -1,0 +1,35 @@
+LUMA -- Version 1.2.0-alpha
+Simulation started at Mon Oct 17 14:28:57 2016
+MPI Topolgy initialised in 2.547ms.
+Constructing Grid level 0 on rank 3
+Grid size = 100x100x1
+MPI size = 4x2x2
+Coordinates on rank 3 are (	1	1	)
+Number of time steps = 100
+Physical grid spacing = 0.010000
+Lattice viscosity = 0.016000
+L0 relaxation time = 0.548000
+Lattice reference velocity 0.040000
+Reynolds Number = 100
+Object Manager Created.
+Initialising BFL Objects from File...
+Successfully acquired object data from cloud input file.
+ObjectManagerBFL: Applying voxel grid filter...
+ObjectManagerBFL: Object represented by 42 markers using 1 marker / voxel voxelisation.
+ObjectManagerBFL: Labelling lattice voxels...
+ObjectManagerBFL: Computing Q...
+ObjectManagerBFL: Q computation complete.
+Finished creating BFL Objects...
+Grid & Object Initialisation completed in 32.562ms.
+Pre-computing buffer sizes for MPI...Complete.
+Creating sub-grid communicators for HDF5...Complete. Status = 0
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Initialising LBM time-stepping...
+Grid 0: Time stepping taking an average of 2.31189ms
+MPI overhead taking an average of 0.044ms
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Writing out object lift and drag
+Simulation completed at Mon Oct 17 14:28:58 2016
+

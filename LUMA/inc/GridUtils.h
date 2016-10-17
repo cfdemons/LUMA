@@ -13,47 +13,52 @@
  *
  */
 
-#pragma once
+#ifndef GRIDUTILS_H
+#define GRIDUTILS_H
 
-// Enumeration for directional options
+/// \enum eCartesianDirection
+/// \brief Enumeration for directional options.
 enum eCartesianDirection
 {
-	eXDirection,
-	eYDirection,
-	eZDirection
+	eXDirection,	///< X-direction
+	eYDirection,	///< Y-direction
+	eZDirection		///< Z-direction
 };
 
-// Enumeration for minimum and maximum
+/// \enum eMinMax
+/// \brief	Enumeration for minimum and maximum.
+///
+///			Some utility methods need to know whether they should be looking
+///			at or for a maximum or minimum edge of a grid so we use this 
+///			enumeration to specify.
 enum eMinMax
 {
-	eMinimum,
-	eMaximum
+	eMinimum,		///< Minimum
+	eMaximum		///< Maximum
 };
 
-/** GridUtils Class is a utility class to hold all the general
- *  methods used by the GridObj and others. Everything about this is static
- *  as no need to instantiate it for every grid on a process.
- */
-
 #include "stdafx.h"
-#include "definitions.h"
 #include "GridObj.h"
-#include "hdf5luma.h"
 
+/// \brief	Grid utility class.
+///
+///			Class provides grid utilities including commonly used logical tests. 
+///			This is a static class and so there is no need to instantiate it.
 class GridUtils {
 
 	// Properties //
 
 public:
-	static std::ofstream* logfile;			// Handle to output file
-	static std::string path_str;            // Static string representing output path
-	static const int dir_reflect[L_dims * 2][L_nVels];	
+	static std::ofstream* logfile;			///< Handle to output file
+	static std::string path_str;            ///< Static string representing output path
+	static const int dir_reflect[L_dims * 2][L_nVels];	///< Array with hardcoded direction numbering for specular reflection
 
 	// Methods //
 
 private:
-	// Since class is static make constructors private to prevent instantiation
+	/// Private constructor since class is static
 	GridUtils();
+	/// Private destructor
 	~GridUtils();
 
 public:
@@ -63,7 +68,7 @@ public:
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace
 	static std::vector<double> linspace(double min, double max, int n);		// Function: linspace
-	static double vecnorm(double vec[]);										// Function: vecnorm + overloads
+	static double vecnorm(double vec[L_dims]);								// Function: vecnorm + overloads
 	static double vecnorm(double val1, double val2);
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double> vec);
@@ -71,7 +76,6 @@ public:
 		int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
 	static std::vector<int> getCoarseIndices(
 		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
-	static double indexToPosition(int index, double dx);	// Function: indexToPosition
 	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add
@@ -83,6 +87,9 @@ public:
 	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
+	// Voxel finding utilities
+	static std::vector<int> getVoxInd(double x, double y, double z, GridObj* g);	// Function to get voxel from global position
+
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
 	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
@@ -93,46 +100,81 @@ public:
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
 	static bool isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);	// Is site on specified sender layer
 	static bool isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);		// Is site on speicfied recv layer
-	static bool isOffGrid(int i, int j, int k, 
-		int N_lim, int M_lim, int K_lim, GridObj& g);							// Is site off supplied grid
+	static bool isOffGrid(int i, int j, int k, GridObj& g);						// Is site off supplied grid
 
 
 	// Templated functions //
 
-	// Function: vecnorm + overload
+	/// \brief Computes the L2-norm.
+	/// \param a1 first component of the vector
+	/// \param a2 second component of the vector
+	/// \param a3 third component of the vector
+	/// \return NumType scalar quantity
 	template <typename NumType>
 	static NumType vecnorm(NumType a1, NumType a2, NumType a3) {
 		return (NumType)sqrt( a1*a1 + a2*a2 + a3*a3 );
 	}
+	/// \brief Computes the L2-norm.
+	/// \param a1 first component of the vector
+	/// \param a2 second component of the vector
+	/// \return NumType scalar quantity
 	template <typename NumType>
 	static NumType vecnorm(NumType a1, NumType a2) {
 		return (NumType)sqrt( a1*a1 + a2*a2 );
 	}
 	
-	// Function: upToZero
+	/// \brief	Rounds a negative value up to zero.
+	///
+	///			If value is positive, return the value unchanged.
+	///
+	/// \param x value to be rounded
+	/// \return NumType rounded value
 	template <typename NumType>
 	static NumType upToZero(NumType x) {	
 		if (x < static_cast<NumType>(0)) return static_cast<NumType>(0);
 		else return x;		
 	};
 
-	// Function: downToLimit
+	/// \brief	Rounds a value greater than a limit down to this value.
+	///
+	///			If value is less than or equal to the limit, return the value 
+	///			unchanged.
+	///
+	/// \param x value to be rounded
+	/// \param limit value to be rounded down to
+	/// \return NumType rounded value
 	template <typename NumType>
 	static NumType downToLimit(NumType x, NumType limit) {	
 		if (x > limit) return limit;
 		else return x;		
 	};
 
-	// Function: factorial
+	/// \brief	Computes the factorial of the supplied value.
+	///
+	///			If n == 0 then returns 1.
+	///
+	/// \param n factorial
+	/// \return NumType n factorial
 	template <typename NumType>
 	static NumType factorial(NumType n) {
 		if (n == static_cast<NumType>(0)) 
 			return static_cast<NumType>(1);
 		else
-			return n * GridUtils::factorial(n - 1);
+			return n * factorial(n - 1);
 	};
 
-	// Function: stridedCopy
+	/// \brief	Performs a strided memcpy.
+	///
+	///			Memcpy() is designed to copy blocks of contiguous memory.
+	///			Strided copy copies a pattern of contiguous blocks.
+	///
+	/// \param dest pointer to start of destination memory
+	/// \param src pointer to start of source memory
+	/// \param block size of contiguous block
+	/// \param offset offset from the start of the soruce array
+	/// \param stride number of elements between start of first block and start of second
+	/// \param count number of blocks in pattern
+	/// \param buf_offset offset from start of destination buffer to start writing. Default is zero if not supplied.
 	template <typename NumType>
 	static void stridedCopy(NumType *dest, NumType *src, size_t block, 
 		size_t offset, size_t stride, size_t count,
@@ -146,7 +188,18 @@ public:
 
 
 	// ************************************************************************
-	// Map global to local indices where locals is a vector container
+	/// \brief	Maps global indices to local indices.
+	///
+	///			Takes a vector container and populates it with the 
+	///			local indices where the supplied global site can be found
+	///			on the grid supplied. If global indicies are not found on the
+	///			supplied grid then local index of -1 is returned.
+	///
+	/// \param i global index
+	/// \param j global index
+	/// \param k global index
+	/// \param g grid on which local indices are required
+	/// \param[out] locals vector container for local indices
 	template <typename NumType>
 	static void global_to_local(int i, int j, int k, GridObj* g, std::vector<NumType>& locals) {
 
@@ -172,7 +225,16 @@ public:
 	}
 
 	// ************************************************************************
-	// Map local to global indices where globals is a vector container
+	/// \brief	Maps local indices to global indices.
+	///
+	///			Takes a vector container and populates it with the 
+	///			global indices of the supplied local site
+	///
+	/// \param i local index
+	/// \param j local index
+	/// \param k local index
+	/// \param g grid on which global indices are required
+	/// \param[out] globals vector container for global indices
 	template <typename NumType>
 	static void local_to_global(int i, int j, int k, GridObj* g, std::vector<NumType>& globals) {
 
@@ -193,3 +255,4 @@ public:
 
 };
 
+#endif

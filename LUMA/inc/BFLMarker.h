@@ -13,10 +13,16 @@
  *
  */
 
-#pragma once
+#ifndef BFLMARKER_H
+#define BFLMARKER_H
+
+#include "stdafx.h"
 #include "Marker.h"
 
-// Definition for the BFLMarker class which represents a marker which defines a BFL object //
+/// \brief	BFL marker.
+///
+///			This class declaration is for a BFL Lagrange point.
+///			A collection of these points form BFL body.
 class BFLMarker :
 	public Marker
 {
@@ -32,27 +38,6 @@ public:
 	// Constructor
 	BFLMarker(double x, double y, double z);
 
-protected:
-
-
-	/*
-	***************************************************************************************************************
-	********************************************* Member Data *****************************************************
-	***************************************************************************************************************
-	*/
-
-
-
-
-
-	/*
-	***************************************************************************************************************
-	********************************************* Member Methods **************************************************
-	***************************************************************************************************************
-	*/
-
-
-
-
 };
 
+#endif

@@ -15,14 +15,19 @@
 
 #include "../inc/stdafx.h"
 #include <mpi.h>
-#include "../inc/definitions.h"
-#include <iostream>
-#include <fstream>
 #include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
+#include "../inc/GridUtils.h"
 
 
-// Called from the general size routine to find the size of the receiving buffer.
+// ****************************************************************************
+/// \brief	Method to pre-compute the size of the receiver layer buffer.
+///
+///			A halo consists of a receiver (outer) and sender (inner) layer. 
+///			This method computes the size of the receiver layers in each 
+///			communication direction (MPI directions).
+///
+/// \param	g	grid being inspected.
 void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 
 	int count, i, j, k, dir;	// Local counters

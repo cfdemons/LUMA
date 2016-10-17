@@ -17,22 +17,23 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
 #include "../inc/BFLBody.h"
 #include "../inc/ObjectManager.h"
-#include <numeric>
+#include "../inc/GridUtils.h"
 
 
-// ***************************************************************************************************
-// Method to apply suitable boundary conditions
+// ****************************************************************************
+/// \brief	Method to apply boundary conditions on lattice.
+///
+///			This method will exmaine the entire lattice for sites which require 
+///			a boundary condition but only apply the boundary condition requested
+///			in the bc_type_flag argument.
+///
+/// \param	bc_type_flag	Flag indicating which set of BCs to apply.
 void GridObj::LBM_boundary (int bc_type_flag) {
 
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Loop over grid, identify BC required & apply BC
 	for (int i = 0; i < N_lim; i++) {
@@ -49,13 +50,18 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) ) {
 
 					// Apply half-way bounce-back
-					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
+
+#ifdef L_LD_OUT
+					// Compute lift and drag contribution of this site
+					objman->computeLiftDrag(i, j, k, this);
+#endif
 
 				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eSymmetry || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSymmetry)
 					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry)) {
 
 					// Apply half-way specular reflection
-					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k,N_lim,M_lim,K_lim);
+					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
 
 
 				/*	******************************************************************************************
@@ -68,7 +74,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// Choose option
 #if (defined L_INLET_ON && defined L_INLET_REGULARISED)
 					// Apply regularised BC
-					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k, N_lim, M_lim, K_lim);
+					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
 #endif
 					// Do-Nothing BC is applied by default in a different way
 
@@ -83,7 +89,7 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 					// !! RIGHT HAND WALL ONLY !!
 #ifdef L_OUTLET_ON
 					// Apply extrapolation
-					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k, M_lim, K_lim);
+					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
 #endif
 
 
@@ -106,9 +112,13 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 }
 
 
-// ***************************************************************************************************
-// Routine to apply half-way bounceback boundary condition
-void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+// ****************************************************************************
+/// \brief	Method to apply half-way bounce-back.
+/// \param	label	current site label.
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
+void GridObj::bc_applyBounceBack(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z;
 
@@ -173,9 +183,16 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int 
 
 }
 
-// ***************************************************************************************************
-// Routine to apply Extrapolation outlet boundary condition
-void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim) {
+// ****************************************************************************
+/// \brief	Method to apply extrapolation outlet.
+///
+///			Can only be applied on right-hand wall.
+///
+/// \param	label	current site label.
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
+void GridObj::bc_applyExtrapolation(int label, int i, int j, int k) {
 
 	/* When using MPI, an outlet may appear at an edge of the grid which 
 	 * is not the right-hand edge. As a remedy to this we first check
@@ -186,81 +203,36 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, i
 	 * Furthermore, the erroneous values will likely stream to an inlet 
 	 * or other boundary site where the incoming values are assumed 
 	 * unknown and are overwritten by the boundary condition at this site.
-	 * Therefore, the impact of not updating these sites is anticipated to
-	 * be zero.
+	 * Therefore, there is no impact of not updating these sites.
 	 */
 
-	if (i-1 < 0 || i-2 < 0) {
+	if (i - 1 >= 0 && i - 2 >= 0)
+	{
+		for (size_t v = 0; v < L_nVels; v++) {
 
-		// Cannot update the outlet using extrapolation
+			// If right-hand wall incoming population then copy value of f from the upstream site
+			if (c[0][v] == -1) f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
 
-	} else {
-
-#if L_dims == 3
-
-		// In 3D, extrapolate populations [1 7 9 15 16]
-		for (size_t v = 1; v < 17; v++) {
-                
-			// Make all this generic in future release
-			if (v == 1 || v == 7 || v == 9 || v == 15 || v == 16) {
-
-				/*
-				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,L_nVels);
-				float x1 = 0.0;
-				float x2 = (float)dx;
-				float x3 = 2 * x2;
-                
-				float lin_m = (y2 - y1) / (x2 - x1);
-				float lin_c = y1;
-                
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = lin_m * x3 + lin_c;
-				*/
-
-				// Just copy value for now as the linear extrapolation doesn't work
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-
-			}
 		}
-
-#else
-		// In 2D, extrapolate populations [7 1 5]
-		for (size_t v = 1; v < 8; v++) {
-
-			if (v == 7 || v == 1 || v == 5) {
-                
-				/*
-				float y2 = (float)f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-				float y1 = (float)f(i-2,j,k,v,M_lim,K_lim,L_nVels);
-				float x1 = 0.0;
-				float x2 = (float)dx;
-				float x3 = 2 * x2;
-                
-				float lin_m = (y2 - y1) / (x2 - x1);
-				float lin_c = y1;
-                
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = lin_m * x3 + lin_c;
-				*/
-
-				// Just copy value for now as the linear extrapolation doesn't work
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
-
-			}
-		}
-#endif
-
 	}
 
 }
 
 
-// ***************************************************************************************************
-// Routine to apply Regularised boundary conditions
-void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+// ****************************************************************************
+/// \brief	Method to apply regularised velocity inlet.
+///
+///			Can be applied on any wall.
+///
+/// \param	label	current site label.
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
+void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z, n;
 
-	/** To allow a generalised application of the regularised BC we need to 
+	/* To allow a generalised application of the regularised BC we need to 
 	 * implement the following:
 	 * 1. Check normal directions to find orientation of normal wall;
 	 * 2. Store the unknown and known directions in two vectors
@@ -287,7 +259,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 		dest_z = k+c[2][v_outgoing];
 
 		// If this site is off-grid then cannot determine orientation of wall
-		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,N_lim,M_lim,K_lim,*this)) {
+		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,*this)) {
 
 			continue;
 
@@ -398,7 +370,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 			// Update feq to match the desired density and velocity and
 			// apply off-equilibrium bounce-back to unknown populations
 			for (n = 0; n < L_nVels; n++) {
-				feq(i,j,k,n,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,n,M_lim,K_lim);
+				feq(i,j,k,n,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,n);
 
 
 				// Different "if conditions" for corners/edges and normal walls
@@ -438,7 +410,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 				f(i,j,k,v,M_lim,K_lim,L_nVels) = 
 
-					LBM_collide(i,j,k,v,M_lim,K_lim) +
+					LBM_collide(i,j,k,v) +
 						
 					(w[v] / (2 * pow(cs,4))) * (
 					( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
@@ -457,7 +429,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 		}
 
-		/** If it reaches here and has gone through all the directions then the wall orientation cannot be found
+		/* If it reaches here and has gone through all the directions then the wall orientation cannot be found
 		 * based on the fact that it cannot find an adjacent site within the centre of the domain on which to 
 		 * base the BC. In this case it must be a buffered layer of inlet sites (the "second row" of sites you get
 		 * when embedding a sub-grid in the inlet) so just set it to default values as it doesn't affect the domain
@@ -474,7 +446,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 			// Set f to default values
 			for (int v = 0; v < L_nVels; v++) {
-				feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,v,M_lim,K_lim);
+				feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,v);
 				f(i,j,k,v,M_lim,K_lim,L_nVels) = feq(i,j,k,v,M_lim,K_lim,L_nVels);
 			}
 		}
@@ -484,14 +456,17 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k, int N_lim, int
 
 }
 
-// ***************************************************************************************************
-// Routine to apply Bfl boundary condition
+// ****************************************************************************
+/// \brief	Method to apply BFL bounce-back.
+///
+///			Currently, assumes only 1 BFL body present on the grid.
+///
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
 void GridObj::bc_applyBfl(int i, int j, int k) {
 
 	// Declarations
-	int N_lim = static_cast<int>( XInd.size() );
-	int M_lim = static_cast<int>( YInd.size() );
-	int K_lim = static_cast<int>( ZInd.size() );
 	MarkerData* m_data;
 	ObjectManager* objMan = ObjectManager::getInstance();
 
@@ -530,15 +505,9 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Not been filtered by above exclusions so try to apply boundary condition. */
 
 		// Get marker ID
-#ifdef L_BUILD_FOR_MPI
-		// Convert locals to global for marker access
-		std::vector<int> globals; GridUtils::local_to_global(i,j,k,this,globals);
-		m_data = objMan->pBody[0].getMarkerData(globals[0],globals[1],globals[2]);
-#else
-		m_data = objMan->pBody[0].getMarkerData(i, j, k);
-#endif
+		m_data = objMan->pBody[0].getMarkerData(XPos[i], YPos[j], ZPos[k]);
 
-		/** Apply BC in pairs  -- BC 1 **/
+		/* Apply BC in pairs  -- BC 1 */
 
 		// Get value of q (outgoing direction, source store)
 		double q = objMan->pBody[0].Q[v_outgoing][m_data->ID];
@@ -553,6 +522,12 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
+
+			// Cannot apply BC if require off-grid data
+			if (i - c[0][v_outgoing] < 0 || i - c[0][v_outgoing] >= N_lim ||
+				j - c[1][v_outgoing] < 0 || j - c[1][v_outgoing] >= M_lim ||
+				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
+				continue;
 
 			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
 				(1 - 2 * q) * 
@@ -572,7 +547,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		}		
 
 
-		/** Apply BC in pairs  -- BC 2 **/
+		/* Apply BC in pairs  -- BC 2 */
 
 		// Get value of q (incoming direction, destination store)
 		q = objMan->pBody[0].Q[v_incoming + L_nVels][m_data->ID];
@@ -585,6 +560,12 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
+
+			// Cannot apply BC if require off-grid data
+			if (i - c[0][v_outgoing] < 0 || i - c[0][v_outgoing] >= N_lim ||
+				j - c[1][v_outgoing] < 0 || j - c[1][v_outgoing] >= M_lim ||
+				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
+				continue;
 
 			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels) = 
 				(1 - 2 * q) * 
@@ -608,8 +589,14 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 
 }
 
-// ***************************************************************************************************
-// Routine to apply Non-reflecting boundary condition
+// ****************************************************************************
+/// \brief	Method to apply NRBC.
+///
+///			Not implemented in this version.
+///
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
 void GridObj::bc_applyNrbc(int i, int j, int k) {
 
 	// Jon's NRBC to go here
@@ -617,9 +604,16 @@ void GridObj::bc_applyNrbc(int i, int j, int k) {
 }
 
 
-// ***************************************************************************************************
-// Routine to apply half-way specular reflection condition for free-slip
-void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim) {
+// ****************************************************************************
+/// \brief	Method to apply half-way specular reflection.
+///
+///			Symmetry boundary condition for free-slip walls.
+///
+/// \param	label	current site label.
+/// \param	i		current site i-index.
+/// \param	j		current site j-index.
+/// \param	k		current site k-index.
+void GridObj::bc_applySpecReflect(int label, int i, int j, int k) {
 
 	int dest_x, dest_y, dest_z;
 
@@ -686,17 +680,12 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int
 }
 
 
-// ***************************************************************************************************
-// HELPER ROUTINES
-// ***************************************************************************************************
-// Routine to reset the velocity at solid sites to zero
+// ****************************************************************************
+/// \brief	Helper method to set macroscopic quantities of solid sites.
+///
+///			Velocity is set to zero and density is set to initial density.
+///			Applies to eSolid and eRefinedSolid sites only.
 void GridObj::bc_solidSiteReset( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -718,5 +707,5 @@ void GridObj::bc_solidSiteReset( ) {
 	}
 
 }
-// ***************************************************************************************************
-// ***************************************************************************************************
+// ****************************************************************************
+// ****************************************************************************

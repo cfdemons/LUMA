@@ -13,46 +13,46 @@
  *
  */
 
-#pragma once
+#ifndef GRIDOBJ_H
+#define GRIDOBJ_H
 
-/** GridObj class which represents a lattice */
-
-#include <vector>
+#include "stdafx.h"
 #include "IVector.h"
-#include "IBBody.h"
-#include <iostream>
-#include <fstream>
-#include "hdf5luma.h"
 
-// Enumeration for Lattice Typing
+/// \enum  eType
+/// \brief Lattice typing labels
 enum eType
 {
-	eSolid,
-	eFluid,
-	eRefined,
-	eTransitionToCoarser,
-	eTransitionToFiner,
-	eBFL,
-	eSymmetry,
-	eInlet,
-	eOutlet,
-	eRefinedSolid,
-	eRefinedSymmetry,
-	eRefinedInlet
+	eSolid,					///< Rigid, solid site
+	eFluid,					///< Fluid site
+	eRefined,				///< Fluid site which is represented on a finer grid
+	eTransitionToCoarser,	///< Fluid site coupled to a coarser grid
+	eTransitionToFiner,		///< Fluid site coupled to a finer grid
+	eBFL,					///< Site containing a BFL marker
+	eSymmetry,				///< Symmetry boundary
+	eInlet,					///< Inlet boundary
+	eOutlet,				///< Outlet boundary
+	eRefinedSolid,			///< Rigid, solid site represented on a finer grid
+	eRefinedSymmetry,		///< Symmtery boundary represented on a finer grid
+	eRefinedInlet			///< Inlet site represented on a finer grid
 };
 
-// Enumeration for BC application type
+/// \enum  eBCType
+/// \brief Flag for indicating which BCs to apply
 enum eBCType
 {
-	eBCAll,
-	eBCSolidSymmetry,
-	eBCInlet,
-	eBCOutlet,
-	eBCInletOutlet,
-	eBCBFL
+	eBCAll,				///< Apply all BCs
+	eBCSolidSymmetry,	///< Apply just solid and symmetry BCs
+	eBCInlet,			///< Apply just inlet BCs
+	eBCOutlet,			///< Apply just outlet BCs
+	eBCInletOutlet,		///< Apply inlet and outlet BCs
+	eBCBFL				///< Apply just BFL BCs
 };
 
-// Base class
+/// \brief	Grid class.
+///
+///			This class represents a grid (lattice) and is capable of owning a 
+///			nested hierarchy of child grids.
 class GridObj
 {
 
@@ -82,63 +82,75 @@ public:
 
 private :
 
-	// 1D subgrid array (size = L_NumReg)
+	/// 1D subgrid array (size = L_NumReg)
 	std::vector<GridObj> subGrid;
 
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
-	int CoarseLimsX[2];
-	int CoarseLimsY[2];
-	int CoarseLimsZ[2];
+	int CoarseLimsX[2];		///< Local X indices corresponding to where this grid is locate on parent grid
+	int CoarseLimsY[2];		///< Local Y indices corresponding to where this grid is locate on parent grid
+	int CoarseLimsZ[2];		///< Local Z indices corresponding to where this grid is locate on parent grid
 
 	// 1D arrays
 public :
-	std::vector<int> XInd; // Vectors of indices
-	std::vector<int> YInd;
-	std::vector<int> ZInd;
-	std::vector<double> XPos; // Vectors of positions of sites
-	std::vector<double> YPos;
-	std::vector<double> ZPos;
+	std::vector<int> XInd;		///< Vector of global X indices of each site
+	std::vector<int> YInd;		///< Vector of global Y indices of each site
+	std::vector<int> ZInd;		///< Vector of global Z indices of each site
+	std::vector<double> XPos;	///< Vector of global X positions of each site
+	std::vector<double> YPos;	///< Vector of global Y positions of each site
+	std::vector<double> ZPos;	///< Vector of global Z positions of each site
 
 private :
 	// Inlet velocity profile
-	std::vector<double> ux_in, uy_in, uz_in;
+	std::vector<double> ux_in;	///< Vector of x-component of inlet velocity read from file
+	std::vector<double> uy_in;	///< Vector of y-component of inlet velocity read from file
+	std::vector<double> uz_in;	///< Vector of z-component of inlet velocity read from file
 
 	// Vector nodal properties
 	// Flattened 4D arrays (i,j,k,vel)
-	IVector<double> f;
-	IVector<double> feq;
-	IVector<double> u;
-	IVector<double> force_xyz;
-	IVector<double> force_i;
+	IVector<double> f;				///< Distribution functions
+	IVector<double> feq;			///< Equilibrium distribution functions
+	IVector<double> u;				///< Macropscopic velocity components
+	IVector<double> force_xyz;		///< Macroscopic body force components
+	IVector<double> force_i;		///< Mesoscopic body force components
 
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
-	IVector<double> rho;
-
-	// Grid scalars
-	double dx, dy, dz;		// Physical spacing
-	int region_number;		// ID of region at a particular level in the embedded grid hierarchy
+	IVector<double> rho;			///< Macroscopic density
 
 	// Time averaged statistics
-	IVector<double> rho_timeav;		// Time-averaged density at each grid point (i,j,k)
-	IVector<double> ui_timeav;		// Time-averaged velocity at each grid point (i,j,k,L_dims)
-	IVector<double> uiuj_timeav;	// Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
+	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)
+	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_dims)
+	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
 
 
 	// Public data members
 public :
 
-	IVector<eType> LatTyp;			// Flattened 3D array of site labels
-	int level;						// Level in embedded grid hierarchy
-	double dt;						// Physical time step size
-	int t;							// Number of completed iterations
-	double nu;						// Kinematic viscosity (in lattice units)
-	double omega;					// Relaxation frequency
+	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
+
+	// Grid Scalars
+	double dx;						///< Physical lattice X spacing
+	double dy;						///< Physical lattice Y spacing
+	double dz;						///< Physical lattice Z spacing
+	int region_number;				///< Region number
+	int level;						///< Level in embedded grid hierarchy
+	double dt;						///< Physical time step size
+	int t;							///< Number of completed iterations on this level
+	double nu;						///< Kinematic viscosity (in lattice units)
+	double omega;					///< Relaxation frequency
 
 	// Timing variables
-	double timeav_mpi_overhead;		// Time of MPI communication
-	double timeav_timestep;			// Time of a timestep
+	double timeav_mpi_overhead;		///< Time-averaged time of MPI communication
+	double timeav_timestep;			///< Time-averaged time of a timestep
+
+	// Local grid sizes
+	int N_lim;			///< Local size of grid in X-direction
+	int M_lim;			///< Local size of grid in Y-direction
+	int K_lim;			///< Local size of grid in Z-direction
+	double XOrigin;	///< Global position of grid left edge
+	double YOrigin;	///< Global position of grid bottom edge
+	double ZOrigin;	///< Global position of grid front edge
 
 
 	/*
@@ -163,27 +175,25 @@ public :
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	void LBM_multi(bool IBM_flag);		// Launch the multi-grid kernel
+	void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
-	double LBM_collide(int i, int j, int k, int v, int M_lim, int K_lim);
-	void LBM_kbcCollide(int i, int j, int k, int M_lim, int K_lim, IVector<double>& f_new);		// KBC collision operator
+	double LBM_collide(int i, int j, int k, int v);
+	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_stream();							// Stream populations
 	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
 	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
-	void LBM_forcegrid(bool reset_flag);		// Apply a force to the grid points (or simply reset force vectors if flag is true)
+	void LBM_forceGrid();						// Apply a force to the grid points
+	void LBM_resetForces();						// Resets the force vectors on the grid
 
 	// Boundary operations
-	void bc_applyBounceBack(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWBB BC
-	void bc_applySpecReflect(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of HWSR BC
-	void bc_applyZouHe(int label, int i, int j, int k, int M_lim, int K_lim);					// Application of Zou-He BC
-	void bc_applyRegularised(int label, int i, int j, int k, int N_lim, int M_lim, int K_lim);	// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k, int M_lim, int K_lim);			// Application of Extrapolation BC
-	void bc_applyBfl(int i, int j, int k);														// Application of BFL BC
-	void bc_applyNrbc(int i, int j, int k);														// Application of characteristic NRBC
-	void bc_solidSiteReset();																	// Reset all the solid site velocities to zero
-	double bc_getWallDensityForRBC(std::vector<double>& ftmp, int normal,
-		int i, int j, int k, int M_lim, int K_lim);		// Gets wall density for generalised, regularised velocity BC
+	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
+	void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
+	void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
+	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
+	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
+	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
+	void bc_solidSiteReset();									// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
 	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
@@ -199,3 +209,4 @@ public :
 
 };
 
+#endif

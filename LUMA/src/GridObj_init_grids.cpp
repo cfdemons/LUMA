@@ -19,22 +19,43 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/MpiManager.h"
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <math.h>
+#include "../inc/GridUtils.h"
 
 using namespace std;
 
-// ***************************************************************************************************
-// Method to get left-hand wall inlet profile from the input file (data may be over- or under-sampled)
+// ****************************************************************************
+/// \brief	Method to import an input profile from a file.
+///
+///			Input data may be over- or under-sampled but it must span the 
+///			physical dimensions of the inlet otherwise the software does
+///			not known how to scale the data to fit. Inlet profile is always
+///			assumed to be oriented vertically (y-direction).
 void GridObj::LBM_init_getInletProfile() {
 
 	size_t i, j;
 	double y, tmp;
-	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;	
+	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
+
+#ifdef L_PARABOLIC_INLET
+
+	// Resize vectors
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
+
+	// Loop over site positions (for left hand inlet, y positions)
+	for (j = 0; j < M_lim; j++) {
+
+		// Set the inlet velocity profile values
+		ux_in[j] = L_u_max * (1 - pow((YPos[j] - (L_b_y - L_a_y - 2 * dy) / 2) / ((L_b_y - L_a_y - 2 * dy) / 2), 2));
+		uy_in[j] = 0.0;
+		uz_in[j] = 0.0;
+	}
+
+#else
+
+	// Indicate to log
+	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
 	// Buffer information from file
 	std::ifstream inletfile;
@@ -79,12 +100,12 @@ void GridObj::LBM_init_getInletProfile() {
 
 
 	// Resize vectors
-	ux_in.resize(YPos.size());
-	uy_in.resize(YPos.size());
-	uz_in.resize(YPos.size());
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
 
 	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < YPos.size(); j++) {
+	for (j = 0; j < M_lim; j++) {
 
 		// Get Y-position
 		y = YPos[j];
@@ -145,19 +166,18 @@ void GridObj::LBM_init_getInletProfile() {
 		*GridUtils::logfile << "Failed to read in inlet profile data. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 	}
+#endif // L_PARABOLIC_INLET
 
 
 }
 
-// ***************************************************************************************************
-
-// Initialise velocity method
+// ****************************************************************************
+/// \brief	Method to initialise the lattice velocity.
+///
+///			Unless the L_NO_FLOW macro is defined, the initial velocity 
+///			everywhere will be set to the values specified in the definitions 
+///			file.
 void GridObj::LBM_initVelocity ( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 
 	// Loop over grid
@@ -170,6 +190,7 @@ void GridObj::LBM_initVelocity ( ) {
 
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_dims) = 0.0;
+				}
 
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
@@ -184,7 +205,6 @@ void GridObj::LBM_initVelocity ( ) {
 
 
 #endif
-
 			}
 		}
 	}
@@ -195,15 +215,9 @@ void GridObj::LBM_initVelocity ( ) {
 }
 
 
-// ***************************************************************************************************
-
-// Initialise density method
+// ****************************************************************************
+/// \brief	Method to initialise the lattice density.
 void GridObj::LBM_initRho ( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -218,9 +232,12 @@ void GridObj::LBM_initRho ( ) {
 
 }
 
-// ***************************************************************************************************
-
-// Non-MPI initialise level 0 grid wrapper
+// ****************************************************************************
+/// \brief	Wrapper to initialise all L0 lattice quantities.
+///
+///			This method wraps the MPI-specific version. It is called by the 
+///			serial build and sets the MPI-specific arguments to default values
+///			before calling the full initialiser.
 void GridObj::LBM_initGrid( ) {
 
 	// Set default value for the following MPI-specific settings
@@ -245,9 +262,11 @@ void GridObj::LBM_initGrid( ) {
 }
 
 
-// ***************************************************************************************************
-
-// Initialise level 0 grid method
+// ****************************************************************************
+/// \brief	Method to initialise all L0 lattice quantities.
+/// \param	local_size	local grid size on this rank including halo.
+/// \param	global_edge_ind	global indices of the rank edges.
+/// \param	global_edge_pos	global positions of the rank edges.
 void GridObj::LBM_initGrid( std::vector<int> local_size, 
 							std::vector< std::vector<int> > global_edge_ind, 
 							std::vector< std::vector<double> > global_edge_pos ) {
@@ -272,7 +291,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 #if (L_dims == 3)
 	// Check that lattice volumes are cubes in 3D
-	if ( (Lx/L_N) != (Ly/L_M) || (Lx/L_N) != (Lz/L_K) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 || abs((Lx/L_N) - (Lz/L_K)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -280,7 +299,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 #else
 	// 2D so need square lattice cells
-	if ( (Lx/L_N) != (Ly/L_M) ) {
+	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -336,12 +355,12 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	///////////////////
 
 	// Get local grid sizes (includes overlap)
-	int N_lim = local_size[0];
-	int M_lim = local_size[1];
+	N_lim = local_size[0];
+	M_lim = local_size[1];
 #if (L_dims == 3)
-	int K_lim = local_size[2];
+	K_lim = local_size[2];
 #else
-	int K_lim = 1;
+	K_lim = 1;
 #endif
 	
 
@@ -437,6 +456,15 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	ZPos = GridUtils::linspace( L_a_z + dz/2, L_b_z - dz/2, L_K );
 #endif
 
+	// Global origins
+	XOrigin = L_a_x + dx / 2;
+	YOrigin = L_a_y + dy / 2;
+#if (L_dims == 3)
+	ZOrigin = L_a_z + dz / 2;
+#else
+	ZOrigin = 0.0;
+#endif
+
 	
 
 	// Define TYPING MATRICES
@@ -492,7 +520,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 				for (int v = 0; v < L_nVels; v++) {
 
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
+					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 				}
 			}
@@ -511,8 +539,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	nu = (L_ibb_l / dx) * L_u_ref / L_Re;
 #elif defined L_SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	//nu = ((L_obj_x_max - L_obj_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
-	nu = ((L_M - L_obj_y_max) - 2) * L_u_ref / L_Re;	// TODO Needs to be a check on whether this is what we want
+	nu = ((L_block_x_max - L_block_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
 #elif defined L_IBM_ON && defined L_IBB_FROM_FILE
 	// If IBM object read from file then use scale length as reference
 	nu = (L_ibb_length_ref / dx) * L_u_ref / L_Re;
@@ -524,8 +551,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	nu = (L_bfl_length_ref / pow(2,L_bfl_on_grid_lev)) * L_u_ref / L_Re;
 #else
 	// If no object then use domain height (in lattice units)
-	nu = (L_M - 2) * L_u_ref / L_Re;	// TODO The minus 2 is bacause of halfway BB
-										// Should have another if condition to check in case this isn't true
+	nu = (L_M - L_wall_thickness_bottom - L_wall_thickness_top) * L_u_ref / L_Re;	// Based on actual width of channel (in lattice units)
 #endif
 
 	// Relaxation frequency on L0
@@ -540,9 +566,9 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 
 
-// ***************************************************************************************************
-
-// Method to initialise the quantities for a refined subgrid assuming a volumetric configuration. Parent grid is passed by reference
+// ****************************************************************************
+/// \brief	Method to initialise all sub-grid quantities.
+/// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	
 	// Declarations
@@ -701,10 +727,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Get local grid size of the sub grid based on limits
 	int local_size[L_dims] = {
-		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5)*2) + 1,
-		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5)*2) + 1
+		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5) * 2) + 1,
+		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5) * 2) + 1
 #if (L_dims == 3)
-		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5)*2) + 1
+		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5) * 2) + 1
 #endif
 	};
 
@@ -734,13 +760,33 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
 
+	/* Global edge origins (set to local dx plus L0 edge then use series 
+	 * expression to correct for presence of other grids) */
+	XOrigin = L_a_x + (dx / 2);
+	YOrigin = L_a_y + (dy / 2);
+#if (L_dims == 3)
+	ZOrigin = L_a_z + (dz / 2);
+#else
+	ZOrigin = 0.0;
+#endif
+
+	// Aggregate offset
+	for (int n = 0; n < level; n++) {
+
+		XOrigin += RefXstart[n][region_number] * (dx * pow(2, level - n));
+		YOrigin += RefYstart[n][region_number] * (dy * pow(2, level - n));
+#if (L_dims == 3)
+		ZOrigin += RefZstart[n][region_number] * (dz * pow(2, level - n));
+#endif
+	}
+
 	
 	// Generate TYPING MATRICES
 	
 	// Get local grid sizes
-	int N_lim = static_cast<int>(XInd.size());
-	int M_lim = static_cast<int>(YInd.size());
-	int K_lim = static_cast<int>(ZInd.size());
+	N_lim = static_cast<int>(XInd.size());
+	M_lim = static_cast<int>(YInd.size());
+	K_lim = static_cast<int>(ZInd.size());
 	
 	// Resize
 	LatTyp.resize( N_lim * M_lim * K_lim );
@@ -795,7 +841,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 				for (int v = 0; v < L_nVels; v++) {
 					
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide( i, j, k, v, M_lim, K_lim );
+					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
 
 				}
 			}
@@ -806,19 +852,18 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/pGrid.omega - .5) *2) + .5);
 
+	// Lattice viscosity is constant across subgrids
+	nu = pGrid.nu;
+
 }
 
-// ***************************************************************************************************
+// ****************************************************************************
+/// \brief	Method to initialise label-based solids
 void GridObj::LBM_initSolidLab() {
 
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
 	if (L_block_on_grid_lev != level || L_block_on_grid_reg != region_number) return;
-
-	// Get local grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
 
 	// Declarations
 	int i, j, k, local_i, local_j, local_k;
@@ -844,9 +889,9 @@ void GridObj::LBM_initSolidLab() {
 		
 		(level == 0) && 
 		
-		(L_obj_x_max > Ng_lim - 1 || L_obj_x_min < 0 || L_obj_y_max > Mg_lim - 1 || L_obj_y_min < 0 
+		(L_block_x_max > Ng_lim - 1 || L_block_x_min < 0 || L_block_y_max > Mg_lim - 1 || L_block_y_min < 0 
 #if (L_dims == 3)
-		|| L_obj_z_max > Kg_lim - 1 || L_obj_z_min < 0
+		|| L_block_z_max > Kg_lim - 1 || L_block_z_min < 0
 #endif
 		)
 
@@ -854,9 +899,9 @@ void GridObj::LBM_initSolidLab() {
 
 		(level != 0) && 
 
-		(L_obj_x_max >= Ng_lim - 2 || L_obj_x_min <= 1 || L_obj_y_max >= Mg_lim - 2 || L_obj_y_min <= 1 
+		(L_block_x_max >= Ng_lim - 2 || L_block_x_min <= 1 || L_block_y_max >= Mg_lim - 2 || L_block_y_min <= 1 
 #if (L_dims == 3)
-		|| L_obj_z_max >= Kg_lim - 2 || L_obj_z_min <= 1
+		|| L_block_z_max >= Kg_lim - 2 || L_block_z_min <= 1
 #endif
 		)
 	
@@ -871,9 +916,9 @@ void GridObj::LBM_initSolidLab() {
 
 
 	// Loop over object definition in global indices
-	for (i = L_obj_x_min; i <= L_obj_x_max; i++) {
-		for (j = L_obj_y_min; j <= L_obj_y_max; j++) {
-			for (k = L_obj_z_min; k <= L_obj_z_max; k++)
+	for (i = L_block_x_min; i <= L_block_x_max; i++) {
+		for (j = L_block_y_min; j <= L_block_y_max; j++) {
+			for (k = L_block_z_min; k <= L_block_z_max; k++)
 			{
 
 				// Only label if the site is on current rank
@@ -899,21 +944,20 @@ void GridObj::LBM_initSolidLab() {
 
 }
 
-// ***************************************************************************************************
-// Initialise wall and object labels method (L0 only)
+// ****************************************************************************
+/// \brief	Method to initialise wall and object labels on L0.
+///
+///			The virtual wind tunnel definitions are implemented by this method.
 void GridObj::LBM_initBoundLab ( ) {
-
-	// Get grid sizes
-	int N_lim = static_cast<int>(XPos.size());
-	int M_lim = static_cast<int>(YPos.size());
-	int K_lim = static_cast<int>(ZPos.size());
-
-#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON
-	int i, j, k;
-#endif
 
 	// Try to add the solid block
 	LBM_initSolidLab();
+
+	// If we need to label the edges...
+#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL
+
+	int i, j, k;
+
 
 #ifdef L_INLET_ON
 	// Left hand face only
@@ -950,7 +994,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XInd[i] == L_N-1) {		// Wall found
+		if (XInd[i] == L_N - 1) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {
@@ -974,13 +1018,13 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if FRONT wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] == 0) {		// Wall found
+		if (ZInd[k] < L_wall_thickness_front) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -988,20 +1032,19 @@ void GridObj::LBM_initBoundLab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}
 
 	// Search index vector to see if BACK wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] == L_K-1) {		// Wall found
+		if (ZInd[k] > L_K-1 - L_wall_thickness_back) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1009,7 +1052,6 @@ void GridObj::LBM_initBoundLab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}
@@ -1019,7 +1061,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] == 0) {		// Wall found
+		if (YInd[j] < L_wall_thickness_bottom) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1027,14 +1069,12 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_VIRTUAL_WINDTUNNEL || defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
 				}
 			}
-			break;
-
 		}
 	}
 
@@ -1042,7 +1082,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] == L_M-1) {		// Wall found
+		if (YInd[j] > L_M-1 - L_wall_thickness_top) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1050,30 +1090,32 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif defined L_VIRTUAL_WINDTUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = eSymmetry;	// Label as symmetry boundary
-#elif (defined L_FLAT_PLATE_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
 #endif
 
 				}
 			}
-			break;
-
 		}
 	}
 
+#endif
+
 }
 
-// ***************************************************************************************************
-
-// Initialise refined labels method
+// ****************************************************************************
+/// \brief	Method to initialise all labels on sub-grids.
+///
+///			Boundary labels are set by considering parent labels on overlapping
+///			sites and then assigning child labels appropriately.
+///
+/// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 
 	// Get parent local grid sizes
-	size_t Np_lim = pGrid.XPos.size();
-	size_t Mp_lim = pGrid.YPos.size();
-	size_t Kp_lim = pGrid.ZPos.size();
+	size_t Np_lim = pGrid.N_lim;
+	size_t Mp_lim = pGrid.M_lim;
+	size_t Kp_lim = pGrid.K_lim;
 	
 	// Declare indices global and local
 	int i, j, k, local_i, local_j, local_k;
@@ -1134,11 +1176,6 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
     
 
 	// Generate grid type matrices for this level //
-	
-	// Get local grid sizes (includes overlap)
-	size_t N_lim = XPos.size();
-	size_t M_lim = YPos.size();
-	size_t K_lim = ZPos.size();
 
 	// Declare array for parent site indices
 	std::vector<int> p;

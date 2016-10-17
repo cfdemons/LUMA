@@ -14,16 +14,15 @@
  */
 
 #include "../inc/stdafx.h"
-#include "../inc/GridObj.h"
-#include <sstream>		// String stream package
-#include <iostream>
-#include "../inc/definitions.h"
-#include "../inc/globalvars.h"
+#include "../inc/GridUtils.h"
 #include "../inc/MpiManager.h"
+#include "../inc/GridObj.h"
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
 #if (L_dims == 3)
+
+// THIS IS WRONG AS WE HAVE CHANGED TO D3Q27 NOW!!!!
 const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
 	{
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
@@ -43,17 +42,21 @@ const int GridUtils::dir_reflect[L_dims * 2][L_nVels] =
 	};
 #endif
 
-// Default Constructor/Destructor
+/// Default constructor
 GridUtils::GridUtils(void)
 {
 }
 
+/// Default destructor
 GridUtils::~GridUtils(void)
 {
 }
 
-// ***************************************************************************************************
-// Returns a vector which is the cross product of a and b
+// *****************************************************************************
+/// \brief	Computes vector product.
+/// \param	a	a vector.
+/// \param	b	a second vector.
+/// \return	a vector which is the cross product of a and b.
 std::vector<double> GridUtils::crossprod(std::vector<double> a, std::vector<double> b) {
 
 	// Declare resulting vector
@@ -67,8 +70,11 @@ std::vector<double> GridUtils::crossprod(std::vector<double> a, std::vector<doub
 
 }
 
-// ***************************************************************************************************
-// Returns a vector which is a minus b
+// *****************************************************************************
+/// \brief	Subtracts two vectors.
+/// \param	a	a vector.
+/// \param	b	a second vector.
+/// \return	a vector which is a - b.
 std::vector<double> GridUtils::subtract(std::vector<double> a, std::vector<double> b) {
 
 	std::vector<double> result;
@@ -79,8 +85,11 @@ std::vector<double> GridUtils::subtract(std::vector<double> a, std::vector<doubl
 
 }
 
-// ***************************************************************************************************
-// Returns a vector which is sum of a and b
+// *****************************************************************************
+/// \brief	Adds two vectors.
+/// \param	a	a vector.
+/// \param	b	a second vector.
+/// \return vector which is a + b.
 std::vector<double> GridUtils::add(std::vector<double> a, std::vector<double> b) {
 
 	std::vector<double> result;
@@ -91,8 +100,11 @@ std::vector<double> GridUtils::add(std::vector<double> a, std::vector<double> b)
 
 }
 
-// ***************************************************************************************************
-// Returns a vector which is scalar multiplied by vector
+// *****************************************************************************
+/// \brief	Multiplies a scalar by a vector.
+/// \param	scalar	a scalar double.
+/// \param	vec		a vector double.
+/// \return a vector which is a scalar multiplied by a vector.
 std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> vec) {
 
 	std::vector<double> result;
@@ -103,8 +115,12 @@ std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> ve
 }
 	
 
-// ***************************************************************************************************
-// Returns a vector with n uniformly spaced values between min and max
+// *****************************************************************************
+/// \brief	Creates a linearly-spaced vector of values.
+/// \param	min	starting value of output vector.
+/// \param	max	ending point of output vector.
+/// \param	n	number of values in output vector.
+/// \return	a vector with n uniformly spaced values between min and max.
 std::vector<double> GridUtils::linspace(double min, double max, int n)
 {
 	// Declare resulting vector
@@ -131,9 +147,11 @@ std::vector<double> GridUtils::linspace(double min, double max, int n)
 	return result;
 }
 
-// ***************************************************************************************************
-
-// Like linspace but spaces elements by 1
+// *****************************************************************************
+/// \brief	Creates a linearly-spaced vector of integers.
+/// \param	min	starting value of output vector.
+/// \param	max	ending point of output vector.
+/// \return	a vector with uniformly spaced integer values between min and max.
 std::vector<int> GridUtils::onespace(int min, int max)
 {
 	// Declare resulting array
@@ -150,10 +168,11 @@ std::vector<int> GridUtils::onespace(int min, int max)
 	return result;
 }
 
-// ***************************************************************************************************
-
-// Functions to compute the magnitude of a vector. Overloads allow different input types
-// 2D vector with arguments supplied separately
+// *****************************************************************************
+/// \brief	Computes the L2 norm using the vector components supplied.
+/// \param	val1	first vector component.
+/// \param	val2	second vector component.
+/// \return	the L2 norm.
 double GridUtils::vecnorm( double val1, double val2 )
 {
 	double result;
@@ -163,7 +182,12 @@ double GridUtils::vecnorm( double val1, double val2 )
 	return result;
 }
 
-// 3D vector with arguments supplied separately
+// *****************************************************************************
+/// \brief	Computes the L2 norm using the vector components supplied.
+/// \param	val1	first vector component.
+/// \param	val2	second vector component.
+/// \param	val3	third vector component.
+/// \return	the L2 norm.
 double GridUtils::vecnorm( double val1, double val2, double val3 )
 {
 	double result;
@@ -173,8 +197,12 @@ double GridUtils::vecnorm( double val1, double val2, double val3 )
 	return result;
 }
 
-// Supplied as a vector
-double GridUtils::vecnorm( double vec[] )
+// *****************************************************************************
+/// \brief	Computes the L2 norm using the vector supplied.
+/// \param	vec	old-style C array representing a vector with the same number of
+///				number of components as the problem dimension.
+/// \return	the L2 norm.
+double GridUtils::vecnorm( double vec[L_dims] )
 {
 	double result;
 
@@ -191,7 +219,10 @@ double GridUtils::vecnorm( double vec[] )
 	return result;
 }
 
-// Supplied as a std::vector
+// *****************************************************************************
+/// \brief	Computes the L2 norm using the vector supplied.
+/// \param	vec	C++ std::vector.
+/// \return	the L2 norm.
 double GridUtils::vecnorm( std::vector<double> vec )
 {
 	double result = 0.0;
@@ -205,58 +236,12 @@ double GridUtils::vecnorm( std::vector<double> vec )
 	return sqrt(result);
 }
 
-// ***************************************************************************************************
 
-// Routine to map the global index of a coarse grid site to a corresponding fine site on the level below
-std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
-
-	// Initialise result
-	std::vector<int> fine_ind;
-
-	// Map indices
-	fine_ind.insert( fine_ind.begin(), 2 * (coarse_i - x_start + 1) - 2 );
-	fine_ind.insert( fine_ind.begin() + 1, 2 * (coarse_j - y_start + 1) - 2 );
-#if (L_dims == 3)
-	fine_ind.insert( fine_ind.begin() + 2, 2 * (coarse_k - z_start + 1) - 2 );
-#else
-	fine_ind.insert(fine_ind.begin() + 2, 0 );
-#endif
-
-	return fine_ind;
-}
-// ***************************************************************************************************
-
-// Routine to map the global index of a fine grid site to parent coarse grid site on the level above
-std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
-
-	// Initialise result
-	std::vector<int> coarse_ind;
-
-	// Convert to top corner index if necessary
-    if ((fine_i % 2) != 0) {
-        fine_i = fine_i - 1;
-    }
-    if ((fine_j % 2) != 0) {
-        fine_j = fine_j - 1;
-    }
-	if ((fine_k % 2) != 0) {
-        fine_k = fine_k - 1;
-    }
-
-	// Reverse map indices
-	coarse_ind.insert( coarse_ind.begin(), (fine_i / 2) + x_start );
-	coarse_ind.insert( coarse_ind.begin() + 1, (fine_j / 2) + y_start );
-#if (L_dims == 3)
-	coarse_ind.insert( coarse_ind.begin() + 2, (fine_k / 2) + z_start );
-#else
-	coarse_ind.insert( coarse_ind.begin() + 2, 0 );
-#endif
-
-	return coarse_ind;
-}
-// ***************************************************************************************************
-
-// Dot Product
+// *****************************************************************************
+/// \brief	Computes the scalar product of two vectors.
+/// \param	vec1	a vector.
+/// \param	vec2	a second vector.
+/// \return	the dot product of the two vectors.
 double GridUtils::dotprod(std::vector<double> vec1, std::vector<double> vec2) {
 
 	// Declare scalar answer
@@ -271,9 +256,11 @@ double GridUtils::dotprod(std::vector<double> vec1, std::vector<double> vec2) {
     return answer;
 }
 
-// ***************************************************************************************************
-
-// Multiplies matrix A by vector x.
+// *****************************************************************************
+/// \brief	Multiplies matrix A by vector x.
+/// \param	A	a matrix represented as a vector or vectors.
+/// \param	x	a vector.
+/// \return	a vector which is A * x.
 std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x) {
 
 	// Check to makes sure dimensions are correct
@@ -298,16 +285,87 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 	return product;
 }
 
-// ***************************************************************************************************
-// Change index to position
-double GridUtils::indexToPosition(int index, double dx) {
+// *****************************************************************************
+/// \brief	Gets the indices of the fine site given the coarse site.
+///
+///			Maps the indices of a coarse grid site to a corresponding fine 
+///			site on the level below.
+///
+/// \param	coarse_i	local i-index of coarse site to be mapped.
+/// \param	x_start		local x-index of start of refined region.
+/// \param	coarse_j	local j-index of coarse site to be mapped.
+/// \param	y_start		local y-index of start of refined region.
+/// \param	coarse_k	local k-index of coarse site to be mapped.
+/// \param	z_start		local z-index of start of refined region.
+/// \return	local indices of the fine grid site.
+std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start) {
 
-	return dx * ( static_cast<double>(index) + 0.5 );
+	// Initialise result
+	std::vector<int> fine_ind;
 
+	// Map indices
+	fine_ind.insert(fine_ind.begin(), 2 * (coarse_i - x_start + 1) - 2);
+	fine_ind.insert(fine_ind.begin() + 1, 2 * (coarse_j - y_start + 1) - 2);
+#if (L_dims == 3)
+	fine_ind.insert(fine_ind.begin() + 2, 2 * (coarse_k - z_start + 1) - 2);
+#else
+	fine_ind.insert(fine_ind.begin() + 2, 0);
+#endif
+
+	return fine_ind;
 }
 
-// ***************************************************************************************************
-// Routine to compute the opposite direction of the one supplied based on D2Q9 or D3Q19 numbering
+// *****************************************************************************
+/// \brief	Gets the indices of the coarse site given the fine site.
+///
+///			Maps the indices of a fine grid site to a corresponding coarse 
+///			site on the level above.
+///
+/// \param	fine_i	local i-index of fine site to be mapped.
+/// \param	x_start	local x-index of start of refined region on the grid above.
+/// \param	fine_j	local j-index of fine site to be mapped.
+/// \param	y_start	local y-index of start of refined region on the grid above.
+/// \param	fine_k	local k-index of fine site to be mapped.
+/// \param	z_start	local z-index of start of refined region on the grid above.
+/// \return	local indices of the coarse grid site.
+std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start) {
+
+	// Initialise result
+	std::vector<int> coarse_ind;
+
+	// Convert to top corner index if necessary
+	if ((fine_i % 2) != 0) {
+		fine_i = fine_i - 1;
+	}
+	if ((fine_j % 2) != 0) {
+		fine_j = fine_j - 1;
+	}
+	if ((fine_k % 2) != 0) {
+		fine_k = fine_k - 1;
+	}
+
+	// Reverse map indices
+	coarse_ind.insert(coarse_ind.begin(), (fine_i / 2) + x_start);
+	coarse_ind.insert(coarse_ind.begin() + 1, (fine_j / 2) + y_start);
+#if (L_dims == 3)
+	coarse_ind.insert(coarse_ind.begin() + 2, (fine_k / 2) + z_start);
+#else
+	coarse_ind.insert(coarse_ind.begin() + 2, 0);
+#endif
+
+	return coarse_ind;
+}
+
+// *****************************************************************************
+/// \brief	Gets the opposite lattice direction to the one supplied.
+///
+///			This is model independent as long as the model directions are 
+///			specified such that the oppoiste direction is either one vector on
+///			or one vector back in the listing depending on whether the direction
+///			supplied is even or odd.
+///
+/// \param	direction	direction to be reversed.
+/// \return	opposite direction in lattice model.
 int GridUtils::getOpposite(int direction) {
 
 	int direction_opposite;
@@ -334,10 +392,20 @@ int GridUtils::getOpposite(int direction) {
 
 }
 
-// ***************************************************************************************************
-// Function to find whether the recv layer containing local site i,j,k links to an adjacent or periodic neighbour rank.
-// Takes in the site indices (local) and the lattice direction in which to check.
-bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
+// *****************************************************************************
+/// \brief	Finds out whether halo containng i,j,k links to neighbour rank periodically.
+///
+///			Checks the receiver layer containing local site i,j,k and determines 
+///			from the MPI topology information whether this layer couples to an 
+///			adjacent or periodic neighbour rank. I.e. if the neighbour is physically 
+///			next to the rank or whether it is actaully at the other side of the domain.
+///
+/// \param	i	local i-index of recv layer site being queried.
+/// \param	j	local j-index of recv layer site being queried.
+/// \param	k	local k-index of recv layer site being queried.
+/// \param	g	grid on which point being queried resides.
+/// \return	boolean answer.
+bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 
 	// Local declarations
 	int exp_MPI_coords[L_dims], act_MPI_coords[L_dims], MPI_dims[L_dims];
@@ -353,24 +421,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 	// Define shifts based on which overlap we are on
 
 	// X
-	if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.XPos[i],eXDirection,eMaximum)) {
 		shift[0] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.XPos[i],eXDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.XPos[i],eXDirection,eMinimum)) {
 		shift[0] = -1;
 	}
 
 	// Y
-	if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.YPos[j],eYDirection,eMaximum)) {
 		shift[1] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.YPos[j],eYDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.YPos[j],eYDirection,eMinimum)) {
 		shift[1] = -1;
 	}
 
 #if (L_dims == 3)
 	// Z
-	if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.ZPos[k],eZDirection,eMaximum)) {
 		shift[2] = 1;
-	} else if (GridUtils::isOnRecvLayer(pGrid.ZPos[k],eZDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.ZPos[k],eZDirection,eMinimum)) {
 		shift[2] = -1;
 	}
 #endif
@@ -395,19 +463,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid) {
 
 }
 
-// ***************************************************************************************************
-// Function to find whether a site with global indices provided is on a given grid or not
-bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
+// *****************************************************************************
+/// \brief	Finds out whether site with supplied index in on the current rank.
+/// \param	gi		global i-index of site.
+/// \param	gj		global j-index of site.
+/// \param	gk		global k-index of site.
+/// \param	grid	grid being queried.
+/// \return	boolean answer.
+bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& grid) {
 	
-	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gi);
-	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gj);
-	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gk);
+	auto found_x = std::find(grid.XInd.begin(), grid.XInd.end(), gi);
+	auto found_y = std::find(grid.YInd.begin(), grid.YInd.end(), gj);
+	auto found_z = std::find(grid.ZInd.begin(), grid.ZInd.end(), gk);
 
-	if (	found_x != pGrid.XInd.end() && found_y != pGrid.YInd.end()
+	if (	found_x != grid.XInd.end() && found_y != grid.YInd.end()
 
 
 #if (L_dims == 3)
-		&& found_z != pGrid.ZInd.end()
+		&& found_z != grid.ZInd.end()
 #endif
 		) {
 
@@ -420,36 +493,40 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid) {
 
 }
 
-// ***************************************************************************************************
-// Overloaded function to find whether a global index gl == (i,j, or k) is on a given grid or not
-bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid) {
+// *****************************************************************************
+/// \brief	Finds out whether global index can be found on the current rank.
+/// \param	gl		global index (i,j or k).
+/// \param	xyz		cartesian direction of interest.
+/// \param	grid	grid being queried.
+/// \return	boolean answer.
+bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& grid) {
 
 	switch (xyz) {
 
 	case eXDirection:
 		{
 		// X direction
-		auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), gl);
+		auto found_x = std::find(grid.XInd.begin(), grid.XInd.end(), gl);
 
-		if (found_x != pGrid.XInd.end()) return true;		
+		if (found_x != grid.XInd.end()) return true;		
 		else return false;
 		}
 
 	case eYDirection:
 		{
 		// Y direction
-		auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), gl);
+		auto found_y = std::find(grid.YInd.begin(), grid.YInd.end(), gl);
 
-		if (found_y != pGrid.YInd.end()) return true;		
+		if (found_y != grid.YInd.end()) return true;		
 		else return false;
 		}
 
 	case eZDirection:
 		{
 		// Z direction
-		auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), gl);
+		auto found_z = std::find(grid.ZInd.begin(), grid.ZInd.end(), gl);
 
-		if (found_z != pGrid.ZInd.end()) return true;		
+		if (found_z != grid.ZInd.end()) return true;		
 		else return false;
 		}
 
@@ -459,8 +536,11 @@ bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj
 
 }
 
-// ***************************************************************************************************
-// Routine to see whether the specified refined region intersects with the span of the provided parent grid
+// *****************************************************************************
+/// \brief	Finds out whether specified refined region is on the grid provided.
+/// \param	pGrid	parent grid at appropriate level.
+/// \param	RegNum	region number desired.
+/// \return	boolean answer.
 bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 
 	// Loop over over X range of subgrid and check for matching index on parent grid
@@ -490,9 +570,19 @@ bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 	
 }
 
-// ***************************************************************************************************
-// Pass null pointer (ptr*) by reference and update it when matching grid is found in hierarchy pointed 
-// to by Grids* which we also pass by reference to save copying it
+// ****************************************************************************
+/// \brief	Get a pointer to a given grid in the hierarchy.
+///
+///			Takes a NULL pointer by reference and updates it when matching grid 
+///			is found in hierarchy on this rank. If grid not found, pointer is 
+///			returned without change and stays NULL. Can be used to test for the 
+///			existence of a grid on a rank by passing in a NULL pointer and 
+///			checking if a NULL pointer is returned.
+///
+/// \param		Grids	x-position of site.
+/// \param		level	y-position of site.
+/// \param		region	z-position of site.
+/// \param[out] ptr		pointer containing address of grid in hierarchy.
 void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
 
 	// Check supplied grid for a match
@@ -529,9 +619,17 @@ void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
 	return;
 
 }
-// ***************************************************************************************************
-// Wrapper routine to check whether a site is on the inner MPI overlap based on its position by checking 
-// all possible sender layer locations
+
+// ****************************************************************************
+/// \brief	Check whether site is on an inner (sender) halo.
+///
+///			Wrapper which checks every halo region of the rank for intersection
+///			with supplied site position.
+///
+/// \param	pos_x	x-position of site.
+/// \param	pos_y	y-position of site.
+/// \param	pos_z	z-position of site.
+/// \return	boolean answer.
 bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 	/* Checks whether X,Y or Z are on a sender layer first.
@@ -577,9 +675,18 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 }
 
-// ***************************************************************************************************
-// Routine to check whether a site is in the inner MPI overlap of the coarsest grid based on its position,
-// whether it is an X, Y or Z coordinate and which edge of the rank you are checking either Min or Max.
+// ****************************************************************************
+/// \brief	Check whether site is on an inner (sender) halo.
+///
+///			Wrapper available which checks every halo. This method only checks 
+///			the halo specified by the Cartesian direction and whether it is the 
+///			left/bottom/front (minimum) or right/top/back (maximum) edge of the 
+///			block.
+///
+/// \param	site_position	position of site.
+/// \param	dir				cartesian direction.
+/// \param maxmin			choice of edge in given direction.
+/// \return	boolean answer.
 bool GridUtils::isOnSenderLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
@@ -630,9 +737,16 @@ bool GridUtils::isOnSenderLayer(double site_position, enum eCartesianDirection d
 
 }
 
-// ***************************************************************************************************
-// Wrapper routine to check whether a site is on the outer MPI overlap based on its position by checking 
-// all possible recv layer locations
+// ****************************************************************************
+/// \brief	Check whether site is on an outer (receiver) halo.
+///
+///			Wrapper which checks every halo region of the rank for intersection
+///			with supplied site position.
+///
+/// \param	pos_x	x-position of site.
+/// \param	pos_y	y-position of site.
+/// \param	pos_z	z-position of site.
+/// \return	boolean answer.
 bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 	/* If any of the coordinates is in the receiver layer then the site will always 
@@ -652,9 +766,18 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 }
 
-// ***************************************************************************************************
-// Routine to check whether a site is in the outer MPI overlap of the coarsest grid based on its position,
-// whether it is an X, Y or Z coordinate and which edge of the rank you are checking Min or Max.
+// ****************************************************************************
+/// \brief	Check whether site is on an outer (receiver) halo.
+///
+///			Wrapper available which checks every halo. This method only checks 
+///			the halo specified by the Cartesian direction and whether it is the 
+///			left/bottom/front (minimum) or right/top/back (maximum) edge of the 
+///			block.
+///
+/// \param	site_position	position of site.
+/// \param	dir				cartesian direction.
+/// \param maxmin			choice of edge in given direction.
+/// \return	boolean answer.
 bool GridUtils::isOnRecvLayer(double site_position, enum eCartesianDirection dir, enum eMinMax maxmin) {
 
 	// Get instance of MPI manager
@@ -704,9 +827,16 @@ bool GridUtils::isOnRecvLayer(double site_position, enum eCartesianDirection dir
 
 }
 
-// ***************************************************************************************************
-// Creates output directory with filename and path passed as a string and returns int specifying whether
-// creation succeeded or failed.
+// ****************************************************************************
+/// \brief	Create output directory.
+///
+///			Compatible with both Windows and Linux. Filename and path passed as 
+///			a single string. Returns 9 if the directory creation was not 
+///			attempted due to not being rank 0. Returns platform specific codes
+///			for everything else.
+///
+/// \param	path_str	full path and filename as string.
+/// \return indicator of status of action.
 int GridUtils::createOutputDirectory(std::string path_str) {
 
 	int result = 9; // Return code of directory creation
@@ -738,13 +868,18 @@ int GridUtils::createOutputDirectory(std::string path_str) {
 	return result;
 }
 
-// ***************************************************************************************************
-// Tests whether a site is on a given grid
-bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, GridObj& g) {
+// ****************************************************************************
+/// \brief	Tests whether a site is on a given grid.
+/// \param	i	local i-index.
+/// \param	j	local j-index.
+/// \param	k	local k-index.
+/// \param	g	grid on which to check.
+/// \return boolean answer.
+bool GridUtils::isOffGrid(int i, int j, int k, GridObj& g) {
 
-	if (	(i >= N_lim || i < 0) ||
-			(j >= M_lim || j < 0) ||
-			(k >= K_lim || k < 0)
+	if (	(i >= g.N_lim || i < 0) ||
+			(j >= g.M_lim || j < 0) ||
+			(k >= g.K_lim || k < 0)
 			) {
 				return true;
 
@@ -761,4 +896,48 @@ bool GridUtils::isOffGrid(int i, int j, int k, int N_lim, int M_lim, int K_lim, 
 		}
 
 		return false;
+}
+
+// ****************************************************************************
+/// \brief	Get local voxel indices
+///
+///			Will return the voxel indices of the nearest voxel on the lattice 
+///			provided for a given point described as a position in global space.
+///			Can return global values that are not on this MPI rank. Use the
+///			GridUtils::isOnThisRank() method to check the result. This method
+///			is used as a position -> voxel converter.
+///
+/// \param	x	global x-position.
+/// \param	y	global y-position.
+/// \param	z	global z-position.
+/// \param	g	lattice on which to look for nearest voxel.
+/// \return vector of indices of the nearest voxel on supplied lattice level.
+std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) {
+
+	std::vector<int> vox;
+
+	// Find how far point is from origin of grid and round to nearest voxel
+	vox.push_back(
+		(int)std::floor(
+			(x - (g->XOrigin - g->dx / 2.0))/ g->dx
+		)
+	);
+	vox.push_back(
+		(int)std::floor(
+			(y - (g->YOrigin - g->dy / 2.0)) / g->dy
+		)
+	);
+
+#if (L_dims == 3)
+	vox.push_back(
+		(int)std::floor(
+			(z - (g->ZOrigin - g->dz / 2.0)) / g->dz
+		)
+	);
+#else
+	vox.push_back(0);
+#endif
+
+	return vox;
+
 }

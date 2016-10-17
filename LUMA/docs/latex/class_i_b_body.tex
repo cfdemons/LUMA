@@ -1,0 +1,387 @@
+\hypertarget{class_i_b_body}{}\section{I\+B\+Body Class Reference}
+\label{class_i_b_body}\index{I\+B\+Body@{I\+B\+Body}}
+
+
+Immersed boundary body.  
+
+
+
+
+{\ttfamily \#include $<$I\+B\+Body.\+h$>$}
+
+Inheritance diagram for I\+B\+Body\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_i_b_body}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}{I\+B\+Body} (void)
+\begin{DoxyCompactList}\small\item\em Constructor which sets group ID to zero by default. \end{DoxyCompactList}\item 
+\hyperlink{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{$\sim$\+I\+B\+Body} (void)
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
+\hyperlink{class_i_b_body_a737e9f9ecfff9a1ea0741b03a43c3478}{I\+B\+Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id})
+\begin{DoxyCompactList}\small\item\em Constructor which assigns the owner grid. \end{DoxyCompactList}\item 
+void \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker} (double x, double y, double z, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
+\begin{DoxyCompactList}\small\item\em Method to add an IB marker to the body. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
+\begin{DoxyCompactList}\small\item\em Downsampling marker adding method (overload) \end{DoxyCompactList}\item 
+void \hyperlink{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}{make\+Body} (double radius, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool moving, int group)
+\begin{DoxyCompactList}\small\item\em Method to seed markers for a sphere / circle. \end{DoxyCompactList}\item 
+void \hyperlink{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length\+\_\+depth, std\+::vector$<$ double $>$ angles, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
+\begin{DoxyCompactList}\small\item\em Method to seed markers for a cuboid / rectangle. \end{DoxyCompactList}\item 
+void \hyperlink{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}{make\+Body} (int numbermarkers, std\+::vector$<$ double $>$ start\+\_\+point, double fil\+\_\+length, std\+::vector$<$ double $>$ angles, std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
+\begin{DoxyCompactList}\small\item\em Method to seed markers for a flexible filament. \end{DoxyCompactList}\item 
+double \hyperlink{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length, double angle, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group, bool plate)
+\begin{DoxyCompactList}\small\item\em Method to seed markers for a 3D plate inclined from the XZ plane. \end{DoxyCompactList}\item 
+void \hyperlink{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{make\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\begin{DoxyCompactList}\small\item\em Method to build a body from a point cloud. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}
+\begin{DoxyCompactList}\small\item\em Flag to indicate flexibility\+: false == rigid body; true == flexible filament. \end{DoxyCompactList}\item 
+bool \hyperlink{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{deformable}
+\begin{DoxyCompactList}\small\item\em Flag to indicate deformable body\+: false == rigid; true == deformable. \end{DoxyCompactList}\item 
+int \hyperlink{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{group\+ID}
+\begin{DoxyCompactList}\small\item\em ID of I\+Bbody group -- position updates can be driven from a flexible body in a group. \end{DoxyCompactList}\item 
+double \hyperlink{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{delta\+\_\+rho}
+\begin{DoxyCompactList}\small\item\em Difference in density between fluid and solid in lattice units. \end{DoxyCompactList}\item 
+double \hyperlink{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{flexural\+\_\+rigidity}
+\begin{DoxyCompactList}\small\item\em Young\textquotesingle{}s modulus E $\ast$ Second moment of area I. \end{DoxyCompactList}\item 
+std\+::vector$<$ double $>$ \hyperlink{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{tension}
+\begin{DoxyCompactList}\small\item\em Tension between the current marker and its neighbour. \end{DoxyCompactList}\item 
+std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}
+\begin{DoxyCompactList}\small\item\em B\+Cs type flags (flexible bodies) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manager}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Immersed boundary body. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Body(void)}{IBBody(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}{}\label{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}
+
+
+Constructor which sets group ID to zero by default. 
+
+\index{I\+B\+Body@{I\+B\+Body}!````~I\+B\+Body@{$\sim$\+I\+B\+Body}}
+\index{````~I\+B\+Body@{$\sim$\+I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{$\sim$\+I\+B\+Body(void)}{~IBBody(void)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::$\sim$\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{}\label{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}
+
+
+Default destructor. 
+
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Body(\+Grid\+Obj $\ast$g, size\+\_\+t id)}{IBBody(GridObj *g, size_t id)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$}]{g, }
+\item[{size\+\_\+t}]{id}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a737e9f9ecfff9a1ea0741b03a43c3478}{}\label{class_i_b_body_a737e9f9ecfff9a1ea0741b03a43c3478}
+
+
+Constructor which assigns the owner grid. 
+
+Also sets the group ID to zero.
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & pointer to owner grid \\
+\hline
+{\em id} & ID of body in array of bodies. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!add\+Marker@{add\+Marker}}
+\index{add\+Marker@{add\+Marker}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{add\+Marker(double x, double y, double z, bool flex\+\_\+rigid)}{addMarker(double x, double y, double z, bool flex_rigid)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::add\+Marker (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{y, }
+\item[{double}]{z, }
+\item[{bool}]{flex\+\_\+rigid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{}\label{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}
+
+
+Method to add an IB marker to the body. 
+
+Adds marker at the given position with the given moving/non-\/moving flag.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & global x-\/position of marker. \\
+\hline
+{\em y} & global y-\/position of marker. \\
+\hline
+{\em z} & global z-\/position of marker. \\
+\hline
+{\em flex\+\_\+rigid} & flag to indicate whether marker is movable or not. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(double radius, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool moving, int group)}{makeBody(double radius, std::vector< double > centre, bool flex_rigid, bool moving, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{double}]{radius, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}{}\label{class_i_b_body_af26b0107e612dab7cd1e73bac1f4f234}
+
+
+Method to seed markers for a sphere / circle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em radius} & radius of circle/sphere. \\
+\hline
+{\em centre} & position vector of circle/sphere centre. \\
+\hline
+{\em flex\+\_\+rigid} & flag to indicate whether body is flexible and requires a structural calculation. \\
+\hline
+{\em deform} & flag to indicate whether body is movable and requires relocation each time step. \\
+\hline
+{\em group} & ID indicating which group the body is part of for collective operations. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(std\+::vector$<$ double $>$ width\+\_\+length\+\_\+depth, std\+::vector$<$ double $>$ angles, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool deform, int group)}{makeBody(std::vector< double > width_length_depth, std::vector< double > angles, std::vector< double > centre, bool flex_rigid, bool deform, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{width\+\_\+length\+\_\+depth, }
+\item[{std\+::vector$<$ double $>$}]{angles, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{}\label{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}
+
+
+Method to seed markers for a cuboid / rectangle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width\+\_\+length\+\_\+depth} & principal dimensions of cuboid / rectangle. \\
+\hline
+{\em angles} & principal orientation of cuboid / rectangle w.\+r.\+t. domain axes. \\
+\hline
+{\em centre} & position vector of cuboid / rectangle centre. \\
+\hline
+{\em flex\+\_\+rigid} & flag to indicate whether body is flexible and requires a structural calculation. \\
+\hline
+{\em deform} & flag to indicate whether body is movable and requires relocation each time step. \\
+\hline
+{\em group} & ID indicating which group the body is part of for collective operations. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(int numbermarkers, std\+::vector$<$ double $>$ start\+\_\+point, double fil\+\_\+length, std\+::vector$<$ double $>$ angles, std\+::vector$<$ int $>$ B\+Cs, bool flex\+\_\+rigid, bool deform, int group)}{makeBody(int numbermarkers, std::vector< double > start_point, double fil_length, std::vector< double > angles, std::vector< int > BCs, bool flex_rigid, bool deform, int group)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{int}]{nummarkers, }
+\item[{std\+::vector$<$ double $>$}]{start\+\_\+point, }
+\item[{double}]{fil\+\_\+length, }
+\item[{std\+::vector$<$ double $>$}]{angles, }
+\item[{std\+::vector$<$ int $>$}]{B\+Cs, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}{}\label{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}
+
+
+Method to seed markers for a flexible filament. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em nummarkers} & number of markers to use for filament. \\
+\hline
+{\em start\+\_\+point} & 3D position vector of the start of the filament. \\
+\hline
+{\em fil\+\_\+length} & length of filament in physical units. \\
+\hline
+{\em angles} & two angles representing filament inclination w.\+r.\+t. domain axes (horizontal plane and vertical plane). \\
+\hline
+{\em B\+Cs} & vector containing start and end boundary condition types (see class definition for valid values). \\
+\hline
+{\em flex\+\_\+rigid} & flag to indicate whether body is flexible and requires a structural calculation. \\
+\hline
+{\em deform} & flag to indicate whether body is movable and requires relocation each time step. \\
+\hline
+{\em group} & ID indicating which group the body is part of for collective operations. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(std\+::vector$<$ double $>$ width\+\_\+length, double angle, std\+::vector$<$ double $>$ centre, bool flex\+\_\+rigid, bool deform, int group, bool plate)}{makeBody(std::vector< double > width_length, double angle, std::vector< double > centre, bool flex_rigid, bool deform, int group, bool plate)}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ double $>$}]{width\+\_\+length, }
+\item[{double}]{angle, }
+\item[{std\+::vector$<$ double $>$}]{centre, }
+\item[{bool}]{flex\+\_\+rigid, }
+\item[{bool}]{deform, }
+\item[{int}]{group, }
+\item[{bool}]{plate}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}{}\label{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}
+
+
+Method to seed markers for a 3D plate inclined from the XZ plane. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width\+\_\+length} & 2D vector of principal dimensions of thin plate. \\
+\hline
+{\em angle} & inclination angle from horizontal. \\
+\hline
+{\em centre} & position vector of the plate centre. \\
+\hline
+{\em flex\+\_\+rigid} & flag to indicate whether body is flexible and requires a structural calculation. \\
+\hline
+{\em deform} & flag to indicate whether body is movable and requires relocation each time step. \\
+\hline
+{\em group} & ID indicating which group the body is part of for collective operations. \\
+\hline
+{\em plate} & arbitrary argument to allow overload otherwise would have the same signature as a filament builder. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
+\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{make\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{makeBody(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{}\label{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}
+
+
+Method to build a body from a point cloud. 
+
+Flexibility and deformable properties taken from definitions.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & pointer to pointer cloud data. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!marker\+Adder@{marker\+Adder}}
+\index{marker\+Adder@{marker\+Adder}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{marker\+Adder(double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool flex\+\_\+rigid)}{markerAdder(double x, double y, double z, int &curr_mark, std::vector< int > &counter, bool flex_rigid)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::marker\+Adder (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{y, }
+\item[{double}]{z, }
+\item[{int \&}]{curr\+\_\+mark, }
+\item[{std\+::vector$<$ int $>$ \&}]{counter, }
+\item[{bool}]{flex\+\_\+rigid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{}\label{class_i_b_body_a16cf21facacb49727c2e1feda473d080}
+
+
+Downsampling marker adding method (overload) 
+
+This method is an overload of the method in the parent class. This version takes the flexible/rigid flag and passes it to the overloaded \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker()} method.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & desired global X-\/position of new marker. \\
+\hline
+{\em y} & desired global\+Y-\/position of new marker. \\
+\hline
+{\em z} & desired global\+Z-\/position of new marker. \\
+\hline
+{\em curr\+\_\+mark} & is a reference to the ID of last marker. \\
+\hline
+{\em counter} & is a reference to the total number of markers in the body. \\
+\hline
+{\em flex\+\_\+rigid} & indicates whether markers added should form part of flexible or rigid body. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Friends And Related Function Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!Object\+Manager@{Object\+Manager}}
+\index{Object\+Manager@{Object\+Manager}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{Object\+Manager}{ObjectManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Object\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{}\label{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}
+
+
+\subsection{Member Data Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!B\+Cs@{B\+Cs}}
+\index{B\+Cs@{B\+Cs}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{B\+Cs}{BCs}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ I\+B\+Body\+::\+B\+Cs\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{}\label{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}
+
+
+B\+Cs type flags (flexible bodies) 
+
+\index{I\+B\+Body@{I\+B\+Body}!deformable@{deformable}}
+\index{deformable@{deformable}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{deformable}{deformable}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::deformable\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}{}\label{class_i_b_body_aac0ea66a55dcb0cf41deb2b9a82743e5}
+
+
+Flag to indicate deformable body\+: false == rigid; true == deformable. 
+
+\index{I\+B\+Body@{I\+B\+Body}!delta\+\_\+rho@{delta\+\_\+rho}}
+\index{delta\+\_\+rho@{delta\+\_\+rho}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{delta\+\_\+rho}{delta_rho}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::delta\+\_\+rho\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a18cd092961f02ecde55363a4d342d098}{}\label{class_i_b_body_a18cd092961f02ecde55363a4d342d098}
+
+
+Difference in density between fluid and solid in lattice units. 
+
+\index{I\+B\+Body@{I\+B\+Body}!flex\+\_\+rigid@{flex\+\_\+rigid}}
+\index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Body\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{}\label{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}
+
+
+Flag to indicate flexibility\+: false == rigid body; true == flexible filament. 
+
+\index{I\+B\+Body@{I\+B\+Body}!flexural\+\_\+rigidity@{flexural\+\_\+rigidity}}
+\index{flexural\+\_\+rigidity@{flexural\+\_\+rigidity}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{flexural\+\_\+rigidity}{flexural_rigidity}}]{\setlength{\rightskip}{0pt plus 5cm}double I\+B\+Body\+::flexural\+\_\+rigidity\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}{}\label{class_i_b_body_a4825a8ef9155062ff9d1011479bd4a9e}
+
+
+Young\textquotesingle{}s modulus E $\ast$ Second moment of area I. 
+
+\index{I\+B\+Body@{I\+B\+Body}!group\+ID@{group\+ID}}
+\index{group\+ID@{group\+ID}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{group\+ID}{groupID}}]{\setlength{\rightskip}{0pt plus 5cm}int I\+B\+Body\+::group\+ID\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}{}\label{class_i_b_body_a4674ade74a2b55ce60a656acfebb4a55}
+
+
+ID of I\+Bbody group -- position updates can be driven from a flexible body in a group. 
+
+\index{I\+B\+Body@{I\+B\+Body}!tension@{tension}}
+\index{tension@{tension}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{tension}{tension}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Body\+::tension\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}{}\label{class_i_b_body_ab786e24bc2b303eefcf286e0138cb2d1}
+
+
+Tension between the current marker and its neighbour. 
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_i_b_body_8h}{I\+B\+Body.\+h}\item 
+\hyperlink{_i_b_body_8cpp}{I\+B\+Body.\+cpp}\end{DoxyCompactItemize}

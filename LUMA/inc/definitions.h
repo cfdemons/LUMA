@@ -136,7 +136,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
+#define L_dims 2		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 100			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites
@@ -291,7 +291,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Bounce-back solids
 #define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_block_on_grid_lev 2		///< Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
@@ -356,22 +356,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 20 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 70 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 10 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 40 };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { 5 };
+	const static int RefXend[L_NumLev][L_NumReg]	= { 110 };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { 4 };
+	const static int RefYend[L_NumLev][L_NumReg]	= { 38 };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { 10 };
-	static int RefZend[L_NumLev][L_NumReg]			= { 40 };
+	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
+	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {20}, {20} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {70}, {80} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {10}, {20} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {40}, {40} };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {10}, {20} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {40} };
+	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
+	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };
 
 #elif (NumReg == 1 && NumLev == 3)
 	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };

@@ -1,6 +1,6 @@
 LUMA -- Version 1.2.0-alpha
-Simulation started at Fri Oct  7 17:21:05 2016
-MPI Topolgy initialised in 4.574ms.
+Simulation started at Mon Oct 17 14:28:57 2016
+MPI Topolgy initialised in 4.45ms.
 Constructing Grid level 0 on rank 6
 Grid size = 100x100x1
 MPI size = 4x2x2
@@ -15,16 +15,16 @@ Object Manager Created.
 Initialising BFL Objects from File...
 Successfully acquired object data from cloud input file.
 Finished creating BFL Objects...
-Grid & Object Initialisation completed in 29.447ms.
+Grid & Object Initialisation completed in 32.558ms.
 Pre-computing buffer sizes for MPI...Complete.
 Creating sub-grid communicators for HDF5...Complete. Status = 0
 Writing out to IOLite file...
 Writing out to HDF5 file...
 Initialising LBM time-stepping...
-Grid 0: Time stepping taking an average of 2.14567ms
-MPI overhead taking an average of 0.21274ms
+Grid 0: Time stepping taking an average of 0.95355ms
+MPI overhead taking an average of 1.43056ms
 Writing out to IOLite file...
 Writing out to HDF5 file...
 Writing out object lift and drag
-Simulation completed at Fri Oct  7 17:21:06 2016
+Simulation completed at Mon Oct 17 14:28:58 2016
 

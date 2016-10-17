@@ -1,4 +1,4 @@
-version		=	1.2.0-alpha
+version		=	1.2.0
 
 General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.
 				IS_NAN() function switched to macro definition.

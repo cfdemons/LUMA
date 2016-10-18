@@ -25,9 +25,9 @@ int \hyperlink{struct_mpi_manager_1_1phdf5__struct_a94d1c88859049aa2b37c9b659e07
 int \hyperlink{struct_mpi_manager_1_1phdf5__struct_a2490c17798ca6cf4db002fa521f170c0}{k\+\_\+end}
 \begin{DoxyCompactList}\small\item\em Ending k-\/index for writable region. \end{DoxyCompactList}\item 
 int \hyperlink{struct_mpi_manager_1_1phdf5__struct_a1ea3307d7dac34273ee8a7b1014273fe}{halo\+\_\+min}
-\begin{DoxyCompactList}\small\item\em Size of halo on the top end of a 1D block. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Size of halo + TL on the top end of a 1D writable block. \end{DoxyCompactList}\item 
 int \hyperlink{struct_mpi_manager_1_1phdf5__struct_af6509514433ef18c04217b54ce4614a0}{halo\+\_\+max}
-\begin{DoxyCompactList}\small\item\em Size of halo on the bottom end of a 1D block. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Size of halo + TL on the bottom end of a 1D writable block. \end{DoxyCompactList}\item 
 int \hyperlink{struct_mpi_manager_1_1phdf5__struct_aa3f8cc807724b61ef3a37509f71100ab}{level}
 \begin{DoxyCompactList}\small\item\em Grid level to which these data correspond. \end{DoxyCompactList}\item 
 int \hyperlink{struct_mpi_manager_1_1phdf5__struct_a1a9978693d5b50cb83b8ccc78fb23a6d}{region}
@@ -47,14 +47,14 @@ Structure also stores the amount of writable data on the grid.
 \subsubsection[{\texorpdfstring{halo\+\_\+max}{halo_max}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::phdf5\+\_\+struct\+::halo\+\_\+max}\hypertarget{struct_mpi_manager_1_1phdf5__struct_af6509514433ef18c04217b54ce4614a0}{}\label{struct_mpi_manager_1_1phdf5__struct_af6509514433ef18c04217b54ce4614a0}
 
 
-Size of halo on the bottom end of a 1D block. 
+Size of halo + TL on the bottom end of a 1D writable block. 
 
 \index{Mpi\+Manager\+::phdf5\+\_\+struct@{Mpi\+Manager\+::phdf5\+\_\+struct}!halo\+\_\+min@{halo\+\_\+min}}
 \index{halo\+\_\+min@{halo\+\_\+min}!Mpi\+Manager\+::phdf5\+\_\+struct@{Mpi\+Manager\+::phdf5\+\_\+struct}}
 \subsubsection[{\texorpdfstring{halo\+\_\+min}{halo_min}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::phdf5\+\_\+struct\+::halo\+\_\+min}\hypertarget{struct_mpi_manager_1_1phdf5__struct_a1ea3307d7dac34273ee8a7b1014273fe}{}\label{struct_mpi_manager_1_1phdf5__struct_a1ea3307d7dac34273ee8a7b1014273fe}
 
 
-Size of halo on the top end of a 1D block. 
+Size of halo + TL on the top end of a 1D writable block. 
 
 \index{Mpi\+Manager\+::phdf5\+\_\+struct@{Mpi\+Manager\+::phdf5\+\_\+struct}!i\+\_\+end@{i\+\_\+end}}
 \index{i\+\_\+end@{i\+\_\+end}!Mpi\+Manager\+::phdf5\+\_\+struct@{Mpi\+Manager\+::phdf5\+\_\+struct}}

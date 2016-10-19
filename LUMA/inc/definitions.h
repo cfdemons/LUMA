@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.2.0"
+#define LUMA_VERSION "1.2.1-alpha"
 
 
 // Header guard
@@ -66,12 +66,12 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 100				///< How many timesteps before whole grid output
+#define L_out_every 1000			///< How many timesteps before whole grid output
 #define L_out_every_forces 100		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
-#define L_IO_LITE					///< ASCII dump on output
+//#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
 
@@ -92,11 +92,11 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
-#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 1000			///< Frequency of write out of restart file
+//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_restart_out_every 10000			///< Frequency of write out of restart file
 
 // LBM configuration
-#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
+//#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
 
 
 /*
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100		///< Number of time steps to run simulation for
+#define L_Timesteps 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -115,7 +115,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // MPI Data
-#define L_Xcores 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
@@ -136,19 +136,19 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2		///< Number of dimensions to the problem
-#define L_N 100			///< Number of x lattice sites
-#define L_M 100			///< Number of y lattice sites
-#define L_K 100			///< Number of z lattice sites
+#define L_dims 3		///< Number of dimensions to the problem
+#define L_N 76			///< Number of x lattice sites
+#define L_M 76			///< Number of y lattice sites
+#define L_K 76			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 1		///< End of domain-x
+#define L_b_x 48		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 1		///< End of domain-y
+#define L_b_y 48		///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
-#define L_b_z 1		///< End of domain-z
+#define L_b_z 48		///< End of domain-z
 
 
 /*
@@ -254,7 +254,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
@@ -273,7 +273,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
@@ -289,7 +289,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
@@ -304,17 +304,17 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Bounce-back objects from point clouds
-//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_object_on_grid_lev 0		///< Provide grid level on which object should be added 
+	#define L_object_on_grid_lev 6		///< Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 30			///< Index for start of object bounding box in X direction
-	#define L_start_object_y 30			///< Index for start of object bounding box in Y direction
-	#define L_centre_object_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_object_length 40			///< The object input is scaled based on this dimension
+	#define L_start_object_x 18			///< Index for start of object bounding box in X direction
+	#define L_start_object_y 43			///< Index for start of object bounding box in Y direction
+	#define L_centre_object_z 132		///< Index for cetnre of object bounding box in Z direction
+	#define L_object_length 87			///< The object input is scaled based on this dimension
 	#define L_object_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_object_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_object_length_ref 100		///< Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
@@ -338,7 +338,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_NumLev 0		///< Levels of refinement (0 = coarse grid only
+#define L_NumLev 6		///< Levels of refinement (0 = coarse grid only)
 #define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -346,61 +346,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Following options are only here to making testing different grid combinations easier
-#if (L_NumReg == 2 && L_NumLev == 2) 
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5, 5}, {2, 2} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {25, 25}, {20, 10} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {5, 14}, {5, 2} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {12, 25}, {10, 10} };
+	const static int RefXstart[L_NumLev][L_NumReg] = { { 35 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
+	const static int RefXend[L_NumLev][L_NumReg] = { { 40 }, { 9 }, { 13 }, { 21 }, { 37 }, { 69 } };
+	const static int RefYstart[L_NumLev][L_NumReg] = { { 35 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
+	const static int RefYend[L_NumLev][L_NumReg] = { { 40 }, { 9 }, { 13 }, { 21 }, { 37 }, { 69 } };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {5, 10}, {2, 2} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
-
-#elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 5 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 110 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 4 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 38 };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
-	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
-
-#elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };
-
-#elif (NumReg == 1 && NumLev == 3)
-	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };
-	const static size_t RefXend[NumLev][NumReg]		= { {34},	{48},	{80} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {9},	{4},	{8} };
-	const static size_t RefYend[NumLev][NumReg]		= { {23},	{24},	{32} };
-	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {2},	{4},	{8} };
-	static size_t RefZend[NumLev][NumReg]		= { {30},	{52},	{88} };
-
-#elif (L_NumReg == 1 && L_NumLev == 3)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {190},	{10},	{10} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {270},	{90},	{90} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {240},	{10},	{10} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {270},	{50},	{70} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {2},	{4},	{8} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {30},	{52},	{88} };
-
-#elif (L_NumReg == 1 && L_NumLev == 4)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {10},	{5},	{10},	{20} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {50},	{70},	{110},	{160} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {0},	{0},	{0},	{0} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {15},	{25},	{40},	{60} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {15},	{5},	{10},	{20} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {45},	{55},	{90},	{140} };
-
-#endif
+	static int RefZstart[L_NumLev][L_NumReg] = { { 34 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
+	static int RefZend[L_NumLev][L_NumReg] = { { 41 }, { 13 }, { 21 }, { 37 }, { 69 }, { 133 } };
 
 #endif
 
@@ -428,8 +380,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #endif
 
 // Set dependent options
-#if L_dims == 3
-	#define L_nVels 27		///< Number of lattice velocities
+#if (L_dims == 3)
+
+	#ifdef L_USE_KBC_COLLISION
+		#define L_nVels 27		///< Number of lattice velocities
+	#else
+		#define L_nVels 19		///< Number of lattice velocities
+	#endif
 
 	#define L_MPI_dir 26	///< Number of MPI directions
 

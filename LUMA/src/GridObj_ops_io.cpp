@@ -468,10 +468,10 @@ void GridObj::io_probeOutput() {
 
 	if (t == L_out_every_probe && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
-		probefile.open("./output/probe.out", std::ios::out);
+		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out);
 	} else {
 		// Append to existing
-		probefile.open("./output/probe.out", std::ios::out | std::ios::app);
+		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out | std::ios::app);
 	}
 
 	// Start a new line if first rank

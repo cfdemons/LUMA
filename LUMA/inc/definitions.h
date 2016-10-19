@@ -66,8 +66,8 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 100				///< How many timesteps before whole grid output
-#define L_out_every_forces 100		///< Specific output frequency of body forces
+#define L_out_every 38707        	///< How many timesteps before whole grid output
+#define L_out_every_forces 38707		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
@@ -76,11 +76,11 @@
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
 
 // High frequency output options
-//#define L_PROBE_OUTPUT						///< Turn on probe output
-#define L_out_every_probe 250					///< Write out frequency of probe output
-const static int nProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
-const static int xProbeLims[2] = {90, 270};		///< Limits of X plane for array of probes
-const static int yProbeLims[2] = {15, 45};		///< Limits of Y plane for array of probes
+#define L_PROBE_OUTPUT						    ///< Turn on probe output
+#define L_out_every_probe 1935 //10s approx		///< Write out frequency of probe output
+const static int nProbes[3] = {1, 1, 1};		///< Number of probes in each direction (x, y, z)
+const static int xProbeLims[2] = {3000, 3000};		///< Limits of X plane for array of probes
+const static int yProbeLims[2] = {2997, 2997};		///< Limits of Y plane for array of probes
 const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of probes
 
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 5000		///< Number of time steps to run simulation for
+#define L_Timesteps 1607820		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,8 +137,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 2		///< Number of dimensions to the problem
-#define L_N 904			///< Number of x lattice sites
-#define L_M 760			///< Number of y lattice sites
+#define L_N 7232 //904			///< Number of x lattice sites
+#define L_M 6080 //760			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites
 
 
@@ -160,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
+#define L_u_ref 0.0260416      //0.04			///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -169,7 +169,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_u_0z 0			///< Initial/inlet z-velocity
 
 #define L_rho_in 1			///< Initial density
-#define L_Re 100			///< Desired Reynolds number
+#define L_Re 2374			///< Desired Reynolds number
 
 // nu computed based on above selections
 

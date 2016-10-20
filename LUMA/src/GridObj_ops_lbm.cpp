@@ -412,6 +412,9 @@ void GridObj::LBM_collide( ) {
 					LBM_kbcCollide(i, j, k, f_new);
 
 #else
+					//Introduce artificial omega for the first 1000 dt so it creates an unsteady effect on the solution
+					if (t < 2000)
+						omega = 1.81;
 
 					// Loop over directions and perform collision
 					for (int v = 0; v < L_nVels; v++) {

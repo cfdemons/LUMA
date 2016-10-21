@@ -35,8 +35,10 @@ public:
 	/// \brief	Velocity in lattice units to velocity in physical units.
 	///
 	///			Converts velocity component from lattice units to m/s. 
-	///         It assumes dx=dt , so vlattice = vadimensional (i.e. v for the dummy fluid with non physical viscosity)
-	///         Then computes the physical velocity using the physical viscosity in definitions.h
+	///         It uses the L_vp0 introduced by the user, dx and dt. 
+	///			You can introduce any L_vp0 you want, but the reference lenght (usualy the width of the domain)
+	///         , the Re number and the LBM parameters will remain the same. So you will be implicitly changing the physical viscosity
+	///         of your fluid when you change L_vp0 
 	///
 	/// \param ulat	Lattice velocity.
 	/// \param currentGrid Pointer to the current grid. 
@@ -44,9 +46,7 @@ public:
 	template <typename T>
 	static T ulat2uphys(T ulat, GridObj* currentGrid)
 	{
-		T lphys = (currentGrid->nu*L_Re*currentGrid->dx) / L_u_ref;
-		
-		return ((L_Re*L_nu) / lphys)*ulat;
+		return (ulat*currentGrid->dx*L_vp0) / currentGrid->dt;
 	}
 
 	

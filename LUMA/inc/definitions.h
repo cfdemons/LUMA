@@ -162,7 +162,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
-#define L_nu   1e-5			///< Viscosity of the real fluid you want to model [m^2/s]
+#define L_vp0   5.0				///< Reference velocity of the real fluid to model [m/s]. Used to calculate the physical velocity to write in a .fga file
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here

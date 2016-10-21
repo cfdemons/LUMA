@@ -366,7 +366,7 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 					//Write the data to the file. 
 					gridoutput << GridUnits::m2cm(GridUnits::ulat2uphys(v[0], this)) << "," 
 						       << GridUnits::m2cm(GridUnits::ulat2uphys(v[1], this)) << "," 
-							   << GridUnits::m2cm(GridUnits::ulat2uphys(v[2], this)) << "," 
+							   << GridUnits::m2cm(GridUnits::ulat2uphys(-v[2], this)) << "," 
 							   << endl;
 				}
 			}

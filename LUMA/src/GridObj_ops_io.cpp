@@ -480,10 +480,19 @@ void GridObj::io_probeOutput() {
 
 	// Probe spacing in each direction
 	int pspace[L_dims];
-	pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
-	pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
+	if (nProbes[0] == 1)
+		pspace[0] = 0.;
+	else
+		pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
+	if (nProbes[1] == 1)
+		pspace[1] = 0.;
+	else
+		pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
 #if (L_dims == 3)
-	pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
+	if (nProbes[2] == 1)
+		pspace[2] = 0.;
+	else
+		pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
 #endif
 
 	// Loop over probe points

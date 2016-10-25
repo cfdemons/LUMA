@@ -63,10 +63,10 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 2000        	///< How many timesteps before whole grid output
+#define L_out_every 2        	    ///< How many timesteps before whole grid output
 #define L_out_every_forces 2000		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
@@ -77,7 +77,7 @@
 
 // High frequency output options
 #define L_PROBE_OUTPUT						    ///< Turn on probe output
-#define L_out_every_probe 120 //10s approx		///< Write out frequency of probe output
+#define L_out_every_probe 10 //10s approx		///< Write out frequency of probe output
 const static int nProbes[3] = {1, 1, 1};		///< Number of probes in each direction (x, y, z)
 const static int xProbeLims[2] = {750, 750};		///< Limits of X plane for array of probes
 const static int yProbeLims[2] = {749, 749};		///< Limits of Y plane for array of probes
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100489 //5000		///< Number of time steps to run simulation for
+#define L_Timesteps 3 //5000		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,8 +137,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 2		///< Number of dimensions to the problem
-#define L_N 1808 //904			///< Number of x lattice sites
-#define L_M 1520 //760			///< Number of y lattice sites
+#define L_N 904			///< Number of x lattice sites
+#define L_M 760			///< Number of y lattice sites
 #define L_K 100			///< Number of z lattice sites
 
 
@@ -338,7 +338,14 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_NumLev 0		///< Levels of refinement (0 = coarse grid only
+
+// Dimensions of bounding box of cityscape (as fraction of domain length)
+#define BB_START_X 0.247787610619469
+#define BB_START_Y 0.4210526315789474
+#define BB_LENGTH_X 0.2212389380530973
+#define BB_LENGTH_Y 0.1578947368421053
+
+#define L_NumLev 1		///< Levels of refinement (0 = coarse grid only
 #define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -356,10 +363,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 5 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 110 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 4 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 38 };
+	const static int RefXstart[L_NumLev][L_NumReg]	= { 88 };
+	const static int RefXend[L_NumLev][L_NumReg]	= { 815 };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { 80 };
+	const static int RefYend[L_NumLev][L_NumReg]	= { 679 };
 	// If doing 2D, these can be arbitrary values
 	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
 	static int RefZend[L_NumLev][L_NumReg]			= { 28 };

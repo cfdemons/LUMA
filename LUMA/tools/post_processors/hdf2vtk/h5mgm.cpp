@@ -262,14 +262,7 @@ int main(int argc, char* argv[])
 #else   // Running on Unix system
 	system(command.c_str());
 #endif // _WIN32
-
-	
-	// Time loop
-	int count = 0; size_t res = 0;
-	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
-
-		// Create VTK filename
-		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t) + ".vtk";
+		
 
 		// Create VTK grid
 		vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid =
@@ -284,6 +277,9 @@ int main(int argc, char* argv[])
 
 		// Total point count
 		int point_count = 0;
+		
+		// Status indicator
+		size_t res = 0;
 
 		// Loop 1 to get mesh details
 		for (int lev = 0; lev < levels; lev++) {
@@ -291,7 +287,7 @@ int main(int argc, char* argv[])
 
 				// Debug
 				int local_point_count = 0;
-				if (t == 0) std::cout << "Interrogating L" << lev << " R" << reg << "...";
+				std::cout << "Interrogating L" << lev << " R" << reg << "...";
 
 				// L0 doesn't have different regions
 				if (lev == 0 && reg != 0) continue;
@@ -416,13 +412,28 @@ int main(int argc, char* argv[])
 				free(Z);
 
 				// Debug
-				if (t == 0) std::cout << "Valid Point Count  = " << local_point_count << std::endl;
+				std::cout << "Valid Point Count  = " << local_point_count << std::endl;
 
 			}
 		}
 
 		// Debug
-		if (t == 0)	std::cout << "Number of cells retained = " << unstructuredGrid->GetNumberOfCells() << std::endl;
+		std::cout << "Number of cells retained = " << unstructuredGrid->GetNumberOfCells() << std::endl;
+
+		// Clean mesh to remove duplicates (Paraview not VTK)
+		/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
+		vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
+		cleaner->SetInputData(unstructuredGrid);
+		cleaner->Update();
+		cleaner->GetOutput();
+		std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
+
+	// Time loop
+	int count = 0;
+	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
+		
+		// Create VTK filename
+		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t) + ".vtk";
 
 		// Add data
 		vtkSmartPointer<vtkIntArray> LatTyp = vtkSmartPointer<vtkIntArray>::New();
@@ -477,6 +488,11 @@ int main(int argc, char* argv[])
 
 		if (dimensions_p == 3) {
 
+			vtkSmartPointer<vtkDoubleArray> Uz = vtkSmartPointer<vtkDoubleArray>::New();
+			Uz->Allocate(unstructuredGrid->GetNumberOfCells());
+			Uz->SetName("Uz");
+			addDataToGrid("/Uz", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz);
+
 			vtkSmartPointer<vtkDoubleArray> Uz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz_TimeAv->SetName("Uz_TimeAv");
@@ -501,14 +517,7 @@ int main(int argc, char* argv[])
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
 
 		// Print progress to screen
-		std::cout << std::to_string((int)(((float)(t + out_every) / (float)(timesteps + out_every)) * 100.0f)) << "% complete." << std::endl;
-
-		// Clean mesh to remove duplicates (Paraview not VTK)
-		/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
-		vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
-		cleaner->SetInputData(unstructuredGrid);
-		cleaner->Update();
-		cleaner->GetOutput();*/
+		std::cout << "\r" << std::to_string((int)(((float)(t + out_every) / (float)(timesteps + out_every)) * 100.0f)) << "% complete." << std::flush;
 
 		// Write grid to file
 		vtkSmartPointer<vtkUnstructuredGridWriter> writer =

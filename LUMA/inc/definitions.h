@@ -63,11 +63,11 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 1000			///< How many timesteps before whole grid output
-#define L_out_every_forces 100		///< Specific output frequency of body forces
+#define L_out_every 1			///< How many timesteps before whole grid output
+#define L_out_every_forces 1		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
@@ -91,7 +91,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 10000			///< Frequency of write out of restart file
 
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 10000		///< Number of time steps to run simulation for
+#define L_Timesteps 2000		///< Number of time steps to run simulation for
 
 
 /*
@@ -136,17 +136,17 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
-#define L_N 76			///< Number of x lattice sites
-#define L_M 76			///< Number of y lattice sites
+#define L_dims 2		///< Number of dimensions to the problem
+#define L_N 100			///< Number of x lattice sites
+#define L_M 50			///< Number of y lattice sites
 #define L_K 76			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 48		///< End of domain-x
+#define L_b_x 2		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 48		///< End of domain-y
+#define L_b_y 1		///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
 #define L_b_z 48		///< End of domain-z
 
@@ -160,11 +160,11 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
+#define L_u_ref 0.06			///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
-#define L_u_0x L_u_ref		///< Initial/inlet x-velocity
+#define L_u_0x 0		///< Initial/inlet x-velocity
 #define L_u_0y 0			///< Initial/inlet y-velocity
 #define L_u_0z 0			///< Initial/inlet z-velocity
 
@@ -269,7 +269,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Periodicity
-//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
@@ -304,7 +304,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Bounce-back objects from point clouds
-#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
 	#define L_object_on_grid_lev 6		///< Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
@@ -338,7 +338,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_NumLev 6		///< Levels of refinement (0 = coarse grid only)
+#define L_NumLev 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0

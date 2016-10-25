@@ -264,174 +264,174 @@ int main(int argc, char* argv[])
 #endif // _WIN32
 		
 
-		// Create VTK grid
-		vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid =
-			vtkSmartPointer<vtkUnstructuredGrid>::New();
+	// Create VTK grid
+	vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid =
+		vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-		// Create VTK grid points
-		vtkSmartPointer<vtkPoints> points =
-			vtkSmartPointer<vtkPoints>::New();
+	// Create VTK grid points
+	vtkSmartPointer<vtkPoints> points =
+		vtkSmartPointer<vtkPoints>::New();
 
-		// Create point ID list
-		std::vector<vtkIdType> pointIds;
+	// Create point ID list
+	std::vector<vtkIdType> pointIds;
 
-		// Total point count
-		int point_count = 0;
+	// Total point count
+	int point_count = 0;
 		
-		// Status indicator
-		size_t res = 0;
+	// Status indicator
+	size_t res = 0;
 
-		// Loop 1 to get mesh details
-		for (int lev = 0; lev < levels; lev++) {
-			for (int reg = 0; reg < regions; reg++) {
+	// Loop 1 to get mesh details
+	for (int lev = 0; lev < levels; lev++) {
+		for (int reg = 0; reg < regions; reg++) {
 
-				// Debug
-				int local_point_count = 0;
-				std::cout << "Interrogating L" << lev << " R" << reg << "...";
+			// Debug
+			int local_point_count = 0;
+			std::cout << "Interrogating L" << lev << " R" << reg << "...";
 
-				// L0 doesn't have different regions
-				if (lev == 0 && reg != 0) continue;
+			// L0 doesn't have different regions
+			if (lev == 0 && reg != 0) continue;
 
-				// Construct input file name
-				std::string IN_FILE_NAME("./hdf_R" + std::to_string(reg) + "N" + std::to_string(lev) + ".h5");
-				input_fid = H5Fopen(IN_FILE_NAME.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-				if (input_fid <= 0) std::cout << "HDF5 ERROR: Cannot open input file!" << std::endl;
+			// Construct input file name
+			std::string IN_FILE_NAME("./hdf_R" + std::to_string(reg) + "N" + std::to_string(lev) + ".h5");
+			input_fid = H5Fopen(IN_FILE_NAME.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+			if (input_fid <= 0) std::cout << "HDF5 ERROR: Cannot open input file!" << std::endl;
 
-				// Get local grid size
-				input_aid = H5Aopen(input_fid, "GridSize", H5P_DEFAULT);
-				if (input_aid <= 0) std::cout << "HDF5 ERROR: Cannot open attribute!" << std::endl;
-				status = H5Aread(input_aid, H5T_NATIVE_INT, gridsize);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot read attribute!" << std::endl;
-				status = H5Aclose(input_aid);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot close attribute!" << std::endl;
+			// Get local grid size
+			input_aid = H5Aopen(input_fid, "GridSize", H5P_DEFAULT);
+			if (input_aid <= 0) std::cout << "HDF5 ERROR: Cannot open attribute!" << std::endl;
+			status = H5Aread(input_aid, H5T_NATIVE_INT, gridsize);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot read attribute!" << std::endl;
+			status = H5Aclose(input_aid);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot close attribute!" << std::endl;
 
-				// Get local dx
-				input_aid = H5Aopen(input_fid, "Dx", H5P_DEFAULT);
-				if (input_aid == NULL) std::cout << "HDF5 ERROR: Cannot open attribute!" << std::endl;
-				status = H5Aread(input_aid, H5T_NATIVE_DOUBLE, &dx);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot read attribute!" << std::endl;
-				status = H5Aclose(input_aid);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot close attribute!" << std::endl;
+			// Get local dx
+			input_aid = H5Aopen(input_fid, "Dx", H5P_DEFAULT);
+			if (input_aid == NULL) std::cout << "HDF5 ERROR: Cannot open attribute!" << std::endl;
+			status = H5Aread(input_aid, H5T_NATIVE_DOUBLE, &dx);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot read attribute!" << std::endl;
+			status = H5Aclose(input_aid);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot close attribute!" << std::endl;
 
-				// Allocate space for LatTyp data
-				int *Type = (int*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(int));
-				if (Type == NULL) {
-					std::cout << "Not enough Memory!!!!" << std::endl;
-					exit(EXIT_FAILURE);
-				}
+			// Allocate space for LatTyp data
+			int *Type = (int*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(int));
+			if (Type == NULL) {
+				std::cout << "Not enough Memory!!!!" << std::endl;
+				exit(EXIT_FAILURE);
+			}
 
-				// Allocate space for X, Y, Z coordinates
-				double *X = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
-				if (X == NULL) {
-					std::cout << "Not enough Memory!!!!" << std::endl;
-					exit(EXIT_FAILURE);
-				}
-				double *Y = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
-				if (Y == NULL) {
-					std::cout << "Not enough Memory!!!!" << std::endl;
-					exit(EXIT_FAILURE);
-				}
-				double *Z = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
-				if (Z == NULL) {
-					std::cout << "Not enough Memory!!!!" << std::endl;
-					exit(EXIT_FAILURE);
-				}
+			// Allocate space for X, Y, Z coordinates
+			double *X = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
+			if (X == NULL) {
+				std::cout << "Not enough Memory!!!!" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double *Y = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
+			if (Y == NULL) {
+				std::cout << "Not enough Memory!!!!" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double *Z = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
+			if (Z == NULL) {
+				std::cout << "Not enough Memory!!!!" << std::endl;
+				exit(EXIT_FAILURE);
+			}
 
-				// Create input dataspace
-				hsize_t dims_input[1];
-				dims_input[0] = gridsize[0] * gridsize[1] * gridsize[2];
-				hid_t input_sid = H5Screate_simple(1, dims_input, NULL);
-				if (input_sid <= 0) std::cout << "HDF5 ERROR: Cannot create input dataspace!" << std::endl;
+			// Create input dataspace
+			hsize_t dims_input[1];
+			dims_input[0] = gridsize[0] * gridsize[1] * gridsize[2];
+			hid_t input_sid = H5Screate_simple(1, dims_input, NULL);
+			if (input_sid <= 0) std::cout << "HDF5 ERROR: Cannot create input dataspace!" << std::endl;
 
-				// Open, read into buffers and close input datasets
-				status = readDataset("/LatTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, Type);
-				if (status != 0) goto readFailed;
-				status = readDataset("/XPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, X);
-				if (status != 0) goto readFailed;
-				status = readDataset("/YPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Y);
-				if (status != 0) goto readFailed;
+			// Open, read into buffers and close input datasets
+			status = readDataset("/LatTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, Type);
+			if (status != 0) goto earlyExit;
+			status = readDataset("/XPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, X);
+			if (status != 0) goto earlyExit;
+			status = readDataset("/YPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Y);
+			if (status != 0) goto earlyExit;
+			if (dimensions_p == 3) {
+				status = readDataset("/ZPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Z);
+				if (status != 0) goto earlyExit;
+			}
+
+			// Loop over grid sites
+			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
+
+				// Ignore list
+				if (
+					Type[c] == eRefined ||
+					Type[c] == eRefinedInlet ||
+					Type[c] == eRefinedSolid ||
+					Type[c] == eRefinedSymmetry ||
+					Type[c] == eTransitionToCoarser
+					) continue;
+
+				local_point_count++;
+
 				if (dimensions_p == 3) {
-					status = readDataset("/ZPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Z);
-					if (status != 0) goto readFailed;
+
+					// Find positions of all 27 possible points and store
+					for (int p = 0; p < 27; p++) {
+						cell_points[p][0] = X[c] + e[0][p] * (dx / 2);
+						cell_points[p][1] = Y[c] + e[1][p] * (dx / 2);
+						cell_points[p][2] = Z[c] + e[2][p] * (dx / 2);
+					}
+
 				}
+				else {
 
-				// Loop over grid sites
-				for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
-
-					// Ignore list
-					if (
-						Type[c] == eRefined ||
-						Type[c] == eRefinedInlet ||
-						Type[c] == eRefinedSolid ||
-						Type[c] == eRefinedSymmetry ||
-						Type[c] == eTransitionToCoarser
-						) continue;
-
-					local_point_count++;
-
-					if (dimensions_p == 3) {
-
-						// Find positions of all 27 possible points and store
-						for (int p = 0; p < 27; p++) {
-							cell_points[p][0] = X[c] + e[0][p] * (dx / 2);
-							cell_points[p][1] = Y[c] + e[1][p] * (dx / 2);
-							cell_points[p][2] = Z[c] + e[2][p] * (dx / 2);
-						}
-
+					// Find positions of all 9 possible points and store
+					int vert = 0;
+					for (int p = 1; p < 27; p += 3) {
+						cell_points[vert][0] = X[c] + e[0][p] * (dx / 2);
+						cell_points[vert][1] = Y[c] + e[1][p] * (dx / 2);
+						cell_points[vert][2] = 0.0;
+						vert++;
 					}
-					else {
-
-						// Find positions of all 9 possible points and store
-						int vert = 0;
-						for (int p = 1; p < 27; p += 3) {
-							cell_points[vert][0] = X[c] + e[0][p] * (dx / 2);
-							cell_points[vert][1] = Y[c] + e[1][p] * (dx / 2);
-							cell_points[vert][2] = 0.0;
-							vert++;
-						}
-
-					}
-
-					// Build cell from points and add to mesh
-					res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
 
 				}
 
-				// Close input dataspace
-				status = H5Sclose(input_sid);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot close input dataspace!" << std::endl;
-
-				// Close input file
-				status = H5Fclose(input_fid);
-				if (status != 0) std::cout << "HDF5 ERROR: Cannot close input file!" << std::endl;
-
-				// Free memory
-				free(Type);
-				free(X);
-				free(Y);
-				free(Z);
-
-				// Debug
-				std::cout << "Valid Point Count  = " << local_point_count << std::endl;
+				// Build cell from points and add to mesh
+				res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
 
 			}
+
+			// Close input dataspace
+			status = H5Sclose(input_sid);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot close input dataspace!" << std::endl;
+
+			// Close input file
+			status = H5Fclose(input_fid);
+			if (status != 0) std::cout << "HDF5 ERROR: Cannot close input file!" << std::endl;
+
+			// Free memory
+			free(Type);
+			free(X);
+			free(Y);
+			free(Z);
+
+			// Debug
+			std::cout << "Valid Point Count  = " << local_point_count << std::endl;
+
 		}
+	}
 
-		// Debug
-		std::cout << "Number of cells retained = " << unstructuredGrid->GetNumberOfCells() << std::endl;
+	// Debug
+	std::cout << "Number of cells retained = " << unstructuredGrid->GetNumberOfCells() << std::endl;
 
-		// Clean mesh to remove duplicates (Paraview not VTK)
-		/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
-		vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
-		cleaner->SetInputData(unstructuredGrid);
-		cleaner->Update();
-		cleaner->GetOutput();
-		std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
+	// Clean mesh to remove duplicates (Paraview not VTK)
+	/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
+	vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
+	cleaner->SetInputData(unstructuredGrid);
+	cleaner->Update();
+	cleaner->GetOutput();
+	std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
 
 	// Time loop
-	int count = 0;
+	int count = 0; int missed_set_count = 0;
 	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
-		
+
 		// Create VTK filename
 		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t) + ".vtk";
 
@@ -439,81 +439,101 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkIntArray> LatTyp = vtkSmartPointer<vtkIntArray>::New();
 		LatTyp->Allocate(unstructuredGrid->GetNumberOfCells());
 		LatTyp->SetName("LatTyp");
-		addDataToGrid("/LatTyp", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, LatTyp);
+		status = addDataToGrid("/LatTyp", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, LatTyp);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> RhoArray = vtkSmartPointer<vtkDoubleArray>::New();
 		RhoArray->Allocate(unstructuredGrid->GetNumberOfCells());
 		RhoArray->SetName("Rho");
-		addDataToGrid("/Rho", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, RhoArray);
+		status = addDataToGrid("/Rho", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, RhoArray);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Rho_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Rho_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Rho_TimeAv->SetName("Rho_TimeAv");
-		addDataToGrid("/Rho_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Rho_TimeAv);
+		status = addDataToGrid("/Rho_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Rho_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Ux = vtkSmartPointer<vtkDoubleArray>::New();
 		Ux->Allocate(unstructuredGrid->GetNumberOfCells());
 		Ux->SetName("Ux");
-		addDataToGrid("/Ux", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux);
+		status = addDataToGrid("/Ux", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Uy = vtkSmartPointer<vtkDoubleArray>::New();
 		Uy->Allocate(unstructuredGrid->GetNumberOfCells());
 		Uy->SetName("Uy");
-		addDataToGrid("/Uy", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy);
+		status = addDataToGrid("/Uy", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Ux_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Ux_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Ux_TimeAv->SetName("Ux_TimeAv");
-		addDataToGrid("/Ux_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux_TimeAv);
+		status = addDataToGrid("/Ux_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Uy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Uy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Uy_TimeAv->SetName("Uy_TimeAv");
-		addDataToGrid("/Uy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy_TimeAv);
+		status = addDataToGrid("/Uy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UxUx_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UxUx_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UxUx_TimeAv->SetName("UxUx_TimeAv");
-		addDataToGrid("/UxUx_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUx_TimeAv);
+		status = addDataToGrid("/UxUx_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUx_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UxUy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UxUy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UxUy_TimeAv->SetName("UxUy_TimeAv");
-		addDataToGrid("/UxUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUy_TimeAv);
+		status = addDataToGrid("/UxUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUy_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UyUy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UyUy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UyUy_TimeAv->SetName("UyUy_TimeAv");
-		addDataToGrid("/UyUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUy_TimeAv);
+		status = addDataToGrid("/UyUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUy_TimeAv);
+		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		if (dimensions_p == 3) {
 
 			vtkSmartPointer<vtkDoubleArray> Uz = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz->SetName("Uz");
-			addDataToGrid("/Uz", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz);
+			status = addDataToGrid("/Uz", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> Uz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz_TimeAv->SetName("Uz_TimeAv");
-			addDataToGrid("/Uz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz_TimeAv);
+			status = addDataToGrid("/Uz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz_TimeAv);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UxUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UxUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UxUz_TimeAv->SetName("UxUz_TimeAv");
-			addDataToGrid("/UxUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUz_TimeAv);
+			status = addDataToGrid("/UxUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUz_TimeAv);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UyUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UyUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UyUz_TimeAv->SetName("UyUz_TimeAv");
-			addDataToGrid("/UyUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUz_TimeAv);
+			status = addDataToGrid("/UyUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUz_TimeAv);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UzUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UzUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UzUz_TimeAv->SetName("UzUz_TimeAv");
-			addDataToGrid("/UzUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UzUz_TimeAv);
+			status = addDataToGrid("/UzUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UzUz_TimeAv);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
 		}
 
+		// If failed to read every dataset then end of time limit has been reached
+		if (dimensions_p == 3 && missed_set_count == NUM_DATASETS_3D) goto earlyExit;
+		else if (dimensions_p == 2 && missed_set_count == NUM_DATASETS_2D) goto earlyExit;
+	
+		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
 
 		// Print progress to screen
@@ -531,8 +551,8 @@ int main(int argc, char* argv[])
 	return 0;
 
 
-readFailed:
+earlyExit:
 	std::cout << "Read failed -- exiting early.";
-	return 999;
+	return EARLY_EXIT;
 }
 

@@ -865,112 +865,126 @@ void GridObj::LBM_initSolidLab() {
 	/* AIRVISION CITYSCAPE ADDER */
 	/*****************************/
 
-	//Build the city only on the finest grid
-	if (level == L_NumLev)
+	// Dimensions of bounding box of cityscape (as fraction of domain length)
+#define BB_START_X 0.247787610619469
+#define BB_START_Y 0.4210526315789474
+#define BB_LENGTH_X 0.2212389380530973
+#define BB_LENGTH_Y 0.1578947368421053
+	int k = 0;
+
+	// Blocks to make up cityscape -- offsets and sizes (as fraction of city length)
+	const double block_offset_x[17] =
 	{
+		0.0,
+		0.05,
+		0.1,
+		0.05,
+		0.05,
+		0.05,
+		0.25,
+		0.35,
+		0.25,
+		0.43,
+		0.65,
+		0.75,
+		0.85,
+		0.6,
+		0.8,
+		0.8,
+		0.9
+	};
 
-		// Dimensions of bounding box of cityscape (as fraction of domain length)
-//#define BB_START_X 0.247787610619469
-//#define BB_START_Y 0.4210526315789474
-//#define BB_LENGTH_X 0.2212389380530973
-//#define BB_LENGTH_Y 0.1578947368421053
-		int k = 0;
+	const double block_offset_y[17] =
+	{
+		0.75,
+		0.5,
+		0.4166666666666667,
+		0.25,
+		0.0833333333333333,
+		0.0,
+		0.7083333333333333,
+		0.7083333333333333,
+		0.3333333333333333,
+		0.9166666666666667,
+		0.9166666666666667,
+		0.8333333333333333,
+		0.8333333333333333,
+		0.0,
+		0.125,
+		0.0,
+		0.125
+	};
 
-		// Blocks to make up cityscape -- offsets and sizes (as fraction of city length)
-		const double block_offset_x[17] =
-		{
-			0.0,
-			0.05,
-			0.1,
-			0.05,
-			0.05,
-			0.05,
-			0.25,
-			0.35,
-			0.25,
-			0.43,
-			0.65,
-			0.75,
-			0.85,
-			0.6,
-			0.8,
-			0.8,
-			0.9
-		};
+	const double block_size_x[17] =
+	{
+		0.13,
+		0.13,
+		0.05,
+		0.13,
+		0.05,
+		0.1,
+		0.1,
+		0.1,
+		0.25,
+		0.12,
+		0.15,
+		0.1,
+		0.05,
+		0.1,
+		0.05,
+		0.2,
+		0.05
+	};
 
-		const double block_offset_y[17] =
-		{
-			0.75,
-			0.5,
-			0.4166666666666667,
-			0.25,
-			0.0833333333333333,
-			0.0,
-			0.7083333333333333,
-			0.7083333333333333,
-			0.3333333333333333,
-			0.9166666666666667,
-			0.9166666666666667,
-			0.8333333333333333,
-			0.8333333333333333,
-			0.0,
-			0.125,
-			0.0,
-			0.125
-		};
+	const double block_size_y[17] =
+	{
+		0.25,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.2916666666666667,
+		0.0833333333333333,
+		0.25,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.0833333333333333,
+		0.1666666666666667,
+		0.0833333333333333,
+		0.075,
+		0.125,
+		0.075
+	};
 
-		const double block_size_x[17] =
-		{
-			0.13,
-			0.13,
-			0.05,
-			0.13,
-			0.05,
-			0.1,
-			0.1,
-			0.1,
-			0.25,
-			0.12,
-			0.15,
-			0.1,
-			0.05,
-			0.1,
-			0.05,
-			0.2,
-			0.05
-		};
+	
+	if (level == L_NumLev) {
+	
+	// Add AirVision geometry to LatTyp matrix (17 boxes)
+	for (int box = 0; box < 17; box++) {
 
-		const double block_size_y[17] =
-		{
-			0.25,
-			0.1666666666666667,
-			0.0833333333333333,
-			0.1666666666666667,
-			0.0833333333333333,
-			0.0833333333333333,
-			0.2916666666666667,
-			0.0833333333333333,
-			0.25,
-			0.0833333333333333,
-			0.0833333333333333,
-			0.0833333333333333,
-			0.1666666666666667,
-			0.0833333333333333,
-			0.075,
-			0.125,
-			0.075
-		};
-
-		// Add AirVision geometry to LatTyp matrix (17 boxes)
-		for (int box = 0; box < 17; box++) {
-
-			int box_start_x = static_cast<int>(std::floor(BB_START_X * L_N + block_offset_x[box] * BB_LENGTH_X * L_N));
-			int box_end_x = static_cast<int>(box_start_x + std::floor(block_size_x[box] * BB_LENGTH_X * L_N));
-			int box_start_y = static_cast<int>(std::floor(BB_START_Y * L_M + block_offset_y[box] * BB_LENGTH_Y * L_M));
-			int box_end_y = static_cast<int>(box_start_y + std::floor(block_size_y[box] * BB_LENGTH_Y * L_M));
+			std::vector<int> box_start = GridUtils::getVoxInd(
+				BB_START_X * (L_b_x - L_a_x) + block_offset_x[box] * BB_LENGTH_X * (L_b_x - L_a_x),
+				BB_START_Y * (L_b_y - L_a_y) + block_offset_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y),
+				ZOrigin,
+				this
+				);
+			std::vector<int> box_end = GridUtils::getVoxInd(
+				BB_START_X * (L_b_x - L_a_x) + block_offset_x[box] * BB_LENGTH_X * (L_b_x - L_a_x) + 
+				block_size_x[box] * BB_LENGTH_X * (L_b_x - L_a_x),
+				BB_START_Y * (L_b_y - L_a_y) + block_offset_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y) +
+				block_size_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y),
+				ZOrigin,
+				this
+				);
+				
+			int box_start_x = box_start[0];
+			int box_start_y = box_start[1];
+			int box_end_x = box_end[0];
+			int box_end_y = box_end[1];
 
 			for (int i = box_start_x; i <= box_end_x; i++) {
-				for (int j = box_start_y; j <= box_end_y; j++) {
+				for (int j = box_start_y; j <= box_end_y; j++) {			
 
 #ifdef L_BUILD_FOR_MPI
 					if (!GridUtils::isOnThisRank(i,j,k,*this)) continue;
@@ -979,14 +993,13 @@ void GridObj::LBM_initSolidLab() {
 					LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eSolid;			
 #else
 
-					LatTyp(i, j, k, M_lim, K_lim) = eSolid;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #endif
 				}
 			}
 
 		}
 	}
-
 
 
 

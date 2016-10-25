@@ -957,31 +957,49 @@ void GridObj::LBM_initSolidLab() {
 		0.075
 	};
 
+	
+	if (level == L_NumLev) {
+	
 	// Add AirVision geometry to LatTyp matrix (17 boxes)
 	for (int box = 0; box < 17; box++) {
 
-		int box_start_x = static_cast<int>(std::floor(BB_START_X * L_N + block_offset_x[box] * BB_LENGTH_X * L_N));
-		int box_end_x = static_cast<int>(box_start_x + std::floor(block_size_x[box] * BB_LENGTH_X * L_N));
-		int box_start_y = static_cast<int>(std::floor(BB_START_Y * L_M + block_offset_y[box] * BB_LENGTH_Y * L_M));
-		int box_end_y = static_cast<int>(box_start_y + std::floor(block_size_y[box] * BB_LENGTH_Y * L_M));
+			std::vector<int> box_start = GridUtils::getVoxInd(
+				BB_START_X * (L_b_x - L_a_x) + block_offset_x[box] * BB_LENGTH_X * (L_b_x - L_a_x),
+				BB_START_Y * (L_b_y - L_a_y) + block_offset_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y),
+				ZOrigin,
+				this
+				);
+			std::vector<int> box_end = GridUtils::getVoxInd(
+				BB_START_X * (L_b_x - L_a_x) + block_offset_x[box] * BB_LENGTH_X * (L_b_x - L_a_x) + 
+				block_size_x[box] * BB_LENGTH_X * (L_b_x - L_a_x),
+				BB_START_Y * (L_b_y - L_a_y) + block_offset_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y) +
+				block_size_y[box] * BB_LENGTH_Y * (L_b_y - L_a_y),
+				ZOrigin,
+				this
+				);
+				
+			int box_start_x = box_start[0];
+			int box_start_y = box_start[1];
+			int box_end_x = box_end[0];
+			int box_end_y = box_end[1];
 
-		for (int i = box_start_x; i <= box_end_x; i++) {
-			for (int j = box_start_y; j <= box_end_y; j++) {			
+			for (int i = box_start_x; i <= box_end_x; i++) {
+				for (int j = box_start_y; j <= box_end_y; j++) {			
 
 #ifdef L_BUILD_FOR_MPI
-				if (!GridUtils::isOnThisRank(i,j,k,*this)) continue;
-				std::vector<int> locals;
-				GridUtils::global_to_local(i, j, k, this, locals);
-				LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eSolid;			
+					if (!GridUtils::isOnThisRank(i,j,k,*this)) continue;
+					std::vector<int> locals;
+					GridUtils::global_to_local(i, j, k, this, locals);
+					LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eSolid;			
 #else
 
-				LatTyp(i,j,k,M_lim,K_lim) = eSolid;
+					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #endif
+				}
 			}
+
 		}
-
 	}
-
 
 
 

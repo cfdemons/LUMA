@@ -866,10 +866,10 @@ void GridObj::LBM_initSolidLab() {
 	/*****************************/
 
 	// Dimensions of bounding box of cityscape (as fraction of domain length)
-#define BB_START_X 0.247787610619469
-#define BB_START_Y 0.4210526315789474
-#define BB_LENGTH_X 0.2212389380530973
-#define BB_LENGTH_Y 0.1578947368421053
+//#define BB_START_X 0.247787610619469
+//#define BB_START_Y 0.4210526315789474
+//#define BB_LENGTH_X 0.2212389380530973
+//#define BB_LENGTH_Y 0.1578947368421053
 	int k = 0;
 
 	// Blocks to make up cityscape -- offsets and sizes (as fraction of city length)

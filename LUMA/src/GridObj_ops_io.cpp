@@ -495,57 +495,82 @@ void GridObj::io_probeOutput() {
 		pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
 #endif
 
-	// Loop over probe points
-	for (i = 0; i < nProbes[0]; i++) {
-		i_global = xProbeLims[0] + i*pspace[0];
+	//The probe is always on the finest grid
+	if (level == L_NumLev) {
 
-		for (j = 0; j < nProbes[1]; j++) {
-			j_global = yProbeLims[0] + j*pspace[1];
+		std::vector<int> probeIndices;
+		double x_global, y_global, z_global;
+		
+		// Loop over probe points
+		for (i = 0; i < nProbes[0]; i++) {
+			x_global = xProbeLims[0] + i*pspace[0];
+
+			for (j = 0; j < nProbes[1]; j++) {
+				y_global = yProbeLims[0] + j*pspace[1];
 
 #if (L_dims == 3)
-			for (int k = 0; k < nProbes[2]; k++) {
-				k_global = zProbeLims[0] + k*pspace[2];
+				for (int k = 0; k < nProbes[2]; k++) {
+					z_global = zProbeLims[0] + k*pspace[2];
 #else
-			k_global = 0; {
+				z_global = ZOrigin; {
 #endif
 
-				// DEBUG
-				*GridUtils::logfile << "Writing probe point: " << 
-					i_global << "," << j_global << "," << k_global << 
-					std::endl;
+					// DEBUG
+					*GridUtils::logfile << "Writing probe point: " <<
+						x_global << "," << y_global << "," << z_global <<
+						std::endl;
 
-				// Is point on rank, if not move on
-				if (!GridUtils::isOnThisRank(i_global,j_global,k_global,*this)) {
-					continue;
-				}
+					//Calculate the position of the probe (in cells of the current mesh)
+					probeIndices = GridUtils::getVoxInd(x_global, y_global, z_global,this);
+					i_global = probeIndices[0];
+					j_global = probeIndices[1];
+					k_global = probeIndices[2];
+					// DEBUG
+					*GridUtils::logfile << "Writing probe cell position: " <<
+						i_global << "," << j_global << "," << k_global <<
+						std::endl;
 
-				// Convert global to local if necessary
+					// Is point on rank, if not move on
+					if (!GridUtils::isOnThisRank(i_global, j_global, k_global, *this)) {
+						continue;
+					}
+
+					// Convert global to local if necessary
 #ifdef L_BUILD_FOR_MPI
-				i_local = i_global - XInd[1] + 1;
-				j_local = j_global - YInd[1] + 1;
+					i_local = i_global - XInd[1] + 1;
+					j_local = j_global - YInd[1] + 1;
 #if (L_dims == 3)
-				k_local = k_global - ZInd[1] + 1;
+					k_local = k_global - ZInd[1] + 1;
 #else
-				k_local = k_global;
+					k_local = k_global;
 #endif
 
 #else
-				i_local = i_global; j_local = j_global; k_local = k_global;
+					i_local = i_global; j_local = j_global; k_local = k_global;
 #endif
-				
 
-				// Write out value and add tab
-				for (d = 0; d < L_dims; d++) {
-					probefile << u(i_local,j_local,k_local,d,M_lims,K_lims,L_dims) << "\t";
+
+					// Write out value and add tab
+					for (d = 0; d < L_dims; d++) {
+						probefile << u(i_local, j_local, k_local, d, M_lims, K_lims, L_dims) << "\t";
+					}
+
 				}
 
 			}
 
 		}
-
 	}
 
 	probefile.close();
+
+	// Now do any sub-grids
+	if (L_NumLev > level) {
+		for (size_t reg = 0; reg < subGrid.size(); reg++) {
+			subGrid[reg].io_probeOutput();
+		}
+	}
+
 
 
 }

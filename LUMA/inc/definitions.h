@@ -66,8 +66,8 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 2        	    ///< How many timesteps before whole grid output
-#define L_out_every_forces 2000		///< Specific output frequency of body forces
+#define L_out_every 15039        	    ///< How many timesteps before whole grid output
+#define L_out_every_forces 15039		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
@@ -77,11 +77,11 @@
 
 // High frequency output options
 #define L_PROBE_OUTPUT						    ///< Turn on probe output
-#define L_out_every_probe 10 //10s approx		///< Write out frequency of probe output
+#define L_out_every_probe 301 //10s approx		///< Write out frequency of probe output
 const static int nProbes[3] = {1, 1, 1};		///< Number of probes in each direction (x, y, z)
-const static int xProbeLims[2] = {750, 750};		///< Limits of X plane for array of probes
-const static int yProbeLims[2] = {749, 749};		///< Limits of Y plane for array of probes
-const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of probes
+const static double xProbeLims[2] = { 3.750658594, 3.750658594 };	///< Limits of X plane for array of probes (in physical units)
+const static double yProbeLims[2] = { 3.74694199, 3.74694199 };	///< Limits of Y plane for array of probes (in physical units)
+const static double zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of probes (in physical units)
 
 
 // Gravity
@@ -93,7 +93,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 10000			///< Frequency of write out of restart file
+#define L_restart_out_every 20000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION				///< Use KBC collision operator instead of LBGK by default
@@ -105,7 +105,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 3 //5000		///< Number of time steps to run simulation for
+#define L_Timesteps 601571 //5000		///< Number of time steps to run simulation for
 
 
 /*
@@ -160,7 +160,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_u_ref 0.104166667   //0.04			///< Reference velocity for scaling, can be mean inelt velocity
+#define L_u_ref 0.083780585  //0.04			///< Reference velocity for scaling, can be mean inelt velocity
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -169,7 +169,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_u_0z 0			///< Initial/inlet z-velocity
 
 #define L_rho_in 1			///< Initial density
-#define L_Re 2372			///< Desired Reynolds number
+#define L_Re 592			///< Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -345,7 +345,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define BB_LENGTH_X 0.2212389380530973
 #define BB_LENGTH_Y 0.1578947368421053
 
-#define L_NumLev 1		///< Levels of refinement (0 = coarse grid only
+#define L_NumLev 2      ///< Levels of refinement (0 = coarse grid only
 #define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
 
 #if L_NumLev != 0
@@ -363,19 +363,19 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
 
 #elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 88 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 815 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 80 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 679 };
+	const static int RefXstart[L_NumLev][L_NumReg] = { 88 }; // 0.5 * BB_START_X * L_N };
+	const static int RefXend[L_NumLev][L_NumReg] = { 815 }; // (BB_START_X + BB_LENGTH_X * 2) * L_N };
+	const static int RefYstart[L_NumLev][L_NumReg] = { 80 }; // 0.5 * BB_START_Y * L_M };
+	const static int RefYend[L_NumLev][L_NumReg] = { 679 }; // (BB_START_Y + BB_LENGTH_Y * 2) * L_M };
 	// If doing 2D, these can be arbitrary values
 	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
 	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
 
 #elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
+	const static int RefXstart[L_NumLev][L_NumReg] = { { 176 }, { 66 } };
+	const static int RefXend[L_NumLev][L_NumReg]	= { {727}, {1037} };
+	const static int RefYstart[L_NumLev][L_NumReg]	= { {160}, {66} };
+	const static int RefYend[L_NumLev][L_NumReg]	= { {599}, {813} };
 	// If doing 2D, these can be arbitrary values
 	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
 	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };

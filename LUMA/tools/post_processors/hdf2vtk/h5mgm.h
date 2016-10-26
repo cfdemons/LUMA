@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2.1"
+#define H5MGM_VERSION "0.2.2"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -40,6 +40,14 @@
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
+
+#define DATASET_READ_FAIL -321
+#define EARLY_EXIT 998
+#define NUM_DATASETS_3D 15
+#define NUM_DATASETS_2D 10
+
+// Static variable
+static bool bQuiet = false;
 
 // Unit vectors for node positions on each cell
 const int e[3][27] =
@@ -74,9 +82,8 @@ herr_t readDataset(std::string VAR, std::string TIME_STRING, hid_t input_fid, hi
 	std::string variable_string = TIME_STRING + VAR;
 	hid_t input_did = H5Dopen(input_fid, variable_string.c_str(), H5P_DEFAULT);
 	if (input_did <= 0) {
-		std::cout << "HDF5 ERROR: Cannot open input dataset -- no output data for " <<
-			TIME_STRING << std::endl;
-		exit(EXIT_FAILURE);
+		if (bQuiet == false) std::cout << "HDF5 ERROR: Cannot open input dataset: " << variable_string << std::endl;
+		return DATASET_READ_FAIL;
 	}
 	status = H5Dread(input_did, H5Type, input_sid, H5S_ALL, H5P_DEFAULT, buffer);
 	if (status != 0) std::cout << "HDF5 ERROR: Cannot read input dataset!" << std::endl;
@@ -138,11 +145,11 @@ herr_t addDataToGrid(std::string VAR, std::string TIME_STRING,
 
 			// Read in the typing matrix
 			status = readDataset("/LatTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, Type);
-			if (status != 0) goto readFailed;
+			if (status == DATASET_READ_FAIL) return status;
 
 			// Open, read and close input dataset
 			status = readDataset(VAR, TIME_STRING, input_fid, input_sid, H5Type, data);
-			if (status != 0) goto readFailed;
+			if (status == DATASET_READ_FAIL) return status;
 
 			// Loop over grid sites
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
@@ -180,10 +187,6 @@ herr_t addDataToGrid(std::string VAR, std::string TIME_STRING,
 	grid->GetCellData()->AddArray(vtkArray);
 
 	return 0;
-
-readFailed:
-	std::cout << "Read failed -- exiting early.";
-	return 998;
 }
 
 /* End of header */

@@ -1,3 +1,12 @@
+version		=	1.2.1-alpha
+
+General		:	Added new refinement guide spreadsheet.
+			Optimisation for hdf2vtk (h5mgm) conversion tool plus handles missing datasets and has quiet option. Now v0.2.2.
+
+Issue #90	:	Fixed probe crash when number of probes 1 in a given direction.
+Issue #85	:	Reinstated D3Q19 velocity model.
+Issue #89	:	Fixed issue with probe output path.
+
 version		=	1.2.0
 
 General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.

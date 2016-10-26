@@ -468,10 +468,10 @@ void GridObj::io_probeOutput() {
 
 	if (t == L_out_every_probe && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
-		probefile.open("./output/probe.out", std::ios::out);
+		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out);
 	} else {
 		// Append to existing
-		probefile.open("./output/probe.out", std::ios::out | std::ios::app);
+		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out | std::ios::app);
 	}
 
 	// Start a new line if first rank
@@ -480,10 +480,13 @@ void GridObj::io_probeOutput() {
 
 	// Probe spacing in each direction
 	int pspace[L_dims];
-	pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
-	pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
+	if (nProbes[0] > 1)
+		pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
+	if (nProbes[1] > 1)
+		pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
 #if (L_dims == 3)
-	pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
+	if (nProbes[2] > 1)
+		pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
 #endif
 
 	// Loop over probe points
@@ -1094,7 +1097,7 @@ int GridObj::io_hdf5(double tval) {
 
 
 	// Call recursively on any present sub-grids
-	if (level < L_NumLev) for (GridObj& g : subGrid) g.io_hdf5(tval);
+	for (GridObj& g : subGrid) g.io_hdf5(tval);
 
 	return 0;
 

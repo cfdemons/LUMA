@@ -149,7 +149,6 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 
 }
 
-
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 int main(int argc, char* argv[])
 {
@@ -163,6 +162,9 @@ int main(int argc, char* argv[])
 		if (arg_str == "version") {
 			std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << std::endl;
 			return 0;
+		}
+		else if (arg_str == "quiet") {
+			bQuiet = true;
 		}
 		else {
 			case_num = std::string(argv[1]);

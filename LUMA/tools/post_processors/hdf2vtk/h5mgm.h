@@ -46,6 +46,9 @@
 #define NUM_DATASETS_3D 15
 #define NUM_DATASETS_2D 10
 
+// Static variable
+static bool bQuiet = false;
+
 // Unit vectors for node positions on each cell
 const int e[3][27] =
 {
@@ -79,7 +82,7 @@ herr_t readDataset(std::string VAR, std::string TIME_STRING, hid_t input_fid, hi
 	std::string variable_string = TIME_STRING + VAR;
 	hid_t input_did = H5Dopen(input_fid, variable_string.c_str(), H5P_DEFAULT);
 	if (input_did <= 0) {
-		std::cout << "HDF5 ERROR: Cannot open input dataset: " << variable_string << std::endl;
+		if (bQuiet == false) std::cout << "HDF5 ERROR: Cannot open input dataset: " << variable_string << std::endl;
 		return DATASET_READ_FAIL;
 	}
 	status = H5Dread(input_did, H5Type, input_sid, H5S_ALL, H5P_DEFAULT, buffer);

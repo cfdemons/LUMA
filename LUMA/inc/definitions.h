@@ -67,7 +67,7 @@
 
 // Output Options
 #define L_out_every 1000			///< How many timesteps before whole grid output
-#define L_out_every_forces 100		///< Specific output frequency of body forces
+#define L_out_every_forces 1000		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output

@@ -353,7 +353,7 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 		//Auxiliar array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
 		double v[3] = { 0.0, 0.0, 0.0 };
 
-		for (size_t k = 0; k < K_lim; k++){
+		for (size_t k = K_lim; k-- > 0;){
 
 			for (size_t j = 0; j < M_lim; j++){
 

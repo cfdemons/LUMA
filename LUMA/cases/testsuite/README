@@ -16,4 +16,5 @@ scripts	-> contains the script to run the test suits (test suite should be run f
 
 
 *** Options ***
-clean | --clean | -c -> will just delete the results directory (should be done before pushing so as to reduce data stored on the repo)
+--clean -> will just delete the results directory (should be done before pushing so as to reduce data stored on the repo)
+--rebase -> will rebase the reference results (should only be required once per release maximum)

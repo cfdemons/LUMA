@@ -13,6 +13,17 @@ To start working on a feature:
 
 Any questions contact Adrian.
 
+## COMPILING IN LINUX WITH GCC ##
+The following steps will guide you through how to compile and run LUMA using the GCC compiler, with the MPICH and HDF5 libraries from a linux terminal. To set this up in an IDE is a straightforward extension:
+
+1) Install the GCC compiler, MPICH and HDF5 libraries using the command: `sudo apt-get install gcc mpich libhdf5-mpich-dev`  
+2) While it isn't essential to set the *HDF5_HOME* environment variable it makes it more convenient. First find the path to where the HDF5 libary is installed - for me this is at */usr/lib/x86_64-linux-gnu/hdf5/mpich*
+3) Set the *HDF5_HOME* environment variable: `export HDF5_HOME=/usr/lib/x86_64-linux-gnu/hdf5/mpich` (this can be added to your *.profile* to save you having to do this everytime you open a terminal)
+4) When compiling use the MPICH wrapper script (with the C++11 option) and make sure the HDF5 libaries are included and linked: `mpicxx -std=c++0x -O3 -I{HDF5_HOME}/include path_to_LUMA/src/* -o LUMA -L{HDF5_HOME}/lib -lhdf5` (the optimisation flag is optional)
+5) If everything has gone as planned there will be an executable in your present working directory called **LUMA**. To run LUMA enter the command: `mpirun -np NPROCS ./LUMA` where *NPROCS* is the number of processes you want to run LUMA with (this value must match the number of processes set in the definition file before compiling or LUMA will crash)
+
+Any questions or issues then contact Joe.
+
 ## SETTING UP CODE::BLOCKS WITH MPI LIBRARIES ##
 MPI libraries are required in order to compile the code. The steps to installing these (in Ubuntu) and then setting up Codeblocks to include them are given below, as well as the compilation and execution steps.
 
@@ -32,7 +43,7 @@ There is probably a way to execute in parallel directly from Codeblocks, when a 
 Contact Joe for guidance on setting up.
 
 ## SETTING UP VISUAL STUDIO ON WINDOWS ##
-Most of the original cost has been written on Windows and compiled using VC++ 2012. Although platform independence is maintained as best as possible there are limitations to maintain compatibility for VC++ 2012 and MSMPI v7 which we used to develop the code originally.
+Originally, the code was written on Windows and compiled with VC++ 2012. Although platform independence is maintained as best as possible there are limitations to maintain compatibility for the somewhat "wild" VC++ 2012 and MSMPI v7. The software has also been successfully compiled using VC++ 2013 which is the current development platform on Windows. In addition, users will also need Parallel HDF 1.8.17 installed and for the merge tool compilation will need VTK 7.0.
 For advice and guidance setting up the code on Visual Studio contact Adrian.
 
 ## CONTACTS ##

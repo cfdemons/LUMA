@@ -35,6 +35,11 @@ void GridObj::LBM_boundary (int bc_type_flag) {
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
+	// Reset object forces for force calculation
+	objman->forceOnObjectX = 0.0;
+	objman->forceOnObjectY = 0.0;
+	objman->forceOnObjectZ = 0.0;
+
 	// Loop over grid, identify BC required & apply BC
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {

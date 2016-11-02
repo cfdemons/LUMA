@@ -567,11 +567,6 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 			<< std::endl;
 
 		fout.close();
-
-		// Reset for next time step
-		forceOnObjectX = 0.0;
-		forceOnObjectY = 0.0;
-		forceOnObjectZ = 0.0;
 	}
 
 }

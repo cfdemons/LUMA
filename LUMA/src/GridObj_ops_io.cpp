@@ -282,9 +282,9 @@ void GridObj::io_textout(std::string output_tag) {
 ///
 void GridObj::io_fgaout() {
 	
-	//Write the file only if the model has the correct number of dimensions
+	// Write the file only if the model has the correct number of dimensions
 	if ((L_dims == 2) || (L_dims == 3)){
-		io_fgaoutPriv(t);
+		_io_fgaout(t);
 	}
 	else{
 		cout << "Error: See Log File" << endl;
@@ -341,16 +341,16 @@ void GridObj::_io_fgaout(int timeStepL0) {
 
 	if (gridoutput.is_open()) {
 
-		//Print number of points (cells) in each direction
+		// Print number of points (cells) in each direction
 		gridoutput << N_lim << "," << M_lim << "," << K_lim << "," << endl;
 
-		//Write the minimum coordinate of the grid. Convert the data to cm, since this is the distance unit used by UE4. 
+		// Write the minimum coordinate of the grid. Convert the data to cm, since this is the distance unit used by UE4. 
 		gridoutput << GridUnits::m2cm(XOrigin) << "," << GridUnits::m2cm(YOrigin) << "," << GridUnits::m2cm(ZOrigin) << "," << endl;
 
-		//Write the maximum coordinate of the grid
+		// Write the maximum coordinate of the grid
 		gridoutput <<GridUnits::m2cm(XOrigin + (N_lim - 1) * dx) << "," << GridUnits::m2cm(YOrigin + (M_lim - 1) * dy) << "," << GridUnits::m2cm(ZOrigin + (K_lim - 1) * dz) << "," << endl;
 
-		//Auxiliar array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
+		// Auxiliary array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
 		double v[3] = { 0.0, 0.0, 0.0 };
 
 		for (size_t k = K_lim; k-- > 0;){
@@ -360,10 +360,10 @@ void GridObj::_io_fgaout(int timeStepL0) {
 				for (size_t i = 0; i < N_lim; i++){
 
 					for (size_t n = 0; n < L_dims; n++){
-						//Fill the v array
+						// Fill the v array
 						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
 					}
-					//Write the data to the file. 
+					// Write the data to the file. 
 					gridoutput << GridUnits::m2cm(GridUnits::ulat2uphys(v[0], this)) << "," 
 						       << GridUnits::m2cm(GridUnits::ulat2uphys(v[1], this)) << "," 
 							   << GridUnits::m2cm(GridUnits::ulat2uphys(-v[2], this)) << "," 
@@ -372,7 +372,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 			}
 		}
 
-		//Close file
+		// Close file
 		gridoutput.close();
 
 		// Call recursively for all child subgrids
@@ -380,7 +380,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].io_fgaoutPriv(timeStepL0);
+				subGrid[reg]._io_fgaout(timeStepL0);
 			}
 		}
 

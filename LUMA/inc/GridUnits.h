@@ -24,8 +24,8 @@
 class GridUnits
 {
 public:
-	GridUnits();
-	~GridUnits();
+	GridUnits(){};
+	~GridUnits(){};
 
 	///< Convert from m to cm
 	template <typename T>

@@ -303,7 +303,7 @@ void GridObj::io_fgaout() {
 ///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
 ///         VectorField object
 ///
-void GridObj::io_fgaoutPriv(int timeSteplvl0) {
+void GridObj::_io_fgaout(int timeStepL0) {
 
 	
 	// Create stream and open text file
@@ -316,7 +316,7 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 	M_str = to_string((int)L_M);
 	K_str = to_string((int)L_K);
 	L_NumLev_str = to_string(level);
-	L_timeStep_str = to_string(timeSteplvl0);
+	L_timeStep_str = to_string(timeStepL0);
 	//if (L_NumLev == 0) ex_str = to_string(0);
 	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
 	if (L_NumLev == 0) NumReg_str = to_string(0);
@@ -380,7 +380,7 @@ void GridObj::io_fgaoutPriv(int timeSteplvl0) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].io_fgaoutPriv(timeSteplvl0);
+				subGrid[reg].io_fgaoutPriv(timeStepL0);
 			}
 		}
 

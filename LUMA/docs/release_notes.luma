@@ -4,6 +4,7 @@ General		:	Added new refinement guide spreadsheet.
 				Optimisation for hdf2vtk (h5mgm) conversion tool plus handles missing datasets and has quiet option. Now v0.2.2.
 				Added a filled cylinder point cloud to address non-physical transients.
 
+Issue #65	:	Added FGA writer for export of field data to UE4.
 Issue #59	:	Fix in place for the momentum exchange to resolve issue with scaling and conflict with outlet BC.
 Issue #90	:	Fixed probe crash when number of probes 1 in a given direction.
 Issue #85	:	Reinstated D3Q19 velocity model.

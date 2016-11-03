@@ -202,10 +202,15 @@ public :
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
+	void  io_fgaout();							// It is io_fgaoutPriv with error control. 
 	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
 	void io_probeOutput();						// Output routine for point probes
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
+
+private:
+	void io_fgaoutPriv(int timeSteplvl0);		// Writes out the macroscopic velocity components for the class as well as any subgrids to a different .fga file for each subgrid. .fga format is the one used for Unreal Engine 4 VectorField object.  
+
 
 };
 

@@ -66,14 +66,15 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 1			///< How many timesteps before whole grid output
-#define L_out_every_forces 1		///< Specific output frequency of body forces
+#define L_out_every 1000			///< How many timesteps before whole grid output
+#define L_out_every_forces 1000		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_IO_FGA                    ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4). 
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
@@ -91,7 +92,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 10000			///< Frequency of write out of restart file
 
@@ -105,7 +106,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 2000		///< Number of time steps to run simulation for
+#define L_Timesteps 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -138,17 +139,17 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Lattice properties (in lattice units)
 #define L_dims 2		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
-#define L_M 50			///< Number of y lattice sites
-#define L_K 76			///< Number of z lattice sites
+#define L_M 100			///< Number of y lattice sites
+#define L_K 100			///< Number of z lattice sites
 
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 2		///< End of domain-x
+#define L_b_x 1		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 1		///< End of domain-y
+#define L_b_y 1 	///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
-#define L_b_z 48		///< End of domain-z
+#define L_b_z 1		///< End of domain-z
 
 
 /*
@@ -161,6 +162,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_u_ref 0.06			///< Reference velocity for scaling, can be mean inelt velocity
+#define L_vp0   5.0				///< Reference velocity of the real fluid to model [m/s]. Used to calculate the physical velocity to write in a .fga file
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -269,11 +271,11 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Periodicity
-#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
@@ -289,7 +291,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 

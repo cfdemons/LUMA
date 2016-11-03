@@ -21,6 +21,7 @@
 #include "../inc/ObjectManager.h"
 #include "../inc/GridUtils.h"
 #include "../inc/hdf5luma.h"
+#include "../inc/GridUnits.h"
 
 using namespace std;
 
@@ -265,6 +266,128 @@ void GridObj::io_textout(std::string output_tag) {
 	} else {
 
 		*GridUtils::logfile << "Cannot open file" << endl;
+
+	}
+
+}
+
+// *****************************************************************************
+/// \brief	.fga file writer.
+///
+///			Writes the components of the macroscopic velocity of the grid at time t and call
+///         recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. 
+///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
+///         VectorField object.
+///         It doesn't do anything if the model is not 2D or 3D. Since .fga files can only store 3D data
+///
+void GridObj::io_fgaout() {
+	
+	//Write the file only if the model has the correct number of dimensions
+	if ((L_dims == 2) || (L_dims == 3)){
+		io_fgaoutPriv(t);
+	}
+	else{
+		cout << "Error: See Log File" << endl;
+		*GridUtils::logfile << ".fga output can only be set for 2 or 3 dimensional models" << endl;
+	}
+
+}
+
+
+
+// *****************************************************************************
+/// \brief	.fga file writer.
+///
+///			Writes the components of the macroscopic velocity of the grid at time t and call
+///         recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. 
+///			.fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a 
+///         VectorField object
+///
+void GridObj::io_fgaoutPriv(int timeSteplvl0) {
+
+	
+	// Create stream and open text file
+	ofstream gridoutput;
+	gridoutput.precision(L_output_precision);
+
+	// Construct File Name
+	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank,L_timeStep_str;
+	N_str = to_string((int)L_N);
+	M_str = to_string((int)L_M);
+	K_str = to_string((int)L_K);
+	L_NumLev_str = to_string(level);
+	L_timeStep_str = to_string(timeSteplvl0);
+	//if (L_NumLev == 0) ex_str = to_string(0);
+	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
+	if (L_NumLev == 0) NumReg_str = to_string(0);
+	else NumReg_str = to_string(region_number);
+	mpirank = to_string(MpiManager::my_rank);
+	// Build string
+	FNameG = string(GridUtils::path_str + "/Grids")
+		+ string("D") + to_string(L_dims)
+		+ string("x") + N_str
+		+ string("y") + M_str
+		+ string("z") + K_str
+		+ string("dtNum") + L_timeStep_str
+		+ string("Lev") + L_NumLev_str
+		+ string("Reg") + NumReg_str
+		//+ string("P") + ex_str
+		+ string("Rnk") + mpirank
+		+ string(".fga");
+	// Get character pointer
+	const char* FNameG_c = FNameG.c_str();
+
+	gridoutput.open(FNameG_c, ios::out);
+
+	if (gridoutput.is_open()) {
+
+		//Print number of points (cells) in each direction
+		gridoutput << N_lim << "," << M_lim << "," << K_lim << "," << endl;
+
+		//Write the minimum coordinate of the grid. Convert the data to cm, since this is the distance unit used by UE4. 
+		gridoutput << GridUnits::m2cm(XOrigin) << "," << GridUnits::m2cm(YOrigin) << "," << GridUnits::m2cm(ZOrigin) << "," << endl;
+
+		//Write the maximum coordinate of the grid
+		gridoutput <<GridUnits::m2cm(XOrigin + (N_lim - 1) * dx) << "," << GridUnits::m2cm(YOrigin + (M_lim - 1) * dy) << "," << GridUnits::m2cm(ZOrigin + (K_lim - 1) * dz) << "," << endl;
+
+		//Auxiliar array to store the velocity data. This way I can use the same code with L_dim = 2 and L_dim = 3
+		double v[3] = { 0.0, 0.0, 0.0 };
+
+		for (size_t k = K_lim; k-- > 0;){
+
+			for (size_t j = 0; j < M_lim; j++){
+
+				for (size_t i = 0; i < N_lim; i++){
+
+					for (size_t n = 0; n < L_dims; n++){
+						//Fill the v array
+						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
+					}
+					//Write the data to the file. 
+					gridoutput << GridUnits::m2cm(GridUnits::ulat2uphys(v[0], this)) << "," 
+						       << GridUnits::m2cm(GridUnits::ulat2uphys(v[1], this)) << "," 
+							   << GridUnits::m2cm(GridUnits::ulat2uphys(-v[2], this)) << "," 
+							   << endl;
+				}
+			}
+		}
+
+		//Close file
+		gridoutput.close();
+
+		// Call recursively for all child subgrids
+		size_t regions = subGrid.size();
+		if (regions != 0) {
+			for (size_t reg = 0; reg < regions; reg++) {
+
+				subGrid[reg].io_fgaoutPriv(timeSteplvl0);
+			}
+		}
+
+	}
+	else {
+
+		*GridUtils::logfile << "Cannot open file for .fga output" << endl;
 
 	}
 

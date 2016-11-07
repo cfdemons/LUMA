@@ -3,6 +3,8 @@ version		=	1.2.1-alpha
 General		:	Added new refinement guide spreadsheet.
 				Optimisation for hdf2vtk (h5mgm) conversion tool plus handles missing datasets and has quiet option. Now v0.2.2.
 				Added a filled cylinder point cloud to address non-physical transients.
+				Added macro to allow marking of functions as deprecated.
+				Fixed an issue with the scaling on the cloud reader -- not documented on the tracker.
 
 Issue #65	:	Added FGA writer for export of field data to UE4.
 Issue #59	:	Fix in place for the momentum exchange to resolve issue with scaling and conflict with outlet BC.

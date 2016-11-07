@@ -352,7 +352,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		break;
 
 	}
-	
+
 	// Handle failure to open
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
@@ -374,7 +374,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		std::istringstream iss;	// Buffer stream to store characters
 
 		// Get line up to new line separator and put in buffer
-		std::getline(file,line_in,'\n');
+		std::getline(file, line_in, '\n');
 		iss.str(line_in);	// Put line in the buffer
 		iss.seekg(0);		// Reset buffer position to start of buffer
 
@@ -382,10 +382,10 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		iss >> tmp_x;
 		iss >> tmp_y;
 		iss >> tmp_z;
-			
+
 		_PCpts->x.push_back(tmp_x);
 		_PCpts->y.push_back(tmp_y);
-			
+
 		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
 #if (L_dims == 3)
 		_PCpts->z.push_back(tmp_z);
@@ -401,29 +401,32 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Failed to read object data from cloud input file." << std::endl;
 		exit(LUMA_FAILED);
-	} else {
+	}
+	else {
 		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
 	}
 
-	
+
 	// Rescale coordinates and shift to global lattice units
 	// (option to scale based on whatever bounding box dimension chosen)
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
-
-#if (scale_direction == eXDirection)
-	double scale_factor = (body_length * g->dx) /
-		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-#elif (scale_direction == eYDirection)
-	double scale_factor = (body_length * g->dy) /
-		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-#elif (scale_direction == eZDirection)
-	double scale_factor = (body_length * g->dz) /
+	double scale_factor;
+	if (scale_direction == eXDirection) {
+		scale_factor = (body_length * g->dx) /
+			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+	}
+	else if (scale_direction == eYDirection) {
+		scale_factor = (body_length * g->dy) /
+			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
+	}
+	else if (scale_direction == eZDirection) {
+		scale_factor = (body_length * g->dz) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-#endif
+	}
 
-	double shift_x =  (g->XOrigin + body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_x = (g->XOrigin + body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	double shift_y = (g->YOrigin + body_start_y * g->dy) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
@@ -436,6 +439,21 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 	}
+
+	// Write out the points after scaling and shifting
+#ifdef L_CLOUD_DEBUG
+	if (!_PCpts->x.empty()) {
+		if (MpiManager::my_rank == 0) {
+			std::ofstream fileout;
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+			for (size_t i = 0; i < _PCpts->x.size(); i++) {
+				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+				fileout << std::endl;
+			}
+			fileout.close();
+		}
+	}
+#endif
 
 	// Declare local variables
 	std::vector<int> locals;

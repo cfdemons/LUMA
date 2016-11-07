@@ -175,7 +175,8 @@ public :
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel
+	DEPRECATED void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel (DEPRECATED VERSION)
+	void LBM_multi();								// Launch the multi-grid kernel
 	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator

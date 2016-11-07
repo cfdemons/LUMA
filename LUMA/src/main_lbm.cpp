@@ -468,11 +468,7 @@ int main( int argc, char* argv[] )
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
-#ifdef L_IBM_ON
-		Grids.LBM_multi(true);	// IBM requires predictor-corrector calls
-#else
-		Grids.LBM_multi(false);	// Just called once as no IBM
-#endif
+		Grids.LBM_multi();	// Main LBM kernel (same both with and without IBM)
 
 		///////////////
 		// Write Out //

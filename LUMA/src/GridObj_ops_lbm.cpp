@@ -27,7 +27,7 @@ streaming and macroscopic calulcation.
 using namespace std;
 
 // *****************************************************************************
-/// \brief	LBM multi-grid kernel.
+/// \brief	LBM multi-grid kernel (DEPRECATED VERSION).
 ///
 ///			The LBM kernel manages the calling of all IBM and LBM methods on a 
 ///			given grid. In addition, this method also manages the recursive calling
@@ -258,6 +258,194 @@ void GridObj::LBM_multi (bool ibmFlag) {
 
 
 }
+
+
+// *****************************************************************************
+/// \brief	LBM multi-grid kernel.
+///
+///			The LBM kernel manages the calling of all IBM and LBM methods on a
+///			given grid. In addition, this method also manages the recursive calling
+///			of the method on sub-grids and manages the framework for grid-grid
+///			interaction.
+void GridObj::LBM_multi () {
+
+	// Start the clock to time the kernel
+	clock_t secs, t_start = clock();
+
+
+	////////////////
+	// LBM kernel //
+	////////////////
+
+
+	// Loop twice on refined levels as refinement ratio per level is 2
+	int count = 1;
+	do {
+
+		// Apply boundary conditions (regularised must be applied before collision)
+#if (defined L_INLET_ON && defined L_INLET_REGULARISED)
+		LBM_boundary(2);
+#endif
+
+#ifdef L_MEGA_DEBUG
+		/*DEBUG*/ io_lite((t+1)*100 + 0,"AFTER INLET BC");
+#endif
+
+		// Force lattice directions using current Cartesian force vector (adding gravity if necessary)
+		LBM_forceGrid();
+
+		// Collision on Lr
+		LBM_collide();
+
+#ifdef L_MEGA_DEBUG
+		/*DEBUG*/ io_lite((t+1)*100 + 1,"AFTER COLLIDE");
+#endif
+
+		////////////////////
+		// Refined levels //
+		////////////////////
+
+		// Check if lower level expected
+		if (L_NumLev > level) {
+
+			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
+
+				// Explode
+				LBM_explode(reg);
+
+				// Call same routine for lower level
+				subGrid[reg].LBM_multi();
+			}
+		}
+
+			// Apply boundary conditions
+#if (defined L_SOLID_BLOCK_ON || defined L_WALLS_ON || defined L_SOLID_FROM_FILE)
+			LBM_boundary(1);	// Bounce-back (walls and solids)
+#endif
+
+#ifdef L_MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 2,"AFTER SOLID BC");
+#endif
+
+#ifdef L_BFL_ON
+			// Store the f values pre stream for BFL
+			ObjectManager::getInstance()->f_prestream = f;
+#endif
+
+			// Stream
+			LBM_stream();
+
+#ifdef L_MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 3,"AFTER STREAM");
+#endif
+
+			// Apply boundary conditions
+#ifdef L_BFL_ON
+			LBM_boundary(5);	// BFL boundary conditions
+#endif
+#ifdef L_MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 4,"AFTER BFL");
+#endif
+
+		// If there is lower levels then coalesce from them
+		if (L_NumLev > level) {
+
+			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
+
+				// Coalesce
+				LBM_coalesce(reg);
+
+			}
+
+#ifdef L_MEGA_DEBUG
+			/*DEBUG*/ io_lite((t+1)*100 + 5,"AFTER COALESCE"); // Do not change this tag!
+#endif
+		}
+
+
+		//////////////
+		// Continue //
+		//////////////
+
+		// Apply boundary conditions
+#ifdef L_OUTLET_ON
+		LBM_boundary(3);	// Outlet
+#endif
+
+#ifdef L_MEGA_DEBUG
+		/*DEBUG*/ io_lite((t+1)*100 + 6,"AFTER OUTLET BC");
+#endif
+
+		// Update macroscopic quantities (including time-averaged quantities)
+		LBM_macro();
+
+#ifdef L_MEGA_DEBUG
+		/*DEBUG*/ io_lite((t+1)*100 + 7,"AFTER MACRO");
+#endif
+
+
+		////////////////////////////////
+		// IBM post-kernel processing //
+		////////////////////////////////
+
+		// Execute IBM procedure using newly computed predicted data
+#ifdef L_IBM_ON
+		if (level == L_IB_Lev && region_number == L_IB_Reg) {
+
+			// Reset force vectors on grid in preparation for spreading step
+			LBM_resetForces();
+
+			// Calculate and apply IBM forcing to fluid
+			ObjectManager::getInstance()->ibm_apply();
+
+			// Update macroscopic quantities (including force from IBM step)
+			LBM_macro();
+
+			// Move the body if necessary
+			ObjectManager::getInstance()->ibm_moveBodies();
+		}
+#endif
+
+		// Increment counters
+		t++; count++;
+
+		// Always drop out on level 0, or if on corrector step on lower grid level
+		if (level == 0) {
+			break;
+		}
+
+	} while (count < 3);
+
+
+	// Get time of loop (includes sub-loops)
+	secs = clock() - t_start;
+
+	// Update average timestep time on this grid
+	timeav_timestep *= (t-1);
+	timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
+	timeav_timestep /= t;
+
+	if (t % L_out_every == 0) {
+		// Performance data to logfile
+		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
+	}
+
+
+	///////////////////////
+	// MPI communication //
+	///////////////////////
+
+#ifdef L_BUILD_FOR_MPI
+	/* Do MPI communication on this grid level before returning. */
+
+	// Launch communication on this grid by passing its level and region number
+	MpiManager::getInstance()->mpi_communicate(level, region_number);
+
+#endif
+
+
+}
+
 
 // *****************************************************************************
 /// \brief	Method to compute body forces.

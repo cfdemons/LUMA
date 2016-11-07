@@ -158,7 +158,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_b_z 1		///< End of domain-z
 
 // Physical velocity
-#define L_U_phys 5.0		///< Reference velocity of the real fluid to model [m/s]. Used to calculate the physical velocity to write in a .fga file
+#define L_U_phys 5.0		///< Reference velocity of the real fluid to model [m/s]
 
 
 /*

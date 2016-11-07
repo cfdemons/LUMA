@@ -31,6 +31,16 @@
 	#endif
 #endif  // _DEBUG
 
+// Deprecated macros depending on platform
+#ifdef __GNUC__
+	#define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+	#define DEPRECATED __declspec(deprecated)
+#else
+	#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+	#define DEPRECATED
+#endif
+
 // Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
 #include <algorithm>
 #include <cmath>

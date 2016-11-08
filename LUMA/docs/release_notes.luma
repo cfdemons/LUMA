@@ -1,3 +1,7 @@
+version		=	1.2.2-alpha
+
+General		:	Optimisation version of the 1.2.1-alpha working code.
+
 version		=	1.2.1-alpha
 
 General		:	Added new refinement guide spreadsheet.

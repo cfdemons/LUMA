@@ -85,6 +85,9 @@ private :
 	/// 1D subgrid array (size = L_NumReg)
 	std::vector<GridObj> subGrid;
 
+	/// Pointer to parent grid
+	GridObj *parentGrid = nullptr;
+
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
 	int CoarseLimsX[2];		///< Local X indices corresponding to where this grid is locate on parent grid
@@ -110,6 +113,7 @@ private :
 	// Flattened 4D arrays (i,j,k,vel)
 	IVector<double> f;				///< Distribution functions
 	IVector<double> feq;			///< Equilibrium distribution functions
+	IVector<double> fNew;			///< Copy of distribution functions
 	IVector<double> u;				///< Macropscopic velocity components
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
@@ -213,6 +217,15 @@ private:
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
+	// Optimised functions
+	void _LBM_stream_opt(int i, int j, int k, int subcycle);
+	void _LBM_coalesce_opt(int i, int j, int k, int v, int region);
+	void _LBM_explode_opt(int i, int j, int k, int v, int src_x, int src_y, int src_z);
+	void _LBM_collide_opt(int i, int j, int k);
+	void _LBM_macro_opt(int i, int j, int k);
+
+public :
+	void LBM_multi_opt(int subcycle = 0);
 
 
 };

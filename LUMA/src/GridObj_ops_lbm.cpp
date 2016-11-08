@@ -446,7 +446,6 @@ void GridObj::LBM_multi () {
 
 }
 
-
 // *****************************************************************************
 /// \brief	Method to compute body forces.
 ///
@@ -1583,4 +1582,288 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 
 }
 
+// *****************************************************************************
+// *****************************************************************************
+/// \brief	Optimised LBM multi-grid kernel.
+///
+///			This kernel compresses the old kernel into a single loop in order to
+///			make it more efficient. Capabilities are current limited with this 
+///			kernel with incompatible options giving unpredictable results.
+///			Use with caution.
+///
+///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
+void GridObj::LBM_multi_opt(int subcycle) {
+
+	// Two iterations on sub-grid
+	if (level < L_NumLev) {
+		for (int i = 0; i < 2; ++i) {
+			subGrid[0].LBM_multi_opt(i);
+		}
+	}
+
+	// Start the clock to time this kernel
+	clock_t secs, t_start = clock();
+
+	// Loop over grid
+	for (int i = 0; i < N_lim; ++i) {
+		for (int j = 0; j < M_lim; ++j) {
+			for (int k = 0; k < K_lim; ++k) {
+
+				// Ignore Refined sites
+				if (LatTyp(i, j, k, M_lim, K_lim) == eRefined) continue;
+
+				// STREAM //
+				_LBM_stream_opt(i,j,k,subcycle);
+
+				// MACROSCOPIC //
+				_LBM_macro_opt(i,j,k);
+
+				// COLLIDE //
+				_LBM_collide_opt(i,j,k);
+				
+			}
+		}
+	}
+
+	// Swap vectors
+	f.swap(fNew);
+
+	// Increment internal loop counter
+	++t;
+
+	// Get time of loop (includes sub-loops)
+	secs = clock() - t_start;
+
+	// Update average timestep time on this grid
+	timeav_timestep *= (t - 1);
+	timeav_timestep += ((double)secs) / CLOCKS_PER_SEC;
+	timeav_timestep /= t;
+
+	if (t % L_out_every == 0) {
+		// Performance data to logfile
+		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
+	}
+
+	// TODO: MPI communications would go here
+
+}
+
+// *****************************************************************************
+/// \brief	Optimised stream operation.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+///	\param	subcycle	number of sub-cycle being performed.
+void GridObj::_LBM_stream_opt(int i, int j, int k, int subcycle) {
+
+	for (int v = 0; v < L_nVels; ++v) {
+
+		// Get indicies for source site
+		int src_x = (i - c[0][v] + N_lim) % N_lim;
+		int src_y = (j - c[1][v] + M_lim) % M_lim;
+		int src_z = (k - c[2][v] + K_lim) % K_lim;
+
+		// BOUNCEBACK
+		if (LatTyp(src_x, src_y, src_z, M_lim, K_lim) == eSolid) {
+			// F value is its opposite (HWBB)
+			fNew(i, j, k, v, M_lim, K_lim, L_nVels) = f(i, j, k, GridUtils::getOpposite(v), M_lim, K_lim, L_nVels);
+		}
+		// DO-NOTHING
+		else if (LatTyp(src_x, src_y, src_z, M_lim, K_lim) == eInlet) {
+			// Set f to equilibrium (forced equilibrium BC)
+			fNew(i, j, k, v, M_lim, K_lim, L_nVels) = LBM_collide(src_x, src_y, src_z, v);
+		}
+		// EXPLODE
+		else if (LatTyp(src_x, src_y, src_z, M_lim, K_lim) == eTransitionToCoarser && subcycle == 0) {
+			// Pull value from parent TL site
+			_LBM_explode_opt(i,j,k,v,src_x,src_y,src_z);
+		}
+		// COALESCE
+		else if (LatTyp(src_x, src_y, src_z, M_lim, K_lim) == eRefined) {
+			// Pull average value from child TL cluster to get value leaving fine grid
+			_LBM_coalesce_opt(i,j,k,v,0);
+		}
+		// REGULAR STREAM
+		else {
+			// Pull populations from source sites
+			fNew(i, j, k, v, M_lim, K_lim, L_nVels) = f(src_x, src_y, src_z, v, M_lim, K_lim, L_nVels);
+		}
+	}
+
+}
+
+// *****************************************************************************
+/// \brief	Optimised coalesce operation.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+/// \param	v	lattice direction.
+///	\param	region	region number from which values are to be coalesced.
+void GridObj::_LBM_coalesce_opt(int i, int j, int k, int v, int region) {
+
+	// Get pointer to child grid
+	GridObj *childGrid = &subGrid[region];
+
+	// Get indices of child site
+	std::vector<int> cInd =
+		GridUtils::getFineIndices(
+		i, subGrid[0].CoarseLimsX[0],
+		j, subGrid[0].CoarseLimsY[0],
+		k, subGrid[0].CoarseLimsZ[0]);
+
+	// Average value of f over child cluster
+	fNew(i, j, k, v, M_lim, K_lim, L_nVels) = (
+		subGrid[0].f(cInd[0], cInd[1], cInd[2], v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0] + 1, cInd[1], cInd[2], v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0], cInd[1] + 1, cInd[2], v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0] + 1, cInd[1] + 1, cInd[2], v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels)
+#if (L_dims == 3)
+		+
+		subGrid[0].f(cInd[0], cInd[1], cInd[2] + 1, v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0] + 1, cInd[1], cInd[2] + 1, v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0], cInd[1] + 1, cInd[2] + 1, v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels) +
+		subGrid[0].f(cInd[0] + 1, cInd[1] + 1, cInd[2] + 1, v, subGrid[0].M_lim, subGrid[0].K_lim, L_nVels)
+		) / 8.0;
+#else
+		) / 4.0;
+#endif
+}
+
+// *****************************************************************************
+/// \brief	Optimised explode operation.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+///	\param	v	lattice direction.
+///	\param	src_x	x-index of site where value is pulled from.
+///	\param	src_y	y-index of site where value is pulled from.
+///	\param	src_z	z-index of site where value is pulled from.
+void GridObj::_LBM_explode_opt(int i, int j, int k, int v, int src_x, int src_y, int src_z) {
+
+	// Get parent indices
+	std::vector<int> pInd =
+		GridUtils::getCoarseIndices(
+		src_x, CoarseLimsX[0],
+		src_y, CoarseLimsY[0],
+		src_z, CoarseLimsZ[0]);
+
+	// Pull value from parent
+	fNew(i, j, k, v, M_lim, K_lim, L_nVels) =
+		parentGrid->f(pInd[0], pInd[1], pInd[2], v, parentGrid->M_lim, parentGrid->K_lim, L_nVels);
+}
+
+// *****************************************************************************
+/// \brief	Optimised collision operation.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+void GridObj::_LBM_collide_opt(int i, int j, int k) {
+
+	// Do not collide on TL to coarser sites on Rohde
+	if (LatTyp(i, j, k, M_lim, K_lim) != eTransitionToCoarser) {
+
+		// Perform collision operation
+		for (int v = 0; v < L_nVels; ++v) {
+			fNew(i, j, k, v, M_lim, K_lim, L_nVels) =
+				fNew(i, j, k, v, M_lim, K_lim, L_nVels) +
+				omega *	(
+				LBM_collide(i, j, k, v) -
+				fNew(i, j, k, v, M_lim, K_lim, L_nVels)
+				);
+		}
+
+	}
+}
+
+// *****************************************************************************
+/// \brief	Optimised macroscopic operation.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+void GridObj::_LBM_macro_opt(int i, int j, int k) {
+
+	// Only update fluid sites or TL to finer
+	if (LatTyp(i, j, k, M_lim, K_lim) == eFluid || LatTyp(i, j, k, M_lim, K_lim) == eTransitionToFiner) {
+
+		// Reset
+		rho(i, j, k, M_lim, K_lim) = 0.0;
+		for (int d = 0; d < L_dims; ++d)
+			u(i, j, k, d, M_lim, K_lim, L_dims) = 0.0;
+
+		for (int v = 0; v < L_nVels; ++v) {
+			// Sum rho and momentum
+			rho(i, j, k, M_lim, K_lim) += fNew(i, j, k, v, M_lim, K_lim, L_nVels);
+			u(i, j, k, 0, M_lim, K_lim, L_dims) += c[0][v] * fNew(i, j, k, v, M_lim, K_lim, L_nVels);
+			u(i, j, k, 1, M_lim, K_lim, L_dims) += c[1][v] * fNew(i, j, k, v, M_lim, K_lim, L_nVels);
+#if (L_dims == 3)
+			u(i, j, k, 2, M_lim, K_lim, L_dims) += c[2][v] * fNew(i, j, k, v, M_lim, K_lim, L_nVels);
+#endif
+		}
+
+		// Divide by rho to get velocity
+		u(i, j, k, 0, M_lim, K_lim, L_dims) /= rho(i, j, k, M_lim, K_lim);
+		u(i, j, k, 1, M_lim, K_lim, L_dims) /= rho(i, j, k, M_lim, K_lim);
+#if (L_dims == 3)
+		u(i, j, k, 2, M_lim, K_lim, L_dims) /= rho(i, j, k, M_lim, K_lim);
+#endif
+
+	}
+
+	// Update child TL sites for aethetic reasons only -- can be removed for performance
+	if (LatTyp(i, j, k, M_lim, K_lim) == eTransitionToFiner) {
+		std::vector<int> cInd =
+			GridUtils::getFineIndices(i, subGrid[0].CoarseLimsX[0], j, subGrid[0].CoarseLimsY[0], k, subGrid[0].CoarseLimsZ[0]);
+		for (int ii = 0; ii < 2; ++ii) {
+			for (int jj = 0; jj < 2; ++jj) {
+#if (L_dims == 3)
+				for (int kk = 0; kk < 2; ++kk)
+#else
+				int kk = 0;
+#endif
+				{
+					subGrid[0].u((cInd[0] + ii), (cInd[1] + jj), (cInd[2] + kk), 0, subGrid[0].M_lim, subGrid[0].K_lim, L_dims)
+						= u(i, j, k, 0, M_lim, K_lim, L_dims);
+					subGrid[0].u((cInd[0] + ii), (cInd[1] + jj), (cInd[2] + kk), 1, subGrid[0].M_lim, subGrid[0].K_lim, L_dims)
+						= u(i, j, k, 1, M_lim, K_lim, L_dims);
+#if (L_dims == 3)
+					subGrid[0].u((cInd[0] + ii), (cInd[1] + jj), (cInd[2] + kk), 2, subGrid[0].M_lim, subGrid[0].K_lim, L_dims)
+						= u(i, j, k, 2, M_lim, K_lim, L_dims);
+#endif
+					subGrid[0].rho((cInd[0] + ii), (cInd[1] + jj), (cInd[2] + kk), subGrid[0].M_lim, subGrid[0].K_lim)
+						= rho(i, j, k, M_lim, K_lim);
+				}
+			}
+		}
+	}
+
+	// TIME-AVERAGED QUANTITIES //
+
+	// Multiply current value by completed time steps to get sum
+	double ta_temp = rho_timeav(i, j, k, M_lim, K_lim) * (double)t;
+	// Add new value
+	ta_temp += rho(i, j, k, M_lim, K_lim);
+	// Divide by completed time steps + 1 to get new average
+	rho_timeav(i, j, k, M_lim, K_lim) = ta_temp / (double)(t + 1);
+
+	// Repeat for other quantities
+	int pq_combo = 0;
+	for (int p = 0; p < L_dims; p++) {
+		ta_temp = ui_timeav(i, j, k, p, M_lim, K_lim, L_dims) * (double)t;
+		ta_temp += u(i, j, k, p, M_lim, K_lim, L_dims);
+		ui_timeav(i, j, k, p, M_lim, K_lim, L_dims) = ta_temp / (double)(t + 1);
+		// Do necessary products
+		for (int q = p; q < L_dims; q++) {
+			ta_temp = uiuj_timeav(i, j, k, pq_combo, M_lim, K_lim, (3 * L_dims - 3)) * (double)t;
+			ta_temp += (u(i, j, k, p, M_lim, K_lim, L_dims) * u(i, j, k, q, M_lim, K_lim, L_dims));
+			uiuj_timeav(i, j, k, pq_combo, M_lim, K_lim, (3 * L_dims - 3)) = ta_temp / (double)(t + 1);
+			pq_combo++;
+		}
+	}
+
+}
 // *****************************************************************************

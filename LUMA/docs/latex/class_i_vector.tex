@@ -2,11 +2,6 @@
 \label{class_i_vector}\index{I\+Vector$<$ Gen\+Typ $>$@{I\+Vector$<$ Gen\+Typ $>$}}
 
 
-Index-\/collapsing vector class.  
-
-
-
-
 {\ttfamily \#include $<$I\+Vector.\+h$>$}
 
 Inheritance diagram for I\+Vector$<$ Gen\+Typ $>$\+:\begin{figure}[H]
@@ -19,26 +14,18 @@ Inheritance diagram for I\+Vector$<$ Gen\+Typ $>$\+:\begin{figure}[H]
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{class_i_vector_aa9e08edf18a107b1512c563f974b84a9}{I\+Vector} ()
-\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Index-\/collapsing vector class. \end{DoxyCompactList}\item 
 \hyperlink{class_i_vector_a98498962689499607ff2f3c0dd251c55}{$\sim$\+I\+Vector} ()
-\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
+\item 
 \hyperlink{class_i_vector_aa20ed511fdb06743b435f23bbf286e8c}{I\+Vector} (size\+\_\+t size, Gen\+Typ val)
-\begin{DoxyCompactList}\small\item\em Custom constructor taking type and value. \end{DoxyCompactList}\item 
+\item 
 Gen\+Typ \& \hyperlink{class_i_vector_aecbb48fdf561c44efb89127c77ab11e2}{operator()} (size\+\_\+t i, size\+\_\+t j, size\+\_\+t k, size\+\_\+t v, size\+\_\+t j\+\_\+max, size\+\_\+t k\+\_\+max, size\+\_\+t v\+\_\+max)
-\begin{DoxyCompactList}\small\item\em 4D array index flatten. \end{DoxyCompactList}\item 
+\item 
 Gen\+Typ \& \hyperlink{class_i_vector_a975461485fb45bd7e970822800266177}{operator()} (size\+\_\+t i, size\+\_\+t j, size\+\_\+t k, size\+\_\+t j\+\_\+max, size\+\_\+t k\+\_\+max)
-\begin{DoxyCompactList}\small\item\em 3D array index flatten. \end{DoxyCompactList}\item 
+\item 
 Gen\+Typ \& \hyperlink{class_i_vector_a506334a0add9a0a79e27a208fda53c0d}{operator()} (size\+\_\+t i, size\+\_\+t j, size\+\_\+t j\+\_\+max)
-\begin{DoxyCompactList}\small\item\em 2D array index flatten. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{DoxyCompactItemize}
 
-
-\subsection{Detailed Description}
-\subsubsection*{template$<$typename Gen\+Typ$>$\\*
-class I\+Vector$<$ Gen\+Typ $>$}
-
-Index-\/collapsing vector class. 
-
-This class has all the behaviour of std\+::vector but has a overriden operator() to allow automatic flattening of indices before returning a reference of value at indexed location. Needs to be able to accept different datatypes so templated. 
 
 \subsection{Constructor \& Destructor Documentation}
 \index{I\+Vector@{I\+Vector}!I\+Vector@{I\+Vector}}
@@ -50,20 +37,16 @@ This class has all the behaviour of std\+::vector but has a overriden operator()
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_aa9e08edf18a107b1512c563f974b84a9}{}\label{class_i_vector_aa9e08edf18a107b1512c563f974b84a9}
 
 
-Default constructor. 
+Index-\/collapsing vector class. 
 
-\index{I\+Vector@{I\+Vector}!````~I\+Vector@{$\sim$\+I\+Vector}}
+This class has all the behaviour of std\+::vector but has a overriden operator() to allow automatic flattening of indices before returning a reference of value at indexed location. Needs to be able to accept different datatypes so templated. Default constructor \index{I\+Vector@{I\+Vector}!````~I\+Vector@{$\sim$\+I\+Vector}}
 \index{````~I\+Vector@{$\sim$\+I\+Vector}!I\+Vector@{I\+Vector}}
 \subsubsection[{\texorpdfstring{$\sim$\+I\+Vector()}{~IVector()}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Gen\+Typ$>$ {\bf I\+Vector}$<$ Gen\+Typ $>$\+::$\sim${\bf I\+Vector} (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_a98498962689499607ff2f3c0dd251c55}{}\label{class_i_vector_a98498962689499607ff2f3c0dd251c55}
-
-
-Default destructor. 
-
-\index{I\+Vector@{I\+Vector}!I\+Vector@{I\+Vector}}
+Default destructor \index{I\+Vector@{I\+Vector}!I\+Vector@{I\+Vector}}
 \index{I\+Vector@{I\+Vector}!I\+Vector@{I\+Vector}}
 \subsubsection[{\texorpdfstring{I\+Vector(size\+\_\+t size, Gen\+Typ val)}{IVector(size_t size, GenTyp val)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Gen\+Typ$>$ {\bf I\+Vector}$<$ Gen\+Typ $>$\+::{\bf I\+Vector} (
 \begin{DoxyParamCaption}
@@ -71,9 +54,7 @@ Default destructor.
 \item[{Gen\+Typ}]{val}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_aa20ed511fdb06743b435f23bbf286e8c}{}\label{class_i_vector_aa20ed511fdb06743b435f23bbf286e8c}
-
-
-Custom constructor taking type and value. 
+Custom constructor taking type and value.
 
 
 \begin{DoxyParams}{Parameters}
@@ -98,11 +79,9 @@ Custom constructor taking type and value.
 \item[{size\+\_\+t}]{v\+\_\+max}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_aecbb48fdf561c44efb89127c77ab11e2}{}\label{class_i_vector_aecbb48fdf561c44efb89127c77ab11e2}
-
-
-4D array index flatten. 
-
-Override of parentheses to auto-\/flatten indices to a single index. 
+4D array index flatten. \begin{DoxyVerb}    Override of parentheses to auto-flatten indices to a single index.
+\end{DoxyVerb}
+ 
 \begin{DoxyParams}{Parameters}
 {\em i} & the i index \\
 \hline
@@ -133,11 +112,9 @@ Gen\+Typ\& a reference to the value at this position in the vector
 \item[{size\+\_\+t}]{k\+\_\+max}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_a975461485fb45bd7e970822800266177}{}\label{class_i_vector_a975461485fb45bd7e970822800266177}
-
-
-3D array index flatten. 
-
-Override of parentheses to auto-\/flatten indices to a single index. 
+3D array index flatten. \begin{DoxyVerb}    Override of parentheses to auto-flatten indices to a single index.
+\end{DoxyVerb}
+ 
 \begin{DoxyParams}{Parameters}
 {\em i} & the i index \\
 \hline
@@ -162,9 +139,7 @@ Gen\+Typ\& a reference to the value at this position in the vector
 \item[{size\+\_\+t}]{j\+\_\+max}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_i_vector_a506334a0add9a0a79e27a208fda53c0d}{}\label{class_i_vector_a506334a0add9a0a79e27a208fda53c0d}
-
-
-2D array index flatten. 
+2D array index flatten.
 
 
 \begin{DoxyParams}{Parameters}

@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.2.1-alpha"
+#define LUMA_VERSION "1.2.2-alpha"
 
 
 // Header guard
@@ -46,7 +46,7 @@
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
-#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
+//#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
@@ -66,13 +66,13 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_out_every 100			///< How many timesteps before whole grid output
+#define L_out_every 1000			///< How many timesteps before whole grid output
 #define L_out_every_forces 100		///< Specific output frequency of body forces
 #define L_output_precision 8		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
-#define L_HDF5_OUTPUT				///< HDF5 dump on output
+//#define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                    ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 
@@ -92,7 +92,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 10000			///< Frequency of write out of restart file
 
@@ -106,7 +106,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 5000		///< Number of time steps to run simulation for
+#define L_Timesteps 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,10 +137,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_dims 3		///< Number of dimensions to the problem
-#define L_N 50			///< Number of x lattice sites
-#define L_M 50			///< Number of y lattice sites
-#define L_K 100			///< Number of z lattice sites
+#define L_dims 2		///< Number of dimensions to the problem
+#define L_N 64			///< Number of x lattice sites
+#define L_M 64			///< Number of y lattice sites
+#define L_K 16			///< Number of z lattice sites
 
 
 /*
@@ -151,9 +151,9 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 0.5		///< End of domain-x
+#define L_b_x 1		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
-#define L_b_y 0.5 	///< End of domain-y
+#define L_b_y 1 	///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
 #define L_b_z 1		///< End of domain-z
 
@@ -168,18 +168,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Fluid data in lattice units
-#define L_USE_INLET_PROFILE		///< Use an inlet profile
-#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_u_ref 0.00883838*4	///< Reference velocity for scaling, can be mean inelt velocity
+//#define L_USE_INLET_PROFILE		///< Use an inlet profile
+//#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_u_ref 0.04	///< Reference velocity for scaling
 #define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
-#define L_u_0x 0			///< Initial/inlet x-velocity
+#define L_u_0x 0.04			///< Initial/inlet x-velocity
 #define L_u_0y 0			///< Initial/inlet y-velocity
-#define L_u_0z 0.04			///< Initial/inlet z-velocity
+#define L_u_0z 0			///< Initial/inlet z-velocity
 
 #define L_rho_in 1			///< Initial density
-#define L_Re 40			///< Desired Reynolds number
+#define L_Re 50			///< Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -191,7 +191,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Master IBM switches //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 #define L_IB_Lev 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
@@ -264,12 +264,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
 #define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define L_INLET_REGULARISED		///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
@@ -284,7 +284,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Solids
 //#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
 #define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units
@@ -299,22 +299,22 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 1		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 30		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 60		///< Index of end of object/wall in x-direction
-	#define L_block_y_min 30		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 60		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 30		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 60		///< Index of end of object/wall in z-direction
+	#define L_block_x_min (L_N / 4)		///< Index of start of object/wall in x-direction
+	#define L_block_x_max (L_block_x_min + (L_N / 4))		///< Index of end of object/wall in x-direction
+	#define L_block_y_min L_block_x_min		///< Index of start of object/wall in y-direction
+	#define L_block_y_max L_block_x_max		///< Index of end of object/wall in y-direction
+	#define L_block_z_min L_block_x_min		///< Index of start of object/wall in z-direction
+	#define L_block_z_max L_block_x_max		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
-#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
 	#define L_object_on_grid_lev 0		///< Provide grid level on which object should be added 
 	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
@@ -356,13 +356,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Following options are only here to making testing different grid combinations easier
-	const static int RefXstart[L_NumLev][L_NumReg] = { { 35 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
-	const static int RefXend[L_NumLev][L_NumReg] = { { 40 }, { 9 }, { 13 }, { 21 }, { 37 }, { 69 } };
-	const static int RefYstart[L_NumLev][L_NumReg] = { { 35 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
-	const static int RefYend[L_NumLev][L_NumReg] = { { 40 }, { 9 }, { 13 }, { 21 }, { 37 }, { 69 } };
+	const static int RefXstart[L_NumLev][L_NumReg] = { { (L_N / 4) } };
+	const static int RefXend[L_NumLev][L_NumReg] = { { (3 * L_N / 4) } };
+	const static int RefYstart[L_NumLev][L_NumReg] = { { (L_N / 4) } };
+	const static int RefYend[L_NumLev][L_NumReg] = { { (3 * L_N / 4) } };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg] = { { 34 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 } };
-	static int RefZend[L_NumLev][L_NumReg] = { { 41 }, { 13 }, { 21 }, { 37 }, { 69 }, { 133 } };
+	static int RefZstart[L_NumLev][L_NumReg] = { { (L_N / 4) } };
+	static int RefZend[L_NumLev][L_NumReg] = { { (3 * L_N / 4) } };
 
 #endif
 

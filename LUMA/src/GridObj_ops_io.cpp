@@ -698,9 +698,9 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	for (int v = 0; v < L_nVels; v++) {
 		litefile << "F" << std::to_string(v) << "\t\t";
 	}
-	for (int v = 0; v < L_nVels; v++) {
+	/*for (int v = 0; v < L_nVels; v++) {
 		litefile << "FEQ" << std::to_string(v) << "\t\t";
-	}
+	}*/
 	litefile << "TA_RHO\t\tTA_UX\t\tTA_UY\t\tTA_UZ\t\tTA_UXUX\t\tTA_UXUY\t\tTA_UXUZ\t\tTA_UYUY\t\tTA_UYUZ\t\tTA_UZUZ" << std::endl;
 	
 	// Indices
@@ -740,9 +740,9 @@ void GridObj::io_lite(double tval, std::string TAG) {
 					for (v = 0; v < L_nVels; v++) {
 						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
 					}
-					for (v = 0; v < L_nVels; v++) {
+					/*for (v = 0; v < L_nVels; v++) {
 						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
-					}
+					}*/
 				
 					// Write out time averaged rho and u
 					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";

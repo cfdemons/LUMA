@@ -1,0 +1,90 @@
+\hypertarget{class_grid_units}{}\section{Grid\+Units Class Reference}
+\label{class_grid_units}\index{Grid\+Units@{Grid\+Units}}
+
+
+\hyperlink{class_grid_units}{Grid\+Units}.  
+
+
+
+
+{\ttfamily \#include $<$Grid\+Units.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_grid_units_a5f9360a53252d5420a6a785e42feca21}{Grid\+Units} ()
+\item 
+\hyperlink{class_grid_units_a082a527c0b79a09eed048527fe283f9e}{$\sim$\+Grid\+Units} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T $>$ }\\static T \hyperlink{class_grid_units_abddfadd5165980c7f6f9ba3d086a79c7}{m2cm} (const T meters)
+\begin{DoxyCompactList}\small\item\em Convert from m to cm. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\static T \hyperlink{class_grid_units_a94d339355f8e81b46405c99c0b7a81aa}{ulat2uphys} (T ulat, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$current\+Grid)
+\begin{DoxyCompactList}\small\item\em Velocity in lattice units to velocity in physical units. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{class_grid_units}{Grid\+Units}. 
+
+This class contains static methods for unit conversion (the only ones implemented are from m to cm and velocity from lattice units to m/s) 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Grid\+Units@{Grid\+Units}!Grid\+Units@{Grid\+Units}}
+\index{Grid\+Units@{Grid\+Units}!Grid\+Units@{Grid\+Units}}
+\subsubsection[{\texorpdfstring{Grid\+Units()}{GridUnits()}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Units\+::\+Grid\+Units (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_grid_units_a5f9360a53252d5420a6a785e42feca21}{}\label{class_grid_units_a5f9360a53252d5420a6a785e42feca21}
+\index{Grid\+Units@{Grid\+Units}!````~Grid\+Units@{$\sim$\+Grid\+Units}}
+\index{````~Grid\+Units@{$\sim$\+Grid\+Units}!Grid\+Units@{Grid\+Units}}
+\subsubsection[{\texorpdfstring{$\sim$\+Grid\+Units()}{~GridUnits()}}]{\setlength{\rightskip}{0pt plus 5cm}Grid\+Units\+::$\sim$\+Grid\+Units (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{class_grid_units_a082a527c0b79a09eed048527fe283f9e}{}\label{class_grid_units_a082a527c0b79a09eed048527fe283f9e}
+
+
+\subsection{Member Function Documentation}
+\index{Grid\+Units@{Grid\+Units}!m2cm@{m2cm}}
+\index{m2cm@{m2cm}!Grid\+Units@{Grid\+Units}}
+\subsubsection[{\texorpdfstring{m2cm(const T meters)}{m2cm(const T meters)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ static T Grid\+Units\+::m2cm (
+\begin{DoxyParamCaption}
+\item[{const T}]{meters}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_units_abddfadd5165980c7f6f9ba3d086a79c7}{}\label{class_grid_units_abddfadd5165980c7f6f9ba3d086a79c7}
+
+
+Convert from m to cm. 
+
+\index{Grid\+Units@{Grid\+Units}!ulat2uphys@{ulat2uphys}}
+\index{ulat2uphys@{ulat2uphys}!Grid\+Units@{Grid\+Units}}
+\subsubsection[{\texorpdfstring{ulat2uphys(\+T ulat, Grid\+Obj $\ast$current\+Grid)}{ulat2uphys(T ulat, GridObj *currentGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ static T Grid\+Units\+::ulat2uphys (
+\begin{DoxyParamCaption}
+\item[{T}]{ulat, }
+\item[{{\bf Grid\+Obj} $\ast$}]{current\+Grid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{class_grid_units_a94d339355f8e81b46405c99c0b7a81aa}{}\label{class_grid_units_a94d339355f8e81b46405c99c0b7a81aa}
+
+
+Velocity in lattice units to velocity in physical units. 
+
+Converts velocity component from lattice units to m/s. It uses the L\+\_\+\+U\+\_\+phys introduced by the user, dx and dt. You can introduce any L\+\_\+\+U\+\_\+phys you want, but the reference lenght (usualy the width of the domain) , the Re number and the L\+BM parameters will remain the same. So you will be implicitly changing the physical viscosity of your fluid when you change L\+\_\+\+U\+\_\+phys
+
+
+\begin{DoxyParams}{Parameters}
+{\em ulat} & Lattice velocity. \\
+\hline
+{\em current\+Grid} & Pointer to the current grid. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+physical velocity 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_grid_units_8h}{Grid\+Units.\+h}\end{DoxyCompactItemize}

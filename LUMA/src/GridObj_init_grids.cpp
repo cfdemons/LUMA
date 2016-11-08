@@ -32,8 +32,7 @@ using namespace std;
 ///			assumed to be oriented vertically (y-direction).
 void GridObj::LBM_init_getInletProfile() {
 
-	size_t i, j;
-	double y, tmp;
+	size_t j;
 	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
 
 #ifdef L_PARABOLIC_INLET
@@ -53,6 +52,9 @@ void GridObj::LBM_init_getInletProfile() {
 	}
 
 #else
+
+	size_t i;
+	double y, tmp;
 
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
@@ -510,7 +512,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Initialise L0 POPULATION matrices (f, feq)
 	f.resize( N_lim*M_lim*K_lim*L_nVels );
 	feq.resize( N_lim*M_lim*K_lim*L_nVels );
-
+	fNew.resize(N_lim * M_lim * K_lim * L_nVels);
 
 
 	// Loop over grid
@@ -527,6 +529,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 		}
 	}
 	feq = f; // Make feq = feq too
+	fNew = f;
 
 
 	// Initialise OTHER parameters
@@ -832,6 +835,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Resize
 	f.resize(N_lim * M_lim * K_lim * L_nVels);
 	feq.resize(N_lim * M_lim * K_lim * L_nVels);
+	fNew.resize(N_lim * M_lim * K_lim * L_nVels);
 	
 
 	// Loop over grid
@@ -848,6 +852,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		}
 	}
 	feq = f; // Set feq to feq
+	fNew = f;
 
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/pGrid.omega - .5) *2) + .5);

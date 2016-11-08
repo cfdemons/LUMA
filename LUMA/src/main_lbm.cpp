@@ -468,7 +468,9 @@ int main( int argc, char* argv[] )
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
-		Grids.LBM_multi();	// Main LBM kernel (same both with and without IBM)
+		//Grids.LBM_multi();	// Main LBM kernel (same both with and without IBM)
+
+		Grids.LBM_multi_opt();	// Launch LBM kernel on top-level grid
 
 		///////////////
 		// Write Out //
@@ -489,17 +491,17 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-		Grids.io_lite(Grids.t,"");
+			*GridUtils::logfile << "Writing out to IOLite file..." << endl;
+			Grids.io_lite(Grids.t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT
-		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
-		Grids.io_hdf5(Grids.t);
+			*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+			Grids.io_hdf5(Grids.t);
 #endif
 
 #if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
-		objMan->io_vtkIBBWriter(Grids.t);
+			objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \

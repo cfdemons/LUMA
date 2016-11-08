@@ -120,6 +120,7 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 	this->level = pGrid.level + 1;
     this->region_number = RegionNumber;
 	this->t = 0;
+	this->parentGrid = &pGrid;
 
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;

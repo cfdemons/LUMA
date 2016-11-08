@@ -40,7 +40,9 @@ void \hyperlink{class_grid_obj_a3ba133d06625fb576ca0909b946033b2}{L\+B\+M\+\_\+i
 \begin{DoxyCompactList}\small\item\em Method to initialise all labels on sub-\/grids. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a023713976673d029103690a91c5415f9}{L\+B\+M\+\_\+init\+\_\+get\+Inlet\+Profile} ()
 \begin{DoxyCompactList}\small\item\em Method to import an input profile from a file. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_ac69eef5f465527c9ccf8941115c68770}{L\+B\+M\+\_\+multi} (bool ibm\+Flag)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_ac69eef5f465527c9ccf8941115c68770}{L\+B\+M\+\_\+multi} (bool ibm\+Flag)
+\begin{DoxyCompactList}\small\item\em L\+BM multi-\/grid kernel (D\+E\+P\+R\+E\+C\+A\+T\+ED V\+E\+R\+S\+I\+ON). \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_a21ee25286fe790eaabcdbf5602f1f38d}{L\+B\+M\+\_\+multi} ()
 \begin{DoxyCompactList}\small\item\em L\+BM multi-\/grid kernel. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a0feb0f9406f626e90c57045350161b22}{L\+B\+M\+\_\+collide} ()
 \begin{DoxyCompactList}\small\item\em Apply collision operator. \end{DoxyCompactList}\item 
@@ -82,6 +84,8 @@ void \hyperlink{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{L\+B\+M\+\_\+a
 \begin{DoxyCompactList}\small\item\em Wrapper method to add sub-\/grid to this grid. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a1f334215b7789ea1ad8e2d1e15c67fb2}{io\+\_\+textout} (std\+::string output\+\_\+tag)
 \begin{DoxyCompactList}\small\item\em Verbose A\+S\+C\+II writer. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_aa80aecb06d7a420865c32b8acc15581e}{io\+\_\+fgaout} ()
+\begin{DoxyCompactList}\small\item\em .fga file writer. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a940b825873a33b2fc9375f7a8f9bffc7}{io\+\_\+restart} (bool I\+O\+\_\+flag)
 \begin{DoxyCompactList}\small\item\em Restart file read-\/writer. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{io\+\_\+probe\+Output} ()
@@ -89,7 +93,9 @@ void \hyperlink{class_grid_obj_af7e8782f95d15884d761cc4f1d5926c0}{io\+\_\+probe\
 void \hyperlink{class_grid_obj_acf311bbf350fd48104663eaabebca835}{io\+\_\+lite} (double tval, std\+::string Tag)
 \begin{DoxyCompactList}\small\item\em A\+S\+C\+II dump of grid data. \end{DoxyCompactList}\item 
 int \hyperlink{class_grid_obj_adc960ac818748b839e81d1375782caa7}{io\+\_\+hdf5} (double tval)
-\begin{DoxyCompactList}\small\item\em H\+D\+F5 writer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em H\+D\+F5 writer. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_ac65e9a1a8aa854d25281780d6b52665b}{L\+B\+M\+\_\+multi\+\_\+opt} (int subcycle=0)
+\begin{DoxyCompactList}\small\item\em Optimised L\+BM multi-\/grid kernel. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -412,7 +418,18 @@ Symmetry boundary condition for free-\/slip walls.
 
 Helper method to set macroscopic quantities of solid sites. 
 
-Velocity is set to zero and density is set to initial density. Applies to e\+Solid and e\+Refined\+Solid sites only. \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+hdf5@{io\+\_\+hdf5}}
+Velocity is set to zero and density is set to initial density. Applies to e\+Solid and e\+Refined\+Solid sites only. \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+fgaout@{io\+\_\+fgaout}}
+\index{io\+\_\+fgaout@{io\+\_\+fgaout}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{io\+\_\+fgaout()}{io_fgaout()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::io\+\_\+fgaout (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_aa80aecb06d7a420865c32b8acc15581e}{}\label{class_grid_obj_aa80aecb06d7a420865c32b8acc15581e}
+
+
+.fga file writer. 
+
+Writes the components of the macroscopic velocity of the grid at time t and call recursively for any sub-\/grid. Writes the data of each subgrid in a different .fga file. .fga is the A\+S\+C\+II file format used by Unreal Engine 4 to read the data that populates a Vector\+Field object. It doesn\textquotesingle{}t do anything if the model is not 2D or 3D. Since .fga files can only store 3D data \index{Grid\+Obj@{Grid\+Obj}!io\+\_\+hdf5@{io\+\_\+hdf5}}
 \index{io\+\_\+hdf5@{io\+\_\+hdf5}!Grid\+Obj@{Grid\+Obj}}
 \subsubsection[{\texorpdfstring{io\+\_\+hdf5(double tval)}{io_hdf5(double tval)}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Obj\+::io\+\_\+hdf5 (
 \begin{DoxyParamCaption}
@@ -813,13 +830,42 @@ Overload of macroscopic quantity calculation to allow it to be applied to a sing
 )}\hypertarget{class_grid_obj_ac69eef5f465527c9ccf8941115c68770}{}\label{class_grid_obj_ac69eef5f465527c9ccf8941115c68770}
 
 
-L\+BM multi-\/grid kernel. 
+L\+BM multi-\/grid kernel (D\+E\+P\+R\+E\+C\+A\+T\+ED V\+E\+R\+S\+I\+ON). 
 
 The L\+BM kernel manages the calling of all I\+BM and L\+BM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-\/grids and manages the framework for grid-\/grid interaction.
 
 
 \begin{DoxyParams}{Parameters}
 {\em ibm\+Flag} & flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using I\+BM. \\
+\hline
+\end{DoxyParams}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}}
+\index{L\+B\+M\+\_\+multi@{L\+B\+M\+\_\+multi}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi()}{LBM_multi()}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a21ee25286fe790eaabcdbf5602f1f38d}{}\label{class_grid_obj_a21ee25286fe790eaabcdbf5602f1f38d}
+
+
+L\+BM multi-\/grid kernel. 
+
+The L\+BM kernel manages the calling of all I\+BM and L\+BM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-\/grids and manages the framework for grid-\/grid interaction. \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+multi\+\_\+opt@{L\+B\+M\+\_\+multi\+\_\+opt}}
+\index{L\+B\+M\+\_\+multi\+\_\+opt@{L\+B\+M\+\_\+multi\+\_\+opt}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+multi\+\_\+opt(int subcycle=0)}{LBM_multi_opt(int subcycle=0)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+multi\+\_\+opt (
+\begin{DoxyParamCaption}
+\item[{int}]{subcycle = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_ac65e9a1a8aa854d25281780d6b52665b}{}\label{class_grid_obj_ac65e9a1a8aa854d25281780d6b52665b}
+
+
+Optimised L\+BM multi-\/grid kernel. 
+
+This kernel compresses the old kernel into a single loop in order to make it more efficient. Capabilities are current limited with this kernel with incompatible options giving unpredictable results. Use with caution.
+
+
+\begin{DoxyParams}{Parameters}
+{\em subcycle} & sub-\/cycle to be performed if called from a subgrid. \\
 \hline
 \end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+reset\+Forces@{L\+B\+M\+\_\+reset\+Forces}}

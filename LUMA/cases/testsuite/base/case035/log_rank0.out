@@ -1,0 +1,20 @@
+LUMA -- Version 1.2.0-alpha
+Simulation started at Mon Nov 14 12:13:10 2016
+Constructing Grid level 0
+Grid size = 50x50x50
+Number of time steps = 100
+Physical grid spacing = 0.020000
+Lattice viscosity = 0.006000
+L0 relaxation time = 0.518000
+Lattice reference velocity 0.040000
+Reynolds Number = 100
+Object Manager Created.
+Grid & Object Initialisation completed in 76.872ms.
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Initialising LBM time-stepping...
+Grid 0: Time stepping taking an average of 328.513ms
+Writing out to IOLite file...
+Writing out to HDF5 file...
+Simulation completed at Mon Nov 14 12:13:49 2016
+

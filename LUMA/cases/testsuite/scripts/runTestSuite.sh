@@ -99,15 +99,24 @@ do
 		mkdir -p ${CASE_RES_PATH}/input
 		cp ${DIR_INPUT}/bbb_input2D.in ${CASE_RES_PATH}/input/bbb_input.in
 	fi
+	# BB point cloud cases
+	if [ ${CASE_NUM_INT} -eq 33 ] || [ ${CASE_NUM_INT} -eq 36 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/bbb_input3D.in ${CASE_RES_PATH}/input/bbb_input.in
+	fi
 
 	# BFL point cloud cases
     if [ ${CASE_NUM_INT} -eq 4 ] || [ ${CASE_NUM_INT} -eq 7 ]; then
 		mkdir -p ${CASE_RES_PATH}/input
 		cp ${DIR_INPUT}/bfl_input2D.in ${CASE_RES_PATH}/input/bfl_input.in
 	fi
+	if [ ${CASE_NUM_INT} -eq 34 ] || [ ${CASE_NUM_INT} -eq 37 ]; then
+		mkdir -p ${CASE_RES_PATH}/input
+		cp ${DIR_INPUT}/bfl_input3D.in ${CASE_RES_PATH}/input/bfl_input.in
+	fi
 
 	# Read in inlet profile
-	if [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 6 ]; then
+	if [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 6 ] || [ ${CASE_NUM_INT} -eq 33 ]; then
 		mkdir -p ${CASE_RES_PATH}/input
 		cp ${DIR_INPUT}/inlet_profile2D.in ${CASE_RES_PATH}/input/inlet_profile.in
 	fi
@@ -126,7 +135,7 @@ do
 	fi
 
 	# Number of processes to run on
-	if [ ${CASE_NUM_INT} -eq 0 ] || [ ${CASE_NUM_INT} -eq 1 ] || [ ${CASE_NUM_INT} -eq 2 ] || [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 4 ] || [ ${CASE_NUM_INT} -eq 5 ] || [ ${CASE_NUM_INT} -eq 30 ] || [ ${CASE_NUM_INT} -eq 31 ]; then
+	if [ ${CASE_NUM_INT} -eq 0 ] || [ ${CASE_NUM_INT} -eq 1 ] || [ ${CASE_NUM_INT} -eq 2 ] || [ ${CASE_NUM_INT} -eq 3 ] || [ ${CASE_NUM_INT} -eq 4 ] || [ ${CASE_NUM_INT} -eq 5 ] || [ ${CASE_NUM_INT} -eq 30 ] || [ ${CASE_NUM_INT} -eq 31 ] || [ ${CASE_NUM_INT} -eq 32 ] || [ ${CASE_NUM_INT} -eq 33 ] || [ ${CASE_NUM_INT} -eq 34 ] || [ ${CASE_NUM_INT} -eq 35 ]; then
 		NPROCS=1
 	elif [ ${CASE_NUM_INT} -eq 6 ] || [ ${CASE_NUM_INT} -eq 7 ] || [ ${CASE_NUM_INT} -eq 8 ] || [ ${CASE_NUM_INT} -eq 9 ]; then
 		NPROCS=8

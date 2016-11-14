@@ -36,7 +36,8 @@ void GridObj::LBM_boundary(int bc_type_flag) {
 	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Reset object forces for force calculation
-	if (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) {
+	if ((bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) && 
+		level == L_object_on_grid_lev && region_number == L_object_on_grid_reg) {
 		objman->forceOnObjectX = 0.0;
 		objman->forceOnObjectY = 0.0;
 		objman->forceOnObjectZ = 0.0;

@@ -1,6 +1,7 @@
 version		=	1.2.2-alpha
 
 General		:	Optimisation version of the 1.2.1-alpha working code.
+				Reinstated force calculation and included a few other optimisations.
 
 version		=	1.2.1-alpha
 

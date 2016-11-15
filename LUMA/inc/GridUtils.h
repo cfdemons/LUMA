@@ -92,7 +92,7 @@ public:
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
+	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);		// Function: isOnThisRank + overloads
 	static bool isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid);
 	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.

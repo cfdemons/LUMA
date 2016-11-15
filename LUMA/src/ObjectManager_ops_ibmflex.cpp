@@ -72,7 +72,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 	// Square of non-dimensional spacing
 	double ds_sqrd = pow(ds_nondim,2);
 
-#ifdef GRAVITY_ON
+#ifdef L_GRAVITY_ON
 	Froude = pow(L_u_ref,2) / L_grav_force * length_lu;
 #else
 	Froude = 0.0;

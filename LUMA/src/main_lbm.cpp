@@ -468,9 +468,12 @@ int main( int argc, char* argv[] )
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
-		//Grids.LBM_multi();	// Main LBM kernel (same both with and without IBM)
 
-		Grids.LBM_multi_opt();	// Launch LBM kernel on top-level grid
+#ifdef L_USE_OPTIMISED_KERNEL
+		Grids.LBM_multi_opt();		// Launch LBM kernel on top-level grid
+#else
+		Grids.LBM_multi();			// Main LBM kernel (same both with and without IBM)
+#endif
 
 		///////////////
 		// Write Out //

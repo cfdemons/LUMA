@@ -65,16 +65,20 @@
 // Using MPI?
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
+// Optimisation
+#define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
+
 // Output Options
-#define L_out_every 1000			///< How many timesteps before whole grid output
+#define L_out_every 100			///< How many timesteps before whole grid output
 #define L_out_every_forces 100		///< Specific output frequency of body forces
-#define L_output_precision 8		///< Precision of output (for text writers)
+#define L_output_precision 5		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
-//#define L_HDF5_OUTPUT				///< HDF5 dump on output
+#define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
-//#define L_IO_FGA                    ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
+//#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
+//#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
@@ -86,13 +90,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Gravity
-//#define GRAVITY_ON						///< Turn on gravity force
+#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
 #define L_grav_force 0.0001
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 10000			///< Frequency of write out of restart file
 
@@ -106,7 +110,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 1000		///< Number of time steps to run simulation for
+#define L_Timesteps 100		///< Number of time steps to run simulation for
 
 
 /*
@@ -138,8 +142,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 2		///< Number of dimensions to the problem
-#define L_N 64			///< Number of x lattice sites
-#define L_M 64			///< Number of y lattice sites
+#define L_N 1280			///< Number of x lattice sites
+#define L_M 256			///< Number of y lattice sites
 #define L_K 16			///< Number of z lattice sites
 
 
@@ -151,7 +155,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Physical dimensions (dictates scaling)
 #define L_a_x 0			///< Start of domain-x
-#define L_b_x 1		///< End of domain-x
+#define L_b_x 5		///< End of domain-x
 #define L_a_y 0			///< Start of domain-y
 #define L_b_y 1 	///< End of domain-y
 #define L_a_z 0			///< Start of domain-z
@@ -264,26 +268,26 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
-#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED		///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Periodicity
-//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
@@ -299,7 +303,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_block_on_grid_lev 1		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 

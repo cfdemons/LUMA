@@ -31,8 +31,10 @@
 void GridObj::LBM_multi_opt(int subcycle) {
 
 	// Two iterations on sub-grid first
-	for (int i = 0; i < 2; ++i) {
-		subGrid[0].LBM_multi_opt(i);
+	if (subGrid.size()) {
+		for (int i = 0; i < 2; ++i) {
+			subGrid[0].LBM_multi_opt(i);
+		}
 	}
 
 	// Start the clock to time this kernel
@@ -118,7 +120,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 
 	for (int v = 0; v < L_nVels; ++v) {
 
-		// Get indicies for source site
+		// Get indicies for source site (periodic by default)
 		int src_x = (i - c_opt[v][0] + N_lim) % N_lim;
 		int src_y = (j - c_opt[v][1] + M_lim) % M_lim;
 		int src_z = (k - c_opt[v][2] + K_lim) % K_lim;
@@ -349,6 +351,9 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 #if (L_dims == 3)
 		u[2 + id * L_dims] = rhouZ_temp / rho_temp;
 #endif
+
+		// Assign density
+		rho[id] = rho_temp;
 
 	}
 

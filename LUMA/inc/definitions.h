@@ -63,7 +63,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Optimisation
 #define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
@@ -90,13 +90,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Gravity
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
 #define L_grav_force 0.0001
 #define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_restart_out_every 10000			///< Frequency of write out of restart file
 
@@ -110,7 +110,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100		///< Number of time steps to run simulation for
+#define L_Timesteps 5000		///< Number of time steps to run simulation for
 
 
 /*
@@ -120,7 +120,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // MPI Data
-#define L_Xcores 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_Xcores 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
@@ -142,9 +142,9 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Lattice properties (in lattice units)
 #define L_dims 2		///< Number of dimensions to the problem
-#define L_N 1280			///< Number of x lattice sites
-#define L_M 256			///< Number of y lattice sites
-#define L_K 16			///< Number of z lattice sites
+#define L_N 640			///< Number of x lattice sites
+#define L_M 128			///< Number of y lattice sites
+#define L_K 128			///< Number of z lattice sites
 
 
 /*
@@ -272,13 +272,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Inlets
-//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED		///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
@@ -287,7 +287,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
 #define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
@@ -303,18 +303,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_block_on_grid_lev 1		///< Provide grid level on which block should be added 
+	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
 	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min (L_N / 4)		///< Index of start of object/wall in x-direction
-	#define L_block_x_max (L_block_x_min + (L_N / 4))		///< Index of end of object/wall in x-direction
-	#define L_block_y_min L_block_x_min		///< Index of start of object/wall in y-direction
-	#define L_block_y_max L_block_x_max		///< Index of end of object/wall in y-direction
-	#define L_block_z_min L_block_x_min		///< Index of start of object/wall in z-direction
-	#define L_block_z_max L_block_x_max		///< Index of end of object/wall in z-direction
+	#define L_block_x_min (L_N / 5)		///< Index of start of object/wall in x-direction
+	#define L_block_x_max (L_block_x_min  + (L_N / 10))		///< Index of end of object/wall in x-direction
+	#define L_block_y_min (L_block_x_min / 4)		///< Index of start of object/wall in y-direction
+	#define L_block_y_max ((L_block_x_min / 4) + L_block_x_min / 2 )		///< Index of end of object/wall in y-direction
+	#define L_block_z_min (L_block_x_min / 4)		///< Index of start of object/wall in z-direction
+	#define L_block_z_max ((L_block_x_min / 4) + L_block_x_min / 2)		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds

@@ -1008,7 +1008,8 @@ void GridObj::LBM_initBoundLab ( ) {
 #ifdef L_FREESTREAM_TUNNEL
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
-					LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
+					//LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
+					LatTyp(i, j, k, M_lim, K_lim) = eInlet;		// Set to free stream for now
 #endif
 
 				}

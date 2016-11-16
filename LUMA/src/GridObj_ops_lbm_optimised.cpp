@@ -140,6 +140,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_nVels] = _LBM_equilibrium_opt(src_id, v);
 		}
+#if (L_NumLev > 0)
 		// EXPLODE
 		else if (src_type_local == eTransitionToCoarser &&
 			subcycle == 0) {
@@ -151,6 +152,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 			// Pull average value from child TL cluster to get value leaving fine grid
 			_LBM_coalesce_opt(i, j, k, id, v);
 		}
+#endif
 		// REGULAR STREAM
 		else {
 			// Pull population from source site

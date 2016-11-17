@@ -146,7 +146,7 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	this->subGrid.back().LBM_initSubGrid(*this);
 
 	// Add another subgrid beneath the one just created if necessary
-	if (this->subGrid.back().level < L_NumLev) {
+	if (this->subGrid.back().level < L_NUM_LEVELS) {
 		this->subGrid.back().LBM_addSubGrid(this->subGrid.back().region_number);
 	}
 

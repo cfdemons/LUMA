@@ -82,7 +82,7 @@ public:
 
 private :
 
-	/// 1D subgrid array (size = L_NumReg)
+	/// 1D subgrid array (size = L_NUM_REGIONS)
 	std::vector<GridObj> subGrid;
 
 	/// Pointer to parent grid
@@ -124,8 +124,8 @@ private :
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)
-	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_dims)
-	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
+	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_DIMS)
+	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_DIMS-3)
 
 	// Grid scale parameters
 	double refinement_ratio = (1 / pow(2, level));	///< Equivalent to (1 / pow(2, level))
@@ -220,7 +220,7 @@ private:
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
 	// Private optimised functions
-	void _LBM_stream_opt(int i, int j, int k, int id, int subcycle);
+	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
 	void _LBM_collide_opt(int id);

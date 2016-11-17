@@ -93,7 +93,7 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 	{
 
 		// Loop over directions from solid site
-		for (int n = 0; n < L_nVels; n++) {
+		for (int n = 0; n < L_NUM_VELS; n++) {
 
 			int n_opp = GridUtils::getOpposite(n); // Get incoming direction
 
@@ -107,14 +107,14 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			{
 
 				forceOnObjectX +=
-					c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels) - 
-					c[0][n] * g->f(i, j, k, n, M_lim, K_lim, L_nVels);
+					c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[0][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
 				forceOnObjectY += 
-					c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels) - 
-					c[1][n] * g->f(i, j, k, n, M_lim, K_lim, L_nVels);
+					c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[1][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
 				forceOnObjectZ +=
-					c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels) - 
-					c[2][n] * g->f(i, j, k, n, M_lim, K_lim, L_nVels);
+					c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[2][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
 
 			}
 		}

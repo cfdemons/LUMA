@@ -35,7 +35,7 @@ void ObjectManager::ibm_apply() {
 			suppout << "\nNEW TIME STEP" << std::endl;
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
-				if (L_dims == 3) {
+				if (L_DIMS == 3) {
 					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
 				} else {
 					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
@@ -197,7 +197,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	// Declarations
 	int inear, jnear;		// Nearest node indices
 	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	double dist_z, delta_z;
 	int knear;
 #endif
@@ -213,7 +213,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		/ iBody[ib]._Owner->dy
 		);
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	knear = (int)std::floor(
 		(iBody[ib].markers[m].position[2] - (iBody[ib]._Owner->ZOrigin - iBody[ib]._Owner->dz / 2.0)) 
 		/ iBody[ib]._Owner->dz
@@ -252,7 +252,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= iBody[ib]._Owner->K_lim ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
@@ -263,7 +263,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	// Loop over surrounding 5 nodes to find support nodes
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int k = knear - 5; k <= knear + 5; k++)
 #else
 			int k = 0;
@@ -274,7 +274,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 				if	(
 					( fabs(iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
 					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 					&&
 					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
 #endif
@@ -283,7 +283,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 					// Skip the nearest as already added when marker constructed
 					if (i == inear && j == jnear
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 						&& k == knear
 #endif			
 						) continue;
@@ -311,19 +311,19 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		// Distance between Lagrange marker and support node in lattice units
 		dist_x = (iBody[ib]._Owner->XPos[i] - iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
 		dist_y = (iBody[ib]._Owner->YPos[j] - iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		dist_z = (iBody[ib]._Owner->ZPos[k] - iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
 #endif
 
 		// Store delta function value
 		delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
 		delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
 #endif
 
 		iBody[ib].markers[m].deltaval.push_back(delta_x * delta_y
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			* delta_z
 #endif	
 			);
@@ -337,7 +337,7 @@ void ObjectManager::ibm_interpol(int ib) {
 
 	// Get grid sizes
 	size_t M_lim = iBody[ib]._Owner->M_lim;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	size_t K_lim = iBody[ib]._Owner->K_lim;
 #endif
 
@@ -352,23 +352,23 @@ void ObjectManager::ibm_interpol(int ib) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 
 			// Loop over directions x y z
-			for (int dir = 0; dir < L_dims; dir++) {
+			for (int dir = 0; dir < L_DIMS; dir++) {
 
 				// Read given velocity component from support node, multiply by delta function
 				// for that support node and sum to get interpolated velocity.
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			iBody[ib].markers[m].fluid_vel[dir] += iBody[ib]._Owner->u(	iBody[ib].markers[m].supp_i[i],
 														iBody[ib].markers[m].supp_j[i],
 														iBody[ib].markers[m].supp_k[i],
 														dir,
-														M_lim, K_lim, L_dims
+														M_lim, K_lim, L_DIMS
 														) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #else
 			iBody[ib].markers[m].fluid_vel[dir] += iBody[ib]._Owner->u(	iBody[ib].markers[m].supp_i[i],
 														iBody[ib].markers[m].supp_j[i],
 														dir,
-														M_lim, L_dims
+														M_lim, L_DIMS
 														) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #endif
 			}
@@ -382,8 +382,8 @@ void ObjectManager::ibm_interpol(int ib) {
 		testout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-				testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_dims) << "\t"
-									  << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_dims) << std::endl;
+				testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_DIMS) << "\t"
+									  << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_DIMS) << std::endl;
 			}
 			testout << std::endl;
 		}
@@ -399,7 +399,7 @@ void ObjectManager::ibm_computeForce(int ib) {
 
 	// Loop over markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		for (int dir = 0; dir < L_dims; dir++) {
+		for (int dir = 0; dir < L_DIMS; dir++) {
 			// Compute restorative force (in lattice units)
 			iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /
 				1.0;	// Time step in grid-normalised lattice units
@@ -421,9 +421,9 @@ void ObjectManager::ibm_spread(int ib) {
 			size_t M_lim = iBody[ib]._Owner->M_lim;
 			size_t K_lim = iBody[ib]._Owner->K_lim;
 
-			for (size_t dir = 0; dir < L_dims; dir++) {
+			for (size_t dir = 0; dir < L_DIMS; dir++) {
 				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
-				iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, L_dims) +=
+				iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], dir, M_lim, K_lim, L_DIMS) +=
 					iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].force_xyz[dir] * iBody[ib].markers[m].epsilon * iBody[ib].spacing/iBody[ib]._Owner->dx;
 			}
 		}
@@ -439,8 +439,8 @@ void ObjectManager::ibm_spread(int ib) {
 		size_t K_lim = iBody[ib]._Owner->K_lim;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-				testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_dims) << "\t"
-									  << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_dims) << std::endl;
+				testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_DIMS) << "\t"
+									  << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_DIMS) << std::endl;
 			}
 			testout << std::endl;
 		}
@@ -480,7 +480,7 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 			for (size_t s = 0; s < iBody[ib].markers[I].supp_i.size(); s++) {
 
 				Delta_I = iBody[ib].markers[I].deltaval[s];
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				Delta_J =
 					ibm_deltaKernel(
 					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dx, 

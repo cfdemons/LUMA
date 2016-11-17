@@ -29,8 +29,8 @@ GridObj* MpiManager::Grids;
 MpiManager::MpiManager(void)
 {
 	// Resize buffer arrays based on number of MPI directions
-	f_buffer_send.resize(L_MPI_dir, std::vector<double>(0));
-	f_buffer_recv.resize(L_MPI_dir, std::vector<double>(0));
+	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
+	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
 }
 
 /// \brief	Default destructor.
@@ -80,22 +80,22 @@ const int MpiManager::MPI_cartlab[3][26] =
 void MpiManager::mpi_init() {
 	
 	// Create communicator and topology
-	int MPI_periodic[L_dims], MPI_reorder;
+	int MPI_periodic[L_DIMS], MPI_reorder;
 	MPI_reorder = true;
-	MPI_dims[0] = L_Xcores; MPI_dims[1] = L_Ycores;
+	MPI_dims[0] = L_MPI_XCORES; MPI_dims[1] = L_MPI_YCORES;
 	MPI_periodic[0] = true;	MPI_periodic[1] = true;
-#if (L_dims == 3)
-	MPI_dims[2] = L_Zcores; MPI_periodic[2] = true;
+#if (L_DIMS == 3)
+	MPI_dims[2] = L_MPI_ZCORES; MPI_periodic[2] = true;
 #endif
 
-	MPI_Cart_create(MPI_COMM_WORLD, L_dims, MPI_dims, MPI_periodic, MPI_reorder, &world_comm);
+	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, MPI_dims, MPI_periodic, MPI_reorder, &world_comm);
 
 	// Get Cartesian topology info
 	MPI_Comm_rank( world_comm, &my_rank );
 	MPI_Comm_size( world_comm, &num_ranks );
 
 	// Store coordinates in the new topology
-	MPI_Cart_coords(world_comm, my_rank, L_dims, MPI_coords);
+	MPI_Cart_coords(world_comm, my_rank, L_DIMS, MPI_coords);
 
 	// Output directory creation (only master rank)
 	if (my_rank == 0) int result = GridUtils::createOutputDirectory(GridUtils::path_str);
@@ -117,7 +117,7 @@ void MpiManager::mpi_init() {
 #ifdef L_MPI_VERBOSE
 	// Write out coordinates
 	*MpiManager::logout << "Coordinates on rank " << my_rank << " are (";
-	for (size_t d = 0; d < L_dims; d++) {
+	for (size_t d = 0; d < L_DIMS; d++) {
 		*MpiManager::logout << "\t" << MPI_coords[d];
 	}
 	*MpiManager::logout << "\t)" << std::endl;
@@ -126,7 +126,7 @@ void MpiManager::mpi_init() {
 	// Store global grid size
 	global_dims[0] = L_N;
 	global_dims[1] = L_M;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	global_dims[2] = L_K;
 #else
 	global_dims[2] = 1;
@@ -140,16 +140,15 @@ void MpiManager::mpi_init() {
 #endif
 
 	// Get neighbour ID //
-	// Cyclical data transfer i.e. from 0 to 1, 1 to 2, 3 to 4 etc... so use MPI_Sendrecv
 
 	// Loop over grid direction
-	for (int dir = 0; dir < L_MPI_dir; dir++) {
+	for (int dir = 0; dir < L_MPI_DIRS; dir++) {
 
 		MPI_Barrier(world_comm);
 
 		// Get coordinates of neighbour (taking into account periodic structure)
-		int coord_tmp[L_dims];
-		for (size_t d = 0; d < L_dims; d++) {
+		int coord_tmp[L_DIMS];
+		for (size_t d = 0; d < L_DIMS; d++) {
 			neighbour_coords[d][dir] = (MPI_coords[d] + MPI_cartlab[d][dir] + MPI_dims[d]) % MPI_dims[d];
 			coord_tmp[d] = neighbour_coords[d][dir];	// Store single vector for getting neighbour rank
 		}
@@ -164,16 +163,16 @@ void MpiManager::mpi_init() {
 #ifdef L_MPI_VERBOSE
 		// Print out current neighbour coordinates and rank
 		*MpiManager::logout << "Neighbour in direction " << dir << " of rank " << my_rank << " is (";
-		for (size_t d = 0; d < L_dims; d++) {
+		for (size_t d = 0; d < L_DIMS; d++) {
 			*MpiManager::logout << "\t" << neighbour_coords[d][dir];
 		}
 		*MpiManager::logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 
 #ifdef L_USE_CUSTOM_MPI_SIZES
-	// If using custom sizes, user must set the L_Zcores to 1
-	if (L_dims == 2 && L_Zcores != 1) {
+	// If using custom sizes, user must set the L_MPI_ZCORES to 1
+	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
 		std::cout << "Error: See Log File" << std::endl;
-		*MpiManager::logout << "Error: L_Zcores must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
+		*MpiManager::logout << "Error: L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting." << std::endl;
 		MpiManager::logout->close();
 		MPI_Finalize();
 		exit(LUMA_FAILED);
@@ -196,16 +195,16 @@ void MpiManager::mpi_init() {
 void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
-	double Lx = L_b_x - L_a_x;
-	double Ly = L_b_y - L_a_y;
-	double Lz = L_b_z - L_a_z;
+	double Lx = L_BX - L_AX;
+	double Ly = L_BY - L_AY;
+	double Lz = L_BZ - L_AZ;
 	double dx = 2 * (Lx / (2 * static_cast<double>(L_N)));
 	double dy = 2 * (Ly / (2 * static_cast<double>(L_M)));
 	double dz = 2 * (Lz / (2 * static_cast<double>(L_K)));
 
 	// Compute required local grid size
 	// Loop over dimensions
-	for (size_t d = 0; d < L_dims; d++) {
+	for (size_t d = 0; d < L_DIMS; d++) {
 
 		if (MPI_dims[d] == 1) {
 			// If only 1 rank in this direction local grid is same size a global grid
@@ -270,10 +269,10 @@ void MpiManager::mpi_gridbuild( ) {
 	global_edge_ind[1][my_rank] = 0;
 	for (int i = 0; i < MPI_coords[0] + 1; i++) {
 		// Find i-th rank
-#if (L_dims == 3)
-		int adj_coords[L_dims] = {i, MPI_coords[1], MPI_coords[2]};
+#if (L_DIMS == 3)
+		int adj_coords[L_DIMS] = {i, MPI_coords[1], MPI_coords[2]};
 #else
-		int adj_coords[L_dims] = {i, MPI_coords[1]};
+		int adj_coords[L_DIMS] = {i, MPI_coords[1]};
 #endif
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
@@ -285,10 +284,10 @@ void MpiManager::mpi_gridbuild( ) {
 	global_edge_ind[3][my_rank] = 0;
 	for (int i = 0; i < MPI_coords[1] + 1; i++) {
 		// Find i-th rank
-#if (L_dims == 3)
-		int adj_coords[L_dims] = {MPI_coords[0], i, MPI_coords[2]};
+#if (L_DIMS == 3)
+		int adj_coords[L_DIMS] = {MPI_coords[0], i, MPI_coords[2]};
 #else
-		int adj_coords[L_dims] = {MPI_coords[0], i};
+		int adj_coords[L_DIMS] = {MPI_coords[0], i};
 #endif
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
@@ -296,12 +295,12 @@ void MpiManager::mpi_gridbuild( ) {
 	}
 	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - yRankSize[my_rank];
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// Z edges
 	global_edge_ind[5][my_rank] = 0;
 	for (int i = 0; i < MPI_coords[2] + 1; i++) {
 		// Find i-th rank
-		int adj_coords[L_dims] = {MPI_coords[0], MPI_coords[1], i};
+		int adj_coords[L_DIMS] = {MPI_coords[0], MPI_coords[1], i};
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
 		global_edge_ind[5][my_rank] += zRankSize[adj_rank];
@@ -317,13 +316,13 @@ void MpiManager::mpi_gridbuild( ) {
 #else
 
 	// Find global indices of edges of coarse grid excluding the overlap
-	global_edge_ind[1][my_rank] = (L_N / L_Xcores) * (MPI_coords[0] + 1);
-	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - (L_N / L_Xcores);
-	global_edge_ind[3][my_rank] = (L_M / L_Ycores) * (MPI_coords[1] + 1);
-	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - (L_M / L_Ycores);
-#if (L_dims == 3)
-	global_edge_ind[5][my_rank] = (L_K / L_Zcores) * (MPI_coords[2] + 1);
-	global_edge_ind[4][my_rank] = global_edge_ind[5][my_rank] - (L_K / L_Zcores);
+	global_edge_ind[1][my_rank] = (L_N / L_MPI_XCORES) * (MPI_coords[0] + 1);
+	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - (L_N / L_MPI_XCORES);
+	global_edge_ind[3][my_rank] = (L_M / L_MPI_YCORES) * (MPI_coords[1] + 1);
+	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - (L_M / L_MPI_YCORES);
+#if (L_DIMS == 3)
+	global_edge_ind[5][my_rank] = (L_K / L_MPI_ZCORES) * (MPI_coords[2] + 1);
+	global_edge_ind[4][my_rank] = global_edge_ind[5][my_rank] - (L_K / L_MPI_ZCORES);
 #else
 	global_edge_ind[5][my_rank] = 1;
 	global_edge_ind[4][my_rank] = 0;
@@ -337,9 +336,9 @@ void MpiManager::mpi_gridbuild( ) {
 	for (int d = 0; d < 6; d++) {
 		global_edge_pos[d][my_rank] = global_edge_ind[d][my_rank] * dx;
 	}
-#if (L_dims != 3)
-	global_edge_pos[5][my_rank] = L_b_z;
-	global_edge_pos[4][my_rank] = L_a_z;
+#if (L_DIMS != 3)
+	global_edge_pos[5][my_rank] = L_BZ;
+	global_edge_pos[4][my_rank] = L_AZ;
 #endif
 
 
@@ -350,7 +349,7 @@ void MpiManager::mpi_gridbuild( ) {
 #ifdef L_MPI_VERBOSE
 	// Write out the Grid size vector
 	*MpiManager::logout << "Grid size on rank " << my_rank << " is (";
-	for (size_t d = 0; d < L_dims; d++) {
+	for (size_t d = 0; d < L_DIMS; d++) {
 		*MpiManager::logout << "\t" << local_size[d];
 	}
 	*MpiManager::logout << "\t)" << std::endl;
@@ -370,7 +369,7 @@ void MpiManager::mpi_gridbuild( ) {
 #ifdef L_USE_CUSTOM_MPI_SIZES
 
 	// 3D check
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	if ( (	zRankSize[neighbour_rank[0]] != local_size[2]-2 || zRankSize[neighbour_rank[1]] != local_size[2]-2 ||
 			yRankSize[neighbour_rank[0]] != local_size[1]-2 || yRankSize[neighbour_rank[1]] != local_size[1]-2
 		 ) || (
@@ -525,7 +524,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	t_start = clock();
 
 	// Loop over directions in Cartesian topology
-	for (int dir = 0; dir < L_MPI_dir; dir++) {
+	for (int dir = 0; dir < L_MPI_DIRS; dir++) {
 
 		/* Create a unique tag based on level (< 32), region (< 10) and direction (< 100).
 		 * MPICH limits state that tag value cannot be greater than 32767 */
@@ -542,7 +541,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		// Adjust buffer size
 		for (MpiManager::buffer_struct bufs : buffer_send_info) {
 			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
-				f_buffer_send[dir].resize(bufs.size[dir] * L_nVels);
+				f_buffer_send[dir].resize(bufs.size[dir] * L_NUM_VELS);
 			}
 		}
 
@@ -561,7 +560,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 #ifdef L_MPI_VERBOSE
 			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
-								<< " -->  Posting Send for " << f_buffer_send[dir].size() / L_nVels
+								<< " -->  Posting Send for " << f_buffer_send[dir].size() / L_NUM_VELS
 								<< " sites to Rank " << neighbour_rank[dir] << " with tag " << TAG << "." << std::endl;
 #endif
 			// Post send message to message queue and log request handle in array
@@ -580,7 +579,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		// Resize the receive buffer
 		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
 			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
-				f_buffer_recv[dir].resize(bufr.size[dir] * L_nVels);
+				f_buffer_recv[dir].resize(bufr.size[dir] * L_NUM_VELS);
 			}
 		}
 
@@ -593,7 +592,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 #ifdef L_MPI_VERBOSE
 			*MpiManager::logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
-								<< " -->  Fetching message for " << f_buffer_recv[dir].size() / L_nVels	
+								<< " -->  Fetching message for " << f_buffer_recv[dir].size() / L_NUM_VELS	
 								<< " sites from Rank " << neighbour_rank[opp_dir] << " with tag " << TAG << "." << std::endl;
 #endif
 
@@ -607,8 +606,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 			// Write out buffers
 			*MpiManager::logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
-								<< " -- Sent " << f_buffer_send[dir].size() / L_nVels << " to " << neighbour_rank[dir] 
-								<< ": Received " << f_buffer_recv[dir].size() / L_nVels << " from " << neighbour_rank[opp_dir] << std::endl;
+								<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir] 
+								<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
 			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(MpiManager::my_rank) + "_Dir" + std::to_string(dir) + ".out";
 			mpi_writeout_buf(filename, dir);
 #endif
@@ -677,8 +676,8 @@ void MpiManager::mpi_buffer_size() {
 
 	// Loop through levels and regions
 	GridObj* g;	// Pointer to a GridObj
-	for (int l = 0; l <= L_NumLev; l++) {
-		for (int r = 0; r < L_NumReg; r++) {
+	for (int l = 0; l <= L_NUM_LEVELS; l++) {
+		for (int r = 0; r < L_NUM_REGIONS; r++) {
 
 			// Null the pointer
 			g = NULL;
@@ -718,13 +717,13 @@ void MpiManager::mpi_buffer_size() {
 			// Write out buffer sizes
 #ifdef L_MPI_VERBOSE
 		*MpiManager::logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_dir; i++) {
+		for (int i = 0; i < L_MPI_DIRS; i++) {
 			*MpiManager::logout << buffer_send_info.back().size[i] << '\t';
 		}
 		*MpiManager::logout << std::endl;
 
 		*MpiManager::logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_dir; i++) {
+		for (int i = 0; i < L_MPI_DIRS; i++) {
 			*MpiManager::logout << buffer_recv_info.back().size[i] << '\t';
 		}
 		*MpiManager::logout << std::endl;
@@ -793,7 +792,7 @@ int MpiManager::mpi_buildCommunicators() {
 	p_data.back().j_start = 1;
 	p_data.back().halo_max = 1;
 	p_data.back().halo_min = 1;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	p_data.back().k_end = K_lim - 2;
 	p_data.back().k_start = 1;
 #else
@@ -806,8 +805,8 @@ int MpiManager::mpi_buildCommunicators() {
 		(p_data.back().k_end - p_data.back().k_start + 1);
 
 	// Loop over the possible sub-grid combinations
-	for (int reg = 0; reg < L_NumReg; reg++) {
-		for (int lev = 1; lev <= L_NumLev; lev++) {
+	for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
+		for (int lev = 1; lev <= L_NUM_LEVELS; lev++) {
 
 			// Try gain access to the sub-grid on this rank
 			GridObj *targetGrid = NULL;
@@ -874,7 +873,7 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check y-directions for halo
 				if (bri.size[5]) {
 					p_data.back().j_end = M_lim - halo_thickness - 1;
-#if (L_dims != 0)
+#if (L_DIMS != 0)
 					p_data.back().halo_max++;	// Increment halo counter for striding
 #endif
 				}
@@ -884,7 +883,7 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[4]) {
 					p_data.back().j_start = halo_thickness;
-#if (L_dims != 0)
+#if (L_DIMS != 0)
 					p_data.back().halo_min++;
 #endif
 				}
@@ -892,7 +891,7 @@ int MpiManager::mpi_buildCommunicators() {
 					p_data.back().j_start = 0;
 				}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				// Check z-directions for halo
 				if (bri.size[9]) {
 					p_data.back().k_end = K_lim - halo_thickness - 1;
@@ -929,18 +928,18 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (targetGrid->YInd[p_data.back().j_start] < halo_thickness) {
 					p_data.back().j_start += halo_thickness;
-#if (L_dims != 3)
+#if (L_DIMS != 3)
 					p_data.back().halo_min++;		// Account for both halo and TL during striding
 #endif
 				}
 				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - halo_thickness) {
 					p_data.back().j_end -= halo_thickness;
-#if (L_dims != 3)
+#if (L_DIMS != 3)
 					p_data.back().halo_max++;
 #endif
 				}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				if (targetGrid->ZInd[p_data.back().k_start] < halo_thickness) {
 					p_data.back().k_start += halo_thickness;
 					p_data.back().halo_min++;
@@ -992,11 +991,11 @@ int MpiManager::mpi_buildCommunicators() {
 			
 			// Define new communicator which contains writable sub-grids of this level and region
 			// by splitting the global communicator using the flags provided.
-			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NumLev]);
+			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NUM_LEVELS]);
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Region " << reg << ", Level " << lev << 
-				" has communicator value: " << subGrid_comm[lev + reg * L_NumLev] << " and colour " << colour << 
+				" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] << " and colour " << colour << 
 				" and writable data size " << p_data.back().writable_data_count << std::endl;
 #endif
 

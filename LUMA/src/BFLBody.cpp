@@ -43,7 +43,7 @@ BFLBody::~BFLBody(void)
 BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 
 	// Assign pointer to owning grid
-	GridUtils::getGrid(g_hierarchy, L_bfl_on_grid_lev, L_bfl_on_grid_reg, this->_Owner);
+	GridUtils::getGrid(g_hierarchy, L_BFL_ON_GRID_LEV, L_BFL_ON_GRID_REG, this->_Owner);
 	this->id = id;
 
 	// Voxel grid filter //
@@ -108,7 +108,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores to the "invalid" value
-	Q = std::vector< std::vector<double> > (L_nVels * 2, std::vector<double> ( 
+	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> ( 
 		markers.size(), -1.0 ) );
 
 	// Loop over local grid and inspect the streaming operations
@@ -120,7 +120,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 					computeQ(i,j,k,_Owner);
 #else
 					computeQ(i,j,_Owner);
@@ -275,7 +275,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 		src.push_back(_Owner->ZPos[k]);
 
 		// Loop over even velocities and ignore rest distribution to save computing Q twice
-		for (int vel = 0; vel < L_nVels - 1; vel+=2) {
+		for (int vel = 0; vel < L_NUM_VELS - 1; vel+=2) {
 
 			// Compute destination coordinates
 			dest_i = (i + c[0][vel] + g->N_lim) % g->N_lim;
@@ -337,7 +337,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 					Q[vel][storeID] = q;
 
 					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + L_nVels][storeID] = 1 - q;
+					Q[GridUtils::getOpposite(vel) + L_NUM_VELS][storeID] = 1 - q;
 				}
 			}
 		}
@@ -452,7 +452,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 		p.push_back(0.0);
 
 		// Loop over velocities (ignore rest distribution)
-		for (int vel = 0; vel < L_nVels - 1; vel++) {
+		for (int vel = 0; vel < L_NUM_VELS - 1; vel++) {
 
 			// Compute destination coordinates
 			dest_i = (i + c[0][vel] + g->N_lim) % g->N_lim;
@@ -494,7 +494,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 					Q[vel][storeID] = q;
 
 					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + L_nVels][storeID] = 1 - q;
+					Q[GridUtils::getOpposite(vel) + L_NUM_VELS][storeID] = 1 - q;
 				}
         
 			}

@@ -30,6 +30,8 @@
 ///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
 void GridObj::LBM_multi_opt(int subcycle) {
 
+	//*MpiManager::logout << "Starting kernel L" << level << std::endl;
+
 	// Two iterations on sub-grid first
 	if (subGrid.size()) {
 		for (int i = 0; i < 2; ++i) {
@@ -50,10 +52,10 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				eType type_local = LatTyp[id];
 
 				// Ignore Refined sites
-				if (type_local == eRefined) continue;
+				if (type_local == eRefined)	continue;
 
 				// STREAM //
-				_LBM_stream_opt(i, j, k, id, subcycle);
+				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
 
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
@@ -66,10 +68,10 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				L_DACTION_WRITE_OUT_FORCES
 #endif
 
-					// COLLIDE //
-					if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
-						_LBM_collide_opt(id);
-					}
+				// COLLIDE //
+				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
+					_LBM_collide_opt(id);
+				}
 
 			}
 		}
@@ -112,13 +114,15 @@ void GridObj::LBM_multi_opt(int subcycle) {
 /// \param	j	y-index of current site.
 /// \param	k	z-index of current site.
 ///	\param	id	flattened ijk index.
+///	\param	type_local	type of current site.
 ///	\param	subcycle	number of sub-cycle being performed.
-void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
+void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle) {
 
 	// Local value to save multiple loads
 	eType src_type_local;
 
-	for (int v = 0; v < L_nVels; ++v) {
+	// Loop over velocities
+	for (int v = 0; v < L_NUM_VELS; ++v) {
 
 		// Get indicies for source site (periodic by default)
 		int src_x = (i - c_opt[v][0] + N_lim) % N_lim;
@@ -132,15 +136,15 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 		// BOUNCEBACK
 		if (src_type_local == eSolid) {
 			// F value is its opposite (HWBB)
-			fNew[v + id * L_nVels] =
-				f[GridUtils::getOpposite(v) + id * L_nVels];
+			fNew[v + id * L_NUM_VELS] =
+				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
 		}
 		// VELOCITY BC
 		else if (src_type_local == eInlet) {
 			// Set f to equilibrium (forced equilibrium BC)
-			fNew[v + id * L_nVels] = _LBM_equilibrium_opt(src_id, v);
+			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
 		}
-#if (L_NumLev > 0)
+#if (L_NUM_LEVELS > 0)	// Only need to check these options when using refinement
 		// EXPLODE
 		else if (src_type_local == eTransitionToCoarser &&
 			subcycle == 0) {
@@ -148,7 +152,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 			_LBM_explode_opt(id, v, src_x, src_y, src_z);
 		}
 		// COALESCE
-		else if (src_type_local == eRefined) {
+		else if (src_type_local == eRefined && type_local == eTransitionToFiner) {
 			// Pull average value from child TL cluster to get value leaving fine grid
 			_LBM_coalesce_opt(i, j, k, id, v);
 		}
@@ -156,7 +160,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 		// REGULAR STREAM
 		else {
 			// Pull population from source site
-			fNew[v + id * L_nVels] = f[v + src_id * L_nVels];
+			fNew[v + id * L_NUM_VELS] = f[v + src_id * L_NUM_VELS];
 		}
 	}
 
@@ -168,8 +172,8 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, int subcycle) {
 /// \param	i	x-index of current site.
 /// \param	j	y-index of current site.
 /// \param	k	z-index of current site.
+///	\param	id	flattened ijk index.
 /// \param	v	lattice direction.
-///	\param	region	region number from which values are to be coalesced.
 void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 
 	// Get pointer to child grid
@@ -190,7 +194,7 @@ void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 	double fNew_local = 0.0;
 	for (int ii = 0; ii < 2; ++ii) {
 		for (int jj = 0; jj < 2; ++jj) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int kk = 0; kk < 2; ++kk)
 #else
 			int kk = 0;
@@ -198,21 +202,22 @@ void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 			{
 				fNew_local +=
 					childGrid->f[v +
-					(cInd[2] + kk) * L_nVels +
-					(cInd[1] + jj) * L_nVels * cK_lim +
-					(cInd[0] + ii) * L_nVels * cK_lim * cM_lim];
+					(cInd[2] + kk) * L_NUM_VELS +
+					(cInd[1] + jj) * L_NUM_VELS * cK_lim +
+					(cInd[0] + ii) * L_NUM_VELS * cK_lim * cM_lim];
 			}
 		}
 	}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	fNew_local /= 8.0;
 #else
 	fNew_local /= 4.0;
 #endif
 
 	// Store back in memory
-	fNew[v + id * L_nVels] = fNew_local;
+	fNew[v + id * L_NUM_VELS] = fNew_local;
+
 }
 
 // *****************************************************************************
@@ -233,12 +238,12 @@ void GridObj::_LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z) {
 		src_z, CoarseLimsZ[0]);
 
 	// Pull value from parent
-	fNew[v + id * L_nVels] =
+	fNew[v + id * L_NUM_VELS] =
 		parentGrid->f[
 			v +
-				pInd[2] * L_nVels +
-				pInd[1] * L_nVels * parentGrid->K_lim +
-				pInd[0] * L_nVels * parentGrid->K_lim * parentGrid->M_lim
+				pInd[2] * L_NUM_VELS +
+				pInd[1] * L_NUM_VELS * parentGrid->K_lim +
+				pInd[0] * L_NUM_VELS * parentGrid->K_lim * parentGrid->M_lim
 		];
 }
 
@@ -258,24 +263,24 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 
 	// Compute the parts of the expansion for feq
 
-#if (L_dims == 3)
-	A = (c_opt[v][0] * u[0 + id * L_dims]) +
-		(c_opt[v][1] * u[1 + id * L_dims]) +
-		(c_opt[v][2] * u[2 + id * L_dims]);
+#if (L_DIMS == 3)
+	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
+		(c_opt[v][1] * u[1 + id * L_DIMS]) +
+		(c_opt[v][2] * u[2 + id * L_DIMS]);
 
-	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_dims] * u[0 + id * L_dims]) +
-		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_dims] * u[1 + id * L_dims]) +
-		((c_opt[v][2] * c_opt[v][2]) - (cs*cs)) * (u[2 + id * L_dims] * u[2 + id * L_dims]) +
-		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_dims] * u[1 + id * L_dims] +
-		2 * c_opt[v][0] * c_opt[v][2] * u[0 + id * L_dims] * u[2 + id * L_dims] +
-		2 * c_opt[v][1] * c_opt[v][2] * u[1 + id * L_dims] * u[2 + id * L_dims];
+	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_DIMS] * u[0 + id * L_DIMS]) +
+		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_DIMS] * u[1 + id * L_DIMS]) +
+		((c_opt[v][2] * c_opt[v][2]) - (cs*cs)) * (u[2 + id * L_DIMS] * u[2 + id * L_DIMS]) +
+		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS] +
+		2 * c_opt[v][0] * c_opt[v][2] * u[0 + id * L_DIMS] * u[2 + id * L_DIMS] +
+		2 * c_opt[v][1] * c_opt[v][2] * u[1 + id * L_DIMS] * u[2 + id * L_DIMS];
 #else
-	A = (c_opt[v][0] * u[0 + id * L_dims]) +
-		(c_opt[v][1] * u[1 + id * L_dims]);
+	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
+		(c_opt[v][1] * u[1 + id * L_DIMS]);
 
-	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_dims] * u[0 + id * L_dims]) +
-		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_dims] * u[1 + id * L_dims]) +
-		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_dims] * u[1 + id * L_dims];
+	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_DIMS] * u[0 + id * L_DIMS]) +
+		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_DIMS] * u[1 + id * L_DIMS]) +
+		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS];
 #endif
 
 
@@ -298,13 +303,13 @@ void GridObj::_LBM_collide_opt(int id) {
 
 #else
 	// Perform collision operation
-	for (int v = 0; v < L_nVels; ++v) {
-		fNew[v + id * L_nVels] +=
+	for (int v = 0; v < L_NUM_VELS; ++v) {
+		fNew[v + id * L_NUM_VELS] +=
 			omega *	(
 			_LBM_equilibrium_opt(id, v) -
-			fNew[v + id * L_nVels]
+			fNew[v + id * L_NUM_VELS]
 			) +
-			force_i[v + id * L_nVels];
+			force_i[v + id * L_NUM_VELS];
 	}
 #endif
 
@@ -313,7 +318,11 @@ void GridObj::_LBM_collide_opt(int id) {
 // *****************************************************************************
 /// \brief	Optimised macroscopic operation.
 ///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
 /// \param	id	flattened ijk index.
+///	\param	type_local	type of site under consideration
 void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
 	// Only update fluid sites or TL to finer
@@ -324,34 +333,34 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 		double rho_temp = 0.0;
 		double rhouX_temp = 0.0;
 		double rhouY_temp = 0.0;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		double rhouZ_temp = 0.0;
 #endif
 
 		// Sum to find rho and momentum
-		for (int v = 0; v < L_nVels; ++v) {
-			rho_temp += fNew[v + id * L_nVels];
-			rhouX_temp += c_opt[v][0] * fNew[v + id * L_nVels];
-			rhouY_temp += c_opt[v][1] * fNew[v + id * L_nVels];
-#if (L_dims == 3)
-			rhouZ_temp += c_opt[v][2] * fNew[v + id * L_nVels];
+		for (int v = 0; v < L_NUM_VELS; ++v) {
+			rho_temp += fNew[v + id * L_NUM_VELS];
+			rhouX_temp += c_opt[v][0] * fNew[v + id * L_NUM_VELS];
+			rhouY_temp += c_opt[v][1] * fNew[v + id * L_NUM_VELS];
+#if (L_DIMS == 3)
+			rhouZ_temp += c_opt[v][2] * fNew[v + id * L_NUM_VELS];
 #endif
 		}
 
 		// Add forces to momentum
 #if (defined L_IBM_ON || defined L_GRAVITY_ON)
-		rhouX_temp += 0.5 * force_xyz[0 + id * L_dims];
-		rhouY_temp += 0.5 * force_xyz[1 + id * L_dims];
-#if (L_dims == 3)
-		rhouX_temp += 0.5 * force_xyz[2 + id * L_dims];
+		rhouX_temp += 0.5 * force_xyz[0 + id * L_DIMS];
+		rhouY_temp += 0.5 * force_xyz[1 + id * L_DIMS];
+#if (L_DIMS == 3)
+		rhouX_temp += 0.5 * force_xyz[2 + id * L_DIMS];
 #endif
 #endif
 
 		// Divide by rho to get velocity
-		u[0 + id * L_dims] = rhouX_temp / rho_temp;
-		u[1 + id * L_dims] = rhouY_temp / rho_temp;
-#if (L_dims == 3)
-		u[2 + id * L_dims] = rhouZ_temp / rho_temp;
+		u[0 + id * L_DIMS] = rhouX_temp / rho_temp;
+		u[1 + id * L_DIMS] = rhouY_temp / rho_temp;
+#if (L_DIMS == 3)
+		u[2 + id * L_DIMS] = rhouZ_temp / rho_temp;
 #endif
 
 		// Assign density
@@ -378,19 +387,19 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
 		for (int ii = 0; ii < 2; ++ii) {
 			for (int jj = 0; jj < 2; ++jj) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				for (int kk = 0; kk < 2; ++kk)
 #else
 				int kk = 0;
 #endif
 				{
-					for (int d = 0; d < L_dims; ++d) {
+					for (int d = 0; d < L_DIMS; ++d) {
 						childGrid->u[
 							d +
-								(cInd[2] + kk) * L_dims +
-								(cInd[1] + jj) * L_dims * cK_lim +
-								(cInd[0] + ii) * L_dims * cK_lim * cM_lim
-						] = u[d + id * L_dims];
+								(cInd[2] + kk) * L_DIMS +
+								(cInd[1] + jj) * L_DIMS * cK_lim +
+								(cInd[0] + ii) * L_DIMS * cK_lim * cM_lim
+						] = u[d + id * L_DIMS];
 					}
 
 					subGrid[0].rho[
@@ -415,15 +424,15 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
 	// Repeat for other quantities
 	int pq_combo = 0;
-	for (int p = 0; p < L_dims; p++) {
-		ta_temp = ui_timeav[p + id * L_dims] * (double)t;
-		ta_temp += u[p + id * L_dims];
-		ui_timeav[p + id * L_dims] = ta_temp / (double)(t + 1);
+	for (int p = 0; p < L_DIMS; p++) {
+		ta_temp = ui_timeav[p + id * L_DIMS] * (double)t;
+		ta_temp += u[p + id * L_DIMS];
+		ui_timeav[p + id * L_DIMS] = ta_temp / (double)(t + 1);
 		// Do necessary products
-		for (int q = p; q < L_dims; q++) {
-			ta_temp = uiuj_timeav[pq_combo + id * (3 * L_dims - 3)] * (double)t;
-			ta_temp += (u[p + id * L_dims] * u[q + id * L_dims]);
-			uiuj_timeav[pq_combo + id * (3 * L_dims - 3)] = ta_temp / (double)(t + 1);
+		for (int q = p; q < L_DIMS; q++) {
+			ta_temp = uiuj_timeav[pq_combo + id * (3 * L_DIMS - 3)] * (double)t;
+			ta_temp += (u[p + id * L_DIMS] * u[q + id * L_DIMS]);
+			uiuj_timeav[pq_combo + id * (3 * L_DIMS - 3)] = ta_temp / (double)(t + 1);
 			pq_combo++;
 		}
 	}
@@ -474,12 +483,12 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 
 #ifdef L_GRAVITY_ON
 	// Add gravity
-	force_xyz[L_grav_direction + id * L_dims] =
-		rho[id] * L_grav_force * refinement_ratio;
+	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
+		rho[id] * L_GRAVITY_FORCE * refinement_ratio;
 #endif
 
 	// Now compute force_i components from Cartesian force vector
-	for (size_t v = 0; v < L_nVels; v++) {
+	for (size_t v = 0; v < L_NUM_VELS; v++) {
 
 		// Reset beta_v
 		beta_v = 0.0;
@@ -488,19 +497,19 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 		lambda_v = (1 - 0.5 * omega) * (w[v] / (cs*cs));
 
 		// Dot product (sum over d dimensions)
-		for (int d = 0; d < L_dims; d++) {
-			beta_v += (c_opt[v][d] * u[d + id * L_dims]);
+		for (int d = 0; d < L_DIMS; d++) {
+			beta_v += (c_opt[v][d] * u[d + id * L_DIMS]);
 		}
 		beta_v = beta_v * (1 / (cs*cs));
 
 		// Compute force using shorthand sum described above
-		for (int d = 0; d < L_dims; d++) {
-			force_i[v + id * L_nVels] += force_xyz[d + id * L_dims] *
-				(c_opt[v][d] * (1 + beta_v) - u[d + id * L_dims]);
+		for (int d = 0; d < L_DIMS; d++) {
+			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] *
+				(c_opt[v][d] * (1 + beta_v) - u[d + id * L_DIMS]);
 		}
 
 		// Multiply by lambda_v
-		force_i[v + id * L_nVels] *= lambda_v;
+		force_i[v + id * L_NUM_VELS] *= lambda_v;
 
 	}
 

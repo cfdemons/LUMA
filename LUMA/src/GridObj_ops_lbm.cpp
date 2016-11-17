@@ -67,9 +67,9 @@ void GridObj::LBM_multi (bool ibmFlag) {
 #ifdef L_IBM_ON
 
 		// If IBM on and predictive loop flag true then store initial data
-		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) { // Only store f, u and rho values on grid where IB body lives
+		if (level == L_IB_ON_LEV && region_number == L_IB_ON_REG && ibmFlag == true) { // Only store f, u and rho values on grid where IB body lives
 
-			*GridUtils::logfile << "Prediction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
+			*GridUtils::logfile << "Prediction step on level " << L_IB_ON_LEV << ", region " << L_IB_ON_REG << " ..." << std::endl;
 
 			// Store lattice data
 			f_ibm_initial = f;
@@ -80,7 +80,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 
 		// Reset lattice and Cartesian force vectors at each site if on repeat.
 		// Don't do this on the sub-grid where IBM exists.
-		if (ibmFlag == true || level != L_IB_Lev || region_number != L_IB_Reg)
+		if (ibmFlag == true || level != L_IB_ON_LEV || region_number != L_IB_ON_REG)
 			LBM_resetForces();
 
 		// Apply boundary conditions (regularised must be applied before collision)
@@ -107,7 +107,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 		////////////////////
 
 		// Check if lower level expected
-		if (L_NumLev > level) {
+		if (L_NUM_LEVELS > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -149,7 +149,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 #endif
 		
 		// If there is lower levels then coalesce from them
-		if (L_NumLev > level) {
+		if (L_NUM_LEVELS > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -191,7 +191,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 
 		// Execute IBM procedure using newly computed predicted data
 #ifdef L_IBM_ON
-		if (level == L_IB_Lev && region_number == L_IB_Reg && ibmFlag == true) {
+		if (level == L_IB_ON_LEV && region_number == L_IB_ON_REG && ibmFlag == true) {
 
 			// Reset force vectors on grid in preparation for spreading step
 			LBM_resetForces();
@@ -206,7 +206,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 			rho = rho_ibm_initial;
 
 			// Corrector step does not reset force vectors but uses newly computed vector instead.
-			*GridUtils::logfile << "Correction step on level " << L_IB_Lev << ", region " << L_IB_Reg << " ..." << std::endl;
+			*GridUtils::logfile << "Correction step on level " << L_IB_ON_LEV << ", region " << L_IB_ON_REG << " ..." << std::endl;
 
 			// Corrector step (no IBM, no repeat)
 			LBM_multi(false);
@@ -223,7 +223,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 		t++; count++;
 
 		// Always drop out on level 0, or if on corrector step on lower grid level
-		if (level == 0 || (ibmFlag == false && level == L_IB_Lev && region_number == L_IB_Reg)) {
+		if (level == 0 || (ibmFlag == false && level == L_IB_ON_LEV && region_number == L_IB_ON_REG)) {
 			break;
 		}
 
@@ -306,7 +306,7 @@ void GridObj::LBM_multi () {
 		////////////////////
 
 		// Check if lower level expected
-		if (L_NumLev > level) {
+		if (L_NUM_LEVELS > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -348,7 +348,7 @@ void GridObj::LBM_multi () {
 #endif
 
 		// If there is lower levels then coalesce from them
-		if (L_NumLev > level) {
+		if (L_NUM_LEVELS > level) {
 
 			for (int reg = 0; reg < static_cast<int>(subGrid.size()); reg++) {
 
@@ -390,7 +390,7 @@ void GridObj::LBM_multi () {
 
 		// Execute IBM procedure using newly computed predicted data
 #ifdef L_IBM_ON
-		if (level == L_IB_Lev && region_number == L_IB_Reg) {
+		if (level == L_IB_ON_LEV && region_number == L_IB_ON_REG) {
 
 			// Reset force vectors on grid in preparation for spreading step
 			LBM_resetForces();
@@ -492,11 +492,11 @@ void GridObj::LBM_forceGrid() {
 
 #ifdef L_GRAVITY_ON
 				// Add gravity to any IBM forces currently stored
-				force_xyz(i,j,k,L_grav_direction,M_lim,K_lim,L_dims) += rho(i,j,k,M_lim,K_lim) * L_grav_force * (1 / pow(2,level));
+				force_xyz(i,j,k,L_GRAVITY_DIRECTION,M_lim,K_lim,L_DIMS) += rho(i,j,k,M_lim,K_lim) * L_GRAVITY_FORCE * (1 / pow(2,level));
 #endif
 
 				// Now compute force_i components from Cartesian force vector
-				for (size_t v = 0; v < L_nVels; v++) {
+				for (size_t v = 0; v < L_NUM_VELS; v++) {
 
 					// Only apply to non-solid sites
 					if (LatTyp(i,j,k,M_lim,K_lim) != eSolid) {
@@ -508,19 +508,19 @@ void GridObj::LBM_forceGrid() {
 						lambda_v = (1 - 0.5 * omega) * ( w[v] / (cs*cs) );
 
 						// Dot product (sum over d dimensions)
-						for (int d = 0; d < L_dims; d++) {
-							beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_dims));
+						for (int d = 0; d < L_DIMS; d++) {
+							beta_v +=  (c[d][v] * u(i,j,k,d,M_lim,K_lim,L_DIMS));
 						}
 						beta_v = beta_v * (1/(cs*cs));
 
 						// Compute force using shorthand sum described above
-						for (int d = 0; d < L_dims; d++) {
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels) += force_xyz(i,j,k,d,M_lim,K_lim,L_dims) *
-								(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_dims));
+						for (int d = 0; d < L_DIMS; d++) {
+							force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS) += force_xyz(i,j,k,d,M_lim,K_lim,L_DIMS) *
+								(c[d][v] * (1 + beta_v) - u(i,j,k,d,M_lim,K_lim,L_DIMS));
 						}
 
 						// Multiply by lambda_v
-						force_i(i,j,k,v,M_lim,K_lim,L_nVels) = force_i(i,j,k,v,M_lim,K_lim,L_nVels) * lambda_v;
+						force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * lambda_v;
 
 					}
 
@@ -538,8 +538,8 @@ void GridObj::LBM_forceGrid() {
 	testout << "\nNEW TIME STEP" << std::endl;
 	for (size_t j = 1; j < M_lim - 1; j++) {
 		for (size_t i = 0; i < N_lim; i++) {
-			for (size_t v = 0; v < L_nVels; v++) {
-				testout << force_i(i,j,0,v,M_lim,K_lim,L_nVels) << "\t";
+			for (size_t v = 0; v < L_NUM_VELS; v++) {
+				testout << force_i(i,j,0,v,M_lim,K_lim,L_NUM_VELS) << "\t";
 			}
 			testout << std::endl;
 		}
@@ -601,18 +601,18 @@ void GridObj::LBM_collide( ) {
 #else
 
 					// Loop over directions and perform collision
-					for (int v = 0; v < L_nVels; v++) {
+					for (int v = 0; v < L_NUM_VELS; v++) {
 
 						// Get feq value by calling overload of collision function
-						feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
+						feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
 
 						// LBGK collision
-						f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
-							f(i,j,k,v,M_lim,K_lim,L_nVels) - 
+						f_new(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = 
+							f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - 
 							omega * ( 
-								f(i,j,k,v,M_lim,K_lim,L_nVels) - feq(i,j,k,v,M_lim,K_lim,L_nVels) 
+								f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) 
 									) +
-							force_i(i,j,k,v,M_lim,K_lim,L_nVels);
+							force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 					}
 
@@ -655,9 +655,9 @@ double GridObj::LBM_collide(int i, int j, int k, int v) {
 
 	// Compute the parts of the expansion for feq (we now have a dot product routine so could simplify this code)
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		// Compute c_ia * u_a which is actually the dot product of c and u
-		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,L_dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,L_dims)) + (c[2][v] * u(i,j,k,2,M_lim,K_lim,L_dims));
+		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,L_DIMS)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,L_DIMS)) + (c[2][v] * u(i,j,k,2,M_lim,K_lim,L_DIMS));
 
 		/*
 		Compute second term in the expansion
@@ -666,19 +666,19 @@ double GridObj::LBM_collide(int i, int j, int k, int v) {
 		+ 2c_x c_y u_x u_y + 2c_x c_z u_x u_z + 2c_y c_z u_y u_z
 		*/
 
-		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,L_dims)*u(i,j,k,0,M_lim,K_lim,L_dims)) +
-			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,L_dims)*u(i,j,k,1,M_lim,K_lim,L_dims)) +
-			((c[2][v]*c[2][v]) - (cs*cs)) * (u(i,j,k,2,M_lim,K_lim,L_dims)*u(i,j,k,2,M_lim,K_lim,L_dims)) +
-			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,L_dims) * u(i,j,k,1,M_lim,K_lim,L_dims) +
-			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,L_dims) * u(i,j,k,2,M_lim,K_lim,L_dims) +
-			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,L_dims) * u(i,j,k,2,M_lim,K_lim,L_dims);
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,L_DIMS)*u(i,j,k,0,M_lim,K_lim,L_DIMS)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,L_DIMS)*u(i,j,k,1,M_lim,K_lim,L_DIMS)) +
+			((c[2][v]*c[2][v]) - (cs*cs)) * (u(i,j,k,2,M_lim,K_lim,L_DIMS)*u(i,j,k,2,M_lim,K_lim,L_DIMS)) +
+			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,L_DIMS) * u(i,j,k,1,M_lim,K_lim,L_DIMS) +
+			2 * c[0][v]*c[2][v] * u(i,j,k,0,M_lim,K_lim,L_DIMS) * u(i,j,k,2,M_lim,K_lim,L_DIMS) +
+			2 * c[1][v]*c[2][v] * u(i,j,k,1,M_lim,K_lim,L_DIMS) * u(i,j,k,2,M_lim,K_lim,L_DIMS);
 #else
 		// 2D versions of the above
-		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,L_dims)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,L_dims));
+		A = (c[0][v] * u(i,j,k,0,M_lim,K_lim,L_DIMS)) + (c[1][v] * u(i,j,k,1,M_lim,K_lim,L_DIMS));
 
-		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,L_dims)*u(i,j,k,0,M_lim,K_lim,L_dims)) +
-			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,L_dims)*u(i,j,k,1,M_lim,K_lim,L_dims)) +
-			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,L_dims) * u(i,j,k,1,M_lim,K_lim,L_dims);
+		B =	((c[0][v]*c[0][v]) - (cs*cs)) * (u(i,j,k,0,M_lim,K_lim,L_DIMS)*u(i,j,k,0,M_lim,K_lim,L_DIMS)) +
+			((c[1][v]*c[1][v]) - (cs*cs)) * (u(i,j,k,1,M_lim,K_lim,L_DIMS)*u(i,j,k,1,M_lim,K_lim,L_DIMS)) +
+			2 * c[0][v]*c[1][v] * u(i,j,k,0,M_lim,K_lim,L_DIMS) * u(i,j,k,1,M_lim,K_lim,L_DIMS);
 #endif
 
 
@@ -702,10 +702,10 @@ double GridObj::LBM_collide(int i, int j, int k, int v) {
 void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	
 	// Declarations
-	double ds[L_nVels], dh[L_nVels], gamma;
+	double ds[L_NUM_VELS], dh[L_NUM_VELS], gamma;
 
 	// Compute required moments and equilibrium moments
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		
 	// Most moments are required in 3D for the KBC-N4 model
 
@@ -726,43 +726,43 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	double M120 = 0.0, M120eq = 0.0;
 	double M012 = 0.0, M012eq = 0.0;
 
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
+		feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXXX but no point in dividing to multiply later
-		M200 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
-		M020 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
-		M002 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[2][v] * c[2][v]);
-		M110 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
-		M101 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[2][v]);
-		M011 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[2][v]);
-		M111 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v] * c[2][v]);
-		M102 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[2][v] * c[2][v]);
-		M210 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v] * c[1][v]);
-		M021 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v] * c[2][v]);
-		M201 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v] * c[2][v]);
-		M120 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v] * c[1][v]);
-		M012 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[2][v] * c[2][v]);
+		M200 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);
+		M020 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v]);
+		M002 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[2][v] * c[2][v]);
+		M110 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v]);
+		M101 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[2][v]);
+		M011 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[2][v]);
+		M111 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v] * c[2][v]);
+		M102 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[2][v] * c[2][v]);
+		M210 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v] * c[1][v]);
+		M021 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v] * c[2][v]);
+		M201 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v] * c[2][v]);
+		M120 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v] * c[1][v]);
+		M012 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[2][v] * c[2][v]);
 
-		M200eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
-		M020eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
-		M002eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[2][v] * c[2][v]);
-		M110eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
-		M101eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[2][v]);
-		M011eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[2][v]);
-		M111eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v] * c[2][v]);
-		M102eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[2][v] * c[2][v]);
-		M210eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v] * c[1][v]);
-		M021eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v] * c[2][v]);
-		M201eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v] * c[2][v]);
-		M120eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v] * c[1][v]);
-		M012eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[2][v] * c[2][v]);
+		M200eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);
+		M020eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v]);
+		M002eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[2][v] * c[2][v]);
+		M110eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v]);
+		M101eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[2][v]);
+		M011eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[2][v]);
+		M111eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v] * c[2][v]);
+		M102eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[2][v] * c[2][v]);
+		M210eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v] * c[1][v]);
+		M021eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v] * c[2][v]);
+		M201eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v] * c[2][v]);
+		M120eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v] * c[1][v]);
+		M012eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[2][v] * c[2][v]);
 	}
 
 	// Compute ds
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 
 		// s part dictated by KBC model choice and directions
 		if (c[0][v] == 0 && c[1][v] == 0 && c[2][v] == 0) {
@@ -817,7 +817,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 
 
 		// Compute dh
-		dh[v] = f(i,j,k,v,M_lim,K_lim,L_nVels) - feq(i,j,k,v,M_lim,K_lim,L_nVels) - ds[v];
+		dh[v] = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - ds[v];
 
 	}
 
@@ -830,23 +830,23 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	double M02 = 0.0, M02eq = 0.0;
 	double M11 = 0.0, M11eq = 0.0;
 
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
+		feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
 
 		// These are actually rho * MXX but no point in dividing to multiply later
-		M20 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
-		M02 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
-		M11 += f(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
+		M20 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);
+		M02 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v]);
+		M11 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v]);
 
-		M20eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[0][v]);
-		M02eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[1][v] * c[1][v]);
-		M11eq += feq(i,j,k,v,M_lim,K_lim,L_nVels) * (c[0][v] * c[1][v]);
+		M20eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);
+		M02eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v]);
+		M11eq += feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[1][v]);
 	}
 
 	// Compute ds
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 
 		// s part dictated by KBC model choice and directions
 		if (c[0][v] == 0 && c[1][v] == 0) {
@@ -876,7 +876,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 
 
 		// Compute dh
-		dh[v] = f(i,j,k,v,M_lim,K_lim,L_nVels) - feq(i,j,k,v,M_lim,K_lim,L_nVels) - ds[v];
+		dh[v] = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - ds[v];
 
 	}
 
@@ -884,11 +884,11 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 
 	// Once all dh and ds have been computed, compute the products
 	double top_prod = 0.0, bot_prod = 0.0;
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 
 		// Compute scalar products
-		top_prod += ds[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_nVels);
-		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_nVels);
+		top_prod += ds[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+		bot_prod += dh[v] * dh[v] / feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 	}
 	
@@ -897,13 +897,13 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	else gamma = (2/omega) - ( 2 - (2/omega) ) * (top_prod / bot_prod);
 
 	// Finally perform collision
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 
 		// Perform collision
-		f_new(i,j,k,v,M_lim,K_lim,L_nVels) = 
-			f(i,j,k,v,M_lim,K_lim,L_nVels) - 
+		f_new(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = 
+			f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - 
 			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-			force_i(i,j,k,v,M_lim,K_lim,L_nVels);
+			force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 	}
 
@@ -950,7 +950,7 @@ void GridObj::LBM_stream( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 
-				for (int v = 0; v < L_nVels; v++) {
+				for (int v = 0; v < L_NUM_VELS; v++) {
 
 					// Store opposite direction
 					v_opp = GridUtils::getOpposite(v);
@@ -976,7 +976,7 @@ void GridObj::LBM_stream( ) {
 					// Do-nothing-inlet --> Any; copy value to new grid (i.e. apply do-nothing inlet)
 #if (defined L_INLET_ON && !defined L_INLET_REGULARISED && !defined L_INLET_NRBC)					
 					} else if (LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) {
-						f_new(i,j,k,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
+						f_new(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 						// Carry on and stream
 #endif
 					}
@@ -1002,7 +1002,7 @@ void GridObj::LBM_stream( ) {
 					// If off-grid
 					if (	(dest_x >= N_lim || dest_x < 0) ||
 							(dest_y >= M_lim || dest_y < 0)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							|| (dest_z >= K_lim || dest_z < 0)
 #endif
 						) {
@@ -1016,7 +1016,7 @@ void GridObj::LBM_stream( ) {
 								" to \t" << dest_x << "," << dest_y << "," << dest_z <<
 								" : \toff-grid in " <<
 								v << " direction. Count1 = " << count1 << ". Value is f = " 
-								<< f(i,j,k,v,M_lim,K_lim,L_nVels) << std::endl;
+								<< f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << std::endl;
 #endif
 
 
@@ -1040,7 +1040,7 @@ void GridObj::LBM_stream( ) {
 									(LatTyp(i,j,k,M_lim,K_lim) == eFluid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eSolid)	)
 							) {
 								// Stream periodically
-								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS) = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								continue;	// Move on to next site
 							}
 
@@ -1048,7 +1048,7 @@ void GridObj::LBM_stream( ) {
 
 							// If not using periodic boundary conditions then retain incoming value as 
 							// will not receive an update from off-grid and continue
-							f_new(i,j,k,v_opp,M_lim,K_lim,L_nVels) = f(i,j,k,v_opp,M_lim,K_lim,L_nVels);
+							f_new(i,j,k,v_opp,M_lim,K_lim,L_NUM_VELS) = f(i,j,k,v_opp,M_lim,K_lim,L_NUM_VELS);
 							continue;
 
 
@@ -1108,7 +1108,7 @@ void GridObj::LBM_stream( ) {
 								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" << 
 								" : \tperiodic stream " <<
 									v << " direction. Count2 = " << count2 << ". Value is f = " 
-									<< f(i,j,k,v,M_lim,K_lim,L_nVels) << std::endl;
+									<< f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << std::endl;
 #endif
 
 
@@ -1118,12 +1118,12 @@ void GridObj::LBM_stream( ) {
 							if (LatTyp(i,j,k,M_lim,K_lim) == eFluid && LatTyp(dest_x,dest_y,dest_z,M_lim,K_lim) == eFluid)
 							{
 								// Stream periodically
-								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS) = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								continue;
 
 							} else {
 								// Incoming value at the destination site should be retained as no periodic BC to be applied
-								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels);
+								f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS);
 								continue;
 
 							}
@@ -1133,7 +1133,7 @@ void GridObj::LBM_stream( ) {
 #else
 
 							// If not using periodic BCs then incoming value at the destination site should be retained
-							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels);
+							f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS) = f(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS);
 							continue;
 
 						}
@@ -1180,12 +1180,12 @@ void GridObj::LBM_stream( ) {
 								" (" << XPos[dest_x] << "," << YPos[dest_y] << "," << ZPos[dest_z] << ")" << 
 								" : \ton-grid stream " <<
 								v << " direction. Count3 = " << count3 << ". Value is f = " 
-								<< f(i,j,k,v,M_lim,K_lim,L_nVels) << std::endl;
+								<< f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << std::endl;
 #endif
 
 
 						// Stream population
-						f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_nVels) = f(i,j,k,v,M_lim,K_lim,L_nVels);
+						f_new(dest_x,dest_y,dest_z,v,M_lim,K_lim,L_NUM_VELS) = f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 					}
 
@@ -1232,20 +1232,20 @@ void GridObj::LBM_macro( ) {
 
 					// Refined site so set both density and velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 0.0;
-					u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
-					u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;
-#if (L_dims == 3)
-					u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
+					u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
 				} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 
 					// Solid site so do not update density but set velocity to zero
 					rho(i,j,k,M_lim,K_lim) = 1.0;
-					u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
-					u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;
-#if (L_dims == 3)
-					u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
+					u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
 				} else if ( LatTyp(i,j,k,M_lim,K_lim) == eSymmetry ||
@@ -1259,15 +1259,15 @@ void GridObj::LBM_macro( ) {
 					// Any other of type of site compute both density and velocity from populations
 					rho_temp = 0.0; fux_temp = 0.0; fuy_temp = 0.0; fuz_temp = 0.0;
 
-					for (int v = 0; v < L_nVels; v++) {
+					for (int v = 0; v < L_NUM_VELS; v++) {
 
 						// Sum up to find mass flux
-						fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
-						fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
-						fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
+						fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+						fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+						fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 						// Sum up to find density
-						rho_temp += f(i,j,k,v,M_lim,K_lim,L_nVels);
+						rho_temp += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 					}
 
@@ -1275,17 +1275,17 @@ void GridObj::LBM_macro( ) {
 					rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 					// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-					fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-					fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
-#if (L_dims == 3)
-					fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+					fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_DIMS);
+					fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_DIMS);
+#if (L_DIMS == 3)
+					fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_DIMS);
 #endif
 
 					// Assign velocity
-					u(i,j,k,0,M_lim,K_lim,L_dims) = fux_temp / rho_temp;
-					u(i,j,k,1,M_lim,K_lim,L_dims) = fuy_temp / rho_temp;
-#if (L_dims == 3)
-					u(i,j,k,2,M_lim,K_lim,L_dims) = fuz_temp / rho_temp;
+					u(i,j,k,0,M_lim,K_lim,L_DIMS) = fux_temp / rho_temp;
+					u(i,j,k,1,M_lim,K_lim,L_DIMS) = fuy_temp / rho_temp;
+#if (L_DIMS == 3)
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = fuz_temp / rho_temp;
 #endif
 
 				}
@@ -1301,15 +1301,15 @@ void GridObj::LBM_macro( ) {
 
 				// Repeat for other quantities
 				int pq_combo = 0;
-				for (int p = 0; p < L_dims; p++) {
-					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,L_dims) * (double)t;
-					ta_temp += u(i,j,k,p,M_lim,K_lim,L_dims);
-					ui_timeav(i,j,k,p,M_lim,K_lim,L_dims) = ta_temp / (double)(t+1);
+				for (int p = 0; p < L_DIMS; p++) {
+					ta_temp = ui_timeav(i,j,k,p,M_lim,K_lim,L_DIMS) * (double)t;
+					ta_temp += u(i,j,k,p,M_lim,K_lim,L_DIMS);
+					ui_timeav(i,j,k,p,M_lim,K_lim,L_DIMS) = ta_temp / (double)(t+1);
 					// Do necessary products
-					for (int q = p; q < L_dims; q++) {
-						ta_temp = uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_dims-3)) * (double)t;
-						ta_temp += ( u(i,j,k,p,M_lim,K_lim,L_dims) * u(i,j,k,q,M_lim,K_lim,L_dims) );
-						uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_dims-3)) = ta_temp / (double)(t+1);
+					for (int q = p; q < L_DIMS; q++) {
+						ta_temp = uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_DIMS-3)) * (double)t;
+						ta_temp += ( u(i,j,k,p,M_lim,K_lim,L_DIMS) * u(i,j,k,q,M_lim,K_lim,L_DIMS) );
+						uiuj_timeav(i,j,k,pq_combo,M_lim,K_lim,(3*L_DIMS-3)) = ta_temp / (double)(t+1);
 						pq_combo++;
 					}
 				}
@@ -1347,20 +1347,20 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 		// Refined site so set both density and velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 0.0;
-		u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
-		u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;
-#if (L_dims == 3)
-		u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
+		u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
+		u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+		u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
 	} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 
 		// Solid site so do not update density but set velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 1.0;
-		u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
-		u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;
-#if (L_dims == 3)
-		u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
+		u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
+		u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+		u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
 	} else if ( LatTyp(i,j,k,M_lim,K_lim) == eSymmetry ||
@@ -1373,15 +1373,15 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		// Any other of type of site compute both density and velocity from populations
 		rho_temp = 0.0; fux_temp = 0.0; fuy_temp = 0.0; fuz_temp = 0.0;
 
-		for (int v = 0; v < L_nVels; v++) {
+		for (int v = 0; v < L_NUM_VELS; v++) {
 
 			// Sum up to find mass flux
-			fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
-			fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
-			fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,L_nVels);
+			fux_temp += (double)c[0][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+			fuy_temp += (double)c[1][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+			fuz_temp += (double)c[2][v] * f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 			// Sum up to find density
-			rho_temp += f(i,j,k,v,M_lim,K_lim,L_nVels);
+			rho_temp += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 		}
 
@@ -1389,17 +1389,17 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		rho(i,j,k,M_lim,K_lim) = rho_temp;
 
 		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
-		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_dims);
-		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_dims);
-#if (L_dims == 3)
-		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_dims);
+		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_DIMS);
+		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_DIMS);
+#if (L_DIMS == 3)
+		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_DIMS);
 #endif
 
 		// Assign velocity
-		u(i,j,k,0,M_lim,K_lim,L_dims) = fux_temp / rho_temp;
-		u(i,j,k,1,M_lim,K_lim,L_dims) = fuy_temp / rho_temp;
-#if (L_dims == 3)
-		u(i,j,k,2,M_lim,K_lim,L_dims) = fuz_temp / rho_temp;
+		u(i,j,k,0,M_lim,K_lim,L_DIMS) = fux_temp / rho_temp;
+		u(i,j,k,1,M_lim,K_lim,L_DIMS) = fuy_temp / rho_temp;
+#if (L_DIMS == 3)
+		u(i,j,k,2,M_lim,K_lim,L_DIMS) = fuz_temp / rho_temp;
 #endif
 
 	}
@@ -1449,33 +1449,33 @@ void GridObj::LBM_explode( int RegionNumber ) {
 					if (fGrid->LatTyp(fi,fj,fk,M_fine,K_fine) == eTransitionToCoarser) {
 
 						// Update fine grid values according to Rohde et al.
-						for (int v = 0; v < L_nVels; v++) {
+						for (int v = 0; v < L_NUM_VELS; v++) {
 
 							// Get coarse site value
-							double coarse_f = f(i,j,k,v,M_coarse,K_coarse,L_nVels);
+							double coarse_f = f(i,j,k,v,M_coarse,K_coarse,L_NUM_VELS);
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							// 3D Case -- cube of 8 cells
 
 							// Copy coarse to fine
-							fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,L_nVels)	= coarse_f;
-							fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,L_nVels)	= coarse_f;
+							fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
+							fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,L_NUM_VELS)	= coarse_f;
 
 #else
 
 							// 2D Case -- square of 4 cells
 
 							// Copy coarse to fine
-							fGrid->f(fi,	fj,		v,M_fine,L_nVels)		= coarse_f;
-							fGrid->f(fi+1,	fj,		v,M_fine,L_nVels)		= coarse_f;
-							fGrid->f(fi,	fj+1,	v,M_fine,L_nVels)		= coarse_f;
-							fGrid->f(fi+1,	fj+1,	v,M_fine,L_nVels)		= coarse_f;
+							fGrid->f(fi,	fj,		v,M_fine,L_NUM_VELS)		= coarse_f;
+							fGrid->f(fi+1,	fj,		v,M_fine,L_NUM_VELS)		= coarse_f;
+							fGrid->f(fi,	fj+1,	v,M_fine,L_NUM_VELS)		= coarse_f;
+							fGrid->f(fi+1,	fj+1,	v,M_fine,L_NUM_VELS)		= coarse_f;
 
 #endif
 						}
@@ -1507,7 +1507,7 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 	int M_fine = static_cast<int>(fGrid->M_lim);
 	int M_coarse = static_cast<int>(M_lim);
 	int K_coarse = static_cast<int>(K_lim);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	int K_fine = static_cast<int>(fGrid->K_lim);
 #else
 	int K_fine = 0;
@@ -1537,37 +1537,37 @@ void GridObj::LBM_coalesce( int RegionNumber ) {
 					int fk = idx_fine[2];
 
 					// Loop over directions
-					for (int v = 0; v < L_nVels; v++) {
+					for (int v = 0; v < L_NUM_VELS; v++) {
 
 						// Check to see if f value is missing on coarse level
-						if (f(i,j,k,v,M_coarse,K_coarse,L_nVels) == 0) {
+						if (f(i,j,k,v,M_coarse,K_coarse,L_NUM_VELS) == 0) {
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							// 3D Case -- cube of 8 cells
 
 							// Average the values
-							f(i,j,k,v,M_coarse,K_coarse,L_nVels) = (
-								fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,L_nVels) +
-								fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,L_nVels)
-								) / pow(2, L_dims);
+							f(i,j,k,v,M_coarse,K_coarse,L_NUM_VELS) = (
+								fGrid->f(fi,	fj,		fk,		v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj,		fk,		v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi,	fj+1,	fk,		v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj+1,	fk,		v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi,	fj,		fk+1,	v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj,		fk+1,	v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi,	fj+1,	fk+1,	v,M_fine,K_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj+1,	fk+1,	v,M_fine,K_fine,L_NUM_VELS)
+								) / pow(2, L_DIMS);
 
 #else
 
 							// 2D Case -- square of 4 cells
 
 							// Average the values
-							f(i,j,k,v,M_coarse,K_coarse,L_nVels) = (
-								fGrid->f(fi,	fj,		v,M_fine,L_nVels) +
-								fGrid->f(fi+1,	fj,		v,M_fine,L_nVels) +
-								fGrid->f(fi,	fj+1,	v,M_fine,L_nVels) +
-								fGrid->f(fi+1,	fj+1,	v,M_fine,L_nVels)
-								) / pow(2, L_dims);
+							f(i,j,k,v,M_coarse,K_coarse,L_NUM_VELS) = (
+								fGrid->f(fi,	fj,		v,M_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj,		v,M_fine,L_NUM_VELS) +
+								fGrid->f(fi,	fj+1,	v,M_fine,L_NUM_VELS) +
+								fGrid->f(fi+1,	fj+1,	v,M_fine,L_NUM_VELS)
+								) / pow(2, L_DIMS);
 
 #endif
 						}

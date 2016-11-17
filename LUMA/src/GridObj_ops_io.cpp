@@ -44,14 +44,14 @@ void GridObj::io_textout(std::string output_tag) {
 	M_str = to_string((int)L_M);
 	K_str = to_string((int)L_K);
 	L_NumLev_str = to_string(level);
-	if (L_NumLev == 0) ex_str = to_string(0);
+	if (L_NUM_LEVELS == 0) ex_str = to_string(0);
 	else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
-	if (L_NumLev == 0) NumReg_str = to_string(0);
+	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
 	mpirank = to_string(MpiManager::my_rank);
 	// Build string
 	FNameG = string(GridUtils::path_str + "/Grids")
-			+ string("D") +  to_string(L_dims)
+			+ string("D") +  to_string(L_DIMS)
 			+ string("x") + N_str
 			+ string("y") + M_str
 			+ string("z") + K_str
@@ -158,7 +158,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 		// Populations (f, feq)
 		gridoutput << "\n\nf Values";
-		for (size_t v = 0; v < L_nVels; v++) {
+		for (size_t v = 0; v < L_NUM_VELS; v++) {
 			// Particular velocity
 			gridoutput << "\nc = " << v+1;
 
@@ -173,7 +173,7 @@ void GridObj::io_textout(std::string output_tag) {
 					for (size_t i = 0; i < N_lim; i++) {
 
 						// Output
-						gridoutput << f(i,j,k,v,M_lim,K_lim,L_nVels) << "\t";
+						gridoutput << f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << "\t";
 
 					}
 				}
@@ -181,7 +181,7 @@ void GridObj::io_textout(std::string output_tag) {
 		}
 
 		gridoutput << "\n\nfeq Values";
-		for (size_t v = 0; v < L_nVels; v++) {
+		for (size_t v = 0; v < L_NUM_VELS; v++) {
 			// Particular velocity
 			gridoutput << "\nc = " << v+1;
 
@@ -196,7 +196,7 @@ void GridObj::io_textout(std::string output_tag) {
 					for (size_t i = 0; i < N_lim; i++) {
 
 						// Output
-						gridoutput << feq(i,j,k,v,M_lim,K_lim,L_nVels) << "\t";
+						gridoutput << feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << "\t";
 
 					}
 				}
@@ -205,7 +205,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 		// Macroscopic (u, rho)
 		gridoutput << "\n\nVelocity Values";
-		for (size_t n = 0; n < L_dims; n++) {
+		for (size_t n = 0; n < L_DIMS; n++) {
 			// Particular component
 			gridoutput << "\nu(" << n+1 << ")";
 
@@ -219,7 +219,7 @@ void GridObj::io_textout(std::string output_tag) {
 					for (size_t i = 0; i < N_lim; i++) {
 
 						// Output
-						gridoutput << u(i,j,k,n,M_lim,K_lim,L_dims) << "\t";
+						gridoutput << u(i,j,k,n,M_lim,K_lim,L_DIMS) << "\t";
 
 					}
 				}
@@ -283,7 +283,7 @@ void GridObj::io_textout(std::string output_tag) {
 void GridObj::io_fgaout() {
 	
 	// Write the file only if the model has the correct number of dimensions
-	if ((L_dims == 2) || (L_dims == 3)){
+	if ((L_DIMS == 2) || (L_DIMS == 3)){
 		_io_fgaout(t);
 	}
 	else{
@@ -317,14 +317,14 @@ void GridObj::_io_fgaout(int timeStepL0) {
 	K_str = to_string((int)L_K);
 	L_NumLev_str = to_string(level);
 	L_timeStep_str = to_string(timeStepL0);
-	//if (L_NumLev == 0) ex_str = to_string(0);
+	//if (L_NUM_LEVELS == 0) ex_str = to_string(0);
 	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
-	if (L_NumLev == 0) NumReg_str = to_string(0);
+	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
 	mpirank = to_string(MpiManager::my_rank);
 	// Build string
 	FNameG = string(GridUtils::path_str + "/Grids")
-		+ string("D") + to_string(L_dims)
+		+ string("D") + to_string(L_DIMS)
 		+ string("x") + N_str
 		+ string("y") + M_str
 		+ string("z") + K_str
@@ -359,9 +359,9 @@ void GridObj::_io_fgaout(int timeStepL0) {
 
 				for (size_t i = 0; i < N_lim; i++){
 
-					for (size_t n = 0; n < L_dims; n++){
+					for (size_t n = 0; n < L_DIMS; n++){
 						// Fill the v array
-						v[n] = u(i, j, k, n, M_lim, K_lim, L_dims);
+						v[n] = u(i, j, k, n, M_lim, K_lim, L_DIMS);
 					}
 					// Write the data to the file. 
 					gridoutput << GridUnits::m2cm(GridUnits::ulat2uphys(v[0], this)) << "," 
@@ -446,13 +446,13 @@ void GridObj::io_restart(bool IO_flag) {
 					file << XInd[i] << "\t" << YInd[j] << "\t" << ZInd[k] << "\t";
 
 					// f values
-					for (v = 0; v < L_nVels; v++) {
-						file << f(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
+					for (v = 0; v < L_NUM_VELS; v++) {
+						file << f(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
 					}
 
 					// u values
-					for (v = 0; v < L_dims; v++) {
-						file << u(i,j,k,v,YInd.size(),ZInd.size(),L_dims) << "\t";
+					for (v = 0; v < L_DIMS; v++) {
+						file << u(i,j,k,v,YInd.size(),ZInd.size(),L_DIMS) << "\t";
 					}
 
 					// rho value
@@ -529,7 +529,7 @@ void GridObj::io_restart(bool IO_flag) {
 			GridUtils::global_to_local(gi,gj,gk,this,ind);
 			i = ind[0];
 			j = ind[1];
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			k = ind[2];
 #else
 			k = 0;
@@ -537,13 +537,13 @@ void GridObj::io_restart(bool IO_flag) {
 
 
 			// Read in f values
-			for (v = 0; v < L_nVels; v++) {
-				iss >> f(i,j,k,v,M_lim,K_lim,L_nVels);
+			for (v = 0; v < L_NUM_VELS; v++) {
+				iss >> f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 			}
 
 			// Read in u values
-			for (v = 0; v < L_dims; v++) {
-				iss >> u(i,j,k,v,M_lim,K_lim,L_dims);
+			for (v = 0; v < L_DIMS; v++) {
+				iss >> u(i,j,k,v,M_lim,K_lim,L_DIMS);
 			}
 
 			// Read in rho value
@@ -560,7 +560,7 @@ void GridObj::io_restart(bool IO_flag) {
 		//////////////////////
 
 #ifdef L_IBM_ON
-		if (level == L_IB_Lev)
+		if (level == L_IB_ON_LEV)
 			ObjectManager::getInstance()->io_restart(IO_flag, level);
 #endif
 
@@ -568,7 +568,7 @@ void GridObj::io_restart(bool IO_flag) {
 	}
 
 	// Call recursively for subgrids
-	if (level < L_NumLev && subGrid.size()) {
+	if (level < L_NUM_LEVELS && subGrid.size()) {
 		for (size_t g = 0; g < subGrid.size(); g++) {
 			subGrid[g].io_restart(IO_flag);
 		}
@@ -589,7 +589,7 @@ void GridObj::io_probeOutput() {
 	int i,j,d,i_local,j_local,k_local,i_global,j_global,k_global;
 	int M_lims = static_cast<int>(YInd.size()), K_lims = static_cast<int>(ZInd.size());
 
-	if (t == L_out_every_probe && MpiManager::my_rank == 0) {
+	if (t == L_PROBE_OUT_FREQ && MpiManager::my_rank == 0) {
 		// Overwrite existing first time through
 		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out);
 	} else {
@@ -602,12 +602,12 @@ void GridObj::io_probeOutput() {
 
 
 	// Probe spacing in each direction
-	int pspace[L_dims];
+	int pspace[L_DIMS];
 	if (nProbes[0] > 1)
 		pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
 	if (nProbes[1] > 1)
 		pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	if (nProbes[2] > 1)
 		pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
 #endif
@@ -619,7 +619,7 @@ void GridObj::io_probeOutput() {
 		for (j = 0; j < nProbes[1]; j++) {
 			j_global = yProbeLims[0] + j*pspace[1];
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int k = 0; k < nProbes[2]; k++) {
 				k_global = zProbeLims[0] + k*pspace[2];
 #else
@@ -640,7 +640,7 @@ void GridObj::io_probeOutput() {
 #ifdef L_BUILD_FOR_MPI
 				i_local = i_global - XInd[1] + 1;
 				j_local = j_global - YInd[1] + 1;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				k_local = k_global - ZInd[1] + 1;
 #else
 				k_local = k_global;
@@ -652,8 +652,8 @@ void GridObj::io_probeOutput() {
 				
 
 				// Write out value and add tab
-				for (d = 0; d < L_dims; d++) {
-					probefile << u(i_local,j_local,k_local,d,M_lims,K_lims,L_dims) << "\t";
+				for (d = 0; d < L_DIMS; d++) {
+					probefile << u(i_local,j_local,k_local,d,M_lims,K_lims,L_DIMS) << "\t";
 				}
 
 			}
@@ -695,10 +695,10 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << " -- " << TAG << std::endl;
 	litefile << "T = " << std::to_string(tval) << std::endl;
 	litefile << "RANK\tTYPE\tX\t\tY\t\tZ\t\tRHO\t\tUX\t\tUY\t\tUZ\t\t";
-	for (int v = 0; v < L_nVels; v++) {
+	for (int v = 0; v < L_NUM_VELS; v++) {
 		litefile << "F" << std::to_string(v) << "\t\t";
 	}
-	/*for (int v = 0; v < L_nVels; v++) {
+	/*for (int v = 0; v < L_NUM_VELS; v++) {
 		litefile << "FEQ" << std::to_string(v) << "\t\t";
 	}*/
 	litefile << "TA_RHO\t\tTA_UX\t\tTA_UY\t\tTA_UZ\t\tTA_UXUX\t\tTA_UXUY\t\tTA_UXUZ\t\tTA_UYUY\t\tTA_UYUZ\t\tTA_UZUZ" << std::endl;
@@ -729,44 +729,44 @@ void GridObj::io_lite(double tval, std::string TAG) {
 
 					// Write out rho and u
 					litefile << rho(i,j,k,YInd.size(),ZInd.size()) << "\t";
-					for (v = 0; v < L_dims; v++) {
-						litefile << u(i,j,k,v,YInd.size(),ZInd.size(),L_dims) << "\t";
+					for (v = 0; v < L_DIMS; v++) {
+						litefile << u(i,j,k,v,YInd.size(),ZInd.size(),L_DIMS) << "\t";
 					}
-#if (L_dims != 3)
+#if (L_DIMS != 3)
 					litefile << std::to_string(0.0) << "\t";
 #endif
 
 					// Write out F and Feq
-					for (v = 0; v < L_nVels; v++) {
-						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
+					for (v = 0; v < L_NUM_VELS; v++) {
+						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
 					}
-					/*for (v = 0; v < L_nVels; v++) {
-						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),L_nVels) << "\t";
+					/*for (v = 0; v < L_NUM_VELS; v++) {
+						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
 					}*/
 				
 					// Write out time averaged rho and u
 					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";
-					for (v = 0; v < L_dims; v++) {
-						litefile << ui_timeav(i,j,k,v,YInd.size(),ZInd.size(),L_dims) << "\t";
+					for (v = 0; v < L_DIMS; v++) {
+						litefile << ui_timeav(i,j,k,v,YInd.size(),ZInd.size(),L_DIMS) << "\t";
 					}
-#if (L_dims != 3)
+#if (L_DIMS != 3)
 					litefile << std::to_string(0.0) << "\t";
 #endif
 
 					// Write out time averaged u products
-					litefile << uiuj_timeav(i,j,k,0,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
-					litefile << uiuj_timeav(i,j,k,1,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
-#if (L_dims == 3)
-					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,0,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,1,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
+#if (L_DIMS == 3)
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
 #else
 					litefile << std::to_string(0.0) << "\t";
 #endif
-#if (L_dims == 3)
-					litefile << uiuj_timeav(i,j,k,3,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
-					litefile << uiuj_timeav(i,j,k,4,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
-					litefile << uiuj_timeav(i,j,k,5,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
+#if (L_DIMS == 3)
+					litefile << uiuj_timeav(i,j,k,3,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,4,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,5,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
 #else
-					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_dims-3)) << "\t";
+					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
 					litefile << std::to_string(0.0) << "\t" << std::to_string(0.0) << "\t";
 #endif
 
@@ -781,7 +781,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	}
 
 	// Now do any sub-grids
-	if (L_NumLev > level) {
+	if (L_NUM_LEVELS > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
 			subGrid[reg].io_lite(tval,"");
 		}
@@ -813,7 +813,7 @@ int GridObj::io_hdf5(double tval) {
 
 	// Declarations
 	hid_t file_id = static_cast<hid_t>(NULL), plist_id = static_cast<hid_t>(NULL), group_id = static_cast<hid_t>(NULL);
-	hid_t filespace = static_cast<hid_t>(NULL); hsize_t dimsf[L_dims];
+	hid_t filespace = static_cast<hid_t>(NULL); hsize_t dimsf[L_DIMS];
 	hid_t memspace = static_cast<hid_t>(NULL); hsize_t dimsm[1];
 	hid_t attspace = static_cast<hid_t>(NULL); hsize_t dimsa[1];
 	hid_t dataset_id = static_cast<hid_t>(NULL); hid_t attrib_id = static_cast<hid_t>(NULL);
@@ -832,7 +832,7 @@ int GridObj::io_hdf5(double tval) {
 	if (level != 0) TL_thickness = 2;
 	int N_mod = N_lim - (2 * TL_thickness);
 	int M_mod = M_lim - (2 * TL_thickness);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	int K_mod = K_lim - (2 * TL_thickness);
 #else
 	int K_mod = K_lim;
@@ -880,7 +880,7 @@ int GridObj::io_hdf5(double tval) {
 	else {
 		// Appropriate sub-grid communicator
 		status = H5Pset_fapl_mpio(
-			plist_id, MpiManager::getInstance()->subGrid_comm[(level - 1) + region_number * L_NumLev], info);
+			plist_id, MpiManager::getInstance()->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS], info);
 	}
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
 
@@ -908,7 +908,7 @@ int GridObj::io_hdf5(double tval) {
 		// L0 from definitions
 		dimsf[0] = L_N;
 		dimsf[1] = L_M;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		dimsf[2] = L_K;
 #endif
 	}
@@ -916,11 +916,11 @@ int GridObj::io_hdf5(double tval) {
 		// >L0 must get global sizes from the refinement region specification (ex. TL)
 		dimsf[0] = (RefXend[level - 1][region_number] - RefXstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
 		dimsf[1] = (RefYend[level - 1][region_number] - RefYstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		dimsf[2] = (RefZend[level - 1][region_number] - RefZstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
 #endif
 	}
-	filespace = H5Screate_simple(L_dims, dimsf, NULL);	// File space is globally sized
+	filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
 
 	// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
 #ifdef L_BUILD_FOR_MPI
@@ -938,17 +938,17 @@ int GridObj::io_hdf5(double tval) {
 	if (t == 0) {
 
 		// Create 1D attribute buffers
-		int buffer_int_array[L_dims];
+		int buffer_int_array[L_DIMS];
 		int buffer_int = 0;
 		double buffer_double = 0.0;
 		buffer_int_array[0] = static_cast<int>(dimsf[0]);
 		buffer_int_array[1] = static_cast<int>(dimsf[1]);
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 		buffer_int_array[2] = static_cast<int>(dimsf[2]);
 	#endif
 
 		// Write Grid Size
-		dimsa[0] = L_dims;
+		dimsa[0] = L_DIMS;
 		attspace = H5Screate_simple(1, dimsa, NULL);
 		attrib_id = H5Acreate(file_id, "GridSize", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int_array[0]);
@@ -960,7 +960,7 @@ int GridObj::io_hdf5(double tval) {
 			// Write Sub-Grid Start
 			buffer_int_array[0] = RefXstart[level - 1][region_number];
 			buffer_int_array[1] = RefYstart[level - 1][region_number];
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			buffer_int_array[2] = RefZstart[level - 1][region_number];
 #endif
 			attspace = H5Screate_simple(1, dimsa, NULL);
@@ -973,7 +973,7 @@ int GridObj::io_hdf5(double tval) {
 			// Write Sub-Grid End
 			buffer_int_array[0] = RefXend[level - 1][region_number];
 			buffer_int_array[1] = RefYend[level - 1][region_number];
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			buffer_int_array[2] = RefZend[level - 1][region_number];
 #endif
 			attrib_id = H5Acreate(file_id, "RefinementEnd", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
@@ -986,7 +986,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
 		
 		// Write Timesteps
-		buffer_int = L_Timesteps;
+		buffer_int = L_TIMESTEPS;
 		dimsa[0] = 1;
 		attspace = H5Screate_simple(1, dimsa, NULL);
 		attrib_id = H5Acreate(file_id, "Timesteps", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
@@ -1012,7 +1012,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 		// Write Levels
-		buffer_int = L_NumLev + 1;
+		buffer_int = L_NUM_LEVELS + 1;
 		attrib_id = H5Acreate(file_id, "NumberOfGrids", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
@@ -1020,7 +1020,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 		// Write Regions
-		buffer_int = L_NumReg;
+		buffer_int = L_NUM_REGIONS;
 		attrib_id = H5Acreate(file_id, "NumberOfRegions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
@@ -1028,7 +1028,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 		// Write Dimensions
-		buffer_int = L_dims;
+		buffer_int = L_DIMS;
 		attrib_id = H5Acreate(file_id, "Dimensions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
@@ -1087,7 +1087,7 @@ int GridObj::io_hdf5(double tval) {
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
 	// WRITE UZ
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	variable_name = time_string + "/Uz";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod,  this, &u[2], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
@@ -1110,7 +1110,7 @@ int GridObj::io_hdf5(double tval) {
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
 	// WRITE UZ_TIMEAV
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	variable_name = time_string + "/Uz_TimeAv";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod,  this, &ui_timeav[2], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
@@ -1140,7 +1140,7 @@ int GridObj::io_hdf5(double tval) {
 	// WRITE UYUY_TIMEAV
 	variable_name = time_string + "/UyUy_TimeAv";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod,  this, &uiuj_timeav[3], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
 #else
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
@@ -1148,7 +1148,7 @@ int GridObj::io_hdf5(double tval) {
 	status = H5Dclose(dataset_id); // Close dataset
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// WRITE UXUZ_TIMEAV
 	variable_name = time_string + "/UxUz_TimeAv";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -1192,7 +1192,7 @@ int GridObj::io_hdf5(double tval) {
 
 
 	// WRITE POSITION Z
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	variable_name = time_string + "/ZPos";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	hdf5_writeDataSet(memspace, filespace, dataset_id, ePosZ, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod,  this, &ZPos[0], H5T_NATIVE_DOUBLE, TL_thickness, p_data);

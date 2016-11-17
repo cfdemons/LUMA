@@ -20,10 +20,10 @@
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
 // Constants so initialise outside the class but in scope.
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 
 // THIS IS WRONG AS WE HAVE CHANGED TO D3Q27 NOW!!!!
-const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
+const int GridUtils::dir_reflect[L_DIMS * 2][L_NUM_VELS] = 
 	{
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
 		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},
@@ -33,7 +33,7 @@ const int GridUtils::dir_reflect[L_dims * 2][L_nVels] =
 		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}
 	};
 #else
-const int GridUtils::dir_reflect[L_dims * 2][L_nVels] = 
+const int GridUtils::dir_reflect[L_DIMS * 2][L_NUM_VELS] = 
 	{
 		{1, 0, 2, 3, 7, 6, 5, 4, 8}, 
 		{1, 0, 2, 3, 4, 6, 5, 4, 8},
@@ -202,11 +202,11 @@ double GridUtils::vecnorm( double val1, double val2, double val3 )
 /// \param	vec	old-style C array representing a vector with the same number of
 ///				number of components as the problem dimension.
 /// \return	the L2 norm.
-double GridUtils::vecnorm( double vec[L_dims] )
+double GridUtils::vecnorm( double vec[L_DIMS] )
 {
 	double result;
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 
 		result = sqrt( pow(vec[0],2) + pow(vec[1],2) + pow(vec[2],2) );
 
@@ -306,7 +306,7 @@ std::vector<int> GridUtils::getFineIndices(int coarse_i, int x_start, int coarse
 	// Map indices
 	fine_ind.insert(fine_ind.begin(), 2 * (coarse_i - x_start + 1) - 2);
 	fine_ind.insert(fine_ind.begin() + 1, 2 * (coarse_j - y_start + 1) - 2);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	fine_ind.insert(fine_ind.begin() + 2, 2 * (coarse_k - z_start + 1) - 2);
 #else
 	fine_ind.insert(fine_ind.begin() + 2, 0);
@@ -347,7 +347,7 @@ std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j
 	// Reverse map indices
 	coarse_ind.insert(coarse_ind.begin(), (fine_i / 2) + x_start);
 	coarse_ind.insert(coarse_ind.begin() + 1, (fine_j / 2) + y_start);
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	coarse_ind.insert(coarse_ind.begin() + 2, (fine_k / 2) + z_start);
 #else
 	coarse_ind.insert(coarse_ind.begin() + 2, 0);
@@ -371,7 +371,7 @@ int GridUtils::getOpposite(int direction) {
 	int direction_opposite;
 
 	// If rest particle then opposite is simply itself
-	if (direction == L_nVels-1) {
+	if (direction == L_NUM_VELS-1) {
 
 		direction_opposite = direction;
 
@@ -408,14 +408,14 @@ int GridUtils::getOpposite(int direction) {
 bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 
 	// Local declarations
-	int exp_MPI_coords[L_dims], act_MPI_coords[L_dims], MPI_dims[L_dims];
+	int exp_MPI_coords[L_DIMS], act_MPI_coords[L_DIMS], MPI_dims[L_DIMS];
 	int shift[3] = {0, 0, 0};
 
 	// Initialise local variables
-	MPI_dims[0] = L_Xcores;
-	MPI_dims[1] = L_Ycores;
-#if (L_dims == 3)
-	MPI_dims[2] = L_Zcores;
+	MPI_dims[0] = L_MPI_XCORES;
+	MPI_dims[1] = L_MPI_YCORES;
+#if (L_DIMS == 3)
+	MPI_dims[2] = L_MPI_ZCORES;
 #endif
 
 	// Define shifts based on which overlap we are on
@@ -434,7 +434,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 		shift[1] = -1;
 	}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// Z
 	if (GridUtils::isOnRecvLayer(g.ZPos[k],eZDirection,eMaximum)) {
 		shift[2] = 1;
@@ -444,7 +444,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 #endif
 
 	// Loop over each Cartesian direction
-	for (int d = 0; d < L_dims; d++) {
+	for (int d = 0; d < L_DIMS; d++) {
 		// Define expected (non-periodic) MPI coordinates of neighbour rank
 		exp_MPI_coords[d] = MpiManager::MPI_coords[d] + shift[d];
 
@@ -479,7 +479,7 @@ bool GridUtils::isOnThisRank(int gi, int gj, int gk, const GridObj& grid) {
 	if (	found_x != grid.XInd.end() && found_y != grid.YInd.end()
 
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		&& found_z != grid.ZInd.end()
 #endif
 		) {
@@ -557,7 +557,7 @@ bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
 	}
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// Loop over over Z range
 	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
 		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
@@ -643,7 +643,7 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 		// Y and Z not recv
 		(!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		)
@@ -653,7 +653,7 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 
 		// X and Z not recv
 		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 
 		)
@@ -755,7 +755,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 
 	if (	GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum) ||
 			GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			|| GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
 #endif
 		) {
@@ -928,7 +928,7 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) 
 		)
 	);
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	vox.push_back(
 		(int)std::floor(
 			(z - (g->ZOrigin - g->dz / 2.0)) / g->dz

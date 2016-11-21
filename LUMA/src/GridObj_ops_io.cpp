@@ -400,10 +400,10 @@ void GridObj::_io_fgaout(int timeStepL0) {
 ///			file format. If the file already exists, data is appended. IB body data
 ///			are also written out but no other body information at present. 
 ///
-/// \param IO_flag	flag to indicate whether a write (true) or read (false) is required.
-void GridObj::io_restart(bool IO_flag) {
+/// \param IO_flag	flag to indicate whether a write or read
+void GridObj::io_restart(eIOFlag IO_flag) {
 
-	if (IO_flag) {
+	if (IO_flag == eWrite) {
 
 		// Restart file stream
 		std::ofstream file;
@@ -414,10 +414,13 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- WRITE //
 		///////////////////////
 
-		if (MpiManager::my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::out);
-		} else { // Append
-			file.open(GridUtils::path_str + "/restart_LBM.out", std::ios::out | std::ios::app);
+		if (level == 0) {
+			// New file
+			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+		}
+		else {
+			// Append
+			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app);
 		}
 
 		// Get grid sizes
@@ -489,7 +492,7 @@ void GridObj::io_restart(bool IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open("./input/restart_LBM.out", std::ios::in);
+		file.open("./input/restart_LBM_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::in);
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "Error opening LBM restart file. Exiting." << std::endl;

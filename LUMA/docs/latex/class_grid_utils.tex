@@ -18,7 +18,7 @@ static std\+::vector$<$ int $>$ \hyperlink{class_grid_utils_a1f0d4a76be76a743c36
 \begin{DoxyCompactList}\small\item\em Creates a linearly-\/spaced vector of integers. \end{DoxyCompactList}\item 
 static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a2f172a6dd8b2749ca1c8336a64a07e29}{linspace} (double min, double max, int n)
 \begin{DoxyCompactList}\small\item\em Creates a linearly-\/spaced vector of values. \end{DoxyCompactList}\item 
-static double \hyperlink{class_grid_utils_ad2f49b732b744929a9505c4b2cd9da13}{vecnorm} (double vec\mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]})
+static double \hyperlink{class_grid_utils_a1e0d0da69ec1543835b98bca884f8927}{vecnorm} (double vec\mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]})
 \begin{DoxyCompactList}\small\item\em Computes the L2 norm using the vector supplied. \end{DoxyCompactList}\item 
 static double \hyperlink{class_grid_utils_ae7d797edf50b3c3a448d59684a135aee}{vecnorm} (double val1, double val2)
 \begin{DoxyCompactList}\small\item\em Computes the L2 norm using the vector components supplied. \end{DoxyCompactList}\item 
@@ -89,7 +89,7 @@ static std\+::ofstream $\ast$ \hyperlink{class_grid_utils_a298239096e929c1ba4eba
 \begin{DoxyCompactList}\small\item\em Handle to output file. \end{DoxyCompactList}\item 
 static std\+::string \hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{path\+\_\+str}
 \begin{DoxyCompactList}\small\item\em Static string representing output path. \end{DoxyCompactList}\item 
-static const int \hyperlink{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{dir\+\_\+reflect} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims} $\ast$2\mbox{]}\mbox{[}\hyperlink{definitions_8h_a920e69a22e5f925675c5c77c521d586d}{L\+\_\+n\+Vels}\mbox{]}
+static const int \hyperlink{class_grid_utils_ae2b566735d973bc25f1a6416010efa70}{dir\+\_\+reflect} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS} $\ast$2\mbox{]}\mbox{[}\hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Array with hardcoded direction numbering for specular reflection. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
@@ -854,11 +854,11 @@ a vector which is a scalar multiplied by a vector.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!vecnorm@{vecnorm}}
 \index{vecnorm@{vecnorm}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{vecnorm(double vec[L\+\_\+dims])}{vecnorm(double vec[L_dims])}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
+\subsubsection[{\texorpdfstring{vecnorm(double vec[L\+\_\+\+D\+I\+MS])}{vecnorm(double vec[L_DIMS])}}]{\setlength{\rightskip}{0pt plus 5cm}double Grid\+Utils\+::vecnorm (
 \begin{DoxyParamCaption}
-\item[{double}]{vec\mbox{[}\+L\+\_\+dims\mbox{]}}
+\item[{double}]{vec\mbox{[}\+L\+\_\+\+D\+I\+M\+S\mbox{]}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ad2f49b732b744929a9505c4b2cd9da13}{}\label{class_grid_utils_ad2f49b732b744929a9505c4b2cd9da13}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a1e0d0da69ec1543835b98bca884f8927}{}\label{class_grid_utils_a1e0d0da69ec1543835b98bca884f8927}
 
 
 Computes the L2 norm using the vector supplied. 
@@ -989,15 +989,17 @@ Num\+Type scalar quantity
 \subsection{Member Data Documentation}
 \index{Grid\+Utils@{Grid\+Utils}!dir\+\_\+reflect@{dir\+\_\+reflect}}
 \index{dir\+\_\+reflect@{dir\+\_\+reflect}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{dir\+\_\+reflect}{dir_reflect}}]{\setlength{\rightskip}{0pt plus 5cm}const int Grid\+Utils\+::dir\+\_\+reflect\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}{}\label{class_grid_utils_a609ef43c9476067a52ee238cd3d594f2}
+\subsubsection[{\texorpdfstring{dir\+\_\+reflect}{dir_reflect}}]{\setlength{\rightskip}{0pt plus 5cm}const int Grid\+Utils\+::dir\+\_\+reflect\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae2b566735d973bc25f1a6416010efa70}{}\label{class_grid_utils_ae2b566735d973bc25f1a6416010efa70}
 {\bfseries Initial value\+:}
 \begin{DoxyCode}
 = 
     \{
-        \{1, 0, 2, 3, 7, 6, 5, 4, 8\}, 
-        \{1, 0, 2, 3, 4, 6, 5, 4, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\}
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\}, 
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\}
     \}
 \end{DoxyCode}
 

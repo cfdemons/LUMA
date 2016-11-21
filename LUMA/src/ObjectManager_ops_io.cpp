@@ -89,18 +89,21 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 /// \brief	Read/write IB body information to restart file.
 /// \param	IO_flag	flag indicating write (true) or read (false).
 /// \param	level	level of the grid begin written/read
-void ObjectManager::io_restart(bool IO_flag, int level) {
+void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
-	if (IO_flag) {
+	if (IO_flag == eWrite) {
 
 		// Output stream
 		std::ofstream file;
 
-		if (MpiManager::my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(GridUtils::path_str + "/restart_IBBody.out", std::ios::out);
-		} else if (level == 0) { // Append
-			file.open(GridUtils::path_str + "/restart_IBBody.out", std::ios::out | std::ios::app);
-		} else { // Must be a subgrid which doesn't own any IB-bodies so return
+		if (level == 0) {
+			// Overwrite as first to write
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+		} else if (level == 0) {
+			// Append
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app);
+		} else {
+			// Must be a subgrid which doesn't own any IB-bodies so return
 			return;
 		}
 
@@ -150,7 +153,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		std::ifstream file;
 
 		// We only enter this routine if on correct level so no need to check
-		file.open("./input/restart_IBBody.out", std::ios::in);
+		file.open("./input/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;

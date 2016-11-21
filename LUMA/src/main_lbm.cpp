@@ -370,27 +370,13 @@ int main( int argc, char* argv[] )
 	// Restart File Input //
 	////////////////////////
 
-	for  (int n = 0; n < MpiManager::num_ranks; n++) {
+	// Read in
+	Grids.io_restart(eRead);
 
-		// Wait for rank accessing the file and only access if this rank's turn
-#ifdef L_BUILD_FOR_MPI
-		MPI_Barrier(mpim->world_comm);
-
-		if (MpiManager::my_rank == n)
-#endif
-		{
-
-			// Read in
-			Grids.io_restart(false);
-
-		}
-
-	}
-
-	// L_RE-initialise IB bodies based on restart positions
+	// Reinitialise IB bodies based on restart positions
 #ifdef L_IBM_ON
 
-	// L_RE-initialise the bodies (compute support etc.)
+	// Reinitialise the bodies (compute support etc.)
 	ObjectManager::getInstance()->ibm_initialise();
 	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
 
@@ -558,23 +544,8 @@ int main( int argc, char* argv[] )
 		/////////////////////////
 		if (Grids.t % L_RESTART_OUT_FREQ == 0) {
 
-			for (int n = 0; n < MpiManager::num_ranks; n++) {
-
-				// Wait for turn and access one rank at a time
-#ifdef L_BUILD_FOR_MPI
-				MPI_Barrier(mpim->world_comm);
-
-				if (MpiManager::my_rank == n)
-#endif
-				{
-
-				// Write out
-				Grids.io_restart(true);
-
-				}
-
-			}
-
+			// Write out
+			Grids.io_restart(eWrite);
 		}
 
 	// Loop End

@@ -49,6 +49,14 @@ enum eBCType
 	eBCBFL				///< Apply just BFL BCs
 };
 
+/// \enum  eIOFlag
+/// \brief Flag for indicating write or read action for IO methods
+enum eIOFlag
+{
+	eWrite,				///< Write to file
+	eRead,				///< Read from file
+};
+
 /// \brief	Grid class.
 ///
 ///			This class represents a grid (lattice) and is capable of owning a 
@@ -182,16 +190,16 @@ public :
 
 	// LBM operations
 	DEPRECATED void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel (DEPRECATED VERSION)
-	void LBM_multi();								// Launch the multi-grid kernel
-	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
+	DEPRECATED void LBM_multi();					// Launch the multi-grid kernel
+	DEPRECATED void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
-	void LBM_stream();							// Stream populations
-	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
+	DEPRECATED void LBM_stream();					// Stream populations
+	DEPRECATED void LBM_macro();					// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
-	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
-	void LBM_forceGrid();						// Apply a force to the grid points
-	void LBM_resetForces();						// Resets the force vectors on the grid
+	DEPRECATED void LBM_boundary(int bc_type_flag);	// Apply boundary conditions
+	DEPRECATED void LBM_forceGrid();				// Apply a force to the grid points
+	void LBM_resetForces();							// Resets the force vectors on the grid
 
 	// Boundary operations
 	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
@@ -200,17 +208,17 @@ public :
 	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
 	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
-	void bc_solidSiteReset();									// Reset all the solid site velocities to zero
+	DEPRECATED void bc_solidSiteReset();						// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
-	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
-	void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
-	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
+	DEPRECATED void LBM_explode(int RegionNumber);		// Explode populations from coarse to fine
+	DEPRECATED void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
+	DEPRECATED void LBM_addSubGrid(int RegionNumber);	// Add and initialise subgrid structure for a given region number
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_fgaout();							// Wrapper for _io_fgaout with 2/3D checking 
-	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
+	void io_restart(eIOFlag IO_flag);			// Reads/writes data from/to the global restart file
 	void io_probeOutput();						// Output routine for point probes
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure

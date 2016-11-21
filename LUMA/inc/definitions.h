@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.2.2-alpha"
+#define LUMA_VERSION "1.3.0-alpha"
 
 
 // Header guard

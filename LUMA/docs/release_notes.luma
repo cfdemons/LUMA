@@ -1,16 +1,17 @@
-version		=	1.2.2-alpha
+version		=	1.3.0-alpha
 
-General		:	Optimisation version of the 1.2.1-alpha working code.
-				Reinstated force calculation and included a few other optimisations.
-
-version		=	1.2.1-alpha
-
-General		:	Added new refinement guide spreadsheet.
+General		:	Reinstated force calculation and included a few other optimisations.
+				Added new refinement guide spreadsheet.
 				Optimisation for hdf2vtk (h5mgm) conversion tool plus handles missing datasets and has quiet option. Now v0.2.2.
 				Added a filled cylinder point cloud to address non-physical transients.
 				Added macro to allow marking of functions as deprecated.
 				Fixed an issue with the scaling on the cloud reader -- not documented on the tracker.
+				Standardised macro definitions.
 
+Issue #93	:	Restart file mechanism changed so that a single file is written out per rank to speed-up the process of restarting large meshes with a large number of cores.
+				This removes the capability to restart onto a differnet topology.
+Issue #35	:	Compression of old LUMA algorithm into a single loop and marked older kernel and elements as deprecated. 3X speed-up using optimised kernel.
+				Can be selected using the USE_OPTIMISED_KERNEL macro. Will reinstate other functionality as required -- raise a ticket.
 Issue #91	:	Predictor-corrector function deprecated in favour of new kernel function using Li method for IBM.
 Issue #65	:	Added FGA writer for export of field data to UE4.
 Issue #59	:	Fix in place for the momentum exchange to resolve issue with scaling and conflict with outlet BC.

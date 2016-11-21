@@ -55,13 +55,13 @@ static void \hyperlink{class_mpi_manager_a03b7914615ccb6e7b8a285f50860d503}{dest
 \item 
 M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}{world\+\_\+comm}
 \begin{DoxyCompactList}\small\item\em Global M\+PI communicator. \end{DoxyCompactList}\item 
-int \hyperlink{class_mpi_manager_a8e2e923e656c338148d42517323c9586}{M\+P\+I\+\_\+dims} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}
+int \hyperlink{class_mpi_manager_a3f1f0a2aa10fbd01c0dc3fac50178a0d}{M\+P\+I\+\_\+dims} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Size of M\+PI Cartesian topology. \end{DoxyCompactList}\item 
-int \hyperlink{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}{neighbour\+\_\+rank} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+int \hyperlink{class_mpi_manager_af2891954ff504c12ec6d5f845e906f28}{neighbour\+\_\+rank} \mbox{[}\hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Neighbour rank number for each direction in Cartesian topology. \end{DoxyCompactList}\item 
-int \hyperlink{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}{neighbour\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+int \hyperlink{class_mpi_manager_a5a7268347fcab916adc61bee47e9f626}{neighbour\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Coordinates in M\+PI topology of neighbour ranks. \end{DoxyCompactList}\item 
-M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{sub\+Grid\+\_\+comm} \mbox{[}1\mbox{]}
+M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a0926101699de914f6be018885bea25b1}{sub\+Grid\+\_\+comm} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Communicators for sub-\/grid / region combinations. \end{DoxyCompactList}\item 
 std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{p\+\_\+data}
 \begin{DoxyCompactList}\small\item\em Vector of structures containing halo descriptors for block writing (H\+D\+F5) \end{DoxyCompactList}\item 
@@ -83,9 +83,9 @@ std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_ab
 \begin{DoxyCompactList}\small\item\em Array of resizeable incoming buffers used for data transfer. \end{DoxyCompactList}\item 
 M\+P\+I\+\_\+\+Status \hyperlink{class_mpi_manager_a257bc27e8099f1cbf5ac70b80d8eadaa}{recv\+\_\+stat}
 \begin{DoxyCompactList}\small\item\em Status structure for Receive return information. \end{DoxyCompactList}\item 
-M\+P\+I\+\_\+\+Request \hyperlink{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}{send\+\_\+requests} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+M\+P\+I\+\_\+\+Request \hyperlink{class_mpi_manager_ae4ba6735840e949dff5cd63ab1695ff0}{send\+\_\+requests} \mbox{[}\hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Array of request structures for handles to posted I\+Sends. \end{DoxyCompactList}\item 
-M\+P\+I\+\_\+\+Status \hyperlink{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}{send\+\_\+stat} \mbox{[}\hyperlink{definitions_8h_a3310be18f0cfda9ca2a17c51518a97e9}{L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}
+M\+P\+I\+\_\+\+Status \hyperlink{class_mpi_manager_a3ccb49ceda719f0c6bb90593a880a730}{send\+\_\+stat} \mbox{[}\hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Array of statuses for each Isend. \end{DoxyCompactList}\item 
 std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1buffer__struct}{buffer\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a3a91c2e8cfb15027a0681c198f82d257}{buffer\+\_\+send\+\_\+info}
 \begin{DoxyCompactList}\small\item\em Vectors of buffer\+\_\+info structures holding sender layer size info. \end{DoxyCompactList}\item 
@@ -100,7 +100,7 @@ static int \hyperlink{class_mpi_manager_a8329212abc23e5fa3e32e961b7823b5b}{my\+\
 \begin{DoxyCompactList}\small\item\em Rank number. \end{DoxyCompactList}\item 
 static int \hyperlink{class_mpi_manager_af5156a5e4519f43230b6b84792464e48}{num\+\_\+ranks}
 \begin{DoxyCompactList}\small\item\em Total number of ranks in M\+PI Cartesian topology. \end{DoxyCompactList}\item 
-static int \hyperlink{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}{M\+P\+I\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a11cd469956bf6689c2bc034ee698e0b7}{L\+\_\+dims}\mbox{]}
+static int \hyperlink{class_mpi_manager_acfdcb17ecd44bb096bec1e79fe856bac}{M\+P\+I\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Coordinates in M\+PI Cartesian topolgy. \end{DoxyCompactList}\item 
 static \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$ \hyperlink{class_mpi_manager_a1520da6b8a663cba25a1a9822dd81543}{Grids}
 \begin{DoxyCompactList}\small\item\em Pointer to grid hierarchy. \end{DoxyCompactList}\item 
@@ -403,14 +403,14 @@ Cartesian unit vectors pointing to each neighbour in Cartesian topology.
 
 Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array. \index{Mpi\+Manager@{Mpi\+Manager}!M\+P\+I\+\_\+coords@{M\+P\+I\+\_\+coords}}
 \index{M\+P\+I\+\_\+coords@{M\+P\+I\+\_\+coords}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+coords}{MPI_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+coords\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}{}\label{class_mpi_manager_a677a39e98470d3945248a66cf0bc3ec3}
+\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+coords}{MPI_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+coords\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_mpi_manager_acfdcb17ecd44bb096bec1e79fe856bac}{}\label{class_mpi_manager_acfdcb17ecd44bb096bec1e79fe856bac}
 
 
 Coordinates in M\+PI Cartesian topolgy. 
 
 \index{Mpi\+Manager@{Mpi\+Manager}!M\+P\+I\+\_\+dims@{M\+P\+I\+\_\+dims}}
 \index{M\+P\+I\+\_\+dims@{M\+P\+I\+\_\+dims}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+dims}{MPI_dims}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+dims\mbox{[}{\bf L\+\_\+dims}\mbox{]}}\hypertarget{class_mpi_manager_a8e2e923e656c338148d42517323c9586}{}\label{class_mpi_manager_a8e2e923e656c338148d42517323c9586}
+\subsubsection[{\texorpdfstring{M\+P\+I\+\_\+dims}{MPI_dims}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::\+M\+P\+I\+\_\+dims\mbox{[}{\bf L\+\_\+\+D\+I\+MS}\mbox{]}}\hypertarget{class_mpi_manager_a3f1f0a2aa10fbd01c0dc3fac50178a0d}{}\label{class_mpi_manager_a3f1f0a2aa10fbd01c0dc3fac50178a0d}
 
 
 Size of M\+PI Cartesian topology. 
@@ -424,14 +424,14 @@ Rank number.
 
 \index{Mpi\+Manager@{Mpi\+Manager}!neighbour\+\_\+coords@{neighbour\+\_\+coords}}
 \index{neighbour\+\_\+coords@{neighbour\+\_\+coords}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{neighbour\+\_\+coords}{neighbour_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+coords\mbox{[}{\bf L\+\_\+dims}\mbox{]}\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}{}\label{class_mpi_manager_a6db3764ecc637f90afded1f783acb244}
+\subsubsection[{\texorpdfstring{neighbour\+\_\+coords}{neighbour_coords}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+coords\mbox{[}{\bf L\+\_\+\+D\+I\+MS}\mbox{]}\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}}\hypertarget{class_mpi_manager_a5a7268347fcab916adc61bee47e9f626}{}\label{class_mpi_manager_a5a7268347fcab916adc61bee47e9f626}
 
 
 Coordinates in M\+PI topology of neighbour ranks. 
 
 \index{Mpi\+Manager@{Mpi\+Manager}!neighbour\+\_\+rank@{neighbour\+\_\+rank}}
 \index{neighbour\+\_\+rank@{neighbour\+\_\+rank}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{neighbour\+\_\+rank}{neighbour_rank}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+rank\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}{}\label{class_mpi_manager_a3f3db562bc7ba8871180c5c9ac388c13}
+\subsubsection[{\texorpdfstring{neighbour\+\_\+rank}{neighbour_rank}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::neighbour\+\_\+rank\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}}\hypertarget{class_mpi_manager_af2891954ff504c12ec6d5f845e906f28}{}\label{class_mpi_manager_af2891954ff504c12ec6d5f845e906f28}
 
 
 Neighbour rank number for each direction in Cartesian topology. 
@@ -466,14 +466,14 @@ Status structure for Receive return information.
 
 \index{Mpi\+Manager@{Mpi\+Manager}!send\+\_\+requests@{send\+\_\+requests}}
 \index{send\+\_\+requests@{send\+\_\+requests}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{send\+\_\+requests}{send_requests}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Request Mpi\+Manager\+::send\+\_\+requests\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}{}\label{class_mpi_manager_af096663b094d919caba62d4bdf8e7d88}
+\subsubsection[{\texorpdfstring{send\+\_\+requests}{send_requests}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Request Mpi\+Manager\+::send\+\_\+requests\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}}\hypertarget{class_mpi_manager_ae4ba6735840e949dff5cd63ab1695ff0}{}\label{class_mpi_manager_ae4ba6735840e949dff5cd63ab1695ff0}
 
 
 Array of request structures for handles to posted I\+Sends. 
 
 \index{Mpi\+Manager@{Mpi\+Manager}!send\+\_\+stat@{send\+\_\+stat}}
 \index{send\+\_\+stat@{send\+\_\+stat}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{send\+\_\+stat}{send_stat}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Status Mpi\+Manager\+::send\+\_\+stat\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+dir}\mbox{]}}\hypertarget{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}{}\label{class_mpi_manager_ab129fdffa1925677841f25bcd4507b5e}
+\subsubsection[{\texorpdfstring{send\+\_\+stat}{send_stat}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Status Mpi\+Manager\+::send\+\_\+stat\mbox{[}{\bf L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}}\hypertarget{class_mpi_manager_a3ccb49ceda719f0c6bb90593a880a730}{}\label{class_mpi_manager_a3ccb49ceda719f0c6bb90593a880a730}
 
 
 Array of statuses for each Isend. 
@@ -487,7 +487,7 @@ Structure containing sender layer edge positions.
 
 \index{Mpi\+Manager@{Mpi\+Manager}!sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}}
 \index{sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{sub\+Grid\+\_\+comm}{subGrid_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::sub\+Grid\+\_\+comm\mbox{[}1\mbox{]}}\hypertarget{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{}\label{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}
+\subsubsection[{\texorpdfstring{sub\+Grid\+\_\+comm}{subGrid_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::sub\+Grid\+\_\+comm\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}}\hypertarget{class_mpi_manager_a0926101699de914f6be018885bea25b1}{}\label{class_mpi_manager_a0926101699de914f6be018885bea25b1}
 
 
 Communicators for sub-\/grid / region combinations. 

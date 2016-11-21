@@ -207,12 +207,19 @@ void GridObj::LBM_initVelocity ( ) {
 
 
 #endif
+				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid) {
+					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = 0.0;
+					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+					u(i, j, k, 2, M_lim, K_lim, L_DIMS) = 0.0;
+#endif
+
+				}
+
+
 			}
 		}
 	}
-
-	// Perform solid site reset of velocity for any solids
-	bc_solidSiteReset();
 
 }
 

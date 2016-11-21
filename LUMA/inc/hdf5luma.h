@@ -35,8 +35,8 @@
 ///			to an HDF5 file using a particular hyperslab selection.
 enum eHdf5SlabType {
 	eScalar,		///< 2/3D data	-- One variable per grid site
-	eVector,		///< 2/3D data	-- L_dims variables per grid site
-	eProductVector,	///< 1D data	-- 3*L_dims-3 variables per grid site
+	eVector,		///< 2/3D data	-- L_DIMS variables per grid site
+	eProductVector,	///< 1D data	-- 3*L_DIMS-3 variables per grid site
 	ePosX,			///< 1D data	-- Single L_dim vector per dimension
 	ePosY,			///< 1D data	-- Single L_dim vector per dimension
 	ePosZ			///< 1D data	-- Single L_dim vector per dimension
@@ -114,7 +114,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	*GridUtils::logfile << "Writable data size = " 
 		<< (i_end - i_start + 1) << "," 
 		<< (j_end - j_start + 1) << 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		"," << (k_end - k_start + 1) << 
 #endif
 
@@ -122,7 +122,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 		" = " << hdf_data.writable_data_count << std::endl;
 #else
 		" = " << (i_end - i_start + 1) * (j_end - j_start + 1) 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		* (k_end - k_start + 1)
 #endif		
 		<< std::endl;
@@ -156,7 +156,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	 * block	= the size of a block in the pattern
 	 * count	= how many times the block is repeated in the pattern
 	 * stride	= number of elements between start of one block and next */
-	hsize_t f_count[L_dims], f_stride[L_dims], f_offset[L_dims], f_block[L_dims];
+	hsize_t f_count[L_DIMS], f_stride[L_DIMS], f_offset[L_DIMS], f_block[L_DIMS];
 
 	// Strided copy variables
 	size_t m_count, m_stride, m_offset, m_block;
@@ -168,13 +168,13 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	 * Correct the offset due to TL presence. */
 	f_offset[0] = g->XInd[i_start] - TL_thickness;
 	f_offset[1] = g->YInd[j_start] - TL_thickness;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	f_offset[2] = g->ZInd[k_start] - TL_thickness;
 #endif	
 
 #else
 	// In serial, only a single process so start writing at the beginning of the file
-	for (int d = 0; d < L_dims; d++) f_offset[d] = 0;
+	for (int d = 0; d < L_DIMS; d++) f_offset[d] = 0;
 
 #endif // L_BUILD_FOR_MPI
 
@@ -188,7 +188,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	f_stride[0] = f_block[0];
 	f_stride[1] = f_block[1];
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	f_block[2] = k_end - k_start + 1;
 	f_count[2] = 1;
 	f_stride[2] = f_block[2];
@@ -196,7 +196,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	// DEBUG //
 #ifdef L_HDF_DEBUG
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	*GridUtils::logfile << "f_offset = (" << f_offset[0] << " " << f_offset[1] << " " << f_offset[2] << ")" << std::endl;
 	*GridUtils::logfile << "f_stride = (" << f_stride[0] << " " << f_stride[1] << " " << f_stride[2] << ")" << std::endl;
 	*GridUtils::logfile << "f_count = (" << f_count[0] << " " << f_count[1] << " " << f_count[2] << ")" << std::endl;
@@ -222,14 +222,14 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 		/* One variable per grid site */
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		// Copy data a 2D slice at a time for 3D cases
 		for (i = i_start; i <= i_end; i++)
 #endif
 		{
 
 			// Get memory space slab parameters from halo descriptors
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			m_offset = k_start + j_start * K_lim + i * M_lim * K_lim;
 			m_block = k_end - k_start + 1;
 			m_count = j_end - j_start + 1;
@@ -241,7 +241,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 			m_stride = m_block + (halo_min + halo_max);
 #endif
 			// Copy slab of memory to buffer
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			size_t buffer_offset = (i - i_start) * m_block * m_count;
 #else
 			size_t buffer_offset = 0;
@@ -259,9 +259,9 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	case eVector:
 
-		/* L_dims variables per grid site */
+		/* L_DIMS variables per grid site */
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		// Copy data a 2D slice at a time for 3D cases
 		for (int i = i_start; i <= i_end; i++)
 #endif
@@ -269,7 +269,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 
 			// Loop through "columns" of data and pattern fastest dimension
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int j = j_start; j <= j_end; j++)
 #else
 			for (int i = i_start; i <= i_end; i++)
@@ -277,20 +277,20 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 			{
 
 				// Get memory space slab parameters from halo descriptors
-#if (L_dims == 3)
-				m_offset = 0 + k_start * L_dims + 
-					j * L_dims * K_lim + i * L_dims * M_lim * K_lim;
+#if (L_DIMS == 3)
+				m_offset = 0 + k_start * L_DIMS + 
+					j * L_DIMS * K_lim + i * L_DIMS * M_lim * K_lim;
 				m_block = 1;
 				m_count = k_end - k_start + 1;
-				m_stride = L_dims;
+				m_stride = L_DIMS;
 #else
-				m_offset = 0 + j_start * L_dims + i * L_dims * M_lim;	// Memory offset handled by incoming pointer
+				m_offset = 0 + j_start * L_DIMS + i * L_DIMS * M_lim;	// Memory offset handled by incoming pointer
 				m_block = 1;
 				m_count = j_end - j_start + 1;
-				m_stride = L_dims;
+				m_stride = L_DIMS;
 #endif				
 				// Strided copy
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				size_t buffer_offset = (j - j_start) * m_count + 
 					(i - i_start) * (j_end - j_start + 1) * m_count;
 #else
@@ -310,17 +310,17 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	case eProductVector:
 
-		/* 3*L_dims-3 variables per grid site */
+		/* 3*L_DIMS-3 variables per grid site */
 
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		// Copy data a 2D slice at a time for 3D cases
 		for (int i = i_start; i <= i_end; i++)
 #endif
 		{
 
 			// Loop through "columns" of data and pattern fastest dimension
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int j = j_start; j <= j_end; j++)
 #else
 			for (int i = i_start; i <= i_end; i++)
@@ -328,20 +328,20 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 			{
 
 				// Get memory space slab parameters from halo descriptors
-#if (L_dims == 3)
-				m_offset = 0 + k_start * (3 * L_dims - 3) + 
-					j * (3 * L_dims - 3) * K_lim + i * (3 * L_dims - 3) * M_lim * K_lim;
+#if (L_DIMS == 3)
+				m_offset = 0 + k_start * (3 * L_DIMS - 3) + 
+					j * (3 * L_DIMS - 3) * K_lim + i * (3 * L_DIMS - 3) * M_lim * K_lim;
 				m_block = 1;
 				m_count = k_end - k_start + 1;
-				m_stride = 3 * L_dims - 3;
+				m_stride = 3 * L_DIMS - 3;
 #else
-				m_offset = 0 + j_start * (3 * L_dims - 3) + i * (3 * L_dims - 3) * M_lim;
+				m_offset = 0 + j_start * (3 * L_DIMS - 3) + i * (3 * L_DIMS - 3) * M_lim;
 				m_block = 1;
 				m_count = j_end - j_start + 1;
-				m_stride = 3 * L_dims - 3;
+				m_stride = 3 * L_DIMS - 3;
 #endif
 				// Strided copy
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				size_t buffer_offset = (j - j_start) * m_count +
 					(i - i_start) * (j_end - j_start + 1) * m_count;
 #else
@@ -362,7 +362,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 		for (int i = i_start; i <= i_end; i++) {
 			for (int j = j_start; j <= j_end; j++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				for (int k = k_start; k <= k_end; k++) {
 
 					memcpy(
@@ -389,7 +389,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	case ePosY:
 
 		for (int i = i_start; i <= i_end; i++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int j = j_start; j <= j_end; j++) {
 				for (int k = k_start; k <= k_end; k++) {
 

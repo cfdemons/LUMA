@@ -17,6 +17,7 @@
 #define IVECTOR_H
 
 #include "stdafx.h"
+
 /// \brief	Index-collapsing vector class.
 ///
 ///			This class has all the behaviour of std::vector but 
@@ -26,12 +27,13 @@
 template <typename GenTyp>
 class IVector :	public std::vector<GenTyp>		// Define IVector class which inherits from std::vector
 {
+	
 public:
 
 	// C++ standard does not automatically inherit constructors
 	/// Default constructor
 	IVector( )
-	{
+	{		
 	}
 
 	/// Default destructor
@@ -50,7 +52,7 @@ public:
 	///
 	/// \param size the desired size of vector
 	/// \param val the value to fill the new vector with
-	IVector(size_t size, GenTyp val) {
+	IVector(size_t size, GenTyp val) {	
 
 		this->resize(size);
 
@@ -116,14 +118,13 @@ public:
 	/// \param j_max the number of j elements
 	/// \return GenTyp& a reference to the value at this position in the vector
 	inline GenTyp& operator() (size_t i, size_t j, size_t j_max) {
-
+		
 		// Loop over j then i
 		size_t idx = j + (i*j_max);
 
 		return this->operator[] (idx);
 
 	}
-
 
 };
 

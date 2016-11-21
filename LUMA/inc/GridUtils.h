@@ -51,7 +51,7 @@ class GridUtils {
 public:
 	static std::ofstream* logfile;			///< Handle to output file
 	static std::string path_str;            ///< Static string representing output path
-	static const int dir_reflect[L_dims * 2][L_nVels];	///< Array with hardcoded direction numbering for specular reflection
+	static const int dir_reflect[L_DIMS * 2][L_NUM_VELS];	///< Array with hardcoded direction numbering for specular reflection
 
 	// Methods //
 
@@ -68,7 +68,7 @@ public:
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace
 	static std::vector<double> linspace(double min, double max, int n);		// Function: linspace
-	static double vecnorm(double vec[L_dims]);								// Function: vecnorm + overloads
+	static double vecnorm(double vec[L_DIMS]);								// Function: vecnorm + overloads
 	static double vecnorm(double val1, double val2);
 	static double vecnorm(double val1, double val2, double val3);
 	static double vecnorm(std::vector<double> vec);
@@ -92,7 +92,7 @@ public:
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);	// Function: isOnThisRank + overloads
+	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);		// Function: isOnThisRank + overloads
 	static bool isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid);
 	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.

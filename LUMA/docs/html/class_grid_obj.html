@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.2.0-alpha</span>
+   &#160;<span id="projectnumber">1.3.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -144,10 +144,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a023713976673d029103690a91c5415f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a023713976673d029103690a91c5415f9">LBM_init_getInletProfile</a> ()</td></tr>
 <tr class="memdesc:a023713976673d029103690a91c5415f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to import an input profile from a file.  <a href="#a023713976673d029103690a91c5415f9">More...</a><br /></td></tr>
 <tr class="separator:a023713976673d029103690a91c5415f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac69eef5f465527c9ccf8941115c68770"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac69eef5f465527c9ccf8941115c68770">LBM_multi</a> (bool ibmFlag)</td></tr>
-<tr class="memdesc:ac69eef5f465527c9ccf8941115c68770"><td class="mdescLeft">&#160;</td><td class="mdescRight">LBM multi-grid kernel.  <a href="#ac69eef5f465527c9ccf8941115c68770">More...</a><br /></td></tr>
+<tr class="memitem:ac69eef5f465527c9ccf8941115c68770"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac69eef5f465527c9ccf8941115c68770">LBM_multi</a> (bool ibmFlag)</td></tr>
+<tr class="memdesc:ac69eef5f465527c9ccf8941115c68770"><td class="mdescLeft">&#160;</td><td class="mdescRight">LBM multi-grid kernel (DEPRECATED VERSION).  <a href="#ac69eef5f465527c9ccf8941115c68770">More...</a><br /></td></tr>
 <tr class="separator:ac69eef5f465527c9ccf8941115c68770"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0feb0f9406f626e90c57045350161b22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a0feb0f9406f626e90c57045350161b22">LBM_collide</a> ()</td></tr>
+<tr class="memitem:a21ee25286fe790eaabcdbf5602f1f38d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a21ee25286fe790eaabcdbf5602f1f38d">LBM_multi</a> ()</td></tr>
+<tr class="memdesc:a21ee25286fe790eaabcdbf5602f1f38d"><td class="mdescLeft">&#160;</td><td class="mdescRight">LBM multi-grid kernel.  <a href="#a21ee25286fe790eaabcdbf5602f1f38d">More...</a><br /></td></tr>
+<tr class="separator:a21ee25286fe790eaabcdbf5602f1f38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0feb0f9406f626e90c57045350161b22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a0feb0f9406f626e90c57045350161b22">LBM_collide</a> ()</td></tr>
 <tr class="memdesc:a0feb0f9406f626e90c57045350161b22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply collision operator.  <a href="#a0feb0f9406f626e90c57045350161b22">More...</a><br /></td></tr>
 <tr class="separator:a0feb0f9406f626e90c57045350161b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1540c0d77a47e60a7fd55f51e5a98451"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a1540c0d77a47e60a7fd55f51e5a98451">LBM_collide</a> (int i, int j, int k, int v)</td></tr>
@@ -156,19 +159,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac4ca0327a53171fe8e1c3076e9f1353f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac4ca0327a53171fe8e1c3076e9f1353f">LBM_kbcCollide</a> (int i, int j, int k, <a class="el" href="class_i_vector.html">IVector</a>&lt; double &gt; &amp;f_new)</td></tr>
 <tr class="memdesc:ac4ca0327a53171fe8e1c3076e9f1353f"><td class="mdescLeft">&#160;</td><td class="mdescRight">KBC collision operator.  <a href="#ac4ca0327a53171fe8e1c3076e9f1353f">More...</a><br /></td></tr>
 <tr class="separator:ac4ca0327a53171fe8e1c3076e9f1353f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5b5cb1f3136da8cbff96955d9c6d9e5b">LBM_stream</a> ()</td></tr>
+<tr class="memitem:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5b5cb1f3136da8cbff96955d9c6d9e5b">LBM_stream</a> ()</td></tr>
 <tr class="memdesc:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming operator.  <a href="#a5b5cb1f3136da8cbff96955d9c6d9e5b">More...</a><br /></td></tr>
 <tr class="separator:a5b5cb1f3136da8cbff96955d9c6d9e5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25382158b7747da7c0639aed513ae39c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a25382158b7747da7c0639aed513ae39c">LBM_macro</a> ()</td></tr>
+<tr class="memitem:a25382158b7747da7c0639aed513ae39c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a25382158b7747da7c0639aed513ae39c">LBM_macro</a> ()</td></tr>
 <tr class="memdesc:a25382158b7747da7c0639aed513ae39c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macroscopic update.  <a href="#a25382158b7747da7c0639aed513ae39c">More...</a><br /></td></tr>
 <tr class="separator:a25382158b7747da7c0639aed513ae39c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab69942450175d12c75f4b8d33b06c905"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ab69942450175d12c75f4b8d33b06c905">LBM_macro</a> (int i, int j, int k)</td></tr>
 <tr class="memdesc:ab69942450175d12c75f4b8d33b06c905"><td class="mdescLeft">&#160;</td><td class="mdescRight">Site-specific macroscopic update.  <a href="#ab69942450175d12c75f4b8d33b06c905">More...</a><br /></td></tr>
 <tr class="separator:ab69942450175d12c75f4b8d33b06c905"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a23d89d6111dd46653b2b1f79a5c7fbf1">LBM_boundary</a> (int bc_type_flag)</td></tr>
+<tr class="memitem:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a23d89d6111dd46653b2b1f79a5c7fbf1">LBM_boundary</a> (int bc_type_flag)</td></tr>
 <tr class="memdesc:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply boundary conditions on lattice.  <a href="#a23d89d6111dd46653b2b1f79a5c7fbf1">More...</a><br /></td></tr>
 <tr class="separator:a23d89d6111dd46653b2b1f79a5c7fbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38db857b219d13ca7b0d35ede87b1536"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a38db857b219d13ca7b0d35ede87b1536">LBM_forceGrid</a> ()</td></tr>
+<tr class="memitem:a38db857b219d13ca7b0d35ede87b1536"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a38db857b219d13ca7b0d35ede87b1536">LBM_forceGrid</a> ()</td></tr>
 <tr class="memdesc:a38db857b219d13ca7b0d35ede87b1536"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to compute body forces.  <a href="#a38db857b219d13ca7b0d35ede87b1536">More...</a><br /></td></tr>
 <tr class="separator:a38db857b219d13ca7b0d35ede87b1536"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5701631be6333e512c7fc8dd6ecabf85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5701631be6333e512c7fc8dd6ecabf85">LBM_resetForces</a> ()</td></tr>
@@ -192,24 +195,27 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae4fd999e7334c8ec8e1118c92e0c7338">bc_applyNrbc</a> (int i, int j, int k)</td></tr>
 <tr class="memdesc:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply NRBC.  <a href="#ae4fd999e7334c8ec8e1118c92e0c7338">More...</a><br /></td></tr>
 <tr class="separator:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac86a233f9475084226e6bf651ffe398f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac86a233f9475084226e6bf651ffe398f">bc_solidSiteReset</a> ()</td></tr>
+<tr class="memitem:ac86a233f9475084226e6bf651ffe398f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac86a233f9475084226e6bf651ffe398f">bc_solidSiteReset</a> ()</td></tr>
 <tr class="memdesc:ac86a233f9475084226e6bf651ffe398f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper method to set macroscopic quantities of solid sites.  <a href="#ac86a233f9475084226e6bf651ffe398f">More...</a><br /></td></tr>
 <tr class="separator:ac86a233f9475084226e6bf651ffe398f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8086651bd7b978e0b9c48d56c3d0595"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ad8086651bd7b978e0b9c48d56c3d0595">LBM_explode</a> (int RegionNumber)</td></tr>
+<tr class="memitem:ad8086651bd7b978e0b9c48d56c3d0595"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ad8086651bd7b978e0b9c48d56c3d0595">LBM_explode</a> (int RegionNumber)</td></tr>
 <tr class="memdesc:ad8086651bd7b978e0b9c48d56c3d0595"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explosion operation for pushing information to finer grids.  <a href="#ad8086651bd7b978e0b9c48d56c3d0595">More...</a><br /></td></tr>
 <tr class="separator:ad8086651bd7b978e0b9c48d56c3d0595"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5832081a70e8990be62317034bb975c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5832081a70e8990be62317034bb975c6">LBM_coalesce</a> (int RegionNumber)</td></tr>
+<tr class="memitem:a5832081a70e8990be62317034bb975c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5832081a70e8990be62317034bb975c6">LBM_coalesce</a> (int RegionNumber)</td></tr>
 <tr class="memdesc:a5832081a70e8990be62317034bb975c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coalesce operation for pulling information from finer grids.  <a href="#a5832081a70e8990be62317034bb975c6">More...</a><br /></td></tr>
 <tr class="separator:a5832081a70e8990be62317034bb975c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0d47be7ccafaa84b5d43da69e2082b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ab0d47be7ccafaa84b5d43da69e2082b9">LBM_addSubGrid</a> (int RegionNumber)</td></tr>
+<tr class="memitem:ab0d47be7ccafaa84b5d43da69e2082b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ab0d47be7ccafaa84b5d43da69e2082b9">LBM_addSubGrid</a> (int RegionNumber)</td></tr>
 <tr class="memdesc:ab0d47be7ccafaa84b5d43da69e2082b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper method to add sub-grid to this grid.  <a href="#ab0d47be7ccafaa84b5d43da69e2082b9">More...</a><br /></td></tr>
 <tr class="separator:ab0d47be7ccafaa84b5d43da69e2082b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f334215b7789ea1ad8e2d1e15c67fb2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a1f334215b7789ea1ad8e2d1e15c67fb2">io_textout</a> (std::string output_tag)</td></tr>
 <tr class="memdesc:a1f334215b7789ea1ad8e2d1e15c67fb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verbose ASCII writer.  <a href="#a1f334215b7789ea1ad8e2d1e15c67fb2">More...</a><br /></td></tr>
 <tr class="separator:a1f334215b7789ea1ad8e2d1e15c67fb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a940b825873a33b2fc9375f7a8f9bffc7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a940b825873a33b2fc9375f7a8f9bffc7">io_restart</a> (bool IO_flag)</td></tr>
-<tr class="memdesc:a940b825873a33b2fc9375f7a8f9bffc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restart file read-writer.  <a href="#a940b825873a33b2fc9375f7a8f9bffc7">More...</a><br /></td></tr>
-<tr class="separator:a940b825873a33b2fc9375f7a8f9bffc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa80aecb06d7a420865c32b8acc15581e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aa80aecb06d7a420865c32b8acc15581e">io_fgaout</a> ()</td></tr>
+<tr class="memdesc:aa80aecb06d7a420865c32b8acc15581e"><td class="mdescLeft">&#160;</td><td class="mdescRight">.fga file writer.  <a href="#aa80aecb06d7a420865c32b8acc15581e">More...</a><br /></td></tr>
+<tr class="separator:aa80aecb06d7a420865c32b8acc15581e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94551d2e383da4b2a2c930488d436a42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a94551d2e383da4b2a2c930488d436a42">io_restart</a> (<a class="el" href="_grid_obj_8h.html#ad1926c22ad82853adff44c4b76b97827">eIOFlag</a> IO_flag)</td></tr>
+<tr class="memdesc:a94551d2e383da4b2a2c930488d436a42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restart file read-writer.  <a href="#a94551d2e383da4b2a2c930488d436a42">More...</a><br /></td></tr>
+<tr class="separator:a94551d2e383da4b2a2c930488d436a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7e8782f95d15884d761cc4f1d5926c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#af7e8782f95d15884d761cc4f1d5926c0">io_probeOutput</a> ()</td></tr>
 <tr class="memdesc:af7e8782f95d15884d761cc4f1d5926c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe writer.  <a href="#af7e8782f95d15884d761cc4f1d5926c0">More...</a><br /></td></tr>
 <tr class="separator:af7e8782f95d15884d761cc4f1d5926c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,6 +225,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adc960ac818748b839e81d1375782caa7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#adc960ac818748b839e81d1375782caa7">io_hdf5</a> (double tval)</td></tr>
 <tr class="memdesc:adc960ac818748b839e81d1375782caa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDF5 writer.  <a href="#adc960ac818748b839e81d1375782caa7">More...</a><br /></td></tr>
 <tr class="separator:adc960ac818748b839e81d1375782caa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac65e9a1a8aa854d25281780d6b52665b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ac65e9a1a8aa854d25281780d6b52665b">LBM_multi_opt</a> (int subcycle=0)</td></tr>
+<tr class="memdesc:ac65e9a1a8aa854d25281780d6b52665b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optimised LBM multi-grid kernel.  <a href="#ac65e9a1a8aa854d25281780d6b52665b">More...</a><br /></td></tr>
+<tr class="separator:ac65e9a1a8aa854d25281780d6b52665b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -758,6 +767,24 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aa80aecb06d7a420865c32b8acc15581e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::io_fgaout </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>.fga file writer. </p>
+<p>Writes the components of the macroscopic velocity of the grid at time t and call recursively for any sub-grid. Writes the data of each subgrid in a different .fga file. .fga is the ASCII file format used by Unreal Engine 4 to read the data that populates a VectorField object. It doesn't do anything if the model is not 2D or 3D. Since .fga files can only store 3D data </p>
+
+</div>
+</div>
 <a class="anchor" id="adc960ac818748b839e81d1375782caa7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -837,14 +864,14 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a940b825873a33b2fc9375f7a8f9bffc7"></a>
+<a class="anchor" id="a94551d2e383da4b2a2c930488d436a42"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void GridObj::io_restart </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_obj_8h.html#ad1926c22ad82853adff44c4b76b97827">eIOFlag</a>&#160;</td>
           <td class="paramname"><em>IO_flag</em></td><td>)</td>
           <td></td>
         </tr>
@@ -855,7 +882,7 @@ Friends</h2></td></tr>
 <p>This routine writes/reads the current rank's data in the custom restart file format. If the file already exists, data is appended. IB body data are also written out but no other body information at present.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">IO_flag</td><td>flag to indicate whether a write (true) or read (false) is required. </td></tr>
+    <tr><td class="paramname">IO_flag</td><td>flag to indicate whether a write or read </td></tr>
   </table>
   </dd>
 </dl>
@@ -1394,11 +1421,54 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>LBM multi-grid kernel. </p>
+<p>LBM multi-grid kernel (DEPRECATED VERSION). </p>
 <p>The LBM kernel manages the calling of all IBM and LBM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-grids and manages the framework for grid-grid interaction.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ibmFlag</td><td>flag to indicate whether this kernel is a predictor (true) or corrector (false) step when using IBM. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a21ee25286fe790eaabcdbf5602f1f38d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::LBM_multi </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>LBM multi-grid kernel. </p>
+<p>The LBM kernel manages the calling of all IBM and LBM methods on a given grid. In addition, this method also manages the recursive calling of the method on sub-grids and manages the framework for grid-grid interaction. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac65e9a1a8aa854d25281780d6b52665b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::LBM_multi_opt </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>subcycle</em> = <code>0</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Optimised LBM multi-grid kernel. </p>
+<p>This kernel compresses the old kernel into a single loop in order to make it more efficient. Capabilities are current limited with this kernel with incompatible options giving unpredictable results. Use with caution.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">subcycle</td><td>sub-cycle to be performed if called from a subgrid. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1846,6 +1916,7 @@ Friends</h2></td></tr>
 <li><a class="el" href="_grid_obj__ops__boundary_8cpp.html">GridObj_ops_boundary.cpp</a></li>
 <li><a class="el" href="_grid_obj__ops__io_8cpp.html">GridObj_ops_io.cpp</a></li>
 <li><a class="el" href="_grid_obj__ops__lbm_8cpp.html">GridObj_ops_lbm.cpp</a></li>
+<li><a class="el" href="_grid_obj__ops__lbm__optimised_8cpp.html">GridObj_ops_lbm_optimised.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

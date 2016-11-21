@@ -120,6 +120,7 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 	this->level = pGrid.level + 1;
     this->region_number = RegionNumber;
 	this->t = 0;
+	this->parentGrid = &pGrid;
 
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
@@ -145,7 +146,7 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	this->subGrid.back().LBM_initSubGrid(*this);
 
 	// Add another subgrid beneath the one just created if necessary
-	if (this->subGrid.back().level < L_NumLev) {
+	if (this->subGrid.back().level < L_NUM_LEVELS) {
 		this->subGrid.back().LBM_addSubGrid(this->subGrid.back().region_number);
 	}
 

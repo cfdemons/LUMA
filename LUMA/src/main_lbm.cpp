@@ -39,7 +39,7 @@ using namespace std;	// Use the standard namespace
 
 // Static variable declarations
 std::string GridUtils::path_str;
-int MpiManager::MPI_coords[L_dims];
+int MpiManager::MPI_coords[L_DIMS];
 
 /// Entry point for the application
 int main( int argc, char* argv[] )
@@ -78,9 +78,9 @@ int main( int argc, char* argv[] )
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
-#if (L_dims != 3 && L_NumLev)
-	for (int i = 0; i < L_NumReg; i++) {
-		for (int l = 0; l < L_NumLev; l++) {
+#if (L_DIMS != 3 && L_NUM_LEVELS)
+	for (int i = 0; i < L_NUM_REGIONS; i++) {
+		for (int l = 0; l < L_NUM_LEVELS; l++) {
 			RefZstart[l][i] = 0;
 			RefZend[l][i] = 0;
 		}
@@ -163,9 +163,9 @@ int main( int argc, char* argv[] )
 
 #ifdef L_BUILD_FOR_MPI
 	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
-	if (	L_Xcores < 2 || L_Ycores < 2
-#if (L_dims == 3)
-		|| L_Zcores < 2
+	if (	L_MPI_XCORES < 2 || L_MPI_YCORES < 2
+#if (L_DIMS == 3)
+		|| L_MPI_ZCORES < 2
 #endif
 		) {
 			std::cout << "Error: See Log File." << std::endl;
@@ -210,20 +210,20 @@ int main( int argc, char* argv[] )
 	// Log file information
 	*GridUtils::logfile << "Grid size = " << L_N << "x" << L_M << "x" << L_K << endl;
 #ifdef L_BUILD_FOR_MPI
-	*GridUtils::logfile << "MPI size = " << L_Xcores << "x" << L_Ycores << "x" << L_Zcores << endl;
+	*GridUtils::logfile << "MPI size = " << L_MPI_XCORES << "x" << L_MPI_YCORES << "x" << L_MPI_ZCORES << endl;
 	*GridUtils::logfile << "Coordinates on rank " << MpiManager::my_rank << " are (";
-		for (size_t d = 0; d < L_dims; d++) {
+		for (size_t d = 0; d < L_DIMS; d++) {
 			*GridUtils::logfile << "\t" << MpiManager::MPI_coords[d];
 		}
 		*GridUtils::logfile << "\t)" << std::endl;
 #endif
-	*GridUtils::logfile << "Number of time steps = " << std::to_string(L_Timesteps) << endl;
+	*GridUtils::logfile << "Number of time steps = " << std::to_string(L_TIMESTEPS) << endl;
 	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dt) << endl;
 	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
 	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_u_ref) << std::endl;
+	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_UREF) << std::endl;
 	// Reynolds Number
-	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_Re) << endl;
+	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_RE) << endl;
 
 
 	/*
@@ -232,12 +232,12 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-	if (L_NumLev != 0) {
+	if (L_NUM_LEVELS != 0) {
 
 		*GridUtils::logfile << "Initialising sub-grids..." << endl;
 
 		// Loop over number of regions and add subgrids to Grids
-		for (int reg = 0; reg < L_NumReg; reg++) {
+		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 
 			// Try adding subgrids and let constructor initialise
 			Grids.LBM_addSubGrid(reg);
@@ -370,27 +370,13 @@ int main( int argc, char* argv[] )
 	// Restart File Input //
 	////////////////////////
 
-	for  (int n = 0; n < MpiManager::num_ranks; n++) {
+	// Read in
+	Grids.io_restart(eRead);
 
-		// Wait for rank accessing the file and only access if this rank's turn
-#ifdef L_BUILD_FOR_MPI
-		MPI_Barrier(mpim->world_comm);
-
-		if (MpiManager::my_rank == n)
-#endif
-		{
-
-			// Read in
-			Grids.io_restart(false);
-
-		}
-
-	}
-
-	// L_Re-initialise IB bodies based on restart positions
+	// Reinitialise IB bodies based on restart positions
 #ifdef L_IBM_ON
 
-	// L_Re-initialise the bodies (compute support etc.)
+	// Reinitialise the bodies (compute support etc.)
 	ObjectManager::getInstance()->ibm_initialise();
 	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
 
@@ -462,13 +448,18 @@ int main( int argc, char* argv[] )
 #endif
 
 		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
-			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_Timesteps << " ------" << endl;
+			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_TIMESTEPS << " ------" << endl;
 
 
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
-		Grids.LBM_multi();	// Main LBM kernel (same both with and without IBM)
+
+#ifdef L_USE_OPTIMISED_KERNEL
+		Grids.LBM_multi_opt();		// Launch LBM kernel on top-level grid
+#else
+		Grids.LBM_multi();			// Main LBM kernel (same both with and without IBM)
+#endif
 
 		///////////////
 		// Write Out //
@@ -489,17 +480,17 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_IO_LITE
-		*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-		Grids.io_lite(Grids.t,"");
+			*GridUtils::logfile << "Writing out to IOLite file..." << endl;
+			Grids.io_lite(Grids.t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT
-		*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
-		Grids.io_hdf5(Grids.t);
+			*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+			Grids.io_hdf5(Grids.t);
 #endif
 
 #if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
-		objMan->io_vtkIBBWriter(Grids.t);
+			objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
@@ -526,7 +517,7 @@ int main( int argc, char* argv[] )
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT
-		if (Grids.t % L_out_every_probe == 0) {
+		if (Grids.t % L_PROBE_OUT_FREQ == 0) {
 
 			for (int n = 0; n < MpiManager::num_ranks; n++) {
 
@@ -551,29 +542,14 @@ int main( int argc, char* argv[] )
 		/////////////////////////
 		// Restart File Output //
 		/////////////////////////
-		if (Grids.t % L_restart_out_every == 0) {
+		if (Grids.t % L_RESTART_OUT_FREQ == 0) {
 
-			for (int n = 0; n < MpiManager::num_ranks; n++) {
-
-				// Wait for turn and access one rank at a time
-#ifdef L_BUILD_FOR_MPI
-				MPI_Barrier(mpim->world_comm);
-
-				if (MpiManager::my_rank == n)
-#endif
-				{
-
-				// Write out
-				Grids.io_restart(true);
-
-				}
-
-			}
-
+			// Write out
+			Grids.io_restart(eWrite);
 		}
 
 	// Loop End
-	} while (Grids.t < L_Timesteps);
+	} while (Grids.t < L_TIMESTEPS);
 
 
 	/*
@@ -612,8 +588,8 @@ int main( int argc, char* argv[] )
 			timings << "\t" << obj_initialise_time;
 
 			// Loop over expected grids
-			for (int lev = 0; lev <= L_NumLev; lev++) {
-				for (int reg = 0; reg < L_NumReg; reg++) {
+			for (int lev = 0; lev <= L_NUM_LEVELS; lev++) {
+				for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 					
 					// Get the grid
 					g = NULL;

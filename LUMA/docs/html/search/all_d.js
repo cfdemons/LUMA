@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['m2cm',['m2cm',['../class_grid_units.html#abddfadd5165980c7f6f9ba3d086a79c7',1,'GridUnits']]],
   ['m_5flim',['M_lim',['../class_grid_obj.html#a01d3f362634c896ecdb80f0e6304c12f',1,'GridObj']]],
   ['main',['main',['../main__lbm_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main_lbm.cpp']]],
   ['main_5flbm_2ecpp',['main_lbm.cpp',['../main__lbm_8cpp.html',1,'']]],
@@ -22,8 +23,8 @@ var searchData=
   ['mpi_5fbuildcommunicators',['mpi_buildCommunicators',['../class_mpi_manager.html#a749fa958cb7343183a69ca6191b45286',1,'MpiManager']]],
   ['mpi_5fcartlab',['MPI_cartlab',['../class_mpi_manager.html#a2c3010f87e6a8a6c65e6f975e37fb7d5',1,'MpiManager']]],
   ['mpi_5fcommunicate',['mpi_communicate',['../class_mpi_manager.html#aedcf84c06fc3e0486fac61d09ce0a268',1,'MpiManager']]],
-  ['mpi_5fcoords',['MPI_coords',['../class_mpi_manager.html#a677a39e98470d3945248a66cf0bc3ec3',1,'MpiManager']]],
-  ['mpi_5fdims',['MPI_dims',['../class_mpi_manager.html#a8e2e923e656c338148d42517323c9586',1,'MpiManager']]],
+  ['mpi_5fcoords',['MPI_coords',['../class_mpi_manager.html#acfdcb17ecd44bb096bec1e79fe856bac',1,'MpiManager']]],
+  ['mpi_5fdims',['MPI_dims',['../class_mpi_manager.html#a3f1f0a2aa10fbd01c0dc3fac50178a0d',1,'MpiManager']]],
   ['mpi_5fgetopposite',['mpi_getOpposite',['../class_mpi_manager.html#a3c10ab477c2e4387d6a02104f9b2a2ea',1,'MpiManager']]],
   ['mpi_5fgridbuild',['mpi_gridbuild',['../class_mpi_manager.html#a7f07e85131147b55eec643c791ec2ba0',1,'MpiManager']]],
   ['mpi_5finit',['mpi_init',['../class_mpi_manager.html#a02adaa06e139dfca2bc71e1a1dbf25c7',1,'MpiManager']]],

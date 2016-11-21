@@ -32,8 +32,7 @@ using namespace std;
 ///			assumed to be oriented vertically (y-direction).
 void GridObj::LBM_init_getInletProfile() {
 
-	size_t i, j;
-	double y, tmp;
+	size_t j;
 	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
 
 #ifdef L_PARABOLIC_INLET
@@ -47,12 +46,15 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = L_u_max * (1 - pow((YPos[j] - (L_b_y - L_a_y - 2 * dy) / 2) / ((L_b_y - L_a_y - 2 * dy) / 2), 2));
+		ux_in[j] = L_UMAX * (1 - pow((YPos[j] - (L_BY - L_AY - 2 * dy) / 2) / ((L_BY - L_AY - 2 * dy) / 2), 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}
 
 #else
+
+	size_t i;
+	double y, tmp;
 
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
@@ -186,10 +188,10 @@ void GridObj::LBM_initVelocity ( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 #ifdef L_NO_FLOW				
-				for (size_t d = 0; d < L_dims; d++) {
+				for (size_t d = 0; d < L_DIMS; d++) {
 
 					// No flow case
-					u(i,j,k,d,M_lim,K_lim,L_dims) = 0.0;
+					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
 
 #else
@@ -197,20 +199,27 @@ void GridObj::LBM_initVelocity ( ) {
 				 * have either been read in from an input file or defined by an expression 
 				 * given in the definitions.
 				 */
-				u(i,j,k,0,M_lim,K_lim,L_dims) = L_u_0x;
-				u(i,j,k,1,M_lim,K_lim,L_dims) = L_u_0y;
-#if (L_dims == 3)
-				u(i,j,k,2,M_lim,K_lim,L_dims) = L_u_0z;
+				u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
+				u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+#if (L_DIMS == 3)
+				u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
 #endif
 
 
 #endif
+				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid) {
+					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = 0.0;
+					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+					u(i, j, k, 2, M_lim, K_lim, L_DIMS) = 0.0;
+#endif
+
+				}
+
+
 			}
 		}
 	}
-
-	// Perform solid site reset of velocity for any solids
-	bc_solidSiteReset();
 
 }
 
@@ -225,7 +234,7 @@ void GridObj::LBM_initRho ( ) {
 			for (int k = 0; k < K_lim; k++) {
 
 				// Uniform Density
-				rho(i,j,k,M_lim,K_lim) = L_rho_in;
+				rho(i,j,k,M_lim,K_lim) = L_RHOIN;
 			}
 		}
 	}
@@ -273,9 +282,9 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	
 	// Store physical spacing
 	// Global dimensions
-	double Lx = L_b_x - L_a_x;
-	double Ly = L_b_y - L_a_y;
-	double Lz = L_b_z - L_a_z;
+	double Lx = L_BX - L_AX;
+	double Ly = L_BY - L_AY;
+	double Lz = L_BZ - L_AZ;
 	dx = 2 * (Lx / (2 * static_cast<double>(L_N)));
 	dy = 2 * (Ly / (2 * static_cast<double>(L_M)));
 	dz = 2 * (Lz / (2 * static_cast<double>(L_K)));
@@ -289,7 +298,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Check input parameters //
 	////////////////////////////
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// Check that lattice volumes are cubes in 3D
 	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 || abs((Lx/L_N) - (Lz/L_K)) > 1e-8 ) {
 		std::cout << "Error: See Log File" << std::endl;
@@ -308,10 +317,10 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 #endif
 
     // Checks to make sure grid size is suitable for refinement
-	if (L_NumLev != 0) {
+	if (L_NUM_LEVELS != 0) {
 
-#if (L_dims == 3)
-		for (int reg = 0; reg < L_NumReg; reg++) {
+#if (L_DIMS == 3)
+		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 			// Check grid is big enough to allow embedded refinement of factor 2
 			if (	(
 					RefXend[level][reg]-RefXstart[level][reg]+1 < 3 || 
@@ -322,7 +331,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 					RefXend[level][reg]-RefXstart[level][reg]+1 == 3 ||
 					RefYend[level][reg]-RefYstart[level][reg]+1 == 3 ||
 					RefZend[level][reg]-RefZstart[level][reg]+1 == 3
-					) && L_NumLev > 1 )
+					) && L_NUM_LEVELS > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
 					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
@@ -330,7 +339,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 			}
 		}
 #else
-		for (int reg = 0; reg < L_NumReg; reg++) {
+		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 			// Check grid is big enough to allow embedded refinement of factor 2
 			if (	(
 					RefXend[level][reg]-RefXstart[level][reg]+1 < 3 || 
@@ -339,7 +348,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 					(
 					RefXend[level][reg]-RefXstart[level][reg]+1 == 3 ||
 					RefYend[level][reg]-RefYstart[level][reg]+1 == 3
-					) && L_NumLev > 1 )
+					) && L_NUM_LEVELS > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
 					*GridUtils::logfile << "Refined region is too small to support refinement. Exiting." << std::endl;
@@ -357,7 +366,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Get local grid sizes (includes overlap)
 	N_lim = local_size[0];
 	M_lim = local_size[1];
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	K_lim = local_size[2];
 #else
 	K_lim = 1;
@@ -382,7 +391,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Add overlap indices to both ends of the vector taking into account periodicity
 	XInd.insert( XInd.begin(), (XInd[0]-1 + L_N) % L_N ); XInd.insert( XInd.end(), (XInd[XInd.size()-1]+1 + L_N) % L_N );
 	YInd.insert( YInd.begin(), (YInd[0]-1 + L_M) % L_M ); YInd.insert( YInd.end(), (YInd[YInd.size()-1]+1 + L_M) % L_M );
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	ZInd.insert( ZInd.begin(), (ZInd[0]-1 + L_K) % L_K ); ZInd.insert( ZInd.end(), (ZInd[ZInd.size()-1]+1 + L_K) % L_K );
 #endif
 
@@ -411,7 +420,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Add overlap sites taking into account periodicity
 	XPos.insert( XPos.begin(), fmod(XPos[0]-dx + Lx, Lx) ); XPos.insert( XPos.end(), fmod(XPos[XPos.size()-1]+dx + Lx, Lx) );
 	YPos.insert( YPos.begin(), fmod(YPos[0]-dy + Ly, Ly) ); YPos.insert( YPos.end(), fmod(YPos[YPos.size()-1]+dy + Ly, Ly) );
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	ZPos.insert( ZPos.begin(), fmod(ZPos[0]-dz + Lz, Lz) ); ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size()-1]+dz + Lz, Lz) );
 #endif
 
@@ -429,7 +438,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	mpim->recv_layer_pos.Y[0]	= YPos[0] - dy/2;					mpim->recv_layer_pos.Y[1]	= YPos[0] + dy/2;
 	mpim->recv_layer_pos.Y[2]	= YPos[local_size[1] - 1] - dy/2;	mpim->recv_layer_pos.Y[3]	= YPos[local_size[1] - 1] + dy/2;
 	// Z
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	mpim->sender_layer_pos.Z[0] = ZPos[1] - dz/2;					mpim->sender_layer_pos.Z[1] = ZPos[1] + dz/2;
 	mpim->sender_layer_pos.Z[2] = ZPos[local_size[2] - 2] - dz/2;	mpim->sender_layer_pos.Z[3] = ZPos[local_size[2] - 2] + dz/2;
 	mpim->recv_layer_pos.Z[0]	= ZPos[0] - dz/2;					mpim->recv_layer_pos.Z[1]	= ZPos[0] + dz/2;
@@ -443,7 +452,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	*mpim->logout << "Y sender layers are: " << mpim->sender_layer_pos.Y[0] << " -- " << mpim->sender_layer_pos.Y[1] << " (min edge) , " << mpim->sender_layer_pos.Y[2] << " -- " << mpim->sender_layer_pos.Y[3] << " (max edge)" << std::endl;
 	*mpim->logout << "Y recv layers are: " << mpim->recv_layer_pos.Y[0] << " -- " << mpim->recv_layer_pos.Y[1] << " (min edge) , " << mpim->recv_layer_pos.Y[2] << " -- " << mpim->recv_layer_pos.Y[3] << " (max edge)" << std::endl;
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	*mpim->logout << "Z sender layers are: " << mpim->sender_layer_pos.Z[0] << " -- " << mpim->sender_layer_pos.Z[1] << " (min edge) , " << mpim->sender_layer_pos.Z[2] << " -- " << mpim->sender_layer_pos.Z[3] << " (max edge)" << std::endl;
 	*mpim->logout << "Z recv layers are: " << mpim->recv_layer_pos.Z[0] << " -- " << mpim->recv_layer_pos.Z[1] << " (min edge) , " << mpim->recv_layer_pos.Z[2] << " -- " << mpim->recv_layer_pos.Z[3] << " (max edge)" << std::endl;
 #endif
@@ -451,16 +460,16 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 #else
 	// When not builiding for MPI positions are straightforward
-	XPos = GridUtils::linspace( L_a_x + dx/2, L_b_x - dx/2, L_N );
-	YPos = GridUtils::linspace( L_a_y + dy/2, L_b_y - dy/2, L_M );
-	ZPos = GridUtils::linspace( L_a_z + dz/2, L_b_z - dz/2, L_K );
+	XPos = GridUtils::linspace( L_AX + dx/2, L_BX - dx/2, L_N );
+	YPos = GridUtils::linspace( L_AY + dy/2, L_BY - dy/2, L_M );
+	ZPos = GridUtils::linspace( L_AZ + dz/2, L_BZ - dz/2, L_K );
 #endif
 
 	// Global origins
-	XOrigin = L_a_x + dx / 2;
-	YOrigin = L_a_y + dy / 2;
-#if (L_dims == 3)
-	ZOrigin = L_a_z + dz / 2;
+	XOrigin = L_AX + dx / 2;
+	YOrigin = L_AY + dy / 2;
+#if (L_DIMS == 3)
+	ZOrigin = L_AZ + dz / 2;
 #else
 	ZOrigin = 0.0;
 #endif
@@ -488,7 +497,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 #endif
 
 	// Velocity field
-	u.resize( N_lim*M_lim*K_lim*L_dims );
+	u.resize( N_lim*M_lim*K_lim*L_DIMS );
 	LBM_initVelocity();
 	
 	// Density field
@@ -496,62 +505,63 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	LBM_initRho();
 
 	// Cartesian force vector
-	force_xyz.resize(N_lim*M_lim*K_lim*L_dims, 0.0);
+	force_xyz.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
 
 	// Lattice force vector
-	force_i.resize(N_lim*M_lim*K_lim*L_nVels, 0.0);
+	force_i.resize(N_lim*M_lim*K_lim*L_NUM_VELS, 0.0);
 
 	// Time averaged quantities
 	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
-	ui_timeav.resize(N_lim*M_lim*K_lim*L_dims, 0.0);
-	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_dims-3), 0.0);
+	ui_timeav.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
+	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_DIMS-3), 0.0);
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
-	f.resize( N_lim*M_lim*K_lim*L_nVels );
-	feq.resize( N_lim*M_lim*K_lim*L_nVels );
-
+	f.resize( N_lim*M_lim*K_lim*L_NUM_VELS );
+	feq.resize( N_lim*M_lim*K_lim*L_NUM_VELS );
+	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
-				for (int v = 0; v < L_nVels; v++) {
+				for (int v = 0; v < L_NUM_VELS; v++) {
 
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
+					f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
 
 				}
 			}
 		}
 	}
 	feq = f; // Make feq = feq too
+	fNew = f;
 
 
 	// Initialise OTHER parameters
 	// Compute kinematic viscosity based on target Reynolds number
 #if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
 	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-	nu = (L_ibb_r*2 / dx) * L_u_ref / L_Re;
+	nu = (L_IBB_R*2 / dx) * L_UREF / L_RE;
 #elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
 	// If IBM rectangle use y-dimension (in lattice units)
-	nu = (L_ibb_l / dx) * L_u_ref / L_Re;
+	nu = (L_IBB_L / dx) * L_UREF / L_RE;
 #elif defined L_SOLID_BLOCK_ON
 	// Use block length (scaled back to L0 units)
-	nu = ((L_block_x_max - L_block_x_min) / pow(2,L_block_on_grid_lev)) * L_u_ref / L_Re;
+	nu = ((L_BLOCK_MAX_X - L_BLOCK_MIN_X) / pow(2,L_BLOCK_ON_GRID_LEV)) * L_UREF / L_RE;
 #elif defined L_IBM_ON && defined L_IBB_FROM_FILE
 	// If IBM object read from file then use scale length as reference
-	nu = (L_ibb_length_ref / dx) * L_u_ref / L_Re;
+	nu = (L_IBB_REF_LENGTH / dx) * L_UREF / L_RE;
 #elif defined L_SOLID_FROM_FILE
 	// Use object length (scaled back to L0 units)
-	nu = (L_object_length_ref / pow(2,L_object_on_grid_lev)) * L_u_ref / L_Re;
+	nu = (L_OBJECT_REF_LENGTH / pow(2,L_OBJECT_ON_GRID_LEV)) * L_UREF / L_RE;
 #elif defined L_BFL_ON
 	// Use bfl body length (scaled back to L0 units)
-	nu = (L_bfl_length_ref / pow(2,L_bfl_on_grid_lev)) * L_u_ref / L_Re;
+	nu = (L_BFL_REF_LENGTH / pow(2,L_BFL_ON_GRID_LEV)) * L_UREF / L_RE;
 #else
 	// If no object then use domain height (in lattice units)
-	nu = (L_M - L_wall_thickness_bottom - L_wall_thickness_top) * L_u_ref / L_Re;	// Based on actual width of channel (in lattice units)
+	nu = (L_M - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) * L_UREF / L_RE;	// Based on actual width of channel (in lattice units)
 #endif
 
 	// Relaxation frequency on L0
@@ -659,7 +669,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	}
 
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	// Z //
 	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZstart[pGrid.level][region_number]);
 	if (found_z != pGrid.ZInd.end()) {
@@ -719,17 +729,17 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Get positons of local refined patch edges
 	double posOffsetX[2] = { pGrid.XPos[ CoarseLimsX[0] ], pGrid.XPos[ CoarseLimsX[1] ] };
 	double posOffsetY[2] = { pGrid.YPos[ CoarseLimsY[0] ], pGrid.YPos[ CoarseLimsY[1] ] };
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	double posOffsetZ[2] = { pGrid.ZPos[ CoarseLimsZ[0] ], pGrid.ZPos[ CoarseLimsZ[0] ] };
 #else
 	double posOffsetZ[2] = { 0.0, 0.0 };
 #endif
 
 	// Get local grid size of the sub grid based on limits
-	int local_size[L_dims] = {
+	int local_size[L_DIMS] = {
 		(int)((CoarseLimsX[1] - CoarseLimsX[0] + .5) * 2) + 1,
 		(int)((CoarseLimsY[1] - CoarseLimsY[0] + .5) * 2) + 1
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		, (int)((CoarseLimsZ[1] - CoarseLimsZ[0] + .5) * 2) + 1
 #endif
 	};
@@ -737,7 +747,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Generate NODE NUMBERS
 	XInd = GridUtils::onespace( IndXstart, IndXstart + local_size[0] - 1 );
 	YInd = GridUtils::onespace( IndYstart, IndYstart + local_size[1] - 1 );
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 	ZInd = GridUtils::onespace( IndZstart, IndZstart + local_size[2] - 1 );
 #else
 	ZInd.insert(ZInd.begin(), 0); // Default for 2D
@@ -754,7 +764,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Populate the position vectors
 	XPos = GridUtils::linspace(posOffsetX[0] - dx / 2, (posOffsetX[0] - dx / 2) + (XInd.size() - 1) * dx, static_cast<int>(XInd.size()) );
 	YPos = GridUtils::linspace(posOffsetY[0] - dy / 2, (posOffsetY[0] - dy / 2) + (YInd.size() - 1) * dy, static_cast<int>(YInd.size()) );
-#if L_dims == 3
+#if L_DIMS == 3
 	ZPos = GridUtils::linspace(posOffsetZ[0] - dz / 2, (posOffsetZ[0] - dz / 2) + (ZInd.size() - 1) * dz, static_cast<int>(ZInd.size()) );
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
@@ -762,10 +772,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	/* Global edge origins (set to local dx plus L0 edge then use series 
 	 * expression to correct for presence of other grids) */
-	XOrigin = L_a_x + (dx / 2);
-	YOrigin = L_a_y + (dy / 2);
-#if (L_dims == 3)
-	ZOrigin = L_a_z + (dz / 2);
+	XOrigin = L_AX + (dx / 2);
+	YOrigin = L_AY + (dy / 2);
+#if (L_DIMS == 3)
+	ZOrigin = L_AZ + (dz / 2);
 #else
 	ZOrigin = 0.0;
 #endif
@@ -775,7 +785,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 		XOrigin += RefXstart[n][region_number] * (dx * pow(2, level - n));
 		YOrigin += RefYstart[n][region_number] * (dy * pow(2, level - n));
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		ZOrigin += RefZstart[n][region_number] * (dz * pow(2, level - n));
 #endif
 	}
@@ -809,7 +819,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 #endif
 
 	// Velocity
-	u.resize(N_lim * M_lim * K_lim * L_dims);
+	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity( );
 
 	// Density
@@ -817,37 +827,39 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	LBM_initRho( );
 
 	// Cartesian force vector
-	force_xyz.resize(N_lim * M_lim * K_lim * L_dims, 0.0);
+	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
 	// Lattice force vector
-	force_i.resize(N_lim * M_lim * K_lim * L_nVels, 0.0);
+	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
 
 	// Time averaged quantities
 	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
-	ui_timeav.resize(N_lim*M_lim*K_lim*L_dims, 0.0);
-	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_dims-3), 0.0);
+	ui_timeav.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
+	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_DIMS-3), 0.0);
 
 
 	// Generate POPULATION MATRICES for lower levels
 	// Resize
-	f.resize(N_lim * M_lim * K_lim * L_nVels);
-	feq.resize(N_lim * M_lim * K_lim * L_nVels);
+	f.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
+	feq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
+	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	
 
 	// Loop over grid
 	for (int i = 0; i != N_lim; ++i) {
 		for (int j = 0; j != M_lim; ++j) {
 			for (int k = 0; k != K_lim; ++k) {
-				for (int v = 0; v < L_nVels; v++) {
+				for (int v = 0; v < L_NUM_VELS; v++) {
 					
 					// Initialise f to feq
-					f(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i, j, k, v);
+					f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
 
 				}
 			}
 		}
 	}
 	feq = f; // Set feq to feq
+	fNew = f;
 
 	// Compute relaxation time from coarser level assume refinement by factor of 2
 	omega = 1 / ( ( (1/pGrid.omega - .5) *2) + .5);
@@ -863,7 +875,7 @@ void GridObj::LBM_initSolidLab() {
 
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
-	if (L_block_on_grid_lev != level || L_block_on_grid_reg != region_number) return;
+	if (L_BLOCK_ON_GRID_LEV != level || L_BLOCK_ON_GRID_REG != region_number) return;
 
 	// Declarations
 	int i, j, k, local_i, local_j, local_k;
@@ -889,9 +901,9 @@ void GridObj::LBM_initSolidLab() {
 		
 		(level == 0) && 
 		
-		(L_block_x_max > Ng_lim - 1 || L_block_x_min < 0 || L_block_y_max > Mg_lim - 1 || L_block_y_min < 0 
-#if (L_dims == 3)
-		|| L_block_z_max > Kg_lim - 1 || L_block_z_min < 0
+		(L_BLOCK_MAX_X > Ng_lim - 1 || L_BLOCK_MIN_X < 0 || L_BLOCK_MAX_Y > Mg_lim - 1 || L_BLOCK_MIN_Y < 0 
+#if (L_DIMS == 3)
+		|| L_BLOCK_MAX_Z > Kg_lim - 1 || L_BLOCK_MIN_Z < 0
 #endif
 		)
 
@@ -899,9 +911,9 @@ void GridObj::LBM_initSolidLab() {
 
 		(level != 0) && 
 
-		(L_block_x_max >= Ng_lim - 2 || L_block_x_min <= 1 || L_block_y_max >= Mg_lim - 2 || L_block_y_min <= 1 
-#if (L_dims == 3)
-		|| L_block_z_max >= Kg_lim - 2 || L_block_z_min <= 1
+		(L_BLOCK_MAX_X >= Ng_lim - 2 || L_BLOCK_MIN_X <= 1 || L_BLOCK_MAX_Y >= Mg_lim - 2 || L_BLOCK_MIN_Y <= 1 
+#if (L_DIMS == 3)
+		|| L_BLOCK_MAX_Z >= Kg_lim - 2 || L_BLOCK_MIN_Z <= 1
 #endif
 		)
 	
@@ -916,9 +928,9 @@ void GridObj::LBM_initSolidLab() {
 
 
 	// Loop over object definition in global indices
-	for (i = L_block_x_min; i <= L_block_x_max; i++) {
-		for (j = L_block_y_min; j <= L_block_y_max; j++) {
-			for (k = L_block_z_min; k <= L_block_z_max; k++)
+	for (i = L_BLOCK_MIN_X; i <= L_BLOCK_MAX_X; i++) {
+		for (j = L_BLOCK_MIN_Y; j <= L_BLOCK_MAX_Y; j++) {
+			for (k = L_BLOCK_MIN_Z; k <= L_BLOCK_MAX_Z; k++)
 			{
 
 				// Only label if the site is on current rank
@@ -927,7 +939,7 @@ void GridObj::LBM_initSolidLab() {
 						// Map global indices to local indices
 						local_i = i - XInd[1] + 1;
 						local_j = j - YInd[1] + 1;
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 						local_k = k - ZInd[1] + 1;
 #else
 						local_k = k;
@@ -963,10 +975,10 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Left hand face only
 
 	// Check for potential singularity in BC
-	if (L_u_max == 1 || L_u_ref == 1) {
+	if (L_UMAX == 1 || L_UREF == 1) {
 		// Singularity so exit
 		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Inlet BC fails with L_u_0x = 1, choose something else. Exiting." << std::endl;
+		*GridUtils::logfile << "Inlet BC fails with L_UX0 = 1, choose something else. Exiting." << std::endl;
 		exit(LUMA_FAILED);
 	}
 
@@ -1003,7 +1015,8 @@ void GridObj::LBM_initBoundLab ( ) {
 #ifdef L_FREESTREAM_TUNNEL
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
-					LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
+					//LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
+					LatTyp(i, j, k, M_lim, K_lim) = eInlet;		// Set to free stream for now
 #endif
 
 				}
@@ -1014,11 +1027,11 @@ void GridObj::LBM_initBoundLab ( ) {
 	}
 #endif
 
-#if ((defined L_WALLS_ON && !defined L_WALLS_ON_2D) || defined L_FREESTREAM_TUNNEL) && (L_dims == 3)
+#if ((defined L_WALLS_ON && !defined L_WALLS_ON_2D) || defined L_FREESTREAM_TUNNEL) && (L_DIMS == 3)
 
 	// Search index vector to see if FRONT wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] < L_wall_thickness_front) {		// Wall found
+		if (ZInd[k] < L_WALL_THICKNESS_FRONT) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1038,7 +1051,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if BACK wall on this rank
 	for (k = 0; k < K_lim; k++ ) {
-		if (ZInd[k] > L_K-1 - L_wall_thickness_back) {		// Wall found
+		if (ZInd[k] > L_K-1 - L_WALL_THICKNESS_BACK) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1061,7 +1074,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if BOTTOM wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] < L_wall_thickness_bottom) {		// Wall found
+		if (YInd[j] < L_WALL_THICKNESS_BOTTOM) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1082,7 +1095,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if TOP wall on this rank
 	for (j = 0; j < M_lim; j++ ) {
-		if (YInd[j] > L_M-1 - L_wall_thickness_top) {		// Wall found
+		if (YInd[j] > L_M-1 - L_WALL_THICKNESS_TOP) {		// Wall found
 
 			// Label wall
 			for (i = 0; i < N_lim; i++) {
@@ -1123,7 +1136,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	// Loop over global indices of refined patch and add "TL to lower" labels
     for (i = (int)RefXstart[pGrid.level][region_number]; i <= (int)RefXend[pGrid.level][region_number]; i++) {
         for (j = (int)RefYstart[pGrid.level][region_number]; j <= (int)RefYend[pGrid.level][region_number]; j++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (k = (int)RefZstart[pGrid.level][region_number]; k <= (int)RefZend[pGrid.level][region_number]; k++)
 #else
 			k = 0;
@@ -1150,7 +1163,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 				if	(
 					(i == RefXstart[pGrid.level][region_number] || i == RefXend[pGrid.level][region_number]) ||
 					(j == RefYstart[pGrid.level][region_number] || j == RefYend[pGrid.level][region_number])
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 					|| (k == RefZstart[pGrid.level][region_number] || k == RefZend[pGrid.level][region_number])
 #endif
 					) {
@@ -1184,7 +1197,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
     // Loop over sub-grid local indices and add labels based on parent site labels
     for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 			for (int k = 0; k < K_lim; k++)
 #else
 			int k = 0;

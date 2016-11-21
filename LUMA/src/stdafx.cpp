@@ -20,20 +20,20 @@
 #include "../inc/stdafx.h"
 
 // Lattice velocities
-#if (L_dims == 3) && defined L_USE_KBC_COLLISION
+#if (L_DIMS == 3) && defined L_USE_KBC_COLLISION
 
 // D3Q27
-const int c[3][L_nVels] =
+const int c[3][L_NUM_VELS] =
 {
 	{ 1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 0 },
 	{ 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, 0, 0, 0, 0, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 1, 0 },
 	{ 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, -1, 1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0 }
 };
 
-#elseif(L_dims == 3) && !defined L_USE_KBC_COLLISION
+#elseif(L_DIMS == 3) && !defined L_USE_KBC_COLLISION
 
 // D3Q19
-const int c[3][L_nVels] =
+const int c[3][L_NUM_VELS] =
 {
 	{1,	-1,  0,  0,  0,  0,  1, -1,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  0 },
 	{0,  0,  1, -1,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0,  0,  0,  0,  0 },
@@ -43,25 +43,38 @@ const int c[3][L_nVels] =
 #else
 
 // D2Q9
-const int c[3][L_nVels] =
+const int c[3][L_NUM_VELS] =
 {
 	{ 1, -1, 0, 0, 1, -1, 1, -1, 0 },
 	{ 0, 0, 1, -1, 1, -1, -1, 1, 0 },
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
+const int c_opt[L_NUM_VELS][3] =
+{
+	{ 1, 0, 0 },
+	{ -1, 0, 0 },
+	{ 0, 1, 0 },
+	{ 0, -1, 0 },
+	{ 1, 1, 0 },
+	{ -1, -1, 0 },
+	{ 1, -1, 0 },
+	{ -1, 1, 0 },
+	{ 0, 0, 0, }
+};
+
 #endif
 
 // Weights for D2Q9, D3Q19 and D3Q27 models
-#if (L_dims == 3) && defined L_USE_KBC_COLLISION
+#if (L_DIMS == 3) && defined L_USE_KBC_COLLISION
 
-const double w[L_nVels] =
+const double w[L_NUM_VELS] =
 { 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0, 2.0 / 27.0,
 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0, 1.0 / 54.0,
 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0, 1.0 / 216.0,
 8.0 / 27.0 };
 
-#elseif (L_dims == 3) && !defined L_USE_KBC_COLLISION
+#elseif (L_DIMS == 3) && !defined L_USE_KBC_COLLISION
 
 const double w[nVels] =
 {1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0,
@@ -70,7 +83,7 @@ const double w[nVels] =
 
 #else
 
-const double w[L_nVels] =
+const double w[L_NUM_VELS] =
 { 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 4.0 / 9.0 };
 
 #endif

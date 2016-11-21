@@ -33,7 +33,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 	int count, i, j, k, dir;	// Local counters
 	// Local grid sizes
 	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		, K_lim = static_cast<int>(g->ZInd.size());
 #else
 		, K_lim = 1;
@@ -68,7 +68,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 	* 24	=	Right-Down-Back
 	* 25	=	Left-Up-Front
 	*/
-	for (dir = 0; dir < L_MPI_dir; dir++)  {
+	for (dir = 0; dir < L_MPI_DIRS; dir++)  {
 
 		// Reset the site counter
 		count = 0;
@@ -90,7 +90,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum))
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -118,7 +118,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum))
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -146,7 +146,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -174,7 +174,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -202,7 +202,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) &&
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -231,7 +231,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum)) &&
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -259,7 +259,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum) && 
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif
@@ -287,7 +287,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 						{
 							if (  GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && 
 								GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)
-	#if (L_dims == 3)
+	#if (L_DIMS == 3)
 								&&
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum))
 	#endif

@@ -49,6 +49,14 @@ enum eBCType
 	eBCBFL				///< Apply just BFL BCs
 };
 
+/// \enum  eIOFlag
+/// \brief Flag for indicating write or read action for IO methods
+enum eIOFlag
+{
+	eWrite,				///< Write to file
+	eRead,				///< Read from file
+};
+
 /// \brief	Grid class.
 ///
 ///			This class represents a grid (lattice) and is capable of owning a 
@@ -82,8 +90,11 @@ public:
 
 private :
 
-	/// 1D subgrid array (size = L_NumReg)
+	/// 1D subgrid array (size = L_NUM_REGIONS)
 	std::vector<GridObj> subGrid;
+
+	/// Pointer to parent grid
+	GridObj *parentGrid = nullptr;
 
 	// Start and end indices of corresponding coarse level
 	// When using MPI these values are local to a particular coarse grid
@@ -110,6 +121,7 @@ private :
 	// Flattened 4D arrays (i,j,k,vel)
 	IVector<double> f;				///< Distribution functions
 	IVector<double> feq;			///< Equilibrium distribution functions
+	IVector<double> fNew;			///< Copy of distribution functions
 	IVector<double> u;				///< Macropscopic velocity components
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
@@ -120,9 +132,11 @@ private :
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)
-	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_dims)
-	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_dims-3)
+	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_DIMS)
+	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_DIMS-3)
 
+	// Grid scale parameters
+	double refinement_ratio = (1 / pow(2, level));	///< Equivalent to (1 / pow(2, level))
 
 	// Public data members
 public :
@@ -176,16 +190,16 @@ public :
 
 	// LBM operations
 	DEPRECATED void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel (DEPRECATED VERSION)
-	void LBM_multi();								// Launch the multi-grid kernel
-	void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
+	DEPRECATED void LBM_multi();					// Launch the multi-grid kernel
+	DEPRECATED void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
 	double LBM_collide(int i, int j, int k, int v);
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
-	void LBM_stream();							// Stream populations
-	void LBM_macro();							// Compute macroscopic quantities + 1 overload for single site
+	DEPRECATED void LBM_stream();					// Stream populations
+	DEPRECATED void LBM_macro();					// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
-	void LBM_boundary(int bc_type_flag);		// Apply boundary conditions
-	void LBM_forceGrid();						// Apply a force to the grid points
-	void LBM_resetForces();						// Resets the force vectors on the grid
+	DEPRECATED void LBM_boundary(int bc_type_flag);	// Apply boundary conditions
+	DEPRECATED void LBM_forceGrid();				// Apply a force to the grid points
+	void LBM_resetForces();							// Resets the force vectors on the grid
 
 	// Boundary operations
 	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
@@ -194,17 +208,17 @@ public :
 	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
 	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
-	void bc_solidSiteReset();									// Reset all the solid site velocities to zero
+	DEPRECATED void bc_solidSiteReset();						// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
-	void LBM_explode(int RegionNumber);			// Explode populations from coarse to fine
-	void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
-	void LBM_addSubGrid(int RegionNumber);		// Add and initialise subgrid structure for a given region number
+	DEPRECATED void LBM_explode(int RegionNumber);		// Explode populations from coarse to fine
+	DEPRECATED void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
+	DEPRECATED void LBM_addSubGrid(int RegionNumber);	// Add and initialise subgrid structure for a given region number
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_fgaout();							// Wrapper for _io_fgaout with 2/3D checking 
-	void io_restart(bool IO_flag);				// Reads/writes data from/to the global restart file
+	void io_restart(eIOFlag IO_flag);			// Reads/writes data from/to the global restart file
 	void io_probeOutput();						// Output routine for point probes
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
@@ -213,6 +227,17 @@ private:
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
+	// Private optimised functions
+	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
+	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
+	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
+	void _LBM_collide_opt(int id);
+	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
+	void _LBM_forceGrid_opt(int id);
+	double _LBM_equilibrium_opt(int id, int v);
+
+public :
+	void LBM_multi_opt(int subcycle = 0);
 
 
 };

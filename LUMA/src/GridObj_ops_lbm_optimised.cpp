@@ -30,8 +30,6 @@
 ///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
 void GridObj::LBM_multi_opt(int subcycle) {
 
-	//*MpiManager::logout << "Starting kernel L" << level << std::endl;
-
 	// Two iterations on sub-grid first
 	if (subGrid.size()) {
 		for (int i = 0; i < 2; ++i) {
@@ -41,6 +39,16 @@ void GridObj::LBM_multi_opt(int subcycle) {
 
 	// Start the clock to time this kernel
 	clock_t secs, t_start = clock();
+
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
+
+	// Reset object forces for momentum exchange force calculation
+	if (level == L_OBJECT_ON_GRID_LEV && region_number == L_OBJECT_ON_GRID_REG) {
+		objman->forceOnObjectX = 0.0;
+		objman->forceOnObjectY = 0.0;
+		objman->forceOnObjectZ = 0.0;
+	}
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; ++i) {
@@ -52,7 +60,18 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				eType type_local = LatTyp[id];
 
 				// Ignore Refined sites
-				if (type_local == eRefined)	continue;
+				if (type_local == eRefined)	{
+					continue;
+				}
+
+				// MOMENTUM EXCHANGE //
+#ifdef L_LD_OUT
+				if (type_local == eSolid) {
+					// Compute lift and drag contribution of this site
+					objman->computeLiftDrag(i, j, k, this);
+				}
+#endif
+				
 
 				// STREAM //
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
@@ -99,6 +118,8 @@ void GridObj::LBM_multi_opt(int subcycle) {
 
 	// MPI COMMUNICATION //
 #ifdef L_BUILD_FOR_MPI
+
+	// TODO: Can we restrict this to just every 2nd sub-cycle?
 
 	// Launch communication on this grid by passing its level and region number
 	MpiManager::getInstance()->mpi_communicate(level, region_number);

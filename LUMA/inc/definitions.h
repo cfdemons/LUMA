@@ -110,7 +110,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 5000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -141,7 +141,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Lattice properties (in lattice units)
-#define L_DIMS 3		///< Number of dimensions to the problem
+#define L_DIMS 2		///< Number of dimensions to the problem
 #define L_N 160			///< Number of x lattice sites
 #define L_M 32			///< Number of y lattice sites
 #define L_K 32			///< Number of z lattice sites

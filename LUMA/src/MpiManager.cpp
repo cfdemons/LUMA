@@ -846,6 +846,10 @@ int MpiManager::mpi_buildCommunicators() {
 					}
 				}
 
+
+				/* THE FOLLOWING MAY BE NOT OBSOLETE AS THE HALO DESCRIPTORS WERE
+				 * UNRELIABLE AND ARE NO-LONGER REQUIRED FOR HDF5 SLAB SIZING. */
+
 				// Halo / TL thickness
 				int halo_thickness = static_cast<int>(pow(2, targetGrid->level));
 

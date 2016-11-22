@@ -213,7 +213,7 @@ public :
 	// Multi-grid operations
 	DEPRECATED void LBM_explode(int RegionNumber);		// Explode populations from coarse to fine
 	DEPRECATED void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
-	DEPRECATED void LBM_addSubGrid(int RegionNumber);	// Add and initialise subgrid structure for a given region number
+	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file

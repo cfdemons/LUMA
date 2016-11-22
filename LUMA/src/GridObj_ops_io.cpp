@@ -814,15 +814,26 @@ int GridObj::io_hdf5(double tval) {
 	// Construct filename
 	std::string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
 
-	// Declarations
-	hid_t file_id = static_cast<hid_t>(NULL), plist_id = static_cast<hid_t>(NULL), group_id = static_cast<hid_t>(NULL);
-	hid_t filespace = static_cast<hid_t>(NULL); hsize_t dimsf[L_DIMS];
-	hid_t memspace = static_cast<hid_t>(NULL); hsize_t dimsm[1];
-	hid_t attspace = static_cast<hid_t>(NULL); hsize_t dimsa[1];
-	hid_t dataset_id = static_cast<hid_t>(NULL); hid_t attrib_id = static_cast<hid_t>(NULL);
+	// ID declarations
+	hid_t file_id = static_cast<hid_t>(NULL);
+	hid_t plist_id = static_cast<hid_t>(NULL);
+	hid_t group_id = static_cast<hid_t>(NULL);
+	hid_t filespace = static_cast<hid_t>(NULL);
+	hid_t memspace = static_cast<hid_t>(NULL);
+	hid_t attspace = static_cast<hid_t>(NULL);
+	hid_t dataset_id = static_cast<hid_t>(NULL);
+	hid_t attrib_id = static_cast<hid_t>(NULL);
+
+	// Dimensions of file, memory and attribute spaces
+	hsize_t dimsf[L_DIMS];
+	hsize_t dimsm[1];
+	hsize_t dimsa[1];
+
+	// Others
 	herr_t status = 0;
 	std::string variable_name;
 	MpiManager::phdf5_struct p_data;
+	int TL_thickness;
 
 	// Turn auto error printing off
 	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
@@ -830,9 +841,18 @@ int GridObj::io_hdf5(double tval) {
 	// Construct time string
 	const std::string time_string("/Time_" + std::to_string(static_cast<int>(tval)));
 
-	// Get modified local grid size (minus TL cells on both sides of grid)
-	int TL_thickness = 0;
-	if (level != 0) TL_thickness = 2;
+	// Set TL thickness
+	if (level == 0) {
+		// TL is zero on L0 grid
+		TL_thickness = 0;
+	}
+	else {
+		// TL thickness is 2 cells on sub-grids
+		TL_thickness = 2;
+	}
+
+	/* Get modified local grid size
+	* i.e. grid size minus TL cells */
 	int N_mod = N_lim - (2 * TL_thickness);
 	int M_mod = M_lim - (2 * TL_thickness);
 #if (L_DIMS == 3)
@@ -878,8 +898,6 @@ int GridObj::io_hdf5(double tval) {
 		status = H5Pset_fapl_mpio(
 			plist_id, MpiManager::getInstance()->world_comm, info);
 	}
-
-	// Else must be writable sub-grid so set communicator
 	else {
 		// Appropriate sub-grid communicator
 		status = H5Pset_fapl_mpio(

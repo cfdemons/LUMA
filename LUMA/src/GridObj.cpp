@@ -58,6 +58,9 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
+
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
 	this->timeav_timestep = 0.0;
@@ -97,6 +100,9 @@ GridObj::GridObj(int level, std::vector<int> local_size,
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
+
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
 	this->timeav_timestep = 0.0;
@@ -121,6 +127,9 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
     this->region_number = RegionNumber;
 	this->t = 0;
 	this->parentGrid = &pGrid;
+
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
 
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;

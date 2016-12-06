@@ -135,8 +135,8 @@ private :
 	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_DIMS)
 	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_DIMS-3)
 
-	// Grid scale parameters
-	double refinement_ratio = (1 / pow(2, level));	///< Equivalent to (1 / pow(2, level))
+	// Grid scale parameter
+	double refinement_ratio;	///< Equivalent to (1 / pow(2, level))
 
 	// Public data members
 public :

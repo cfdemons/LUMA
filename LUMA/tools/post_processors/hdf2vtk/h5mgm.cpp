@@ -24,8 +24,7 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 {
 
 	// Local declarations
-	vtkSmartPointer<vtkCellArray> face_array =
-		vtkSmartPointer<vtkCellArray>::New();
+	vtkSmartPointer<vtkCellArray> face_array = vtkSmartPointer<vtkCellArray>::New();
 	std::vector<vtkIdType> face_ids;
 	size_t status = 0;
 
@@ -144,6 +143,9 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 		grid->InsertNextCell(VTK_POLYGON, 4, &face_ids[0]);
 
 	}
+
+	// Free face array (forces destructor to be called)
+	face_array = NULL;
 
 	return status;
 
@@ -283,13 +285,15 @@ int main(int argc, char* argv[])
 	// Status indicator
 	size_t res = 0;
 
+	std::cout << "Building mesh..." << std::endl;
+
 	// Loop 1 to get mesh details
 	for (int lev = 0; lev < levels; lev++) {
 		for (int reg = 0; reg < regions; reg++) {
 
 			// Debug
 			int local_point_count = 0;
-			std::cout << "Interrogating L" << lev << " R" << reg << "...";
+			std::cout << "Adding cells from L" << lev << " R" << reg << "...";
 
 			// L0 doesn't have different regions
 			if (lev == 0 && reg != 0) continue;
@@ -360,6 +364,9 @@ int main(int argc, char* argv[])
 			// Loop over grid sites
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
+				std::cout << "\r" << "Examining cell " << std::to_string(c + 1) << "/" << 
+					std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << std::flush;
+
 				// Ignore list
 				if (
 					Type[c] == eRefined ||
@@ -398,6 +405,7 @@ int main(int argc, char* argv[])
 				res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
 
 			}
+			std::cout << std::endl;
 
 			// Close input dataspace
 			status = H5Sclose(input_sid);
@@ -421,6 +429,7 @@ int main(int argc, char* argv[])
 
 	// Debug
 	std::cout << "Number of cells retained = " << unstructuredGrid->GetNumberOfCells() << std::endl;
+	std::cout << "Adding data for each time step to mesh..." << std::endl;
 
 	// Clean mesh to remove duplicates (Paraview not VTK)
 	/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
@@ -546,8 +555,26 @@ int main(int argc, char* argv[])
 			vtkSmartPointer<vtkUnstructuredGridWriter>::New();
 		writer->SetFileName(vtkFilename.c_str());
 		writer->SetFileTypeToBinary();
+#if VTK_MAJOR_VERSION <= 5
+		writer->SetInput(unstructuredGrid);
+#else
 		writer->SetInputData(unstructuredGrid);
+#endif
 		writer->Write();
+
+		// Free the memory used (forces destructor call)
+		LatTyp = NULL;
+		RhoArray = NULL;
+		Rho_TimeAv = NULL;
+		Ux = NULL;
+		Uy = NULL;
+		Ux_TimeAv = NULL;
+		Uy_TimeAv = NULL;
+		UxUx_TimeAv = NULL;
+		UxUy_TimeAv = NULL;
+		UyUy_TimeAv = NULL;
+
+
 	}
 
 	return 0;

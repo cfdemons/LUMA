@@ -47,7 +47,7 @@
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
-//#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
+#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
@@ -75,7 +75,7 @@
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
-#define L_HDF5_OUTPUT				///< HDF5 dump on output
+//#define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES

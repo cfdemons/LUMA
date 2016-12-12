@@ -544,25 +544,25 @@ bool GridUtils::isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj
 bool GridUtils::hasThisSubGrid(const GridObj& pGrid, int RegNum) {
 
 	// Loop over over X range of subgrid and check for matching index on parent grid
-	for (size_t i = RefXstart[pGrid.level][RegNum]; i <= RefXend[pGrid.level][RegNum]; i++) {
+	for (size_t i = cRefStartX[pGrid.level][RegNum]; i <= cRefEndX[pGrid.level][RegNum]; i++) {
 		auto found_i = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), i);
 		if (found_i != pGrid.XInd.end()) break;		// If a match is found then chance that range intersects parent grid indices
-		else if (i == RefXend[pGrid.level][RegNum] && found_i == pGrid.XInd.end()) return false;	// Got to the end and X is not intersecting
+		else if (i == cRefEndX[pGrid.level][RegNum] && found_i == pGrid.XInd.end()) return false;	// Got to the end and X is not intersecting
 	}
 
 	// Loop over over Y range
-	for (size_t j = RefYstart[pGrid.level][RegNum]; j <= RefYend[pGrid.level][RegNum]; j++) {
+	for (size_t j = cRefStartY[pGrid.level][RegNum]; j <= cRefEndY[pGrid.level][RegNum]; j++) {
 		auto found_j = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), j);
 		if (found_j != pGrid.YInd.end()) break;
-		else if (j == RefYend[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
+		else if (j == cRefEndY[pGrid.level][RegNum] && found_j == pGrid.YInd.end()) return false;
 	}
 
 #if (L_DIMS == 3)
 	// Loop over over Z range
-	for (size_t k = RefZstart[pGrid.level][RegNum]; k <= RefZend[pGrid.level][RegNum]; k++) {
+	for (size_t k = cRefStartZ[pGrid.level][RegNum]; k <= cRefEndZ[pGrid.level][RegNum]; k++) {
 		auto found_k = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), k);
 		if (found_k != pGrid.ZInd.end()) break;
-		else if (k == RefZend[pGrid.level][RegNum] && found_k == pGrid.ZInd.end()) return false;
+		else if (k == cRefEndZ[pGrid.level][RegNum] && found_k == pGrid.ZInd.end()) return false;
 	}
 #endif
 

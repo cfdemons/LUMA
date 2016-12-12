@@ -72,7 +72,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 #ifdef L_BFL_DEBUG
 	std::ofstream file;
 	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
-	file.precision(L_output_precision);
+	file.precision(L_OUTPUT_PRECISION);
 	for (size_t n = 0; n < markers.size(); n++) {
 		file << std::to_string(n) << ", " << 
 			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
@@ -138,7 +138,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 
 #ifdef L_BFL_DEBUG
 	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
-	file.precision(L_output_precision);
+	file.precision(L_OUTPUT_PRECISION);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {
 			file << i[n] << '\t';

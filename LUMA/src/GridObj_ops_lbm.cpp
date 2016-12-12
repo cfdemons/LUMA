@@ -238,7 +238,7 @@ void GridObj::LBM_multi (bool ibmFlag) {
 	timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
 	timeav_timestep /= t;
 
-	if (t % L_out_every == 0) {
+	if (t % L_OUT_EVERY == 0) {
 		// Performance data to logfile
 		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 	}
@@ -425,7 +425,7 @@ void GridObj::LBM_multi () {
 	timeav_timestep += ((double)secs)/CLOCKS_PER_SEC;
 	timeav_timestep /= t;
 
-	if (t % L_out_every == 0) {
+	if (t % L_OUT_EVERY == 0) {
 		// Performance data to logfile
 		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep*1000 << "ms" << std::endl;
 	}

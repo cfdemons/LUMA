@@ -69,9 +69,9 @@
 #define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
 
 // Output Options
-#define L_out_every 100			///< How many timesteps before whole grid output
-#define L_out_every_forces 100		///< Specific output frequency of body forces
-#define L_output_precision 5		///< Precision of output (for text writers)
+#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
+#define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -83,10 +83,10 @@
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
 #define L_PROBE_OUT_FREQ 250					///< Write out frequency of probe output
-const static int nProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
-const static int xProbeLims[2] = {90, 270};		///< Limits of X plane for array of probes
-const static int yProbeLims[2] = {15, 45};		///< Limits of Y plane for array of probes
-const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of probes
+const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
+const static int cProbeLimsX[2] = {90, 270};		///< Limits of X plane for array of probes
+const static int cProbeLimsY[2] = {15, 45};		///< Limits of Y plane for array of probes
+const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array of probes
 
 
 // Gravity
@@ -131,12 +131,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
 #ifdef L_USE_CUSTOM_MPI_SIZES
 	/// Number of sites in X direction for each custom rank
-	const static size_t xRankSize[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {50, 50, 50, 50, 350, 350, 350, 350};
+	const static size_t cRankSizeX[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {50, 50, 50, 50, 350, 350, 350, 350};
 	/// Number of sites in Y direction for each custom rank
-	const static size_t yRankSize[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 20, 130, 130, 20, 20, 130, 130};
+	const static size_t cRankSizeY[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 20, 130, 130, 20, 20, 130, 130};
 	/// Number of sites in Z direction for each custom rank.
 	/// The following can be arbitrary if doing a 2D problem
-	const static size_t zRankSize[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 30, 20, 30, 20, 30, 20, 30};
+	const static size_t cRankSizeZ[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 30, 20, 30, 20, 30, 20, 30};
 #endif
 
 
@@ -360,13 +360,13 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 
 // Following options are only here to making testing different grid combinations easier
-	const static int RefXstart[L_NUM_LEVELS][L_NUM_REGIONS] = { { L_M / 2 } };
-	const static int RefXend[L_NUM_LEVELS][L_NUM_REGIONS] = { { (2 * L_M) } };
-	const static int RefYstart[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
-	const static int RefYend[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
+	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { L_M / 2 } };
+	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (2 * L_M) } };
+	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
+	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
 	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
-	static int RefZend[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
+	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
+	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
 
 #endif
 
@@ -450,12 +450,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 #if L_NUM_LEVELS == 0
 	// Set region info to default as no refinement
-	const static int RefXstart[1][1]	= {0};
-	const static int RefXend[1][1]		= {0};
-	const static int RefYstart[1][1]	= {0};
-	const static int RefYend[1][1]		= {0};
-	static int RefZstart[1][1]			= {0};
-	static int RefZend[1][1]			= {0};
+	const static int cRefStartX[1][1]	= {0};
+	const static int cRefEndX[1][1]		= {0};
+	const static int cRefStartY[1][1]	= {0};
+	const static int cRefEndY[1][1]		= {0};
+	static int cRefStartZ[1][1]			= {0};
+	static int cRefEndZ[1][1]			= {0};
 
 	#undef L_NUM_REGIONS
 	#define L_NUM_REGIONS 1

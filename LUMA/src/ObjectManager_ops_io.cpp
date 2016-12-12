@@ -568,7 +568,7 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 	{
 		// Create stream
 		std::ofstream fout;
-		fout.precision(L_output_precision);
+		fout.precision(L_OUTPUT_PRECISION);
 		// Filename
 		std::stringstream fileName;
 		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << MpiManager::my_rank << ".csv";

@@ -36,7 +36,7 @@ void GridObj::io_textout(std::string output_tag) {
 
 	// Create stream and open text file
 	ofstream gridoutput;
-	gridoutput.precision(L_output_precision);
+	gridoutput.precision(L_OUTPUT_PRECISION);
 
 	// Construct File Name
 	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank;
@@ -308,7 +308,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 	
 	// Create stream and open text file
 	ofstream gridoutput;
-	gridoutput.precision(L_output_precision);
+	gridoutput.precision(L_OUTPUT_PRECISION);
 
 	// Construct File Name
 	string FNameG, N_str, M_str, K_str, ex_str, L_NumLev_str, NumReg_str, mpirank,L_timeStep_str;
@@ -606,25 +606,25 @@ void GridObj::io_probeOutput() {
 
 	// Probe spacing in each direction
 	int pspace[L_DIMS];
-	if (nProbes[0] > 1)
-		pspace[0] = abs(xProbeLims[1] - xProbeLims[0]) / (nProbes[0] - 1);
-	if (nProbes[1] > 1)
-		pspace[1] = abs(yProbeLims[1] - yProbeLims[0]) / (nProbes[1] - 1);
+	if (cNumProbes[0] > 1)
+		pspace[0] = abs(cProbeLimsX[1] - cProbeLimsX[0]) / (cNumProbes[0] - 1);
+	if (cNumProbes[1] > 1)
+		pspace[1] = abs(cProbeLimsY[1] - cProbeLimsY[0]) / (cNumProbes[1] - 1);
 #if (L_DIMS == 3)
-	if (nProbes[2] > 1)
-		pspace[2] = abs(zProbeLims[1] - zProbeLims[0]) / (nProbes[2] - 1);
+	if (cNumProbes[2] > 1)
+		pspace[2] = abs(cProbeLimsZ[1] - cProbeLimsZ[0]) / (cNumProbes[2] - 1);
 #endif
 
 	// Loop over probe points
-	for (i = 0; i < nProbes[0]; i++) {
-		i_global = xProbeLims[0] + i*pspace[0];
+	for (i = 0; i < cNumProbes[0]; i++) {
+		i_global = cProbeLimsX[0] + i*pspace[0];
 
-		for (j = 0; j < nProbes[1]; j++) {
-			j_global = yProbeLims[0] + j*pspace[1];
+		for (j = 0; j < cNumProbes[1]; j++) {
+			j_global = cProbeLimsY[0] + j*pspace[1];
 
 #if (L_DIMS == 3)
-			for (int k = 0; k < nProbes[2]; k++) {
-				k_global = zProbeLims[0] + k*pspace[2];
+			for (int k = 0; k < cNumProbes[2]; k++) {
+				k_global = cProbeLimsZ[0] + k*pspace[2];
 #else
 			k_global = 0; {
 #endif
@@ -690,7 +690,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	litefile.open(filename, std::ios::out);
 
 	// Set precision and force fixed formatting
-	litefile.precision(L_output_precision);
+	litefile.precision(L_OUTPUT_PRECISION);
 	litefile.setf(std::ios::fixed);
 	litefile.setf(std::ios::showpoint);
 
@@ -935,10 +935,10 @@ int GridObj::io_hdf5(double tval) {
 	}
 	else {
 		// >L0 must get global sizes from the refinement region specification (ex. TL)
-		dimsf[0] = (RefXend[level - 1][region_number] - RefXstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
-		dimsf[1] = (RefYend[level - 1][region_number] - RefYstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
+		dimsf[0] = (cRefEndX[level - 1][region_number] - cRefStartX[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
+		dimsf[1] = (cRefEndY[level - 1][region_number] - cRefStartY[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
 #if (L_DIMS == 3)
-		dimsf[2] = (RefZend[level - 1][region_number] - RefZstart[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
+		dimsf[2] = (cRefEndZ[level - 1][region_number] - cRefStartZ[level - 1][region_number] + 1) * 2 - (2 * TL_thickness);
 #endif
 	}
 	filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
@@ -979,10 +979,10 @@ int GridObj::io_hdf5(double tval) {
 
 		if (level != 0) {
 			// Write Sub-Grid Start
-			buffer_int_array[0] = RefXstart[level - 1][region_number];
-			buffer_int_array[1] = RefYstart[level - 1][region_number];
+			buffer_int_array[0] = cRefStartX[level - 1][region_number];
+			buffer_int_array[1] = cRefStartY[level - 1][region_number];
 #if (L_DIMS == 3)
-			buffer_int_array[2] = RefZstart[level - 1][region_number];
+			buffer_int_array[2] = cRefStartZ[level - 1][region_number];
 #endif
 			attspace = H5Screate_simple(1, dimsa, NULL);
 			attrib_id = H5Acreate(file_id, "RefinementStart", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
@@ -992,10 +992,10 @@ int GridObj::io_hdf5(double tval) {
 			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 			// Write Sub-Grid End
-			buffer_int_array[0] = RefXend[level - 1][region_number];
-			buffer_int_array[1] = RefYend[level - 1][region_number];
+			buffer_int_array[0] = cRefEndX[level - 1][region_number];
+			buffer_int_array[1] = cRefEndY[level - 1][region_number];
 #if (L_DIMS == 3)
-			buffer_int_array[2] = RefZend[level - 1][region_number];
+			buffer_int_array[2] = cRefEndZ[level - 1][region_number];
 #endif
 			attrib_id = H5Acreate(file_id, "RefinementEnd", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int_array[0]);
@@ -1017,7 +1017,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 		// Write Out Frequency
-		buffer_int = L_out_every;
+		buffer_int = L_OUT_EVERY;
 		attrib_id = H5Acreate(file_id, "OutputFrequency", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;

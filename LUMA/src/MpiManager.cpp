@@ -230,13 +230,13 @@ void MpiManager::mpi_gridbuild( ) {
 			switch (d)
 			{
 			case 0:
-				local_size.push_back( xRankSize[my_rank] + 2 );
+				local_size.push_back( cRankSizeX[my_rank] + 2 );
 				break;
 			case 1:
-				local_size.push_back( yRankSize[my_rank] + 2 );
+				local_size.push_back( cRankSizeY[my_rank] + 2 );
 				break;
 			case 2:
-				local_size.push_back( zRankSize[my_rank] + 2 );
+				local_size.push_back( cRankSizeZ[my_rank] + 2 );
 				break;
 
 			default:
@@ -276,9 +276,9 @@ void MpiManager::mpi_gridbuild( ) {
 #endif
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
-		global_edge_ind[1][my_rank] += xRankSize[adj_rank];
+		global_edge_ind[1][my_rank] += cRankSizeX[adj_rank];
 	}
-	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - xRankSize[my_rank];
+	global_edge_ind[0][my_rank] = global_edge_ind[1][my_rank] - cRankSizeX[my_rank];
 
 	// Y edges
 	global_edge_ind[3][my_rank] = 0;
@@ -291,9 +291,9 @@ void MpiManager::mpi_gridbuild( ) {
 #endif
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
-		global_edge_ind[3][my_rank] += yRankSize[adj_rank];
+		global_edge_ind[3][my_rank] += cRankSizeY[adj_rank];
 	}
-	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - yRankSize[my_rank];
+	global_edge_ind[2][my_rank] = global_edge_ind[3][my_rank] - cRankSizeY[my_rank];
 
 #if (L_DIMS == 3)
 	// Z edges
@@ -303,9 +303,9 @@ void MpiManager::mpi_gridbuild( ) {
 		int adj_coords[L_DIMS] = {MPI_coords[0], MPI_coords[1], i};
 		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
 		// Add the number of sites on this rank to total
-		global_edge_ind[5][my_rank] += zRankSize[adj_rank];
+		global_edge_ind[5][my_rank] += cRankSizeZ[adj_rank];
 	}
-	global_edge_ind[4][my_rank] = global_edge_ind[5][my_rank] - zRankSize[my_rank];
+	global_edge_ind[4][my_rank] = global_edge_ind[5][my_rank] - cRankSizeZ[my_rank];
 #else
 	global_edge_ind[5][my_rank] = 1;
 	global_edge_ind[4][my_rank] = 0;
@@ -370,14 +370,14 @@ void MpiManager::mpi_gridbuild( ) {
 
 	// 3D check
 #if (L_DIMS == 3)
-	if ( (	zRankSize[neighbour_rank[0]] != local_size[2]-2 || zRankSize[neighbour_rank[1]] != local_size[2]-2 ||
-			yRankSize[neighbour_rank[0]] != local_size[1]-2 || yRankSize[neighbour_rank[1]] != local_size[1]-2
+	if ( (	cRankSizeZ[neighbour_rank[0]] != local_size[2]-2 || cRankSizeZ[neighbour_rank[1]] != local_size[2]-2 ||
+			cRankSizeY[neighbour_rank[0]] != local_size[1]-2 || cRankSizeY[neighbour_rank[1]] != local_size[1]-2
 		 ) || (
-			zRankSize[neighbour_rank[4]] != local_size[2]-2 || zRankSize[neighbour_rank[5]] != local_size[2]-2 ||
-			xRankSize[neighbour_rank[4]] != local_size[0]-2 || xRankSize[neighbour_rank[5]] != local_size[0]-2
+			cRankSizeZ[neighbour_rank[4]] != local_size[2]-2 || cRankSizeZ[neighbour_rank[5]] != local_size[2]-2 ||
+			cRankSizeX[neighbour_rank[4]] != local_size[0]-2 || cRankSizeX[neighbour_rank[5]] != local_size[0]-2
 		 ) || (
-			xRankSize[neighbour_rank[8]] != local_size[0]-2 || xRankSize[neighbour_rank[9]] != local_size[0]-2 ||
-			yRankSize[neighbour_rank[8]] != local_size[1]-2 || yRankSize[neighbour_rank[9]] != local_size[1]-2
+			cRankSizeX[neighbour_rank[8]] != local_size[0]-2 || cRankSizeX[neighbour_rank[9]] != local_size[0]-2 ||
+			cRankSizeY[neighbour_rank[8]] != local_size[1]-2 || cRankSizeY[neighbour_rank[9]] != local_size[1]-2
 		 )
 		) {
 
@@ -387,23 +387,23 @@ void MpiManager::mpi_gridbuild( ) {
 			// Tell user size it should be
 			*MpiManager::logout <<
 				" Z (left/right): " <<
-				zRankSize[neighbour_rank[0]] << " needed " << local_size[2]-2 << ", " <<
-				zRankSize[neighbour_rank[1]] << " needed " << local_size[2]-2 << ", " <<
+				cRankSizeZ[neighbour_rank[0]] << " needed " << local_size[2]-2 << ", " <<
+				cRankSizeZ[neighbour_rank[1]] << " needed " << local_size[2]-2 << ", " <<
 				" Z (up/down): " <<
-				zRankSize[neighbour_rank[4]] << " needed " << local_size[2]-2 << ", " <<
-				zRankSize[neighbour_rank[5]] << " needed " << local_size[2]-2 << ", " <<
+				cRankSizeZ[neighbour_rank[4]] << " needed " << local_size[2]-2 << ", " <<
+				cRankSizeZ[neighbour_rank[5]] << " needed " << local_size[2]-2 << ", " <<
 				" Y (left/right): " <<
-				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
-				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
 				" Y (front/back): " <<
-				yRankSize[neighbour_rank[8]] << " needed " << local_size[1]-2 << ", " <<
-				yRankSize[neighbour_rank[9]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[8]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[9]] << " needed " << local_size[1]-2 << ", " <<
 				" X (up/down): " <<
-				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
-				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2 << ", " <<
+				cRankSizeX[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
+				cRankSizeX[neighbour_rank[5]] << " needed " << local_size[0]-2 << ", " <<
 				" X (front/back): " <<
-				xRankSize[neighbour_rank[8]] << " needed " << local_size[0]-2 << ", " <<
-				xRankSize[neighbour_rank[9]] << " needed " << local_size[0]-2;
+				cRankSizeX[neighbour_rank[8]] << " needed " << local_size[0]-2 << ", " <<
+				cRankSizeX[neighbour_rank[9]] << " needed " << local_size[0]-2;
 
 			MpiManager::logout->close();
 			MPI_Finalize();
@@ -414,9 +414,9 @@ void MpiManager::mpi_gridbuild( ) {
 #else
 
 	// 2D check
-	if ( (	yRankSize[neighbour_rank[0]] != local_size[1]-2 || yRankSize[neighbour_rank[1]] != local_size[1]-2
+	if ( (	cRankSizeY[neighbour_rank[0]] != local_size[1]-2 || cRankSizeY[neighbour_rank[1]] != local_size[1]-2
 		 ) || (
-			xRankSize[neighbour_rank[4]] != local_size[0]-2 || xRankSize[neighbour_rank[5]] != local_size[0]-2
+			cRankSizeX[neighbour_rank[4]] != local_size[0]-2 || cRankSizeX[neighbour_rank[5]] != local_size[0]-2
 		 )
 		) {
 
@@ -426,11 +426,11 @@ void MpiManager::mpi_gridbuild( ) {
 			// Tell user size it should be
 			*MpiManager::logout <<
 				" Y (left/right): " <<
-				yRankSize[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
-				yRankSize[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[0]] << " needed " << local_size[1]-2 << ", " <<
+				cRankSizeY[neighbour_rank[1]] << " needed " << local_size[1]-2 << ", " <<
 				" X (up/down): " <<
-				xRankSize[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
-				xRankSize[neighbour_rank[5]] << " needed " << local_size[0]-2;
+				cRankSizeX[neighbour_rank[4]] << " needed " << local_size[0]-2 << ", " <<
+				cRankSizeX[neighbour_rank[5]] << " needed " << local_size[0]-2;
 
 			MpiManager::logout->close();
 			MPI_Finalize();
@@ -643,13 +643,13 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	Grid->timeav_mpi_overhead /= Grid->t;
 
 #ifdef L_TEXTOUT
-	if (Grid->t % L_out_every == 0) {
+	if (Grid->t % L_OUT_EVERY == 0) {
 		*GridUtils::logfile << "Writing out to <Grids.out>" << std::endl;
 		Grid->io_textout("POST MPI COMMS");
 	}
 #endif
 
-	if (Grid->t % L_out_every == 0) {
+	if (Grid->t % L_OUT_EVERY == 0) {
 		// Performance Data
 		*GridUtils::logfile << "MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
 	}
@@ -827,9 +827,9 @@ int MpiManager::mpi_buildCommunicators() {
 				K_lim = static_cast<int>(targetGrid->K_lim);
 
 				// Get global grid sizes
-				N_global = 2 * (RefXend[lev - 1][reg] - RefXstart[lev - 1][reg] + 1);
-				M_global = 2 * (RefYend[lev - 1][reg] - RefYstart[lev - 1][reg] + 1);
-				K_global = 2 * (RefZend[lev - 1][reg] - RefZstart[lev - 1][reg] + 1);
+				N_global = 2 * (cRefEndX[lev - 1][reg] - cRefStartX[lev - 1][reg] + 1);
+				M_global = 2 * (cRefEndY[lev - 1][reg] - cRefStartY[lev - 1][reg] + 1);
+				K_global = 2 * (cRefEndZ[lev - 1][reg] - cRefStartZ[lev - 1][reg] + 1);
 
 				// Add a new phdf5_struct
 				p_data.emplace_back();

@@ -323,14 +323,14 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 			// Check grid is big enough to allow embedded refinement of factor 2
 			if (	(
-					RefXend[level][reg]-RefXstart[level][reg]+1 < 3 || 
-					RefYend[level][reg]-RefYstart[level][reg]+1 < 3 || 
-					RefZend[level][reg]-RefZstart[level][reg]+1 < 3
+					cRefEndX[level][reg]-cRefStartX[level][reg]+1 < 3 || 
+					cRefEndY[level][reg]-cRefStartY[level][reg]+1 < 3 || 
+					cRefEndZ[level][reg]-cRefStartZ[level][reg]+1 < 3
 					) || (
 					(
-					RefXend[level][reg]-RefXstart[level][reg]+1 == 3 ||
-					RefYend[level][reg]-RefYstart[level][reg]+1 == 3 ||
-					RefZend[level][reg]-RefZstart[level][reg]+1 == 3
+					cRefEndX[level][reg]-cRefStartX[level][reg]+1 == 3 ||
+					cRefEndY[level][reg]-cRefStartY[level][reg]+1 == 3 ||
+					cRefEndZ[level][reg]-cRefStartZ[level][reg]+1 == 3
 					) && L_NUM_LEVELS > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
@@ -342,12 +342,12 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 			// Check grid is big enough to allow embedded refinement of factor 2
 			if (	(
-					RefXend[level][reg]-RefXstart[level][reg]+1 < 3 || 
-					RefYend[level][reg]-RefYstart[level][reg]+1 < 3
+					cRefEndX[level][reg]-cRefStartX[level][reg]+1 < 3 || 
+					cRefEndY[level][reg]-cRefStartY[level][reg]+1 < 3
 					) || (
 					(
-					RefXend[level][reg]-RefXstart[level][reg]+1 == 3 ||
-					RefYend[level][reg]-RefYstart[level][reg]+1 == 3
+					cRefEndX[level][reg]-cRefStartX[level][reg]+1 == 3 ||
+					cRefEndY[level][reg]-cRefStartY[level][reg]+1 == 3
 					) && L_NUM_LEVELS > 1 )
 				) {
 					std::cout << "Error: See Log File" << std::endl;
@@ -612,33 +612,33 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Start Limit
 	// Find the local index of the refinement limits if they are on the rank at all
-	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXstart[pGrid.level][region_number]);
+	auto found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), cRefStartX[pGrid.level][region_number]);
 	if (found_x != pGrid.XInd.end()) {	// Starts on this rank
 		CoarseLimsX[0] = static_cast<int>(found_x - pGrid.XInd.begin());	// Store local index as the limit
 		// Start index is simply zero
 		IndXstart = 0;
 
 	// Starts on some rank to the left of this one
-	} else if ( (int)RefXstart[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
+	} else if ( (int)cRefStartX[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
 		// Set limit to start edge of the rank
 		CoarseLimsX[0] = 0;
 		// Compute starting index of sub-grid on this rank (take into account rest of grid somewhere to left)
-		IndXstart = (pGrid.XInd[CoarseLimsX[0]] - RefXstart[pGrid.level][region_number]) * 2;
+		IndXstart = (pGrid.XInd[CoarseLimsX[0]] - cRefStartX[pGrid.level][region_number]) * 2;
 
 	}
 
 	// End Limit
-	found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), RefXend[pGrid.level][region_number]);
+	found_x = std::find(pGrid.XInd.begin(), pGrid.XInd.end(), cRefEndX[pGrid.level][region_number]);
 	if (found_x != pGrid.XInd.end()) {	// Ends on this rank
 		CoarseLimsX[1] = static_cast<int>(found_x - pGrid.XInd.begin());
 
 	// End on some rank to the right of this one
-	} else if ( (int)RefXend[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 1 - offset] + offset ) {
+	} else if ( (int)cRefEndX[pGrid.level][region_number] > pGrid.XInd[pGrid.XInd.size() - 1 - offset] + offset ) {
 		// Set grid limits to end edge of the rank
 		CoarseLimsX[1] = static_cast<int>(pGrid.XInd.size()) - 1;
 
 	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
-	} else if ( (int)RefXend[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
+	} else if ( (int)cRefEndX[pGrid.level][region_number] < pGrid.XInd[offset] - offset ) {
 		// Set grid limits to end edge of the rank
 		CoarseLimsX[1] = static_cast<int>(pGrid.XInd.size()) - 1;
 
@@ -646,24 +646,24 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 
 	// Y //
-	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYstart[pGrid.level][region_number]);
+	auto found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), cRefStartY[pGrid.level][region_number]);
 	if (found_y != pGrid.YInd.end()) {
 		CoarseLimsY[0] = static_cast<int>(found_y - pGrid.YInd.begin());
 		IndYstart = 0;
 
-	} else if ( (int)RefYstart[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
+	} else if ( (int)cRefStartY[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
 		CoarseLimsY[0] = 0;
-		IndYstart = (pGrid.YInd[CoarseLimsY[0]] - RefYstart[pGrid.level][region_number]) * 2;
+		IndYstart = (pGrid.YInd[CoarseLimsY[0]] - cRefStartY[pGrid.level][region_number]) * 2;
 	}
 
-	found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), RefYend[pGrid.level][region_number]);
+	found_y = std::find(pGrid.YInd.begin(), pGrid.YInd.end(), cRefEndY[pGrid.level][region_number]);
 	if (found_y != pGrid.YInd.end()) {
 		CoarseLimsY[1] = static_cast<int>(found_y - pGrid.YInd.begin());
 
-	} else if ( (int)RefYend[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 1 - offset] + offset ) {
+	} else if ( (int)cRefEndY[pGrid.level][region_number] > pGrid.YInd[pGrid.YInd.size() - 1 - offset] + offset ) {
 		CoarseLimsY[1] = static_cast<int>(pGrid.YInd.size()) - 1;
 
-	} else if ( (int)RefYend[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
+	} else if ( (int)cRefEndY[pGrid.level][region_number] < pGrid.YInd[offset] - offset ) {
 		CoarseLimsY[1] = static_cast<int>(pGrid.YInd.size()) - 1;
 
 	}
@@ -671,24 +671,24 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 #if (L_DIMS == 3)
 	// Z //
-	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZstart[pGrid.level][region_number]);
+	auto found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), cRefStartZ[pGrid.level][region_number]);
 	if (found_z != pGrid.ZInd.end()) {
 		CoarseLimsZ[0] = static_cast<int>(found_z - pGrid.ZInd.begin());
 		IndZstart = 0;
 
-	} else if ( (int)RefZstart[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
+	} else if ( (int)cRefStartZ[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
 		CoarseLimsZ[0] = 0;
-		IndZstart = (pGrid.ZInd[CoarseLimsZ[0]] - RefZstart[pGrid.level][region_number]) * 2;
+		IndZstart = (pGrid.ZInd[CoarseLimsZ[0]] - cRefStartZ[pGrid.level][region_number]) * 2;
 	}
 
-	found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), RefZend[pGrid.level][region_number]);
+	found_z = std::find(pGrid.ZInd.begin(), pGrid.ZInd.end(), cRefEndZ[pGrid.level][region_number]);
 	if (found_z != pGrid.ZInd.end()) {
 		CoarseLimsZ[1] = static_cast<int>(found_z - pGrid.ZInd.begin());
 
-	} else if ( (int)RefZend[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 1 - offset] + offset ) {
+	} else if ( (int)cRefEndZ[pGrid.level][region_number] > pGrid.ZInd[pGrid.ZInd.size() - 1 - offset] + offset ) {
 		CoarseLimsZ[1] = static_cast<int>(pGrid.ZInd.size()) - 1;
 
-	} else if ( (int)RefZend[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
+	} else if ( (int)cRefEndZ[pGrid.level][region_number] < pGrid.ZInd[offset] - offset ) {
 		CoarseLimsZ[1] = static_cast<int>(pGrid.ZInd.size()) - 1;
 
 	}
@@ -783,10 +783,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Aggregate offset
 	for (int n = 0; n < level; n++) {
 
-		XOrigin += RefXstart[n][region_number] * (dx * pow(2, level - n));
-		YOrigin += RefYstart[n][region_number] * (dy * pow(2, level - n));
+		XOrigin += cRefStartX[n][region_number] * (dx * pow(2, level - n));
+		YOrigin += cRefStartY[n][region_number] * (dy * pow(2, level - n));
 #if (L_DIMS == 3)
-		ZOrigin += RefZstart[n][region_number] * (dz * pow(2, level - n));
+		ZOrigin += cRefStartZ[n][region_number] * (dz * pow(2, level - n));
 #endif
 	}
 
@@ -887,9 +887,9 @@ void GridObj::LBM_initSolidLab() {
 	// Get global grid sizes
 	int Ng_lim, Mg_lim, Kg_lim;
 	if (level != 0) {
-		Ng_lim = (RefXend[level-1][region_number] - RefXstart[level-1][region_number] + 1) * 2;
-		Mg_lim = (RefYend[level-1][region_number] - RefYstart[level-1][region_number] + 1) * 2;
-		Kg_lim = (RefZend[level-1][region_number] - RefZstart[level-1][region_number] + 1) * 2;
+		Ng_lim = (cRefEndX[level-1][region_number] - cRefStartX[level-1][region_number] + 1) * 2;
+		Mg_lim = (cRefEndY[level-1][region_number] - cRefStartY[level-1][region_number] + 1) * 2;
+		Kg_lim = (cRefEndZ[level-1][region_number] - cRefStartZ[level-1][region_number] + 1) * 2;
 	} else {
 		Ng_lim = L_N; Mg_lim = L_M; Kg_lim = L_K;
 	}
@@ -1134,10 +1134,10 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	int i, j, k, local_i, local_j, local_k;
 
 	// Loop over global indices of refined patch and add "TL to lower" labels
-    for (i = (int)RefXstart[pGrid.level][region_number]; i <= (int)RefXend[pGrid.level][region_number]; i++) {
-        for (j = (int)RefYstart[pGrid.level][region_number]; j <= (int)RefYend[pGrid.level][region_number]; j++) {
+    for (i = (int)cRefStartX[pGrid.level][region_number]; i <= (int)cRefEndX[pGrid.level][region_number]; i++) {
+        for (j = (int)cRefStartY[pGrid.level][region_number]; j <= (int)cRefEndY[pGrid.level][region_number]; j++) {
 #if (L_DIMS == 3)
-			for (k = (int)RefZstart[pGrid.level][region_number]; k <= (int)RefZend[pGrid.level][region_number]; k++)
+			for (k = (int)cRefStartZ[pGrid.level][region_number]; k <= (int)cRefEndZ[pGrid.level][region_number]; k++)
 #else
 			k = 0;
 #endif
@@ -1161,10 +1161,10 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 
 				// If on the edge of the global refined patch and it is simply a fluid then it is TL so label
 				if	(
-					(i == RefXstart[pGrid.level][region_number] || i == RefXend[pGrid.level][region_number]) ||
-					(j == RefYstart[pGrid.level][region_number] || j == RefYend[pGrid.level][region_number])
+					(i == cRefStartX[pGrid.level][region_number] || i == cRefEndX[pGrid.level][region_number]) ||
+					(j == cRefStartY[pGrid.level][region_number] || j == cRefEndY[pGrid.level][region_number])
 #if (L_DIMS == 3)
-					|| (k == RefZstart[pGrid.level][region_number] || k == RefZend[pGrid.level][region_number])
+					|| (k == cRefStartZ[pGrid.level][region_number] || k == cRefEndZ[pGrid.level][region_number])
 #endif
 					) {
 

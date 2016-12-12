@@ -81,8 +81,8 @@ int main( int argc, char* argv[] )
 #if (L_DIMS != 3 && L_NUM_LEVELS)
 	for (int i = 0; i < L_NUM_REGIONS; i++) {
 		for (int l = 0; l < L_NUM_LEVELS; l++) {
-			RefZstart[l][i] = 0;
-			RefZend[l][i] = 0;
+			cRefStartZ[l][i] = 0;
+			cRefEndZ[l][i] = 0;
 		}
 	}
 #endif
@@ -154,7 +154,7 @@ int main( int argc, char* argv[] )
 	}
 
 	// Fix output format to screen
-	cout.precision(L_output_precision);
+	cout.precision(L_OUTPUT_PRECISION);
 
 	// Output start time
 	*GridUtils::logfile << "LUMA -- Version " << LUMA_VERSION << std::endl;
@@ -447,7 +447,7 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_out_every == 0)
+		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_OUT_EVERY == 0)
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_TIMESTEPS << " ------" << endl;
 
 
@@ -466,7 +466,7 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids.t % L_out_every == 0) {
+		if (Grids.t % L_OUT_EVERY == 0) {
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
 #endif
@@ -503,7 +503,7 @@ int main( int argc, char* argv[] )
 
 		// Write out forces of objects
 #ifdef L_LD_OUT
-		if (Grids.t % L_out_every_forces == 0) {
+		if (Grids.t % L_OUT_EVERY_FORCES == 0) {
 
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;
 			objMan->io_writeForceOnObject(Grids.t);

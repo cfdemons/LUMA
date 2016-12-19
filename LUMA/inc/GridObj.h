@@ -231,7 +231,7 @@ private:
 	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
-	void _LBM_collide_opt(int id);
+	void _LBM_collide_opt(int id, double omega_s);
 	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);

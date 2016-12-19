@@ -10,6 +10,8 @@ General		:	Reinstated force calculation and included a few other optimisations.
 				Fixed an unlogged issue with the refinement ratio not beeing initialised correctly.
 				H5MGM tool updated to give more information to the user.
 
+Issue #96	:	BGK Smagorinsky model added to the optimised kernel.
+Issue #95	:	Fixed typo in pre-processor directive that prevented the use of the 3D models.
 Issue #92	:	Replaced use of halo descriptor data with simpler solution for sub-grid striding in slab copies to fix write-out inconsistencies.
 Issue #93	:	Restart file mechanism changed so that a single file is written out per rank to speed-up the process of restarting large meshes with a large number of cores.
 				This removes the capability to restart onto a different topology.

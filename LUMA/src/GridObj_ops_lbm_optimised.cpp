@@ -50,6 +50,16 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		objman->forceOnObjectZ = 0.0;
 	}
 
+	// Compute Smagorinksy-modified relaxation
+#ifdef L_USE_BGKSMAG
+	// Smagorinsky
+	double tau = 1.0 / omega;
+	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * 1.4142 * (L_CSMAG * L_CSMAG)) - tau);
+	double omega_s = 1 / (tau + tau_t);
+#else
+	double omega_s = omega;
+#endif
+
 	// Loop over grid
 	for (int i = 0; i < N_lim; ++i) {
 		for (int j = 0; j < M_lim; ++j) {
@@ -89,7 +99,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
-					_LBM_collide_opt(id);
+					_LBM_collide_opt(id, omega_s);
 				}
 
 			}
@@ -317,16 +327,18 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 ///			is currently not optimised.
 ///
 /// \param	id	flattened ijk index.
-void GridObj::_LBM_collide_opt(int id) {
+///	\param	omega_s	Smagorinsky-modified omega value (equal to omega if not using BGK-Smag)
+void GridObj::_LBM_collide_opt(int id, double omega_s) {
 
 #ifdef L_USE_KBC_COLLISION
 	LBM_kbcCollide();
 
 #else
-	// Perform collision operation
+
+	// Perform collision operation (using omega_s -- modified if using Smagorinksy)
 	for (int v = 0; v < L_NUM_VELS; ++v) {
 		fNew[v + id * L_NUM_VELS] +=
-			omega *	(
+			omega_s *	(
 			_LBM_equilibrium_opt(id, v) -
 			fNew[v + id * L_NUM_VELS]
 			) +

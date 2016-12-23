@@ -438,8 +438,8 @@ void MpiManager::mpi_gridbuild( ) {
 
 		 }
 
-#endif
-#endif
+#endif // L_DIMS == 3
+#endif // L_USE_CUSTOM_MPI_SIZES
 
 }
 
@@ -1010,4 +1010,99 @@ int MpiManager::mpi_buildCommunicators() {
 
 	return status;
 }
+// ************************************************************************* //
+/// \brief	Update the load balancing information stored in the MpiManager
+///
+///			This method is executed by all processes. Counts the ACTIVE cells on
+///			the current rank and pushes the information to the master (rank 0)
+///			which writes this information to an output file if required. Must be 
+///			called after the grids have been built or will return zero.
+void MpiManager::mpi_updateLoadInfo() {
+
+	/* Loop over the grids and compute the number of ACTIVE cells on the rank.
+	 * In other words exclude the cells covered by a sub-grid. However, does 
+	 * include halo cells as these are part of the calculation. */
+	long active_cell_count = 0;
+
+	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev) {
+		for (int reg = 0; reg < L_NUM_REGIONS; ++reg) {
+
+			// Get pointer to grid if available on this process
+			GridObj *g = NULL;
+			GridUtils::getGrid(Grids, lev, reg, g);
+
+			if (g != NULL) {
+
+				// Get size (includes halo)
+				long grid_cell_count = g->N_lim * g->M_lim * g->K_lim;
+
+#ifdef L_MPI_VERBOSE
+				*logout << "Level = " << lev << ", Region = " << reg << ", pointer = " << g << std::endl;
+				*logout << "Local Size = " << g->N_lim << "x" << g->M_lim << "x" << g->K_lim << std::endl;
+#endif
+
+				// Update total
+				if (lev == 0) {
+
+					// Add cells to counter
+					active_cell_count += grid_cell_count;
+				}
+
+				else {
+					// Remove the coarse cells from the count
+					active_cell_count -= grid_cell_count / 2;
+
+					// Add the fine cells
+					active_cell_count += grid_cell_count;
+				}
+
+			}
+		}
+	}
+
+	// Pass active cell count to master
+	long *cell_counts;
+	if (my_rank == 0) {
+
+		// Allocate space for receive buffer
+		cell_counts = (long*)malloc(num_ranks * sizeof(long));
+	}
+
+	// Gather data (into root process)
+	MPI_Gather(&active_cell_count, 1, MPI_LONG, cell_counts, 1, MPI_LONG, 0, world_comm);
+
+
+	// Write information
+#ifdef L_MPI_VERBOSE
+	*logout << "Active Cell Count (this rank) = " << active_cell_count << std::endl;
+#endif
+
+	// If master, write special log file
+#ifdef L_MPI_WRITE_LOAD_BALANCE
+	
+	if (my_rank == 0) {
+
+		std::ofstream counts_out;
+		counts_out.open(GridUtils::path_str + "/loadbalancing.out", std::ios::out);
+
+		// Get max load
+		double max_load = 0;
+		for (int process = 0; process < num_ranks; ++process)
+			if (cell_counts[process] > max_load) max_load = static_cast<double>(cell_counts[process]);
+
+		for (int process = 0; process < num_ranks; ++process) {
+
+			// Write process number, active count, load (as percentage of maximum)
+			counts_out << process << "\t" << cell_counts[process] << "\t" << 
+				(static_cast<double>(cell_counts[process]) * 100.0 / max_load) << std::endl;
+
+		}
+
+		counts_out.close();
+	}
+
+#endif
+
+}
 // ************************************************************************** //
+

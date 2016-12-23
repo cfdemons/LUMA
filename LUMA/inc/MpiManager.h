@@ -159,6 +159,7 @@ public :
 	void mpi_init();		// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
 	int mpi_buildCommunicators();	// Create a new communicator for each sub-grid and region combo
+	void mpi_updateLoadInfo();	// Method to compute the number of active cells on the rank and pass to master
 
 	// Buffer methods
 	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction

@@ -43,6 +43,7 @@
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
@@ -112,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 20000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -305,7 +306,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_BLOCK_ON_GRID_LEV 0		///< Provide grid level on which block should be added 
 	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
@@ -354,19 +355,19 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
-#define L_NUM_REGIONS 0		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
-	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { L_M / 2 } };
-	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (2 * L_M) } };
-	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
-	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
+	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_N / 4) } };
+	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_N / 4) - 1 } };
+	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 4) } };
+	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
 	// If doing 2D, these can be arbitrary values
-	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 8) } };
-	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (7 * L_M / 8) } };
+	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_K / 4) } };
+	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
 
 #endif
 

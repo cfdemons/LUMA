@@ -10,6 +10,7 @@ General		:	Reinstated force calculation and included a few other optimisations.
 				Fixed an unlogged issue with the refinement ratio not beeing initialised correctly.
 				H5MGM tool updated to give more information to the user.
 
+Issue #74	:	Load balance indicator and file write-out added.
 Issue #96	:	BGK Smagorinsky model added to the optimised kernel.
 Issue #95	:	Fixed typo in pre-processor directive that prevented the use of the 3D models.
 Issue #92	:	Replaced use of halo descriptor data with simpler solution for sub-grid striding in slab copies to fix write-out inconsistencies.

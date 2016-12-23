@@ -412,6 +412,9 @@ int main( int argc, char* argv[] )
 	//  Build halo descriptors and sub-grid communicators
 	mpim->mpi_buildCommunicators();
 
+	// Compute load balance information
+	mpim->mpi_updateLoadInfo();
+
 #endif
 
 

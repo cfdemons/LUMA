@@ -363,7 +363,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Checks passed //
 	///////////////////
 
-	// Get local grid sizes (includes overlap)
+	// Get local grid sizes (includes halo)
 	N_lim = local_size[0];
 	M_lim = local_size[1];
 #if (L_DIMS == 3)
@@ -793,7 +793,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	
 	// Generate TYPING MATRICES
 	
-	// Get local grid sizes
+	// Get local grid sizes (includes halo)
 	N_lim = static_cast<int>(XInd.size());
 	M_lim = static_cast<int>(YInd.size());
 	K_lim = static_cast<int>(ZInd.size());

@@ -5,6 +5,7 @@ var searchData=
   ['sender_5flayer_5fpos',['sender_layer_pos',['../class_mpi_manager.html#a0cb9f8f024ec0a186374995fb203ea1e',1,'MpiManager']]],
   ['size',['size',['../struct_mpi_manager_1_1buffer__struct.html#a1d38a439ae551da0a708d7a8b39f5c76',1,'MpiManager::buffer_struct']]],
   ['spacing',['spacing',['../class_body.html#a1d4ac2e6fdbc946d5eab0973fd78770b',1,'Body']]],
+  ['sq',['SQ',['../stdafx_8h.html#ac3644f84794a8bfdacf39c4b2c2495fc',1,'stdafx.h']]],
   ['stdafx_2ecpp',['stdafx.cpp',['../stdafx_8cpp.html',1,'']]],
   ['stdafx_2eh',['stdafx.h',['../stdafx_8h.html',1,'']]],
   ['stridedcopy',['stridedCopy',['../class_grid_utils.html#aa3ca6e20ef4fa927cb845956d7565b1e',1,'GridUtils']]],

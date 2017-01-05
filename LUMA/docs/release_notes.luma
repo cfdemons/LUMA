@@ -8,8 +8,9 @@ General		:	Reinstated force calculation and included a few other optimisations.
 				Fixed an issue with the scaling on the cloud reader -- not documented on the tracker.
 				Standardised macro definitions.
 				Fixed an unlogged issue with the refinement ratio not beeing initialised correctly.
-				H5MGM tool updated to give more information to the user.
+				H5MGM tool updated to give more information to the user and fix an compilation issue with GNU associated with labels.
 
+Issue #100	:	Fixed issue with HDF5 writer when TL is completely within a halo region and data is over-trimmed. New implementation for halo trimming.
 Issue #74	:	Load balance indicator and file write-out added.
 Issue #96	:	BGK Smagorinsky model added to the optimised kernel.
 Issue #95	:	Fixed typo in pre-processor directive that prevented the use of the 3D models.

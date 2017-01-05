@@ -76,6 +76,9 @@
 	#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
 #endif
 
+// Squared operator
+#define SQ(x) ((x) * (x))
+
 // Include definitions
 #include "definitions.h"
 

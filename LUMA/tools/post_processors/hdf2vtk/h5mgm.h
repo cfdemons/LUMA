@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2.3"
+#define H5MGM_VERSION "0.2.4"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -48,6 +48,7 @@
 
 // Static variable
 static bool bQuiet = false;
+static bool bLoud = false;
 
 // Unit vectors for node positions on each cell
 const int e[3][27] =

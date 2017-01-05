@@ -6,7 +6,9 @@
 \item 
 const int \hyperlink{stdafx_8cpp_acd0e30afbac0230abeed2d7cd4bfa55d}{c} \mbox{[}3\mbox{]}\mbox{[}\hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Lattice velocities. \end{DoxyCompactList}\item 
-const double \hyperlink{stdafx_8cpp_a206bd13336a935ddfc32a0160772c6e8}{w} \mbox{[}n\+Vels\mbox{]}
+const int \hyperlink{stdafx_8cpp_a52d5340e36f564ac0f659612e91983ef}{c\+\_\+opt} \mbox{[}\hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}\mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em Lattice velocities optimised arrangement. \end{DoxyCompactList}\item 
+const double \hyperlink{stdafx_8cpp_ae4d049be80428f501e8b405d82d49366}{w} \mbox{[}\hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Quadrature weights. \end{DoxyCompactList}\item 
 const double \hyperlink{stdafx_8cpp_ae51e162e8ad5da2cef261f3936312f64}{cs} = 1.\+0 / sqrt(3.\+0)
 \begin{DoxyCompactList}\small\item\em Lattice sound speed. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -20,14 +22,36 @@ const double \hyperlink{stdafx_8cpp_ae51e162e8ad5da2cef261f3936312f64}{cs} = 1.\
 \begin{DoxyCode}
 =
 \{
-    \{1, -1,  0,  0,  0,  0,  1, -1,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  0 \},
-    \{0,  0,  1, -1,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0,  0,  0,  0,  0 \},
-    \{0,  0,  0,  0,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0 \}
+    \{ 1, -1, 0, 0, 1, -1, 1, -1, 0 \},
+    \{ 0, 0, 1, -1, 1, -1, -1, 1, 0 \},
+    \{ 0, 0, 0, 0, 0, 0, 0, 0, 0 \}
 \}
 \end{DoxyCode}
 
 
 Lattice velocities. 
+
+\index{stdafx.\+cpp@{stdafx.\+cpp}!c\+\_\+opt@{c\+\_\+opt}}
+\index{c\+\_\+opt@{c\+\_\+opt}!stdafx.\+cpp@{stdafx.\+cpp}}
+\subsubsection[{\texorpdfstring{c\+\_\+opt}{c_opt}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+\_\+opt\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{stdafx_8cpp_a52d5340e36f564ac0f659612e91983ef}{}\label{stdafx_8cpp_a52d5340e36f564ac0f659612e91983ef}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+\{
+    \{ 1, 0, 0 \},
+    \{ -1, 0, 0 \},
+    \{ 0, 1, 0 \},
+    \{ 0, -1, 0 \},
+    \{ 1, 1, 0 \},
+    \{ -1, -1, 0 \},
+    \{ 1, -1, 0 \},
+    \{ -1, 1, 0 \},
+    \{ 0, 0, 0, \}
+\}
+\end{DoxyCode}
+
+
+Lattice velocities optimised arrangement. 
 
 \index{stdafx.\+cpp@{stdafx.\+cpp}!cs@{cs}}
 \index{cs@{cs}!stdafx.\+cpp@{stdafx.\+cpp}}
@@ -38,14 +62,11 @@ Lattice sound speed.
 
 \index{stdafx.\+cpp@{stdafx.\+cpp}!w@{w}}
 \index{w@{w}!stdafx.\+cpp@{stdafx.\+cpp}}
-\subsubsection[{\texorpdfstring{w}{w}}]{\setlength{\rightskip}{0pt plus 5cm}const double w\mbox{[}n\+Vels\mbox{]}}\hypertarget{stdafx_8cpp_a206bd13336a935ddfc32a0160772c6e8}{}\label{stdafx_8cpp_a206bd13336a935ddfc32a0160772c6e8}
+\subsubsection[{\texorpdfstring{w}{w}}]{\setlength{\rightskip}{0pt plus 5cm}const double w\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}\mbox{]}}\hypertarget{stdafx_8cpp_ae4d049be80428f501e8b405d82d49366}{}\label{stdafx_8cpp_ae4d049be80428f501e8b405d82d49366}
 {\bfseries Initial value\+:}
 \begin{DoxyCode}
 =
-\{1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0,
-1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.
-      0, 1.0/36.0,
-1.0/3.0\}
+\{ 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 4.0 / 9.0 \}
 \end{DoxyCode}
 
 

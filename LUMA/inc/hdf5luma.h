@@ -82,11 +82,6 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	int k_start = hdf_data.k_start;
 	int k_end = hdf_data.k_end;
 
-	/* HALO DESCRIPTORS WILL BE REMOVED IN A FUTURE RELEASE */
-
-	//int halo_min = hdf_data.halo_min;
-	//int halo_max = hdf_data.halo_max;
-
 	// Create buffer (block of data we aim to write from this process)
 	T *buffer = (T*)malloc(hdf_data.writable_data_count * sizeof(T));
 
@@ -99,17 +94,6 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	int j_end = M_lim - TL_thickness - 1;
 	int k_start = TL_thickness;
 	int k_end = K_lim - TL_thickness - 1;
-	
-	/* HALO DESCRIPTORS WILL BE REMOVED IN A FUTURE RELEASE */
-
-	//int halo_min = 2;
-	//int halo_max = 2;
-
-	// L0 grids do not have TL
-	/*if (g->level == 0) {
-		halo_min = 0;
-		halo_max = 0;
-	}*/
 
 	// Create buffer excluding TL
 	T *buffer = (T*)malloc(N_mod * M_mod * K_mod * sizeof(T));

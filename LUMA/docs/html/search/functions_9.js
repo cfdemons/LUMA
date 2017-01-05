@@ -17,5 +17,6 @@ var searchData=
   ['mpi_5fgetopposite',['mpi_getOpposite',['../class_mpi_manager.html#a3c10ab477c2e4387d6a02104f9b2a2ea',1,'MpiManager']]],
   ['mpi_5fgridbuild',['mpi_gridbuild',['../class_mpi_manager.html#a7f07e85131147b55eec643c791ec2ba0',1,'MpiManager']]],
   ['mpi_5finit',['mpi_init',['../class_mpi_manager.html#a02adaa06e139dfca2bc71e1a1dbf25c7',1,'MpiManager']]],
+  ['mpi_5fupdateloadinfo',['mpi_updateLoadInfo',['../class_mpi_manager.html#ae6a8b1a857a00cdc4ed115512db050f4',1,'MpiManager']]],
   ['mpi_5fwriteout_5fbuf',['mpi_writeout_buf',['../class_mpi_manager.html#ab498bdf0822e2747f83c187d682dd934',1,'MpiManager']]]
 ];

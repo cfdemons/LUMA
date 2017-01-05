@@ -313,21 +313,21 @@ template&lt;typename T &gt; </div>
 <p>Helper method to write out using HDF5. </p>
 <p>Automatically selects the correct slab arrangement and buffers the data accordingly before writing to structured file. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">memspace</td><td>memory dataspace id </td></tr>
-    <tr><td class="paramname">filespace</td><td>file dataspace id </td></tr>
-    <tr><td class="paramname">dataset_id</td><td>dataset id </td></tr>
-    <tr><td class="paramname">slab_type</td><td>slab type enum </td></tr>
-    <tr><td class="paramname">N_lim</td><td>number of X-direction sites on the local grid </td></tr>
-    <tr><td class="paramname">M_lim</td><td>number of Y-direction sites on the local grid </td></tr>
-    <tr><td class="paramname">K_lim</td><td>number of Z-direction sites on the local grid </td></tr>
-    <tr><td class="paramname">N_mod</td><td>number of X-direction sites excluding TL sites </td></tr>
-    <tr><td class="paramname">M_mod</td><td>number of Y-direction sites excluding TL sites </td></tr>
-    <tr><td class="paramname">K_mod</td><td>number of Z-direction sites excluding TL sites </td></tr>
-    <tr><td class="paramname">g</td><td>pointer to grid which we are writing out </td></tr>
-    <tr><td class="paramname">data</td><td>pointer to the start of the array to be written </td></tr>
-    <tr><td class="paramname">hdf_datatype</td><td>HDF5 datatype being written </td></tr>
-    <tr><td class="paramname">TL_thickness</td><td>the thickness of the TL on this grid level in local lattice units </td></tr>
-    <tr><td class="paramname">hdf_data</td><td>the data structure containing information about local halos </td></tr>
+    <tr><td class="paramname">memspace</td><td>memory dataspace id. </td></tr>
+    <tr><td class="paramname">filespace</td><td>file dataspace id. </td></tr>
+    <tr><td class="paramname">dataset_id</td><td>dataset id. </td></tr>
+    <tr><td class="paramname">slab_type</td><td>slab type enum. </td></tr>
+    <tr><td class="paramname">N_lim</td><td>number of X-direction sites on the local grid. </td></tr>
+    <tr><td class="paramname">M_lim</td><td>number of Y-direction sites on the local grid. </td></tr>
+    <tr><td class="paramname">K_lim</td><td>number of Z-direction sites on the local grid. </td></tr>
+    <tr><td class="paramname">N_mod</td><td>number of X-direction sites excluding TL sites. </td></tr>
+    <tr><td class="paramname">M_mod</td><td>number of Y-direction sites excluding TL sites. </td></tr>
+    <tr><td class="paramname">K_mod</td><td>number of Z-direction sites excluding TL sites. </td></tr>
+    <tr><td class="paramname">g</td><td>pointer to grid which we are writing out. </td></tr>
+    <tr><td class="paramname">data</td><td>pointer to the start of the array to be written. </td></tr>
+    <tr><td class="paramname">hdf_datatype</td><td>HDF5 datatype being written. </td></tr>
+    <tr><td class="paramname">TL_thickness</td><td>the thickness of the TL on this grid level in local lattice units. </td></tr>
+    <tr><td class="paramname">hdf_data</td><td>the data structure containing information about local halos. </td></tr>
   </table>
   </dd>
 </dl>

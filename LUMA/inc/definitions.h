@@ -49,7 +49,7 @@
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_HDF_DEBUG					///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -113,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 1		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -144,10 +144,10 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 
 // Lattice properties (in lattice units)
-#define L_DIMS 3		///< Number of dimensions to the problem
-#define L_N 128			///< Number of x lattice sites
-#define L_M 128			///< Number of y lattice sites
-#define L_K 128			///< Number of z lattice sites
+#define L_DIMS 2		///< Number of dimensions to the problem
+#define L_N 20			///< Number of x lattice sites
+#define L_M 10			///< Number of y lattice sites
+#define L_K 1			///< Number of z lattice sites
 
 
 /*
@@ -157,12 +157,12 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 */
 
 // Physical dimensions (dictates scaling)
-#define L_AX 0			///< Start of domain-x
-#define L_BX 1		///< End of domain-x
-#define L_AY 0			///< Start of domain-y
-#define L_BY 1 	///< End of domain-y
-#define L_AZ 0			///< Start of domain-z
-#define L_BZ 1		///< End of domain-z
+#define L_AX 0.0		///< Start of domain-x
+#define L_BX 2.0		///< End of domain-x
+#define L_AY 0.0		///< Start of domain-y
+#define L_BY 1.0 		///< End of domain-y
+#define L_AZ 0.0		///< Start of domain-z
+#define L_BZ 1.0		///< End of domain-z
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -175,15 +175,15 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE		///< Use an inlet profile
+//#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_UREF 0.04	///< Reference velocity for scaling
+#define L_UREF 0.04				///< Reference velocity for scaling
 #define L_UMAX L_UREF*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 0.04			///< Initial/inlet x-velocity
-#define L_UY0 0			///< Initial/inlet y-velocity
-#define L_UZ0 0			///< Initial/inlet z-velocity
+#define L_UY0 0.0			///< Initial/inlet y-velocity
+#define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density
 #define L_RE 150			///< Desired Reynolds number
@@ -271,7 +271,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
+//#define L_FREESTREAM_TUNNEL			///< Adds a inlet to all faces
 
 
 // Inlets
@@ -290,8 +290,8 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_THICKNESS_BOTTOM 1		///< Thickness of walls in coarsest lattice units
 #define L_WALL_THICKNESS_TOP 1			///< Thickness of top walls in coarsest lattice units
 #define L_WALL_THICKNESS_FRONT 1		///< Thickness of front (3D) walls in coarsest lattice units
@@ -315,7 +315,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 	#define L_BLOCK_MIN_X (L_N / 6)			///< Index of start of object/wall in x-direction
 	#define L_BLOCK_MAX_X (2 * L_N / 6)		///< Index of end of object/wall in x-direction
 	#define L_BLOCK_MIN_Y (1)			///< Index of start of object/wall in y-direction
-	#define L_BLOCK_MAX_Y (2 * L_M / 6)		///< Index of end of object/wall in y-direction
+	#define L_BLOCK_MAX_Y (L_M / 6)		///< Index of end of object/wall in y-direction
 	#define L_BLOCK_MIN_Z (2.5 * L_K / 6)			///< Index of start of object/wall in z-direction
 	#define L_BLOCK_MAX_Z (3.5 * L_K / 6)		///< Index of end of object/wall in z-direction
 
@@ -355,19 +355,26 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
-	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_N / 4) } };
-	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_N / 4) - 1 } };
-	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 4) } };
-	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
-	// If doing 2D, these can be arbitrary values
-	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_K / 4) } };
-	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
+	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 1 },	{ 2 } };
+	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 18 }, { 31 } };
+	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 2 },	{ 2 } };
+	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 6 },	{ 6 } };
+	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 1 },	{ 1 } };
+	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 1 },	{ 1 } };
+
+	//const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_N / 4) } };
+	//const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_N / 4) - 1 } };
+	//const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 4) } };
+	//const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
+	//// If doing 2D, these can be arbitrary values
+	//static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_K / 4) } };
+	//static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
 
 #endif
 

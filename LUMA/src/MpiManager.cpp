@@ -790,8 +790,6 @@ int MpiManager::mpi_buildCommunicators() {
 	p_data.back().i_start = 1;
 	p_data.back().j_end = M_lim - 2;
 	p_data.back().j_start = 1;
-	p_data.back().halo_max = 1;
-	p_data.back().halo_min = 1;
 #if (L_DIMS == 3)
 	p_data.back().k_end = K_lim - 2;
 	p_data.back().k_start = 1;
@@ -819,14 +817,17 @@ int MpiManager::mpi_buildCommunicators() {
 				 * which do not contain sub-grid regions that will need to be
 				 * written out. If we didn't, at write-time the buffer size would be
 				 * zero and the HDF5 write would fail. So now we check for writable
-				 * data by checking the buffers versus the grid size. */
+				 * data by excluding halo and TL sites in a 2-step process. The first 
+				 * step is to determine whether a halo exists by querying the buffer
+				 * size information then compute the offset. The second is the shift 
+				 * the indices a second time if they are pointing to a TL. */
 
-				// Get local grid sizes
+				// Get local grid sizes (halo included)
 				N_lim = static_cast<int>(targetGrid->N_lim);
 				M_lim = static_cast<int>(targetGrid->M_lim);
 				K_lim = static_cast<int>(targetGrid->K_lim);
 
-				// Get global grid sizes
+				// Get global grid sizes (halo not included of course)
 				N_global = 2 * (cRefEndX[lev - 1][reg] - cRefStartX[lev - 1][reg] + 1);
 				M_global = 2 * (cRefEndY[lev - 1][reg] - cRefStartY[lev - 1][reg] + 1);
 				K_global = 2 * (cRefEndZ[lev - 1][reg] - cRefStartZ[lev - 1][reg] + 1);
@@ -846,29 +847,55 @@ int MpiManager::mpi_buildCommunicators() {
 					}
 				}
 
+				/* First we define the writable region limits in local indices 
+				 * taking into account the elements that sit in the halo 
+				 * (recv layer) which will not be written out.
+				 * Note that a non-zero buffer size indicates that some portion of
+				 * the grid lies on a neighbour rank (either its halo or the core 
+				 * of the grid). However, the index offset for the writable region
+				 * needs to know how much of the grid is on the neighbour and apply
+				 * a suitable correction. We do this by starting at the grid edges 
+				 * shift the index if that site is on a receiver layer. Once off the 
+				 * receiver layer (i.e. out of the halo) we have computed the offset.
+				 * This fixes a previous issue where it was assumed that the shift 
+				 * always be a full halo shift which is not true if a TL is in the 
+				 * halo.*/
 
-				/* THE FOLLOWING MAY BE NOT OBSOLETE AS THE HALO DESCRIPTORS WERE
-				 * UNRELIABLE AND ARE NO-LONGER REQUIRED FOR HDF5 SLAB SIZING. */
+				// Declarations
+				int shifted_index;
+				
+				// Set writable region start and end indices
+				p_data.back().i_start = 0;
+				p_data.back().i_end = 0;
+				p_data.back().j_start = 0;
+				p_data.back().j_end = 0;
+				p_data.back().k_start = 0;
+				p_data.back().k_end = 0;
 
-				// Halo / TL thickness
-				int halo_thickness = static_cast<int>(pow(2, targetGrid->level));
-
-				// Set halo descriptors
-				p_data.back().halo_min = 0, p_data.back().halo_max = 0;	// Boolean flags
-				p_data.back().i_start = 0, p_data.back().i_end = 0,		// Indices
-				p_data.back().j_start = 0, p_data.back().j_end = 0,
-				p_data.back().k_start = 0, p_data.back().k_end = 0;
-
-				// Check x-directions for halo
+				// Check x-directions for presence of halo (i.e. non-zero buffer size)				
 				if (bri.size[1]) {
-					p_data.back().i_end = N_lim - halo_thickness - 1;
+					shifted_index = N_lim;
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXDirection, eMaximum));
+					p_data.back().i_end = shifted_index;	// Index has now shifted off halo
+
+#if defined L_HDF_DEBUG
+					*logout << "Upper X halo thickness = " << N_lim - 1 - shifted_index << std::endl;
+#endif
+
 				}
 				else {
-					p_data.back().i_end = N_lim - 1;
+					p_data.back().i_end = N_lim - 1;	// No halo so end index is edge of grid
 				}
 
 				if (bri.size[0]) {
-					p_data.back().i_start = halo_thickness;
+					shifted_index = -1;
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXDirection, eMinimum));
+					p_data.back().i_start = shifted_index;
+
+#if defined L_HDF_DEBUG
+					*logout << "Lower X halo thickness = " << shifted_index << std::endl;
+#endif
+
 				}
 				else {
 					p_data.back().i_start = 0;
@@ -876,20 +903,28 @@ int MpiManager::mpi_buildCommunicators() {
 
 				// Check y-directions for halo
 				if (bri.size[5]) {
-					p_data.back().j_end = M_lim - halo_thickness - 1;
-#if (L_DIMS != 0)
-					p_data.back().halo_max++;	// Increment halo counter for striding
+					shifted_index = M_lim;
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYDirection, eMaximum));
+					p_data.back().j_end = shifted_index;
+
+#if defined L_HDF_DEBUG
+					*logout << "Upper Y halo thickness = " << M_lim - 1 - shifted_index << std::endl;
 #endif
+
 				}
 				else {
 					p_data.back().j_end = M_lim - 1;
 				}
 
 				if (bri.size[4]) {
-					p_data.back().j_start = halo_thickness;
-#if (L_DIMS != 0)
-					p_data.back().halo_min++;
+					shifted_index = -1;
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYDirection, eMinimum));
+					p_data.back().j_start = shifted_index;
+
+#if defined L_HDF_DEBUG
+					*logout << "Lower Y halo thickness = " << shifted_index << std::endl;
 #endif
+
 				}
 				else {
 					p_data.back().j_start = 0;
@@ -898,16 +933,28 @@ int MpiManager::mpi_buildCommunicators() {
 #if (L_DIMS == 3)
 				// Check z-directions for halo
 				if (bri.size[9]) {
-					p_data.back().k_end = K_lim - halo_thickness - 1;
-					p_data.back().halo_max++;
+					shifted_index = K_lim;
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZDirection, eMaximum));
+					p_data.back().k_end = shifted_index;
+
+#if defined L_HDF_DEBUG
+					*logout << "Upper Z halo thickness = " << K_lim - 1 - shifted_index << std::endl;
+#endif
+
 				}
 				else {
 					p_data.back().k_end = K_lim - 1;
 				}
 
 				if (bri.size[8]) {
-					p_data.back().k_start = halo_thickness;
-					p_data.back().halo_min++;
+					shifted_index = -1;
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZDirection, eMinimum));
+					p_data.back().k_start = shifted_index;
+
+#if defined L_HDF_DEBUG
+					*logout << "Lower Z halo thickness = " << shifted_index << std::endl;
+#endif
+
 				}
 				else {
 					p_data.back().k_start = 0;
@@ -919,50 +966,40 @@ int MpiManager::mpi_buildCommunicators() {
 
 				/* Now account for transition layers -- If the current indices
 				 * defining the writable region have a global index that is in
-				 * the TL then we can shift them off the TL. It is possible that
+				 * the TL (i.e. within 2 sites of the edge of the global grid) 
+				 * then we shift them off the TL. It is possible that
 				 * this causes indices to be negative or writable regions to
 				 * have a size < 0 which indicates that the rank has no writable
 				 * data. */
-				if (targetGrid->XInd[p_data.back().i_start] < halo_thickness) {
-					p_data.back().i_start += halo_thickness;
+				if (targetGrid->XInd[p_data.back().i_start] < 2) {
+					p_data.back().i_start += 2;
 				}
-				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - halo_thickness) {
-					p_data.back().i_end -= halo_thickness;
+				if (targetGrid->XInd[p_data.back().i_end] > N_global - 1 - 2) {
+					p_data.back().i_end -= 2;
 				}
 
-				if (targetGrid->YInd[p_data.back().j_start] < halo_thickness) {
-					p_data.back().j_start += halo_thickness;
-#if (L_DIMS != 3)
-					p_data.back().halo_min++;		// Account for both halo and TL during striding
-#endif
+				if (targetGrid->YInd[p_data.back().j_start] < 2) {
+					p_data.back().j_start += 2;
 				}
-				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - halo_thickness) {
-					p_data.back().j_end -= halo_thickness;
-#if (L_DIMS != 3)
-					p_data.back().halo_max++;
-#endif
+				if (targetGrid->YInd[p_data.back().j_end] > M_global - 1 - 2) {
+					p_data.back().j_end -= 2;
 				}
 
 #if (L_DIMS == 3)
-				if (targetGrid->ZInd[p_data.back().k_start] < halo_thickness) {
-					p_data.back().k_start += halo_thickness;
-					p_data.back().halo_min++;
+				if (targetGrid->ZInd[p_data.back().k_start] < 2) {
+					p_data.back().k_start += 2;
 				}
-				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - halo_thickness) {
-					p_data.back().k_end -= halo_thickness;
-					p_data.back().halo_max++;
+				if (targetGrid->ZInd[p_data.back().k_end] > K_global - 1 - 2) {
+					p_data.back().k_end -= 2;
 				}
 #endif
 
 
-#ifdef L_MPI_VERBOSE
+#if defined L_HDF_DEBUG
 				*logout << "Writable data limits computed as: " << std::endl <<
-					p_data.back().i_start << " - " << p_data.back().i_end << std::endl << "\t" <<
-					p_data.back().j_start << " - " << p_data.back().j_end << std::endl << "\t" <<
-					p_data.back().k_start << " - " << p_data.back().k_end << std::endl;
-
-				*logout << "Halo thicknesses are: " <<
-					p_data.back().halo_min << " & " << p_data.back().halo_max << std::endl;
+					"i = " << p_data.back().i_start << " - " << p_data.back().i_end << std::endl << 
+					"j = " << p_data.back().j_start << " - " << p_data.back().j_end << std::endl <<
+					"k = " << p_data.back().k_start << " - " << p_data.back().k_end << std::endl;
 #endif
 
 				// Test for writable data
@@ -997,7 +1034,7 @@ int MpiManager::mpi_buildCommunicators() {
 			// by splitting the global communicator using the flags provided.
 			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NUM_LEVELS]);
 
-#ifdef L_MPI_VERBOSE
+#if defined L_HDF_DEBUG
 			*logout << "Region " << reg << ", Level " << lev << 
 				" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] << " and colour " << colour << 
 				" and writable data size " << p_data.back().writable_data_count << std::endl;

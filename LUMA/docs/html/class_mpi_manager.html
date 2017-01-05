@@ -125,6 +125,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a749fa958cb7343183a69ca6191b45286"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a749fa958cb7343183a69ca6191b45286">mpi_buildCommunicators</a> ()</td></tr>
 <tr class="memdesc:a749fa958cb7343183a69ca6191b45286"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define writable sub-grid communicators.  <a href="#a749fa958cb7343183a69ca6191b45286">More...</a><br /></td></tr>
 <tr class="separator:a749fa958cb7343183a69ca6191b45286"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6a8b1a857a00cdc4ed115512db050f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ae6a8b1a857a00cdc4ed115512db050f4">mpi_updateLoadInfo</a> ()</td></tr>
+<tr class="memdesc:ae6a8b1a857a00cdc4ed115512db050f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the load balancing information stored in the <a class="el" href="class_mpi_manager.html" title="MPI Manager class. ">MpiManager</a>.  <a href="#ae6a8b1a857a00cdc4ed115512db050f4">More...</a><br /></td></tr>
+<tr class="separator:ae6a8b1a857a00cdc4ed115512db050f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1b33a4a24d9abf528528a296aa1d92d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ae1b33a4a24d9abf528528a296aa1d92d">mpi_buffer_pack</a> (int dir, <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
 <tr class="memdesc:ae1b33a4a24d9abf528528a296aa1d92d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to pack the communication buffer.  <a href="#ae1b33a4a24d9abf528528a296aa1d92d">More...</a><br /></td></tr>
 <tr class="separator:ae1b33a4a24d9abf528528a296aa1d92d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -546,6 +549,24 @@ Static Public Attributes</h2></td></tr>
 
 <p>Initialisation routine. </p>
 <p>Method is responsible for initialising the MPI topolgy and associated data. Must be called immediately after MPI_init(). </p>
+
+</div>
+</div>
+<a class="anchor" id="ae6a8b1a857a00cdc4ed115512db050f4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MpiManager::mpi_updateLoadInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update the load balancing information stored in the <a class="el" href="class_mpi_manager.html" title="MPI Manager class. ">MpiManager</a>. </p>
+<p>This method is executed by all processes. Counts the ACTIVE cells on the current rank and pushes the information to the master (rank 0) which writes this information to an output file if required. Must be called after the grids have been built or will return zero. </p>
 
 </div>
 </div>

@@ -27,6 +27,8 @@ void \hyperlink{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}{mpi\+\_\+gr
 \begin{DoxyCompactList}\small\item\em Domain decomposition. \end{DoxyCompactList}\item 
 int \hyperlink{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}{mpi\+\_\+build\+Communicators} ()
 \begin{DoxyCompactList}\small\item\em Define writable sub-\/grid communicators. \end{DoxyCompactList}\item 
+void \hyperlink{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}{mpi\+\_\+update\+Load\+Info} ()
+\begin{DoxyCompactList}\small\item\em Update the load balancing information stored in the \hyperlink{class_mpi_manager}{Mpi\+Manager}. \end{DoxyCompactList}\item 
 void \hyperlink{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}{mpi\+\_\+buffer\+\_\+pack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
 \begin{DoxyCompactList}\small\item\em Method to pack the communication buffer. \end{DoxyCompactList}\item 
 void \hyperlink{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}{mpi\+\_\+buffer\+\_\+unpack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
@@ -297,7 +299,18 @@ Method to decompose the domain and identify local grid sizes. Parameters defined
 
 Initialisation routine. 
 
-Method is responsible for initialising the M\+PI topolgy and associated data. Must be called immediately after M\+P\+I\+\_\+init(). \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}}
+Method is responsible for initialising the M\+PI topolgy and associated data. Must be called immediately after M\+P\+I\+\_\+init(). \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+update\+Load\+Info@{mpi\+\_\+update\+Load\+Info}}
+\index{mpi\+\_\+update\+Load\+Info@{mpi\+\_\+update\+Load\+Info}!Mpi\+Manager@{Mpi\+Manager}}
+\subsubsection[{\texorpdfstring{mpi\+\_\+update\+Load\+Info()}{mpi_updateLoadInfo()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+update\+Load\+Info (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}{}\label{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}
+
+
+Update the load balancing information stored in the \hyperlink{class_mpi_manager}{Mpi\+Manager}. 
+
+This method is executed by all processes. Counts the A\+C\+T\+I\+VE cells on the current rank and pushes the information to the master (rank 0) which writes this information to an output file if required. Must be called after the grids have been built or will return zero. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}}
 \index{mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{mpi\+\_\+writeout\+\_\+buf(std\+::string filename, int dir)}{mpi_writeout_buf(std::string filename, int dir)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+writeout\+\_\+buf (
 \begin{DoxyParamCaption}

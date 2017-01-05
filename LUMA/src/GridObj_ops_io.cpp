@@ -693,18 +693,6 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	litefile.precision(L_OUTPUT_PRECISION);
 	litefile.setf(std::ios::fixed);
 	litefile.setf(std::ios::showpoint);
-
-	// Write simple header
-	litefile << "L" << level << " R" << region_number << " P" << std::to_string(MpiManager::my_rank) << " -- " << TAG << std::endl;
-	litefile << "T = " << std::to_string(tval) << std::endl;
-	litefile << "RANK\tTYPE\tX\t\tY\t\tZ\t\tRHO\t\tUX\t\tUY\t\tUZ\t\t";
-	for (int v = 0; v < L_NUM_VELS; v++) {
-		litefile << "F" << std::to_string(v) << "\t\t";
-	}
-	/*for (int v = 0; v < L_NUM_VELS; v++) {
-		litefile << "FEQ" << std::to_string(v) << "\t\t";
-	}*/
-	litefile << "TA_RHO\t\tTA_UX\t\tTA_UY\t\tTA_UZ\t\tTA_UXUX\t\tTA_UXUY\t\tTA_UXUZ\t\tTA_UYUY\t\tTA_UYUZ\t\tTA_UZUZ" << std::endl;
 	
 	// Indices
 	size_t i,j,k,v;
@@ -743,10 +731,11 @@ void GridObj::io_lite(double tval, std::string TAG) {
 					for (v = 0; v < L_NUM_VELS; v++) {
 						litefile << f(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
 					}
-					/*for (v = 0; v < L_NUM_VELS; v++) {
-						litefile << feq(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
-					}*/
+					for (v = 0; v < L_NUM_VELS; v++) {
+						litefile << fNew(i,j,k,v,YInd.size(),ZInd.size(),L_NUM_VELS) << "\t";
+					}
 				
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
 					// Write out time averaged rho and u
 					litefile << rho_timeav(i,j,k,YInd.size(),ZInd.size()) << "\t";
 					for (v = 0; v < L_DIMS; v++) {
@@ -772,6 +761,8 @@ void GridObj::io_lite(double tval, std::string TAG) {
 					litefile << uiuj_timeav(i,j,k,2,YInd.size(),ZInd.size(),(3*L_DIMS-3)) << "\t";
 					litefile << std::to_string(0.0) << "\t" << std::to_string(0.0) << "\t";
 #endif
+
+#endif // L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 					// New line
 					litefile << std::endl;
@@ -1080,12 +1071,16 @@ int GridObj::io_hdf5(double tval) {
 	status = H5Dclose(dataset_id); // Close dataset
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
+
 	// WRITE RHO_TIMEAV
 	variable_name = time_string + "/Rho_TimeAv";
 	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod, this, &rho_timeav[0], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
 	status = H5Dclose(dataset_id); // Close dataset
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+#endif
 
 
 
@@ -1115,6 +1110,8 @@ int GridObj::io_hdf5(double tval) {
 	status = H5Dclose(dataset_id); // Close dataset
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 #endif
+
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 	// WRITE UX_TIMEAV
 	variable_name = time_string + "/Ux_TimeAv";
@@ -1190,6 +1187,8 @@ int GridObj::io_hdf5(double tval) {
 	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, N_mod, M_mod, K_mod,  this, &uiuj_timeav[5], H5T_NATIVE_DOUBLE, TL_thickness, p_data);
 	status = H5Dclose(dataset_id); // Close dataset
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
 #endif
 
 

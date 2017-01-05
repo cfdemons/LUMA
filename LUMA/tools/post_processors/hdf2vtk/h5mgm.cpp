@@ -168,6 +168,9 @@ int main(int argc, char* argv[])
 		else if (arg_str == "quiet") {
 			bQuiet = true;
 		}
+		else if (arg_str == "loud") {
+			bLoud = true;
+		}
 		else {
 			case_num = std::string(argv[1]);
 		}
@@ -351,21 +354,39 @@ int main(int argc, char* argv[])
 
 			// Open, read into buffers and close input datasets
 			status = readDataset("/LatTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, Type);
-			if (status != 0) goto earlyExit;
+			if (status != 0)
+			{
+				std::cout << "Read failed -- exiting early.";
+				return EARLY_EXIT;
+			}
 			status = readDataset("/XPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, X);
-			if (status != 0) goto earlyExit;
+			if (status != 0)
+			{
+				std::cout << "Read failed -- exiting early.";
+				return EARLY_EXIT;
+			}
 			status = readDataset("/YPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Y);
-			if (status != 0) goto earlyExit;
+			if (status != 0)
+			{
+				std::cout << "Read failed -- exiting early.";
+				return EARLY_EXIT;
+			}
 			if (dimensions_p == 3) {
 				status = readDataset("/ZPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Z);
-				if (status != 0) goto earlyExit;
+				if (status != 0)
+				{
+					std::cout << "Read failed -- exiting early.";
+					return EARLY_EXIT;
+				}
 			}
 
 			// Loop over grid sites
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
-				std::cout << "\r" << "Examining cell " << std::to_string(c + 1) << "/" << 
-					std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << std::flush;
+				if (bLoud || c % 100000 == 0) {
+					std::cout << "\r" << "Examining cell " << std::to_string(c + 1) << "/" <<
+						std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << std::flush;
+				}
 
 				// Ignore list
 				if (
@@ -405,6 +426,8 @@ int main(int argc, char* argv[])
 				res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
 
 			}
+			std::cout << "\r" << "Examining cell " << std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << "/" <<
+				std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << std::flush;
 			std::cout << std::endl;
 
 			// Close input dataspace
@@ -541,8 +564,16 @@ int main(int argc, char* argv[])
 		}
 
 		// If failed to read every dataset then end of time limit has been reached
-		if (dimensions_p == 3 && missed_set_count == NUM_DATASETS_3D) goto earlyExit;
-		else if (dimensions_p == 2 && missed_set_count == NUM_DATASETS_2D) goto earlyExit;
+		if (dimensions_p == 3 && missed_set_count == NUM_DATASETS_3D)
+		{
+			std::cout << "Read failed -- exiting early.";
+			return EARLY_EXIT;
+		}
+		else if (dimensions_p == 2 && missed_set_count == NUM_DATASETS_2D)
+		{
+			std::cout << "Read failed -- exiting early.";
+			return EARLY_EXIT;
+		}
 	
 		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
@@ -578,10 +609,5 @@ int main(int argc, char* argv[])
 	}
 
 	return 0;
-
-
-earlyExit:
-	std::cout << "Read failed -- exiting early.";
-	return EARLY_EXIT;
 }
 

@@ -73,8 +73,6 @@ public :
 		int j_end;		///< Ending j-index for writable region
 		int k_start;	///< Starting k-index for writable region
 		int k_end;		///< Ending k-index for writable region
-		int halo_min;	///< Size of halo + TL on the top end of a 1D writable block
-		int halo_max;	///< Size of halo + TL on the bottom end of a 1D writable block
 
 		// Identifiers
 		int level;		///< Grid level to which these data correspond

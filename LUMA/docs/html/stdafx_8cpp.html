@@ -100,9 +100,12 @@ Variables</h2></td></tr>
 <tr class="memitem:acd0e30afbac0230abeed2d7cd4bfa55d"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8cpp.html#acd0e30afbac0230abeed2d7cd4bfa55d">c</a> [3][<a class="el" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>]</td></tr>
 <tr class="memdesc:acd0e30afbac0230abeed2d7cd4bfa55d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lattice velocities.  <a href="#acd0e30afbac0230abeed2d7cd4bfa55d">More...</a><br /></td></tr>
 <tr class="separator:acd0e30afbac0230abeed2d7cd4bfa55d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a206bd13336a935ddfc32a0160772c6e8"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8cpp.html#a206bd13336a935ddfc32a0160772c6e8">w</a> [nVels]</td></tr>
-<tr class="memdesc:a206bd13336a935ddfc32a0160772c6e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Quadrature weights.  <a href="#a206bd13336a935ddfc32a0160772c6e8">More...</a><br /></td></tr>
-<tr class="separator:a206bd13336a935ddfc32a0160772c6e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52d5340e36f564ac0f659612e91983ef"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8cpp.html#a52d5340e36f564ac0f659612e91983ef">c_opt</a> [<a class="el" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>][3]</td></tr>
+<tr class="memdesc:a52d5340e36f564ac0f659612e91983ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lattice velocities optimised arrangement.  <a href="#a52d5340e36f564ac0f659612e91983ef">More...</a><br /></td></tr>
+<tr class="separator:a52d5340e36f564ac0f659612e91983ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4d049be80428f501e8b405d82d49366"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8cpp.html#ae4d049be80428f501e8b405d82d49366">w</a> [<a class="el" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>]</td></tr>
+<tr class="memdesc:ae4d049be80428f501e8b405d82d49366"><td class="mdescLeft">&#160;</td><td class="mdescRight">Quadrature weights.  <a href="#ae4d049be80428f501e8b405d82d49366">More...</a><br /></td></tr>
+<tr class="separator:ae4d049be80428f501e8b405d82d49366"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae51e162e8ad5da2cef261f3936312f64"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8cpp.html#ae51e162e8ad5da2cef261f3936312f64">cs</a> = 1.0 / sqrt(3.0)</td></tr>
 <tr class="memdesc:ae51e162e8ad5da2cef261f3936312f64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lattice sound speed.  <a href="#ae51e162e8ad5da2cef261f3936312f64">More...</a><br /></td></tr>
 <tr class="separator:ae51e162e8ad5da2cef261f3936312f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,8 +120,22 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{</div><div class="line">    {1, -1,  0,  0,  0,  0,  1, -1,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  0 },</div><div class="line">    {0,  0,  1, -1,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0,  0,  0,  0,  0 },</div><div class="line">    {0,  0,  0,  0,  1, -1,  0,  0,  0,  0,  1, -1, -1,  1,  1, -1,  1, -1,  0 }</div><div class="line">}</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{</div><div class="line">    { 1, -1, 0, 0, 1, -1, 1, -1, 0 },</div><div class="line">    { 0, 0, 1, -1, 1, -1, -1, 1, 0 },</div><div class="line">    { 0, 0, 0, 0, 0, 0, 0, 0, 0 }</div><div class="line">}</div></div><!-- fragment -->
 <p>Lattice velocities. </p>
+
+</div>
+</div>
+<a class="anchor" id="a52d5340e36f564ac0f659612e91983ef"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int c_opt[<a class="el" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>][3]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{</div><div class="line">    { 1, 0, 0 },</div><div class="line">    { -1, 0, 0 },</div><div class="line">    { 0, 1, 0 },</div><div class="line">    { 0, -1, 0 },</div><div class="line">    { 1, 1, 0 },</div><div class="line">    { -1, -1, 0 },</div><div class="line">    { 1, -1, 0 },</div><div class="line">    { -1, 1, 0 },</div><div class="line">    { 0, 0, 0, }</div><div class="line">}</div></div><!-- fragment -->
+<p>Lattice velocities optimised arrangement. </p>
 
 </div>
 </div>
@@ -136,16 +153,16 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a206bd13336a935ddfc32a0160772c6e8"></a>
+<a class="anchor" id="ae4d049be80428f501e8b405d82d49366"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const double w[nVels]</td>
+          <td class="memname">const double w[<a class="el" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0,</div><div class="line">1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0,</div><div class="line">1.0/3.0}</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{ 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 4.0 / 9.0 }</div></div><!-- fragment -->
 <p>Quadrature weights. </p>
 
 </div>

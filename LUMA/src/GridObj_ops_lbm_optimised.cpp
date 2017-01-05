@@ -96,7 +96,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				}
 				L_DACTION_WRITE_OUT_FORCES
 #endif
-
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
 					_LBM_collide_opt(id, omega_s);
@@ -154,6 +153,12 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 
 	// Loop over velocities
 	for (int v = 0; v < L_NUM_VELS; ++v) {
+
+		// Do nothing inlets and solid sites are simply reset to equilibrium
+		if (type_local == eInlet || type_local == eSolid) {
+			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
+			continue;
+		}
 
 		// Get indicies for source site (periodic by default)
 		int src_x = (i - c_opt[v][0] + N_lim) % N_lim;
@@ -299,9 +304,9 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 		(c_opt[v][1] * u[1 + id * L_DIMS]) +
 		(c_opt[v][2] * u[2 + id * L_DIMS]);
 
-	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_DIMS] * u[0 + id * L_DIMS]) +
-		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_DIMS] * u[1 + id * L_DIMS]) +
-		((c_opt[v][2] * c_opt[v][2]) - (cs*cs)) * (u[2 + id * L_DIMS] * u[2 + id * L_DIMS]) +
+	B = (SQ(c_opt[v][0]) - SQ(cs)) * SQ(u[0 + id * L_DIMS]) +
+		(SQ(c_opt[v][1]) - SQ(cs)) * SQ(u[1 + id * L_DIMS]) +
+		(SQ(c_opt[v][2]) - SQ(cs)) * SQ(u[2 + id * L_DIMS]) +
 		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS] +
 		2 * c_opt[v][0] * c_opt[v][2] * u[0 + id * L_DIMS] * u[2 + id * L_DIMS] +
 		2 * c_opt[v][1] * c_opt[v][2] * u[1 + id * L_DIMS] * u[2 + id * L_DIMS];
@@ -309,14 +314,14 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
 		(c_opt[v][1] * u[1 + id * L_DIMS]);
 
-	B = ((c_opt[v][0] * c_opt[v][0]) - (cs*cs)) * (u[0 + id * L_DIMS] * u[0 + id * L_DIMS]) +
-		((c_opt[v][1] * c_opt[v][1]) - (cs*cs)) * (u[1 + id * L_DIMS] * u[1 + id * L_DIMS]) +
+	B = (SQ(c_opt[v][0]) - SQ(cs)) * SQ(u[0 + id * L_DIMS]) +
+		(SQ(c_opt[v][1]) - SQ(cs)) * SQ(u[1 + id * L_DIMS]) +
 		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS];
 #endif
 
 
 	// Compute f^eq
-	return rho[id] * w[v] * (1 + (A / (cs*cs)) + (B / (2 * (cs*cs*cs*cs))));
+	return rho[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
 
 }
 
@@ -337,6 +342,7 @@ void GridObj::_LBM_collide_opt(int id, double omega_s) {
 
 	// Perform collision operation (using omega_s -- modified if using Smagorinksy)
 	for (int v = 0; v < L_NUM_VELS; ++v) {
+
 		fNew[v + id * L_NUM_VELS] +=
 			omega_s *	(
 			_LBM_equilibrium_opt(id, v) -

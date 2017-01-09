@@ -79,7 +79,7 @@ ObjectManager::ObjectManager(GridObj* g) {
 /// \param	g	pointer to grid on which object resides.
 void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 
-	// TODO: Need abounding box for object if we have walls in the domain otherwise they will also be counted
+	// TODO: Need a bounding box for object if we have walls in the domain otherwise they will also be counted
 	// TODO: Also need to be able to identify which body this site relates to so we can differentiate
 
 	int N_lim = g->N_lim;
@@ -93,9 +93,10 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 	{
 
 		// Loop over directions from solid site
-		for (int n = 0; n < L_nVels; n++) {
+		for (int n = 0; n < L_NUM_VELS; n++) {
 
-			int n_opp = GridUtils::getOpposite(n); // Get incoming direction
+			// Get incoming direction
+			int n_opp = GridUtils::getOpposite(n);
 
 			// Compute destination coordinates
 			int xdest = i + c[0][n];
@@ -106,12 +107,15 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
 
-				forceOnObjectX += c[0][n_opp] *
-					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
-				forceOnObjectY += c[1][n_opp] *
-					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
-				forceOnObjectZ += c[2][n_opp] *
-					(g->f(i, j, k, n, M_lim, K_lim, L_nVels) + g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_nVels));
+				forceOnObjectX +=
+					c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[0][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
+				forceOnObjectY += 
+					c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[1][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
+				forceOnObjectZ +=
+					c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
+					c[2][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
 
 			}
 		}

@@ -90,15 +90,15 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 	}
 	this->groupID = group;
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 
 	// Sphere //
 
 	// Following code for point generation on unit sphere actually seeds
 	// using Fibonacci sphere technique. Code is not my own but works.
 	double inc = L_PI * (3 - sqrt(5));
-    double off = 2.0 / (float)L_num_markers ;
-    for (int k = 0; k < L_num_markers; k++) {
+    double off = 2.0 / (float)L_NUM_MARKERS ;
+    for (int k = 0; k < L_NUM_MARKERS; k++) {
         double y = k * off - 1 + (off / 2);
         double r = sqrt(1 - y*y);
         double phi = k * inc;
@@ -109,7 +109,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing (assuming all Lagrange markers are uniformly spaced)
 	std::vector<double> diff;
-	for (int d = 0; d < L_dims; d++) {
+	for (int d = 0; d < L_DIMS; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -118,7 +118,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 #else
 	// Circle -- find theta
-	std::vector<double> theta = GridUtils::linspace(0, 2*L_PI - (2*L_PI / L_num_markers), L_num_markers);
+	std::vector<double> theta = GridUtils::linspace(0, 2*L_PI - (2*L_PI / L_NUM_MARKERS), L_NUM_MARKERS);
 	for (size_t i = 0; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -129,7 +129,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 
 	// Spacing
 	std::vector<double> diff;
-	for (int d = 0; d < L_dims; d++) {
+	for (int d = 0; d < L_DIMS; d++) {
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
@@ -164,14 +164,14 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	double wid = width_length_depth[0];
 	double len = width_length_depth[1];
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 
 	// Cube //
 
 	double dep = width_length_depth[2];
 
 	// Check side lengths to make sure we can ensure points on the corners
-	if (fmod(L_ibb_w,L_ibb_l) != 0 && fmod(len,wid) != 0 && fmod(len,L_ibb_d) != 0 && fmod(dep,len) != 0) {
+	if (fmod(L_IBB_W,L_IBB_L) != 0 && fmod(len,wid) != 0 && fmod(len,L_IBB_D) != 0 && fmod(dep,len) != 0) {
 			std::cout << "Error: See Log File" << std::endl;
 			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
 			exit(LUMA_FAILED);
@@ -202,12 +202,12 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Since we have points on the faces as well as the edges we have a quadratic expression to be solved to
-	// find the level of refinement required to get the nearest number of points to L_num_markers.
+	// find the level of refinement required to get the nearest number of points to L_NUM_MARKERS.
 	int ref;
 
 	int a = 2*side_ratio_1 + 2*side_ratio_1 + 2*side_ratio_1*side_ratio_2;
 	int b = 4 + 4*side_ratio_1 + 4*side_ratio_2;
-	int c = 8-L_num_markers;
+	int c = 8-L_NUM_MARKERS;
 
 	double P = (-b + sqrt(pow(b,2) - (4*a*c)) )/(2*a) + 1;
 
@@ -302,7 +302,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Double the number of points to be used as can be rounded down to only a relatively small number
-	int ref = (int)ceil( log( L_num_markers / (2 * (1+side_ratio)) ) / log(2) );
+	int ref = (int)ceil( log( L_NUM_MARKERS / (2 * (1+side_ratio)) ) / log(2) );
 
 	// Check to see if enough points
 	if (ref == 0) {
@@ -329,7 +329,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	for (int i = 0; i < np_x; i++) {
 		for (int j = 0; j < np_y; j++) {
 			// 2D specification of z
-			z = (L_b_z - L_a_z)/2;
+			z = (L_BZ - L_AZ)/2;
 
 			// x and y positions
 			x = start_x + i*spacing;
@@ -402,8 +402,8 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 	this->groupID = group;
 
 	// Assign delta_rho and flexural rigidity
-	this->delta_rho = L_ibb_delta_rho;
-	this->flexural_rigidity = L_ibb_EI;
+	this->delta_rho = L_IBB_DELTA_RHO;
+	this->flexural_rigidity = L_IBB_EI;
 
 	// Create zero tension vector for filament
 	std::fill(tension.begin(), tension.end(), 0.0);
@@ -451,7 +451,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	bool flex_rigid, bool deform, int group, bool plate) {
 
 	// Exit if called in 2D
-	if ( L_dims == 2 ) {
+	if ( L_DIMS == 2 ) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
 		exit(LUMA_FAILED);
@@ -470,8 +470,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	this->groupID = group;
 
 	// Assign delta_rho and flexural rigidity
-	this->delta_rho = L_ibb_delta_rho;
-	this->flexural_rigidity = L_ibb_EI;
+	this->delta_rho = L_IBB_DELTA_RHO;
+	this->flexural_rigidity = L_IBB_EI;
 
 	// Shorter variable names for convenience
 	double len_z, len_x;
@@ -497,7 +497,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// The following is derived by inspection of the problem and ensures a point on each corner of the body
 	// Double the number of points to be used as can be rounded down to only a relatively small number
-	int ref = (int)ceil( log( 2*L_num_markers / (2 * (1+side_ratio)) ) / log(2) );
+	int ref = (int)ceil( log( 2*L_NUM_MARKERS / (2 * (1+side_ratio)) ) / log(2) );
 
 	// Check to see if enough points
 	if (ref == 0) {
@@ -565,8 +565,8 @@ void IBBody::makeBody(PCpts* _PCpts) {
 
 
 	// Set some default body properties
-	this->deformable = L_ibb_deform;
-	this->flex_rigid = L_ibb_flex_rigid;
+	this->deformable = L_IBB_MOVABLE;
+	this->flex_rigid = L_IBB_FLEXIBLE;
 
 	// Declare local variables
 	std::vector<int> locals;

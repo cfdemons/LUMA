@@ -121,7 +121,7 @@ public:
 	void io_vtkIBBWriter(double tval);				// VTK body writer
 	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
 	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
-	void io_restart(bool IO_flag, int level);		// Restart read and write for IBBodies given grid level
+	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts* _PCpts, eObjectType objtype);	// Method to read in Point Cloud data
 	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
 };

@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.2.0"
+#define LUMA_VERSION "1.3.0-alpha"
 
 
 // Header guard
@@ -43,6 +43,7 @@
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
@@ -65,38 +66,45 @@
 // Using MPI?
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
+// Optimisation
+#define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
+
 // Output Options
-#define L_out_every 100				///< How many timesteps before whole grid output
-#define L_out_every_forces 100		///< Specific output frequency of body forces
-#define L_output_precision 8		///< Precision of output (for text writers)
+#define L_OUT_EVERY 2000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
+#define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
-#define L_IO_LITE					///< ASCII dump on output
+//#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
+//#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
-#define L_out_every_probe 250					///< Write out frequency of probe output
-const static int nProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
-const static int xProbeLims[2] = {90, 270};		///< Limits of X plane for array of probes
-const static int yProbeLims[2] = {15, 45};		///< Limits of Y plane for array of probes
-const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of probes
+#define L_PROBE_OUT_FREQ 250					///< Write out frequency of probe output
+const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
+const static int cProbeLimsX[2] = {90, 270};		///< Limits of X plane for array of probes
+const static int cProbeLimsY[2] = {15, 45};		///< Limits of Y plane for array of probes
+const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array of probes
 
 
 // Gravity
-//#define GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
-#define L_grav_force 0.0001
-#define L_grav_direction eXDirection		///< Gravity direction (specify using enumeration)
+#define L_GRAVITY_FORCE 0.0001
+#define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
-#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_restart_out_every 1000			///< Frequency of write out of restart file
+//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
 
 // LBM configuration
-#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
+//#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
+//#define L_USE_BGKSMAG
+#define L_CSMAG 0.07
 
 
 /*
@@ -105,7 +113,7 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_Timesteps 100		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 6000		///< Number of time steps to run simulation for
 
 
 /*
@@ -115,40 +123,49 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // MPI Data
-#define L_Xcores 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_Ycores 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
-#define L_Zcores 2
+#define L_MPI_ZCORES 2
 
 //#define L_USE_CUSTOM_MPI_SIZES		///< Define to use custom decomposition otherwise decomposition will be uniform
 
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
 #ifdef L_USE_CUSTOM_MPI_SIZES
 	/// Number of sites in X direction for each custom rank
-	const static size_t xRankSize[L_Xcores*L_Ycores*L_Zcores]		= {50, 50, 50, 50, 350, 350, 350, 350};
+	const static size_t cRankSizeX[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {50, 50, 50, 50, 350, 350, 350, 350};
 	/// Number of sites in Y direction for each custom rank
-	const static size_t yRankSize[L_Xcores*L_Ycores*L_Zcores]		= {20, 20, 130, 130, 20, 20, 130, 130};
+	const static size_t cRankSizeY[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 20, 130, 130, 20, 20, 130, 130};
 	/// Number of sites in Z direction for each custom rank.
 	/// The following can be arbitrary if doing a 2D problem
-	const static size_t zRankSize[L_Xcores*L_Ycores*L_Zcores]		= {20, 30, 20, 30, 20, 30, 20, 30};
+	const static size_t cRankSizeZ[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 30, 20, 30, 20, 30, 20, 30};
 #endif
 
 
 // Lattice properties (in lattice units)
-#define L_dims 2		///< Number of dimensions to the problem
+#define L_DIMS 3		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
-#define L_M 100			///< Number of y lattice sites
-#define L_K 100			///< Number of z lattice sites
+#define L_M 50			///< Number of y lattice sites
+#define L_K 50			///< Number of z lattice sites
 
+
+/*
+*******************************************************************************
+****************************** Physical Data **********************************
+*******************************************************************************
+*/
 
 // Physical dimensions (dictates scaling)
-#define L_a_x 0			///< Start of domain-x
-#define L_b_x 1		///< End of domain-x
-#define L_a_y 0			///< Start of domain-y
-#define L_b_y 1		///< End of domain-y
-#define L_a_z 0			///< Start of domain-z
-#define L_b_z 1		///< End of domain-z
+#define L_AX 0.0		///< Start of domain-x
+#define L_BX 2.0		///< End of domain-x
+#define L_AY 0.0		///< Start of domain-y
+#define L_BY 1.0 		///< End of domain-y
+#define L_AZ 0.0		///< Start of domain-z
+#define L_BZ 1.0		///< End of domain-z
+
+// Physical velocity
+#define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
 
 
 /*
@@ -158,18 +175,18 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE		///< Use an inlet profile
+//#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_u_ref 0.04			///< Reference velocity for scaling, can be mean inelt velocity
-#define L_u_max L_u_ref*1.5		///< Max velocity of inlet profile
+#define L_UREF 0.04				///< Reference velocity for scaling
+#define L_UMAX L_UREF*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
-#define L_u_0x L_u_ref		///< Initial/inlet x-velocity
-#define L_u_0y 0			///< Initial/inlet y-velocity
-#define L_u_0z 0			///< Initial/inlet z-velocity
+#define L_UX0 0.04			///< Initial/inlet x-velocity
+#define L_UY0 0.0			///< Initial/inlet y-velocity
+#define L_UZ0 0.0			///< Initial/inlet z-velocity
 
-#define L_rho_in 1			///< Initial density
-#define L_Re 100			///< Desired Reynolds number
+#define L_RHOIN 1			///< Initial density
+#define L_RE 150			///< Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -182,8 +199,8 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Master IBM switches //
 //#define L_IBM_ON						///< Turn on IBM
-#define L_IB_Lev 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
-#define L_IB_Reg 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
+#define L_IB_ON_LEV 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
+#define L_IB_ON_REG 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
@@ -191,27 +208,27 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Read in IB Body from File
 //#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
 
-	#define L_ibb_on_grid_lev L_IB_Lev		///< Provide grid level on which object should be added
-	#define L_ibb_on_grid_reg L_IB_Reg		///< Provide grid region on which object should be added
+	#define L_IBB_ON_GRID_LEV L_IB_ON_LEV		///< Provide grid level on which object should be added
+	#define L_IBB_ON_GRID_REG L_IB_ON_REG		///< Provide grid region on which object should be added
 	// Following specified in physical distances
-	#define L_start_ibb_x 0.3		///< Start X of object bounding box
-	#define L_start_ibb_y 0.2		///< Start Y of object bounding box
-	#define L_centre_ibb_z 0.5		///< Centre of object bounding box in Z direction
-	#define L_ibb_length 0.5		///< The object input is scaled based on this dimension
-	#define L_ibb_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_ibb_length_ref 0.5	///< Reference length to be used in the definition of Reynolds number
+	#define L_START_IBB_X 0.3		///< Start X of object bounding box
+	#define L_START_IBB_Y 0.2		///< Start Y of object bounding box
+	#define L_CENTRE_IBB_Z 0.5		///< Centre of object bounding box in Z direction
+	#define L_IBB_LENGTH 0.5		///< The object input is scaled based on this dimension
+	#define L_IBB_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
+	#define L_IBB_REF_LENGTH 0.5	///< Reference length to be used in the definition of Reynolds number
 
 // Default global properties
-#define L_num_markers 120		///< Number of Lagrange points to use when building a prefab body (approximately)
-#define L_ibb_deform false		///< Default deformable property of body to be built (whether it moves or not)
-#define L_ibb_flex_rigid false	///< Whether a structural calculation needs to be performed on the body
+#define L_NUM_MARKERS 31		///< Number of Lagrange points to use when building a prefab body (approximately)
+#define L_IBB_MOVABLE false		///< Default deformable property of body to be built (whether it moves or not)
+#define L_IBB_FLEXIBLE false	///< Whether a structural calculation needs to be performed on the body
 
 
 // Switches for inserting certain bodies (enable only one at once!)
-//#define L_INSERT_CIRCLE_SPHERE
+#define L_INSERT_CIRCLE_SPHERE
 //#define L_INSERT_RECTANGLE_CUBOID
 //#define L_INSERT_BOTH
-#define L_INSERT_FILAMENT
+//#define L_INSERT_FILAMENT
 //#define L_INSERT_FILARRAY
 //#define L_2D_RIGID_PLATE_IBM
 //#define L_2D_PLATE_WITH_FLAP
@@ -219,31 +236,31 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 //#define L_3D_PLATE_WITH_FLAP
 
 // Physical dimensions of rigid IB body or flexible plate
-#define L_ibb_x 0.2		///< X Position of body centre
-#define L_ibb_y 0.5		///< Y Position of body centre
-#define L_ibb_z 0.0		///< Z Position of body centre
-#define L_ibb_w 0.5		///< Width (x) of IB body
-#define L_ibb_l 0.5		///< Length (y) of IB body
-#define L_ibb_d 0.5		///< Depth (z) of IB body
-#define L_ibb_r 0.25	///< Radius of IB body
+#define L_IBB_X 0.2		///< X Position of body centre
+#define L_IBB_Y 0.2		///< Y Position of body centre
+#define L_IBB_Z 0.0		///< Z Position of body centre
+#define L_IBB_W 0.5		///< Width (x) of IB body
+#define L_IBB_L 0.5		///< Length (y) of IB body
+#define L_IBB_D 0.5		///< Depth (z) of IB body
+#define L_IBB_R 0.05	///< Radius of IB body
 
 // Physical dimensions of flexible IB filament
-#define L_ibb_filament_length 0.5		///< Length of filament
-#define L_ibb_filament_start_x 0.2		///< Start X position of the filament
-#define L_ibb_filament_start_y 0.5		///< Start Y position of the filament
-#define L_ibb_filament_start_z 0.5		///< Start Z position of the filament
+#define L_IBB_FILAMENT_LENGTH 0.5		///< Length of filament
+#define L_IBB_FILAMENT_START_X 0.2		///< Start X position of the filament
+#define L_IBB_FILAMENT_START_Y 0.5		///< Start Y position of the filament
+#define L_IBB_FILAMENT_START_Z 0.5		///< Start Z position of the filament
 
 // Angles of filament or plate
-#define L_ibb_angle_vert 90		///< Inclination of filament in XY plane
-#define L_ibb_angle_horz 0		///< Inclination of filament in XZ plane
+#define L_IBB_ANGLE_VERT 90		///< Inclination of filament in XY plane
+#define L_IBB_ANGLE_HORZ 0		///< Inclination of filament in XZ plane
 
 // Boundary conditions of flexible filament or flexible plate
-#define L_start_BC 2		///< Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
-#define L_end_BC 0			///< Type of boundary condition at filament end:	0 == free; 1 = simply supported; 2 == clamped
+#define L_FILAMENT_START_BC 2		///< Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
+#define L_FILAMENT_END_BC 0			///< Type of boundary condition at filament end:	0 == free; 1 = simply supported; 2 == clamped
 
 // Mechanical properties of filament
-#define L_ibb_delta_rho 1.0		///< Difference in density (lattice units) between solid and fluid
-#define L_ibb_EI 2.0			///< Flexural rigidity (lattice units) of filament
+#define L_IBB_DELTA_RHO 1.0		///< Difference in density (lattice units) between solid and fluid
+#define L_IBB_EI 2.0			///< Flexural rigidity (lattice units) of filament
 
 
 /*
@@ -259,12 +276,12 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 
 // Inlets
 #define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define L_INLET_REGULARISED		///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default First Order Extrap.)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
@@ -275,10 +292,10 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 // Solids
 #define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_wall_thickness_bottom 1		///< Thickness of walls in coarsest lattice units
-#define L_wall_thickness_top 1			///< Thickness of top walls in coarsest lattice units
-#define L_wall_thickness_front 1		///< Thickness of front (3D) walls in coarsest lattice units
-#define L_wall_thickness_back 1			///< Thickness of back (3D) walls in coarsest lattice units
+#define L_WALL_THICKNESS_BOTTOM 1		///< Thickness of walls in coarsest lattice units
+#define L_WALL_THICKNESS_TOP 1			///< Thickness of top walls in coarsest lattice units
+#define L_WALL_THICKNESS_FRONT 1		///< Thickness of front (3D) walls in coarsest lattice units
+#define L_WALL_THICKNESS_BACK 1			///< Thickness of back (3D) walls in coarsest lattice units
 
 
 
@@ -289,46 +306,46 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_block_on_grid_lev 0		///< Provide grid level on which block should be added 
-	#define L_block_on_grid_reg 0		///< Provide grid region on which block should be added 
+	#define L_BLOCK_ON_GRID_LEV 0		///< Provide grid level on which block should be added 
+	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_block_x_min 30		///< Index of start of object/wall in x-direction
-	#define L_block_x_max 60		///< Index of end of object/wall in x-direction
-	#define L_block_y_min 30		///< Index of start of object/wall in y-direction
-	#define L_block_y_max 60		///< Index of end of object/wall in y-direction
-	#define L_block_z_min 30		///< Index of start of object/wall in z-direction
-	#define L_block_z_max 60		///< Index of end of object/wall in z-direction
+	#define L_BLOCK_MIN_X (L_N / 6)			///< Index of start of object/wall in x-direction
+	#define L_BLOCK_MAX_X (2 * L_N / 6)		///< Index of end of object/wall in x-direction
+	#define L_BLOCK_MIN_Y (1)			///< Index of start of object/wall in y-direction
+	#define L_BLOCK_MAX_Y (L_M / 6)		///< Index of end of object/wall in y-direction
+	#define L_BLOCK_MIN_Z (2.5 * L_K / 6)			///< Index of start of object/wall in z-direction
+	#define L_BLOCK_MAX_Z (3.5 * L_K / 6)		///< Index of end of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
 //#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_object_on_grid_lev 0		///< Provide grid level on which object should be added 
-	#define L_object_on_grid_reg 0		///< Provide grid region on which object should be added
+	#define L_OBJECT_ON_GRID_LEV 0		///< Provide grid level on which object should be added 
+	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_object_x 30			///< Index for start of object bounding box in X direction
-	#define L_start_object_y 30			///< Index for start of object bounding box in Y direction
-	#define L_centre_object_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_object_length 40			///< The object input is scaled based on this dimension
-	#define L_object_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_object_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_START_OBJECT_X 400			///< Index for start of object bounding box in X direction
+	#define L_START_OBJECT_Y 360			///< Index for start of object bounding box in Y direction
+	#define L_CENTRE_OBJECT_Z 24		///< Index for cetnre of object bounding box in Z direction
+	#define L_OBJECT_LENGTH 80			///< The object input is scaled based on this dimension
+	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
+	#define L_OBJECT_REF_LENGTH 80		///< Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
 //#define L_BFL_ON					///< Build BFL body from point cloud
 
-	#define L_bfl_on_grid_lev 0		///< Provide grid level on which BFL body should be added 
-	#define L_bfl_on_grid_reg 0		///< Provide grid region on which BFL body should be added
+	#define L_BFL_ON_GRID_LEV 0		///< Provide grid level on which BFL body should be added 
+	#define L_BFL_ON_GRID_REG 0		///< Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_start_bfl_x 30		///< Index for start of object bounding box in X direction
-	#define L_start_bfl_y 30		///< Index for start of object bounding box in Y direction
-	#define L_centre_bfl_z 50		///< Index for cetnre of object bounding box in Z direction
-	#define L_bfl_length 40			///< The BFL object input is scaled based on this dimension
-	#define L_bfl_scale_direction eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_bfl_length_ref 40		///< Reference length to be used in the definition of Reynolds number
+	#define L_START_BFL_X 30		///< Index for start of object bounding box in X direction
+	#define L_START_BFL_Y 30		///< Index for start of object bounding box in Y direction
+	#define L_CENTRE_BFL_Z 50		///< Index for cetnre of object bounding box in Z direction
+	#define L_BFL_LENGTH 40			///< The BFL object input is scaled based on this dimension
+	#define L_BFL_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
+	#define L_BFL_REF_LENGTH 40		///< Reference length to be used in the definition of Reynolds number
 
 
 
@@ -338,69 +355,26 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 *******************************************************************************
 */
 
-#define L_NumLev 0		///< Levels of refinement (0 = coarse grid only
-#define L_NumReg 1		///< Number of refined regions (can be arbitrary if L_NumLev = 0)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
-#if L_NumLev != 0
+#if L_NUM_LEVELS != 0
 // Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
+	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 1 },	{ 2 } };
+	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 98 }, { 193 } };
+	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 1 },	{ 2 } };
+	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 15 },	{ 27 } };
+	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 10 },	{ 10 } };
+	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 30 },	{ 30 } };
 
-// Following options are only here to making testing different grid combinations easier
-#if (L_NumReg == 2 && L_NumLev == 2) 
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5, 5}, {2, 2} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {25, 25}, {20, 10} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {5, 14}, {5, 2} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {12, 25}, {10, 10} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {5, 10}, {2, 2} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {20, 15}, {10, 10} };
-
-#elif (L_NumReg == 1 && L_NumLev == 1)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { 5 };
-	const static int RefXend[L_NumLev][L_NumReg]	= { 110 };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { 4 };
-	const static int RefYend[L_NumLev][L_NumReg]	= { 38 };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { 4 };
-	static int RefZend[L_NumLev][L_NumReg]			= { 28 };
-
-#elif (L_NumReg == 1 && L_NumLev == 2)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {5}, {5} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {110}, {150} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {4}, {4} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {38}, {61} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {20}, {5} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {40}, {35} };
-
-#elif (NumReg == 1 && NumLev == 3)
-	const static size_t RefXstart[NumLev][NumReg]	= { {8},	{4},	{8} };
-	const static size_t RefXend[NumLev][NumReg]		= { {34},	{48},	{80} };
-	const static size_t RefYstart[NumLev][NumReg]	= { {9},	{4},	{8} };
-	const static size_t RefYend[NumLev][NumReg]		= { {23},	{24},	{32} };
-	// If doing 2D, these can be arbitrary values
-	static size_t RefZstart[NumLev][NumReg]		= { {2},	{4},	{8} };
-	static size_t RefZend[NumLev][NumReg]		= { {30},	{52},	{88} };
-
-#elif (L_NumReg == 1 && L_NumLev == 3)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {190},	{10},	{10} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {270},	{90},	{90} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {240},	{10},	{10} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {270},	{50},	{70} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {2},	{4},	{8} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {30},	{52},	{88} };
-
-#elif (L_NumReg == 1 && L_NumLev == 4)
-	const static int RefXstart[L_NumLev][L_NumReg]	= { {10},	{5},	{10},	{20} };
-	const static int RefXend[L_NumLev][L_NumReg]	= { {50},	{70},	{110},	{160} };
-	const static int RefYstart[L_NumLev][L_NumReg]	= { {0},	{0},	{0},	{0} };
-	const static int RefYend[L_NumLev][L_NumReg]	= { {15},	{25},	{40},	{60} };
-	// If doing 2D, these can be arbitrary values
-	static int RefZstart[L_NumLev][L_NumReg]		= { {15},	{5},	{10},	{20} };
-	static int RefZend[L_NumLev][L_NumReg]			= { {45},	{55},	{90},	{140} };
-
-#endif
+	//const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_N / 4) } };
+	//const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_N / 4) - 1 } };
+	//const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_M / 4) } };
+	//const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
+	//// If doing 2D, these can be arbitrary values
+	//static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_K / 4) } };
+	//static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_M / 4) - 1 } };
 
 #endif
 
@@ -412,92 +386,97 @@ const static int zProbeLims[2] = {30, 120};		///< Limits of Z plane for array of
 */
 
 // Set default value for level and region for IB body if no subgrids
-#if (defined L_IBM_ON && L_NumLev == 0)
-	#undef L_IB_Lev
-	#undef L_IB_Reg
-	#define L_IB_Lev 0				// Grid level for immersed boundary object (0 if no refined regions)
-	#define L_IB_Reg 0				// Grid region for immersed boundary object (0 if no refined regions)
+#if (defined L_IBM_ON && L_NUM_LEVELS == 0)
+	#undef L_IB_ON_LEV
+	#undef L_IB_ON_REG
+	#define L_IB_ON_LEV 0				// Grid level for immersed boundary object (0 if no refined regions)
+	#define L_IB_ON_REG 0				// Grid region for immersed boundary object (0 if no refined regions)
 #endif
 
 // Set default value for level and region for IB body if no subgrids
 #ifndef L_IBM_ON
-	#undef L_IB_Lev
-	#undef L_IB_Reg
-	#define L_IB_Lev -1				// Grid level for immersed boundary object (-1 if no IBM)
-	#define L_IB_Reg -1				// Grid region for immersed boundary object (-1 if no IBM)
+	#undef L_IB_ON_LEV
+	#undef L_IB_ON_REG
+	#define L_IB_ON_LEV -1				// Grid level for immersed boundary object (-1 if no IBM)
+	#define L_IB_ON_REG -1				// Grid region for immersed boundary object (-1 if no IBM)
 #endif
 
 // Set dependent options
-#if L_dims == 3
-	#define L_nVels 27		///< Number of lattice velocities
+#if (L_DIMS == 3)
 
-	#define L_MPI_dir 26	///< Number of MPI directions
+	#ifdef L_USE_KBC_COLLISION
+		#define L_NUM_VELS 27		///< Number of lattice velocities
+	#else
+		#define L_NUM_VELS 19		///< Number of lattice velocities
+	#endif
+
+	#define L_MPI_DIRS 26	///< Number of MPI directions
 
 #else
-	#define L_nVels 9		// Use D2Q9
+	#define L_NUM_VELS 9		// Use D2Q9
 
 	// MPI config to 2D
-	#define L_MPI_dir 8
+	#define L_MPI_DIRS 8
 
 	// Set Z limits for 2D
-	#undef L_a_z
-	#define L_a_z 0
+	#undef L_AZ
+	#define L_AZ 0
 
-	#undef L_b_z
-	#define L_b_z 2
+	#undef L_BZ
+	#define L_BZ 2
 
 	#undef L_K
 	#define L_K 1
 
 	// Set object limits for 2D
-	#undef L_block_z_min
-	#define L_block_z_min 0
+	#undef L_BLOCK_MIN_Z
+	#define L_BLOCK_MIN_Z 0
 
-	#undef L_block_z_max
-	#define L_block_z_max 0
+	#undef L_BLOCK_MAX_Z
+	#define L_BLOCK_MAX_Z 0
 
-	#undef L_ibb_d
-	#define L_ibb_d 0
+	#undef L_IBB_D
+	#define L_IBB_D 0
 
 	// Set BFL start for 2D
-	#undef L_centre_object_z
-	#define L_centre_object_z 0
+	#undef L_CENTRE_OBJECT_Z
+	#define L_CENTRE_OBJECT_Z 0
 
 	// Set Object start for 2D
-	#undef L_centre_bfl_z
-	#define L_centre_bfl_z 0
+	#undef L_CENTRE_BFL_Z
+	#define L_CENTRE_BFL_Z 0
 
 	// Set IBB start for 2D
-	#undef L_centre_ibb_z
-	#define L_centre_ibb_z 0
+	#undef L_CENTRE_IBB_Z
+	#define L_CENTRE_IBB_Z 0
 
 	// Set z inlet velocity
-	#undef L_u_0z
-	#define L_u_0z 0
+	#undef L_UZ0
+	#define L_UZ0 0
 
 #endif
 
-#if L_NumLev == 0
+#if L_NUM_LEVELS == 0
 	// Set region info to default as no refinement
-	const static int RefXstart[1][1]	= {0};
-	const static int RefXend[1][1]		= {0};
-	const static int RefYstart[1][1]	= {0};
-	const static int RefYend[1][1]		= {0};
-	static int RefZstart[1][1]			= {0};
-	static int RefZend[1][1]			= {0};
+	const static int cRefStartX[1][1]	= {0};
+	const static int cRefEndX[1][1]		= {0};
+	const static int cRefStartY[1][1]	= {0};
+	const static int cRefEndY[1][1]		= {0};
+	static int cRefStartZ[1][1]			= {0};
+	static int cRefEndZ[1][1]			= {0};
 
-	#undef L_NumReg
-	#define L_NumReg 1
+	#undef L_NUM_REGIONS
+	#define L_NUM_REGIONS 1
 #endif
 
 // Clean up for using profiled inlet
 #ifdef L_USE_INLET_PROFILE
-	#undef L_u_0x
-	#define L_u_0x ux_in[j]
-	#undef L_u_0y
-	#define L_u_0y uy_in[j]
-	#undef L_u_0z
-	#define L_u_0z uz_in[j]
+	#undef L_UX0
+	#define L_UX0 ux_in[j]
+	#undef L_UY0
+	#define L_UY0 uy_in[j]
+	#undef L_UZ0
+	#define L_UZ0 uz_in[j]
 #endif
 
 #endif

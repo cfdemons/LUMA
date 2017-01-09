@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.2.0-alpha</span>
+   &#160;<span id="projectnumber">1.3.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -122,12 +122,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a2490c17798ca6cf4db002fa521f170c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a2490c17798ca6cf4db002fa521f170c0">k_end</a></td></tr>
 <tr class="memdesc:a2490c17798ca6cf4db002fa521f170c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ending k-index for writable region.  <a href="#a2490c17798ca6cf4db002fa521f170c0">More...</a><br /></td></tr>
 <tr class="separator:a2490c17798ca6cf4db002fa521f170c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ea3307d7dac34273ee8a7b1014273fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#a1ea3307d7dac34273ee8a7b1014273fe">halo_min</a></td></tr>
-<tr class="memdesc:a1ea3307d7dac34273ee8a7b1014273fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of halo + TL on the top end of a 1D writable block.  <a href="#a1ea3307d7dac34273ee8a7b1014273fe">More...</a><br /></td></tr>
-<tr class="separator:a1ea3307d7dac34273ee8a7b1014273fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6509514433ef18c04217b54ce4614a0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#af6509514433ef18c04217b54ce4614a0">halo_max</a></td></tr>
-<tr class="memdesc:af6509514433ef18c04217b54ce4614a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of halo + TL on the bottom end of a 1D writable block.  <a href="#af6509514433ef18c04217b54ce4614a0">More...</a><br /></td></tr>
-<tr class="separator:af6509514433ef18c04217b54ce4614a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3f8cc807724b61ef3a37509f71100ab"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html#aa3f8cc807724b61ef3a37509f71100ab">level</a></td></tr>
 <tr class="memdesc:aa3f8cc807724b61ef3a37509f71100ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grid level to which these data correspond.  <a href="#aa3f8cc807724b61ef3a37509f71100ab">More...</a><br /></td></tr>
 <tr class="separator:aa3f8cc807724b61ef3a37509f71100ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,34 +136,6 @@ Public Attributes</h2></td></tr>
 <div class="textblock"><p>Structure for storing halo information for HDF5. </p>
 <p>Structure also stores the amount of writable data on the grid. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="af6509514433ef18c04217b54ce4614a0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int MpiManager::phdf5_struct::halo_max</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Size of halo + TL on the bottom end of a 1D writable block. </p>
-
-</div>
-</div>
-<a class="anchor" id="a1ea3307d7dac34273ee8a7b1014273fe"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int MpiManager::phdf5_struct::halo_min</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Size of halo + TL on the top end of a 1D writable block. </p>
-
-</div>
-</div>
 <a class="anchor" id="a28567c9488624c7de401c9ee5c5fa13e"></a>
 <div class="memitem">
 <div class="memproto">

@@ -31,6 +31,16 @@
 	#endif
 #endif  // _DEBUG
 
+// Deprecated macros depending on platform
+#ifdef __GNUC__
+	#define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+	#define DEPRECATED __declspec(deprecated)
+#else
+	#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+	#define DEPRECATED
+#endif
+
 // Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
 #include <algorithm>
 #include <cmath>
@@ -66,12 +76,42 @@
 	#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
 #endif
 
+// Squared operator
+#define SQ(x) ((x) * (x))
+
 // Include definitions
 #include "definitions.h"
 
 // Global variable references
-extern const int c[3][L_nVels];				///< Lattice velocities
-extern const double w[L_nVels];				///< Quadrature weights
+extern const int c[3][L_NUM_VELS];				///< Lattice velocities
+extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
+extern const double w[L_NUM_VELS];				///< Quadrature weights
 extern const double cs;						///< Lattice sound speed
+
+
+// Debug stuff -- maybe I should put all these debug statements into some static
+// class and just compile blank functions if not in debugging mode?
+#ifdef L_IBM_DEBUG
+#define L_DACTION_WRITE_OUT_FORCES \
+std::ofstream testout; \
+testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app); \
+testout << "\nNEW TIME STEP" << std::endl; \
+for (size_t j = 1; j < M_lim - 1; j++) { \
+	for (size_t i = 0; i < N_lim; i++) { \
+		for (size_t v = 0; v < L_NUM_VELS; v++) { \
+			testout << force_i(i, j, 0, v, M_lim, K_lim, L_NUM_VELS) << "\t"; \
+		} \
+		testout << std::endl; \
+	} \
+	testout << std::endl; \
+} \
+testout.close(); \
+
+#else
+	#define L_DACTION_WRITE_OUT_FORCES
+#endif
+
+
+
 
 #endif

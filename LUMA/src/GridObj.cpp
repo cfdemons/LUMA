@@ -58,6 +58,9 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
+
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
 	this->timeav_timestep = 0.0;
@@ -97,6 +100,9 @@ GridObj::GridObj(int level, std::vector<int> local_size,
 		this->CoarseLimsZ[i] = 0;
 	}
 
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
+
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
 	this->timeav_timestep = 0.0;
@@ -120,6 +126,10 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 	this->level = pGrid.level + 1;
     this->region_number = RegionNumber;
 	this->t = 0;
+	this->parentGrid = &pGrid;
+
+	// Assign refinement ratio
+	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
 
 	// Reset timers
 	this->timeav_mpi_overhead = 0.0;
@@ -145,7 +155,7 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	this->subGrid.back().LBM_initSubGrid(*this);
 
 	// Add another subgrid beneath the one just created if necessary
-	if (this->subGrid.back().level < L_NumLev) {
+	if (this->subGrid.back().level < L_NUM_LEVELS) {
 		this->subGrid.back().LBM_addSubGrid(this->subGrid.back().region_number);
 	}
 

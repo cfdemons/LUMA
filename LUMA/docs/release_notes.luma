@@ -1,3 +1,32 @@
+version		=	1.3.0-alpha
+
+General		:	Reinstated force calculation and included a few other optimisations.
+				Added new refinement guide spreadsheet.
+				Optimisation for hdf2vtk (h5mgm) conversion tool plus handles missing datasets and has quiet option. Now v0.2.2.
+				Added a filled cylinder point cloud to address non-physical transients.
+				Added macro to allow marking of functions as deprecated.
+				Fixed an issue with the scaling on the cloud reader -- not documented on the tracker.
+				Standardised macro definitions.
+				Fixed an unlogged issue with the refinement ratio not beeing initialised correctly.
+				H5MGM tool updated to give more information to the user and fix an compilation issue with GNU associated with labels.
+				Memory footprint of H5MGM has now been dramatically reduced by removing unnecessary mesh points previously stored.
+
+Issue #100	:	Fixed issue with HDF5 writer when TL is completely within a halo region and data is over-trimmed. New implementation for halo trimming.
+Issue #74	:	Load balance indicator and file write-out added.
+Issue #96	:	BGK Smagorinsky model added to the optimised kernel.
+Issue #95	:	Fixed typo in pre-processor directive that prevented the use of the 3D models.
+Issue #92	:	Replaced use of halo descriptor data with simpler solution for sub-grid striding in slab copies to fix write-out inconsistencies.
+Issue #93	:	Restart file mechanism changed so that a single file is written out per rank to speed-up the process of restarting large meshes with a large number of cores.
+				This removes the capability to restart onto a different topology.
+Issue #35	:	Compression of old LUMA algorithm into a single loop and marked older kernel and elements as deprecated. 3X speed-up using optimised kernel.
+				Can be selected using the L_USE_OPTIMISED_KERNEL macro. Will reinstate other functionality as required -- raise a ticket.
+Issue #91	:	Predictor-corrector function deprecated in favour of new kernel function using Li method for IBM.
+Issue #65	:	Added FGA writer for export of field data to UE4.
+Issue #59	:	Fix in place for the momentum exchange to resolve issue with scaling and conflict with outlet BC.
+Issue #90	:	Fixed probe crash when number of probes 1 in a given direction.
+Issue #85	:	Reinstated D3Q19 velocity model.
+Issue #89	:	Fixed issue with probe output path.
+
 version		=	1.2.0
 
 General 	: 	Compatibilty between GNU and MSVC compilers has been improved through header/forward declaration rearrangement.

@@ -37,8 +37,8 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, bool flex_rigid) {
 	this->desired_vel.push_back(0.0);
 
 	// Resize vectors
-	this->fluid_vel.resize(L_dims);
-	this->force_xyz.resize(L_dims);
+	this->fluid_vel.resize(L_DIMS);
+	this->force_xyz.resize(L_DIMS);
 
 }
 

@@ -36,7 +36,7 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 
 			// Write out position
 			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				jout	<< iBody[ib].markers[i].position[0] << ", " 
 						<< iBody[ib].markers[i].position[1] << ", " 
 						<< iBody[ib].markers[i].position[2] << std::endl;
@@ -89,18 +89,21 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 /// \brief	Read/write IB body information to restart file.
 /// \param	IO_flag	flag indicating write (true) or read (false).
 /// \param	level	level of the grid begin written/read
-void ObjectManager::io_restart(bool IO_flag, int level) {
+void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
-	if (IO_flag) {
+	if (IO_flag == eWrite) {
 
 		// Output stream
 		std::ofstream file;
 
-		if (MpiManager::my_rank == 0 && level == 0) { // Overwrite as first to write
-			file.open(GridUtils::path_str + "/restart_IBBody.out", std::ios::out);
-		} else if (level == 0) { // Append
-			file.open(GridUtils::path_str + "/restart_IBBody.out", std::ios::out | std::ios::app);
-		} else { // Must be a subgrid which doesn't own any IB-bodies so return
+		if (level == 0) {
+			// Overwrite as first to write
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+		} else if (level == 0) {
+			// Append
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app);
+		} else {
+			// Must be a subgrid which doesn't own any IB-bodies so return
 			return;
 		}
 
@@ -150,7 +153,7 @@ void ObjectManager::io_restart(bool IO_flag, int level) {
 		std::ifstream file;
 
 		// We only enter this routine if on correct level so no need to check
-		file.open("./input/restart_IBBody.out", std::ios::in);
+		file.open("./input/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
 			std::cout << "Error: See Log File" << std::endl;
@@ -258,7 +261,7 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
         fout << "POINTS " << iBody[ib].markers.size() << " float\n";
         for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 				fout	<< iBody[ib].markers[i].position[0] << " " 
 						<< iBody[ib].markers[i].position[1] << " " 
 						<< iBody[ib].markers[i].position[2] << std::endl;
@@ -317,42 +320,42 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	case eBBBCloud:
 		file.open("./input/bbb_input.in", std::ios::in);
-		on_grid_lev = L_object_on_grid_lev;
-		on_grid_reg = L_object_on_grid_reg;
-		body_length = L_object_length;
-		body_start_x = L_start_object_x;
-		body_start_y = L_start_object_y;
-		body_centre_z = L_centre_object_z;
-		scale_direction = L_object_scale_direction;
+		on_grid_lev = L_OBJECT_ON_GRID_LEV;
+		on_grid_reg = L_OBJECT_ON_GRID_REG;
+		body_length = L_OBJECT_LENGTH;
+		body_start_x = L_START_OBJECT_X;
+		body_start_y = L_START_OBJECT_Y;
+		body_centre_z = L_CENTRE_OBJECT_Z;
+		scale_direction = L_OBJECT_SCALE_DIRECTION;
 		break;
 
 	case eBFLCloud:
 		file.open("./input/bfl_input.in", std::ios::in);
-		on_grid_lev = L_bfl_on_grid_lev;
-		on_grid_reg = L_bfl_on_grid_reg;
-		body_length = L_bfl_length;
-		body_start_x = L_start_bfl_x;
-		body_start_y = L_start_bfl_y;
-		body_centre_z = L_centre_bfl_z;
-		scale_direction = L_bfl_scale_direction;
+		on_grid_lev = L_BFL_ON_GRID_LEV;
+		on_grid_reg = L_BFL_ON_GRID_REG;
+		body_length = L_BFL_LENGTH;
+		body_start_x = L_START_BFL_X;
+		body_start_y = L_START_BFL_Y;
+		body_centre_z = L_CENTRE_BFL_Z;
+		scale_direction = L_BFL_SCALE_DIRECTION;
 		break;
 
 	case eIBBCloud:
 		file.open("./input/ibb_input.in", std::ios::in);
 
 		// Definitions are in phsyical units so convert to LUs
-		on_grid_lev = L_ibb_on_grid_lev;
-		on_grid_reg = L_ibb_on_grid_reg;
+		on_grid_lev = L_IBB_ON_GRID_LEV;
+		on_grid_reg = L_IBB_ON_GRID_REG;
 		GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
-		body_length = static_cast<int>(L_ibb_length / g->dx);
-		body_start_x = static_cast<int>(L_start_ibb_x / g->dx);
-		body_start_y = static_cast<int>(L_start_ibb_y / g->dx);
-		body_centre_z = static_cast<int>(L_centre_ibb_z / g->dx);
-		scale_direction = L_ibb_scale_direction;
+		body_length = static_cast<int>(L_IBB_LENGTH / g->dx);
+		body_start_x = static_cast<int>(L_START_IBB_X / g->dx);
+		body_start_y = static_cast<int>(L_START_IBB_Y / g->dx);
+		body_centre_z = static_cast<int>(L_CENTRE_IBB_Z / g->dx);
+		scale_direction = L_IBB_SCALE_DIRECTION;
 		break;
 
 	}
-	
+
 	// Handle failure to open
 	if (!file.is_open()) {
 		std::cout << "Error: See Log File" << std::endl;
@@ -374,7 +377,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		std::istringstream iss;	// Buffer stream to store characters
 
 		// Get line up to new line separator and put in buffer
-		std::getline(file,line_in,'\n');
+		std::getline(file, line_in, '\n');
 		iss.str(line_in);	// Put line in the buffer
 		iss.seekg(0);		// Reset buffer position to start of buffer
 
@@ -382,12 +385,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		iss >> tmp_x;
 		iss >> tmp_y;
 		iss >> tmp_z;
-			
+
 		_PCpts->x.push_back(tmp_x);
 		_PCpts->y.push_back(tmp_y);
-			
+
 		// If running a 2D calculation, only read in x and y coordinates and force z coordinates to match the domain
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		_PCpts->z.push_back(tmp_z);
 #else
 		_PCpts->z.push_back(0);
@@ -401,29 +404,32 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		std::cout << "Error: See Log File" << std::endl;
 		*GridUtils::logfile << "Failed to read object data from cloud input file." << std::endl;
 		exit(LUMA_FAILED);
-	} else {
+	}
+	else {
 		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
 	}
 
-	
+
 	// Rescale coordinates and shift to global lattice units
 	// (option to scale based on whatever bounding box dimension chosen)
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
-
-#if (scale_direction == eXDirection)
-	double scale_factor = (body_length * g->dx) /
-		std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-#elif (scale_direction == eYDirection)
-	double scale_factor = (body_length * g->dy) /
-		std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-#elif (scale_direction == eZDirection)
-	double scale_factor = (body_length * g->dz) /
+	double scale_factor;
+	if (scale_direction == eXDirection) {
+		scale_factor = (body_length * g->dx) /
+			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+	}
+	else if (scale_direction == eYDirection) {
+		scale_factor = (body_length * g->dy) /
+			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
+	}
+	else if (scale_direction == eZDirection) {
+		scale_factor = (body_length * g->dz) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-#endif
+	}
 
-	double shift_x =  (g->XOrigin + body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_x = (g->XOrigin + body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	double shift_y = (g->YOrigin + body_start_y * g->dy) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
@@ -436,6 +442,21 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 	}
+
+	// Write out the points after scaling and shifting
+#ifdef L_CLOUD_DEBUG
+	if (!_PCpts->x.empty()) {
+		if (MpiManager::my_rank == 0) {
+			std::ofstream fileout;
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+			for (size_t i = 0; i < _PCpts->x.size(); i++) {
+				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+				fileout << std::endl;
+			}
+			fileout.close();
+		}
+	}
+#endif
 
 	// Declare local variables
 	std::vector<int> locals;
@@ -541,13 +562,13 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 
 	// Get grid on which object resides
 	GridObj *g = NULL;
-	GridUtils::getGrid(_Grids, L_object_on_grid_lev, L_object_on_grid_reg, g);
+	GridUtils::getGrid(_Grids, L_OBJECT_ON_GRID_LEV, L_OBJECT_ON_GRID_REG, g);
 	// If this grid exists on this process
 	if (g != NULL)
 	{
 		// Create stream
 		std::ofstream fout;
-		fout.precision(L_output_precision);
+		fout.precision(L_OUTPUT_PRECISION);
 		// Filename
 		std::stringstream fileName;
 		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << MpiManager::my_rank << ".csv";
@@ -557,21 +578,16 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
 
 		fout << std::to_string(tval) << ","
-			<< std::to_string(forceOnObjectX / pow(2, L_object_on_grid_lev)) << ","
-			<< std::to_string(forceOnObjectY / pow(2, L_object_on_grid_lev)) << ","
+			<< std::to_string(forceOnObjectX / pow(2, L_OBJECT_ON_GRID_LEV)) << ","
+			<< std::to_string(forceOnObjectY / pow(2, L_OBJECT_ON_GRID_LEV)) << ","
 #if (dims == 3)
-			<< std::to_string(forceOnObjectZ / pow(2, L_object_on_grid_lev))
+			<< std::to_string(forceOnObjectZ / pow(2, L_OBJECT_ON_GRID_LEV))
 #else
 			<< std::to_string(0.0)
 #endif
 			<< std::endl;
 
 		fout.close();
-
-		// Reset for next time step
-		forceOnObjectX = 0.0;
-		forceOnObjectY = 0.0;
-		forceOnObjectZ = 0.0;
 	}
 
 }

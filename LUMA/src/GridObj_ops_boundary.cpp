@@ -30,10 +30,19 @@
 ///			in the bc_type_flag argument.
 ///
 /// \param	bc_type_flag	Flag indicating which set of BCs to apply.
-void GridObj::LBM_boundary (int bc_type_flag) {
+void GridObj::LBM_boundary(int bc_type_flag) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
+
+	// Reset object forces for force calculation
+	if ((bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) && 
+		level == L_OBJECT_ON_GRID_LEV && region_number == L_OBJECT_ON_GRID_REG) {
+		objman->forceOnObjectX = 0.0;
+		objman->forceOnObjectY = 0.0;
+		objman->forceOnObjectZ = 0.0;
+	}
+
 
 	// Loop over grid, identify BC required & apply BC
 	for (int i = 0; i < N_lim; i++) {
@@ -123,7 +132,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k) {
 	int dest_x, dest_y, dest_z;
 
 	// For each outgoing direction
-	for (int v_outgoing = 0; v_outgoing < L_nVels; v_outgoing++) {
+	for (int v_outgoing = 0; v_outgoing < L_NUM_VELS; v_outgoing++) {
 
 		// Identify site where the population will be streamed to //
 
@@ -176,7 +185,7 @@ void GridObj::bc_applyBounceBack(int label, int i, int j, int k) {
 			int v_incoming = GridUtils::getOpposite(v_outgoing);
 							
 			// Overwriting outgoing population with expected incoming value
-			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,L_nVels);
+			f(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS) = f(dest_x,dest_y,dest_z,v_incoming,M_lim,K_lim,L_NUM_VELS);
 							
 		}
 	}
@@ -208,10 +217,10 @@ void GridObj::bc_applyExtrapolation(int label, int i, int j, int k) {
 
 	if (i - 1 >= 0 && i - 2 >= 0)
 	{
-		for (size_t v = 0; v < L_nVels; v++) {
+		for (size_t v = 0; v < L_NUM_VELS; v++) {
 
 			// If right-hand wall incoming population then copy value of f from the upstream site
-			if (c[0][v] == -1) f(i,j,k,v,M_lim,K_lim,L_nVels) = f(i-1,j,k,v,M_lim,K_lim,L_nVels);
+			if (c[0][v] == -1) f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = f(i-1,j,k,v,M_lim,K_lim,L_NUM_VELS);
 
 		}
 	}
@@ -246,12 +255,12 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 	// Get references for f values to make the following a bit neater and easier to read
 	// but does make it slower
 	IVector<double> ftmp;
-	for (n = 0; n < L_nVels; n++) {
-		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,L_nVels));
+	for (n = 0; n < L_NUM_VELS; n++) {
+		ftmp.push_back(f(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
 	}	
 
 	// Loop to find orientation of wall (do not include rest direction)
-	for (size_t v_outgoing = 0; v_outgoing < L_nVels - 1; v_outgoing++) {
+	for (size_t v_outgoing = 0; v_outgoing < L_NUM_VELS - 1; v_outgoing++) {
 
 		// Identify site in this direction //
 		dest_x = i+c[0][v_outgoing];
@@ -281,7 +290,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 			int normal_dir;
 
 			// First 4 (2D) or 6 (3D) are normals so apply straight wall version of density
-			if (v_outgoing < 2 * L_dims) {
+			if (v_outgoing < 2 * L_DIMS) {
 
 				/* According to Latt & Chopard 2008 and the cited thesis by Latt 2007 we define the regularised
 				 * boundary condition as folows:
@@ -296,7 +305,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 				 */				
 
 				// Find nature of normal and assign normal velocity
-				for (n = 0; n < L_dims; n++) {
+				for (n = 0; n < L_DIMS; n++) {
 
 					// Is it normal x, y or z vector?
 					if (abs(c[n][v_outgoing]) == 1) {
@@ -305,14 +314,16 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 						// Get appropriate normal velocity (+ve u_normal = incoming flow)
 						switch (n) {
 						case 0:
-							u_normal = c[normal_dir][v_outgoing] * L_u_0x;
+							u_normal = c[normal_dir][v_outgoing] * L_UX0;
 							break;
 						case 1:
-							u_normal = c[normal_dir][v_outgoing] * L_u_0y;
+							u_normal = c[normal_dir][v_outgoing] * L_UY0;
 							break;
 						case 2:
-							u_normal = c[normal_dir][v_outgoing] * L_u_0z;
+							u_normal = c[normal_dir][v_outgoing] * L_UZ0;
 							break;
+						default:
+							u_normal = 0.0;
 						}
 
 						break;
@@ -322,7 +333,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 				// Loop through direction vectors and compute the relevant momenta
 				// from the known (outgoing) populations
-				for (n = 0; n < L_nVels; n++) {
+				for (n = 0; n < L_NUM_VELS; n++) {
 
 					// Check against normal
 					if (c[normal_dir][n] == -c[normal_dir][v_outgoing]) {
@@ -361,34 +372,34 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 			// Set macroscopic quantities to desired values
 			rho(i,j,k,M_lim,K_lim) = rho_wall;
-			u(i,j,k,0,M_lim,K_lim,L_dims) = L_u_0x;
-			u(i,j,k,1,M_lim,K_lim,L_dims) = L_u_0y;
-#if (L_dims == 3)
-			u(i,j,k,2,M_lim,K_lim,L_dims) = L_u_0z;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+#if (L_DIMS == 3)
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
 #endif
 
 			// Update feq to match the desired density and velocity and
 			// apply off-equilibrium bounce-back to unknown populations
-			for (n = 0; n < L_nVels; n++) {
-				feq(i,j,k,n,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,n);
+			for (n = 0; n < L_NUM_VELS; n++) {
+				feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i,j,k,n);
 
 
 				// Different "if conditions" for corners/edges and normal walls
-				if (v_outgoing < 2 * L_dims) {
+				if (v_outgoing < 2 * L_DIMS) {
 					// Unknowns on normal wall share normal component
 					if (c[normal_dir][n] == c[normal_dir][v_outgoing]) {
 						ftmp[n] = ftmp[GridUtils::getOpposite(n)] - 
-							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,L_nVels) - feq(i,j,k,n,M_lim,K_lim,L_nVels));
+							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,L_NUM_VELS) - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
 					}
 				} else {
 					// Unknowns on corners/edges are ones which do not share any component of outgoing vector
 					if (c[0][n] != c[0][v_outgoing] && c[1][n] != c[1][v_outgoing]
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 					&& c[2][n] != c[2][v_outgoing]
 #endif
 					) {
 						ftmp[n] = ftmp[GridUtils::getOpposite(n)] - 
-							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,L_nVels) - feq(i,j,k,n,M_lim,K_lim,L_nVels));
+							(feq(i,j,k,GridUtils::getOpposite(n),M_lim,K_lim,L_NUM_VELS) - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
 					}
 				}
 			}
@@ -396,19 +407,19 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 			// Get off-equilibrium stress components
 			double Sxx = 0, Syy = 0, Sxy = 0;	// 2D & 3D
 			double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
-			for (n = 0; n < L_nVels; n++) {
-				Sxx += c[0][n] * c[0][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
-				Syy += c[1][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
-				Szz += c[2][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
-				Sxy += c[0][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
-				Sxz += c[0][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
-				Syz += c[1][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_nVels));
+			for (n = 0; n < L_NUM_VELS; n++) {
+				Sxx += c[0][n] * c[0][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
+				Syy += c[1][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
+				Szz += c[2][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
+				Sxy += c[0][n] * c[1][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
+				Sxz += c[0][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
+				Syz += c[1][n] * c[2][n] * (ftmp[n] - feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS));
 			}
 
 			// Compute regularised non-equilibrium components and add to feq to get new populations
-			for (int v = 0; v < L_nVels; v++) {
+			for (int v = 0; v < L_NUM_VELS; v++) {
 
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = 
+				f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = 
 
 					LBM_collide(i,j,k,v) +
 						
@@ -434,20 +445,20 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 		 * base the BC. In this case it must be a buffered layer of inlet sites (the "second row" of sites you get
 		 * when embedding a sub-grid in the inlet) so just set it to default values as it doesn't affect the domain
 		 * anyway. */
-		if (v_outgoing == L_nVels) {
+		if (v_outgoing == L_NUM_VELS) {
 
 			// Set macroscopic quantities to default values
-			rho(i,j,k,M_lim,K_lim) = L_rho_in;
-			u(i,j,k,0,M_lim,K_lim,L_dims) = L_u_0x;
-			u(i,j,k,1,M_lim,K_lim,L_dims) = L_u_0y;
-#if (L_dims == 3)
-			u(i,j,k,2,M_lim,K_lim,L_dims) = L_u_0z;
+			rho(i,j,k,M_lim,K_lim) = L_RHOIN;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+#if (L_DIMS == 3)
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
 #endif
 
 			// Set f to default values
-			for (int v = 0; v < L_nVels; v++) {
-				feq(i,j,k,v,M_lim,K_lim,L_nVels) = LBM_collide(i,j,k,v);
-				f(i,j,k,v,M_lim,K_lim,L_nVels) = feq(i,j,k,v,M_lim,K_lim,L_nVels);
+			for (int v = 0; v < L_NUM_VELS; v++) {
+				feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i,j,k,v);
+				f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 			}
 		}
 
@@ -471,7 +482,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 	ObjectManager* objMan = ObjectManager::getInstance();
 
 	// For each even outgoing direction (saves BC being applied twice otherwise)
-	for (int v_outgoing = 0; v_outgoing < L_nVels; v_outgoing+=2) {
+	for (int v_outgoing = 0; v_outgoing < L_NUM_VELS; v_outgoing+=2) {
 
 		// Get oppposite direction
 		int v_incoming = GridUtils::getOpposite(v_outgoing);
@@ -517,8 +528,8 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		// Half-way Bounce Back
 		if (q == 0) {
 
-			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
-				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_nVels);
+			f(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS) = 
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_NUM_VELS);
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
@@ -529,20 +540,20 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
 				continue;
 
-			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
+			f(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS) = 
 				(1 - 2 * q) * 
-				objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],v_incoming,M_lim,K_lim,L_nVels) +
+				objMan->f_prestream(i - c[0][v_outgoing],j - c[1][v_outgoing],k - c[2][v_outgoing],v_incoming,M_lim,K_lim,L_NUM_VELS) +
 				2 * q * 
-				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_nVels);
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_NUM_VELS);
 
 		// q greater than or equal to 0.5 BFL bounce back (post stream)
 		} else if (q >= 0.5 && q < 1) {
 
-			f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
+			f(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS) = 
 				1 / (2 * q) *
-				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_nVels) +
+				objMan->f_prestream(i,j,k,v_incoming,M_lim,K_lim,L_NUM_VELS) +
 				(2 * q - 1) / (2 * q) * 
-				objMan->f_prestream(i,j,k,v_outgoing,M_lim,K_lim,L_nVels);
+				objMan->f_prestream(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS);
                           
 		}		
 
@@ -550,13 +561,13 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Apply BC in pairs  -- BC 2 */
 
 		// Get value of q (incoming direction, destination store)
-		q = objMan->pBody[0].Q[v_incoming + L_nVels][m_data->ID];
+		q = objMan->pBody[0].Q[v_incoming + L_NUM_VELS][m_data->ID];
 
 		// Half-way Bounce Back
 		if (q == 0) {
 
-			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels) = 
-				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_nVels);
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_NUM_VELS) = 
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_NUM_VELS);
 
 		// q less than 0.5 BFL bounce back (post stream)
 		} else if (q < 0.5 && q > 0) {
@@ -567,20 +578,20 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 				k - c[2][v_outgoing] < 0 || k - c[2][v_outgoing] >= K_lim)
 				continue;
 
-			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels) = 
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_NUM_VELS) = 
 				(1 - 2 * q) * 
-				objMan->f_prestream(dest_i - c[0][v_incoming],dest_j - c[1][v_incoming],dest_k - c[2][v_incoming],v_outgoing,M_lim,K_lim,L_nVels) +
+				objMan->f_prestream(dest_i - c[0][v_incoming],dest_j - c[1][v_incoming],dest_k - c[2][v_incoming],v_outgoing,M_lim,K_lim,L_NUM_VELS) +
 				2 * q * 
-				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_nVels);
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_NUM_VELS);
 
 		// q greater than or equal to 0.5 BFL bounce back (post stream)
 		} else if (q >= 0.5 && q < 1) {
 
-			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels) = 
+			f(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_NUM_VELS) = 
 				1 / (2 * q) *
-				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_nVels) +
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_outgoing,M_lim,K_lim,L_NUM_VELS) +
 				(2 * q - 1) / (2 * q) * 
-				objMan->f_prestream(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_nVels);
+				objMan->f_prestream(dest_i,dest_j,dest_k,v_incoming,M_lim,K_lim,L_NUM_VELS);
                           
 		}
 
@@ -618,7 +629,7 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k) {
 	int dest_x, dest_y, dest_z;
 
 	// Check the 4 (2D) or 6 (3D) normals to get orientation of the wall
-	for (size_t normal = 0; normal < (L_dims * 2); normal++) {
+	for (size_t normal = 0; normal < (L_DIMS * 2); normal++) {
 
 		// Identify site where the population will be streamed to //
 
@@ -668,10 +679,10 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k) {
 
 			// This normal is valid so apply specular reflection to sites getting 
 			// correct direction depending on the normal
-			for (size_t v_outgoing = 0; v_outgoing < L_nVels; v_outgoing++) {
+			for (size_t v_outgoing = 0; v_outgoing < L_NUM_VELS; v_outgoing++) {
 
-				f(i,j,k,v_outgoing,M_lim,K_lim,L_nVels) = 
-					f(dest_x,dest_y,dest_z,GridUtils::dir_reflect[normal][v_outgoing],M_lim,K_lim,L_nVels);
+				f(i,j,k,v_outgoing,M_lim,K_lim,L_NUM_VELS) = 
+					f(dest_x,dest_y,dest_z,GridUtils::dir_reflect[normal][v_outgoing],M_lim,K_lim,L_NUM_VELS);
 			}
 			break; // Do not check for any other normals
 		}
@@ -695,10 +706,10 @@ void GridObj::bc_solidSiteReset( ) {
 				// Reset solid site velocities to zero
 				if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
 					
-					u(i,j,k,0,M_lim,K_lim,L_dims) = 0.0;
-					u(i,j,k,1,M_lim,K_lim,L_dims) = 0.0;
-#if (L_dims == 3)
-					u(i,j,k,2,M_lim,K_lim,L_dims) = 0.0;
+					u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
+					u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 				}
 

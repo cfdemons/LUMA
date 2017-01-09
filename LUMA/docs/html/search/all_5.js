@@ -15,6 +15,7 @@ var searchData=
   ['ehdf5slabtype',['eHdf5SlabType',['../hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827',1,'hdf5luma.h']]],
   ['eibbcloud',['eIBBCloud',['../_object_manager_8h.html#a7b78fa3db30dfb9c1efc82bf886fe184a406e7ef09db105cf3ee74f0efaddf676',1,'ObjectManager.h']]],
   ['einlet',['eInlet',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60ea9d6c3aa304c07e89d3a2a04709f2ad58',1,'GridObj.h']]],
+  ['eioflag',['eIOFlag',['../_grid_obj_8h.html#ad1926c22ad82853adff44c4b76b97827',1,'GridObj.h']]],
   ['emaximum',['eMaximum',['../_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43fad7a43efd0c24ef3b2cacd24bb5ffe684',1,'GridUtils.h']]],
   ['eminimum',['eMinimum',['../_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43fa685aa113e3d0e867795042b26fb1f96a',1,'GridUtils.h']]],
   ['eminmax',['eMinMax',['../_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f',1,'GridUtils.h']]],
@@ -25,6 +26,7 @@ var searchData=
   ['eposz',['ePosZ',['../hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827ac8001d013004932d19bef8aad9b54d61',1,'hdf5luma.h']]],
   ['eproductvector',['eProductVector',['../hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827ab7c51b08bef16bbff8d6eb5d778b2fae',1,'hdf5luma.h']]],
   ['epsilon',['epsilon',['../class_i_b_marker.html#a8127c61f723299ba0bf04439c1fb1c1e',1,'IBMarker']]],
+  ['eread',['eRead',['../_grid_obj_8h.html#ad1926c22ad82853adff44c4b76b97827ad945f8680b27f79853b6560531cd3e21',1,'GridObj.h']]],
   ['erefined',['eRefined',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60eaaf00ee0534b31719f0d98692daaaaa3d',1,'GridObj.h']]],
   ['erefinedinlet',['eRefinedInlet',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60eab26d09958c615d6162be705b5936f3b7',1,'GridObj.h']]],
   ['erefinedsolid',['eRefinedSolid',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60eaf8f58615760e2a6fcf179064f09e6b8f',1,'GridObj.h']]],
@@ -36,6 +38,7 @@ var searchData=
   ['etransitiontofiner',['eTransitionToFiner',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60ea2d9407ad92b1a90101ab85d57385db78',1,'GridObj.h']]],
   ['etype',['eType',['../_grid_obj_8h.html#a12f8ec8f0e7a4584b9fe481bb53fa60e',1,'GridObj.h']]],
   ['evector',['eVector',['../hdf5luma_8h.html#aeb801087dd3059ef3a744ba98ed90827a0cb24ca4f528f9ee7efe120eaf3ad303',1,'hdf5luma.h']]],
+  ['ewrite',['eWrite',['../_grid_obj_8h.html#ad1926c22ad82853adff44c4b76b97827a24f15ebde1ba6f2a6c10aadd8e78df5d',1,'GridObj.h']]],
   ['exdirection',['eXDirection',['../_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1',1,'GridUtils.h']]],
   ['eydirection',['eYDirection',['../_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf',1,'GridUtils.h']]],
   ['ezdirection',['eZDirection',['../_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027',1,'GridUtils.h']]]

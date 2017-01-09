@@ -42,7 +42,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	int idx, i, j , k, v;
 	// Local grid sizes for read/writing arrays
 	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 		, K_lim = static_cast<int>(g->ZInd.size());
 #else
 		, K_lim = 1;
@@ -74,14 +74,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
 							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -104,14 +104,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
 							(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -134,14 +134,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -164,14 +164,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -194,14 +194,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -225,14 +225,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -255,14 +255,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -285,14 +285,14 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 					{
 						if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
 							GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
-#if (L_dims == 3)
+#if (L_DIMS == 3)
 							&&
 							(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
 #endif
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -323,8 +323,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -350,8 +350,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -377,8 +377,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -404,8 +404,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -431,8 +431,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -458,8 +458,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -485,8 +485,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -512,8 +512,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -539,8 +539,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -566,8 +566,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -593,8 +593,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -620,8 +620,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -647,8 +647,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -674,8 +674,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -701,8 +701,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -728,8 +728,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -755,8 +755,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}
@@ -782,8 +782,8 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 								(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
 						) {
 							// Must be a site to send
-							for (v = 0; v < L_nVels; v++) {
-								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_nVels);
+							for (v = 0; v < L_NUM_VELS; v++) {
+								f_buffer_send[dir][idx] = g->f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 								idx++;
 							}
 						}

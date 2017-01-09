@@ -30,7 +30,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Allocate the owning grid level and region for this immersed boundary
 	GridObj* g = NULL;
-	GridUtils::getGrid(this->_Grids, L_IB_Lev, L_IB_Reg, g);
+	GridUtils::getGrid(this->_Grids, L_IB_ON_LEV, L_IB_ON_REG, g);
 
 	// Increase the iBody array by single IBBody object
 	iBody.emplace_back(g, iBody.size());
@@ -47,96 +47,96 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// =========================== Build a rectangle/cuboid ===========================  //
 
 		// Dimensions
-		dimensions.push_back(L_ibb_w);
-		dimensions.push_back(L_ibb_l);
-		dimensions.push_back(L_ibb_d);
-		centrepoint.push_back(L_ibb_x);
-		centrepoint.push_back(L_ibb_y);
-		centrepoint.push_back(L_ibb_z);
+		dimensions.push_back(L_IBB_W);
+		dimensions.push_back(L_IBB_L);
+		dimensions.push_back(L_IBB_D);
+		centrepoint.push_back(L_IBB_X);
+		centrepoint.push_back(L_IBB_Y);
+		centrepoint.push_back(L_IBB_Z);
 
 		// Angle vector
 		std::vector<double> angles;
-		angles.push_back(L_ibb_angle_vert);
-#if (L_dims == 3)
-		angles.push_back(L_ibb_angle_horz);
+		angles.push_back(L_IBB_ANGLE_VERT);
+#if (L_DIMS == 3)
+		angles.push_back(L_IBB_ANGLE_HORZ);
 #else
 		angles.push_back(0.0);
 #endif
 
 		// Build
-		iBody.back().makeBody(dimensions, angles, centrepoint, false, L_ibb_deform, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(dimensions, angles, centrepoint, false, L_IBB_MOVABLE, static_cast<int>(iBody.size() - 1));
 
 
 	} else if (body_type == 2) {
 		// =========================== Build a circle/sphere ===========================  //
 
 		// Dimensions
-		centrepoint.push_back(L_ibb_x);
-		centrepoint.push_back(L_ibb_y);
-		centrepoint.push_back(L_ibb_z);
+		centrepoint.push_back(L_IBB_X);
+		centrepoint.push_back(L_IBB_Y);
+		centrepoint.push_back(L_IBB_Z);
 
 		// Build
-		iBody.back().makeBody(L_ibb_r, centrepoint, false, L_ibb_deform, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_IBB_R, centrepoint, false, L_IBB_MOVABLE, static_cast<int>(iBody.size() - 1));
 
 
 	} else if (body_type == 3) {
 		// =========================== Build both with custom dimensions ===========================  //
 
 		// Dimensions
-		centrepoint.push_back( 2*(double)(L_b_x-L_a_x)/5 );
-		centrepoint.push_back( 2*(double)(L_b_y - L_a_y)/5 );
-		centrepoint.push_back(L_ibb_z);
-		dimensions.push_back(L_ibb_w);
-		dimensions.push_back(L_ibb_l);
-		dimensions.push_back(L_ibb_d);
+		centrepoint.push_back( 2*(double)(L_BX-L_AX)/5 );
+		centrepoint.push_back( 2*(double)(L_BY - L_AY)/5 );
+		centrepoint.push_back(L_IBB_Z);
+		dimensions.push_back(L_IBB_W);
+		dimensions.push_back(L_IBB_L);
+		dimensions.push_back(L_IBB_D);
 
 		// Build circle first
-		iBody.back().makeBody(L_ibb_r, centrepoint, false, L_ibb_deform, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_IBB_R, centrepoint, false, L_IBB_MOVABLE, static_cast<int>(iBody.size() - 1));
 		
 		// Grow vector
 		iBody.emplace_back(g, iBody.size());
 
 		// Angle vector
 		std::vector<double> angles;
-		angles.push_back(L_ibb_angle_vert);
-#if (L_dims == 3)
-		angles.push_back(L_ibb_angle_horz);
+		angles.push_back(L_IBB_ANGLE_VERT);
+#if (L_DIMS == 3)
+		angles.push_back(L_IBB_ANGLE_HORZ);
 #else
 		angles.push_back(0.0);
 #endif
 		// Position
-		centrepoint[0] = 3*(double)(L_b_x - L_a_x)/5;
-		centrepoint[1] = 3*(double)(L_b_y - L_a_y)/5;
-		centrepoint[2] = L_ibb_z;
+		centrepoint[0] = 3*(double)(L_BX - L_AX)/5;
+		centrepoint[1] = 3*(double)(L_BY - L_AY)/5;
+		centrepoint[2] = L_IBB_Z;
 
 		// Build rectangle
-		iBody.back().makeBody(dimensions, angles, centrepoint, false, L_ibb_deform, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(dimensions, angles, centrepoint, false, L_IBB_MOVABLE, static_cast<int>(iBody.size() - 1));
 
 
 	} else if (body_type == 4) {
 		// =========================== Build flexible filament ===========================  //
 
 		// End points
-		start_position.push_back(L_ibb_filament_start_x);
-		start_position.push_back(L_ibb_filament_start_y);
-		start_position.push_back(L_ibb_filament_start_z);
+		start_position.push_back(L_IBB_FILAMENT_START_X);
+		start_position.push_back(L_IBB_FILAMENT_START_Y);
+		start_position.push_back(L_IBB_FILAMENT_START_Z);
 
 		// Angle vector
 		std::vector<double> angles;
-		angles.push_back(L_ibb_angle_vert);
-#if (L_dims == 3)
-		angles.push_back(L_ibb_angle_horz);
+		angles.push_back(L_IBB_ANGLE_VERT);
+#if (L_DIMS == 3)
+		angles.push_back(L_IBB_ANGLE_HORZ);
 #else
 		angles.push_back(0.0);
 #endif
 
 		// Pack BC info
 		std::vector<int> BCs;
-		BCs.push_back(L_start_BC);
-		BCs.push_back(L_end_BC);
+		BCs.push_back(L_FILAMENT_START_BC);
+		BCs.push_back(L_FILAMENT_END_BC);
 
 		// Build body
-		iBody.back().makeBody(L_num_markers, start_position, L_ibb_filament_length, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_NUM_MARKERS, start_position, L_IBB_FILAMENT_LENGTH, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
 
 		
 	} else if (body_type == 5) {
@@ -146,7 +146,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 
 		// If 2D, just build a filament
-#if (L_dims == 2)
+#if (L_DIMS == 2)
 		*GridUtils::logfile << "Building plate as a filament as only 2D" << std::endl;
 		iBody.resize(iBody.size()-1); // Reduce size of iBody vector
 		ibm_buildBody(4);	// Call add again but as a filament
@@ -155,22 +155,22 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		int group = 999;
 
 		// Centre point
-		centrepoint.push_back(L_ibb_x);
-		centrepoint.push_back(L_ibb_y);
-		centrepoint.push_back(L_ibb_z);		
+		centrepoint.push_back(L_IBB_X);
+		centrepoint.push_back(L_IBB_Y);
+		centrepoint.push_back(L_IBB_Z);		
 
 		// Dimensions
-		width_length.push_back(L_ibb_w);
-		width_length.push_back(L_ibb_d);
+		width_length.push_back(L_IBB_W);
+		width_length.push_back(L_IBB_D);
 
 		// Angles
-		angles.push_back(L_ibb_angle_vert);
-		angles.push_back(L_ibb_angle_horz);
+		angles.push_back(L_IBB_ANGLE_VERT);
+		angles.push_back(L_IBB_ANGLE_HORZ);
 
 		// Pack BC info
 		std::vector<int> BCs;
-		BCs.push_back(L_start_BC);
-		BCs.push_back(L_end_BC);
+		BCs.push_back(L_FILAMENT_START_BC);
+		BCs.push_back(L_FILAMENT_END_BC);
 
 		// Declarations
 		std::vector<double> start_point; start_point.resize(3);
@@ -181,10 +181,10 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// Define spacing for filaments
 		double  lengthwise_spacing;
 		// Must use odd number of filaments to ensure ones on edges and in centre
-		if (L_num_markers % 2 == 0) {
-			lengthwise_spacing = (width_length[1]) / (L_num_markers-1);
+		if (L_NUM_MARKERS % 2 == 0) {
+			lengthwise_spacing = (width_length[1]) / (L_NUM_MARKERS-1);
 		} else {
-			lengthwise_spacing = (width_length[1]) / L_num_markers;
+			lengthwise_spacing = (width_length[1]) / L_NUM_MARKERS;
 		}
 
 		// Loop
@@ -203,9 +203,9 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 			// Build filament with fixed group ID making centre filament flexible
 			if (i == (counter-1)/2) {
-				iBody.back().makeBody(L_num_markers, start_point, width_length[0], angles, BCs, true, true, group);
+				iBody.back().makeBody(L_NUM_MARKERS, start_point, width_length[0], angles, BCs, true, true, group);
 			} else {
-				iBody.back().makeBody(L_num_markers, start_point, width_length[0], angles, BCs, false, true, group);
+				iBody.back().makeBody(L_NUM_MARKERS, start_point, width_length[0], angles, BCs, false, true, group);
 			}
 
 
@@ -218,54 +218,54 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// =========================== Build 2D rigid plate ===========================  //
 
 		// End points
-		start_position.push_back( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
-		start_position.push_back( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_IBB_FILAMENT_START_X - (L_IBB_FILAMENT_LENGTH/2)*cos(-L_IBB_ANGLE_VERT * L_PI / 180) );
+		start_position.push_back( L_IBB_FILAMENT_START_Y - (L_IBB_FILAMENT_LENGTH/2)*sin(-L_IBB_ANGLE_VERT * L_PI / 180) );
 		start_position.push_back( 0.0 );
 
 		// Angle vector
 		std::vector<double> angles;
-		angles.push_back(-L_ibb_angle_vert);
+		angles.push_back(-L_IBB_ANGLE_VERT);
 		angles.push_back(0.0);
 
 		// Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
 		// Pack BC info
 		std::vector<int> BCs;
-		BCs.push_back(L_start_BC);
-		BCs.push_back(L_end_BC);
+		BCs.push_back(L_FILAMENT_START_BC);
+		BCs.push_back(L_FILAMENT_END_BC);
 
 		// Build body as rigid filament
-		iBody.back().makeBody(L_num_markers, start_position, L_ibb_filament_length, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
+		iBody.back().makeBody(L_NUM_MARKERS, start_position, L_IBB_FILAMENT_LENGTH, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
 
 
 	} else if (body_type == 7) {
 		// =========================== Build 2D rigid plate + flexible flap ===========================  //
 	
 		// End points
-		start_position.push_back( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) );
-		start_position.push_back( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) );
+		start_position.push_back( L_IBB_FILAMENT_START_X - (L_IBB_FILAMENT_LENGTH/2)*cos(-L_IBB_ANGLE_VERT * L_PI / 180) );
+		start_position.push_back( L_IBB_FILAMENT_START_Y - (L_IBB_FILAMENT_LENGTH/2)*sin(-L_IBB_ANGLE_VERT * L_PI / 180) );
 		start_position.push_back( 0.0 );
 
 		// Angle vector
 		std::vector<double> angles;
-		angles.push_back(-L_ibb_angle_vert);
+		angles.push_back(-L_IBB_ANGLE_VERT);
 		angles.push_back(0.0);
 
 		// Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
 		// Pack BC info
 		std::vector<int> BCs;
-		BCs.push_back(L_start_BC);
-		BCs.push_back(L_end_BC);
+		BCs.push_back(L_FILAMENT_START_BC);
+		BCs.push_back(L_FILAMENT_END_BC);
 
 		// Build body with bit chopped off end to allow flap
-		double lspace = L_ibb_filament_length / (L_num_markers-2);
-		iBody.back().makeBody(L_num_markers - 1, start_position, L_ibb_filament_length - lspace, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
+		double lspace = L_IBB_FILAMENT_LENGTH / (L_NUM_MARKERS-2);
+		iBody.back().makeBody(L_NUM_MARKERS - 1, start_position, L_IBB_FILAMENT_LENGTH - lspace, angles, BCs, false, false, static_cast<int>(iBody.size() - 1));
 
 		// Add flap of half the length (slightly lower resolution)
 		iBody.emplace_back(g, iBody.size());
 		angles[0] = 0.0;
-		start_position[0] = ( L_ibb_filament_start_x - (L_ibb_filament_length/2)*cos(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*cos(-L_ibb_angle_vert * L_PI / 180);
-		start_position[1] = ( L_ibb_filament_start_y - (L_ibb_filament_length/2)*sin(-L_ibb_angle_vert * L_PI / 180) ) + (L_ibb_filament_length)*sin(-L_ibb_angle_vert * L_PI / 180);
-		iBody.back().makeBody((L_num_markers / 2) - 3, start_position, L_ibb_filament_length / 2, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
+		start_position[0] = ( L_IBB_FILAMENT_START_X - (L_IBB_FILAMENT_LENGTH/2)*cos(-L_IBB_ANGLE_VERT * L_PI / 180) ) + (L_IBB_FILAMENT_LENGTH)*cos(-L_IBB_ANGLE_VERT * L_PI / 180);
+		start_position[1] = ( L_IBB_FILAMENT_START_Y - (L_IBB_FILAMENT_LENGTH/2)*sin(-L_IBB_ANGLE_VERT * L_PI / 180) ) + (L_IBB_FILAMENT_LENGTH)*sin(-L_IBB_ANGLE_VERT * L_PI / 180);
+		iBody.back().makeBody((L_NUM_MARKERS / 2) - 3, start_position, L_IBB_FILAMENT_LENGTH / 2, angles, BCs, true, true, static_cast<int>(iBody.size() - 1));
 
 		
 
@@ -273,38 +273,38 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// =========================== Build 3D rigid plate ===========================  //
 
 		// Dimensions
-		dimensions.push_back(L_ibb_w);
-		dimensions.push_back(L_ibb_d);
-		centrepoint.push_back(L_ibb_x);
-		centrepoint.push_back(L_ibb_y);
-		centrepoint.push_back(L_ibb_z);
+		dimensions.push_back(L_IBB_W);
+		dimensions.push_back(L_IBB_D);
+		centrepoint.push_back(L_IBB_X);
+		centrepoint.push_back(L_IBB_Y);
+		centrepoint.push_back(L_IBB_Z);
 
 		// Inclination
 		std::vector<double> angles;
-		angles.push_back(-L_ibb_angle_vert);
+		angles.push_back(-L_IBB_ANGLE_VERT);
 
 		// Build using plate flag
-		iBody.back().makeBody(dimensions, -L_ibb_angle_vert, centrepoint, false, false, static_cast<int>(iBody.size() - 1), true);
+		iBody.back().makeBody(dimensions, -L_IBB_ANGLE_VERT, centrepoint, false, false, static_cast<int>(iBody.size() - 1), true);
 
 
 	} else if (body_type == 9) {
 		// =========================== Build 3D rigid plate + flexible flap ===========================  //
 
 		// Dimensions
-		dimensions.push_back(L_ibb_w);
-		dimensions.push_back(L_ibb_d);
-		centrepoint.push_back(L_ibb_x);
-		centrepoint.push_back(L_ibb_y);
-		centrepoint.push_back(L_ibb_z);
+		dimensions.push_back(L_IBB_W);
+		dimensions.push_back(L_IBB_D);
+		centrepoint.push_back(L_IBB_X);
+		centrepoint.push_back(L_IBB_Y);
+		centrepoint.push_back(L_IBB_Z);
 
 		// Build a rigid plate
-		double lspace = iBody.back().makeBody(dimensions, -L_ibb_angle_vert, centrepoint, false, false, static_cast<int>(iBody.size() - 1), true);
+		double lspace = iBody.back().makeBody(dimensions, -L_IBB_ANGLE_VERT, centrepoint, false, false, static_cast<int>(iBody.size() - 1), true);
 		
 		// Add filament array of half the length starting horizontal
 		// Trailing edge
-		double start_z = centrepoint[2] - L_ibb_d/2, 
-		start_x = centrepoint[0] + (L_ibb_w/2)*cos(-L_ibb_angle_vert * L_PI / 180), 
-		start_y = centrepoint[1] + (L_ibb_w/2)*sin(-L_ibb_angle_vert * L_PI / 180);
+		double start_z = centrepoint[2] - L_IBB_D/2, 
+		start_x = centrepoint[0] + (L_IBB_W/2)*cos(-L_IBB_ANGLE_VERT * L_PI / 180), 
+		start_y = centrepoint[1] + (L_IBB_W/2)*sin(-L_IBB_ANGLE_VERT * L_PI / 180);
 
 		// Delete TE markers
 		std::vector<int> logvec;
@@ -325,13 +325,13 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 		// Pack BC info
 		std::vector<int> BCs;
-		BCs.push_back(L_start_BC);
-		BCs.push_back(L_end_BC);
+		BCs.push_back(L_FILAMENT_START_BC);
+		BCs.push_back(L_FILAMENT_END_BC);
 	
 		// Define number of filaments (slightly lower resolution)
 		int lengthwise_fils;
 		// Must use odd number of filaments to ensure ones on edges and in centre
-		lengthwise_fils = (int) (L_ibb_d / lspace);
+		lengthwise_fils = (int) (L_IBB_D / lspace);
 		if (lengthwise_fils % 2 == 0) {
 			lengthwise_fils = lengthwise_fils + 1;
 		}
@@ -352,9 +352,9 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 			// Build filament with fixed group ID making centre filament flexible
 			if (i == (lengthwise_fils-1)/2) {
-				iBody.back().makeBody((L_num_markers/2)-6, start_point, L_ibb_w/2, angles, BCs, true, true, 888);
+				iBody.back().makeBody((L_NUM_MARKERS/2)-6, start_point, L_IBB_W/2, angles, BCs, true, true, 888);
 			} else {
-				iBody.back().makeBody((L_num_markers/2)-6, start_point, L_ibb_w/2, angles, BCs, false, true, 888);
+				iBody.back().makeBody((L_NUM_MARKERS/2)-6, start_point, L_IBB_W/2, angles, BCs, false, true, 888);
 			}
 
 

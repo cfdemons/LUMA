@@ -4,7 +4,8 @@ Parameters are passed as a single command line argument as follows:
 
 Valid options for the argument are:
 
-	quiet		Silences warnings of missing datasets. Useful if you write non-conforming HDF5 files using something other than LUMA.
-	XXX			Where XXX are three numbers to be appended to the VTK filename to differntiate cases. e.g. h5mgm 000 will produce files named something like "vtk.000.t.vtk"
+	quiet		Will not write the log file.
+	XXX			Where XXX are three numbers to be appended to the VTK filename to differntiate cases. 
+				e.g. h5mgm 000 will produce files named something like "luma.000.<t>.vtk"
 	version		Prints the version number of the tool compiled on your system.
-	loud		Prints out the mesh building progress.
+	loud		Prints out information to the screen as well as to the log file.

@@ -49,7 +49,7 @@
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG					///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -99,7 +99,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 10000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -113,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 10000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 6000		///< Number of time steps to run simulation for
 
 
 /*
@@ -144,10 +144,10 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 
 // Lattice properties (in lattice units)
-#define L_DIMS 2		///< Number of dimensions to the problem
-#define L_N 20			///< Number of x lattice sites
-#define L_M 10			///< Number of y lattice sites
-#define L_K 1			///< Number of z lattice sites
+#define L_DIMS 3		///< Number of dimensions to the problem
+#define L_N 100			///< Number of x lattice sites
+#define L_M 50			///< Number of y lattice sites
+#define L_K 50			///< Number of z lattice sites
 
 
 /*
@@ -362,11 +362,11 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 // Global lattice indices (in terms of each grid level) for each refined region specified on each level
 
 	const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 1 },	{ 2 } };
-	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 18 }, { 31 } };
-	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 2 },	{ 2 } };
-	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 6 },	{ 6 } };
-	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 1 },	{ 1 } };
-	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 1 },	{ 1 } };
+	const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 98 }, { 193 } };
+	const static int cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS]	= { { 1 },	{ 2 } };
+	const static int cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS]		= { { 15 },	{ 27 } };
+	static int cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 10 },	{ 10 } };
+	static int cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS]			= { { 30 },	{ 30 } };
 
 	//const static int cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (L_N / 4) } };
 	//const static int cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { (3 * L_N / 4) - 1 } };

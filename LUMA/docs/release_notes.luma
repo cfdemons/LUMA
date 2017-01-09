@@ -9,6 +9,7 @@ General		:	Reinstated force calculation and included a few other optimisations.
 				Standardised macro definitions.
 				Fixed an unlogged issue with the refinement ratio not beeing initialised correctly.
 				H5MGM tool updated to give more information to the user and fix an compilation issue with GNU associated with labels.
+				Memory footprint of H5MGM has now been dramatically reduced by removing unnecessary mesh points previously stored.
 
 Issue #100	:	Fixed issue with HDF5 writer when TL is completely within a halo region and data is over-trimmed. New implementation for halo trimming.
 Issue #74	:	Load balance indicator and file write-out added.

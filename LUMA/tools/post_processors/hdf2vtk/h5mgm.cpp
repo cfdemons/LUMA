@@ -34,101 +34,34 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 		global_ids.push_back(*point_count + c);
 	}
 
-	/* In 3D we construct a polyhedron out of faces.
-	 * In 2D we simply construct a single polygon. */
+	if (dimensions_p == 3)
+	{
 
-	if (dimensions_p == 3) {
-
-		// Construct one face at a time out of vertices
-		for (int c = 0; c < 27; c++) {
-
-			// If it is a face
-			if (abs(e[0][c]) + abs(e[1][c]) + abs(e[2][c]) == 1) {
-
-				// Get face centre vector
-				int face_centre[3];
-				face_centre[0] = e[0][c];
-				face_centre[1] = e[1][c];
-				face_centre[2] = e[2][c];
-
-				// Clear temporary storage
-				face_ids.clear();
-
-				// Left face
-				if (face_centre[0] == -1) {
-
-					face_ids.push_back(*point_count + 0);
-					face_ids.push_back(*point_count + 2);
-					face_ids.push_back(*point_count + 8);
-					face_ids.push_back(*point_count + 6);
-
-				}
-				// Right face
-				else if (face_centre[0] == 1) {
-
-					face_ids.push_back(*point_count + 18);
-					face_ids.push_back(*point_count + 20);
-					face_ids.push_back(*point_count + 26);
-					face_ids.push_back(*point_count + 24);
-
-
-				}
-				// Bottom face
-				else if (face_centre[1] == -1) {
-
-					face_ids.push_back(*point_count + 0);
-					face_ids.push_back(*point_count + 2);
-					face_ids.push_back(*point_count + 20);
-					face_ids.push_back(*point_count + 18);
-
-				}
-				// Top face
-				else if (face_centre[1] == 1) {
-
-					face_ids.push_back(*point_count + 6);
-					face_ids.push_back(*point_count + 8);
-					face_ids.push_back(*point_count + 26);
-					face_ids.push_back(*point_count + 24);
-
-				}
-				// Front face
-				else if (face_centre[2] == -1) {
-
-					face_ids.push_back(*point_count + 0);
-					face_ids.push_back(*point_count + 6);
-					face_ids.push_back(*point_count + 24);
-					face_ids.push_back(*point_count + 18);
-
-				}
-				// Back face
-				else if (face_centre[2] == 1) {
-
-
-					face_ids.push_back(*point_count + 2);
-					face_ids.push_back(*point_count + 8);
-					face_ids.push_back(*point_count + 26);
-					face_ids.push_back(*point_count + 20);
-
-				}
-
-				// Add face to array
-				face_array->InsertNextCell(face_ids.size(), &face_ids[0]);
-			}
-		}
+		// Specify points that make up voxel in specific order
+		face_ids.push_back(*point_count + 0);
+		face_ids.push_back(*point_count + 4);
+		face_ids.push_back(*point_count + 2);
+		face_ids.push_back(*point_count + 6);
+		face_ids.push_back(*point_count + 1);
+		face_ids.push_back(*point_count + 5);
+		face_ids.push_back(*point_count + 3);
+		face_ids.push_back(*point_count + 7);
+		
 
 		// Update offset
-		*point_count += 27;
+		*point_count += 8;
 	}
-	else {
+	else
+	{
 
-		// Specify points that make up face
+		// Specify points that make up quad in specific order
 		face_ids.push_back(*point_count + 0);
 		face_ids.push_back(*point_count + 2);
-		face_ids.push_back(*point_count + 8);
-		face_ids.push_back(*point_count + 6);
+		face_ids.push_back(*point_count + 1);
+		face_ids.push_back(*point_count + 3);
 
 		// Update offset
-		*point_count += 9;
+		*point_count += 4;
 
 	}
 
@@ -136,11 +69,10 @@ size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
 	grid->SetPoints(global_pts);
 
 	if (dimensions_p == 3) {
-		grid->InsertNextCell(VTK_POLYHEDRON, 27, &global_ids[0],
-			6, face_array->GetPointer());
+		grid->InsertNextCell(VTK_VOXEL, 8, &face_ids[0]);
 	}
 	else {
-		grid->InsertNextCell(VTK_POLYGON, 4, &face_ids[0]);
+		grid->InsertNextCell(VTK_PIXEL, 4, &face_ids[0]);
 
 	}
 
@@ -180,7 +112,7 @@ int main(int argc, char* argv[])
 	std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << ". Running..." << std::endl;
 
 	// Path for output
-	std::string path_str("./vtk_output");
+	std::string path_str(H5MGM_OUTPUT_PATH);
 
 	// Create directory
 	std::string command = "mkdir -p " + path_str;
@@ -193,7 +125,9 @@ int main(int argc, char* argv[])
 	// Open log file if not set to quiet
 	if (bQuiet == false)
 	{
-		logfile.open("log.out", std::ios::out | std::ios::app);
+		std::string logpath = H5MGM_OUTPUT_PATH;
+		logpath += "/log.out";
+		logfile.open(logpath, std::ios::out | std::ios::app);
 		logfile << "---------------------------------------" << std::endl;
 	}
 
@@ -273,10 +207,10 @@ int main(int argc, char* argv[])
 	// Create cell node position list for VTK
 	std::vector< std::vector<double> > cell_points;
 	if (dimensions_p == 3) {
-		cell_points.resize(27, std::vector<double>(3));
+		cell_points.resize(8, std::vector<double>(3));
 	}
 	else {
-		cell_points.resize(9, std::vector<double>(3));
+		cell_points.resize(4, std::vector<double>(3));
 	}
 
 
@@ -368,26 +302,26 @@ int main(int argc, char* argv[])
 			if (status != 0)
 			{
 				writeInfo("Typing matrix read failed -- exiting early.", eFatal);
-				return EARLY_EXIT;
+				exit(EARLY_EXIT);
 			}
 			status = readDataset("/XPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, X);
 			if (status != 0)
 			{
 				writeInfo("X position vector read failed -- exiting early.", eFatal);
-				return EARLY_EXIT;
+				exit(EARLY_EXIT);
 			}
 			status = readDataset("/YPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Y);
 			if (status != 0)
 			{
 				writeInfo("Y position vector read failed -- exiting early.", eFatal);
-				return EARLY_EXIT;
+				exit(EARLY_EXIT);
 			}
 			if (dimensions_p == 3) {
 				status = readDataset("/ZPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Z);
 				if (status != 0)
 				{
 					writeInfo("Z position vector read failed -- exiting early.", eFatal);
-					return EARLY_EXIT;
+					exit(EARLY_EXIT);
 				}
 			}
 
@@ -412,8 +346,8 @@ int main(int argc, char* argv[])
 
 				if (dimensions_p == 3) {
 
-					// Find positions of all 27 possible points and store
-					for (int p = 0; p < 27; p++) {
+					// Find positions of corner points and store
+					for (int p = 0; p < 8; ++p) {
 						cell_points[p][0] = X[c] + e[0][p] * (dx / 2);
 						cell_points[p][1] = Y[c] + e[1][p] * (dx / 2);
 						cell_points[p][2] = Z[c] + e[2][p] * (dx / 2);
@@ -422,13 +356,11 @@ int main(int argc, char* argv[])
 				}
 				else {
 
-					// Find positions of all 9 possible points and store
-					int vert = 0;
-					for (int p = 1; p < 27; p += 3) {
-						cell_points[vert][0] = X[c] + e[0][p] * (dx / 2);
-						cell_points[vert][1] = Y[c] + e[1][p] * (dx / 2);
-						cell_points[vert][2] = 0.0;
-						vert++;
+					// Find positions of corner points and store
+					for (int p = 0; p < 4; ++p) {
+						cell_points[p][0] = X[c] + e2[0][p] * (dx / 2);
+						cell_points[p][1] = Y[c] + e2[1][p] * (dx / 2);
+						cell_points[p][2] = 0.0;
 					}
 
 				}
@@ -472,10 +404,14 @@ int main(int argc, char* argv[])
 	cleaner->Update();
 	cleaner->GetOutput();
 	std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
+	// Could also use CleanPolyGrid?
 
 	// Time loop
-	int count = 0; int missed_set_count = 0;
+	int count = 0; int missed_set_count;
 	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
+
+		// Reset counter
+		missed_set_count = 0;
 
 		// Create VTK filename
 		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t) + ".vtk";
@@ -578,19 +514,20 @@ int main(int argc, char* argv[])
 		if (dimensions_p == 3 && missed_set_count == NUM_DATASETS_3D)
 		{
 			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
-			return EARLY_EXIT;
+			exit(EARLY_EXIT);
 		}
 		else if (dimensions_p == 2 && missed_set_count == NUM_DATASETS_2D)
 		{
 			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
-			return EARLY_EXIT;
+			exit(EARLY_EXIT);
 		}
 	
 		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
 
 		// Print progress to screen
-		std::cout << "\r" << std::to_string((int)(((float)(t + out_every) / (float)(timesteps + out_every)) * 100.0f)) << "% complete." << std::flush;
+		std::cout << "\r" << std::to_string((int)(((float)(t + out_every) / 
+			(float)(timesteps + out_every)) * 100.0f)) << "% complete." << std::flush;
 
 		// Write grid to file
 		vtkSmartPointer<vtkUnstructuredGridWriter> writer =

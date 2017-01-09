@@ -45,6 +45,7 @@
 #define EARLY_EXIT 998
 #define NUM_DATASETS_3D 15
 #define NUM_DATASETS_2D 10
+#define H5MGM_OUTPUT_PATH "./vtk_output"
 
 // Static variables
 static bool bQuiet = false;
@@ -52,11 +53,17 @@ static bool bLoud = false;
 static ofstream logfile;
 
 // Unit vectors for node positions on each cell
-const int e[3][27] =
+const int e[3][8] =
 {
-	{ -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  1,  1,  1 },
-	{ -1, -1, -1,  0,  0,  0,  1,  1,  1, -1, -1, -1,  0,  0,  0,  1,  1,  1, -1, -1, -1,  0,  0,  0,  1,  1,  1 },
-	{ -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1 }
+	{ -1, -1, -1, -1,  1,  1,  1,  1 },
+	{ -1, -1,  1,  1, -1, -1,  1,  1 },
+	{ -1,  1, -1,  1, -1,  1, -1,  1 }
+};
+
+const int e2[2][4] =
+{
+	{ -1, -1,  1, 1 },
+	{ -1,  1, -1, 1 }
 };
 
 // Typing enumeration from LUMA

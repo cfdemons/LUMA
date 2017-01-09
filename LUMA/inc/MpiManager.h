@@ -86,7 +86,7 @@ public :
 	// Static Data (commonly used and grid-independent)
 	static int my_rank;				///< Rank number
 	static int num_ranks;			///< Total number of ranks in MPI Cartesian topology
-	static int MPI_coords[L_DIMS];	///< Coordinates in MPI Cartesian topolgy
+	static int MPI_coords[L_DIMS];	///< Coordinates in MPI Cartesian topology
 
 
 	// Grid data

@@ -44,7 +44,7 @@
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 #define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -70,14 +70,14 @@
 #define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
 
 // Output Options
-#define L_OUT_EVERY 2000			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -113,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 6000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -144,7 +144,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 
 // Lattice properties (in lattice units)
-#define L_DIMS 3		///< Number of dimensions to the problem
+#define L_DIMS 2		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 50			///< Number of y lattice sites
 #define L_K 50			///< Number of z lattice sites
@@ -198,7 +198,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 */
 
 // Master IBM switches //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 #define L_IB_ON_LEV 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_ON_REG 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
@@ -206,17 +206,17 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // Read in IB Body from File
-//#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
+#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
 
 	#define L_IBB_ON_GRID_LEV L_IB_ON_LEV		///< Provide grid level on which object should be added
 	#define L_IBB_ON_GRID_REG L_IB_ON_REG		///< Provide grid region on which object should be added
 	// Following specified in physical distances
-	#define L_START_IBB_X 0.3		///< Start X of object bounding box
-	#define L_START_IBB_Y 0.2		///< Start Y of object bounding box
+	#define L_START_IBB_X 0.4		///< Start X of object bounding box
+	#define L_START_IBB_Y 0.35		///< Start Y of object bounding box
 	#define L_CENTRE_IBB_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_IBB_LENGTH 0.5		///< The object input is scaled based on this dimension
+	#define L_IBB_LENGTH 0.2		///< The object input is scaled based on this dimension
 	#define L_IBB_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_IBB_REF_LENGTH 0.5	///< Reference length to be used in the definition of Reynolds number
+	#define L_IBB_REF_LENGTH 0.2	///< Reference length to be used in the definition of Reynolds number
 
 // Default global properties
 #define L_NUM_MARKERS 31		///< Number of Lagrange points to use when building a prefab body (approximately)
@@ -225,7 +225,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 
 // Switches for inserting certain bodies (enable only one at once!)
-#define L_INSERT_CIRCLE_SPHERE
+//#define L_INSERT_CIRCLE_SPHERE
 //#define L_INSERT_RECTANGLE_CUBOID
 //#define L_INSERT_BOTH
 //#define L_INSERT_FILAMENT
@@ -355,7 +355,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0

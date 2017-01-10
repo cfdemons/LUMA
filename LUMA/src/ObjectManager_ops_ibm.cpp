@@ -146,9 +146,10 @@ void ObjectManager::ibm_initialise() {
 		bodyout.close();
 #endif
 
-		// Compute extended support for each marker
-		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
-			ibm_findSupport(ib, m);	// Pass body ID and marker ID
+		// Compute extended support for each marker in the body (or body portion)
+		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++)
+		{
+			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
 
 		// Find epsilon for the body
@@ -195,19 +196,24 @@ double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Declarations
-	int inear, jnear;		// Nearest node indices
-	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
-#if (L_DIMS == 3)
-	double dist_z, delta_z;
+	int inear, jnear;							// Nearest node indices (global indices)
+	std::vector<double> nearpos;				// Position of the nearest marker
 	int knear;
+
+#ifdef L_BUILD_FOR_MPI
+	// Get MpiManager
+	MpiManager *mpim = MpiManager::getInstance();
+	int estimated_rank_offset[3] = { 0, 0, 0 };
+	iBody[ib].markers[m].support_rank.push_back(MpiManager::my_rank);	// Add this rank for owning the first support point
 #endif
 
-
 	// Find closest support node (simulate std::round as not availble on MSVC2012)
+	// Should always be on this rank and should not be in recv layer.
 	inear = (int)std::floor(
 		(iBody[ib].markers[m].position[0] - (iBody[ib]._Owner->XOrigin - iBody[ib]._Owner->dx / 2.0)) 
 		/ iBody[ib]._Owner->dx
 		);
+
 	jnear = (int)std::floor(
 		(iBody[ib].markers[m].position[1] - (iBody[ib]._Owner->YOrigin - iBody[ib]._Owner->dy / 2.0)) 
 		/ iBody[ib]._Owner->dy
@@ -218,49 +224,38 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		(iBody[ib].markers[m].position[2] - (iBody[ib]._Owner->ZOrigin - iBody[ib]._Owner->dz / 2.0)) 
 		/ iBody[ib]._Owner->dz
 		);
+#else
+	knear = 0;
 #endif
 
+	// Get local indices of the nearest node so we can retrieve the position
+	std::vector<int> locals;
+	GridUtils::global_to_local(inear, jnear, knear, iBody[ib]._Owner, locals);
+	nearpos.push_back(iBody[ib]._Owner->XPos[locals[0]]);
+	nearpos.push_back(iBody[ib]._Owner->YPos[locals[1]]);
+	nearpos.push_back(iBody[ib]._Owner->ZPos[locals[2]]);
 
-	/* Define limits of support region (only have to do one since lattice is 
-	 * uniformly spaced with dx = dy = dz). Following protocol for arbitrary 
-	 * grid spacing each marker should have at least 3 support nodes in each 
-	 * direction. */
-	double h_plus = std::max(
-		std::abs((iBody[ib]._Owner->XPos[inear + 1] - iBody[ib]._Owner->XPos[inear]) / iBody[ib]._Owner->dx), 
-		std::abs((iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[inear - 1]) / iBody[ib]._Owner->dx)
-		);
-	double h_minus = std::min(
-		std::abs((iBody[ib]._Owner->XPos[inear + 1] - iBody[ib]._Owner->XPos[inear]) / iBody[ib]._Owner->dx), 
-		std::abs((iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[inear - 1]) / iBody[ib]._Owner->dx)
-		);
+	// Side length of support region defined as 3 x dilation parameter
+	iBody[ib].markers[m].dilation = 1.0;
 
-	// Side length of support region defined as 3 x dilation paramter which is found from:
-	iBody[ib].markers[m].dilation = (5.0/6.0) * h_plus + (1.0/6.0) * h_minus;	// TODO Find out why this has such a drastic effect on everything
-		//+ ( (1.0/9.0)); // * (1 / pow(2,iBody[ib]._Owner->level)) );	// This last term is a small fraction of the local grid spacing in lattice units
+	// Vector to store estimated positions of the possible support points
+	double estimated_position[3] = { 0, 0, 0 };
 
-
-	// Test to see if required support nodes are available
-	if ( inear - 5 < 0 || static_cast<size_t>(inear + 5) >= iBody[ib]._Owner->N_lim ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the X boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-
-	} else if ( jnear - 5 < 0 || static_cast<size_t>(jnear + 5) >= iBody[ib]._Owner->M_lim ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Y boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-
-	}
-
-#if (L_DIMS == 3)
-	else if ( knear - 5 < 0 || static_cast<size_t>(knear + 5) >= iBody[ib]._Owner->K_lim ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body " << std::to_string(ib) << " is too near the Z boundary of the grid so support cannot be guaranteed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
-	}
+#ifdef L_IBM_DEBUG
+	// DEBUG -- write out support point list adding marker header here
+	std::ofstream supportout;
+	supportout.open(GridUtils::path_str 
+		+ "/IBsupport_" + std::to_string(ib) 
+		+ "_rank" + std::to_string(MpiManager::my_rank)
+		+ ".out", std::ios::app);
+	supportout
+		<< "Marker: " << m << "\t"
+		<< iBody[ib].markers[m].position[0] << "\t"
+		<< iBody[ib].markers[m].position[1] << "\t"
+		<< iBody[ib].markers[m].position[2] << std::endl;
 #endif
 
-	// Loop over surrounding 5 nodes to find support nodes
+	// Loop over surrounding 5 lattice sites and check if within support region
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
 #if (L_DIMS == 3)
@@ -269,65 +264,136 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 			int k = 0;
 #endif
 			{
+				/* Estimate position of suppot point rather than read from the 
+				 * grid in case the point is outside the rank. 
+				 * Estimate only works since LBM lattice uniformly spaced. */				
+				estimated_position[0] = nearpos[0] + (i - inear) * iBody[ib]._Owner->dx;
+				estimated_position[1] = nearpos[1] + (j - jnear) * iBody[ib]._Owner->dy;
+				estimated_position[2] = nearpos[2] + (k - knear) * iBody[ib]._Owner->dz;
 
-				// Find distance between Lagrange marker and possible support node and decide whether in cage or not
+				/* Find distance between Lagrange marker and proposed support point and
+				 * Check if inside the cage (convert to lattice units) */
 				if	(
-					( fabs(iBody[ib]._Owner->XPos[inear] - iBody[ib]._Owner->XPos[i])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation ) &&
-					( fabs(iBody[ib]._Owner->YPos[jnear] - iBody[ib]._Owner->YPos[j])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
+					(fabs(iBody[ib].markers[m].position[0] - estimated_position[0]) / iBody[ib]._Owner->dx	
+					< 1.5 * iBody[ib].markers[m].dilation) &&
+					(fabs(iBody[ib].markers[m].position[1] - estimated_position[1]) / iBody[ib]._Owner->dy	
+					< 1.5 * iBody[ib].markers[m].dilation)
 #if (L_DIMS == 3)
 					&&
-					( fabs(iBody[ib]._Owner->ZPos[knear] - iBody[ib]._Owner->ZPos[k])/iBody[ib]._Owner->dx < 1.5*iBody[ib].markers[m].dilation )
+					(fabs(iBody[ib].markers[m].position[2] - estimated_position[2]) / iBody[ib]._Owner->dz 
+					< 1.5 * iBody[ib].markers[m].dilation)
 #endif
 					)
 				{
 
+#ifdef L_IBM_DEBUG
+					// DEBUG -- add this support point to the list
+					supportout
+						<< iBody[ib].markers[m].support_rank.back() << "\t"
+						<< estimated_position[0] << "\t"
+						<< estimated_position[1] << "\t"
+						<< estimated_position[2] << std::endl;
+#endif
+
 					// Skip the nearest as already added when marker constructed
-					if (i == inear && j == jnear
+					if (i != inear && j != jnear
 #if (L_DIMS == 3)
-						&& k == knear
+						&& k != knear
 #endif			
-						) continue;
+						)
+					{
 
-					// Lies within support region so store information
-					iBody[ib].markers[m].supp_i.push_back(i);
-					iBody[ib].markers[m].supp_j.push_back(j);
-					iBody[ib].markers[m].supp_k.push_back(k);
 
+						// Lies within support region so add support point data
+						iBody[ib].markers[m].supp_i.push_back(i);
+						iBody[ib].markers[m].supp_j.push_back(j);
+						iBody[ib].markers[m].supp_k.push_back(k);
+
+						// Add owning rank as this one for now
+						iBody[ib].markers[m].support_rank.push_back(MpiManager::my_rank);
+
+
+#ifdef L_BUILD_FOR_MPI
+						/* Estimate which rank this point belongs to by seeing which
+						 * edge of the grid it is off. Use estimated rather than
+						 * actual positions. Compare to sender layer edges as if
+						 * it is on the recv layer it is belongs to the neighbour. */
+						if (estimated_position[0] < mpim->sender_layer_pos.X[0]) estimated_rank_offset[0] = -1;
+						if (estimated_position[0] > mpim->sender_layer_pos.X[3]) estimated_rank_offset[0] = 1;
+						if (estimated_position[1] < mpim->sender_layer_pos.Y[0]) estimated_rank_offset[1] = -1;
+						if (estimated_position[1] > mpim->sender_layer_pos.Y[3]) estimated_rank_offset[1] = 1;
+#if (L_DIMS == 3)
+						if (estimated_position[2] < mpim->sender_layer_pos.Z[0]) estimated_rank_offset[2] = -1;
+						if (estimated_position[2] > mpim->sender_layer_pos.Z[3]) estimated_rank_offset[2] = 1;
+#endif
+
+						// Get MPI direction of the neighbour that owns this point
+						int owner_direction = GridUtils::getMpiDirection(estimated_rank_offset);
+						if (owner_direction != -1)
+						{
+							// Owned by a neighbour so correct the support rank
+							iBody[ib].markers[m].support_rank.back() = mpim->neighbour_rank[owner_direction];
+						}
+					}
+#endif
 				}
 			}
 		}
 	}
 
+#ifdef L_IBM_DEBUG
+	// DEBUG -- close the file
+	supportout.close();
+#endif
+
 	// Store normalised area of support region
 	iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
 
-	// Loop over all nodes for marker m and compute additional data for each
-	for (size_t s = 0; s < iBody[ib].markers[m].supp_i.size(); s++) {
-
-		int i = iBody[ib].markers[m].supp_i[s];
-		int j = iBody[ib].markers[m].supp_j[s];
-		int k = iBody[ib].markers[m].supp_k[s];
-
-		// Distance between Lagrange marker and support node in lattice units
-		dist_x = (iBody[ib]._Owner->XPos[i] - iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
-		dist_y = (iBody[ib]._Owner->YPos[j] - iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
-#if (L_DIMS == 3)
-		dist_z = (iBody[ib]._Owner->ZPos[k] - iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
-#endif
-
-		// Store delta function value
-		delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
-		delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
-#if (L_DIMS == 3)
-		delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
-#endif
-
-		iBody[ib].markers[m].deltaval.push_back(delta_x * delta_y
-#if (L_DIMS == 3)
-			* delta_z
-#endif	
-			);
+	/* Initialise delta information for the set of support points 
+	 * including those not on this rank using estimated positions. */
+	for (int s = 0; s < static_cast<int>(iBody[ib].markers[m].supp_i.size()); s++)
+	{
+		ibm_initialiseSupport(ib, m, s, estimated_position);
 	}
+
+}
+
+// *****************************************************************************
+/// \brief	Initialise data associated with support points found.
+///
+///			Finds and stores the delta values of the support points.
+///
+/// \param	ib	iBody being operated on.
+/// \param	m	marker of interest.
+/// \param	s	support point of interest.
+void ObjectManager::ibm_initialiseSupport(int ib, int m, int s, double estimated_position[])
+{
+
+	// Declarations
+	double dist_x, dist_y, delta_x, delta_y;	// Distances and deltas
+#if (L_DIMS == 3)
+	double dist_z, delta_z;
+#endif
+
+	// Distance between Lagrange marker and support node in lattice units
+	dist_x = (estimated_position[0] - iBody[ib].markers[m].position[0]) / iBody[ib]._Owner->dx;
+	dist_y = (estimated_position[1] - iBody[ib].markers[m].position[1]) / iBody[ib]._Owner->dy;
+#if (L_DIMS == 3)
+	dist_z = (estimated_position[2] - iBody[ib].markers[m].position[2]) / iBody[ib]._Owner->dz;
+#endif
+
+	// Store delta function value
+	delta_x = ibm_deltaKernel(dist_x, iBody[ib].markers[m].dilation);
+	delta_y = ibm_deltaKernel(dist_y, iBody[ib].markers[m].dilation);
+#if (L_DIMS == 3)
+	delta_z = ibm_deltaKernel(dist_z, iBody[ib].markers[m].dilation);
+#endif
+
+	iBody[ib].markers[m].deltaval.push_back(delta_x * delta_y
+#if (L_DIMS == 3)
+		* delta_z
+#endif	
+		);
 }
 
 // *****************************************************************************
@@ -453,6 +519,14 @@ void ObjectManager::ibm_spread(int ib) {
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
 double ObjectManager::ibm_findEpsilon(int ib) {
+
+	/***** TODO: In order to compute epsilon using this linear system a single process needs 
+	to know all the delta values of all the support points in the body to build the whole system. 
+	We could simply nominate a rank to do this based on the body ID but we will have to think about
+	how to gather the data -- this is one of the problems of not using the other approach I guess. *****/
+
+
+
 
 	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.

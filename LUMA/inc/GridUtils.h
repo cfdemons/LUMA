@@ -101,7 +101,7 @@ public:
 	static bool isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);	// Is site on specified sender layer
 	static bool isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);		// Is site on speicfied recv layer
 	static bool isOffGrid(int i, int j, int k, GridObj& g);						// Is site off supplied grid
-
+	static int getMpiDirection(int offset_vector[]);							// Get MPI direction from vector
 
 	// Templated functions //
 

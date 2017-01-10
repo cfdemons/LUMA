@@ -941,3 +941,29 @@ std::vector<int> GridUtils::getVoxInd(double x, double y, double z, GridObj* g) 
 	return vox;
 
 }
+
+// ****************************************************************************
+/// \brief	Get direction in MPI topology from unit vector.
+///
+/// \param	offset_vector	unit vector pointing away from current rank.
+/// \return	MPI direction.
+int GridUtils::getMpiDirection(int offset_vector[])
+{
+	// Loop over the directions
+	for (int d = 0; d < L_MPI_DIRS; ++d)
+	{
+		if (offset_vector[0] == MpiManager::MPI_cartlab[0][d] &&
+			offset_vector[1] == MpiManager::MPI_cartlab[1][d]
+
+#if (L_DIMS == 3)
+			&& offset_vector[2] == MpiManager::MPI_cartlab[2][d]
+#endif
+			)
+		{
+			return d;
+		}
+	}
+
+	return -1;
+
+}

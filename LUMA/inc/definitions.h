@@ -129,10 +129,10 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 /// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_MPI_ZCORES 2
 
-//#define L_USE_CUSTOM_MPI_SIZES		///< Define to use custom decomposition otherwise decomposition will be uniform
+//#define L_MPI_PLANAR_DECOMPOSITION		///< Define to use custom decomposition otherwise decomposition will be uniform
 
 // MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 	/// Number of sites in X direction for each custom rank
 	const static size_t cRankSizeX[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {50, 50, 50, 50, 350, 350, 350, 350};
 	/// Number of sites in Y direction for each custom rank

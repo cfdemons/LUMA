@@ -168,7 +168,7 @@ void MpiManager::mpi_init() {
 		}
 		*MpiManager::logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 	// If using custom sizes, user must set the L_MPI_ZCORES to 1
 	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
 		std::cout << "Error: See Log File" << std::endl;
@@ -210,7 +210,7 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
-#ifndef L_USE_CUSTOM_MPI_SIZES
+#ifndef L_MPI_PLANAR_DECOMPOSITION
 
 		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
 			// If number of cores doesn't allow exact division of grid sites, exit.
@@ -224,8 +224,10 @@ void MpiManager::mpi_gridbuild( ) {
 		} else {
 
 			// Else, find local grid size
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
+			//
+			
 			// Get grids sizes from the definitions file
 			switch (d)
 			{
@@ -259,7 +261,7 @@ void MpiManager::mpi_gridbuild( ) {
 	global_edge_pos.resize( 6, std::vector<double>(num_ranks) );
 
 
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
 	// If using custom sizing need to cumulatively establish how far from origin
 
@@ -366,7 +368,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 
 	// Check my grid size dimensions with the neighbours to make sure it all lines up
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
 	// 3D check
 #if (L_DIMS == 3)
@@ -439,7 +441,7 @@ void MpiManager::mpi_gridbuild( ) {
 		 }
 
 #endif // L_DIMS == 3
-#endif // L_USE_CUSTOM_MPI_SIZES
+#endif // L_MPI_PLANAR_DECOMPOSITION
 
 }
 

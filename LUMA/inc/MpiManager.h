@@ -53,6 +53,16 @@ public :
 	int MPI_dims[L_DIMS];						///< Size of MPI Cartesian topology
 	int neighbour_rank[L_MPI_DIRS];				///< Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[L_DIMS][L_MPI_DIRS];	///< Coordinates in MPI topology of neighbour ranks
+
+	// Sizes of each of the mpi domains. 
+#ifdef L_MPI_PLANAR_DECOMPOSITION
+	// Number of sites in X direction for each custom rank
+	std::vector<size_t> cRankSizeX;
+	// Number of sites in Y direction for each custom rank
+	std::vector<size_t> cRankSizeY;
+	// Number of sites in Z direction for each custom rank.
+	std::vector<size_t> cRankSizeZ;
+#endif
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)

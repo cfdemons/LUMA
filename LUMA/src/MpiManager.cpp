@@ -264,16 +264,19 @@ void MpiManager::mpi_gridbuild( ) {
 		for (int j = 0; j < numCores[1]; j++){
 			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
 
-			for (int k = 0; k < numCores[2]; j++){
+			for (int k = 0; k < numCores[2]; k++){
 				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
 				cRankSizeX[ind] = sX;
 				cRankSizeY[ind] = sY;
 				cRankSizeZ[ind] = sZ;
 				ind++;
+
+				*MpiManager::logout << ind << std::endl;
 			}
 		}
 	}
 
+	
 	for (int i = 0; i < (numCores[0] * numCores[1] * numCores[2]); i++)
 		*MpiManager::logout << cRankSizeX[i] << " " << cRankSizeY[i] << " " << cRankSizeZ[i] << std::endl;
 

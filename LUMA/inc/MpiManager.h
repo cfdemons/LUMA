@@ -57,11 +57,11 @@ public :
 	// Sizes of each of the mpi domains. 
 #ifdef L_MPI_PLANAR_DECOMPOSITION
 	// Number of sites in X direction for each custom rank
-	std::vector<size_t> cRankSizeX;
+	std::vector<int> cRankSizeX;
 	// Number of sites in Y direction for each custom rank
-	std::vector<size_t> cRankSizeY;
+	std::vector<int> cRankSizeY;
 	// Number of sites in Z direction for each custom rank.
-	std::vector<size_t> cRankSizeZ;
+	std::vector<int> cRankSizeZ;
 #endif
 	
 	/// Communicators for sub-grid / region combinations

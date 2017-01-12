@@ -221,8 +221,8 @@ void MpiManager::mpi_gridbuild( ) {
 	//Fill up the cRankSize arrays with the coordinates of each mpi region. 
 
 	//Auxiliar variables
-	float numCells[3];
-	float numCores[3];
+	int numCells[3];
+	int numCores[3];
 	numCells[0] = L_N;
 	numCells[1] = L_M;
 	numCells[2] = L_K;
@@ -241,7 +241,7 @@ void MpiManager::mpi_gridbuild( ) {
 	for (size_t d = 0; d < L_DIMS; d++){
 
 		//Calculate the size of each domain
-		cellsInDomains[d] = ceil(numCells[d] / numCores[d]);
+		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
 
 		//Calculate the size of the last domain
 		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d]*numCores[d] - numCells[d]);
@@ -257,15 +257,15 @@ void MpiManager::mpi_gridbuild( ) {
 	}
 
 	//Fill the cRankSize arrays
-	size_t ind = 0;
-	for (size_t i = 0; i < numCores[0]; i++){
-		size_t sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+	int ind = 0;
+	for (int i = 0; i < numCores[0]; i++){
+		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
 
-		for (size_t j = 0; j < numCores[1]; j++){
-			size_t sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+		for (int j = 0; j < numCores[1]; j++){
+			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
 
-			for (size_t k = 0; k < numCores[2]; j++){
-				size_t sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+			for (int k = 0; k < numCores[2]; j++){
+				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
 				cRankSizeX[ind] = sX;
 				cRankSizeY[ind] = sY;
 				cRankSizeZ[ind] = sZ;

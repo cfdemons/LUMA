@@ -237,6 +237,10 @@ void MpiManager::mpi_gridbuild( ) {
 	int cellsInDomains[3];
 	int cellsLastDomain[3];
 
+	//Set the last position to 0, just in case we are working with L_DIMS = 2
+	cellsInDomains[2] = 0;
+	cellsLastDomain[2] = 0;
+
 	//Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++){
 
@@ -249,7 +253,7 @@ void MpiManager::mpi_gridbuild( ) {
 		//Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0){
 			std::cout << "Error: See Log File" << std::endl;
-			*MpiManager::logout << "Last core in dir="<< d << "direction has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x, d=1 is y, d=2 is z" << std::endl;
+			*MpiManager::logout << "Last core in dir= "<< d << " has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x, d=1 is y, d=2 is z" << std::endl;
 			MpiManager::logout->close();
 			MPI_Finalize();
 			exit(LUMA_FAILED);
@@ -270,15 +274,10 @@ void MpiManager::mpi_gridbuild( ) {
 				cRankSizeY[ind] = sY;
 				cRankSizeZ[ind] = sZ;
 				ind++;
-
-				*MpiManager::logout << ind << std::endl;
 			}
 		}
 	}
 
-	
-	for (int i = 0; i < (numCores[0] * numCores[1] * numCores[2]); i++)
-		*MpiManager::logout << cRankSizeX[i] << " " << cRankSizeY[i] << " " << cRankSizeZ[i] << std::endl;
 
 #endif 
 
@@ -290,16 +289,6 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
-//#ifndef L_MPI_PLANAR_DECOMPOSITION
-//
-//		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
-//			// If number of cores doesn't allow exact division of grid sites, exit.
-//			std::cout << "Error: See Log File" << std::endl;
-//			*MpiManager::logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
-//			MpiManager::logout->close();
-//			MPI_Finalize();
-//			exit(LUMA_FAILED);
-//#endif
 
 		} else {
 

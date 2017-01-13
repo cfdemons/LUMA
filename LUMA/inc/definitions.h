@@ -42,7 +42,7 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 #define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
@@ -70,7 +70,7 @@
 #define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 10       		///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -113,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 100		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 10		///< Number of time steps to run simulation for
 
 
 /*
@@ -126,22 +126,9 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-/// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_MPI_ZCORES 2
 
-#define L_MPI_PLANAR_DECOMPOSITION		///< Define to use custom decomposition otherwise decomposition will be uniform
-
-// MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
-//#ifdef L_MPI_PLANAR_DECOMPOSITION
-//	/// Number of sites in X direction for each custom rank
-//	const static size_t cRankSizeX[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]; //= { 50, 50, 50, 50, 350, 350, 350, 350 };
-//	/// Number of sites in Y direction for each custom rank
-//	const static size_t cRankSizeY[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]; //= { 20, 20, 130, 130, 20, 20, 130, 130 };
-//	/// Number of sites in Z direction for each custom rank.
-//	/// The following can be arbitrary if doing a 2D problem
-//	const static size_t cRankSizeZ[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]; //= { 20, 30, 20, 30, 20, 30, 20, 30 };
-//#endif
-
+#define L_MPI_PLANAR_DECOMPOSITION		///< Define to use uniform decomposition even if the number of cells in a direction is not divisible by its number of cores. LUMA will adjust the number of cells on the last MPI domain. 
 
 // Lattice properties (in lattice units)
 #define L_DIMS 3		///< Number of dimensions to the problem

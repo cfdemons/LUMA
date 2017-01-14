@@ -125,7 +125,9 @@ inline void errorfcn(std::string msg, std::ofstream *logfile)
 	std::cout << "Error: See Log File" << std::endl;
 	*logfile << msg << std::endl;
 	logfile->close();
+#ifdef L_BUILD_FOR_MPI
 	MPI_Finalize();
+#endif
 	exit(LUMA_FAILED);
 }
 

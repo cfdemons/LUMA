@@ -187,6 +187,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[k]);
 
 	storeID = m_data->ID;
+	delete m_data;
 
 	// Get list of IDs of neighbour vertices for plane construction
 	std::vector<int> V;
@@ -211,7 +212,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 			}
 		}
 	}
-	delete m_data;
+	
 
 	// Build a triangular plane for each combination of vertices //
 
@@ -369,6 +370,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[0]);
 
 	int storeID = m_data->ID;
+	delete m_data;
 
 
 	// Get list of IDs of neighbour vertices for line construction
@@ -387,11 +389,13 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 				// If data valid, then store ID
 				if (m_data->ID != -1) V.push_back(m_data->ID);
 
+				// Clean-up after getMarkerData call
+				delete m_data;
+
 			}
 
 		}
 	}
-	delete m_data;
 
 	// Can only continue if we have at least 2 points
 	if (V.size() < 2) return;

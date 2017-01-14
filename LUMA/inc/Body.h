@@ -323,11 +323,12 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 	// True if the data store is not empty
 	if (m_data->ID != -1) {
 
-		delete m_data;	// Deallocate the store
+		delete m_data;	// Deallocate the store before leaving scope
 		return true;
 
 	}
 
+	delete m_data;
 	return false;
 
 };

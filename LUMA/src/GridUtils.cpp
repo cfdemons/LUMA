@@ -524,7 +524,7 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank loc,
 	if (grid != nullptr)
 	{
 		// If location vector is null then create one and remember to delete it
-		if (pos != nullptr) {
+		if (pos == nullptr) {
 			new_vector = true;
 			pos = new std::vector<int>();
 		}
@@ -1243,15 +1243,15 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 		idx = 4;
 	}
 
-	// Get local index (although could be off grid)
+	// Compute number of complete cells between point and edge of rank core
 	*ijk = static_cast<int>(
 		std::floor((xyz - mpim->rank_core_edge[idx][mpim->my_rank]) / g->dh)
 		);
 
-	// Compute offset from global edge (note that max halo thickness is 1 / refinement ratio)
+	// Compute offset from global edge (number of voxels between grid edge and rank egde)
 	offset = static_cast<int>(
-		(mpim->rank_core_edge[idx][mpim->my_rank] - 
-		mpim->global_edges[idx][g->level + g->region_number * L_NUM_LEVELS]) / g->dh
+		std::round((mpim->rank_core_edge[idx][mpim->my_rank] - 
+		mpim->global_edges[idx][g->level + g->region_number * L_NUM_LEVELS]) / g->dh)
 		);
 
 	/* If the origin is not on the halo but outside this rank to the left then offset

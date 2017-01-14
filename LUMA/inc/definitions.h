@@ -67,7 +67,7 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -96,7 +96,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 5000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 50		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -303,7 +303,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_BLOCK_ON_GRID_LEV 2		///< Provide grid level on which block should be added 
 	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
@@ -320,29 +320,29 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Bounce-back objects from point clouds
 //#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_OBJECT_ON_GRID_LEV 0		///< Provide grid level on which object should be added 
+	#define L_OBJECT_ON_GRID_LEV 2		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_OBJECT_X 0.2		///< Start of object bounding box in X direction
-	#define L_START_OBJECT_Y 0.1		///< Start of object bounding box in Y direction
+	#define L_START_OBJECT_X 0.7		///< Start of object bounding box in X direction
+	#define L_START_OBJECT_Y 0.4		///< Start of object bounding box in Y direction
 	#define L_CENTRE_OBJECT_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_OBJECT_LENGTH 0.3			///< The object input is scaled based on this dimension
+	#define L_OBJECT_LENGTH 0.2			///< The object input is scaled based on this dimension
 	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_OBJECT_REF_LENGTH 0.3		///< Reference length to be used in the definition of Reynolds number
+	#define L_OBJECT_REF_LENGTH 0.2		///< Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects
 //#define L_BFL_ON					///< Build BFL body from point cloud
 
-	#define L_BFL_ON_GRID_LEV 0		///< Provide grid level on which BFL body should be added 
+	#define L_BFL_ON_GRID_LEV 2		///< Provide grid level on which BFL body should be added 
 	#define L_BFL_ON_GRID_REG 0		///< Provide grid region on which BFL body should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_BFL_X 0.3		///< Start of object bounding box in X direction
-	#define L_START_BFL_Y 0.3		///< Start of object bounding box in Y direction
+	#define L_START_BFL_X 0.9		///< Start of object bounding box in X direction
+	#define L_START_BFL_Y 0.4		///< Start of object bounding box in Y direction
 	#define L_CENTRE_BFL_Z 0.5		///< Cetnre of object bounding box in Z direction
-	#define L_BFL_LENGTH 0.4		///< The BFL object input is scaled based on this dimension
+	#define L_BFL_LENGTH 0.2		///< The BFL object input is scaled based on this dimension
 	#define L_BFL_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_BFL_REF_LENGTH 0.4	///< Reference length to be used in the definition of Reynolds number
+	#define L_BFL_REF_LENGTH 0.2	///< Reference length to be used in the definition of Reynolds number
 
 
 

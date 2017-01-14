@@ -350,7 +350,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		// Definitions are in phsyical units so convert to LUs
 		on_grid_lev = L_IBB_ON_GRID_LEV;
 		on_grid_reg = L_IBB_ON_GRID_REG;
-		GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
 		body_length = L_IBB_LENGTH;
 		body_start_x = L_START_IBB_X;
 		body_start_y = L_START_IBB_Y;
@@ -370,6 +369,14 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
+	MpiManager *mpim = MpiManager::getInstance();
+	int mpim_idx = g->level + g->region_number * L_NUM_LEVELS;
+
+	// Round bounding box dimensions to nearest voxel edge on this grid
+	body_start_x = std::round(body_start_x / g->dh) * g->dh;
+	body_start_y = std::round(body_start_y / g->dh) * g->dh;
+	body_centre_z = std::round(body_centre_z / g->dh) * g->dh + g->dh / 2.0;	// Centre shifted to voxel centre
+	body_length = std::round(body_length / g->dh) * g->dh;
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -410,30 +417,31 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 
 
-	// Rescale coordinates and shift to global lattice units
-	// (option to scale based on whatever bounding box dimension chosen)
+	// Rescale coordinates to fit into size required
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
 	double scale_factor;
+	// Scale slightly smaller (to voxel centres) to ensure symmetrical distribution of voxels
 	if (scale_direction == eXDirection) {
-		scale_factor = body_length /
+		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
 	else if (scale_direction == eYDirection) {
-		scale_factor = body_length /
+		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
 	else if (scale_direction == eZDirection) {
-		scale_factor = body_length /
+		scale_factor = (body_length - g->dh) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
 
-	double shift_x = (g->XOrigin + body_start_x) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
-	double shift_y = (g->YOrigin + body_start_y) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	// Shift to voxel centre not to edge
+	double shift_x = (body_start_x + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_y = (body_start_y + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-	double z_start_position = g->ZOrigin + body_centre_z - (scaled_body_length / 2);
+	double z_start_position = body_centre_z - (scaled_body_length / 2);
 	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 
 	// Apply to each point to convert to global positions

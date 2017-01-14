@@ -61,10 +61,11 @@ void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 	markers.emplace_back(x, y, z, flex_rigid);
 
 	// Add nearest node as basic support
-	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
-	this->markers.back().supp_i.push_back(globals[0]);
-	this->markers.back().supp_j.push_back(globals[1]);
-	this->markers.back().supp_k.push_back(globals[2]);
+	std::vector<int> ijk;
+	GridUtils::getEnclosingVoxel(x, y, z, _Owner, &ijk);
+	this->markers.back().supp_i.push_back(ijk[0]);
+	this->markers.back().supp_j.push_back(ijk[1]);
+	this->markers.back().supp_k.push_back(ijk[2]);
 
 }
 
@@ -172,9 +173,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(L_IBB_W,L_IBB_L) != 0 && fmod(len,wid) != 0 && fmod(len,L_IBB_D) != 0 && fmod(dep,len) != 0) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -225,9 +224,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) +
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -287,9 +284,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -308,9 +303,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -329,7 +322,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	for (int i = 0; i < np_x; i++) {
 		for (int j = 0; j < np_y; j++) {
 			// 2D specification of z
-			z = (L_BZ - L_AZ)/2;
+			z = L_BZ/2;
 
 			// x and y positions
 			x = start_x + i*spacing;
@@ -357,9 +350,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Just in case anything goes wrong here...
 	if (markers.size() != num_points) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Body is not closed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Body is not closed. Exiting.", GridUtils::logfile);
 	}
 
 }
@@ -381,9 +372,7 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting.", GridUtils::logfile);
 	}
 
 	// Designate BCs
@@ -452,9 +441,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Exit if called in 2D
 	if ( L_DIMS == 2 ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting.", GridUtils::logfile);
 	}
 
 	// Designate body as being flexible or rigid and an open surface
@@ -482,9 +469,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -503,9 +488,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners

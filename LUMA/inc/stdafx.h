@@ -49,6 +49,7 @@
 #include <fstream>
 #include <sstream>
 #include <numeric>
+#include <assert.h>
 
 // Check OS is Windows or not
 #ifdef _WIN32
@@ -66,9 +67,6 @@
 #endif
 
 #include <stdio.h>
-
-/// Error definition
-#define LUMA_FAILED 12345
 
 #ifdef _WIN32
 	#define L_IS_NAN _isnan			///< Not a Number declaration (Windows)
@@ -110,6 +108,26 @@ testout.close(); \
 #else
 	#define L_DACTION_WRITE_OUT_FORCES
 #endif
+
+
+/// Error definition
+#define LUMA_FAILED 12345
+#define L_ERROR errorfcn	///< Error function shorthand
+/// \brief Fatal Error function.
+///
+///			Writes error to the user and further information to the supplied logfile.
+///			Inlined since this header is included everywhere.
+///
+///	\param	msg		string to be printed to the log file.
+///	\param	logfile	pointer to the logfile where the message is to be written.
+inline void errorfcn(std::string msg, std::ofstream *logfile)
+{
+	std::cout << "Error: See Log File" << std::endl;
+	*logfile << msg << std::endl;
+	logfile->close();
+	MPI_Finalize();
+	exit(LUMA_FAILED);
+}
 
 
 

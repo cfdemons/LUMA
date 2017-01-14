@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.3.0</span>
+   &#160;<span id="projectnumber">1.4.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -101,9 +101,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ae2c829e8787d4aa03ec961dc84213b0d"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ae2c829e8787d4aa03ec961dc84213b0d">createOutputDirectory</a> (std::string <a class="el" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">path_str</a>)</td></tr>
-<tr class="memdesc:ae2c829e8787d4aa03ec961dc84213b0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create output directory.  <a href="#ae2c829e8787d4aa03ec961dc84213b0d">More...</a><br /></td></tr>
-<tr class="separator:ae2c829e8787d4aa03ec961dc84213b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af931614cb5eab6b906aa01106089b628"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af931614cb5eab6b906aa01106089b628">createOutputDirectory</a> (std::string <a class="el" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">path_str</a>)</td></tr>
+<tr class="memdesc:af931614cb5eab6b906aa01106089b628"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create output directory.  <a href="#af931614cb5eab6b906aa01106089b628">More...</a><br /></td></tr>
+<tr class="separator:af931614cb5eab6b906aa01106089b628"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a1f0d4a76be76a743c368c9a1d4d46cbc">onespace</a> (int min, int max)</td></tr>
 <tr class="memdesc:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a linearly-spaced vector of integers.  <a href="#a1f0d4a76be76a743c368c9a1d4d46cbc">More...</a><br /></td></tr>
 <tr class="separator:a1f0d4a76be76a743c368c9a1d4d46cbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,36 +152,48 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:afac10170d3f6f96a32da6a783b815954"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#afac10170d3f6f96a32da6a783b815954">getGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *&amp;Grids, int level, int region, <a class="el" href="class_grid_obj.html">GridObj</a> *&amp;ptr)</td></tr>
 <tr class="memdesc:afac10170d3f6f96a32da6a783b815954"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to a given grid in the hierarchy.  <a href="#afac10170d3f6f96a32da6a783b815954">More...</a><br /></td></tr>
 <tr class="separator:afac10170d3f6f96a32da6a783b815954"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6d26dfc410f88cb0901464a58c594ac"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ad6d26dfc410f88cb0901464a58c594ac">getVoxInd</a> (double x, double y, double z, <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
-<tr class="memdesc:ad6d26dfc410f88cb0901464a58c594ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices.  <a href="#ad6d26dfc410f88cb0901464a58c594ac">More...</a><br /></td></tr>
-<tr class="separator:ad6d26dfc410f88cb0901464a58c594ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a7c13884020ab181ee8cb6dd2ea7e4fd7">isOverlapPeriodic</a> (int i, int j, int k, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
 <tr class="memdesc:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether halo containng i,j,k links to neighbour rank periodically.  <a href="#a7c13884020ab181ee8cb6dd2ea7e4fd7">More...</a><br /></td></tr>
 <tr class="separator:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1c2d23d0cdd548368aaaffb4f22502d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ac1c2d23d0cdd548368aaaffb4f22502d">isOnThisRank</a> (int gi, int gj, int gk, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
-<tr class="memdesc:ac1c2d23d0cdd548368aaaffb4f22502d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether site with supplied index in on the current rank.  <a href="#ac1c2d23d0cdd548368aaaffb4f22502d">More...</a><br /></td></tr>
-<tr class="separator:ac1c2d23d0cdd548368aaaffb4f22502d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d9558846f757c6f60fa61f104b63071"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a1d9558846f757c6f60fa61f104b63071">isOnThisRank</a> (int gl, enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> xyz, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
-<tr class="memdesc:a1d9558846f757c6f60fa61f104b63071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether global index can be found on the current rank.  <a href="#a1d9558846f757c6f60fa61f104b63071">More...</a><br /></td></tr>
-<tr class="separator:a1d9558846f757c6f60fa61f104b63071"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0863e64842ddc907d0a2ab22b9624e07"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a0863e64842ddc907d0a2ab22b9624e07">hasThisSubGrid</a> (const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid, int RegNum)</td></tr>
-<tr class="memdesc:a0863e64842ddc907d0a2ab22b9624e07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether specified refined region is on the grid provided.  <a href="#a0863e64842ddc907d0a2ab22b9624e07">More...</a><br /></td></tr>
-<tr class="separator:a0863e64842ddc907d0a2ab22b9624e07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcf9512bd143ac0b9ef7eec33f1510ec"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#adcf9512bd143ac0b9ef7eec33f1510ec">isOnThisRank</a> (double x, double y, double z, <a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> loc=<a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dca6505acf15690a324459e652a94fc339a">eNone</a>, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid=nullptr, std::vector&lt; int &gt; *pos=nullptr)</td></tr>
+<tr class="memdesc:adcf9512bd143ac0b9ef7eec33f1510ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether site with supplied position is on the current rank.  <a href="#adcf9512bd143ac0b9ef7eec33f1510ec">More...</a><br /></td></tr>
+<tr class="separator:adcf9512bd143ac0b9ef7eec33f1510ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eca1ee0dff756b5cd65d45f84b24118"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a4eca1ee0dff756b5cd65d45f84b24118">isOnThisRank</a> (double xyz, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> loc=<a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dca6505acf15690a324459e652a94fc339a">eNone</a>, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid=nullptr, int *pos=nullptr)</td></tr>
+<tr class="memdesc:a4eca1ee0dff756b5cd65d45f84b24118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether the supplied position can be found on the current rank.  <a href="#a4eca1ee0dff756b5cd65d45f84b24118">More...</a><br /></td></tr>
+<tr class="separator:a4eca1ee0dff756b5cd65d45f84b24118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a14da5d778eb6d81fbcd5c9331a8082dd">intersectsRefinedRegion</a> (const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid, int RegNum)</td></tr>
+<tr class="memdesc:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided.  <a href="#a14da5d778eb6d81fbcd5c9331a8082dd">More...</a><br /></td></tr>
+<tr class="separator:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0692236725709af2d98872805fc84ae"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af0692236725709af2d98872805fc84ae">isOnSenderLayer</a> (double pos_x, double pos_y, double pos_z)</td></tr>
 <tr class="memdesc:af0692236725709af2d98872805fc84ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an inner (sender) halo.  <a href="#af0692236725709af2d98872805fc84ae">More...</a><br /></td></tr>
 <tr class="separator:af0692236725709af2d98872805fc84ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfec29d90b6942de2f3c52c225a4d888"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#abfec29d90b6942de2f3c52c225a4d888">isOnRecvLayer</a> (double pos_x, double pos_y, double pos_z)</td></tr>
 <tr class="memdesc:abfec29d90b6942de2f3c52c225a4d888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an outer (receiver) halo.  <a href="#abfec29d90b6942de2f3c52c225a4d888">More...</a><br /></td></tr>
 <tr class="separator:abfec29d90b6942de2f3c52c225a4d888"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70a234125350fca607d3943e0f1edd7c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a70a234125350fca607d3943e0f1edd7c">isOnSenderLayer</a> (double site_position, enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> xyz, enum <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax)</td></tr>
-<tr class="memdesc:a70a234125350fca607d3943e0f1edd7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an inner (sender) halo.  <a href="#a70a234125350fca607d3943e0f1edd7c">More...</a><br /></td></tr>
-<tr class="separator:a70a234125350fca607d3943e0f1edd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2b6e1225cab2a840110e2a70f6bd23c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af2b6e1225cab2a840110e2a70f6bd23c">isOnRecvLayer</a> (double site_position, enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> xyz, enum <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax)</td></tr>
-<tr class="memdesc:af2b6e1225cab2a840110e2a70f6bd23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an outer (receiver) halo.  <a href="#af2b6e1225cab2a840110e2a70f6bd23c">More...</a><br /></td></tr>
-<tr class="separator:af2b6e1225cab2a840110e2a70f6bd23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48709fd0b88db1e79bbc3a12026fe33a"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a48709fd0b88db1e79bbc3a12026fe33a">isOffGrid</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> &amp;g)</td></tr>
-<tr class="memdesc:a48709fd0b88db1e79bbc3a12026fe33a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests whether a site is on a given grid.  <a href="#a48709fd0b88db1e79bbc3a12026fe33a">More...</a><br /></td></tr>
-<tr class="separator:a48709fd0b88db1e79bbc3a12026fe33a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a595b78d268cdbc0e6a3b008ac93e0cb4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a595b78d268cdbc0e6a3b008ac93e0cb4">isOnSenderLayer</a> (double site_position, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax)</td></tr>
+<tr class="memdesc:a595b78d268cdbc0e6a3b008ac93e0cb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an inner (sender) halo.  <a href="#a595b78d268cdbc0e6a3b008ac93e0cb4">More...</a><br /></td></tr>
+<tr class="separator:a595b78d268cdbc0e6a3b008ac93e0cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fb32f233e85584a04856c6c67299d68"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a0fb32f233e85584a04856c6c67299d68">isOnRecvLayer</a> (double site_position, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax)</td></tr>
+<tr class="memdesc:a0fb32f233e85584a04856c6c67299d68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an outer (receiver) halo.  <a href="#a0fb32f233e85584a04856c6c67299d68">More...</a><br /></td></tr>
+<tr class="separator:a0fb32f233e85584a04856c6c67299d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a59da2eb58afd9e785b45b23ad962df"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a1a59da2eb58afd9e785b45b23ad962df">getMpiDirection</a> (int offset_vector[])</td></tr>
+<tr class="memdesc:a1a59da2eb58afd9e785b45b23ad962df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get direction in MPI topology from unit vector.  <a href="#a1a59da2eb58afd9e785b45b23ad962df">More...</a><br /></td></tr>
+<tr class="separator:a1a59da2eb58afd9e785b45b23ad962df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb35c1a485e74c0b2794b84573b5e50f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#acb35c1a485e74c0b2794b84573b5e50f">isOffGrid</a> (int i, int j, int k, const <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
+<tr class="memdesc:acb35c1a485e74c0b2794b84573b5e50f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests whether a site is on a given grid.  <a href="#acb35c1a485e74c0b2794b84573b5e50f">More...</a><br /></td></tr>
+<tr class="separator:acb35c1a485e74c0b2794b84573b5e50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c030776101d001fda37eb7f90d2b20"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ad0c030776101d001fda37eb7f90d2b20">getEnclosingVoxel</a> (double x, double y, double z, const <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; int &gt; *ijk)</td></tr>
+<tr class="memdesc:ad0c030776101d001fda37eb7f90d2b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#ad0c030776101d001fda37eb7f90d2b20">More...</a><br /></td></tr>
+<tr class="separator:ad0c030776101d001fda37eb7f90d2b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20901145122cf56507713abe0467638c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a20901145122cf56507713abe0467638c">getEnclosingVoxel</a> (double x, const <a class="el" href="class_grid_obj.html">GridObj</a> *g, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, int *ijk)</td></tr>
+<tr class="memdesc:a20901145122cf56507713abe0467638c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#a20901145122cf56507713abe0467638c">More...</a><br /></td></tr>
+<tr class="separator:a20901145122cf56507713abe0467638c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d9c31d1c15198d1455627d1fa29804"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a78d9c31d1c15198d1455627d1fa29804">isOnTransitionLayer</a> (double pos_x, double pos_y, double pos_z, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid)</td></tr>
+<tr class="memdesc:a78d9c31d1c15198d1455627d1fa29804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a TL.  <a href="#a78d9c31d1c15198d1455627d1fa29804">More...</a><br /></td></tr>
+<tr class="separator:a78d9c31d1c15198d1455627d1fa29804"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af241bda5fffef58362b1e77d9d3de6dc"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af241bda5fffef58362b1e77d9d3de6dc">isOnTransitionLayer</a> (double position, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a> minmax, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid)</td></tr>
+<tr class="memdesc:af241bda5fffef58362b1e77d9d3de6dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a specific TL (to upper).  <a href="#af241bda5fffef58362b1e77d9d3de6dc">More...</a><br /></td></tr>
+<tr class="separator:af241bda5fffef58362b1e77d9d3de6dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a78aa4876d7066bce253c52457e7b901d">vecnorm</a> (NumType a1, NumType a2, NumType a3)</td></tr>
 <tr class="memdesc:a78aa4876d7066bce253c52457e7b901d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the L2-norm.  <a href="#a78aa4876d7066bce253c52457e7b901d">More...</a><br /></td></tr>
@@ -206,14 +218,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#aa3ca6e20ef4fa927cb845956d7565b1e">stridedCopy</a> (NumType *dest, NumType *src, size_t block, size_t offset, size_t stride, size_t count, size_t buf_offset=0)</td></tr>
 <tr class="memdesc:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a strided memcpy.  <a href="#aa3ca6e20ef4fa927cb845956d7565b1e">More...</a><br /></td></tr>
 <tr class="separator:aa3ca6e20ef4fa927cb845956d7565b1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
-<tr class="memitem:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a28cba8aa8cbe5dd20fa3405e2f46eeb2">global_to_local</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; NumType &gt; &amp;locals)</td></tr>
-<tr class="memdesc:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps global indices to local indices.  <a href="#a28cba8aa8cbe5dd20fa3405e2f46eeb2">More...</a><br /></td></tr>
-<tr class="separator:a28cba8aa8cbe5dd20fa3405e2f46eeb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3e122b19b2ee0e159b3025b2858d895"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
-<tr class="memitem:ac3e122b19b2ee0e159b3025b2858d895"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ac3e122b19b2ee0e159b3025b2858d895">local_to_global</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; NumType &gt; &amp;globals)</td></tr>
-<tr class="memdesc:ac3e122b19b2ee0e159b3025b2858d895"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps local indices to global indices.  <a href="#ac3e122b19b2ee0e159b3025b2858d895">More...</a><br /></td></tr>
-<tr class="separator:ac3e122b19b2ee0e159b3025b2858d895"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -275,7 +279,7 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae2c829e8787d4aa03ec961dc84213b0d"></a>
+<a class="anchor" id="af931614cb5eab6b906aa01106089b628"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -283,7 +287,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int GridUtils::createOutputDirectory </td>
+          <td class="memname">void GridUtils::createOutputDirectory </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>path_str</em></td><td>)</td>
@@ -298,7 +302,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Create output directory. </p>
-<p>Compatible with both Windows and Linux. Filename and path passed as a single string. Returns 9 if the directory creation was not attempted due to not being rank 0. Returns platform specific codes for everything else.</p>
+<p>Compatible with both Windows and Linux. Filename and path passed as a single string. Returns nothing at the moment.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path_str</td><td>full path and filename as string. </td></tr>
@@ -553,6 +557,129 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="ad0c030776101d001fda37eb7f90d2b20"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridUtils::getEnclosingVoxel </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; int &gt; *&#160;</td>
+          <td class="paramname"><em>ijk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get local voxel indices on grid in which provided position lies. </p>
+<p>Wrapper for the overload which concentates all check into a vector.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>x-position. </td></tr>
+    <tr><td class="paramname">y</td><td>y-position. </td></tr>
+    <tr><td class="paramname">z</td><td>z-position. </td></tr>
+    <tr><td class="paramname">g</td><td>lattice on which to look for enclosing voxel. </td></tr>
+    <tr><td class="paramname">ijk</td><td>pointer to vector where indices are to be placed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a20901145122cf56507713abe0467638c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridUtils::getEnclosingVoxel </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>xyz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>ijk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get local voxel indices on grid in which provided position lies. </p>
+<p>Will return the 1D voxel index of the voxel on the lattice provided within which point with position (xyz) lies. This is done by rounding the position to obtain how many voxels in from the grid core edge it is, then accounting for whether the grid starts on another rank, in the halo, or further into the grid by offsetting the original index by this amount. This approach saves expensive seraches of the position vectors on each grid. This method can be used as a position -&gt; voxel converter. The index may be off grid so it is advisable to call isOnThisRank instead.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xyz</td><td>x, y or z-position. </td></tr>
+    <tr><td class="paramname">g</td><td>lattice on which to look for enclosing voxel. </td></tr>
+    <tr><td class="paramname">dir</td><td>1D direction. </td></tr>
+    <tr><td class="paramname">ijk</td><td>pointer to local index storage location. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="aee47fe58eccee5fffd67bb489fd1c315"></a>
 <div class="memitem">
 <div class="memproto">
@@ -684,6 +811,39 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a1a59da2eb58afd9e785b45b23ad962df"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridUtils::getMpiDirection </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>offset_vector</em>[]</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get direction in MPI topology from unit vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">offset_vector</td><td>unit vector pointing away from current rank. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>MPI direction. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="af3c54e468658879756c71b01abd028d5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -718,7 +878,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ad6d26dfc410f88cb0901464a58c594ac"></a>
+<a class="anchor" id="a14da5d778eb6d81fbcd5c9331a8082dd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -726,133 +886,7 @@ template&lt;typename NumType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; int &gt; GridUtils::getVoxInd </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>z</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
-          <td class="paramname"><em>g</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get local voxel indices. </p>
-<p>Will return the voxel indices of the nearest voxel on the lattice provided for a given point described as a position in global space. Can return global values that are not on this MPI rank. Use the <a class="el" href="class_grid_utils.html#ac1c2d23d0cdd548368aaaffb4f22502d" title="Finds out whether site with supplied index in on the current rank. ">GridUtils::isOnThisRank()</a> method to check the result. This method is used as a position -&gt; voxel converter.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>global x-position. </td></tr>
-    <tr><td class="paramname">y</td><td>global y-position. </td></tr>
-    <tr><td class="paramname">z</td><td>global z-position. </td></tr>
-    <tr><td class="paramname">g</td><td>lattice on which to look for nearest voxel. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>vector of indices of the nearest voxel on supplied lattice level. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a28cba8aa8cbe5dd20fa3405e2f46eeb2"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename NumType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void GridUtils::global_to_local </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
-          <td class="paramname"><em>g</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; NumType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>locals</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Maps global indices to local indices. </p>
-<p>Takes a vector container and populates it with the local indices where the supplied global site can be found on the grid supplied. If global indicies are not found on the supplied grid then local index of -1 is returned.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">i</td><td>global index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">j</td><td>global index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">k</td><td>global index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">g</td><td>grid on which local indices are required </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">locals</td><td>vector container for local indices </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a0863e64842ddc907d0a2ab22b9624e07"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool GridUtils::hasThisSubGrid </td>
+          <td class="memname">bool GridUtils::intersectsRefinedRegion </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
           <td class="paramname"><em>pGrid</em>, </td>
@@ -876,7 +910,8 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Finds out whether specified refined region is on the grid provided. </p>
+<p>Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided. </p>
+<p>Prinicpal use is for sub-grid initialisation to determine whether a sub-grid needs adding or not. This decision is made based on whether any part of the grid is covered by the discrete voxels of existing grids on the rank.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pGrid</td><td>parent grid at appropriate level. </td></tr>
@@ -888,7 +923,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a48709fd0b88db1e79bbc3a12026fe33a"></a>
+<a class="anchor" id="acb35c1a485e74c0b2794b84573b5e50f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -916,7 +951,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
           <td class="paramname"><em>g</em>&#160;</td>
         </tr>
         <tr>
@@ -998,7 +1033,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="af2b6e1225cab2a840110e2a70f6bd23c"></a>
+<a class="anchor" id="a0fb32f233e85584a04856c6c67299d68"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1014,14 +1049,14 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
           <td class="paramname"><em>dir</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a>&#160;</td>
-          <td class="paramname"><em>maxmin</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a>&#160;</td>
+          <td class="paramname"><em>minmax</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1042,7 +1077,7 @@ template&lt;typename NumType &gt; </div>
   <table class="params">
     <tr><td class="paramname">site_position</td><td>position of site. </td></tr>
     <tr><td class="paramname">dir</td><td>cartesian direction. </td></tr>
-    <tr><td class="paramname">maxmin</td><td>choice of edge in given direction. </td></tr>
+    <tr><td class="paramname">minmax</td><td>choice of edge in given direction. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1102,7 +1137,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a70a234125350fca607d3943e0f1edd7c"></a>
+<a class="anchor" id="a595b78d268cdbc0e6a3b008ac93e0cb4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1118,14 +1153,14 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
           <td class="paramname"><em>dir</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a>&#160;</td>
-          <td class="paramname"><em>maxmin</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a>&#160;</td>
+          <td class="paramname"><em>minmax</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1146,7 +1181,7 @@ template&lt;typename NumType &gt; </div>
   <table class="params">
     <tr><td class="paramname">site_position</td><td>position of site. </td></tr>
     <tr><td class="paramname">dir</td><td>cartesian direction. </td></tr>
-    <tr><td class="paramname">maxmin</td><td>choice of edge in given direction. </td></tr>
+    <tr><td class="paramname">minmax</td><td>choice of edge in given direction. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1154,7 +1189,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ac1c2d23d0cdd548368aaaffb4f22502d"></a>
+<a class="anchor" id="adcf9512bd143ac0b9ef7eec33f1510ec"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1164,26 +1199,38 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="memname">bool GridUtils::isOnThisRank </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gi</em>, </td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gj</em>, </td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gk</em>, </td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
-          <td class="paramname"><em>grid</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a>&#160;</td>
+          <td class="paramname"><em>loc</em> = <code><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dca6505acf15690a324459e652a94fc339a">eNone</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>grid</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; int &gt; *&#160;</td>
+          <td class="paramname"><em>pos</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1198,13 +1245,16 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Finds out whether site with supplied index in on the current rank. </p>
+<p>Finds out whether site with supplied position is on the current rank. </p>
+<p>Will return true if the site is in the halo as well (send or recv). Location information provided to indicate where point is. Returns eNone enumeration if not request or if query is false. If a grid is supplied, will only return true if site is on the grid supplied. If you want to exclude the sites that belong to the halo you can call <a class="el" href="class_grid_utils.html#abfec29d90b6942de2f3c52c225a4d888" title="Check whether site is on an outer (receiver) halo. ">isOnRecvLayer()</a> or <a class="el" href="class_grid_utils.html#af0692236725709af2d98872805fc84ae" title="Check whether site is on an inner (sender) halo. ">isOnSenderLayer()</a> on the same site.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">gi</td><td>global i-index of site. </td></tr>
-    <tr><td class="paramname">gj</td><td>global j-index of site. </td></tr>
-    <tr><td class="paramname">gk</td><td>global k-index of site. </td></tr>
-    <tr><td class="paramname">grid</td><td>grid being queried. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">x</td><td>x-position of site. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">y</td><td>y-position of site. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">z</td><td>z-position of site. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">pos</td><td>pointer to the start of a vector in which local indices are returned. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">grid</td><td>grid being queried. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">loc</td><td>description of the location of the point. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1212,7 +1262,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a1d9558846f757c6f60fa61f104b63071"></a>
+<a class="anchor" id="a4eca1ee0dff756b5cd65d45f84b24118"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1222,19 +1272,91 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="memname">bool GridUtils::isOnThisRank </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">enum <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>xyz</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a>&#160;</td>
+          <td class="paramname"><em>loc</em> = <code><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dca6505acf15690a324459e652a94fc339a">eNone</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>grid</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>pos</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Finds out whether the supplied position can be found on the current rank. </p>
+<p>Direction-specific version of the overload.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">xyz</td><td>position (x, y or z) </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">dir</td><td>cartesian direction of interest (x, y or z). </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">loc</td><td>description of the location of the point. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">grid</td><td>grid being queried. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">pos</td><td>the local index of the found site. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>boolean answer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a78d9c31d1c15198d1455627d1fa29804"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GridUtils::isOnTransitionLayer </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pos_x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pos_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pos_z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
           <td class="paramname"><em>grid</em>&#160;</td>
         </tr>
         <tr>
@@ -1250,12 +1372,73 @@ template&lt;typename NumType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Finds out whether global index can be found on the current rank. </p>
+<p>Check whether site is on a TL. </p>
+<p>Wrapper which checks every possible TL location on the grid supplied.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">gl</td><td>global index (i,j or k). </td></tr>
-    <tr><td class="paramname">xyz</td><td>cartesian direction of interest. </td></tr>
-    <tr><td class="paramname">grid</td><td>grid being queried. </td></tr>
+    <tr><td class="paramname">pos_x</td><td>x-position of site. </td></tr>
+    <tr><td class="paramname">pos_y</td><td>y-position of site. </td></tr>
+    <tr><td class="paramname">pos_z</td><td>z-position of site. </td></tr>
+    <tr><td class="paramname">grid</td><td>given grid on which to check. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>boolean answer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af241bda5fffef58362b1e77d9d3de6dc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GridUtils::isOnTransitionLayer </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>position</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a8e005b039da2246588381c4feeeac43f">eMinMax</a>&#160;</td>
+          <td class="paramname"><em>minmax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>grid</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check whether site is on a specific TL (to upper). </p>
+<p>Wrapper available which checks every TL. This method only checks the TL specified by the Cartesian direction and whether it is the left/bottom/front (minimum) or right/top/back (maximum) edge of the supplied grid.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">position</td><td>position of point. </td></tr>
+    <tr><td class="paramname">dir</td><td>cartesian direction. </td></tr>
+    <tr><td class="paramname">minmax</td><td>choice of edge in given direction. </td></tr>
+    <tr><td class="paramname">grid</td><td>given grid on which to check. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1370,73 +1553,6 @@ template&lt;typename NumType &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a vector with n uniformly spaced values between min and max. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ac3e122b19b2ee0e159b3025b2858d895"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename NumType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void GridUtils::local_to_global </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
-          <td class="paramname"><em>g</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; NumType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>globals</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Maps local indices to global indices. </p>
-<p>Takes a vector container and populates it with the global indices of the supplied local site</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">i</td><td>local index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">j</td><td>local index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">k</td><td>local index </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">g</td><td>grid on which global indices are required </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">globals</td><td>vector container for global indices </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -1596,11 +1712,11 @@ template&lt;typename NumType &gt; </div>
 <p>Memcpy() is designed to copy blocks of contiguous memory. Strided copy copies a pattern of contiguous blocks.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">dest</td><td>pointer to start of destination memory </td></tr>
-    <tr><td class="paramname">src</td><td>pointer to start of source memory </td></tr>
-    <tr><td class="paramname">block</td><td>size of contiguous block </td></tr>
-    <tr><td class="paramname">offset</td><td>offset from the start of the soruce array </td></tr>
-    <tr><td class="paramname">stride</td><td>number of elements between start of first block and start of second </td></tr>
+    <tr><td class="paramname">dest</td><td>pointer to start of destination memory. </td></tr>
+    <tr><td class="paramname">src</td><td>pointer to start of source memory. </td></tr>
+    <tr><td class="paramname">block</td><td>size of contiguous block. </td></tr>
+    <tr><td class="paramname">offset</td><td>offset from the start of the soruce array. </td></tr>
+    <tr><td class="paramname">stride</td><td>number of elements between start of first block and start of second. </td></tr>
     <tr><td class="paramname">count</td><td>number of blocks in pattern </td></tr>
     <tr><td class="paramname">buf_offset</td><td>offset from start of destination buffer to start writing. Default is zero if not supplied. </td></tr>
   </table>
@@ -2011,7 +2127,7 @@ template&lt;typename NumType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= </div><div class="line">    {</div><div class="line">        {1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, </div><div class="line">        {1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},</div><div class="line">        {0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},</div><div class="line">        {0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},</div><div class="line">        {0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18},</div><div class="line">        {0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}</div><div class="line">    }</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">= </div><div class="line">    {</div><div class="line">        {1, 0, 2, 3, 7, 6, 5, 4, 8}, </div><div class="line">        {1, 0, 2, 3, 4, 6, 5, 4, 8},</div><div class="line">        {0, 1, 3, 2, 6, 7, 4, 5, 8},</div><div class="line">        {0, 1, 3, 2, 6, 7, 4, 5, 8}</div><div class="line">    }</div></div><!-- fragment -->
 <p>Array with hardcoded direction numbering for specular reflection. </p>
 
 </div>

@@ -39,7 +39,6 @@ using namespace std;	// Use the standard namespace
 
 // Static variable declarations
 std::string GridUtils::path_str;
-int MpiManager::MPI_coords[L_DIMS];
 
 /// Entry point for the application
 int main( int argc, char* argv[] )
@@ -69,20 +68,14 @@ int main( int argc, char* argv[] )
 	// Usual initialise
 	MPI_Init( &argc, &argv );
 
-#else
-
-	// When not using MPI, set max ranks to 1 and current rank to 0.
-	MpiManager::num_ranks = 1;
-	MpiManager::my_rank = 0;
-
 #endif
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
 #if (L_DIMS != 3 && L_NUM_LEVELS)
 	for (int i = 0; i < L_NUM_REGIONS; i++) {
 		for (int l = 0; l < L_NUM_LEVELS; l++) {
-			cRefStartZ[l][i] = 0;
-			cRefEndZ[l][i] = 0;
+			cRefStartZ[l][i] = 0.0;
+			cRefEndZ[l][i] = 0.0;
 		}
 	}
 #endif
@@ -109,16 +102,15 @@ int main( int argc, char* argv[] )
 	std::string path_str(timeout_char);
 	GridUtils::path_str = path_str;   // Set static path variable for output directory
 
-#ifdef L_BUILD_FOR_MPI
 
 	// Create MpiManager object
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Create stream for Mpi Logfile
 	std::ofstream mpilog;
-	MpiManager::logout = &mpilog;	// Assign pointer to logfile stream to MpiManager
+	mpim->logout = &mpilog;		// Assign pointer to logfile stream to MpiManager
 	
-	// Initialise the topology
+	// Initialise the manager, grid information and topology
 	mpim->mpi_init();
 
 	// Print out version number
@@ -131,21 +123,14 @@ int main( int argc, char* argv[] )
 #endif
 	}
 
+#ifdef L_BUILD_FOR_MPI
 	// Decompose the domain
 	mpim->mpi_gridbuild();
-#else
-
-	// Create directory
-	int result = GridUtils::createOutputDirectory(path_str);
-
-	// Print out version number
-	std::cout << "Running LUMA -- Version " << LUMA_VERSION << std::endl;
-
 #endif
 	
 	// Create application log file
 	std::ofstream logfile;
-	logfile.open(GridUtils::path_str + "/log_rank" + to_string(MpiManager::my_rank) + ".out", std::ios::out);
+	logfile.open(GridUtils::path_str + "/log_rank" + to_string(mpim->my_rank) + ".out", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
 	// TODO: Handle case when logfile doesn't open correctly
@@ -168,10 +153,7 @@ int main( int argc, char* argv[] )
 		|| L_MPI_ZCORES < 2
 #endif
 		) {
-			std::cout << "Error: See Log File." << std::endl;
-			*GridUtils::logfile << "When using MPI must use at least 2 cores in each direction. Exiting." << std::endl;
-			MPI_Finalize();
-			exit(LUMA_FAILED);
+		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
 	}
 #endif
 
@@ -201,7 +183,7 @@ int main( int argc, char* argv[] )
 	// Create the grid object (level = 0)
 #ifdef L_BUILD_FOR_MPI
 	// Call MPI constructor
-	GridObj Grids(0, mpim->local_size, mpim->global_edge_ind, mpim->global_edge_pos);
+	GridObj Grids(0, mpim->local_size, mpim->rank_core_edge);
 #else
 	// Call basic wrapper constructor
 	GridObj Grids(0);
@@ -211,14 +193,14 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Grid size = " << L_N << "x" << L_M << "x" << L_K << endl;
 #ifdef L_BUILD_FOR_MPI
 	*GridUtils::logfile << "MPI size = " << L_MPI_XCORES << "x" << L_MPI_YCORES << "x" << L_MPI_ZCORES << endl;
-	*GridUtils::logfile << "Coordinates on rank " << MpiManager::my_rank << " are (";
+	*GridUtils::logfile << "Coordinates on rank " << mpim->my_rank << " are (";
 		for (size_t d = 0; d < L_DIMS; d++) {
-			*GridUtils::logfile << "\t" << MpiManager::MPI_coords[d];
+			*GridUtils::logfile << "\t" << mpim->rank_coords[d];
 		}
 		*GridUtils::logfile << "\t)" << std::endl;
 #endif
 	*GridUtils::logfile << "Number of time steps = " << std::to_string(L_TIMESTEPS) << endl;
-	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dt) << endl;
+	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dh) << endl;
 	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
 	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
 	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_UREF) << std::endl;
@@ -401,7 +383,7 @@ int main( int argc, char* argv[] )
 
 
 	// Set the pointer to the hierarchy in the MpiManager
-	MpiManager::Grids = &Grids;
+	mpim->Grids = &Grids;
 
 
 #ifdef L_BUILD_FOR_MPI
@@ -409,13 +391,19 @@ int main( int argc, char* argv[] )
 	// Compute buffer sizes
 	mpim->mpi_buffer_size();
 
+#endif
+
 	//  Build halo descriptors and sub-grid communicators
 	mpim->mpi_buildCommunicators();
+
+#ifdef L_BUILD_FOR_MPI
 
 	// Compute load balance information
 	mpim->mpi_updateLoadInfo();
 
 #endif
+
+
 
 
 	// Write out t = 0
@@ -450,7 +438,7 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if (MpiManager::my_rank == 0 && (Grids.t+1) % L_OUT_EVERY == 0)
+		if (mpim->my_rank == 0 && (Grids.t+1) % L_OUT_EVERY == 0)
 			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_TIMESTEPS << " ------" << endl;
 
 
@@ -458,11 +446,7 @@ int main( int argc, char* argv[] )
 		// Launch LBM Kernel //
 		///////////////////////
 
-#ifdef L_USE_OPTIMISED_KERNEL
 		Grids.LBM_multi_opt();		// Launch LBM kernel on top-level grid
-#else
-		Grids.LBM_multi();			// Main LBM kernel (same both with and without IBM)
-#endif
 
 		///////////////
 		// Write Out //
@@ -527,7 +511,7 @@ int main( int argc, char* argv[] )
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef L_BUILD_FOR_MPI
 				MPI_Barrier(mpim->world_comm);
-				if (MpiManager::my_rank == n) 
+				if (mpim->my_rank == n) 
 #endif
 				{
 
@@ -575,7 +559,7 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 		MPI_Barrier(mpim->world_comm);
 
-		if (MpiManager::my_rank == n)
+		if (mpim->my_rank == n)
 #endif
 		{
 			if (n == 0)	timings.open(GridUtils::path_str + "/timings.out",std::ios::out);
@@ -629,12 +613,11 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
 	logfile.close();
 
-	// Destroy ObjectManager
+	// Destroy singleton
 	ObjectManager::destroyInstance();
+	MpiManager::destroyInstance();
 
 #ifdef L_BUILD_FOR_MPI
-	// Close logfile
-	MpiManager::logout->close();
 	// Finalise MPI
 	MPI_Finalize();
 #endif

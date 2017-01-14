@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.3.0</span>
+   &#160;<span id="projectnumber">1.4.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -126,6 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac5e71323491a8c3f38fecc51d1530a04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#ac5e71323491a8c3f38fecc51d1530a04">ibm_findSupport</a> (int ib, int m)</td></tr>
 <tr class="memdesc:ac5e71323491a8c3f38fecc51d1530a04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds support points for iBody.  <a href="#ac5e71323491a8c3f38fecc51d1530a04">More...</a><br /></td></tr>
 <tr class="separator:ac5e71323491a8c3f38fecc51d1530a04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45943d344a20ac8f4c2349de28c1ace6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#a45943d344a20ac8f4c2349de28c1ace6">ibm_initialiseSupport</a> (int ib, int m, int s, double estimated_position[])</td></tr>
+<tr class="memdesc:a45943d344a20ac8f4c2349de28c1ace6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise data associated with support points found.  <a href="#a45943d344a20ac8f4c2349de28c1ace6">More...</a><br /></td></tr>
+<tr class="separator:a45943d344a20ac8f4c2349de28c1ace6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada21b4ed1a05af704597fce572142df8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_manager.html#ada21b4ed1a05af704597fce572142df8">ibm_computeForce</a> (int ib)</td></tr>
 <tr class="memdesc:ada21b4ed1a05af704597fce572142df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute restorative force at each marker in a body.  <a href="#ada21b4ed1a05af704597fce572142df8">More...</a><br /></td></tr>
 <tr class="separator:ada21b4ed1a05af704597fce572142df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -798,6 +801,56 @@ Friends</h2></td></tr>
 
 <p>Initialise the array of iBodies. </p>
 <p>Computes support and epsilon values. </p>
+
+</div>
+</div>
+<a class="anchor" id="a45943d344a20ac8f4c2349de28c1ace6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ObjectManager::ibm_initialiseSupport </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>estimated_position</em>[]&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise data associated with support points found. </p>
+<p>Finds and stores the delta values of the support points.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ib</td><td>iBody being operated on. </td></tr>
+    <tr><td class="paramname">m</td><td>marker of interest. </td></tr>
+    <tr><td class="paramname">s</td><td>support point of interest. </td></tr>
+    <tr><td class="paramname">estimate_position</td><td>vector containing the estimated position of the support point. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

@@ -7,6 +7,7 @@
 {\ttfamily \#include $<$fstream$>$}\\*
 {\ttfamily \#include $<$sstream$>$}\\*
 {\ttfamily \#include $<$numeric$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
 {\ttfamily \#include $<$stdlib.\+h$>$}\\*
 {\ttfamily \#include $<$cstring$>$}\\*
 {\ttfamily \#include $<$stdio.\+h$>$}\\*
@@ -16,14 +17,21 @@
 \item 
 \#define \hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED}
 \item 
-\#define \hyperlink{stdafx_8h_a785727f822adc2d7112e0158817a88ba}{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}~12345
-\begin{DoxyCompactList}\small\item\em Error definition. \end{DoxyCompactList}\item 
 \#define \hyperlink{stdafx_8h_a7a997b38125dd4556b664304fb414ac7}{L\+\_\+\+I\+S\+\_\+\+N\+AN}~std\+::isnan
 \begin{DoxyCompactList}\small\item\em Not a Number declaration (Unix) \end{DoxyCompactList}\item 
 \#define \hyperlink{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}{SQ}(x)~((x) $\ast$ (x))
 \item 
 \#define \hyperlink{stdafx_8h_af8d3b25556396facf0f8c19decc56200}{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}
+\item 
+\#define \hyperlink{stdafx_8h_a785727f822adc2d7112e0158817a88ba}{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}~12345
+\begin{DoxyCompactList}\small\item\em Error definition. \end{DoxyCompactList}\item 
+\#define \hyperlink{stdafx_8h_a48538932682d4fe3cdf01547db361240}{L\+\_\+\+E\+R\+R\+OR}~\hyperlink{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{errorfcn}
 \end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{errorfcn} (std\+::string msg, std\+::ofstream $\ast$logfile)
+\begin{DoxyCompactList}\small\item\em Fatal Error function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -44,7 +52,10 @@ const double \hyperlink{stdafx_8h_ae51e162e8ad5da2cef261f3936312f64}{cs}
 \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}}
 \index{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}{L_DACTION_WRITE_OUT_FORCES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}\hypertarget{stdafx_8h_af8d3b25556396facf0f8c19decc56200}{}\label{stdafx_8h_af8d3b25556396facf0f8c19decc56200}
-\index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+I\+S\+\_\+\+N\+AN@{L\+\_\+\+I\+S\+\_\+\+N\+AN}}
+\index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}}
+\index{L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}!stdafx.\+h@{stdafx.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+E\+R\+R\+OR}{L_ERROR}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+E\+R\+R\+OR~{\bf errorfcn}}\hypertarget{stdafx_8h_a48538932682d4fe3cdf01547db361240}{}\label{stdafx_8h_a48538932682d4fe3cdf01547db361240}
+Error function shorthand \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+I\+S\+\_\+\+N\+AN@{L\+\_\+\+I\+S\+\_\+\+N\+AN}}
 \index{L\+\_\+\+I\+S\+\_\+\+N\+AN@{L\+\_\+\+I\+S\+\_\+\+N\+AN}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+I\+S\+\_\+\+N\+AN}{L_IS_NAN}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+S\+\_\+\+N\+AN~std\+::isnan}\hypertarget{stdafx_8h_a7a997b38125dd4556b664304fb414ac7}{}\label{stdafx_8h_a7a997b38125dd4556b664304fb414ac7}
 
@@ -65,6 +76,30 @@ Error definition.
 \item[{}]{x}
 \end{DoxyParamCaption}
 )~((x) $\ast$ (x))}\hypertarget{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}{}\label{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}
+
+
+\subsection{Function Documentation}
+\index{stdafx.\+h@{stdafx.\+h}!errorfcn@{errorfcn}}
+\index{errorfcn@{errorfcn}!stdafx.\+h@{stdafx.\+h}}
+\subsubsection[{\texorpdfstring{errorfcn(std\+::string msg, std\+::ofstream $\ast$logfile)}{errorfcn(std::string msg, std::ofstream *logfile)}}]{\setlength{\rightskip}{0pt plus 5cm}void errorfcn (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{msg, }
+\item[{std\+::ofstream $\ast$}]{logfile}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{}\label{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}
+
+
+Fatal Error function. 
+
+Writes error to the user and further information to the supplied logfile. Inlined since this header is included everywhere.
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg} & string to be printed to the log file. \\
+\hline
+{\em logfile} & pointer to the logfile where the message is to be written. \\
+\hline
+\end{DoxyParams}
 
 
 \subsection{Variable Documentation}

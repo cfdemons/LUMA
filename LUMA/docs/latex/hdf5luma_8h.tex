@@ -28,7 +28,7 @@ enum \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Ty
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$typename T $>$ }\\void \hyperlink{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}{hdf5\+\_\+write\+Data\+Set} (hid\+\_\+t \&memspace, hid\+\_\+t \&filespace, hid\+\_\+t \&dataset\+\_\+id, \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Type} slab\+\_\+type, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, int N\+\_\+mod, int M\+\_\+mod, int K\+\_\+mod, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, T $\ast$data, hid\+\_\+t hdf\+\_\+datatype, int T\+L\+\_\+thickness, \hyperlink{struct_mpi_manager_1_1phdf5__struct}{Mpi\+Manager\+::phdf5\+\_\+struct} hdf\+\_\+data)
+{\footnotesize template$<$typename T $>$ }\\void \hyperlink{hdf5luma_8h_a845defd92c42124ac022c8b8de28d55b}{hdf5\+\_\+write\+Data\+Set} (hid\+\_\+t \&memspace, hid\+\_\+t \&filespace, hid\+\_\+t \&dataset\+\_\+id, \hyperlink{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827}{e\+Hdf5\+Slab\+Type} slab\+\_\+type, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, T $\ast$data, hid\+\_\+t hdf\+\_\+datatype, bool $\ast$T\+L\+\_\+present, int T\+L\+\_\+thickness, \hyperlink{struct_mpi_manager_1_1phdf5__struct}{Mpi\+Manager\+::phdf5\+\_\+struct} hdf\+\_\+data)
 \begin{DoxyCompactList}\small\item\em Helper method to write out using H\+D\+F5. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
@@ -74,7 +74,7 @@ e\+PosZ\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d01300493
 \subsection{Function Documentation}
 \index{hdf5luma.\+h@{hdf5luma.\+h}!hdf5\+\_\+write\+Data\+Set@{hdf5\+\_\+write\+Data\+Set}}
 \index{hdf5\+\_\+write\+Data\+Set@{hdf5\+\_\+write\+Data\+Set}!hdf5luma.\+h@{hdf5luma.\+h}}
-\subsubsection[{\texorpdfstring{hdf5\+\_\+write\+Data\+Set(hid\+\_\+t \&memspace, hid\+\_\+t \&filespace, hid\+\_\+t \&dataset\+\_\+id, e\+Hdf5\+Slab\+Type slab\+\_\+type, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, int N\+\_\+mod, int M\+\_\+mod, int K\+\_\+mod, Grid\+Obj $\ast$g, T $\ast$data, hid\+\_\+t hdf\+\_\+datatype, int T\+L\+\_\+thickness, Mpi\+Manager\+::phdf5\+\_\+struct hdf\+\_\+data)}{hdf5_writeDataSet(hid_t &memspace, hid_t &filespace, hid_t &dataset_id, eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim, int N_mod, int M_mod, int K_mod, GridObj *g, T *data, hid_t hdf_datatype, int TL_thickness, MpiManager::phdf5_struct hdf_data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ void hdf5\+\_\+write\+Data\+Set (
+\subsubsection[{\texorpdfstring{hdf5\+\_\+write\+Data\+Set(hid\+\_\+t \&memspace, hid\+\_\+t \&filespace, hid\+\_\+t \&dataset\+\_\+id, e\+Hdf5\+Slab\+Type slab\+\_\+type, int N\+\_\+lim, int M\+\_\+lim, int K\+\_\+lim, Grid\+Obj $\ast$g, T $\ast$data, hid\+\_\+t hdf\+\_\+datatype, bool $\ast$\+T\+L\+\_\+present, int T\+L\+\_\+thickness, Mpi\+Manager\+::phdf5\+\_\+struct hdf\+\_\+data)}{hdf5_writeDataSet(hid_t &memspace, hid_t &filespace, hid_t &dataset_id, eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim, GridObj *g, T *data, hid_t hdf_datatype, bool *TL_present, int TL_thickness, MpiManager::phdf5_struct hdf_data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ void hdf5\+\_\+write\+Data\+Set (
 \begin{DoxyParamCaption}
 \item[{hid\+\_\+t \&}]{memspace, }
 \item[{hid\+\_\+t \&}]{filespace, }
@@ -83,16 +83,14 @@ e\+PosZ\hypertarget{hdf5luma_8h_aeb801087dd3059ef3a744ba98ed90827ac8001d01300493
 \item[{int}]{N\+\_\+lim, }
 \item[{int}]{M\+\_\+lim, }
 \item[{int}]{K\+\_\+lim, }
-\item[{int}]{N\+\_\+mod, }
-\item[{int}]{M\+\_\+mod, }
-\item[{int}]{K\+\_\+mod, }
 \item[{{\bf Grid\+Obj} $\ast$}]{g, }
 \item[{T $\ast$}]{data, }
 \item[{hid\+\_\+t}]{hdf\+\_\+datatype, }
+\item[{bool $\ast$}]{T\+L\+\_\+present, }
 \item[{int}]{T\+L\+\_\+thickness, }
 \item[{{\bf Mpi\+Manager\+::phdf5\+\_\+struct}}]{hdf\+\_\+data}
 \end{DoxyParamCaption}
-)}\hypertarget{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}{}\label{hdf5luma_8h_a4ee29a9ff13d50dbd028587437297263}
+)}\hypertarget{hdf5luma_8h_a845defd92c42124ac022c8b8de28d55b}{}\label{hdf5luma_8h_a845defd92c42124ac022c8b8de28d55b}
 
 
 Helper method to write out using H\+D\+F5. 
@@ -113,17 +111,13 @@ Automatically selects the correct slab arrangement and buffers the data accordin
 \hline
 {\em K\+\_\+lim} & number of Z-\/direction sites on the local grid. \\
 \hline
-{\em N\+\_\+mod} & number of X-\/direction sites excluding TL sites. \\
-\hline
-{\em M\+\_\+mod} & number of Y-\/direction sites excluding TL sites. \\
-\hline
-{\em K\+\_\+mod} & number of Z-\/direction sites excluding TL sites. \\
-\hline
 {\em g} & pointer to grid which we are writing out. \\
 \hline
 {\em data} & pointer to the start of the array to be written. \\
 \hline
 {\em hdf\+\_\+datatype} & H\+D\+F5 datatype being written. \\
+\hline
+{\em T\+L\+\_\+present} & pointer to array of flags indicating whether a lower TL is present on this grid in given direction so offset in file can be computed. \\
 \hline
 {\em T\+L\+\_\+thickness} & the thickness of the TL on this grid level in local lattice units. \\
 \hline

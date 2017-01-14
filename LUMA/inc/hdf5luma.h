@@ -54,27 +54,21 @@ enum eHdf5SlabType {
 /// \param N_lim		number of X-direction sites on the local grid.
 /// \param M_lim		number of Y-direction sites on the local grid.
 /// \param K_lim		number of Z-direction sites on the local grid.
-/// \param N_mod		number of X-direction sites excluding TL sites.
-/// \param M_mod		number of Y-direction sites excluding TL sites.
-/// \param K_mod		number of Z-direction sites excluding TL sites.
 /// \param g			pointer to grid which we are writing out.
 /// \param data			pointer to the start of the array to be written.
 /// \param hdf_datatype HDF5 datatype being written.
+///	\param TL_present	pointer to array of flags indicating whether a lower TL is 
+///						present on this grid in given direction so offset in file can be computed.
 /// \param TL_thickness the thickness of the TL on this grid level in local lattice units.
 /// \param hdf_data		the data structure containing information about local halos.
 template <typename T>
 void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
-	eHdf5SlabType slab_type,
-	int N_lim, int M_lim, int K_lim,
-	int N_mod, int M_mod, int K_mod,
+	eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim,
 	GridObj *g, T *data, hid_t hdf_datatype,
-	int TL_thickness, MpiManager::phdf5_struct hdf_data) {
+	bool *TL_present, int TL_thickness, MpiManager::phdf5_struct hdf_data) {
 
 
-	
-#ifdef L_BUILD_FOR_MPI
-
-	// Writable region indicies
+	// Writable region indicies from the MPIM
 	int i_start = hdf_data.i_start;
 	int i_end = hdf_data.i_end;
 	int j_start = hdf_data.j_start;
@@ -84,20 +78,6 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	// Create buffer (block of data we aim to write from this process)
 	T *buffer = (T*)malloc(hdf_data.writable_data_count * sizeof(T));
-
-#else
-
-	// Writable region indicies
-	int i_start = TL_thickness;
-	int i_end = N_lim - TL_thickness - 1;
-	int j_start = TL_thickness;
-	int j_end = M_lim - TL_thickness - 1;
-	int k_start = TL_thickness;
-	int k_end = K_lim - TL_thickness - 1;
-
-	// Create buffer excluding TL
-	T *buffer = (T*)malloc(N_mod * M_mod * K_mod * sizeof(T));
-#endif
 
 	// DEBUG //
 #ifdef L_HDF_DEBUG
@@ -157,14 +137,11 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 #ifdef L_BUILD_FOR_MPI
 
 	/* Get global offsets for start of file space from the indexing vector.
-	 * Correct the offset due to TL presence. i.e. if the start index is element
-	 * number 2 we need to write to element 0 in the file since the real domain
-	 * will be 2 * TL wider than the file space so elements need shifting back by
-	 * a single TL_thickness. */
-	f_offset[0] = g->XInd[i_start] - TL_thickness;
-	f_offset[1] = g->YInd[j_start] - TL_thickness;
+	 * Correct the offset due to TL presence as TL is not written out. */
+	f_offset[0] = static_cast<size_t>((g->XPos[i_start] - g->XOrigin) / g->dh) - TL_present[0] * TL_thickness;
+	f_offset[1] = static_cast<size_t>((g->YPos[j_start] - g->YOrigin) / g->dh) - TL_present[1] * TL_thickness;
 #if (L_DIMS == 3)
-	f_offset[2] = g->ZInd[k_start] - TL_thickness;
+	f_offset[2] = static_cast<size_t>((g->ZPos[k_start] - g->ZOrigin) / g->dh) - TL_present[2] * TL_thickness;
 #endif	
 
 #else

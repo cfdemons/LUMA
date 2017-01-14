@@ -32,9 +32,9 @@ void MpiManager::mpi_buffer_size_recv(GridObj*& g) {
 
 	int count, i, j, k, dir;	// Local counters
 	// Local grid sizes
-	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
+	int N_lim = static_cast<int>(g->N_lim), M_lim = static_cast<int>(g->M_lim)
 #if (L_DIMS == 3)
-		, K_lim = static_cast<int>(g->ZInd.size());
+		, K_lim = static_cast<int>(g->K_lim);
 #else
 		, K_lim = 1;
 #endif

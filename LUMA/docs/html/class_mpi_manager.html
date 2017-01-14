@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="lumalogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LUMA
-   &#160;<span id="projectnumber">1.3.0</span>
+   &#160;<span id="projectnumber">1.4.0-alpha</span>
    </div>
    <div id="projectbrief">2D/3D FSI lattice Boltzmann solver for CPU</div>
   </td>
@@ -108,7 +108,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure storing buffers sizes in each direction for particular grid.  <a href="struct_mpi_manager_1_1buffer__struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1layer__edges.html">layer_edges</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing global positions of the edges of halos.  <a href="struct_mpi_manager_1_1layer__edges.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing absolute positions of the edges of halos.  <a href="struct_mpi_manager_1_1layer__edges.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">phdf5_struct</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure for storing halo information for HDF5.  <a href="struct_mpi_manager_1_1phdf5__struct.html#details">More...</a><br /></td></tr>
@@ -167,9 +167,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#aec1ed834d1a8fa19f87499fb0d5cd332">world_comm</a></td></tr>
 <tr class="memdesc:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global MPI communicator.  <a href="#aec1ed834d1a8fa19f87499fb0d5cd332">More...</a><br /></td></tr>
 <tr class="separator:aec1ed834d1a8fa19f87499fb0d5cd332"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f1f0a2aa10fbd01c0dc3fac50178a0d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a3f1f0a2aa10fbd01c0dc3fac50178a0d">MPI_dims</a> [<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td></tr>
-<tr class="memdesc:a3f1f0a2aa10fbd01c0dc3fac50178a0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of MPI Cartesian topology.  <a href="#a3f1f0a2aa10fbd01c0dc3fac50178a0d">More...</a><br /></td></tr>
-<tr class="separator:a3f1f0a2aa10fbd01c0dc3fac50178a0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d486f77671328cdc139f6cef2a4006f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a8d486f77671328cdc139f6cef2a4006f">dimensions</a> [<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td></tr>
+<tr class="memdesc:a8d486f77671328cdc139f6cef2a4006f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of MPI Cartesian topology.  <a href="#a8d486f77671328cdc139f6cef2a4006f">More...</a><br /></td></tr>
+<tr class="separator:a8d486f77671328cdc139f6cef2a4006f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2891954ff504c12ec6d5f845e906f28"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#af2891954ff504c12ec6d5f845e906f28">neighbour_rank</a> [<a class="el" href="definitions_8h.html#a144328eed4e90ebcf8a9f66aa7337266">L_MPI_DIRS</a>]</td></tr>
 <tr class="memdesc:af2891954ff504c12ec6d5f845e906f28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Neighbour rank number for each direction in Cartesian topology.  <a href="#af2891954ff504c12ec6d5f845e906f28">More...</a><br /></td></tr>
 <tr class="separator:af2891954ff504c12ec6d5f845e906f28"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,24 +182,39 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a03972530e718d5b0a7f119e9c6132179"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">phdf5_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a03972530e718d5b0a7f119e9c6132179">p_data</a></td></tr>
 <tr class="memdesc:a03972530e718d5b0a7f119e9c6132179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of structures containing halo descriptors for block writing (HDF5)  <a href="#a03972530e718d5b0a7f119e9c6132179">More...</a><br /></td></tr>
 <tr class="separator:a03972530e718d5b0a7f119e9c6132179"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae41fb382e17680a49821077167bf1905"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ae41fb382e17680a49821077167bf1905">global_dims</a> [3]</td></tr>
-<tr class="memdesc:ae41fb382e17680a49821077167bf1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global dimensions of problem coarse lattice.  <a href="#ae41fb382e17680a49821077167bf1905">More...</a><br /></td></tr>
-<tr class="separator:ae41fb382e17680a49821077167bf1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8329212abc23e5fa3e32e961b7823b5b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a8329212abc23e5fa3e32e961b7823b5b">my_rank</a></td></tr>
+<tr class="memdesc:a8329212abc23e5fa3e32e961b7823b5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rank number.  <a href="#a8329212abc23e5fa3e32e961b7823b5b">More...</a><br /></td></tr>
+<tr class="separator:a8329212abc23e5fa3e32e961b7823b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5156a5e4519f43230b6b84792464e48"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#af5156a5e4519f43230b6b84792464e48">num_ranks</a></td></tr>
+<tr class="memdesc:af5156a5e4519f43230b6b84792464e48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of ranks in MPI Cartesian topology.  <a href="#af5156a5e4519f43230b6b84792464e48">More...</a><br /></td></tr>
+<tr class="separator:af5156a5e4519f43230b6b84792464e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54a3ad1d90d1508ebc82f81655d917f8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a54a3ad1d90d1508ebc82f81655d917f8">rank_coords</a> [<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td></tr>
+<tr class="memdesc:a54a3ad1d90d1508ebc82f81655d917f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates in MPI Cartesian topology.  <a href="#a54a3ad1d90d1508ebc82f81655d917f8">More...</a><br /></td></tr>
+<tr class="separator:a54a3ad1d90d1508ebc82f81655d917f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cdf6e1ce19f22daa9e84bc88bf4382d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a3cdf6e1ce19f22daa9e84bc88bf4382d">global_size</a> [3][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>+1]</td></tr>
+<tr class="memdesc:a3cdf6e1ce19f22daa9e84bc88bf4382d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overall size of each grid (excluding halo of course).  <a href="#a3cdf6e1ce19f22daa9e84bc88bf4382d">More...</a><br /></td></tr>
+<tr class="separator:a3cdf6e1ce19f22daa9e84bc88bf4382d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26f0512e19009451431d6d0ba59bf81a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a26f0512e19009451431d6d0ba59bf81a">global_edges</a> [6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>+1]</td></tr>
+<tr class="memdesc:a26f0512e19009451431d6d0ba59bf81a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute position of grid edges (excluding halo of course).  <a href="#a26f0512e19009451431d6d0ba59bf81a">More...</a><br /></td></tr>
+<tr class="separator:a26f0512e19009451431d6d0ba59bf81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18d53c4f9968cccec36127d33776e3d4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a18d53c4f9968cccec36127d33776e3d4">subgrid_tlayer_key</a> [6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td></tr>
+<tr class="memdesc:a18d53c4f9968cccec36127d33776e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean flag array to indicate the presence of a TL on sub-grid edges.  <a href="#a18d53c4f9968cccec36127d33776e3d4">More...</a><br /></td></tr>
+<tr class="separator:a18d53c4f9968cccec36127d33776e3d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ad4a918a4cd19e644ff3295b2854fc6af">local_size</a></td></tr>
-<tr class="memdesc:ad4a918a4cd19e644ff3295b2854fc6af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dimensions of coarse lattice represented on this rank (includes inner and outer halos).  <a href="#ad4a918a4cd19e644ff3295b2854fc6af">More...</a><br /></td></tr>
+<tr class="memdesc:ad4a918a4cd19e644ff3295b2854fc6af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dimensions of coarse lattice represented on this rank (includes halo).  <a href="#ad4a918a4cd19e644ff3295b2854fc6af">More...</a><br /></td></tr>
 <tr class="separator:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f994471f9c2986b2c8606b7b716566a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a0f994471f9c2986b2c8606b7b716566a">global_edge_ind</a></td></tr>
-<tr class="memdesc:a0f994471f9c2986b2c8606b7b716566a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global indices of coarse lattice nodes represented on this rank.  <a href="#a0f994471f9c2986b2c8606b7b716566a">More...</a><br /></td></tr>
-<tr class="separator:a0f994471f9c2986b2c8606b7b716566a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd8c87e0a21d31b59d7cc1f7f146d5f4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#abd8c87e0a21d31b59d7cc1f7f146d5f4">global_edge_pos</a></td></tr>
-<tr class="memdesc:abd8c87e0a21d31b59d7cc1f7f146d5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global positions of coarse lattice nodes represented on this rank.  <a href="#abd8c87e0a21d31b59d7cc1f7f146d5f4">More...</a><br /></td></tr>
-<tr class="separator:abd8c87e0a21d31b59d7cc1f7f146d5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0211cd784c9ed1514d5968599e794313"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a0211cd784c9ed1514d5968599e794313">rank_core_edge</a></td></tr>
+<tr class="memdesc:a0211cd784c9ed1514d5968599e794313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute positions of edges of the core region represented on this rank.  <a href="#a0211cd784c9ed1514d5968599e794313">More...</a><br /></td></tr>
+<tr class="separator:a0211cd784c9ed1514d5968599e794313"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cb9f8f024ec0a186374995fb203ea1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_mpi_manager_1_1layer__edges.html">layer_edges</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a0cb9f8f024ec0a186374995fb203ea1e">sender_layer_pos</a></td></tr>
 <tr class="memdesc:a0cb9f8f024ec0a186374995fb203ea1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing sender layer edge positions.  <a href="#a0cb9f8f024ec0a186374995fb203ea1e">More...</a><br /></td></tr>
 <tr class="separator:a0cb9f8f024ec0a186374995fb203ea1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1ff57a97ec56efc1690dd3a5a52fd64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_mpi_manager_1_1layer__edges.html">layer_edges</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ad1ff57a97ec56efc1690dd3a5a52fd64">recv_layer_pos</a></td></tr>
 <tr class="memdesc:ad1ff57a97ec56efc1690dd3a5a52fd64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure containing receiver layer edge positions.  <a href="#ad1ff57a97ec56efc1690dd3a5a52fd64">More...</a><br /></td></tr>
 <tr class="separator:ad1ff57a97ec56efc1690dd3a5a52fd64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5ce72a2047a4cbb38f76d71c96571d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ad5ce72a2047a4cbb38f76d71c96571d8">Grids</a></td></tr>
+<tr class="memdesc:ad5ce72a2047a4cbb38f76d71c96571d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to grid hierarchy.  <a href="#ad5ce72a2047a4cbb38f76d71c96571d8">More...</a><br /></td></tr>
+<tr class="separator:ad5ce72a2047a4cbb38f76d71c96571d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafbb74832f69a915927b9bf252bd971d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#aafbb74832f69a915927b9bf252bd971d">f_buffer_send</a></td></tr>
 <tr class="memdesc:aafbb74832f69a915927b9bf252bd971d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of resizeable outgoing buffers used for data transfer.  <a href="#aafbb74832f69a915927b9bf252bd971d">More...</a><br /></td></tr>
 <tr class="separator:aafbb74832f69a915927b9bf252bd971d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,27 +236,15 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a5e769fa077d24d62d10a9a0d303009d1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1buffer__struct.html">buffer_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a5e769fa077d24d62d10a9a0d303009d1">buffer_recv_info</a></td></tr>
 <tr class="memdesc:a5e769fa077d24d62d10a9a0d303009d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vectors of buffer_info structures holding receiver layer size info.  <a href="#a5e769fa077d24d62d10a9a0d303009d1">More...</a><br /></td></tr>
 <tr class="separator:a5e769fa077d24d62d10a9a0d303009d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a0dd93f57d78f568048197c95311832"><td class="memItemLeft" align="right" valign="top">std::ofstream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a9a0dd93f57d78f568048197c95311832">logout</a></td></tr>
+<tr class="memdesc:a9a0dd93f57d78f568048197c95311832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logfile handle.  <a href="#a9a0dd93f57d78f568048197c95311832">More...</a><br /></td></tr>
+<tr class="separator:a9a0dd93f57d78f568048197c95311832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a2c3010f87e6a8a6c65e6f975e37fb7d5">MPI_cartlab</a> [3][26]</td></tr>
-<tr class="memdesc:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cartesian unit vectors pointing to each neighbour in Cartesian topology.  <a href="#a2c3010f87e6a8a6c65e6f975e37fb7d5">More...</a><br /></td></tr>
-<tr class="separator:a2c3010f87e6a8a6c65e6f975e37fb7d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8329212abc23e5fa3e32e961b7823b5b"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a8329212abc23e5fa3e32e961b7823b5b">my_rank</a></td></tr>
-<tr class="memdesc:a8329212abc23e5fa3e32e961b7823b5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rank number.  <a href="#a8329212abc23e5fa3e32e961b7823b5b">More...</a><br /></td></tr>
-<tr class="separator:a8329212abc23e5fa3e32e961b7823b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5156a5e4519f43230b6b84792464e48"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#af5156a5e4519f43230b6b84792464e48">num_ranks</a></td></tr>
-<tr class="memdesc:af5156a5e4519f43230b6b84792464e48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of ranks in MPI Cartesian topology.  <a href="#af5156a5e4519f43230b6b84792464e48">More...</a><br /></td></tr>
-<tr class="separator:af5156a5e4519f43230b6b84792464e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfdcb17ecd44bb096bec1e79fe856bac"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#acfdcb17ecd44bb096bec1e79fe856bac">MPI_coords</a> [<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td></tr>
-<tr class="memdesc:acfdcb17ecd44bb096bec1e79fe856bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates in MPI Cartesian topology.  <a href="#acfdcb17ecd44bb096bec1e79fe856bac">More...</a><br /></td></tr>
-<tr class="separator:acfdcb17ecd44bb096bec1e79fe856bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1520da6b8a663cba25a1a9822dd81543"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a1520da6b8a663cba25a1a9822dd81543">Grids</a></td></tr>
-<tr class="memdesc:a1520da6b8a663cba25a1a9822dd81543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to grid hierarchy.  <a href="#a1520da6b8a663cba25a1a9822dd81543">More...</a><br /></td></tr>
-<tr class="separator:a1520da6b8a663cba25a1a9822dd81543"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbd3a2866235c1d4a32e6806318061fd"><td class="memItemLeft" align="right" valign="top">static std::ofstream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#afbd3a2866235c1d4a32e6806318061fd">logout</a></td></tr>
-<tr class="memdesc:afbd3a2866235c1d4a32e6806318061fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logfile handle.  <a href="#afbd3a2866235c1d4a32e6806318061fd">More...</a><br /></td></tr>
-<tr class="separator:afbd3a2866235c1d4a32e6806318061fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c5f58ce12a1a8002cb124bf61e80d09"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a0c5f58ce12a1a8002cb124bf61e80d09">neighbour_vectors</a> [3][26]</td></tr>
+<tr class="memdesc:a0c5f58ce12a1a8002cb124bf61e80d09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cartesian unit vectors pointing to each neighbour in Cartesian topology.  <a href="#a0c5f58ce12a1a8002cb124bf61e80d09">More...</a><br /></td></tr>
+<tr class="separator:a0c5f58ce12a1a8002cb124bf61e80d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>MPI Manager class. </p>
@@ -548,7 +551,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initialisation routine. </p>
-<p>Method is responsible for initialising the MPI topolgy and associated data. Must be called immediately after MPI_init(). </p>
+<p>Method is responsible for initialising the MPI topolgy and associated data. Must be called immediately after MPI_init(). For serial vuilds this gets called simply to intialise the MPIM with a basic set of grid information used by other methods. </p>
 
 </div>
 </div>
@@ -628,6 +631,20 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a8d486f77671328cdc139f6cef2a4006f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int MpiManager::dimensions[<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Size of MPI Cartesian topology. </p>
+
+</div>
+</div>
 <a class="anchor" id="ab8f1eeab50fd4812b3a51af1a6c43713"></a>
 <div class="memitem">
 <div class="memproto">
@@ -656,66 +673,44 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae41fb382e17680a49821077167bf1905"></a>
+<a class="anchor" id="a26f0512e19009451431d6d0ba59bf81a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int MpiManager::global_dims[3]</td>
+          <td class="memname">double MpiManager::global_edges[6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>+1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Global dimensions of problem coarse lattice. </p>
+<p>Absolute position of grid edges (excluding halo of course). </p>
+<p>Since L0 can only be region = 0 this array should be accessed as [level + region_number * L_NUM_LEVELS] in a loop where level cannot be 0. To retrieve L0 info, simply access [0]. </p>
 
 </div>
 </div>
-<a class="anchor" id="a0f994471f9c2986b2c8606b7b716566a"></a>
+<a class="anchor" id="a3cdf6e1ce19f22daa9e84bc88bf4382d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::vector&lt;int&gt; &gt; MpiManager::global_edge_ind</td>
+          <td class="memname">int MpiManager::global_size[3][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>+1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Global indices of coarse lattice nodes represented on this rank. </p>
-<p>Excludes outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number. </p>
+<p>Overall size of each grid (excluding halo of course). </p>
+<p>Since L0 can only be region = 0 this array should be accessed as [level + region_number * L_NUM_LEVELS] in a loop where level cannot be 0. To retrieve L0 info, simply access [0]. </p>
 
 </div>
 </div>
-<a class="anchor" id="abd8c87e0a21d31b59d7cc1f7f146d5f4"></a>
+<a class="anchor" id="ad5ce72a2047a4cbb38f76d71c96571d8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::vector&lt;double&gt; &gt; MpiManager::global_edge_pos</td>
+          <td class="memname"><a class="el" href="class_grid_obj.html">GridObj</a>* MpiManager::Grids</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-<p>Global positions of coarse lattice nodes represented on this rank. </p>
-<p>Excluding outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number. </p>
-
-</div>
-</div>
-<a class="anchor" id="a1520da6b8a663cba25a1a9822dd81543"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_grid_obj.html">GridObj</a> * MpiManager::Grids</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Pointer to grid hierarchy. </p>
@@ -732,107 +727,32 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Dimensions of coarse lattice represented on this rank (includes inner and outer halos). </p>
+<p>Dimensions of coarse lattice represented on this rank (includes halo). </p>
 
 </div>
 </div>
-<a class="anchor" id="afbd3a2866235c1d4a32e6806318061fd"></a>
+<a class="anchor" id="a9a0dd93f57d78f568048197c95311832"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::ofstream * MpiManager::logout</td>
+          <td class="memname">std::ofstream* MpiManager::logout</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Logfile handle. </p>
 
 </div>
 </div>
-<a class="anchor" id="a2c3010f87e6a8a6c65e6f975e37fb7d5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const int MpiManager::MPI_cartlab</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">    {</div><div class="line">        {1, -1,  1, -1,  0,  0, -1,  1,     0,  0,      1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1,  0,  0,  1, -1},</div><div class="line">        {0,  0,  1, -1,  1, -1,  1, -1,     0,  0,      0,  0,  1, -1,  1, -1,  1, -1,  0,  0, -1,  1, -1,  1, -1,  1},</div><div class="line">        {0,  0,  0,  0,  0,  0,  0,  0,     1, -1,      1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1}</div><div class="line">    }</div></div><!-- fragment -->
-<p>Cartesian unit vectors pointing to each neighbour in Cartesian topology. </p>
-<p>Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array. </p>
-
-</div>
-</div>
-<a class="anchor" id="acfdcb17ecd44bb096bec1e79fe856bac"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int MpiManager::MPI_coords</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Coordinates in MPI Cartesian topology. </p>
-
-</div>
-</div>
-<a class="anchor" id="a3f1f0a2aa10fbd01c0dc3fac50178a0d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int MpiManager::MPI_dims[<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Size of MPI Cartesian topology. </p>
-
-</div>
-</div>
 <a class="anchor" id="a8329212abc23e5fa3e32e961b7823b5b"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int MpiManager::my_rank</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Rank number. </p>
@@ -867,7 +787,7 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af5156a5e4519f43230b6b84792464e48"></a>
+<a class="anchor" id="a0c5f58ce12a1a8002cb124bf61e80d09"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -875,7 +795,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int MpiManager::num_ranks</td>
+          <td class="memname">const int MpiManager::neighbour_vectors</td>
         </tr>
       </table>
   </td>
@@ -883,6 +803,21 @@ Static Public Attributes</h2></td></tr>
 <span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= </div><div class="line">{</div><div class="line">    { 1, -1, 1, -1, 0, 0, -1, 1, 0, 0, 1, -1, 1, -1, 0, 0, -1, 1, -1, 1, -1, 1, 0, 0, 1, -1 },</div><div class="line">    { 0, 0, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 0, 0, -1, 1, -1, 1, -1, 1 },</div><div class="line">    { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1 }</div><div class="line">}</div></div><!-- fragment -->
+<p>Cartesian unit vectors pointing to each neighbour in Cartesian topology. </p>
+<p>Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or previous column in the array. MSVC 2013 does not support initialiser lists tagged onto the constructor although it is valid C++ so I have had to make it static even though it goes against the idea of the singleton design. </p>
+
+</div>
+</div>
+<a class="anchor" id="af5156a5e4519f43230b6b84792464e48"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int MpiManager::num_ranks</td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 <p>Total number of ranks in MPI Cartesian topology. </p>
@@ -900,6 +835,35 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Vector of structures containing halo descriptors for block writing (HDF5) </p>
+
+</div>
+</div>
+<a class="anchor" id="a54a3ad1d90d1508ebc82f81655d917f8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int MpiManager::rank_coords[<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Coordinates in MPI Cartesian topology. </p>
+
+</div>
+</div>
+<a class="anchor" id="a0211cd784c9ed1514d5968599e794313"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::vector&lt;double&gt; &gt; MpiManager::rank_core_edge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Absolute positions of edges of the core region represented on this rank. </p>
+<p>Excludes outer overlapping layer (recv layer). Rows are x,y,z start and end pairs and columns are rank number. </p>
 
 </div>
 </div>
@@ -987,6 +951,21 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a18d53c4f9968cccec36127d33776e3d4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MpiManager::subgrid_tlayer_key[6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Boolean flag array to indicate the presence of a TL on sub-grid edges. </p>
+<p>It is not a given that a sub-grid has a TL on every edge of the grid. Specifically if we have a sub-grid which is perodic (or in future, which merges with another sub-grid?). The HDF5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-grid initialisation. Flags are stored X left, right, Y... </p>
+
+</div>
+</div>
 <a class="anchor" id="aec1ed834d1a8fa19f87499fb0d5cd332"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1003,8 +982,6 @@ Static Public Attributes</h2></td></tr>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_mpi_manager_8h_source.html">MpiManager.h</a></li>
-<li><a class="el" href="_grid_obj_8cpp.html">GridObj.cpp</a></li>
-<li><a class="el" href="main__lbm_8cpp.html">main_lbm.cpp</a></li>
 <li><a class="el" href="_mpi__buffer__pack_8cpp.html">Mpi_buffer_pack.cpp</a></li>
 <li><a class="el" href="_mpi__buffer__size__recv_8cpp.html">Mpi_buffer_size_recv.cpp</a></li>
 <li><a class="el" href="_mpi__buffer__size__send_8cpp.html">Mpi_buffer_size_send.cpp</a></li>

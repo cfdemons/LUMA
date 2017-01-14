@@ -28,6 +28,8 @@ void \hyperlink{class_object_manager_a8096f9ec97cf7ce2fc45ebfcbdf3617e}{ibm\+\_\
 \begin{DoxyCompactList}\small\item\em Spread restorative force back onto marker support. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_ac5e71323491a8c3f38fecc51d1530a04}{ibm\+\_\+find\+Support} (int ib, int m)
 \begin{DoxyCompactList}\small\item\em Finds support points for i\+Body. \end{DoxyCompactList}\item 
+void \hyperlink{class_object_manager_a45943d344a20ac8f4c2349de28c1ace6}{ibm\+\_\+initialise\+Support} (int ib, int m, int s, double estimated\+\_\+position\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Initialise data associated with support points found. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_ada21b4ed1a05af704597fce572142df8}{ibm\+\_\+compute\+Force} (int ib)
 \begin{DoxyCompactList}\small\item\em Compute restorative force at each marker in a body. \end{DoxyCompactList}\item 
 double \hyperlink{class_object_manager_a0538f952cf2d548ff89a3ce058fc1649}{ibm\+\_\+find\+Epsilon} (int ib)
@@ -426,7 +428,34 @@ Support for given marker in given body is sought on the owning grid.
 
 Initialise the array of i\+Bodies. 
 
-Computes support and epsilon values. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+interpol@{ibm\+\_\+interpol}}
+Computes support and epsilon values. \index{Object\+Manager@{Object\+Manager}!ibm\+\_\+initialise\+Support@{ibm\+\_\+initialise\+Support}}
+\index{ibm\+\_\+initialise\+Support@{ibm\+\_\+initialise\+Support}!Object\+Manager@{Object\+Manager}}
+\subsubsection[{\texorpdfstring{ibm\+\_\+initialise\+Support(int ib, int m, int s, double estimated\+\_\+position[])}{ibm_initialiseSupport(int ib, int m, int s, double estimated_position[])}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+initialise\+Support (
+\begin{DoxyParamCaption}
+\item[{int}]{ib, }
+\item[{int}]{m, }
+\item[{int}]{s, }
+\item[{double}]{estimated\+\_\+position\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\hypertarget{class_object_manager_a45943d344a20ac8f4c2349de28c1ace6}{}\label{class_object_manager_a45943d344a20ac8f4c2349de28c1ace6}
+
+
+Initialise data associated with support points found. 
+
+Finds and stores the delta values of the support points.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ib} & i\+Body being operated on. \\
+\hline
+{\em m} & marker of interest. \\
+\hline
+{\em s} & support point of interest. \\
+\hline
+{\em estimate\+\_\+position} & vector containing the estimated position of the support point. \\
+\hline
+\end{DoxyParams}
+\index{Object\+Manager@{Object\+Manager}!ibm\+\_\+interpol@{ibm\+\_\+interpol}}
 \index{ibm\+\_\+interpol@{ibm\+\_\+interpol}!Object\+Manager@{Object\+Manager}}
 \subsubsection[{\texorpdfstring{ibm\+\_\+interpol(int ib)}{ibm_interpol(int ib)}}]{\setlength{\rightskip}{0pt plus 5cm}void Object\+Manager\+::ibm\+\_\+interpol (
 \begin{DoxyParamCaption}

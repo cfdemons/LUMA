@@ -41,9 +41,9 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	 * This buffer will also be used to receive the new values using MPI_Sendrecv_replace(). */
 	int idx, i, j , k, v;
 	// Local grid sizes for read/writing arrays
-	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
+	int N_lim = static_cast<int>(g->N_lim), M_lim = static_cast<int>(g->M_lim)
 #if (L_DIMS == 3)
-		, K_lim = static_cast<int>(g->ZInd.size());
+		, K_lim = static_cast<int>(g->K_lim);
 #else
 		, K_lim = 1;
 #endif

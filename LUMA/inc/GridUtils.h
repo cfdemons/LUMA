@@ -16,6 +16,16 @@
 #ifndef GRIDUTILS_H
 #define GRIDUTILS_H
 
+/// \enum eLocationOnRank
+/// \brief Enumeration indicating the location of a site when queried using isOnThisRank()
+enum eLocationOnRank
+{
+	eNone,	///< No information provided (default).
+	eCore,	///< Site on core (including send layer).
+	eHalo	///< Site in halo (recv layer).
+	
+};
+
 /// \enum eCartesianDirection
 /// \brief Enumeration for directional options.
 enum eCartesianDirection
@@ -63,7 +73,7 @@ private:
 
 public:
 	// IO utilities
-	static int createOutputDirectory(std::string path_str);		// Output directory creator
+	static void createOutputDirectory(std::string path_str);		// Output directory creator
 
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace
@@ -80,28 +90,34 @@ public:
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
-	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: crossprod
+	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);	// Function: crossprod
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
-	// Voxel finding utilities
-	static std::vector<int> getVoxInd(double x, double y, double z, GridObj* g);	// Function to get voxel from global position
-
 	// MPI-related utilities
-	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);	// Function: isOverlapPeriodic
-	static bool isOnThisRank(int gi, int gj, int gk, const GridObj& pGrid);		// Function: isOnThisRank + overloads
-	static bool isOnThisRank(int gl, enum eCartesianDirection xyz, const GridObj& pGrid);
-	static bool hasThisSubGrid(const GridObj& pGrid, int RegNum);	// Function: hasThisSubGrid
+	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);		// Is this halo periodically connected to neighbour
+	static bool isOnThisRank(double x, double y, double z, 
+		eLocationOnRank loc = eNone, const GridObj *grid = nullptr,
+		std::vector<int> *pos = nullptr);											// Is a site on this MPI rank nad if so, where is it?
+	static bool isOnThisRank(double xyz, eCartesianDirection dir, 
+		eLocationOnRank loc = eNone, const GridObj *grid = nullptr, int *pos = nullptr);
+	static bool intersectsRefinedRegion(const GridObj& pGrid, int RegNum);			// Does the refined region interesect the current rank.
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
-	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);		// Is site on any sender layer
-	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);		// Is site on any recv layer
-	static bool isOnSenderLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);	// Is site on specified sender layer
-	static bool isOnRecvLayer(double site_position, enum eCartesianDirection xyz, enum eMinMax minmax);		// Is site on speicfied recv layer
-	static bool isOffGrid(int i, int j, int k, GridObj& g);						// Is site off supplied grid
-	static int getMpiDirection(int offset_vector[]);							// Get MPI direction from vector
+	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);			// Is site on any sender layer
+	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);			// Is site on any recv layer
+	static bool isOnSenderLayer(double site_position, eCartesianDirection dir, eMinMax minmax);	// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, eCartesianDirection dir, eMinMax minmax);	// Is site on specified recv layer
+	static int getMpiDirection(int offset_vector[]);								// Get MPI direction from vector
+
+	// Coordinate Management
+	static bool isOffGrid(int i, int j, int k, const GridObj *g);					// Is site off supplied grid
+	static void getEnclosingVoxel(double x, double y, double z, const GridObj *g, std::vector<int> *ijk);	// Take a position and a get a local ijk
+	static void getEnclosingVoxel(double x, const GridObj *g, eCartesianDirection dir, int *ijk);
+	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, const GridObj *grid);	// Is site on any TL to upper
+	static bool isOnTransitionLayer(double position, eCartesianDirection dir, eMinMax minmax, const GridObj *grid);	// Is site on specified TL to upper
 
 	// Templated functions //
 
@@ -168,11 +184,11 @@ public:
 	///			Memcpy() is designed to copy blocks of contiguous memory.
 	///			Strided copy copies a pattern of contiguous blocks.
 	///
-	/// \param dest pointer to start of destination memory
-	/// \param src pointer to start of source memory
-	/// \param block size of contiguous block
-	/// \param offset offset from the start of the soruce array
-	/// \param stride number of elements between start of first block and start of second
+	/// \param dest		pointer to start of destination memory.
+	/// \param src		pointer to start of source memory.
+	/// \param block	size of contiguous block.
+	/// \param offset	offset from the start of the soruce array.
+	/// \param stride	number of elements between start of first block and start of second.
 	/// \param count number of blocks in pattern
 	/// \param buf_offset offset from start of destination buffer to start writing. Default is zero if not supplied.
 	template <typename NumType>
@@ -185,73 +201,6 @@ public:
 			buf_offset += block;
 		}
 	};
-
-
-	// ************************************************************************
-	/// \brief	Maps global indices to local indices.
-	///
-	///			Takes a vector container and populates it with the 
-	///			local indices where the supplied global site can be found
-	///			on the grid supplied. If global indicies are not found on the
-	///			supplied grid then local index of -1 is returned.
-	///
-	/// \param i global index
-	/// \param j global index
-	/// \param k global index
-	/// \param g grid on which local indices are required
-	/// \param[out] locals vector container for local indices
-	template <typename NumType>
-	static void global_to_local(int i, int j, int k, GridObj* g, std::vector<NumType>& locals) {
-
-		// Clear array if not empty
-		if (locals.size()) locals.clear();
-
-		// Find indices in arrays
-		auto loc_i = std::find(g->XInd.begin(), g->XInd.end(), i);
-		auto loc_j = std::find(g->YInd.begin(), g->YInd.end(), j);
-		auto loc_k = std::find(g->ZInd.begin(), g->ZInd.end(), k);
-
-		// Put indices in locals
-		if (loc_i != g->XInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->XInd.begin(),loc_i)) );
-		else locals.push_back(-1);
-		if (loc_j != g->YInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->YInd.begin(),loc_j)) );
-		else locals.push_back(-1);
-		if (loc_k != g->ZInd.end()) locals.push_back( static_cast<NumType>(std::distance(g->ZInd.begin(),loc_k)) );
-		else locals.push_back(-1);
-
-		return;	// Directions not on the grid are returned with index -1
-
-
-	}
-
-	// ************************************************************************
-	/// \brief	Maps local indices to global indices.
-	///
-	///			Takes a vector container and populates it with the 
-	///			global indices of the supplied local site
-	///
-	/// \param i local index
-	/// \param j local index
-	/// \param k local index
-	/// \param g grid on which global indices are required
-	/// \param[out] globals vector container for global indices
-	template <typename NumType>
-	static void local_to_global(int i, int j, int k, GridObj* g, std::vector<NumType>& globals) {
-
-		// Clear array if not empty
-		if (globals.size()) globals.clear();
-
-		// Put indices in globals
-		globals.push_back( static_cast<NumType>(g->XInd[i]) );
-		globals.push_back( static_cast<NumType>(g->YInd[j]) );
-		globals.push_back( static_cast<NumType>(g->ZInd[k]) );
-
-		return;
-
-	}
-
-
-
 
 };
 

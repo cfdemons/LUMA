@@ -35,7 +35,7 @@ public:
 	/// \brief	Velocity in lattice units to velocity in physical units.
 	///
 	///			Converts velocity component from lattice units to m/s. 
-	///         It uses the L_PHYSICAL_U introduced by the user, dx and dt. 
+	///         It uses the L_PHYSICAL_U introduced by the user, dh and dt. 
 	///			You can introduce any L_PHYSICAL_U you want, but the reference lenght (usualy the width of the domain)
 	///         , the Re number and the LBM parameters will remain the same. So you will be implicitly changing the physical viscosity
 	///         of your fluid when you change L_PHYSICAL_U 
@@ -46,7 +46,7 @@ public:
 	template <typename T>
 	static T ulat2uphys(T ulat, GridObj* currentGrid)
 	{
-		return (ulat*currentGrid->dx*L_PHYSICAL_U) / currentGrid->dt;
+		return (ulat*currentGrid->dh*L_PHYSICAL_U) / currentGrid->dt;
 	}
 
 	

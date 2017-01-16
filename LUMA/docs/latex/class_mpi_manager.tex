@@ -369,7 +369,7 @@ Array of resizeable outgoing buffers used for data transfer.
 
 Absolute position of grid edges (excluding halo of course). 
 
-Since L0 can only be region = 0 this array should be accessed as \mbox{[}level + region\+\_\+number $\ast$ L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS\mbox{]} in a loop where level cannot be 0. To retrieve L0 info, simply access \mbox{[}0\mbox{]}. \index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+size@{global\+\_\+size}}
+Since L0 can only be region = 0 this array should be accessed as \mbox{[}level + region\+\_\+number $\ast$ L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS\mbox{]} in a loop where level cannot be 0. To retrieve L0 info, simply access \mbox{[}0\mbox{]}. The first index should be accessed using the enumerator e\+Cartesian\+Min\+Max. \index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+size@{global\+\_\+size}}
 \index{global\+\_\+size@{global\+\_\+size}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{global\+\_\+size}{global_size}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::global\+\_\+size\mbox{[}3\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}}\hypertarget{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}{}\label{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}
 
@@ -462,7 +462,7 @@ Coordinates in M\+PI Cartesian topology.
 
 Absolute positions of edges of the core region represented on this rank. 
 
-Excludes outer overlapping layer (recv layer). Rows are x,y,z start and end pairs and columns are rank number. \index{Mpi\+Manager@{Mpi\+Manager}!recv\+\_\+layer\+\_\+pos@{recv\+\_\+layer\+\_\+pos}}
+Excludes outer overlapping layer (recv layer). Rows are x,y,z start and end pairs and columns are rank number. Access the rows using the e\+Cart\+Min\+Max enumeration. \index{Mpi\+Manager@{Mpi\+Manager}!recv\+\_\+layer\+\_\+pos@{recv\+\_\+layer\+\_\+pos}}
 \index{recv\+\_\+layer\+\_\+pos@{recv\+\_\+layer\+\_\+pos}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{recv\+\_\+layer\+\_\+pos}{recv_layer_pos}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf layer\+\_\+edges} Mpi\+Manager\+::recv\+\_\+layer\+\_\+pos}\hypertarget{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}{}\label{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}
 
@@ -511,7 +511,7 @@ Communicators for sub-\/grid / region combinations.
 
 Boolean flag array to indicate the presence of a TL on sub-\/grid edges. 
 
-It is not a given that a sub-\/grid has a TL on every edge of the grid. Specifically if we have a sub-\/grid which is perodic (or in future, which merges with another sub-\/grid?). The H\+D\+F5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-\/grid initialisation. Flags are stored X left, right, Y... \index{Mpi\+Manager@{Mpi\+Manager}!world\+\_\+comm@{world\+\_\+comm}}
+It is not a given that a sub-\/grid has a TL on every edge of the grid. Specifically if we have a sub-\/grid which is perodic (or in future, which merges with another sub-\/grid?). The H\+D\+F5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-\/grid initialisation. The first index should be accessed using the enumerator e\+Cartesian\+Min\+Max. If no sub-\/grids present then adopts a default 6x1 size. \index{Mpi\+Manager@{Mpi\+Manager}!world\+\_\+comm@{world\+\_\+comm}}
 \index{world\+\_\+comm@{world\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{world\+\_\+comm}{world_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::world\+\_\+comm}\hypertarget{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}{}\label{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}
 

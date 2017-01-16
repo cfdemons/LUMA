@@ -131,15 +131,15 @@ void MpiManager::mpi_init() {
 
 
 	// Store global sizes and edges for L0
-	global_size[0][0] = static_cast<int>(L_N);
+	global_size[eXDirection][0] = static_cast<int>(L_N);
 	global_edges[eXMin][0] = 0.0;
 	global_edges[eXMax][0] = L_BX;
 
-	global_size[1][0] = static_cast<int>(L_M);
+	global_size[eYDirection][0] = static_cast<int>(L_M);
 	global_edges[eYMin][0] = 0.0;
 	global_edges[eYMax][0] = L_BY;
 
-	global_size[2][0] = static_cast<int>(L_K);
+	global_size[eZDirection][0] = static_cast<int>(L_K);
 	global_edges[eZMin][0] = 0.0;
 	global_edges[eZMax][0] = L_BZ;
 
@@ -178,19 +178,19 @@ void MpiManager::mpi_init() {
 			global_edges[eZMax][idx] = std::round(cRefEndZ[lev - 1][reg] / dh) * dh;
 
 			// Populate sizes
-			global_size[0][idx] = static_cast<int>((global_edges[eXMax][idx] - global_edges[eXMin][idx]) / (dh / 2.0));
-			global_size[1][idx] = static_cast<int>((global_edges[eYMax][idx] - global_edges[eYMin][idx]) / (dh / 2.0));
+			global_size[eXDirection][idx] = static_cast<int>((global_edges[eXMax][idx] - global_edges[eXMin][idx]) / (dh / 2.0));
+			global_size[eYDirection][idx] = static_cast<int>((global_edges[eYMax][idx] - global_edges[eYMin][idx]) / (dh / 2.0));
 #if (L_DIMS == 3)
-			global_size[2][idx] = static_cast<int>((global_edges[eZMax][idx] - global_edges[eZMin][idx]) / (dh / 2.0));
+			global_size[eZDirection][idx] = static_cast<int>((global_edges[eZMax][idx] - global_edges[eZMin][idx]) / (dh / 2.0));
 #else
-			global_size[2][idx] = 1;
+			global_size[eZDirection][idx] = 1;
 #endif
 
 			/* If the start and end edges are the same, assume the user is trying to make the sub-grid periodic
 			 * so size of sub-grid is just double the parent grid size in that direction */
-			if (global_edges[eXMin][idx] == global_edges[eXMax][idx]) global_size[0][idx] = global_size[0][idx - 1] * 2;
-			if (global_edges[eYMin][idx] == global_edges[eYMax][idx]) global_size[1][idx] = global_size[1][idx - 1] * 2;
-			if (global_edges[eZMin][idx] == global_edges[eZMax][idx]) global_size[2][idx] = global_size[2][idx - 1] * 2;
+			if (global_edges[eXMin][idx] == global_edges[eXMax][idx]) global_size[eXDirection][idx] = global_size[eXDirection][idx - 1] * 2;
+			if (global_edges[eYMin][idx] == global_edges[eYMax][idx]) global_size[eYDirection][idx] = global_size[eYDirection][idx - 1] * 2;
+			if (global_edges[eZMin][idx] == global_edges[eZMax][idx]) global_size[eZDirection][idx] = global_size[eZDirection][idx - 1] * 2;
 
 
 		}
@@ -283,7 +283,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 	// Global physical dimensions
 	double Lx = L_BX;
-	double dh = 2 * (Lx / (2 * static_cast<double>(L_N)));
+	double dh = Lx / static_cast<double>(L_N);
 
 	// Compute required local grid size
 	// Loop over dimensions
@@ -976,7 +976,7 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check x-directions for presence of halo (i.e. non-zero buffer size)				
 				if (bri.size[1]) {
 					shifted_index = N_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXDirection, eMaximum));
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMax));
 					p_data.back().i_end = shifted_index;	// Index has now shifted off halo
 
 #if defined L_HDF_DEBUG
@@ -990,7 +990,7 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[0]) {
 					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXDirection, eMinimum));
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMin));
 					p_data.back().i_start = shifted_index;
 
 #if defined L_HDF_DEBUG
@@ -1005,7 +1005,7 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check y-directions for halo
 				if (bri.size[5]) {
 					shifted_index = M_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYDirection, eMaximum));
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMax));
 					p_data.back().j_end = shifted_index;
 
 #if defined L_HDF_DEBUG
@@ -1019,7 +1019,7 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[4]) {
 					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYDirection, eMinimum));
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMin));
 					p_data.back().j_start = shifted_index;
 
 #if defined L_HDF_DEBUG
@@ -1035,7 +1035,7 @@ int MpiManager::mpi_buildCommunicators() {
 				// Check z-directions for halo
 				if (bri.size[9]) {
 					shifted_index = K_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZDirection, eMaximum));
+					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMax));
 					p_data.back().k_end = shifted_index;
 
 #if defined L_HDF_DEBUG
@@ -1049,7 +1049,7 @@ int MpiManager::mpi_buildCommunicators() {
 
 				if (bri.size[8]) {
 					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZDirection, eMinimum));
+					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMin));
 					p_data.back().k_start = shifted_index;
 
 #if defined L_HDF_DEBUG

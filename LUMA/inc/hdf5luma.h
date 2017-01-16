@@ -139,15 +139,11 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	/* Get global offsets for start of file space from the number of cells 
 	 * between the origin and the first writable cell.
 	 * Correct the offset due to TL presence as TL is not written out. */
-	f_offset[0] = static_cast<size_t>(std::round((g->XPos[i_start] - g->XOrigin) / g->dh)) - TL_present[0] * TL_thickness;
-	f_offset[1] = static_cast<size_t>(std::round((g->YPos[j_start] - g->YOrigin) / g->dh)) - TL_present[1] * TL_thickness;
+	f_offset[0] = static_cast<size_t>(std::round((g->XPos[i_start] - g->XOrigin) / g->dh)) - TL_present[eXDirection] * TL_thickness;
+	f_offset[1] = static_cast<size_t>(std::round((g->YPos[j_start] - g->YOrigin) / g->dh)) - TL_present[eYDirection] * TL_thickness;
 #if (L_DIMS == 3)
-	f_offset[2] = static_cast<size_t>(std::round((g->ZPos[k_start] - g->ZOrigin) / g->dh)) - TL_present[2] * TL_thickness;
+	f_offset[2] = static_cast<size_t>(std::round((g->ZPos[k_start] - g->ZOrigin) / g->dh)) - TL_present[eZDirection] * TL_thickness;
 #endif
-
-
-	if (MpiManager::getInstance()->my_rank == 0 && g->level == 1)
-		std::cout << k_start << "->" << f_offset[2] << "=" << g->ZPos[k_start] << "-" << g->ZOrigin << "/" << g->dh << "-" << TL_present[2] << "*" << TL_thickness << std::endl;
 
 #else
 	// In serial, only a single process so start writing at the beginning of the file

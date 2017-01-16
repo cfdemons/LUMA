@@ -684,7 +684,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Absolute position of grid edges (excluding halo of course). </p>
-<p>Since L0 can only be region = 0 this array should be accessed as [level + region_number * L_NUM_LEVELS] in a loop where level cannot be 0. To retrieve L0 info, simply access [0]. </p>
+<p>Since L0 can only be region = 0 this array should be accessed as [level + region_number * L_NUM_LEVELS] in a loop where level cannot be 0. To retrieve L0 info, simply access [0]. The first index should be accessed using the enumerator eCartesianMinMax. </p>
 
 </div>
 </div>
@@ -863,7 +863,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Absolute positions of edges of the core region represented on this rank. </p>
-<p>Excludes outer overlapping layer (recv layer). Rows are x,y,z start and end pairs and columns are rank number. </p>
+<p>Excludes outer overlapping layer (recv layer). Rows are x,y,z start and end pairs and columns are rank number. Access the rows using the eCartMinMax enumeration. </p>
 
 </div>
 </div>
@@ -962,7 +962,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Boolean flag array to indicate the presence of a TL on sub-grid edges. </p>
-<p>It is not a given that a sub-grid has a TL on every edge of the grid. Specifically if we have a sub-grid which is perodic (or in future, which merges with another sub-grid?). The HDF5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-grid initialisation. Flags are stored X left, right, Y... </p>
+<p>It is not a given that a sub-grid has a TL on every edge of the grid. Specifically if we have a sub-grid which is perodic (or in future, which merges with another sub-grid?). The HDF5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-grid initialisation. The first index should be accessed using the enumerator eCartesianMinMax. If no sub-grids present then adopts a default 6x1 size. </p>
 
 </div>
 </div>

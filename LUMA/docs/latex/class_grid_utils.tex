@@ -58,9 +58,9 @@ static bool \hyperlink{class_grid_utils_af0692236725709af2d98872805fc84ae}{is\+O
 \begin{DoxyCompactList}\small\item\em Check whether site is on an inner (sender) halo. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_abfec29d90b6942de2f3c52c225a4d888}{is\+On\+Recv\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an outer (receiver) halo. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a595b78d268cdbc0e6a3b008ac93e0cb4}{is\+On\+Sender\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax)
+static bool \hyperlink{class_grid_utils_a9179e27b25b1be249edd6d22455d57bd}{is\+On\+Sender\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an inner (sender) halo. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a0fb32f233e85584a04856c6c67299d68}{is\+On\+Recv\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax)
+static bool \hyperlink{class_grid_utils_a381a3ef0d42132313081b5c06f732092}{is\+On\+Recv\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an outer (receiver) halo. \end{DoxyCompactList}\item 
 static int \hyperlink{class_grid_utils_a1a59da2eb58afd9e785b45b23ad962df}{get\+Mpi\+Direction} (int offset\+\_\+vector\mbox{[}$\,$\mbox{]})
 \begin{DoxyCompactList}\small\item\em Get direction in M\+PI topology from unit vector. \end{DoxyCompactList}\item 
@@ -72,7 +72,7 @@ static void \hyperlink{class_grid_utils_a20901145122cf56507713abe0467638c}{get\+
 \begin{DoxyCompactList}\small\item\em Get local voxel indices on grid in which provided position lies. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a78d9c31d1c15198d1455627d1fa29804}{is\+On\+Transition\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
 \begin{DoxyCompactList}\small\item\em Check whether site is on a TL. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_af241bda5fffef58362b1e77d9d3de6dc}{is\+On\+Transition\+Layer} (double position, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a8e005b039da2246588381c4feeeac43f}{e\+Min\+Max} minmax, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
+static bool \hyperlink{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}{is\+On\+Transition\+Layer} (double position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
 \begin{DoxyCompactList}\small\item\em Check whether site is on a specific TL (to upper). \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{vecnorm} (Num\+Type a1, Num\+Type a2, Num\+Type a3)
 \begin{DoxyCompactList}\small\item\em Computes the L2-\/norm. \end{DoxyCompactList}\item 
@@ -512,13 +512,12 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}}
 \index{is\+On\+Recv\+Layer@{is\+On\+Recv\+Layer}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+Recv\+Layer(double site\+\_\+position, e\+Cartesian\+Direction dir, e\+Min\+Max minmax)}{isOnRecvLayer(double site_position, eCartesianDirection dir, eMinMax minmax)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Recv\+Layer (
+\subsubsection[{\texorpdfstring{is\+On\+Recv\+Layer(double site\+\_\+position, e\+Cart\+Min\+Max edge)}{isOnRecvLayer(double site_position, eCartMinMax edge)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Recv\+Layer (
 \begin{DoxyParamCaption}
 \item[{double}]{site\+\_\+position, }
-\item[{{\bf e\+Cartesian\+Direction}}]{dir, }
-\item[{{\bf e\+Min\+Max}}]{minmax}
+\item[{{\bf e\+Cart\+Min\+Max}}]{edge}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a0fb32f233e85584a04856c6c67299d68}{}\label{class_grid_utils_a0fb32f233e85584a04856c6c67299d68}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a381a3ef0d42132313081b5c06f732092}{}\label{class_grid_utils_a381a3ef0d42132313081b5c06f732092}
 
 
 Check whether site is on an outer (receiver) halo. 
@@ -529,9 +528,7 @@ Wrapper available which checks every halo. This method only checks the halo spec
 \begin{DoxyParams}{Parameters}
 {\em site\+\_\+position} & position of site. \\
 \hline
-{\em dir} & cartesian direction. \\
-\hline
-{\em minmax} & choice of edge in given direction. \\
+{\em edge} & combination of cartesian direction and choice of edge. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -566,13 +563,12 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}}
 \index{is\+On\+Sender\+Layer@{is\+On\+Sender\+Layer}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+Sender\+Layer(double site\+\_\+position, e\+Cartesian\+Direction dir, e\+Min\+Max minmax)}{isOnSenderLayer(double site_position, eCartesianDirection dir, eMinMax minmax)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Sender\+Layer (
+\subsubsection[{\texorpdfstring{is\+On\+Sender\+Layer(double site\+\_\+position, e\+Cart\+Min\+Max edge)}{isOnSenderLayer(double site_position, eCartMinMax edge)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Sender\+Layer (
 \begin{DoxyParamCaption}
 \item[{double}]{site\+\_\+position, }
-\item[{{\bf e\+Cartesian\+Direction}}]{dir, }
-\item[{{\bf e\+Min\+Max}}]{minmax}
+\item[{{\bf e\+Cart\+Min\+Max}}]{edge}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a595b78d268cdbc0e6a3b008ac93e0cb4}{}\label{class_grid_utils_a595b78d268cdbc0e6a3b008ac93e0cb4}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a9179e27b25b1be249edd6d22455d57bd}{}\label{class_grid_utils_a9179e27b25b1be249edd6d22455d57bd}
 
 
 Check whether site is on an inner (sender) halo. 
@@ -583,9 +579,7 @@ Wrapper available which checks every halo. This method only checks the halo spec
 \begin{DoxyParams}{Parameters}
 {\em site\+\_\+position} & position of site. \\
 \hline
-{\em dir} & cartesian direction. \\
-\hline
-{\em minmax} & choice of edge in given direction. \\
+{\em edge} & combination of cartesian direction and choice of edge. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -692,14 +686,13 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}}
 \index{is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double position, e\+Cartesian\+Direction dir, e\+Min\+Max minmax, const Grid\+Obj $\ast$grid)}{isOnTransitionLayer(double position, eCartesianDirection dir, eMinMax minmax, const GridObj *grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
+\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double position, e\+Cart\+Min\+Max edge, const Grid\+Obj $\ast$grid)}{isOnTransitionLayer(double position, eCartMinMax edge, const GridObj *grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
 \begin{DoxyParamCaption}
 \item[{double}]{position, }
-\item[{{\bf e\+Cartesian\+Direction}}]{dir, }
-\item[{{\bf e\+Min\+Max}}]{minmax, }
+\item[{{\bf e\+Cart\+Min\+Max}}]{edge, }
 \item[{const {\bf Grid\+Obj} $\ast$}]{grid}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af241bda5fffef58362b1e77d9d3de6dc}{}\label{class_grid_utils_af241bda5fffef58362b1e77d9d3de6dc}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}{}\label{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}
 
 
 Check whether site is on a specific TL (to upper). 
@@ -710,9 +703,7 @@ Wrapper available which checks every TL. This method only checks the TL specifie
 \begin{DoxyParams}{Parameters}
 {\em position} & position of point. \\
 \hline
-{\em dir} & cartesian direction. \\
-\hline
-{\em minmax} & choice of edge in given direction. \\
+{\em edge} & combination of cartesian direction and choice of edge. \\
 \hline
 {\em grid} & given grid on which to check. \\
 \hline
@@ -1062,10 +1053,12 @@ Num\+Type scalar quantity
 \begin{DoxyCode}
 = 
     \{
-        \{1, 0, 2, 3, 7, 6, 5, 4, 8\}, 
-        \{1, 0, 2, 3, 4, 6, 5, 4, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\}
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\}, 
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\}
     \}
 \end{DoxyCode}
 

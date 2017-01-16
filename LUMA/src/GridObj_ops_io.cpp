@@ -48,7 +48,7 @@ void GridObj::io_textout(std::string output_tag) {
 	K_str = to_string((int)L_K);
 	L_NumLev_str = to_string(level);
 	if (L_NUM_LEVELS == 0) ex_str = to_string(0);
-	else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
+	else ex_str = to_string(CoarseLimsX[eMinimum]) + string("_") + to_string(CoarseLimsY[eMinimum]) + string("_") + to_string(CoarseLimsZ[eMinimum]);
 	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
 	mpirank = to_string(mpim->my_rank);
@@ -90,9 +90,9 @@ void GridObj::io_textout(std::string output_tag) {
 				gridoutput << "Grid is refined." << endl;
 				// Get size of regions
 				for (size_t reg = 0; reg < subGrid.size(); reg++) {
-					int finex = subGrid[reg].CoarseLimsX[1] - subGrid[reg].CoarseLimsX[0] + 1;
-					int finey = subGrid[reg].CoarseLimsY[1] - subGrid[reg].CoarseLimsY[0] + 1;
-					int finez = subGrid[reg].CoarseLimsZ[1] - subGrid[reg].CoarseLimsZ[0] + 1;
+					int finex = subGrid[reg].CoarseLimsX[eMaximum] - subGrid[reg].CoarseLimsX[eMinimum] + 1;
+					int finey = subGrid[reg].CoarseLimsY[eMaximum] - subGrid[reg].CoarseLimsY[eMinimum] + 1;
+					int finez = subGrid[reg].CoarseLimsZ[eMaximum] - subGrid[reg].CoarseLimsZ[eMinimum] + 1;
 					gridoutput << "Local region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez)*100) / (L_N*L_M*L_K) << "%" << endl;
 				}
 			}
@@ -309,7 +309,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 	L_NumLev_str = to_string(level);
 	L_timeStep_str = to_string(timeStepL0);
 	//if (L_NUM_LEVELS == 0) ex_str = to_string(0);
-	//else ex_str = to_string(CoarseLimsX[0]) + string("_") + to_string(CoarseLimsY[0]) + string("_") + to_string(CoarseLimsZ[0]);
+	//else ex_str = to_string(CoarseLimsX[eMinimum]) + string("_") + to_string(CoarseLimsY[eMinimum]) + string("_") + to_string(CoarseLimsZ[eMinimum]);
 	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
 	mpirank = to_string(mpim->my_rank);
@@ -790,7 +790,7 @@ int GridObj::io_hdf5(double tval) {
 	std::string variable_name;
 	MpiManager::phdf5_struct p_data;
 	int TL_thickness;
-	bool TL_present[3];
+	bool TL_present[3];		// Access using eCartesianDirection
 
 	// Turn auto error printing off
 	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
@@ -802,16 +802,16 @@ int GridObj::io_hdf5(double tval) {
 	if (level == 0) {
 		// TL is zero on L0 grid
 		TL_thickness = 0;
-		TL_present[0] = false;
-		TL_present[1] = false;
-		TL_present[2] = false;
+		TL_present[eXDirection] = false;
+		TL_present[eYDirection] = false;
+		TL_present[eZDirection] = false;
 	}
 	else {
 		// TL thickness is 2 cells on sub-grids
 		TL_thickness = 2;
-		TL_present[0] = mpim->subgrid_tlayer_key[0][level + region_number * L_NUM_LEVELS];
-		TL_present[1] = mpim->subgrid_tlayer_key[2][level + region_number * L_NUM_LEVELS];
-		TL_present[2] = mpim->subgrid_tlayer_key[4][level + region_number * L_NUM_LEVELS];
+		TL_present[eXDirection] = mpim->subgrid_tlayer_key[eXMin][level + region_number * L_NUM_LEVELS];
+		TL_present[eYDirection] = mpim->subgrid_tlayer_key[eYMin][level + region_number * L_NUM_LEVELS];
+		TL_present[eZDirection] = mpim->subgrid_tlayer_key[eZMin][level + region_number * L_NUM_LEVELS];
 	}
 
 
@@ -874,16 +874,16 @@ int GridObj::io_hdf5(double tval) {
 		
 	// Compute dataspaces (file space data in MPIM and ex. TL where appropriate)
 	int idx = level + region_number * L_NUM_LEVELS;
-	dimsf[0] = mpim->global_size[0][idx]
-		- mpim->subgrid_tlayer_key[0][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[1][idx - 1] * TL_thickness;
-	dimsf[1] = mpim->global_size[1][idx]
-		- mpim->subgrid_tlayer_key[2][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[3][idx - 1] * TL_thickness;
+	dimsf[0] = mpim->global_size[eXDirection][idx]
+		- mpim->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
+		- mpim->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness;
+	dimsf[1] = mpim->global_size[eYDirection][idx]
+		- mpim->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
+		- mpim->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness;
 #if (L_DIMS == 3)
-	dimsf[2] = mpim->global_size[2][idx]
-		- mpim->subgrid_tlayer_key[4][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[5][idx - 1] * TL_thickness;
+	dimsf[2] = mpim->global_size[eZDirection][idx]
+		- mpim->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
+		- mpim->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness;
 #endif
 	filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
 

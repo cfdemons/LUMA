@@ -42,14 +42,14 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_HDF_DEBUG					///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -148,7 +148,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 40		///< Number of lattice sites per unit length
+#define L_RESOLUTION 20		///< Number of lattice sites per unit length
 
 // Physical dimensions
 #define L_BX 2.0		///< End of domain-x
@@ -299,7 +299,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Bounce-back solids
 #define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_BLOCK_ON_GRID_LEV 0		///< Provide grid level on which block should be added 
+	#define L_BLOCK_ON_GRID_LEV 2		///< Provide grid level on which block should be added 
 	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level

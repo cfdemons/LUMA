@@ -1003,7 +1003,7 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, cons
 		right_edge = mpim->global_edges[eXMax][idx];
 		left_edge = right_edge - 2.0 * grid->dh;
 	}
-	else if (edge == eMinimum)
+	else if (edge == eXMin)
 	{
 		if (!mpim->subgrid_tlayer_key[eXMin][idx - 1]) return false;
 		left_edge = mpim->global_edges[eXMin][idx];
@@ -1040,9 +1040,6 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, cons
 		// Invalid string indicating direction
 		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile);
 	}
-
-	if (mpim->my_rank == 0 && (edge == eZMin || edge == eZMax) && grid->level == 1)
-	std::cout << "Rank " << mpim->my_rank << " Position = " << position << " edges = " << left_edge << " & " << right_edge << std::endl;
 
 	if (position >= left_edge && position < right_edge) return true;
 	else return false;

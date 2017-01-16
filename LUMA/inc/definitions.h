@@ -42,14 +42,14 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 10000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 10		///< Number of time steps to run simulation for
 
 
 /*
@@ -140,29 +140,23 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #endif
 
 
-// Lattice properties (in lattice units)
-#define L_DIMS 2		///< Number of dimensions to the problem
-#define L_N 100			///< Number of x lattice sites
-#define L_M 50			///< Number of y lattice sites
-#define L_K 50			///< Number of z lattice sites
-
-
 /*
 *******************************************************************************
 ****************************** Physical Data **********************************
 *******************************************************************************
 */
 
-// Physical dimensions (dictates scaling)
+// Lattice properties
+#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_RESOLUTION 40		///< Number of lattice sites per unit length
+
+// Physical dimensions
 #define L_BX 2.0		///< End of domain-x
 #define L_BY 1.0 		///< End of domain-y
 #define L_BZ 1.0		///< End of domain-z
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
-
-// Reference length
-#define L_LREF 0.1		///< Reference length for Re calculation (overridden by case specific options)
 
 
 /*
@@ -288,11 +282,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Solids
 #define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-//#define L_WALLS_ON_2D					///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_WALL_THICKNESS_BOTTOM 0.02		///< Thickness of walls in coarsest lattice units
-#define L_WALL_THICKNESS_TOP 0.02		///< Thickness of top walls in coarsest lattice units
-#define L_WALL_THICKNESS_FRONT 0.02		///< Thickness of front (3D) walls in coarsest lattice units
-#define L_WALL_THICKNESS_BACK 0.02		///< Thickness of back (3D) walls in coarsest lattice units
+//#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALL_THICKNESS_BOTTOM (L_BX/L_N)		///< Thickness of wall
+#define L_WALL_THICKNESS_TOP (L_BX/L_N)			///< Thickness of top wall
+#define L_WALL_THICKNESS_FRONT (L_BX/L_N)		///< Thickness of front (3D) wall
+#define L_WALL_THICKNESS_BACK (L_BX/L_N)		///< Thickness of back (3D) wall
 
 
 
@@ -303,9 +297,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
-	#define L_BLOCK_ON_GRID_LEV 2		///< Provide grid level on which block should be added 
+	#define L_BLOCK_ON_GRID_LEV 0		///< Provide grid level on which block should be added 
 	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
 	// Wall labelling routine implements this
 	// Specified in lattice units (i.e. by index) local to the chosen grid level
@@ -313,8 +307,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_BLOCK_MAX_X 1.1		///< End of object/wall in x-direction
 	#define L_BLOCK_MIN_Y 0.4		///< Start of object/wall in y-direction
 	#define L_BLOCK_MAX_Y 0.6		///< End of object/wall in y-direction
-	#define L_BLOCK_MIN_Z 0.2		///< Start of object/wall in z-direction
-	#define L_BLOCK_MAX_Z 0.4		///< End of object/wall in z-direction
+	#define L_BLOCK_MIN_Z 0.3		///< Start of object/wall in z-direction
+	#define L_BLOCK_MAX_Z 0.7		///< End of object/wall in z-direction
 
 
 // Bounce-back objects from point clouds
@@ -339,7 +333,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
 	#define L_START_BFL_X 0.9		///< Start of object bounding box in X direction
 	#define L_START_BFL_Y 0.4		///< Start of object bounding box in Y direction
-	#define L_CENTRE_BFL_Z 0.5		///< Cetnre of object bounding box in Z direction
+	#define L_CENTRE_BFL_Z 0.5		///< Centre of object bounding box in Z direction
 	#define L_BFL_LENGTH 0.2		///< The BFL object input is scaled based on this dimension
 	#define L_BFL_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
 	#define L_BFL_REF_LENGTH 0.2	///< Reference length to be used in the definition of Reynolds number
@@ -356,14 +350,14 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
-// Global lattice indices (in terms of each grid level) for each refined region specified on each level
+// Position of each refined region
 
-	static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.5 }, { 0.6 } };
-	static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { 1.5 }, { 1.4 } };
-	static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.2 }, { 0.3 } };
-	static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.8 }, { 0.7 } };
-	static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.1 }, { 0.2 } };
-	static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.5 }, { 0.4 } };
+static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.5 }, { 0.6 } };
+static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = { { 1.5 }, { 1.4 } };
+static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.2 }, { 0.3 } };
+static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.8 }, { 0.7 } };
+static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.1 }, { 0.25 } };
+static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.9 }, { 0.75 } };
 
 #endif
 
@@ -373,6 +367,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 ************************* Clean-up: NOT FOR EDITING ***************************
 *******************************************************************************
 */
+
+#define L_N (L_BX * L_RESOLUTION)
+#define L_M (L_BY * L_RESOLUTION)
+#define L_K (L_BZ * L_RESOLUTION)
 
 // Set dependent options
 #if (L_DIMS == 3)

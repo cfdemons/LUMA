@@ -109,7 +109,8 @@ public :
 	///
 	///			Since L0 can only be region = 0 this array should be accessed as 
 	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
-	///			cannot be 0. To retrieve L0 info, simply access [0].
+	///			cannot be 0. To retrieve L0 info, simply access [0]. The first index
+	///			should be accessed using the enumerator eCartesianMinMax.
 	///
 	double global_edges[6][L_NUM_LEVELS * L_NUM_REGIONS + 1];
 
@@ -119,9 +120,15 @@ public :
 	///			Specifically if we have a sub-grid which is perodic (or in future, which
 	///			merges with another sub-grid?). The HDF5 writer needs to know whether 
 	///			to exclude sites to account for TL or not so we store information here
-	///			from the sub-grid initialisation. Flags are stored X left, right, Y...
+	///			from the sub-grid initialisation. The first index should be accessed 
+	///			using the enumerator eCartesianMinMax. If no sub-grids present then 
+	///			adopts a default 6x1 size.
 	///
+#if (L_NUM_LEVELS == 0)
+	bool subgrid_tlayer_key[6][1];
+#else
 	bool subgrid_tlayer_key[6][L_NUM_LEVELS * L_NUM_REGIONS];
+#endif
 
 	/// Dimensions of coarse lattice represented on this rank (includes halo).
 	std::vector<int> local_size;
@@ -130,6 +137,7 @@ public :
 	///
 	///			Excludes outer overlapping layer (recv layer). 
 	///			Rows are x,y,z start and end pairs and columns are rank number.
+	///			Access the rows using the eCartMinMax enumeration.
 	std::vector< std::vector<double> > rank_core_edge;
 
 	/// \struct layer_edges
@@ -137,7 +145,8 @@ public :
 	///
 	///			Sender (inner) and receiver (outer) parts of halo are located 
 	///			using the convention [left_min left_max right_min right_max] 
-	///			for X and similar for Y and Z.
+	///			for X and similar for Y and Z. Access using the enumerator 
+	///			eEdgeMinMax.
 	struct layer_edges {
 		double X[4];	///< X limits
 		double Y[4];	///< Y limits

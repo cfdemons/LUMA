@@ -42,7 +42,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 #endif
 
 #ifdef L_MPI_VERBOSE
-	*MpiManager::logout << "Unpacking direction " << dir << std::endl;
+	*logout << "Unpacking direction " << dir << std::endl;
 #endif
 
 	// Copy outgoing information from f_buffer_recv to outer layers
@@ -868,7 +868,7 @@ void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
 	}
 
 #ifdef L_MPI_VERBOSE
-	*MpiManager::logout << "Unpacking direction " << dir << " complete." << std::endl;
+	*logout << "Unpacking direction " << dir << " complete." << std::endl;
 #endif
 
 }

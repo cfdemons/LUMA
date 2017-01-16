@@ -80,7 +80,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	for (int v = 0; v < L_NUM_VELS; v++) {
 		
 		// Update feq
-		feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i, j, k, v);
+		feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = _LBM_equilibrium_opt(k + j * K_lim + i * K_lim * M_lim, v);
 
 		// These are actually rho * MXXX but no point in dividing to multiply later
 		M200 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);

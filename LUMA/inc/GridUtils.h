@@ -47,6 +47,29 @@ enum eMinMax
 	eMaximum		///< Maximum
 };
 
+/// \enum eCartMinMax
+/// \brief	Enumeration for the combination of eCartesianDirection and eMinMax 
+///			as these are often used together to index arrays.
+enum eCartMinMax
+{
+	eXMin,
+	eXMax,
+	eYMin,
+	eYMax,
+	eZMin,
+	eZMax
+};
+
+/// \enum eEdgeMinMax
+/// \brief	Enumeration for the combination of Left and Right min and max edges.
+enum eEdgeMinMax
+{
+	eLeftMin,
+	eLeftMax,
+	eRightMin,
+	eRightMax
+};
+
 #include "stdafx.h"
 #include "GridObj.h"
 
@@ -108,8 +131,8 @@ public:
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);			// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);			// Is site on any recv layer
-	static bool isOnSenderLayer(double site_position, eCartesianDirection dir, eMinMax minmax);	// Is site on specified sender layer
-	static bool isOnRecvLayer(double site_position, eCartesianDirection dir, eMinMax minmax);	// Is site on specified recv layer
+	static bool isOnSenderLayer(double site_position, eCartMinMax edge);			// Is site on specified sender layer
+	static bool isOnRecvLayer(double site_position, eCartMinMax edge);				// Is site on specified recv layer
 	static int getMpiDirection(int offset_vector[]);								// Get MPI direction from vector
 
 	// Coordinate Management
@@ -117,7 +140,7 @@ public:
 	static void getEnclosingVoxel(double x, double y, double z, const GridObj *g, std::vector<int> *ijk);	// Take a position and a get a local ijk
 	static void getEnclosingVoxel(double x, const GridObj *g, eCartesianDirection dir, int *ijk);
 	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, const GridObj *grid);	// Is site on any TL to upper
-	static bool isOnTransitionLayer(double position, eCartesianDirection dir, eMinMax minmax, const GridObj *grid);	// Is site on specified TL to upper
+	static bool isOnTransitionLayer(double position, eCartMinMax edge, const GridObj *grid);		// Is site on specified TL to upper
 
 	// Templated functions //
 

@@ -760,7 +760,7 @@ int GridObj::io_hdf5(double tval) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 #ifdef L_MPI_VERBOSE
-	*MpiManager::logout << "Rank " << mpim->my_rank << ": Writing out Level " << level << ", Region " << region_number << std::endl;
+	*mpim->logout << "Rank " << mpim->my_rank << ": Writing out Level " << level << ", Region " << region_number << std::endl;
 #endif
 
 	/***********************/

@@ -49,7 +49,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 #endif
 
 #ifdef L_MPI_VERBOSE
-	*MpiManager::logout << "Packing direction " << dir << std::endl;
+	*logout << "Packing direction " << dir << std::endl;
 #endif
 
 	/* Copy outgoing information from inner layers to f_buffer_send using 
@@ -800,7 +800,7 @@ void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
 	}
 
 #ifdef L_MPI_VERBOSE
-	*MpiManager::logout << "Packing direction " << dir << " complete." << std::endl;
+	*logout << "Packing direction " << dir << " complete." << std::endl;
 #endif
 
 }

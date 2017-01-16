@@ -421,24 +421,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 	// Define shifts based on which overlap we are on
 
 	// X
-	if (GridUtils::isOnRecvLayer(g.XPos[i],eXDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.XPos[i],eXMax)) {
 		shift[0] = 1;
-	} else if (GridUtils::isOnRecvLayer(g.XPos[i],eXDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.XPos[i],eXMin)) {
 		shift[0] = -1;
 	}
 
 	// Y
-	if (GridUtils::isOnRecvLayer(g.YPos[j],eYDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.YPos[j],eYMax)) {
 		shift[1] = 1;
-	} else if (GridUtils::isOnRecvLayer(g.YPos[j],eYDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.YPos[j],eYMin)) {
 		shift[1] = -1;
 	}
 
 #if (L_DIMS == 3)
 	// Z
-	if (GridUtils::isOnRecvLayer(g.ZPos[k],eZDirection,eMaximum)) {
+	if (GridUtils::isOnRecvLayer(g.ZPos[k],eZMax)) {
 		shift[2] = 1;
-	} else if (GridUtils::isOnRecvLayer(g.ZPos[k],eZDirection,eMinimum)) {
+	} else if (GridUtils::isOnRecvLayer(g.ZPos[k],eZMin)) {
 		shift[2] = -1;
 	}
 #endif
@@ -492,12 +492,12 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank loc,
 	
 	// Check whether point within the edges of grid core
 	if (
-		mpim->rank_core_edge[0][mpim->my_rank] <= x && x < mpim->rank_core_edge[1][mpim->my_rank] &&
-		mpim->rank_core_edge[2][mpim->my_rank] <= y && y < mpim->rank_core_edge[3][mpim->my_rank]
+		mpim->rank_core_edge[eXMin][mpim->my_rank] <= x && x < mpim->rank_core_edge[eXMax][mpim->my_rank] &&
+		mpim->rank_core_edge[eYMin][mpim->my_rank] <= y && y < mpim->rank_core_edge[eYMax][mpim->my_rank]
 
 #if (L_DIMS == 3)
 		&&
-		mpim->rank_core_edge[4][mpim->my_rank] <= z && z < mpim->rank_core_edge[5][mpim->my_rank]
+		mpim->rank_core_edge[eZMin][mpim->my_rank] <= z && z < mpim->rank_core_edge[eZMax][mpim->my_rank]
 #endif		
 		)
 	{
@@ -565,18 +565,18 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 	switch (dir) {
 
 	case eXDirection:
-		lims[0] = 0;
-		lims[1] = 1;
+		lims[0] = eXMin;
+		lims[1] = eXMax;
 		break;
 
 	case eYDirection:
-		lims[0] = 2;
-		lims[1] = 3;
+		lims[0] = eYMin;
+		lims[1] = eYMax;
 		break;
 
 	case eZDirection:
-		lims[0] = 4;
-		lims[1] = 5;
+		lims[0] = eZMin;
+		lims[1] = eZMax;
 		break;
 	}
 
@@ -588,7 +588,10 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 	}
 
 	// Is on halo?
-	else if (GridUtils::isOnRecvLayer(xyz, dir, eMinimum) || GridUtils::isOnRecvLayer(xyz, dir, eMaximum))
+	else if (
+		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(lims[0])) || 
+		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(lims[1]))
+		)
 	{
 		loc = eHalo;
 		result = true;
@@ -639,8 +642,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	for (i = 0; i < pGrid.N_lim; ++i)
 	{
 		// If voxel centre intersects range of refined region
-		if (pGrid.XPos[i] > mpim->global_edges[0][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.XPos[i] < mpim->global_edges[1][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.XPos[i] > mpim->global_edges[eXMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.XPos[i] < mpim->global_edges[eXMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;	// Possibility of intersection
 			break;
@@ -656,8 +659,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	// Y //
 	for (i = 0; i < pGrid.M_lim; ++i)
 	{
-		if (pGrid.YPos[i] > mpim->global_edges[2][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.YPos[i] < mpim->global_edges[3][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.YPos[i] > mpim->global_edges[eYMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.YPos[i] < mpim->global_edges[eYMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;
 			break;
@@ -673,8 +676,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	// Z //
 	for (i = 0; i < pGrid.K_lim; ++i)
 	{
-		if (pGrid.ZPos[i] > mpim->global_edges[4][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.ZPos[i] < mpim->global_edges[5][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.ZPos[i] > mpim->global_edges[eZMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.ZPos[i] < mpim->global_edges[eZMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;
 			break;
@@ -760,31 +763,34 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 	if (
 	(
 		// X on sender
-		(GridUtils::isOnSenderLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_x,eXDirection,eMaximum)) &&
+		(GridUtils::isOnSenderLayer(pos_x,eXMin) || GridUtils::isOnSenderLayer(pos_x,eXMax)) &&
 
 		// Y and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
+		(
+		!GridUtils::isOnRecvLayer(pos_y,eYMin) && !GridUtils::isOnRecvLayer(pos_y,eYMax)
 #if (L_DIMS == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZMin) && !GridUtils::isOnRecvLayer(pos_z,eZMax)
 #endif
 		)
 	) || (
 		// Y on sender
-		(GridUtils::isOnSenderLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_y,eYDirection,eMaximum)) &&
+		(GridUtils::isOnSenderLayer(pos_y,eYMin) || GridUtils::isOnSenderLayer(pos_y,eYMax)) &&
 
 		// X and Z not recv
-		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)
+		(
+		!GridUtils::isOnRecvLayer(pos_x,eXMin) && !GridUtils::isOnRecvLayer(pos_x,eXMax)
 #if (L_DIMS == 3)
-		&& !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
+		&& !GridUtils::isOnRecvLayer(pos_z,eZMin) && !GridUtils::isOnRecvLayer(pos_z,eZMax)
 
 		)
 	) || (
 		// Z on sender
-		(GridUtils::isOnSenderLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnSenderLayer(pos_z,eZDirection,eMaximum)) &&
+		(GridUtils::isOnSenderLayer(pos_z,eZMin) || GridUtils::isOnSenderLayer(pos_z,eZMax)) &&
 
 		// X and Y not recv
-		(!GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum)	&& 
-		!GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
+		(
+		!GridUtils::isOnRecvLayer(pos_x,eXMin) && !GridUtils::isOnRecvLayer(pos_x,eXMax)	&& 
+		!GridUtils::isOnRecvLayer(pos_y,eYMin) && !GridUtils::isOnRecvLayer(pos_y,eYMax)
 #endif
 		)
 	)
@@ -805,55 +811,43 @@ bool GridUtils::isOnSenderLayer(double pos_x, double pos_y, double pos_z) {
 ///			block.
 ///
 /// \param	site_position	position of site.
-/// \param	dir				cartesian direction.
-/// \param minmax			choice of edge in given direction.
+/// \param	edge			combination of cartesian direction and choice of edge.
 /// \return	boolean answer.
-bool GridUtils::isOnSenderLayer(double site_position, enum eCartesianDirection dir, enum eMinMax minmax) {
+bool GridUtils::isOnSenderLayer(double site_position, enum eCartMinMax edge) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank inner overlap regions dictated by the coarsest rank
-	if (dir == eXDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->sender_layer_pos.X[2] && site_position < mpim->sender_layer_pos.X[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->sender_layer_pos.X[0] && site_position < mpim->sender_layer_pos.X[1] ) return true;
-
-		}
-
-	} else if (dir == eYDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->sender_layer_pos.Y[2] && site_position < mpim->sender_layer_pos.Y[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->sender_layer_pos.Y[0] && site_position < mpim->sender_layer_pos.Y[1] ) return true;
-
-		}
-
-	} else if (dir == eZDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->sender_layer_pos.Z[2] && site_position < mpim->sender_layer_pos.Z[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->sender_layer_pos.Z[0] && site_position < mpim->sender_layer_pos.Z[1] ) return true;
-
-		}
-
-	} else {
-
-		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting.", logfile);
-
+	if (edge == eXMax)
+	{
+		if (site_position >= mpim->sender_layer_pos.X[eRightMin] && site_position < mpim->sender_layer_pos.X[eRightMax]) return true;
 	}
-
+	else if (edge == eXMin)
+	{
+		if (site_position >= mpim->sender_layer_pos.X[eLeftMin] && site_position < mpim->sender_layer_pos.X[eLeftMax]) return true;
+	}
+	else if (edge == eYMax)
+	{
+		if (site_position >= mpim->sender_layer_pos.Y[eRightMin] && site_position < mpim->sender_layer_pos.Y[eRightMax]) return true;
+	}
+	else if (edge == eYMin)
+	{
+		if (site_position >= mpim->sender_layer_pos.Y[eLeftMin] && site_position < mpim->sender_layer_pos.Y[eLeftMax]) return true;
+	}
+	else if (edge == eZMax)
+	{
+		if (site_position >= mpim->sender_layer_pos.Z[eRightMin] && site_position < mpim->sender_layer_pos.Z[eRightMax]) return true;
+	}
+	else if (edge == eZMin)
+	{
+		if (site_position >= mpim->sender_layer_pos.Z[eLeftMin] && site_position < mpim->sender_layer_pos.Z[eLeftMax]) return true;
+	}
+	else
+	{
+		// Invalid string indicating direction
+		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer(). Exiting.", logfile);
+	}
 
 	return false;
 
@@ -875,10 +869,12 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
-	if (	GridUtils::isOnRecvLayer(pos_x,eXDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_x,eXDirection,eMaximum) ||
-			GridUtils::isOnRecvLayer(pos_y,eYDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_y,eYDirection,eMaximum)
+	if (
+		GridUtils::isOnRecvLayer(pos_x,eXMin) || GridUtils::isOnRecvLayer(pos_x,eXMax) ||
+		GridUtils::isOnRecvLayer(pos_y,eYMin) || GridUtils::isOnRecvLayer(pos_y,eYMax)
 #if (L_DIMS == 3)
-			|| GridUtils::isOnRecvLayer(pos_z,eZDirection,eMinimum) || GridUtils::isOnRecvLayer(pos_z,eZDirection,eMaximum)
+		||
+		GridUtils::isOnRecvLayer(pos_z,eZMin) || GridUtils::isOnRecvLayer(pos_z,eZMax)
 #endif
 		) {
 			return true;
@@ -897,53 +893,42 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 ///			block.
 ///
 /// \param	site_position	position of site.
-/// \param	dir				cartesian direction.
-/// \param	minmax			choice of edge in given direction.
+/// \param	edge			combination of cartesian direction and choice of edge.
 /// \return	boolean answer.
-bool GridUtils::isOnRecvLayer(double site_position, enum eCartesianDirection dir, enum eMinMax minmax) {
+bool GridUtils::isOnRecvLayer(double site_position, enum eCartMinMax edge) {
 
 	// Get instance of MPI manager
 	MpiManager* mpim = MpiManager::getInstance();
 	
 	// Do checks on rank outer overlap regions dictated by the coarsest rank
-	if (dir == eXDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->recv_layer_pos.X[2] && site_position < mpim->recv_layer_pos.X[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->recv_layer_pos.X[0] && site_position < mpim->recv_layer_pos.X[1] ) return true;
-
-		}
-
-	} else if (dir == eYDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->recv_layer_pos.Y[2] && site_position < mpim->recv_layer_pos.Y[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->recv_layer_pos.Y[0] && site_position < mpim->recv_layer_pos.Y[1] ) return true;
-
-		}
-		
-	} else if (dir == eZDirection) {
-
-		if (minmax == eMaximum) {
-			if (site_position >= mpim->recv_layer_pos.Z[2] && site_position < mpim->recv_layer_pos.Z[3] ) return true;
-
-		}
-		else if (minmax == eMinimum) {
-			if (site_position >= mpim->recv_layer_pos.Z[0] && site_position < mpim->recv_layer_pos.Z[1] ) return true;
-
-		}
-
-	} else {
-
+	if (edge == eXMax)
+	{
+		if (site_position >= mpim->recv_layer_pos.X[eRightMin] && site_position < mpim->recv_layer_pos.X[eRightMax]) return true;
+	}
+	else if (edge == eXMin)
+	{
+		if (site_position >= mpim->recv_layer_pos.X[eLeftMin] && site_position < mpim->recv_layer_pos.X[eLeftMax]) return true;
+	}
+	else if (edge == eYMax)
+	{
+		if (site_position >= mpim->recv_layer_pos.Y[eRightMin] && site_position < mpim->recv_layer_pos.Y[eRightMax]) return true;
+	}
+	else if (edge == eYMin)
+	{
+		if (site_position >= mpim->recv_layer_pos.Y[eLeftMin] && site_position < mpim->recv_layer_pos.Y[eLeftMax]) return true;
+	}
+	else if (edge == eZMax)
+	{
+		if (site_position >= mpim->recv_layer_pos.Z[eRightMin] && site_position < mpim->recv_layer_pos.Z[eRightMax]) return true;
+	}
+	else if (edge == eZMin)
+	{
+		if (site_position >= mpim->recv_layer_pos.Z[eLeftMin] && site_position < mpim->recv_layer_pos.Z[eLeftMax]) return true;
+	}
+	else
+	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer() / GridUtils::isOnRecvLayer(). Exiting.", logfile);
-
+		L_ERROR("Invalid direction specified in GridUtils::isOnRecvLayer(). Exiting.", logfile);
 	}
 
 	return false;
@@ -964,15 +949,15 @@ bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, co
 {
 
 	if (
-		GridUtils::isOnTransitionLayer(pos_x, eXDirection, eMinimum, grid) ||
-		GridUtils::isOnTransitionLayer(pos_x, eXDirection, eMaximum, grid) ||
-		GridUtils::isOnTransitionLayer(pos_y, eYDirection, eMinimum, grid) ||
-		GridUtils::isOnTransitionLayer(pos_y, eYDirection, eMaximum, grid)
+		GridUtils::isOnTransitionLayer(pos_x, eXMin, grid) ||
+		GridUtils::isOnTransitionLayer(pos_x, eXMax, grid) ||
+		GridUtils::isOnTransitionLayer(pos_y, eYMin, grid) ||
+		GridUtils::isOnTransitionLayer(pos_y, eYMax, grid)
 #if (L_DIMS == 3)
 		||
 
-		GridUtils::isOnTransitionLayer(pos_z, eZDirection, eMinimum, grid) ||
-		GridUtils::isOnTransitionLayer(pos_z, eZDirection, eMaximum, grid)
+		GridUtils::isOnTransitionLayer(pos_z, eZMin, grid) ||
+		GridUtils::isOnTransitionLayer(pos_z, eZMax, grid)
 #endif
 		) return true;
 
@@ -989,11 +974,10 @@ bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, co
 ///			supplied grid.
 ///
 /// \param	position	position of point.
-/// \param	dir			cartesian direction.
-/// \param	minmax		choice of edge in given direction.
+/// \param	edge			combination of cartesian direction and choice of edge.
 /// \param	grid		given grid on which to check.
 /// \return	boolean answer.
-bool GridUtils::isOnTransitionLayer(double position, enum eCartesianDirection dir, enum eMinMax minmax, const GridObj *grid) {
+bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, const GridObj *grid) {
 
 	// L0 has no TL so always return false
 	if (grid->level == 0) return false;
@@ -1010,66 +994,55 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartesianDirection di
 	int idx = grid->level + grid->region_number * L_NUM_LEVELS;
 
 	// Switch on direction
-	if (dir == eXDirection)
+	if (edge == eXMax)
 	{
-		if (minmax == eMaximum) {
+		// If no TL as indicated at grid initialisation time then return
+		if (!mpim->subgrid_tlayer_key[eXMax][idx - 1]) return false;
 
-			// If no TL as indicated at grid initialisation time then return
-			if (!mpim->subgrid_tlayer_key[1][idx - 1]) return false;
-
-			// Define TL
-			right_edge = mpim->global_edges[1][idx];
-			left_edge = right_edge - 2.0 * grid->dh;
-		}
-		else if (minmax == eMinimum)
-		{
-			if (!mpim->subgrid_tlayer_key[0][idx - 1]) return false;
-			left_edge = mpim->global_edges[0][idx];
-			right_edge = left_edge + 2.0 * grid->dh;
-		}
+		// Define TL
+		right_edge = mpim->global_edges[eXMax][idx];
+		left_edge = right_edge - 2.0 * grid->dh;
+	}
+	else if (edge == eMinimum)
+	{
+		if (!mpim->subgrid_tlayer_key[eXMin][idx - 1]) return false;
+		left_edge = mpim->global_edges[eXMin][idx];
+		right_edge = left_edge + 2.0 * grid->dh;
+	}
+	else if (edge == eYMax)
+	{
+		if (!mpim->subgrid_tlayer_key[eYMax][idx - 1]) return false;
+		right_edge = mpim->global_edges[eYMax][idx];
+		left_edge = right_edge - 2.0 * grid->dh;
+	}
+	else if (edge == eYMin)
+	{
+		if (!mpim->subgrid_tlayer_key[eYMin][idx - 1]) return false;
+		left_edge = mpim->global_edges[eYMin][idx];
+		right_edge = left_edge + 2.0 * grid->dh;
+	}
+	else if (edge == eZMax)
+	{
+		if (!mpim->subgrid_tlayer_key[eZMax][idx - 1]) return false;
+		right_edge = mpim->global_edges[eZMax][idx];
+		left_edge = right_edge - 2.0 * grid->dh;
 
 	}
-	else if (dir == eYDirection)
+	else if (edge == eZMin)
 	{
-
-		if (minmax == eMaximum) {
-			if (!mpim->subgrid_tlayer_key[3][idx - 1]) return false;
-			right_edge = mpim->global_edges[3][idx];
-			left_edge = right_edge - 2.0 * grid->dh;
-
-		}
-		else if (minmax == eMinimum) {
-			if (!mpim->subgrid_tlayer_key[2][idx - 1]) return false;
-			left_edge = mpim->global_edges[2][idx];
-			right_edge = left_edge + 2.0 * grid->dh;
-
-		}
-
-	}
-	else if (dir == eZDirection)
-	{
-
-		if (minmax == eMaximum) {
-			if (!mpim->subgrid_tlayer_key[5][idx - 1]) return false;
-			right_edge = mpim->global_edges[5][idx];
-			left_edge = right_edge - 2.0 * grid->dh;
-
-		}
-		else if (minmax == eMinimum) {
-			if (!mpim->subgrid_tlayer_key[4][idx - 1]) return false;
-			left_edge = mpim->global_edges[4][idx];
-			right_edge = left_edge + 2.0 * grid->dh;
-
-		}
+		if (!mpim->subgrid_tlayer_key[eZMin][idx - 1]) return false;
+		left_edge = mpim->global_edges[eZMin][idx];
+		right_edge = left_edge + 2.0 * grid->dh;
 
 	}
 	else
 	{
-
 		// Invalid string indicating direction
 		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile);
-
 	}
+
+	if (mpim->my_rank == 0 && (edge == eZMin || edge == eZMax) && grid->level == 1)
+	std::cout << "Rank " << mpim->my_rank << " Position = " << position << " edges = " << left_edge << " & " << right_edge << std::endl;
 
 	if (position >= left_edge && position < right_edge) return true;
 	else return false;
@@ -1232,15 +1205,15 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 
 	if (dir == eXDirection)
 	{
-		idx = 0;
+		idx = eXMin;
 	}
 	else if (dir == eYDirection)
 	{
-		idx = 2;
+		idx = eYMin;
 	}
 	else if (dir == eZDirection)
 	{
-		idx = 4;
+		idx = eZMin;
 	}
 
 	// Compute number of complete cells between point and edge of rank core
@@ -1248,7 +1221,10 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 		std::floor((xyz - mpim->rank_core_edge[idx][mpim->my_rank]) / g->dh)
 		);
 
-	// Compute offset from global edge (number of voxels between grid edge and rank egde)
+	/* Compute offset from global edge i.e. number of voxels between grid edge and 
+	 * rank egde. We round it as although they are exact (as they are MPIM quantities
+	 * there may be round-off errors which might give an non-zero answer when zero 
+	 * was expected) */
 	offset = static_cast<int>(
 		std::round((mpim->rank_core_edge[idx][mpim->my_rank] - 
 		mpim->global_edges[idx][g->level + g->region_number * L_NUM_LEVELS]) / g->dh)
@@ -1262,8 +1238,16 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	if (offset > static_cast<int>(1.0 / g->refinement_ratio))
 		offset = static_cast<int>(1.0 / g->refinement_ratio);
 
+	// If on L0, always add a halo offset of 1 for MPI builds
+#ifdef L_BUILD_FOR_MPI
+	if (g->level == 0)
+		offset = 1;
+#endif
+
 	// Correct the ijk position
 	*ijk += offset;
+
+
 
 	return;
 

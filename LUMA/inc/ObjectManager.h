@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "IVector.h"
+#include "IBInfo.h"
 #include "IBMarker.h"
 #include "IBBody.h"
 #include "BFLBody.h"

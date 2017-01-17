@@ -59,6 +59,8 @@ std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1f
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{Object\+Manager}
+\item 
+class \hyperlink{class_i_b_body_a54980b051e93ff6b0f02df2ff7fee3a8}{I\+B\+Info}
 \end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
@@ -308,15 +310,15 @@ This method is an overload of the method in the parent class. This version takes
 
 
 \begin{DoxyParams}{Parameters}
-{\em x} & desired global X-\/position of new marker. \\
+{\em x} & desired X-\/position of new marker. \\
 \hline
-{\em y} & desired global\+Y-\/position of new marker. \\
+{\em y} & desired Y-\/position of new marker. \\
 \hline
-{\em z} & desired global\+Z-\/position of new marker. \\
+{\em z} & desired Z-\/position of new marker. \\
 \hline
 {\em curr\+\_\+mark} & is a reference to the ID of last marker. \\
 \hline
-{\em counter} & is a reference to the total number of markers in the body. \\
+{\em counter} & is an array of the number of contributing points to a given marker position. \\
 \hline
 {\em flex\+\_\+rigid} & indicates whether markers added should form part of flexible or rigid body. \\
 \hline
@@ -324,6 +326,9 @@ This method is an overload of the method in the parent class. This version takes
 
 
 \subsection{Friends And Related Function Documentation}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Info@{I\+B\+Info}}
+\index{I\+B\+Info@{I\+B\+Info}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Info}{IBInfo}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf I\+B\+Info}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_body_a54980b051e93ff6b0f02df2ff7fee3a8}{}\label{class_i_b_body_a54980b051e93ff6b0f02df2ff7fee3a8}
 \index{I\+B\+Body@{I\+B\+Body}!Object\+Manager@{Object\+Manager}}
 \index{Object\+Manager@{Object\+Manager}!I\+B\+Body@{I\+B\+Body}}
 \subsubsection[{\texorpdfstring{Object\+Manager}{ObjectManager}}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Object\+Manager}\hspace{0.3cm}{\ttfamily [friend]}}\hypertarget{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}{}\label{class_i_b_body_a8b86bdcdb7c54a536293d8632363e114}

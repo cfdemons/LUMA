@@ -478,7 +478,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	do {
 
 		// If on this rank get its indices
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], loc, g))
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
 		{
 			// Increment counter
 			a++;
@@ -490,8 +490,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->z.erase(_PCpts->z.begin() + a);
 		}
 
-	} while (a < static_cast<int>(_PCpts->x.size()));
+		*GridUtils::logfile << std::to_string(loc) << std::endl;
 
+	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes
 #ifdef L_CLOUD_DEBUG

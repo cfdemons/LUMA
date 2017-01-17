@@ -518,7 +518,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			iss >> x >> y >> z;
 
 			// Get indices
-			eLocationOnRank loc = eNone;
+			eLocationOnRank *loc = nullptr;
 			std::vector<int> ijk;
 			if (!GridUtils::isOnThisRank(x, y, z, loc, g, &ijk)) continue;
 			i = ijk[0];
@@ -610,7 +610,7 @@ void GridObj::io_probeOutput() {
 #endif
 
 				// Is point on rank, if not move on
-				eLocationOnRank loc = eNone;
+				eLocationOnRank *loc = nullptr;
 				std::vector<int> ijk;
 				if (!GridUtils::isOnThisRank(x,y,z,loc,this,&ijk)) continue;
 

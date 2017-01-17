@@ -44,12 +44,12 @@
 //#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
-//#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
+#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG					///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG					///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 10		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -147,8 +147,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 20		///< Number of lattice sites per unit length
+#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_RESOLUTION 40		///< Number of lattice sites per unit length
 
 // Physical dimensions
 #define L_BX 2.0		///< End of domain-x
@@ -189,7 +189,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Master IBM switches //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 #define L_IB_ON_LEV 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
 #define L_IB_ON_REG 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
@@ -202,8 +202,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_IBB_ON_GRID_LEV L_IB_ON_LEV		///< Provide grid level on which object should be added
 	#define L_IBB_ON_GRID_REG L_IB_ON_REG		///< Provide grid region on which object should be added
 	// Following specified in physical distances
-	#define L_START_IBB_X 0.4		///< Start X of object bounding box
-	#define L_START_IBB_Y 0.35		///< Start Y of object bounding box
+	#define L_START_IBB_X 0.9		///< Start X of object bounding box
+	#define L_START_IBB_Y 0.4		///< Start Y of object bounding box
 	#define L_CENTRE_IBB_Z 0.5		///< Centre of object bounding box in Z direction
 	#define L_IBB_LENGTH 0.2		///< The object input is scaled based on this dimension
 	#define L_IBB_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
@@ -277,7 +277,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Periodicity
-//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (only applies to fluid-fluid interfaces)
+#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
 
 
 // Solids
@@ -297,7 +297,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Bounce-back solids
-#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
+//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
 
 	#define L_BLOCK_ON_GRID_LEV 2		///< Provide grid level on which block should be added 
 	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
@@ -346,7 +346,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0

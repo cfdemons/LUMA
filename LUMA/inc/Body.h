@@ -153,6 +153,7 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 	this->markers.back().supp_i.push_back(ijk[0]);
 	this->markers.back().supp_j.push_back(ijk[1]);
 	this->markers.back().supp_k.push_back(ijk[2]);
+	this->markers.back().support_rank.push_back(MpiManager::getInstance()->my_rank);
 };
 
 /*********************************************/
@@ -170,7 +171,7 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
 	// Get indices of voxel associated with the supplied position
 	std::vector<int> vox;
-	eLocationOnRank loc = eNone;
+	eLocationOnRank *loc = nullptr;
 	if (GridUtils::isOnThisRank(x, y, z, loc, _Owner, &vox))
 	{
 

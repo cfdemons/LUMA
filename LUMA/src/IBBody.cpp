@@ -22,6 +22,7 @@
 #include "../inc/PCpts.h"
 #include "../inc/GridUtils.h"
 #include "../inc/ObjectManager.h"
+#include "../inc/MpiManager.h"
 
 // ***************************************************************************************************
 /// \brief Constructor which sets group ID to zero by default.
@@ -66,6 +67,7 @@ void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
 	this->markers.back().supp_i.push_back(ijk[0]);
 	this->markers.back().supp_j.push_back(ijk[1]);
 	this->markers.back().supp_k.push_back(ijk[2]);
+	this->markers.back().support_rank.push_back(MpiManager::getInstance()->my_rank);
 
 }
 
@@ -600,11 +602,11 @@ void IBBody::makeBody(PCpts* _PCpts) {
 ///			This version takes the flexible/rigid flag and passes it to the 
 ///			overloaded addMarker() method.
 ///
-/// \param x desired global X-position of new marker.
-/// \param y desired globalY-position of new marker.
-/// \param z desired globalZ-position of new marker.
+/// \param x desired X-position of new marker.
+/// \param y desired Y-position of new marker.
+/// \param z desired Z-position of new marker.
 /// \param curr_mark is a reference to the ID of last marker.
-///	\param counter is a reference to the total number of markers in the body.
+///	\param counter is an array of the number of contributing points to a given marker position.
 /// \param flex_rigid indicates whether markers added should form part of flexible or rigid body.
 void IBBody::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid) {
 
@@ -614,7 +616,7 @@ void IBBody::markerAdder(double x, double y, double z, int& curr_mark, std::vect
 		// Increment point counter
 		counter[curr_mark]++;
 
-		// Update position of marker in current voxel
+		// Update average position of marker in current voxel
 		markers[curr_mark].position[0] =
 			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
 		markers[curr_mark].position[1] =

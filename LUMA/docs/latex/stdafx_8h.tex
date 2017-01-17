@@ -52,6 +52,22 @@ const double \hyperlink{stdafx_8h_ae51e162e8ad5da2cef261f3936312f64}{cs}
 \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}}
 \index{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}{L_DACTION_WRITE_OUT_FORCES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}\hypertarget{stdafx_8h_af8d3b25556396facf0f8c19decc56200}{}\label{stdafx_8h_af8d3b25556396facf0f8c19decc56200}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+std::ofstream testout; \(\backslash\)
+testout.open(\hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{GridUtils::path\_str} + \textcolor{stringliteral}{"/force\_i\_LB.out"}, std::ios::app); \(\backslash\)
+testout << \textcolor{stringliteral}{"\(\backslash\)nNEW TIME STEP"} << std::endl; \(\backslash\)
+for (\textcolor{keywordtype}{size\_t} j = 1; j < M\_lim - 1; j++) \{ \(\backslash\)
+    for (\textcolor{keywordtype}{size\_t} i = 0; i < N\_lim; i++) \{ \(\backslash\)
+        for (\textcolor{keywordtype}{size\_t} v = 0; v < \hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\_NUM\_VELS}; v++) \{ \(\backslash\)
+            testout << force\_i(i, j, 0, v, M\_lim, K\_lim, L\_NUM\_VELS) << \textcolor{stringliteral}{"\(\backslash\)t"}; \(\backslash\)
+        \} \(\backslash\)
+        testout << std::endl; \(\backslash\)
+    \} \(\backslash\)
+    testout << std::endl; \(\backslash\)
+\} \(\backslash\)
+testout.close(); \(\backslash\)
+\end{DoxyCode}
 \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}}
 \index{L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+E\+R\+R\+OR}{L_ERROR}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+E\+R\+R\+OR~{\bf errorfcn}}\hypertarget{stdafx_8h_a48538932682d4fe3cdf01547db361240}{}\label{stdafx_8h_a48538932682d4fe3cdf01547db361240}

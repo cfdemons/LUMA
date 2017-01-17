@@ -480,7 +480,7 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 /// \param		grid	grid being queried.
 /// \param[out]	loc		description of the location of the point.
 /// \return	boolean answer.
-bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank loc, 
+bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc, 
 	const GridObj *grid, std::vector<int> *pos) {
 	
 	// Get instance of MpiManager
@@ -501,21 +501,21 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank loc,
 #endif		
 		)
 	{
-		loc = eCore;
+		if (loc != nullptr) *loc = eCore;
 		result = true;
 	}
 
 	// Check whether point within receiver layers
 	else if (GridUtils::isOnRecvLayer(x, y, z))
 	{
-		loc = eHalo;
+		if (loc != nullptr) *loc = eHalo;
 		result = true;
 	}
 
 	// Not on either core or halo so not on grid
 	else
 	{
-		loc = eNone;
+		if (loc != nullptr) *loc = eNone;
 		result = false;
 		return result;
 	}
@@ -552,7 +552,7 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank loc,
 /// \param[out]	pos	the local index of the found site.
 /// \return	boolean answer.
 bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir, 
-	eLocationOnRank loc, const GridObj *grid, int *pos) {
+	eLocationOnRank *loc, const GridObj *grid, int *pos) {
 
 	// Get instance of MpiManager
 	MpiManager *mpim = MpiManager::getInstance();
@@ -583,7 +583,7 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 	// Is on core?
 	if (mpim->rank_core_edge[lims[0]][mpim->my_rank] <= xyz && xyz < mpim->rank_core_edge[lims[1]][mpim->my_rank])
 	{
-		loc = eCore;
+		if (loc != nullptr) *loc = eCore;
 		result = true;
 	}
 
@@ -593,14 +593,14 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(lims[1]))
 		)
 	{
-		loc = eHalo;
+		if (loc != nullptr) *loc = eHalo;
 		result = true;
 	}
 
 	// Not on grid
 	else
 	{
-		loc = eNone;
+		if (loc != nullptr) *loc = eNone;
 		result = false;
 		return result;
 	}

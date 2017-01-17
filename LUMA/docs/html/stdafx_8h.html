@@ -170,7 +170,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">std::ofstream testout; \</div><div class="line">testout.open(<a class="code" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">GridUtils::path_str</a> + <span class="stringliteral">&quot;/force_i_LB.out&quot;</span>, std::ios::app); \</div><div class="line">testout &lt;&lt; <span class="stringliteral">&quot;\nNEW TIME STEP&quot;</span> &lt;&lt; std::endl; \</div><div class="line">for (<span class="keywordtype">size_t</span> j = 1; j &lt; M_lim - 1; j++) { \</div><div class="line">    for (<span class="keywordtype">size_t</span> i = 0; i &lt; N_lim; i++) { \</div><div class="line">        for (<span class="keywordtype">size_t</span> v = 0; v &lt; <a class="code" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>; v++) { \</div><div class="line">            testout &lt;&lt; force_i(i, j, 0, v, M_lim, K_lim, L_NUM_VELS) &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>; \</div><div class="line">        } \</div><div class="line">        testout &lt;&lt; std::endl; \</div><div class="line">    } \</div><div class="line">    testout &lt;&lt; std::endl; \</div><div class="line">} \</div><div class="line">testout.close(); \</div><div class="ttc" id="definitions_8h_html_a947c7e248feb63ae57fb828c03c4c001"><div class="ttname"><a href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a></div><div class="ttdeci">#define L_NUM_VELS</div><div class="ttdef"><b>Definition:</b> definitions.h:387</div></div>
+<div class="ttc" id="class_grid_utils_html_a9b58748e9e05e84852962d7abc7942e3"><div class="ttname"><a href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">GridUtils::path_str</a></div><div class="ttdeci">static std::string path_str</div><div class="ttdoc">Static string representing output path. </div><div class="ttdef"><b>Definition:</b> GridUtils.h:86</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a48538932682d4fe3cdf01547db361240"></a>

@@ -63,7 +63,7 @@ int \hyperlink{class_mpi_manager_af2891954ff504c12ec6d5f845e906f28}{neighbour\+\
 \begin{DoxyCompactList}\small\item\em Neighbour rank number for each direction in Cartesian topology. \end{DoxyCompactList}\item 
 int \hyperlink{class_mpi_manager_a5a7268347fcab916adc61bee47e9f626}{neighbour\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Coordinates in M\+PI topology of neighbour ranks. \end{DoxyCompactList}\item 
-M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a0926101699de914f6be018885bea25b1}{sub\+Grid\+\_\+comm} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}
+M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{sub\+Grid\+\_\+comm} \mbox{[}1\mbox{]}
 \begin{DoxyCompactList}\small\item\em Communicators for sub-\/grid / region combinations. \end{DoxyCompactList}\item 
 std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{p\+\_\+data}
 \begin{DoxyCompactList}\small\item\em Vector of structures containing halo descriptors for block writing (H\+D\+F5) \end{DoxyCompactList}\item 
@@ -77,7 +77,7 @@ int \hyperlink{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}{global\+\_\+
 \begin{DoxyCompactList}\small\item\em Overall size of each grid (excluding halo of course). \end{DoxyCompactList}\item 
 double \hyperlink{class_mpi_manager_a26f0512e19009451431d6d0ba59bf81a}{global\+\_\+edges} \mbox{[}6\mbox{]}\mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}
 \begin{DoxyCompactList}\small\item\em Absolute position of grid edges (excluding halo of course). \end{DoxyCompactList}\item 
-bool \hyperlink{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}{subgrid\+\_\+tlayer\+\_\+key} \mbox{[}6\mbox{]}\mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}
+bool \hyperlink{class_mpi_manager_a189a0e754b2c0351ac8d48263c3d8a70}{subgrid\+\_\+tlayer\+\_\+key} \mbox{[}6\mbox{]}\mbox{[}1\mbox{]}
 \begin{DoxyCompactList}\small\item\em Boolean flag array to indicate the presence of a TL on sub-\/grid edges. \end{DoxyCompactList}\item 
 std\+::vector$<$ int $>$ \hyperlink{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}{local\+\_\+size}
 \begin{DoxyCompactList}\small\item\em Dimensions of coarse lattice represented on this rank (includes halo). \end{DoxyCompactList}\item 
@@ -499,14 +499,14 @@ Structure containing sender layer edge positions.
 
 \index{Mpi\+Manager@{Mpi\+Manager}!sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}}
 \index{sub\+Grid\+\_\+comm@{sub\+Grid\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{sub\+Grid\+\_\+comm}{subGrid_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::sub\+Grid\+\_\+comm\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}}\hypertarget{class_mpi_manager_a0926101699de914f6be018885bea25b1}{}\label{class_mpi_manager_a0926101699de914f6be018885bea25b1}
+\subsubsection[{\texorpdfstring{sub\+Grid\+\_\+comm}{subGrid_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::sub\+Grid\+\_\+comm\mbox{[}1\mbox{]}}\hypertarget{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}{}\label{class_mpi_manager_a32921c381b76fb8f27d3334ebd1756cd}
 
 
 Communicators for sub-\/grid / region combinations. 
 
 \index{Mpi\+Manager@{Mpi\+Manager}!subgrid\+\_\+tlayer\+\_\+key@{subgrid\+\_\+tlayer\+\_\+key}}
 \index{subgrid\+\_\+tlayer\+\_\+key@{subgrid\+\_\+tlayer\+\_\+key}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{subgrid\+\_\+tlayer\+\_\+key}{subgrid_tlayer_key}}]{\setlength{\rightskip}{0pt plus 5cm}bool Mpi\+Manager\+::subgrid\+\_\+tlayer\+\_\+key\mbox{[}6\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}}\hypertarget{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}{}\label{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}
+\subsubsection[{\texorpdfstring{subgrid\+\_\+tlayer\+\_\+key}{subgrid_tlayer_key}}]{\setlength{\rightskip}{0pt plus 5cm}bool Mpi\+Manager\+::subgrid\+\_\+tlayer\+\_\+key\mbox{[}6\mbox{]}\mbox{[}1\mbox{]}}\hypertarget{class_mpi_manager_a189a0e754b2c0351ac8d48263c3d8a70}{}\label{class_mpi_manager_a189a0e754b2c0351ac8d48263c3d8a70}
 
 
 Boolean flag array to indicate the presence of a TL on sub-\/grid edges. 

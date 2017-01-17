@@ -176,9 +176,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a5a7268347fcab916adc61bee47e9f626"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a5a7268347fcab916adc61bee47e9f626">neighbour_coords</a> [<a class="el" href="definitions_8h.html#a31d5945080ee5c34edc32e6f74c724c8">L_DIMS</a>][<a class="el" href="definitions_8h.html#a144328eed4e90ebcf8a9f66aa7337266">L_MPI_DIRS</a>]</td></tr>
 <tr class="memdesc:a5a7268347fcab916adc61bee47e9f626"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates in MPI topology of neighbour ranks.  <a href="#a5a7268347fcab916adc61bee47e9f626">More...</a><br /></td></tr>
 <tr class="separator:a5a7268347fcab916adc61bee47e9f626"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0926101699de914f6be018885bea25b1"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a0926101699de914f6be018885bea25b1">subGrid_comm</a> [<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td></tr>
-<tr class="memdesc:a0926101699de914f6be018885bea25b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Communicators for sub-grid / region combinations.  <a href="#a0926101699de914f6be018885bea25b1">More...</a><br /></td></tr>
-<tr class="separator:a0926101699de914f6be018885bea25b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32921c381b76fb8f27d3334ebd1756cd"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a32921c381b76fb8f27d3334ebd1756cd">subGrid_comm</a> [1]</td></tr>
+<tr class="memdesc:a32921c381b76fb8f27d3334ebd1756cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Communicators for sub-grid / region combinations.  <a href="#a32921c381b76fb8f27d3334ebd1756cd">More...</a><br /></td></tr>
+<tr class="separator:a32921c381b76fb8f27d3334ebd1756cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03972530e718d5b0a7f119e9c6132179"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="struct_mpi_manager_1_1phdf5__struct.html">phdf5_struct</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a03972530e718d5b0a7f119e9c6132179">p_data</a></td></tr>
 <tr class="memdesc:a03972530e718d5b0a7f119e9c6132179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of structures containing halo descriptors for block writing (HDF5)  <a href="#a03972530e718d5b0a7f119e9c6132179">More...</a><br /></td></tr>
 <tr class="separator:a03972530e718d5b0a7f119e9c6132179"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -197,9 +197,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a26f0512e19009451431d6d0ba59bf81a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a26f0512e19009451431d6d0ba59bf81a">global_edges</a> [6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>+1]</td></tr>
 <tr class="memdesc:a26f0512e19009451431d6d0ba59bf81a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute position of grid edges (excluding halo of course).  <a href="#a26f0512e19009451431d6d0ba59bf81a">More...</a><br /></td></tr>
 <tr class="separator:a26f0512e19009451431d6d0ba59bf81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18d53c4f9968cccec36127d33776e3d4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a18d53c4f9968cccec36127d33776e3d4">subgrid_tlayer_key</a> [6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td></tr>
-<tr class="memdesc:a18d53c4f9968cccec36127d33776e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean flag array to indicate the presence of a TL on sub-grid edges.  <a href="#a18d53c4f9968cccec36127d33776e3d4">More...</a><br /></td></tr>
-<tr class="separator:a18d53c4f9968cccec36127d33776e3d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a189a0e754b2c0351ac8d48263c3d8a70"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#a189a0e754b2c0351ac8d48263c3d8a70">subgrid_tlayer_key</a> [6][1]</td></tr>
+<tr class="memdesc:a189a0e754b2c0351ac8d48263c3d8a70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean flag array to indicate the presence of a TL on sub-grid edges.  <a href="#a189a0e754b2c0351ac8d48263c3d8a70">More...</a><br /></td></tr>
+<tr class="separator:a189a0e754b2c0351ac8d48263c3d8a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mpi_manager.html#ad4a918a4cd19e644ff3295b2854fc6af">local_size</a></td></tr>
 <tr class="memdesc:ad4a918a4cd19e644ff3295b2854fc6af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dimensions of coarse lattice represented on this rank (includes halo).  <a href="#ad4a918a4cd19e644ff3295b2854fc6af">More...</a><br /></td></tr>
 <tr class="separator:ad4a918a4cd19e644ff3295b2854fc6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -937,12 +937,12 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a0926101699de914f6be018885bea25b1"></a>
+<a class="anchor" id="a32921c381b76fb8f27d3334ebd1756cd"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">MPI_Comm MpiManager::subGrid_comm[<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td>
+          <td class="memname">MPI_Comm MpiManager::subGrid_comm[1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -951,12 +951,12 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a18d53c4f9968cccec36127d33776e3d4"></a>
+<a class="anchor" id="a189a0e754b2c0351ac8d48263c3d8a70"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool MpiManager::subgrid_tlayer_key[6][<a class="el" href="definitions_8h.html#a2ce7c3facc5f789b0e201757516539a5">L_NUM_LEVELS</a> *<a class="el" href="definitions_8h.html#a3efeae83589481193d81da498e7f746a">L_NUM_REGIONS</a>]</td>
+          <td class="memname">bool MpiManager::subgrid_tlayer_key[6][1]</td>
         </tr>
       </table>
 </div><div class="memdoc">

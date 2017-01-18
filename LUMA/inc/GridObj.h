@@ -236,6 +236,7 @@ private :
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
 
+	double _LBM_smag(int id, int omega); 
 public :
 	void LBM_multi_opt(int subcycle = 0);
 

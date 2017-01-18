@@ -50,16 +50,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		objman->forceOnObjectZ = 0.0;
 	}
 
-	// Compute Smagorinksy-modified relaxation
-#ifdef L_USE_BGKSMAG
-	// Smagorinsky
-	double tau = 1.0 / omega;
-	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * 1.4142 * (L_CSMAG * L_CSMAG)) - tau);
-	double omega_s = 1 / (tau + tau_t);
-#else
-	double omega_s = omega;
-#endif
-
 	// Loop over grid
 	for (int i = 0; i < N_lim; ++i) {
 		for (int j = 0; j < M_lim; ++j) {
@@ -98,6 +88,12 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #endif
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
+#ifdef L_USE_BGKSMAG
+					// Compute Smagorinksy-modified relaxation
+					double omega_s = _LBM_smag(id, omega);
+#else
+					double omega_s = omega;
+#endif
 					_LBM_collide_opt(id, omega_s);
 				}
 
@@ -136,6 +132,8 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #endif
 
 }
+
+
 
 // *****************************************************************************
 /// \brief	Optimised stream operation.
@@ -323,6 +321,23 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 	// Compute f^eq
 	return rho[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
 
+}
+
+// *****************************************************************************
+/// \brief	Compute Smagorinksy-modified relaxation
+/// 
+/// Model taken from "DNS and LES of decaying isotropic turbulence with and without frame rotation using lattice Boltzmann method"
+/// by Yu, Huidan Girimaji, Sharath S. Luo, Li Shi  [2005]
+///
+///	\param	id flattened ijk index. 
+/// \param omega Relaxation frequency. 
+/// \return Smagorinsky-modified omega value
+double GridObj::_LBM_smag(int id, double omega)
+{
+	// Smagorinsky
+	double tau = 1.0 / omega;
+	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)) - tau);  //I HAVE TO CALCULATE Q!
+	double omega_s = 1 / (tau + tau_t);
 }
 
 // *****************************************************************************

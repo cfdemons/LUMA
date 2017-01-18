@@ -62,6 +62,7 @@
 
 // Numbers
 #define L_PI 3.14159265358979323846		///< PI definition
+#define L_SQRT2 1.4142135623731         ///< Square root of 2 definition
 
 // Using MPI?
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
@@ -103,7 +104,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
-//#define L_USE_BGKSMAG
+#define L_USE_BGKSMAG
 #define L_CSMAG 0.07
 
 

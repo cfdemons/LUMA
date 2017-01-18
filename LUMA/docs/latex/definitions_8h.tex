@@ -11,19 +11,19 @@
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
-\#define \hyperlink{definitions_8h_aad986a4e7a930719eb54951337fdf420}{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}~\char`\"{}1.\+3.\+0-\/alpha\char`\"{}
+\#define \hyperlink{definitions_8h_aad986a4e7a930719eb54951337fdf420}{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}~\char`\"{}1.\+4.\+0-\/alpha\char`\"{}
 \begin{DoxyCompactList}\small\item\em L\+U\+MA version. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a314d4d130266dff44899531d1ecf9e68}{L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE}
-\begin{DoxyCompactList}\small\item\em Write out the load balancing information based on active cell count. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a971d3b8f2554083c0a2bc08b9028031f}{L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG}
+\begin{DoxyCompactList}\small\item\em Write I\+BM body and matrix data out to text files. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a3285dd546a65e78d922ea603df396df6}{L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG}
+\begin{DoxyCompactList}\small\item\em Write out to a file the cloud that has been read in. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a90bb6a4429387db750f2c1bcd62673a7}{L\+\_\+\+PI}~3.\+14159265358979323846
 \begin{DoxyCompactList}\small\item\em PI definition. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a8d3ae8088334a2477471d505546b51ee}{L\+\_\+\+B\+U\+I\+L\+D\+\_\+\+F\+O\+R\+\_\+\+M\+PI}
 \begin{DoxyCompactList}\small\item\em Enable M\+PI features in build. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a83fd2d4a7451f2e29afdc857b0d58b53}{L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL}
-\begin{DoxyCompactList}\small\item\em Opt to use the optimised kernel over the traditional kernel. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ada886114d207f89d22d045d45a9d7939}{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}~2000
+\#define \hyperlink{definitions_8h_ada886114d207f89d22d045d45a9d7939}{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}~100
 \begin{DoxyCompactList}\small\item\em How many timesteps before whole grid output. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}~100
+\#define \hyperlink{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}~1
 \begin{DoxyCompactList}\small\item\em Specific output frequency of body forces. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a33b004cc971d67d0683bb5c634613340}{L\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+P\+R\+E\+C\+I\+S\+I\+ON}~5
 \begin{DoxyCompactList}\small\item\em Precision of output (for text writers) \end{DoxyCompactList}\item 
@@ -31,15 +31,19 @@
 \begin{DoxyCompactList}\small\item\em H\+D\+F5 dump on output. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a3c98e14efc786c44b2bd7e7bb029baad}{L\+\_\+\+P\+R\+O\+B\+E\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}~250
 \begin{DoxyCompactList}\small\item\em Write out frequency of probe output. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a8e0732e70d5e5aacf8dd9d5c052581d8}{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON}
+\item 
 \#define \hyperlink{definitions_8h_aecfc105da02f464e255da9e1e709c9ef}{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+F\+O\+R\+CE}~0.\+0001
 \begin{DoxyCompactList}\small\item\em Expression for the gravity force. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a60d63ef5a0253c0b7fcaba7a2e6eaaa0}{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+D\+I\+R\+E\+C\+T\+I\+ON}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
 \begin{DoxyCompactList}\small\item\em Gravity direction (specify using enumeration) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}~100000
+\#define \hyperlink{definitions_8h_a912c608ee692f5d7b0f36defb8a537f5}{L\+\_\+\+N\+O\+\_\+\+F\+L\+OW}
+\begin{DoxyCompactList}\small\item\em Initialise the domain with no flow. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}~5000
 \begin{DoxyCompactList}\small\item\em Frequency of write out of restart file. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a68f53015f50d5dcfe778756dc11d6523}{L\+\_\+\+C\+S\+M\+AG}~0.\+07
 \item 
-\#define \hyperlink{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}~6000
+\#define \hyperlink{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}~1
 \begin{DoxyCompactList}\small\item\em Number of time steps to run simulation for. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a20e4edca4234b187213d9861ed47cfee}{L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES}~2
 \begin{DoxyCompactList}\small\item\em Number of M\+PI ranks to divide domain into in X direction. \end{DoxyCompactList}\item 
@@ -47,24 +51,14 @@
 \item 
 \#define \hyperlink{definitions_8h_a2056c962eb2da8601e8a60258f12df09}{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}~2
 \item 
-\#define \hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}~3
+\#define \hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}~2
 \begin{DoxyCompactList}\small\item\em Number of dimensions to the problem. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N}~100
-\begin{DoxyCompactList}\small\item\em Number of x lattice sites. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{L\+\_\+M}~50
-\begin{DoxyCompactList}\small\item\em Number of y lattice sites. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K}~50
-\begin{DoxyCompactList}\small\item\em Number of z lattice sites. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a41a84dc637e628b444156adb076fca5e}{L\+\_\+\+AX}~0.\+0
-\begin{DoxyCompactList}\small\item\em Start of domain-\/x. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON}~40
+\begin{DoxyCompactList}\small\item\em Number of lattice sites per unit length. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX}~2.\+0
 \begin{DoxyCompactList}\small\item\em End of domain-\/x. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a617ecc318331c37304bb31be46a8ca31}{L\+\_\+\+AY}~0.\+0
-\begin{DoxyCompactList}\small\item\em Start of domain-\/y. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a299244e9d03053fd7d80509bd0a2361a}{L\+\_\+\+BY}~1.\+0
 \begin{DoxyCompactList}\small\item\em End of domain-\/y. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a12d5140e2dbe0c422567926b38dbf69b}{L\+\_\+\+AZ}~0.\+0
-\begin{DoxyCompactList}\small\item\em Start of domain-\/z. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a34b3ed95c179139e7815d23f16a53428}{L\+\_\+\+BZ}~1.\+0
 \begin{DoxyCompactList}\small\item\em End of domain-\/z. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_ae97573d5355d075068079c0aaabfe9da}{L\+\_\+\+P\+H\+Y\+S\+I\+C\+A\+L\+\_\+U}~0.\+2
@@ -83,27 +77,31 @@
 \begin{DoxyCompactList}\small\item\em Initial density. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a222843d3009b45b3fdad4990c6860a7a}{L\+\_\+\+RE}~150
 \begin{DoxyCompactList}\small\item\em Desired Reynolds number. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_accce182ed268f13988df2c17ca8be236}{L\+\_\+\+I\+B\+M\+\_\+\+ON}
+\begin{DoxyCompactList}\small\item\em Turn on I\+BM. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_af1641cc05de78bf5111511429305856d}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}~0
 \begin{DoxyCompactList}\small\item\em Grid level for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}~0
 \begin{DoxyCompactList}\small\item\em Grid region for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_aa36d7dd2755d13b6660507418407fe0c}{L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE}
 \begin{DoxyCompactList}\small\item\em Write out the bodies to a V\+TK file. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_aa120e37821e51afe0c17fde102cedff4}{L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}
+\begin{DoxyCompactList}\small\item\em Build immersed bodies from a point cloud file. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a7a845310dc14b8249e1eb414ce99619a}{L\+\_\+\+I\+B\+B\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~\hyperlink{definitions_8h_af1641cc05de78bf5111511429305856d}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}
 \begin{DoxyCompactList}\small\item\em Provide grid level on which object should be added. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_abaf3cf8640a87a588d5d0ac6fbfc790b}{L\+\_\+\+I\+B\+B\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+R\+EG}~\hyperlink{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}
 \begin{DoxyCompactList}\small\item\em Provide grid region on which object should be added. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}~0.\+3
+\#define \hyperlink{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}~0.\+9
 \begin{DoxyCompactList}\small\item\em Start X of object bounding box. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_adf74489c4c50bede3a446213a87daaee}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}~0.\+2
+\#define \hyperlink{definitions_8h_adf74489c4c50bede3a446213a87daaee}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}~0.\+4
 \begin{DoxyCompactList}\small\item\em Start Y of object bounding box. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_afa616559fb1b2924a38e1c7259773e8e}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}~0.\+5
 \begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_afaba7680065d3c49853b93adcd804b93}{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}~0.\+5
+\#define \hyperlink{definitions_8h_afaba7680065d3c49853b93adcd804b93}{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em The object input is scaled based on this dimension. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_aad50a4fe272da56e6204ca7ec7adbc8c}{L\+\_\+\+I\+B\+B\+\_\+\+S\+C\+A\+L\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+ON}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
 \begin{DoxyCompactList}\small\item\em Scale in this direction (specify as enumeration) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a120dfa8b3fdb75624d122325662717a4}{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~0.\+5
+\#define \hyperlink{definitions_8h_a120dfa8b3fdb75624d122325662717a4}{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em Reference length to be used in the definition of Reynolds number. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_aa4123d6badcbb31e2c476ad7eade8cf5}{L\+\_\+\+N\+U\+M\+\_\+\+M\+A\+R\+K\+E\+RS}~31
 \begin{DoxyCompactList}\small\item\em Number of Lagrange points to use when building a prefab body (approximately) \end{DoxyCompactList}\item 
@@ -111,8 +109,6 @@
 \begin{DoxyCompactList}\small\item\em Default deformable property of body to be built (whether it moves or not) \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_ac4560225b9213fbb8a0f1bd3bcdef0d9}{L\+\_\+\+I\+B\+B\+\_\+\+F\+L\+E\+X\+I\+B\+LE}~false
 \begin{DoxyCompactList}\small\item\em Whether a structural calculation needs to be performed on the body. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ad20e3b8705ccb7026426f9f4eafe3c1d}{L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE}
-\item 
 \#define \hyperlink{definitions_8h_a6d139befb312ac1c3aa016803638b524}{L\+\_\+\+I\+B\+B\+\_\+X}~0.\+2
 \begin{DoxyCompactList}\small\item\em X Position of body centre. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_afd197549e1ca690f6c838dfcc85ee702}{L\+\_\+\+I\+B\+B\+\_\+Y}~0.\+2
@@ -147,137 +143,138 @@
 \begin{DoxyCompactList}\small\item\em Difference in density (lattice units) between solid and fluid. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a9406fff8301408c26e222bb6008efb40}{L\+\_\+\+I\+B\+B\+\_\+\+EI}~2.\+0
 \begin{DoxyCompactList}\small\item\em Flexural rigidity (lattice units) of filament. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}
-\begin{DoxyCompactList}\small\item\em Turn on inlet boundary (assumed left-\/hand wall -\/ default Do Nothing) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}
-\begin{DoxyCompactList}\small\item\em Turn on outlet boundary (assumed right-\/hand wall -- default Do Nothing) \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a42e07cf4141633f1606d23c86c04151e}{L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES}
+\begin{DoxyCompactList}\small\item\em Turn on periodic boundary conditions (doesn\textquotesingle{}t do anything anymore -- periodic by default) \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a0b3396bff7d835aebf3590dc65e87bd1}{L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+ON}
 \begin{DoxyCompactList}\small\item\em Turn on no-\/slip walls (default is top, bottom, front, back unless L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+O\+N\+\_\+2D is used) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}~1
-\begin{DoxyCompactList}\small\item\em Thickness of walls in coarsest lattice units. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}~1
-\begin{DoxyCompactList}\small\item\em Thickness of top walls in coarsest lattice units. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}~1
-\begin{DoxyCompactList}\small\item\em Thickness of front (3D) walls in coarsest lattice units. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}~1
-\begin{DoxyCompactList}\small\item\em Thickness of back (3D) walls in coarsest lattice units. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_aee81fbba0786b679937db2a7a513aa81}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~0
+\#define \hyperlink{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}~(\hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX}/\hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N})
+\begin{DoxyCompactList}\small\item\em Thickness of wall. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}~(\hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX}/\hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N})
+\begin{DoxyCompactList}\small\item\em Thickness of top wall. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}~(\hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX}/\hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N})
+\begin{DoxyCompactList}\small\item\em Thickness of front (3D) wall. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}~(\hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX}/\hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N})
+\begin{DoxyCompactList}\small\item\em Thickness of back (3D) wall. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_aee81fbba0786b679937db2a7a513aa81}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~2
 \begin{DoxyCompactList}\small\item\em Provide grid level on which block should be added. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_ae110aa81b96b3fed5b5aafe8e53c5b29}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+R\+EG}~0
 \begin{DoxyCompactList}\small\item\em Provide grid region on which block should be added. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}~(\hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N} / 6)
-\begin{DoxyCompactList}\small\item\em Index of start of object/wall in x-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}~(2 $\ast$ \hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N} / 6)
-\begin{DoxyCompactList}\small\item\em Index of end of object/wall in x-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}~(1)
-\begin{DoxyCompactList}\small\item\em Index of start of object/wall in y-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a0dd60ecfce803240011b2d92783c1805}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}~(\hyperlink{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{L\+\_\+M} / 6)
-\begin{DoxyCompactList}\small\item\em Index of end of object/wall in y-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a529148161c7b95eb283ada864b63449b}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}~(2.\+5 $\ast$ \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K} / 6)
-\begin{DoxyCompactList}\small\item\em Index of start of object/wall in z-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}~(3.\+5 $\ast$ \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K} / 6)
-\begin{DoxyCompactList}\small\item\em Index of end of object/wall in z-\/direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~0
+\#define \hyperlink{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}~0.\+9
+\begin{DoxyCompactList}\small\item\em Start of object/wall in x-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}~1.\+1
+\begin{DoxyCompactList}\small\item\em End of object/wall in x-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}~0.\+4
+\begin{DoxyCompactList}\small\item\em Start of object/wall in y-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a0dd60ecfce803240011b2d92783c1805}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}~0.\+6
+\begin{DoxyCompactList}\small\item\em End of object/wall in y-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a529148161c7b95eb283ada864b63449b}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}~0.\+3
+\begin{DoxyCompactList}\small\item\em Start of object/wall in z-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}~0.\+7
+\begin{DoxyCompactList}\small\item\em End of object/wall in z-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~2
 \begin{DoxyCompactList}\small\item\em Provide grid level on which object should be added. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a0095318442547ed4b86d2c0265c6014e}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+R\+EG}~0
 \begin{DoxyCompactList}\small\item\em Provide grid region on which object should be added. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_aa71672c4b5166d5ee510ea281e101639}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}~400
-\begin{DoxyCompactList}\small\item\em Index for start of object bounding box in X direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}~360
-\begin{DoxyCompactList}\small\item\em Index for start of object bounding box in Y direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}~24
-\begin{DoxyCompactList}\small\item\em Index for cetnre of object bounding box in Z direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}~80
+\#define \hyperlink{definitions_8h_aa71672c4b5166d5ee510ea281e101639}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}~0.\+7
+\begin{DoxyCompactList}\small\item\em Start of object bounding box in X direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}~0.\+4
+\begin{DoxyCompactList}\small\item\em Start of object bounding box in Y direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}~0.\+5
+\begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em The object input is scaled based on this dimension. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a95226c42754371efab69149b6e9cf598}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+S\+C\+A\+L\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+ON}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
 \begin{DoxyCompactList}\small\item\em Scale in this direction (specify as enumeration) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_af5244472b18816a051cfb67baaf0257e}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~80
+\#define \hyperlink{definitions_8h_af5244472b18816a051cfb67baaf0257e}{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em Reference length to be used in the definition of Reynolds number. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~0
+\#define \hyperlink{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}~2
 \begin{DoxyCompactList}\small\item\em Provide grid level on which B\+FL body should be added. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a3d49c7cf3ba5d743547568ed13e5cb51}{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+R\+EG}~0
 \begin{DoxyCompactList}\small\item\em Provide grid region on which B\+FL body should be added. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}~30
-\begin{DoxyCompactList}\small\item\em Index for start of object bounding box in X direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}~30
-\begin{DoxyCompactList}\small\item\em Index for start of object bounding box in Y direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}~50
-\begin{DoxyCompactList}\small\item\em Index for cetnre of object bounding box in Z direction. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}~40
+\#define \hyperlink{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}~0.\+9
+\begin{DoxyCompactList}\small\item\em Start of object bounding box in X direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}~0.\+4
+\begin{DoxyCompactList}\small\item\em Start of object bounding box in Y direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}~0.\+5
+\begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em The B\+FL object input is scaled based on this dimension. \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a464a103ce7c013808a4f559fa67f00c8}{L\+\_\+\+B\+F\+L\+\_\+\+S\+C\+A\+L\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+ON}~\hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}
 \begin{DoxyCompactList}\small\item\em Scale in this direction (specify as enumeration) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~40
+\#define \hyperlink{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}~0.\+2
 \begin{DoxyCompactList}\small\item\em Reference length to be used in the definition of Reynolds number. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}~2
+\#define \hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}~0
 \begin{DoxyCompactList}\small\item\em Levels of refinement (0 = coarse grid only) \end{DoxyCompactList}\item 
 \#define \hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}~1
 \begin{DoxyCompactList}\small\item\em Number of refined regions (can be arbitrary if L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS = 0) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_af1641cc05de78bf5111511429305856d}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}~-\/1
-\begin{DoxyCompactList}\small\item\em Grid level for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}~-\/1
-\begin{DoxyCompactList}\small\item\em Grid region for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}~19
-\begin{DoxyCompactList}\small\item\em Number of lattice velocities. \end{DoxyCompactList}\item 
-\#define \hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}~26
-\begin{DoxyCompactList}\small\item\em Number of M\+PI directions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\#define \hyperlink{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{L\+\_\+N}~(\hyperlink{definitions_8h_a6926734c774a221ba8c8aa9f28e04e7a}{L\+\_\+\+BX} $\ast$ \hyperlink{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})
+\item 
+\#define \hyperlink{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{L\+\_\+M}~(\hyperlink{definitions_8h_a299244e9d03053fd7d80509bd0a2361a}{L\+\_\+\+BY} $\ast$ \hyperlink{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})
+\item 
+\#define \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K}~(\hyperlink{definitions_8h_a34b3ed95c179139e7815d23f16a53428}{L\+\_\+\+BZ} $\ast$ \hyperlink{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})
+\item 
+\#define \hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}~9
+\item 
+\#define \hyperlink{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}~8
+\item 
+\#define \hyperlink{definitions_8h_a34b3ed95c179139e7815d23f16a53428}{L\+\_\+\+BZ}~2
+\begin{DoxyCompactList}\small\item\em End of domain-\/z. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{L\+\_\+K}~1
+\item 
+\#define \hyperlink{definitions_8h_a2056c962eb2da8601e8a60258f12df09}{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}~1
+\item 
+\#define \hyperlink{definitions_8h_a529148161c7b95eb283ada864b63449b}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}~0.\+0
+\begin{DoxyCompactList}\small\item\em Start of object/wall in z-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}~0.\+0
+\begin{DoxyCompactList}\small\item\em End of object/wall in z-\/direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_aee4af46dde335b5cb692ac407c5361be}{L\+\_\+\+I\+B\+B\+\_\+D}~0.\+0
+\begin{DoxyCompactList}\small\item\em Depth (z) of IB body. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}~0.\+0
+\begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}~0.\+0
+\begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_afa616559fb1b2924a38e1c7259773e8e}{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}~0.\+0
+\begin{DoxyCompactList}\small\item\em Centre of object bounding box in Z direction. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_af308cd5770a5a12dd879bdc73ba26956}{L\+\_\+\+U\+Z0}~0.\+0
+\begin{DoxyCompactList}\small\item\em Initial/inlet z-\/velocity. \end{DoxyCompactList}\item 
+\#define \hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}~1
+\begin{DoxyCompactList}\small\item\em Number of refined regions (can be arbitrary if L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS = 0) \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
 static const int \hyperlink{definitions_8h_a32d6d2405dcbd016eedd04dd8073af5a}{c\+Num\+Probes} \mbox{[}3\mbox{]} = \{3, 3, 3\}
 \begin{DoxyCompactList}\small\item\em Number of probes in each direction (x, y, z) \end{DoxyCompactList}\item 
-static const int \hyperlink{definitions_8h_a916ff47e3b2245cf9371ad17979af59f}{c\+Probe\+LimsX} \mbox{[}2\mbox{]} = \{90, 270\}
+static const double \hyperlink{definitions_8h_a87fb7c7ad2b0e61e88fb91cf1bf5939f}{c\+Probe\+LimsX} \mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}
 \begin{DoxyCompactList}\small\item\em Limits of X plane for array of probes. \end{DoxyCompactList}\item 
-static const int \hyperlink{definitions_8h_a5a3043410500f51ca5993013de158e4d}{c\+Probe\+LimsY} \mbox{[}2\mbox{]} = \{15, 45\}
+static const double \hyperlink{definitions_8h_a9665b16c40cc9e912851619450978c6f}{c\+Probe\+LimsY} \mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}
 \begin{DoxyCompactList}\small\item\em Limits of Y plane for array of probes. \end{DoxyCompactList}\item 
-static const int \hyperlink{definitions_8h_a489ed67b64e1e0b638e17eaa84607168}{c\+Probe\+LimsZ} \mbox{[}2\mbox{]} = \{30, 120\}
+static const double \hyperlink{definitions_8h_a9aef911b5094b209889d8cbd9001d77e}{c\+Probe\+LimsZ} \mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}
 \begin{DoxyCompactList}\small\item\em Limits of Z plane for array of probes. \end{DoxyCompactList}\item 
-static const int \hyperlink{definitions_8h_a3d13567b447095a7b8b56a4c3abb2c49}{c\+Ref\+StartX} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 1 \}, \{ 2 \} \}
+static double \hyperlink{definitions_8h_abf756f6824bb0292fa1dbe79991cd48d}{c\+Ref\+StartX} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \item 
-static const int \hyperlink{definitions_8h_a670f6d54127c889a8fcb5d8d09731079}{c\+Ref\+EndX} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 98 \}, \{ 193 \} \}
+static double \hyperlink{definitions_8h_a81d3f0905a4daee8f305d1da2608c109}{c\+Ref\+EndX} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \item 
-static const int \hyperlink{definitions_8h_a57e3d7f2bca8c94901fa45262a72d29c}{c\+Ref\+StartY} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 1 \}, \{ 2 \} \}
+static double \hyperlink{definitions_8h_ab1fe74d0426158ccbd467013359ef9bb}{c\+Ref\+StartY} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \item 
-static const int \hyperlink{definitions_8h_a203f7f247ae3afb0002163ef09659738}{c\+Ref\+EndY} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 15 \}, \{ 27 \} \}
+static double \hyperlink{definitions_8h_adcd456978d6cd111bf1e8137eccf5c40}{c\+Ref\+EndY} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \item 
-static int \hyperlink{definitions_8h_aef484f65aee4ded88664eb80c01d0e58}{c\+Ref\+StartZ} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 10 \}, \{ 10 \} \}
+static double \hyperlink{definitions_8h_a41a9ec7b60bbafa63334fa5156dcdc64}{c\+Ref\+StartZ} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \item 
-static int \hyperlink{definitions_8h_a04a5378cf6d5ad6fb3b90ef77b996432}{c\+Ref\+EndZ} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 30 \}, \{ 30 \} \}
+static double \hyperlink{definitions_8h_a2b622872514eb55945df8f0723883be6}{c\+Ref\+EndZ} \mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}
 \end{DoxyCompactItemize}
 
 
 \subsection{Macro Definition Documentation}
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+AX@{L\+\_\+\+AX}}
-\index{L\+\_\+\+AX@{L\+\_\+\+AX}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+AX}{L_AX}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+AX~0.\+0}\hypertarget{definitions_8h_a41a84dc637e628b444156adb076fca5e}{}\label{definitions_8h_a41a84dc637e628b444156adb076fca5e}
-
-
-Start of domain-\/x. 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+AY@{L\+\_\+\+AY}}
-\index{L\+\_\+\+AY@{L\+\_\+\+AY}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+AY}{L_AY}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+AY~0.\+0}\hypertarget{definitions_8h_a617ecc318331c37304bb31be46a8ca31}{}\label{definitions_8h_a617ecc318331c37304bb31be46a8ca31}
-
-
-Start of domain-\/y. 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+AZ@{L\+\_\+\+AZ}}
-\index{L\+\_\+\+AZ@{L\+\_\+\+AZ}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+AZ}{L_AZ}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+AZ~0.\+0}\hypertarget{definitions_8h_a12d5140e2dbe0c422567926b38dbf69b}{}\label{definitions_8h_a12d5140e2dbe0c422567926b38dbf69b}
-
-
-Start of domain-\/z. 
-
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}{L_BFL_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH~40}\hypertarget{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}{}\label{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH}{L_BFL_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}{}\label{definitions_8h_ae3d194621b9da9e133d3d8755bdb997d}
 
 
 The B\+FL object input is scaled based on this dimension. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}}
 \index{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_BFL_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~0}\hypertarget{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}{}\label{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_BFL_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~2}\hypertarget{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}{}\label{definitions_8h_aa04cf5942aee61d318586a15e69b0a26}
 
 
 Provide grid level on which B\+FL body should be added. 
@@ -291,7 +288,7 @@ Provide grid region on which B\+FL body should be added.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_BFL_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~40}\hypertarget{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}{}\label{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_BFL_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+F\+L\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}{}\label{definitions_8h_aeedcde56123af03041d8a38e772b4bc9}
 
 
 Reference length to be used in the definition of Reynolds number. 
@@ -305,49 +302,63 @@ Scale in this direction (specify as enumeration)
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}{L_BLOCK_MAX_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X~(2 $\ast$ {\bf L\+\_\+N} / 6)}\hypertarget{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}{}\label{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X}{L_BLOCK_MAX_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+X~1.\+1}\hypertarget{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}{}\label{definitions_8h_a2d5af1bd2e14716173b2296a6ae31e62}
 
 
-Index of end of object/wall in x-\/direction. 
+End of object/wall in x-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}{L_BLOCK_MAX_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y~({\bf L\+\_\+M} / 6)}\hypertarget{definitions_8h_a0dd60ecfce803240011b2d92783c1805}{}\label{definitions_8h_a0dd60ecfce803240011b2d92783c1805}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y}{L_BLOCK_MAX_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Y~0.\+6}\hypertarget{definitions_8h_a0dd60ecfce803240011b2d92783c1805}{}\label{definitions_8h_a0dd60ecfce803240011b2d92783c1805}
 
 
-Index of end of object/wall in y-\/direction. 
+End of object/wall in y-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}{L_BLOCK_MAX_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z~(3.\+5 $\ast$ {\bf L\+\_\+K} / 6)}\hypertarget{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{}\label{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}{L_BLOCK_MAX_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z~0.\+7}\hypertarget{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{}\label{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}
 
 
-Index of end of object/wall in z-\/direction. 
+End of object/wall in z-\/direction. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}}
+\index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z}{L_BLOCK_MAX_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+A\+X\+\_\+Z~0.\+0}\hypertarget{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}{}\label{definitions_8h_af8c6594d6cd0c0a5010cbc5367f08c65}
+
+
+End of object/wall in z-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}{L_BLOCK_MIN_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X~({\bf L\+\_\+N} / 6)}\hypertarget{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}{}\label{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X}{L_BLOCK_MIN_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+X~0.\+9}\hypertarget{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}{}\label{definitions_8h_a1e93f30d98cd5ecdf414a08e2148ba3f}
 
 
-Index of start of object/wall in x-\/direction. 
+Start of object/wall in x-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}{L_BLOCK_MIN_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y~(1)}\hypertarget{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}{}\label{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y}{L_BLOCK_MIN_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Y~0.\+4}\hypertarget{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}{}\label{definitions_8h_ab9cedc007df5053f4b0dae4c99208a3a}
 
 
-Index of start of object/wall in y-\/direction. 
+Start of object/wall in y-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}{L_BLOCK_MIN_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z~(2.\+5 $\ast$ {\bf L\+\_\+K} / 6)}\hypertarget{definitions_8h_a529148161c7b95eb283ada864b63449b}{}\label{definitions_8h_a529148161c7b95eb283ada864b63449b}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}{L_BLOCK_MIN_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z~0.\+3}\hypertarget{definitions_8h_a529148161c7b95eb283ada864b63449b}{}\label{definitions_8h_a529148161c7b95eb283ada864b63449b}
 
 
-Index of start of object/wall in z-\/direction. 
+Start of object/wall in z-\/direction. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}}
+\index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z}{L_BLOCK_MIN_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+M\+I\+N\+\_\+Z~0.\+0}\hypertarget{definitions_8h_a529148161c7b95eb283ada864b63449b}{}\label{definitions_8h_a529148161c7b95eb283ada864b63449b}
+
+
+Start of object/wall in z-\/direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}}
 \index{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_BLOCK_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~0}\hypertarget{definitions_8h_aee81fbba0786b679937db2a7a513aa81}{}\label{definitions_8h_aee81fbba0786b679937db2a7a513aa81}
+\subsubsection[{\texorpdfstring{L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_BLOCK_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+B\+L\+O\+C\+K\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~2}\hypertarget{definitions_8h_aee81fbba0786b679937db2a7a513aa81}{}\label{definitions_8h_aee81fbba0786b679937db2a7a513aa81}
 
 
 Provide grid level on which block should be added. 
@@ -387,12 +398,26 @@ End of domain-\/y.
 
 End of domain-\/z. 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+BZ@{L\+\_\+\+BZ}}
+\index{L\+\_\+\+BZ@{L\+\_\+\+BZ}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+BZ}{L_BZ}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+BZ~2}\hypertarget{definitions_8h_a34b3ed95c179139e7815d23f16a53428}{}\label{definitions_8h_a34b3ed95c179139e7815d23f16a53428}
+
+
+End of domain-\/z. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}}
 \index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}{L_CENTRE_BFL_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z~50}\hypertarget{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{}\label{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}{L_CENTRE_BFL_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z~0.\+5}\hypertarget{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{}\label{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}
 
 
-Index for cetnre of object bounding box in Z direction. 
+Centre of object bounding box in Z direction. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}}
+\index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z}{L_CENTRE_BFL_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+B\+F\+L\+\_\+Z~0.\+0}\hypertarget{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}{}\label{definitions_8h_a140208dfadeb8d5ec46625a11676cdba}
+
+
+Centre of object bounding box in Z direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}}
 \index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}!definitions.\+h@{definitions.\+h}}
@@ -401,19 +426,40 @@ Index for cetnre of object bounding box in Z direction.
 
 Centre of object bounding box in Z direction. 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}}
+\index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z}{L_CENTRE_IBB_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+I\+B\+B\+\_\+Z~0.\+0}\hypertarget{definitions_8h_afa616559fb1b2924a38e1c7259773e8e}{}\label{definitions_8h_afa616559fb1b2924a38e1c7259773e8e}
+
+
+Centre of object bounding box in Z direction. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}}
 \index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}{L_CENTRE_OBJECT_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z~24}\hypertarget{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{}\label{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}{L_CENTRE_OBJECT_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z~0.\+5}\hypertarget{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{}\label{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}
 
 
-Index for cetnre of object bounding box in Z direction. 
+Centre of object bounding box in Z direction. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}}
+\index{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z@{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z}{L_CENTRE_OBJECT_Z}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+E\+N\+T\+R\+E\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Z~0.\+0}\hypertarget{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}{}\label{definitions_8h_a1d042b9944ca4da76bd6f507cd0ec72c}
+
+
+Centre of object bounding box in Z direction. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG@{L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG}}
+\index{L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG@{L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG}{L_CLOUD_DEBUG}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+L\+O\+U\+D\+\_\+\+D\+E\+B\+UG}\hypertarget{definitions_8h_a3285dd546a65e78d922ea603df396df6}{}\label{definitions_8h_a3285dd546a65e78d922ea603df396df6}
+
+
+Write out to a file the cloud that has been read in. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+C\+S\+M\+AG@{L\+\_\+\+C\+S\+M\+AG}}
 \index{L\+\_\+\+C\+S\+M\+AG@{L\+\_\+\+C\+S\+M\+AG}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+C\+S\+M\+AG}{L_CSMAG}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+C\+S\+M\+AG~0.\+07}\hypertarget{definitions_8h_a68f53015f50d5dcfe778756dc11d6523}{}\label{definitions_8h_a68f53015f50d5dcfe778756dc11d6523}
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+D\+I\+MS@{L\+\_\+\+D\+I\+MS}}
 \index{L\+\_\+\+D\+I\+MS@{L\+\_\+\+D\+I\+MS}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+D\+I\+MS}{L_DIMS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+D\+I\+MS~3}\hypertarget{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{}\label{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}
+\subsubsection[{\texorpdfstring{L\+\_\+\+D\+I\+MS}{L_DIMS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+D\+I\+MS~2}\hypertarget{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{}\label{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}
 
 
 Number of dimensions to the problem. 
@@ -446,7 +492,10 @@ Gravity direction (specify using enumeration)
 
 Expression for the gravity force. 
 
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT@{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON@{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON}}
+\index{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON@{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON}{L_GRAVITY_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+ON}\hypertarget{definitions_8h_a8e0732e70d5e5aacf8dd9d5c052581d8}{}\label{definitions_8h_a8e0732e70d5e5aacf8dd9d5c052581d8}
+Turn on gravity force \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT@{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}}
 \index{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT@{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}{L_HDF5_OUTPUT}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+H\+D\+F5\+\_\+\+O\+U\+T\+P\+UT}\hypertarget{definitions_8h_ad1af4e8e23e70d05d6c600358a956bf0}{}\label{definitions_8h_ad1af4e8e23e70d05d6c600358a956bf0}
 
@@ -460,23 +509,9 @@ H\+D\+F5 dump on output.
 
 Grid level for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) 
 
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}}
-\index{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV}{L_IB_ON_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+L\+EV~-\/1}\hypertarget{definitions_8h_af1641cc05de78bf5111511429305856d}{}\label{definitions_8h_af1641cc05de78bf5111511429305856d}
-
-
-Grid level for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) 
-
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}}
 \index{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}{L_IB_ON_REG}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG~0}\hypertarget{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}{}\label{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}
-
-
-Grid region for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}}
-\index{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG@{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG}{L_IB_ON_REG}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+\_\+\+O\+N\+\_\+\+R\+EG~-\/1}\hypertarget{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}{}\label{definitions_8h_a8522d24c43dcce5922f465cd9ea1feb3}
 
 
 Grid region for immersed boundary object (0 if no refined regions, -\/1 if no I\+BM) 
@@ -498,6 +533,13 @@ Inclination of filament in XY plane.
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+D@{L\+\_\+\+I\+B\+B\+\_\+D}}
 \index{L\+\_\+\+I\+B\+B\+\_\+D@{L\+\_\+\+I\+B\+B\+\_\+D}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+D}{L_IBB_D}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+D~0.\+5}\hypertarget{definitions_8h_aee4af46dde335b5cb692ac407c5361be}{}\label{definitions_8h_aee4af46dde335b5cb692ac407c5361be}
+
+
+Depth (z) of IB body. 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+D@{L\+\_\+\+I\+B\+B\+\_\+D}}
+\index{L\+\_\+\+I\+B\+B\+\_\+D@{L\+\_\+\+I\+B\+B\+\_\+D}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+D}{L_IBB_D}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+D~0.\+0}\hypertarget{definitions_8h_aee4af46dde335b5cb692ac407c5361be}{}\label{definitions_8h_aee4af46dde335b5cb692ac407c5361be}
 
 
 Depth (z) of IB body. 
@@ -551,6 +593,13 @@ Start Z position of the filament.
 
 Whether a structural calculation needs to be performed on the body. 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE@{L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}}
+\index{L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE@{L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}{L_IBB_FROM_FILE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+\+F\+R\+O\+M\+\_\+\+F\+I\+LE}\hypertarget{definitions_8h_aa120e37821e51afe0c17fde102cedff4}{}\label{definitions_8h_aa120e37821e51afe0c17fde102cedff4}
+
+
+Build immersed bodies from a point cloud file. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+L@{L\+\_\+\+I\+B\+B\+\_\+L}}
 \index{L\+\_\+\+I\+B\+B\+\_\+L@{L\+\_\+\+I\+B\+B\+\_\+L}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+L}{L_IBB_L}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+L~0.\+5}\hypertarget{definitions_8h_a005bdc01c7e1bd1d7bff52ce3e209d22}{}\label{definitions_8h_a005bdc01c7e1bd1d7bff52ce3e209d22}
@@ -560,7 +609,7 @@ Length (y) of IB body.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}{L_IBB_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH~0.\+5}\hypertarget{definitions_8h_afaba7680065d3c49853b93adcd804b93}{}\label{definitions_8h_afaba7680065d3c49853b93adcd804b93}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH}{L_IBB_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_afaba7680065d3c49853b93adcd804b93}{}\label{definitions_8h_afaba7680065d3c49853b93adcd804b93}
 
 
 The object input is scaled based on this dimension. 
@@ -595,7 +644,7 @@ Radius of IB body.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_IBB_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~0.\+5}\hypertarget{definitions_8h_a120dfa8b3fdb75624d122325662717a4}{}\label{definitions_8h_a120dfa8b3fdb75624d122325662717a4}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_IBB_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+B\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_a120dfa8b3fdb75624d122325662717a4}{}\label{definitions_8h_a120dfa8b3fdb75624d122325662717a4}
 
 
 Reference length to be used in the definition of Reynolds number. 
@@ -635,44 +684,32 @@ Y Position of body centre.
 
 Z Position of body centre. 
 
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}}
-\index{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}{L_INLET_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+N\+L\+E\+T\+\_\+\+ON}\hypertarget{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}{}\label{definitions_8h_af3ed87498078a8d5a16d48ba9a33c956}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG@{L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG}}
+\index{L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG@{L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG}{L_IBM_DEBUG}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+M\+\_\+\+D\+E\+B\+UG}\hypertarget{definitions_8h_a971d3b8f2554083c0a2bc08b9028031f}{}\label{definitions_8h_a971d3b8f2554083c0a2bc08b9028031f}
 
 
-Turn on inlet boundary (assumed left-\/hand wall -\/ default Do Nothing) 
+Write I\+BM body and matrix data out to text files. 
 
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE@{L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE}}
-\index{L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE@{L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE}{L_INSERT_CIRCLE_SPHERE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+N\+S\+E\+R\+T\+\_\+\+C\+I\+R\+C\+L\+E\+\_\+\+S\+P\+H\+E\+RE}\hypertarget{definitions_8h_ad20e3b8705ccb7026426f9f4eafe3c1d}{}\label{definitions_8h_ad20e3b8705ccb7026426f9f4eafe3c1d}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+I\+B\+M\+\_\+\+ON@{L\+\_\+\+I\+B\+M\+\_\+\+ON}}
+\index{L\+\_\+\+I\+B\+M\+\_\+\+ON@{L\+\_\+\+I\+B\+M\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+I\+B\+M\+\_\+\+ON}{L_IBM_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+I\+B\+M\+\_\+\+ON}\hypertarget{definitions_8h_accce182ed268f13988df2c17ca8be236}{}\label{definitions_8h_accce182ed268f13988df2c17ca8be236}
+
+
+Turn on I\+BM. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+K@{L\+\_\+K}}
 \index{L\+\_\+K@{L\+\_\+K}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+K}{L_K}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+K~50}\hypertarget{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{}\label{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}
-
-
-Number of z lattice sites. 
-
+\subsubsection[{\texorpdfstring{L\+\_\+K}{L_K}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+K~({\bf L\+\_\+\+BZ} $\ast$ {\bf L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})}\hypertarget{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{}\label{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+K@{L\+\_\+K}}
+\index{L\+\_\+K@{L\+\_\+K}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+K}{L_K}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+K~1}\hypertarget{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}{}\label{definitions_8h_a8cb9b2dc6d7c3d9c63df66ac74bbf6cc}
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+M@{L\+\_\+M}}
 \index{L\+\_\+M@{L\+\_\+M}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+M}{L_M}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+M~50}\hypertarget{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{}\label{definitions_8h_a9299d91330ef6046619e4785d69b62c6}
-
-
-Number of y lattice sites. 
-
+\subsubsection[{\texorpdfstring{L\+\_\+M}{L_M}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+M~({\bf L\+\_\+\+BY} $\ast$ {\bf L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})}\hypertarget{definitions_8h_a9299d91330ef6046619e4785d69b62c6}{}\label{definitions_8h_a9299d91330ef6046619e4785d69b62c6}
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS@{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}}
 \index{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS@{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}{L_MPI_DIRS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS~26}\hypertarget{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{}\label{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}
-
-
-Number of M\+PI directions. 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE@{L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE}}
-\index{L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE@{L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE}{L_MPI_WRITE_LOAD_BALANCE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+W\+R\+I\+T\+E\+\_\+\+L\+O\+A\+D\+\_\+\+B\+A\+L\+A\+N\+CE}\hypertarget{definitions_8h_a314d4d130266dff44899531d1ecf9e68}{}\label{definitions_8h_a314d4d130266dff44899531d1ecf9e68}
-
-
-Write out the load balancing information based on active cell count. 
-
+\subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS}{L_MPI_DIRS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+D\+I\+RS~8}\hypertarget{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}{}\label{definitions_8h_a144328eed4e90ebcf8a9f66aa7337266}
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES}}
 \index{L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES}{L_MPI_XCORES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+X\+C\+O\+R\+ES~2}\hypertarget{definitions_8h_a20e4edca4234b187213d9861ed47cfee}{}\label{definitions_8h_a20e4edca4234b187213d9861ed47cfee}
@@ -686,16 +723,22 @@ Number of M\+PI ranks to divide domain into in X direction.
 Number of M\+PI ranks to divide domain into in Y direction \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}}
 \index{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}{L_MPI_ZCORES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES~2}\hypertarget{definitions_8h_a2056c962eb2da8601e8a60258f12df09}{}\label{definitions_8h_a2056c962eb2da8601e8a60258f12df09}
+Number of M\+PI ranks to divide domain into in Z direction. Set to 1 if doing a 2D problem when using custom M\+PI sizes \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}}
+\index{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES@{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES}{L_MPI_ZCORES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+M\+P\+I\+\_\+\+Z\+C\+O\+R\+ES~1}\hypertarget{definitions_8h_a2056c962eb2da8601e8a60258f12df09}{}\label{definitions_8h_a2056c962eb2da8601e8a60258f12df09}
 Number of M\+PI ranks to divide domain into in Z direction. Set to 1 if doing a 2D problem when using custom M\+PI sizes \index{definitions.\+h@{definitions.\+h}!L\+\_\+N@{L\+\_\+N}}
 \index{L\+\_\+N@{L\+\_\+N}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+N}{L_N}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+N~100}\hypertarget{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{}\label{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}
+\subsubsection[{\texorpdfstring{L\+\_\+N}{L_N}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+N~({\bf L\+\_\+\+BX} $\ast$ {\bf L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON})}\hypertarget{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}{}\label{definitions_8h_a41b210a6c3ab25d2c0e72d031b1ba191}
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+N\+O\+\_\+\+F\+L\+OW@{L\+\_\+\+N\+O\+\_\+\+F\+L\+OW}}
+\index{L\+\_\+\+N\+O\+\_\+\+F\+L\+OW@{L\+\_\+\+N\+O\+\_\+\+F\+L\+OW}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+N\+O\+\_\+\+F\+L\+OW}{L_NO_FLOW}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+O\+\_\+\+F\+L\+OW}\hypertarget{definitions_8h_a912c608ee692f5d7b0f36defb8a537f5}{}\label{definitions_8h_a912c608ee692f5d7b0f36defb8a537f5}
 
 
-Number of x lattice sites. 
+Initialise the domain with no flow. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS@{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}}
 \index{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS@{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}{L_NUM_LEVELS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS~2}\hypertarget{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{}\label{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}
+\subsubsection[{\texorpdfstring{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}{L_NUM_LEVELS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS~0}\hypertarget{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{}\label{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}
 
 
 Levels of refinement (0 = coarse grid only) 
@@ -714,23 +757,26 @@ Number of Lagrange points to use when building a prefab body (approximately)
 
 Number of refined regions (can be arbitrary if L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS = 0) 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS@{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}}
+\index{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS@{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}{L_NUM_REGIONS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS~1}\hypertarget{definitions_8h_a3efeae83589481193d81da498e7f746a}{}\label{definitions_8h_a3efeae83589481193d81da498e7f746a}
+
+
+Number of refined regions (can be arbitrary if L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS = 0) 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS@{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}}
 \index{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS@{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}{L_NUM_VELS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS~19}\hypertarget{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{}\label{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}
-
-
-Number of lattice velocities. 
-
+\subsubsection[{\texorpdfstring{L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS}{L_NUM_VELS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+N\+U\+M\+\_\+\+V\+E\+LS~9}\hypertarget{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{}\label{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}{L_OBJECT_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH~80}\hypertarget{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}{}\label{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH}{L_OBJECT_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}{}\label{definitions_8h_a3a9ffbc4c7c1a312f354cabfa2e9b3ac}
 
 
 The object input is scaled based on this dimension. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}}
 \index{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_OBJECT_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~0}\hypertarget{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}{}\label{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV}{L_OBJECT_ON_GRID_LEV}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+O\+N\+\_\+\+G\+R\+I\+D\+\_\+\+L\+EV~2}\hypertarget{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}{}\label{definitions_8h_ac5b836e394bb69fb23ebd75b78413267}
 
 
 Provide grid level on which object should be added. 
@@ -744,7 +790,7 @@ Provide grid region on which object should be added.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}}
 \index{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH@{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_OBJECT_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~80}\hypertarget{definitions_8h_af5244472b18816a051cfb67baaf0257e}{}\label{definitions_8h_af5244472b18816a051cfb67baaf0257e}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH}{L_OBJECT_REF_LENGTH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+\+R\+E\+F\+\_\+\+L\+E\+N\+G\+TH~0.\+2}\hypertarget{definitions_8h_af5244472b18816a051cfb67baaf0257e}{}\label{definitions_8h_af5244472b18816a051cfb67baaf0257e}
 
 
 Reference length to be used in the definition of Reynolds number. 
@@ -758,24 +804,17 @@ Scale in this direction (specify as enumeration)
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY@{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}}
 \index{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY@{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}{L_OUT_EVERY}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY~2000}\hypertarget{definitions_8h_ada886114d207f89d22d045d45a9d7939}{}\label{definitions_8h_ada886114d207f89d22d045d45a9d7939}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY}{L_OUT_EVERY}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+RY~100}\hypertarget{definitions_8h_ada886114d207f89d22d045d45a9d7939}{}\label{definitions_8h_ada886114d207f89d22d045d45a9d7939}
 
 
 How many timesteps before whole grid output. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}}
 \index{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}{L_OUT_EVERY_FORCES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES~100}\hypertarget{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}{}\label{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}
+\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES}{L_OUT_EVERY_FORCES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+\_\+\+E\+V\+E\+R\+Y\+\_\+\+F\+O\+R\+C\+ES~1}\hypertarget{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}{}\label{definitions_8h_ae8678291288cf3a20f0e8faf71d3bc0a}
 
 
 Specific output frequency of body forces. 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}}
-\index{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON@{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}{L_OUTLET_ON}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+O\+U\+T\+L\+E\+T\+\_\+\+ON}\hypertarget{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}{}\label{definitions_8h_afff0075a8e2b0ce77d28b426e3938ec5}
-
-
-Turn on outlet boundary (assumed right-\/hand wall -- default Do Nothing) 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+P\+R\+E\+C\+I\+S\+I\+ON@{L\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+P\+R\+E\+C\+I\+S\+I\+ON}}
 \index{L\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+P\+R\+E\+C\+I\+S\+I\+ON@{L\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+P\+R\+E\+C\+I\+S\+I\+ON}!definitions.\+h@{definitions.\+h}}
@@ -783,6 +822,13 @@ Turn on outlet boundary (assumed right-\/hand wall -- default Do Nothing)
 
 
 Precision of output (for text writers) 
+
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES@{L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES}}
+\index{L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES@{L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES}{L_PERIODIC_BOUNDARIES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+P\+E\+R\+I\+O\+D\+I\+C\+\_\+\+B\+O\+U\+N\+D\+A\+R\+I\+ES}\hypertarget{definitions_8h_a42e07cf4141633f1606d23c86c04151e}{}\label{definitions_8h_a42e07cf4141633f1606d23c86c04151e}
+
+
+Turn on periodic boundary conditions (doesn\textquotesingle{}t do anything anymore -- periodic by default) 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+P\+H\+Y\+S\+I\+C\+A\+L\+\_\+U@{L\+\_\+\+P\+H\+Y\+S\+I\+C\+A\+L\+\_\+U}}
 \index{L\+\_\+\+P\+H\+Y\+S\+I\+C\+A\+L\+\_\+U@{L\+\_\+\+P\+H\+Y\+S\+I\+C\+A\+L\+\_\+U}!definitions.\+h@{definitions.\+h}}
@@ -812,9 +858,16 @@ Write out frequency of probe output.
 
 Desired Reynolds number. 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON@{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON}}
+\index{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON@{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON}{L_RESOLUTION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+R\+E\+S\+O\+L\+U\+T\+I\+ON~40}\hypertarget{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}{}\label{definitions_8h_aaa9fb28b40065706416e12b1a5d8e56c}
+
+
+Number of lattice sites per unit length. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ@{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}}
 \index{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ@{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}{L_RESTART_OUT_FREQ}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ~100000}\hypertarget{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}{}\label{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}
+\subsubsection[{\texorpdfstring{L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ}{L_RESTART_OUT_FREQ}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+R\+E\+S\+T\+A\+R\+T\+\_\+\+O\+U\+T\+\_\+\+F\+R\+EQ~5000}\hypertarget{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}{}\label{definitions_8h_a9c5c5b7194973689b624d63c08d34d29}
 
 
 Frequency of write out of restart file. 
@@ -828,49 +881,49 @@ Initial density.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}{L_START_BFL_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X~30}\hypertarget{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}{}\label{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X}{L_START_BFL_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+X~0.\+9}\hypertarget{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}{}\label{definitions_8h_ad5fef7ce9d23804daf0a12eb80f12098}
 
 
-Index for start of object bounding box in X direction. 
+Start of object bounding box in X direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}{L_START_BFL_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y~30}\hypertarget{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}{}\label{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y}{L_START_BFL_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+B\+F\+L\+\_\+Y~0.\+4}\hypertarget{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}{}\label{definitions_8h_a16a305abf3a796e36b0b275c6c2118b3}
 
 
-Index for start of object bounding box in Y direction. 
+Start of object bounding box in Y direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}{L_START_IBB_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X~0.\+3}\hypertarget{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}{}\label{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X}{L_START_IBB_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+X~0.\+9}\hypertarget{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}{}\label{definitions_8h_ad1a55467d25288fdf4b4cbc7fef755b5}
 
 
 Start X of object bounding box. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}{L_START_IBB_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y~0.\+2}\hypertarget{definitions_8h_adf74489c4c50bede3a446213a87daaee}{}\label{definitions_8h_adf74489c4c50bede3a446213a87daaee}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y}{L_START_IBB_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+I\+B\+B\+\_\+Y~0.\+4}\hypertarget{definitions_8h_adf74489c4c50bede3a446213a87daaee}{}\label{definitions_8h_adf74489c4c50bede3a446213a87daaee}
 
 
 Start Y of object bounding box. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}{L_START_OBJECT_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X~400}\hypertarget{definitions_8h_aa71672c4b5166d5ee510ea281e101639}{}\label{definitions_8h_aa71672c4b5166d5ee510ea281e101639}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X}{L_START_OBJECT_X}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+X~0.\+7}\hypertarget{definitions_8h_aa71672c4b5166d5ee510ea281e101639}{}\label{definitions_8h_aa71672c4b5166d5ee510ea281e101639}
 
 
-Index for start of object bounding box in X direction. 
+Start of object bounding box in X direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}}
 \index{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y@{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}{L_START_OBJECT_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y~360}\hypertarget{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}{}\label{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y}{L_START_OBJECT_Y}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+T\+A\+R\+T\+\_\+\+O\+B\+J\+E\+C\+T\+\_\+Y~0.\+4}\hypertarget{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}{}\label{definitions_8h_a6d6dde1ea3752e68f187d0268ea89764}
 
 
-Index for start of object bounding box in Y direction. 
+Start of object bounding box in Y direction. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS@{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}}
 \index{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS@{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}{L_TIMESTEPS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS~6000}\hypertarget{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}{}\label{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}
+\subsubsection[{\texorpdfstring{L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS}{L_TIMESTEPS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+T\+I\+M\+E\+S\+T\+E\+PS~1}\hypertarget{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}{}\label{definitions_8h_a07ed8f3f5db8ad0952df0d2eccab0f13}
 
 
 Number of time steps to run simulation for. 
@@ -888,13 +941,6 @@ Max velocity of inlet profile.
 
 
 Reference velocity for scaling. 
-
-\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL@{L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL}}
-\index{L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL@{L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL}{L_USE_OPTIMISED_KERNEL}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+U\+S\+E\+\_\+\+O\+P\+T\+I\+M\+I\+S\+E\+D\+\_\+\+K\+E\+R\+N\+EL}\hypertarget{definitions_8h_a83fd2d4a7451f2e29afdc857b0d58b53}{}\label{definitions_8h_a83fd2d4a7451f2e29afdc857b0d58b53}
-
-
-Opt to use the optimised kernel over the traditional kernel. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+U\+X0@{L\+\_\+\+U\+X0}}
 \index{L\+\_\+\+U\+X0@{L\+\_\+\+U\+X0}!definitions.\+h@{definitions.\+h}}
@@ -917,6 +963,13 @@ Initial/inlet y-\/velocity.
 
 Initial/inlet z-\/velocity. 
 
+\index{definitions.\+h@{definitions.\+h}!L\+\_\+\+U\+Z0@{L\+\_\+\+U\+Z0}}
+\index{L\+\_\+\+U\+Z0@{L\+\_\+\+U\+Z0}!definitions.\+h@{definitions.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+U\+Z0}{L_UZ0}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+U\+Z0~0.\+0}\hypertarget{definitions_8h_af308cd5770a5a12dd879bdc73ba26956}{}\label{definitions_8h_af308cd5770a5a12dd879bdc73ba26956}
+
+
+Initial/inlet z-\/velocity. 
+
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE@{L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE}}
 \index{L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE@{L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE}!definitions.\+h@{definitions.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE}{L_VTK_BODY_WRITE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+V\+T\+K\+\_\+\+B\+O\+D\+Y\+\_\+\+W\+R\+I\+TE}\hypertarget{definitions_8h_aa36d7dd2755d13b6660507418407fe0c}{}\label{definitions_8h_aa36d7dd2755d13b6660507418407fe0c}
@@ -926,31 +979,31 @@ Write out the bodies to a V\+TK file.
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}}
 \index{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}{L_WALL_THICKNESS_BACK}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK~1}\hypertarget{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}{}\label{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}
+\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK}{L_WALL_THICKNESS_BACK}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+A\+CK~({\bf L\+\_\+\+BX}/{\bf L\+\_\+N})}\hypertarget{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}{}\label{definitions_8h_a435d44fedd08e00d437ba3002bb6fa0e}
 
 
-Thickness of back (3D) walls in coarsest lattice units. 
+Thickness of back (3D) wall. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}}
 \index{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}{L_WALL_THICKNESS_BOTTOM}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM~1}\hypertarget{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}{}\label{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}
+\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM}{L_WALL_THICKNESS_BOTTOM}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+B\+O\+T\+T\+OM~({\bf L\+\_\+\+BX}/{\bf L\+\_\+N})}\hypertarget{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}{}\label{definitions_8h_a0781430c3a694e3c272f8a1a1ec58ae4}
 
 
-Thickness of walls in coarsest lattice units. 
+Thickness of wall. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}}
 \index{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}{L_WALL_THICKNESS_FRONT}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT~1}\hypertarget{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}{}\label{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}
+\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT}{L_WALL_THICKNESS_FRONT}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+F\+R\+O\+NT~({\bf L\+\_\+\+BX}/{\bf L\+\_\+N})}\hypertarget{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}{}\label{definitions_8h_a29896d629d37501dd3c0dd6b9a5d3f2e}
 
 
-Thickness of front (3D) walls in coarsest lattice units. 
+Thickness of front (3D) wall. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}}
 \index{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP@{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}{L_WALL_THICKNESS_TOP}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP~1}\hypertarget{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}{}\label{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}
+\subsubsection[{\texorpdfstring{L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP}{L_WALL_THICKNESS_TOP}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+W\+A\+L\+L\+\_\+\+T\+H\+I\+C\+K\+N\+E\+S\+S\+\_\+\+T\+OP~({\bf L\+\_\+\+BX}/{\bf L\+\_\+N})}\hypertarget{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}{}\label{definitions_8h_a817c4ba75364e5ac21d657db7e96f921}
 
 
-Thickness of top walls in coarsest lattice units. 
+Thickness of top wall. 
 
 \index{definitions.\+h@{definitions.\+h}!L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+ON@{L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+ON}}
 \index{L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+ON@{L\+\_\+\+W\+A\+L\+L\+S\+\_\+\+ON}!definitions.\+h@{definitions.\+h}}
@@ -961,7 +1014,7 @@ Turn on no-\/slip walls (default is top, bottom, front, back unless L\+\_\+\+W\+
 
 \index{definitions.\+h@{definitions.\+h}!L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON@{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}}
 \index{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON@{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}{LUMA_VERSION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON~\char`\"{}1.\+3.\+0-\/alpha\char`\"{}}\hypertarget{definitions_8h_aad986a4e7a930719eb54951337fdf420}{}\label{definitions_8h_aad986a4e7a930719eb54951337fdf420}
+\subsubsection[{\texorpdfstring{L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON}{LUMA_VERSION}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+U\+M\+A\+\_\+\+V\+E\+R\+S\+I\+ON~\char`\"{}1.\+4.\+0-\/alpha\char`\"{}}\hypertarget{definitions_8h_aad986a4e7a930719eb54951337fdf420}{}\label{definitions_8h_aad986a4e7a930719eb54951337fdf420}
 
 
 L\+U\+MA version. 
@@ -978,40 +1031,40 @@ Number of probes in each direction (x, y, z)
 
 \index{definitions.\+h@{definitions.\+h}!c\+Probe\+LimsX@{c\+Probe\+LimsX}}
 \index{c\+Probe\+LimsX@{c\+Probe\+LimsX}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Probe\+LimsX}{cProbeLimsX}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Probe\+LimsX\mbox{[}2\mbox{]} = \{90, 270\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a916ff47e3b2245cf9371ad17979af59f}{}\label{definitions_8h_a916ff47e3b2245cf9371ad17979af59f}
+\subsubsection[{\texorpdfstring{c\+Probe\+LimsX}{cProbeLimsX}}]{\setlength{\rightskip}{0pt plus 5cm}const double c\+Probe\+LimsX\mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a87fb7c7ad2b0e61e88fb91cf1bf5939f}{}\label{definitions_8h_a87fb7c7ad2b0e61e88fb91cf1bf5939f}
 
 
 Limits of X plane for array of probes. 
 
 \index{definitions.\+h@{definitions.\+h}!c\+Probe\+LimsY@{c\+Probe\+LimsY}}
 \index{c\+Probe\+LimsY@{c\+Probe\+LimsY}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Probe\+LimsY}{cProbeLimsY}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Probe\+LimsY\mbox{[}2\mbox{]} = \{15, 45\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a5a3043410500f51ca5993013de158e4d}{}\label{definitions_8h_a5a3043410500f51ca5993013de158e4d}
+\subsubsection[{\texorpdfstring{c\+Probe\+LimsY}{cProbeLimsY}}]{\setlength{\rightskip}{0pt plus 5cm}const double c\+Probe\+LimsY\mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a9665b16c40cc9e912851619450978c6f}{}\label{definitions_8h_a9665b16c40cc9e912851619450978c6f}
 
 
 Limits of Y plane for array of probes. 
 
 \index{definitions.\+h@{definitions.\+h}!c\+Probe\+LimsZ@{c\+Probe\+LimsZ}}
 \index{c\+Probe\+LimsZ@{c\+Probe\+LimsZ}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Probe\+LimsZ}{cProbeLimsZ}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Probe\+LimsZ\mbox{[}2\mbox{]} = \{30, 120\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a489ed67b64e1e0b638e17eaa84607168}{}\label{definitions_8h_a489ed67b64e1e0b638e17eaa84607168}
+\subsubsection[{\texorpdfstring{c\+Probe\+LimsZ}{cProbeLimsZ}}]{\setlength{\rightskip}{0pt plus 5cm}const double c\+Probe\+LimsZ\mbox{[}2\mbox{]} = \{0.\+1, 0.\+2\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a9aef911b5094b209889d8cbd9001d77e}{}\label{definitions_8h_a9aef911b5094b209889d8cbd9001d77e}
 
 
 Limits of Z plane for array of probes. 
 
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+EndX@{c\+Ref\+EndX}}
 \index{c\+Ref\+EndX@{c\+Ref\+EndX}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+EndX}{cRefEndX}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Ref\+EndX\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 98 \}, \{ 193 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a670f6d54127c889a8fcb5d8d09731079}{}\label{definitions_8h_a670f6d54127c889a8fcb5d8d09731079}
+\subsubsection[{\texorpdfstring{c\+Ref\+EndX}{cRefEndX}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+EndX\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a81d3f0905a4daee8f305d1da2608c109}{}\label{definitions_8h_a81d3f0905a4daee8f305d1da2608c109}
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+EndY@{c\+Ref\+EndY}}
 \index{c\+Ref\+EndY@{c\+Ref\+EndY}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+EndY}{cRefEndY}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Ref\+EndY\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 15 \}, \{ 27 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a203f7f247ae3afb0002163ef09659738}{}\label{definitions_8h_a203f7f247ae3afb0002163ef09659738}
+\subsubsection[{\texorpdfstring{c\+Ref\+EndY}{cRefEndY}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+EndY\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_adcd456978d6cd111bf1e8137eccf5c40}{}\label{definitions_8h_adcd456978d6cd111bf1e8137eccf5c40}
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+EndZ@{c\+Ref\+EndZ}}
 \index{c\+Ref\+EndZ@{c\+Ref\+EndZ}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+EndZ}{cRefEndZ}}]{\setlength{\rightskip}{0pt plus 5cm}int c\+Ref\+EndZ\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 30 \}, \{ 30 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a04a5378cf6d5ad6fb3b90ef77b996432}{}\label{definitions_8h_a04a5378cf6d5ad6fb3b90ef77b996432}
+\subsubsection[{\texorpdfstring{c\+Ref\+EndZ}{cRefEndZ}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+EndZ\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a2b622872514eb55945df8f0723883be6}{}\label{definitions_8h_a2b622872514eb55945df8f0723883be6}
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+StartX@{c\+Ref\+StartX}}
 \index{c\+Ref\+StartX@{c\+Ref\+StartX}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+StartX}{cRefStartX}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Ref\+StartX\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 1 \}, \{ 2 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a3d13567b447095a7b8b56a4c3abb2c49}{}\label{definitions_8h_a3d13567b447095a7b8b56a4c3abb2c49}
+\subsubsection[{\texorpdfstring{c\+Ref\+StartX}{cRefStartX}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+StartX\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_abf756f6824bb0292fa1dbe79991cd48d}{}\label{definitions_8h_abf756f6824bb0292fa1dbe79991cd48d}
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+StartY@{c\+Ref\+StartY}}
 \index{c\+Ref\+StartY@{c\+Ref\+StartY}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+StartY}{cRefStartY}}]{\setlength{\rightskip}{0pt plus 5cm}const int c\+Ref\+StartY\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 1 \}, \{ 2 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a57e3d7f2bca8c94901fa45262a72d29c}{}\label{definitions_8h_a57e3d7f2bca8c94901fa45262a72d29c}
+\subsubsection[{\texorpdfstring{c\+Ref\+StartY}{cRefStartY}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+StartY\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_ab1fe74d0426158ccbd467013359ef9bb}{}\label{definitions_8h_ab1fe74d0426158ccbd467013359ef9bb}
 \index{definitions.\+h@{definitions.\+h}!c\+Ref\+StartZ@{c\+Ref\+StartZ}}
 \index{c\+Ref\+StartZ@{c\+Ref\+StartZ}!definitions.\+h@{definitions.\+h}}
-\subsubsection[{\texorpdfstring{c\+Ref\+StartZ}{cRefStartZ}}]{\setlength{\rightskip}{0pt plus 5cm}int c\+Ref\+StartZ\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS}\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]} = \{ \{ 10 \}, \{ 10 \} \}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_aef484f65aee4ded88664eb80c01d0e58}{}\label{definitions_8h_aef484f65aee4ded88664eb80c01d0e58}
+\subsubsection[{\texorpdfstring{c\+Ref\+StartZ}{cRefStartZ}}]{\setlength{\rightskip}{0pt plus 5cm}double c\+Ref\+StartZ\mbox{[}1\mbox{]}\mbox{[}1\mbox{]} = \{0.\+0\}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{definitions_8h_a41a9ec7b60bbafa63334fa5156dcdc64}{}\label{definitions_8h_a41a9ec7b60bbafa63334fa5156dcdc64}

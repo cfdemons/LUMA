@@ -148,10 +148,12 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 	markers.emplace_back(x, y, z);
 
 	// Add nearest node as basic support
-	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
-	this->markers.back().supp_i.push_back(globals[0]);
-	this->markers.back().supp_j.push_back(globals[1]);
-	this->markers.back().supp_k.push_back(globals[2]);
+	std::vector<int> ijk;
+	GridUtils::getEnclosingVoxel(x, y, z, _Owner, &ijk);
+	this->markers.back().supp_i.push_back(ijk[0]);
+	this->markers.back().supp_j.push_back(ijk[1]);
+	this->markers.back().supp_k.push_back(ijk[2]);
+	this->markers.back().support_rank.push_back(MpiManager::getInstance()->my_rank);
 };
 
 /*********************************************/
@@ -160,35 +162,39 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 ///			Return marker and voxel/primary support data associated with
 ///			supplied global position.
 ///
-/// \param x global X-position nearest to marker to be retrieved.
-/// \param y global Y-position nearest to marker to be retrieved.
-/// \param z global Z-position nearest to marker to be retrieved.
+/// \param x X-position nearest to marker to be retrieved.
+/// \param y Y-position nearest to marker to be retrieved.
+/// \param z Z-position nearest to marker to be retrieved.
 /// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid.
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
-	// Get global indices of voxel associated with the supplied position
-	std::vector<int> vox = GridUtils::getVoxInd(x, y, z, _Owner);
+	// Get indices of voxel associated with the supplied position
+	std::vector<int> vox;
+	eLocationOnRank *loc = nullptr;
+	if (GridUtils::isOnThisRank(x, y, z, loc, _Owner, &vox))
+	{
 
-	// Find all marker IDs that match these indices
-	for (int i = 0; i < static_cast<int>(markers.size()); ++i) {
-		if (markers[i].supp_i[0] == vox[0] &&
-			markers[i].supp_j[0] == vox[1] &&
-			markers[i].supp_k[0] == vox[2]) {
+		// Find all marker IDs that match these indices
+		for (int i = 0; i < static_cast<int>(markers.size()); ++i) {
+			if (markers[i].supp_i[0] == vox[0] &&
+				markers[i].supp_j[0] == vox[1] &&
+				markers[i].supp_k[0] == vox[2]) {
 
-			// Indice represents the target ID so create new MarkerData store on the heap
-			MarkerData* m_MarkerData = new MarkerData(
-				markers[i].supp_i[0],
-				markers[i].supp_j[0],
-				markers[i].supp_k[0],
-				markers[i].position[0],
-				markers[i].position[1],
-				markers[i].position[2],
-				i
-				);
-			return m_MarkerData;	// Return the pointer to store information
+				// Indice represents the target ID so create new MarkerData store on the heap
+				MarkerData* m_MarkerData = new MarkerData(
+					markers[i].supp_i[0],
+					markers[i].supp_j[0],
+					markers[i].supp_k[0],
+					markers[i].position[0],
+					markers[i].position[1],
+					markers[i].position[2],
+					i
+					);
+				return m_MarkerData;	// Return the pointer to store information
+			}
+
 		}
-
 	}
 
 	// If not found then create empty MarkerData store using default constructor
@@ -277,16 +283,16 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
 	try {
 
-		// Try to retrieve the position of the marker identified by <curr_mark>
+		// Try to retrieve the position of the voxel centre belonging to <curr_mark>
 		// Assume that first support point is the closest to the marker position
-		int i = markers[curr_mark].supp_i[0];
-		int j = markers[curr_mark].supp_j[0];
-		int k = markers[curr_mark].supp_k[0];
+		double vx = _Owner->XPos[markers[curr_mark].supp_i[0]];
+		double vy = _Owner->YPos[markers[curr_mark].supp_j[0]];
+		double vz = _Owner->ZPos[markers[curr_mark].supp_k[0]];
 
 		// Test within
-		if ((x > i - (_Owner->dx / 2) && x <= i + (_Owner->dx / 2)) &&
-			(y > j - (_Owner->dx / 2) && y <= j + (_Owner->dx / 2)) &&
-			(z > k - (_Owner->dx / 2) && z <= k + (_Owner->dx / 2))
+		if ((x >= vx - (_Owner->dh / 2) && x < vx + (_Owner->dh / 2)) &&
+			(y >= vy - (_Owner->dh / 2) && y < vy + (_Owner->dh / 2)) &&
+			(z >= vz - (_Owner->dh / 2) && z < vz + (_Owner->dh / 2))
 			) return true;
 
 		// Catch all
@@ -304,9 +310,9 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
 /*********************************************/
 /// \brief	Determines whether a point is inside an existing marker's support voxel.
-/// \param x global X-position of point.
-/// \param y global Y-position of point.
-/// \param z global Z-position of point.
+/// \param x X-position of point.
+/// \param y Y-position of point.
+/// \param z Z-position of point.
 /// \return true of false
 // Returns boolean as to whether a given point is in an existing marker voxel
 template <typename MarkerType>
@@ -318,11 +324,12 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 	// True if the data store is not empty
 	if (m_data->ID != -1) {
 
-		delete m_data;	// Deallocate the store
+		delete m_data;	// Deallocate the store before leaving scope
 		return true;
 
 	}
 
+	delete m_data;
 	return false;
 
 };

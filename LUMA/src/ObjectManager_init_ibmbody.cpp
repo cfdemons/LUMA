@@ -37,9 +37,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Check that the owning grid was found and exists
 	if ( iBody.back()._Owner == NULL ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Could not find the subgrid where the immersed boundary is meant to lie." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile);
 	}
 
 
@@ -83,8 +81,8 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// =========================== Build both with custom dimensions ===========================  //
 
 		// Dimensions
-		centrepoint.push_back( 2*(double)(L_BX-L_AX)/5 );
-		centrepoint.push_back( 2*(double)(L_BY - L_AY)/5 );
+		centrepoint.push_back( 2*(double)L_BX/5 );
+		centrepoint.push_back( 2*(double)L_BY/5 );
 		centrepoint.push_back(L_IBB_Z);
 		dimensions.push_back(L_IBB_W);
 		dimensions.push_back(L_IBB_L);
@@ -105,8 +103,8 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		angles.push_back(0.0);
 #endif
 		// Position
-		centrepoint[0] = 3*(double)(L_BX - L_AX)/5;
-		centrepoint[1] = 3*(double)(L_BY - L_AY)/5;
+		centrepoint[0] = 3*(double)L_BX/5;
+		centrepoint[1] = 3*(double)L_BY/5;
 		centrepoint[2] = L_IBB_Z;
 
 		// Build rectangle

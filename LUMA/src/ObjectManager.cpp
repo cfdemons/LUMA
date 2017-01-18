@@ -103,6 +103,9 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			int ydest = j + c[1][n];
 			int zdest = k + c[2][n];
 
+			// Reject site on grid edges (like single-cell walls)
+			if (GridUtils::isOffGrid(xdest, ydest, zdest, g)) return;
+
 			// Only apply if streams to a fluid site
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{

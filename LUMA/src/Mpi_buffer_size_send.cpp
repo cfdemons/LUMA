@@ -32,9 +32,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 	
 	int count, i, j, k, dir;	// Local counters
 	// Local grid sizes
-	int N_lim = static_cast<int>(g->XInd.size()), M_lim = static_cast<int>(g->YInd.size())
+	int N_lim = static_cast<int>(g->N_lim), M_lim = static_cast<int>(g->M_lim)
 #if (L_DIMS == 3)
-		, K_lim = static_cast<int>(g->ZInd.size());
+		, K_lim = static_cast<int>(g->K_lim);
 #else
 		, K_lim = 1;
 #endif
@@ -88,11 +88,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYMax) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMin))
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -114,11 +114,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
-								(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum))
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
+								(!GridUtils::isOnRecvLayer(g->YPos[j],eYMax) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMin))
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -140,11 +140,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -166,11 +166,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -192,11 +192,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
+							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) &&
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -219,11 +219,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) &&
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
+							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) &&
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -245,11 +245,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum) && 
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -271,11 +271,11 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum) && 
-								GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)
+							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
+								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
 #if (L_DIMS == 3)
 								&&
-								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMaximum) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZDirection,eMinimum))
+								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
 								// Must be a site to pass in MPI so increment counter
@@ -302,9 +302,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -325,9 +325,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -348,9 +348,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -371,9 +371,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -394,9 +394,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -417,9 +417,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -440,9 +440,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -463,9 +463,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -486,9 +486,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -509,9 +509,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -532,9 +532,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -555,9 +555,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(!GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -578,9 +578,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -601,9 +601,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -624,9 +624,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -647,9 +647,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMinimum) && !GridUtils::isOnRecvLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -670,9 +670,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMaximum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMinimum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMaximum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMax))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;
@@ -693,9 +693,9 @@ void MpiManager::mpi_buffer_size_send(GridObj*& g) {
 						// Check conditions for sender
 						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
 						{
-							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXDirection,eMinimum)) && 
-									(GridUtils::isOnSenderLayer(g->YPos[j],eYDirection,eMaximum)) &&
-									(GridUtils::isOnSenderLayer(g->ZPos[k],eZDirection,eMinimum))
+							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
+									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
+									(GridUtils::isOnSenderLayer(g->ZPos[k],eZMin))
 							) {
 								// Must be a site to pass in MPI so increment counter
 								count++;

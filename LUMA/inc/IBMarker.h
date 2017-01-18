@@ -28,6 +28,7 @@ class IBMarker : public Marker {
 	friend class ObjectManager;
 	// Same for IBBody
 	friend class IBBody;
+	friend class IBInfo;
 
 public:
 

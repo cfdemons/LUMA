@@ -76,9 +76,7 @@ public:
 	GridObj(int level); // Basic grid constructor
 	GridObj(int RegionNumber, GridObj& pGrid); // Sub grid constructor with region and reference to parent grid for initialisation
 	// MPI L0 constructor with local size and global edges
-	GridObj(int level, std::vector<int> local_size, 
-		std::vector< std::vector<int> > GlobalLimsInd, 
-		std::vector< std::vector<double> > GlobalLimsPos);
+	GridObj(int level, std::vector<int> local_size,	std::vector< std::vector<double> > GlobalLimsPos);
 	~GridObj( ); // Default destructor
 
 
@@ -104,9 +102,6 @@ private :
 
 	// 1D arrays
 public :
-	std::vector<int> XInd;		///< Vector of global X indices of each site
-	std::vector<int> YInd;		///< Vector of global Y indices of each site
-	std::vector<int> ZInd;		///< Vector of global Z indices of each site
 	std::vector<double> XPos;	///< Vector of global X positions of each site
 	std::vector<double> YPos;	///< Vector of global Y positions of each site
 	std::vector<double> ZPos;	///< Vector of global Z positions of each site
@@ -144,9 +139,7 @@ public :
 	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
 
 	// Grid Scalars
-	double dx;						///< Physical lattice X spacing
-	double dy;						///< Physical lattice Y spacing
-	double dz;						///< Physical lattice Z spacing
+	double dh;						///< Physical lattice spacing (same for x, y and z)
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size
@@ -162,9 +155,9 @@ public :
 	int N_lim;			///< Local size of grid in X-direction
 	int M_lim;			///< Local size of grid in Y-direction
 	int K_lim;			///< Local size of grid in Z-direction
-	double XOrigin;	///< Global position of grid left edge
-	double YOrigin;	///< Global position of grid bottom edge
-	double ZOrigin;	///< Global position of grid front edge
+	double XOrigin;		///< Position of grid left edge
+	double YOrigin;		///< Position of grid bottom edge
+	double ZOrigin;		///< Position of grid front edge
 
 
 	/*
@@ -180,7 +173,6 @@ public :
 	void LBM_initRho();				// Initialise the density field
 	void LBM_initGrid();			// Non-MPI wrapper for initialiser
 	void LBM_initGrid(std::vector<int> local_size,
-		std::vector< std::vector<int> > GlobalLimsInd,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
 	void LBM_initBoundLab();					// Initialise labels for walls
@@ -189,16 +181,8 @@ public :
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	DEPRECATED void LBM_multi(bool ibmFlag);		// Launch the multi-grid kernel (DEPRECATED VERSION)
-	DEPRECATED void LBM_multi();					// Launch the multi-grid kernel
-	DEPRECATED void LBM_collide();					// Apply collision + 1 overload for equilibrium calculation
-	double LBM_collide(int i, int j, int k, int v);
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
-	DEPRECATED void LBM_stream();					// Stream populations
-	DEPRECATED void LBM_macro();					// Compute macroscopic quantities + 1 overload for single site
 	void LBM_macro(int i, int j, int k);
-	DEPRECATED void LBM_boundary(int bc_type_flag);	// Apply boundary conditions
-	DEPRECATED void LBM_forceGrid();				// Apply a force to the grid points
 	void LBM_resetForces();							// Resets the force vectors on the grid
 
 	// Boundary operations
@@ -208,11 +192,8 @@ public :
 	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
 	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
 	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
-	DEPRECATED void bc_solidSiteReset();						// Reset all the solid site velocities to zero
 
 	// Multi-grid operations
-	DEPRECATED void LBM_explode(int RegionNumber);		// Explode populations from coarse to fine
-	DEPRECATED void LBM_coalesce(int RegionNumber);		// Coalesce populations from fine to coarse
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
 
 	// IO methods
@@ -227,7 +208,7 @@ private :
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
-	// Private optimised functions
+	// Private optimised LBM functions
 	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);

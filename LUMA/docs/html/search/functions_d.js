@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ulat2uphys',['ulat2uphys',['../class_grid_units.html#a94d339355f8e81b46405c99c0b7a81aa',1,'GridUnits']]],
-  ['uptozero',['upToZero',['../class_grid_utils.html#a5a3e26a94e62833f0a9e5a4bda066dac',1,'GridUtils']]]
+  ['stridedcopy',['stridedCopy',['../class_grid_utils.html#aa3ca6e20ef4fa927cb845956d7565b1e',1,'GridUtils']]],
+  ['subtract',['subtract',['../class_grid_utils.html#a6f5af65d6bb25e0d34be50670b41514f',1,'GridUtils']]]
 ];

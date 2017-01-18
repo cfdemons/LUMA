@@ -71,7 +71,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 
 #ifdef L_BFL_DEBUG
 	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
 	for (size_t n = 0; n < markers.size(); n++) {
 		file << std::to_string(n) << ", " << 
@@ -94,12 +94,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	for (Marker& m : markers) {
 
 		// When using MPI need to convert the global indices of the support sites to local indices for array access
-#ifdef L_BUILD_FOR_MPI
-		std::vector<int> locals; GridUtils::global_to_local(m.supp_i[0],m.supp_j[0],m.supp_k[0],_Owner,locals);
-		_Owner->LatTyp(locals[0],locals[1],locals[2],M_lim,K_lim) = eBFL;
-#else
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
-#endif
 
 	}
 
@@ -137,7 +132,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
 #ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {
@@ -148,8 +143,8 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	file.close();
 #endif
 
-	// Set spacing to same as grid dx
-	this->spacing = _Owner->dx;
+	// Set spacing to same as grid dh
+	this->spacing = _Owner->dh;
 
 }
 
@@ -192,6 +187,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[k]);
 
 	storeID = m_data->ID;
+	delete m_data;
 
 	// Get list of IDs of neighbour vertices for plane construction
 	std::vector<int> V;
@@ -216,7 +212,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 			}
 		}
 	}
-	delete m_data;
+	
 
 	// Build a triangular plane for each combination of vertices //
 
@@ -374,6 +370,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[0]);
 
 	int storeID = m_data->ID;
+	delete m_data;
 
 
 	// Get list of IDs of neighbour vertices for line construction
@@ -392,11 +389,13 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 				// If data valid, then store ID
 				if (m_data->ID != -1) V.push_back(m_data->ID);
 
+				// Clean-up after getMarkerData call
+				delete m_data;
+
 			}
 
 		}
 	}
-	delete m_data;
 
 	// Can only continue if we have at least 2 points
 	if (V.size() < 2) return;

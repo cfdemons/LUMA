@@ -5,5 +5,5 @@ var searchData=
   ['local_5farea',['local_area',['../class_i_b_marker.html#aa332dcba1676eae4fbb6d0fa6caca809',1,'IBMarker']]],
   ['local_5fsize',['local_size',['../class_mpi_manager.html#ad4a918a4cd19e644ff3295b2854fc6af',1,'MpiManager']]],
   ['logfile',['logfile',['../class_grid_utils.html#a298239096e929c1ba4eba925e351c1b3',1,'GridUtils']]],
-  ['logout',['logout',['../class_mpi_manager.html#afbd3a2866235c1d4a32e6806318061fd',1,'MpiManager']]]
+  ['logout',['logout',['../class_mpi_manager.html#a9a0dd93f57d78f568048197c95311832',1,'MpiManager']]]
 ];

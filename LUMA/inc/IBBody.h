@@ -26,8 +26,9 @@ class GridObj;
 /// \brief	Immersed boundary body.
 class IBBody : public Body<IBMarker> {
 
-	// Make ObjectManager a friend class so it can access the protected data of IBBody objects
+	// Add friend classes so they can access the protected data of IBBody objects
 	friend class ObjectManager;
+	friend class IBInfo;
 
 public:
 	// Constructor and destructor

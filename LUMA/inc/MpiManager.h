@@ -23,11 +23,10 @@ class GridObj;
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
 #define range_i_left	i = 0; i < GridUtils::downToLimit((int)pow(2, g->level + 1), N_lim); i++	///< For loop definition for left halo
 #define range_j_down	j = 0; j < GridUtils::downToLimit((int)pow(2, g->level + 1), M_lim); j++	///< For loop definition for bottom halo
-#define range_k_front k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++		///< For loop definition for front halo
-#define range_i_right i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++	///< For loop definition for right halo
-#define range_j_up	j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++		///< For loop definition for top halo
+#define range_k_front	k = 0; k < GridUtils::downToLimit((int)pow(2, g->level + 1), K_lim); k++	///< For loop definition for front halo
+#define range_i_right	i = GridUtils::upToZero(N_lim - (int)pow(2, g->level + 1)); i < N_lim; i++	///< For loop definition for right halo
+#define range_j_up		j = GridUtils::upToZero(M_lim - (int)pow(2, g->level + 1)); j < M_lim; j++	///< For loop definition for top halo
 #define range_k_back	k = GridUtils::upToZero(K_lim - (int)pow(2, g->level + 1)); k < K_lim; k++	///< For loop definition for back halo
-
 
 /// \brief	MPI Manager class.
 ///
@@ -48,9 +47,17 @@ public :
 	*/
 
 	// MPI world data (all public)
-	MPI_Comm world_comm;						///< Global MPI communicator
-	static const int MPI_cartlab[3][26];		///< Cartesian unit vectors pointing to each neighbour in Cartesian topology
-	int MPI_dims[L_DIMS];						///< Size of MPI Cartesian topology
+	MPI_Comm world_comm;	///< Global MPI communicator
+
+	/// \brief	Cartesian unit vectors pointing to each neighbour in Cartesian topology.
+	///
+	///			Define 3D such that first 8 mimic the 2D ones. Opposites are 
+	///			simply the next or previous column in the array. MSVC 2013 does
+	///			not support initialiser lists tagged onto the constructor although
+	///			it is valid C++ so I have had to make it static even though it goes
+	///			against the idea of the singleton design.
+	static const int neighbour_vectors[3][26];
+	int dimensions[L_DIMS];						///< Size of MPI Cartesian topology
 	int neighbour_rank[L_MPI_DIRS];				///< Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[L_DIMS][L_MPI_DIRS];	///< Coordinates in MPI topology of neighbour ranks
 
@@ -93,32 +100,63 @@ public :
 	};
 	std::vector<phdf5_struct> p_data;			///< Vector of structures containing halo descriptors for block writing (HDF5)
 	
-	// Static Data (commonly used and grid-independent)
-	static int my_rank;				///< Rank number
-	static int num_ranks;			///< Total number of ranks in MPI Cartesian topology
-	static int MPI_coords[L_DIMS];	///< Coordinates in MPI Cartesian topology
+	// Commonly used properties of the rank / topology
+	int my_rank;				///< Rank number
+	int num_ranks;				///< Total number of ranks in MPI Cartesian topology
+	int rank_coords[L_DIMS];		///< Coordinates in MPI Cartesian topology
 
 
 	// Grid data
-	int global_dims[3];				///< Global dimensions of problem coarse lattice.
-	std::vector<int> local_size;	///< Dimensions of coarse lattice represented on this rank (includes inner and outer halos).
-
-	/// \brief	Global indices of coarse lattice nodes represented on this rank.
+	/// \brief	Overall size of each grid (excluding halo of course).
 	///
-	///			Excludes outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number.
-	std::vector< std::vector<int> > global_edge_ind;	
-
-	/// \brief	Global positions of coarse lattice nodes represented on this rank.
+	///			Since L0 can only be region = 0 this array should be accessed as 
+	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
+	///			cannot be 0. To retrieve L0 info, simply access [0].
 	///
-	///			Excluding outer overlapping layer. Rows are x,y,z start and end pairs and columns are rank number.
-	std::vector< std::vector<double> > global_edge_pos;
+	int global_size[3][L_NUM_LEVELS * L_NUM_REGIONS + 1];
+
+	/// \brief	Absolute position of grid edges (excluding halo of course).
+	///
+	///			Since L0 can only be region = 0 this array should be accessed as 
+	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
+	///			cannot be 0. To retrieve L0 info, simply access [0]. The first index
+	///			should be accessed using the enumerator eCartesianMinMax.
+	///
+	double global_edges[6][L_NUM_LEVELS * L_NUM_REGIONS + 1];
+
+	/// \brief	Boolean flag array to indicate the presence of a TL on sub-grid edges.
+	///
+	///			It is not a given that a sub-grid has a TL on every edge of the grid.
+	///			Specifically if we have a sub-grid which is perodic (or in future, which
+	///			merges with another sub-grid?). The HDF5 writer needs to know whether 
+	///			to exclude sites to account for TL or not so we store information here
+	///			from the sub-grid initialisation. The first index should be accessed 
+	///			using the enumerator eCartesianMinMax. If no sub-grids present then 
+	///			adopts a default 6x1 size.
+	///
+#if (L_NUM_LEVELS == 0)
+	bool subgrid_tlayer_key[6][1];
+#else
+	bool subgrid_tlayer_key[6][L_NUM_LEVELS * L_NUM_REGIONS];
+#endif
+
+	/// Dimensions of coarse lattice represented on this rank (includes halo).
+	std::vector<int> local_size;
+
+	/// \brief	Absolute positions of edges of the core region represented on this rank.
+	///
+	///			Excludes outer overlapping layer (recv layer). 
+	///			Rows are x,y,z start and end pairs and columns are rank number.
+	///			Access the rows using the eCartMinMax enumeration.
+	std::vector< std::vector<double> > rank_core_edge;
 
 	/// \struct layer_edges
-	/// \brief	Structure containing global positions of the edges of halos.
+	/// \brief	Structure containing absolute positions of the edges of halos.
 	///
 	///			Sender (inner) and receiver (outer) parts of halo are located 
 	///			using the convention [left_min left_max right_min right_max] 
-	///			for X,Y and Z.
+	///			for X and similar for Y and Z. Access using the enumerator 
+	///			eEdgeMinMax.
 	struct layer_edges {
 		double X[4];	///< X limits
 		double Y[4];	///< Y limits
@@ -128,7 +166,7 @@ public :
 	layer_edges recv_layer_pos;		///< Structure containing receiver layer edge positions.
 	
 	/// Pointer to grid hierarchy
-	static GridObj* Grids;
+	GridObj* Grids;
 	
 
 	// Buffer data
@@ -149,7 +187,7 @@ public :
 	std::vector<buffer_struct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.
 
 	/// Logfile handle
-	static std::ofstream* logout;
+	std::ofstream* logout;
 
 
 
@@ -183,6 +221,7 @@ public :
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
+
 };
 
 #endif

@@ -31,6 +31,21 @@ MpiManager::MpiManager(void)
 	// Resize buffer arrays based on number of MPI directions
 	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
 	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
+
+	//Resize the planar mpi domains if L_MPI_PLANAR_DECOMPOSITION is activated
+#ifdef L_MPI_PLANAR_DECOMPOSITION
+	size_t xSize, ySize, zSize;
+	xSize = L_MPI_XCORES;
+	ySize = L_MPI_YCORES;
+#if (L_DIMS == 3)
+	zSize = L_MPI_ZCORES;
+#else
+	zSize = 1;
+#endif
+	cRankSizeX.resize(xSize*ySize*zSize);
+	cRankSizeY.resize(xSize*ySize*zSize);
+	cRankSizeZ.resize(xSize*ySize*zSize);
+#endif
 }
 
 /// \brief	Default destructor.
@@ -168,7 +183,7 @@ void MpiManager::mpi_init() {
 		}
 		*MpiManager::logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 	// If using custom sizes, user must set the L_MPI_ZCORES to 1
 	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
 		std::cout << "Error: See Log File" << std::endl;
@@ -202,6 +217,70 @@ void MpiManager::mpi_gridbuild( ) {
 	double dy = 2 * (Ly / (2 * static_cast<double>(L_M)));
 	double dz = 2 * (Lz / (2 * static_cast<double>(L_K)));
 
+#ifdef L_MPI_PLANAR_DECOMPOSITION
+	//Fill up the cRankSize arrays with the coordinates of each mpi region. 
+
+	//Auxiliar variables
+	int numCells[3];
+	int numCores[3];
+	numCells[0] = L_N;
+	numCells[1] = L_M;
+	numCells[2] = L_K;
+	numCores[0] = L_MPI_XCORES;
+	numCores[1] = L_MPI_YCORES;
+#if (L_DIMS == 3)
+	numCores[2] = L_MPI_ZCORES;
+#else
+	numCores[2] = 1;
+#endif
+
+	int cellsInDomains[3];
+	int cellsLastDomain[3];
+
+	//Set the last position to 0, just in case we are working with L_DIMS = 2
+	cellsInDomains[2] = 0;
+	cellsLastDomain[2] = 0;
+
+	//Loop over dimensions
+	for (size_t d = 0; d < L_DIMS; d++){
+
+		//Calculate the size of each domain
+		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
+
+		//Calculate the size of the last domain
+		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d]*numCores[d] - numCells[d]);
+
+		//Throw an error if cellsInLast domain is <=0
+		if (cellsLastDomain[d] <= 0){
+			std::cout << "Error: See Log File" << std::endl;
+			*MpiManager::logout << "Last core in dir= "<< d << " has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x, d=1 is y, d=2 is z" << std::endl;
+			MpiManager::logout->close();
+			MPI_Finalize();
+			exit(LUMA_FAILED);
+		}
+	}
+
+	//Fill the cRankSize arrays
+	int ind = 0;
+	for (int i = 0; i < numCores[0]; i++){
+		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+
+		for (int j = 0; j < numCores[1]; j++){
+			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+
+			for (int k = 0; k < numCores[2]; k++){
+				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+				cRankSizeX[ind] = sX;
+				cRankSizeY[ind] = sY;
+				cRankSizeZ[ind] = sZ;
+				ind++;
+			}
+		}
+	}
+
+
+#endif 
+
 	// Compute required local grid size
 	// Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++) {
@@ -210,22 +289,13 @@ void MpiManager::mpi_gridbuild( ) {
 			// If only 1 rank in this direction local grid is same size a global grid
 			local_size.push_back( global_dims[d] );
 
-#ifndef L_USE_CUSTOM_MPI_SIZES
-
-		} else if ( fmod(static_cast<double>(global_dims[d]) , static_cast<double>(MPI_dims[d])) ) {
-			// If number of cores doesn't allow exact division of grid sites, exit.
-			std::cout << "Error: See Log File" << std::endl;
-			*MpiManager::logout << "Grid cannot be divided evenly among the cores. Exiting." << std::endl;
-			MpiManager::logout->close();
-			MPI_Finalize();
-			exit(LUMA_FAILED);
-#endif
 
 		} else {
 
 			// Else, find local grid size
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
+			
 			// Get grids sizes from the definitions file
 			switch (d)
 			{
@@ -259,7 +329,7 @@ void MpiManager::mpi_gridbuild( ) {
 	global_edge_pos.resize( 6, std::vector<double>(num_ranks) );
 
 
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
 	// If using custom sizing need to cumulatively establish how far from origin
 
@@ -366,7 +436,7 @@ void MpiManager::mpi_gridbuild( ) {
 
 
 	// Check my grid size dimensions with the neighbours to make sure it all lines up
-#ifdef L_USE_CUSTOM_MPI_SIZES
+#ifdef L_MPI_PLANAR_DECOMPOSITION
 
 	// 3D check
 #if (L_DIMS == 3)
@@ -439,7 +509,7 @@ void MpiManager::mpi_gridbuild( ) {
 		 }
 
 #endif // L_DIMS == 3
-#endif // L_USE_CUSTOM_MPI_SIZES
+#endif // L_MPI_PLANAR_DECOMPOSITION
 
 }
 

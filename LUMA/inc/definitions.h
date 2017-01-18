@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.3.0-alpha"
+#define LUMA_VERSION "1.3.0"
 
 
 // Header guard
@@ -70,7 +70,7 @@
 #define L_USE_OPTIMISED_KERNEL			///< Opt to use the optimised kernel over the traditional kernel
 
 // Output Options
-#define L_OUT_EVERY 2000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 10       		///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -113,7 +113,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 6000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 10		///< Number of time steps to run simulation for
 
 
 /*
@@ -126,28 +126,15 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-/// Set to 1 if doing a 2D problem when using custom MPI sizes
 #define L_MPI_ZCORES 2
 
-//#define L_USE_CUSTOM_MPI_SIZES		///< Define to use custom decomposition otherwise decomposition will be uniform
-
-// MPI local grid sizes (Cartesian topolgy numbered in z, y then x directions)
-#ifdef L_USE_CUSTOM_MPI_SIZES
-	/// Number of sites in X direction for each custom rank
-	const static size_t cRankSizeX[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {50, 50, 50, 50, 350, 350, 350, 350};
-	/// Number of sites in Y direction for each custom rank
-	const static size_t cRankSizeY[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 20, 130, 130, 20, 20, 130, 130};
-	/// Number of sites in Z direction for each custom rank.
-	/// The following can be arbitrary if doing a 2D problem
-	const static size_t cRankSizeZ[L_MPI_XCORES*L_MPI_YCORES*L_MPI_ZCORES]		= {20, 30, 20, 30, 20, 30, 20, 30};
-#endif
-
+#define L_MPI_PLANAR_DECOMPOSITION		///< Define to use uniform decomposition even if the number of cells in a direction is not divisible by its number of cores. LUMA will adjust the number of cells on the last MPI domain. 
 
 // Lattice properties (in lattice units)
 #define L_DIMS 3		///< Number of dimensions to the problem
 #define L_N 100			///< Number of x lattice sites
 #define L_M 50			///< Number of y lattice sites
-#define L_K 50			///< Number of z lattice sites
+#define L_K 25			///< Number of z lattice sites
 
 
 /*
@@ -158,11 +145,11 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 
 // Physical dimensions (dictates scaling)
 #define L_AX 0.0		///< Start of domain-x
-#define L_BX 2.0		///< End of domain-x
+#define L_BX 100		///< End of domain-x
 #define L_AY 0.0		///< Start of domain-y
-#define L_BY 1.0 		///< End of domain-y
+#define L_BY 50 		///< End of domain-y
 #define L_AZ 0.0		///< Start of domain-z
-#define L_BZ 1.0		///< End of domain-z
+#define L_BZ 25		///< End of domain-z
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -355,7 +342,7 @@ const static int cProbeLimsZ[2] = {30, 120};		///< Limits of Z plane for array o
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0

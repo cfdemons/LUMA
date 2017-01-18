@@ -1,4 +1,6 @@
-version		=	1.3.0-alpha
+Issue #104	:   Added option to automatically calculate MPI planar domain decomposition
+
+version		=	1.3.0
 
 General		:	Reinstated force calculation and included a few other optimisations.
 				Added new refinement guide spreadsheet.

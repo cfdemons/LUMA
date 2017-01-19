@@ -336,11 +336,36 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 /// \return Smagorinsky-modified omega value
 double GridObj::_LBM_smag(int id, double omega)
 {
-	//Calculate the non equilibrium stress tensor. 
+	//Calculate the non equilibrium stress tensor
 	Matrix2D<double> nonEquiStress[L_DIMS][L_DIMS];
+	//std::valarray<double> fneq[L_NUM_VELS];
+	double fneq[L_NUM_VELS];
+ 
+	for (int v = 0; v < L_NUM_VELS; ++v) {
+		fneq[v] = fNew[v + id*L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
+	}
+
+	//Calculate diagonal and upper diagonal of the non equilibrium stress tensor
+	for (int i = 0; i < L_DIMS; ++i){
+		for (int j = i; j < L_DIMS; ++j){
+			nonEquiStress[i][j] = 0.0;
+			for (int v = 0; v < L_NUM_VELS; ++v){
+				nonEquiStress[i][j] += c_opt[v][i] * c_opt[v][j] * fneq[v];
+			}
+		}
+	}
+
+	//Fill in the lower diagonal of the non equilibrium stress tensor (since this tensor is symmetric)
+	for (int i = 1; i < L_DIMS; ++i){
+		for (j = 0; j < i; ++j){
+			nonEquiStress[i][j] = nonEquiStress[j][i];
+		}
+	}
+
+	double Q = sqrt(2.0*nonEquiStress%nonEquiStress);
 
 	double tau = 1.0 / omega;
-	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)) - tau);  //I HAVE TO CALCULATE Q!
+	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)*Q) - tau);  //I HAVE TO CALCULATE Q!
 	return ( 1 / (tau + tau_t) );
 }
 

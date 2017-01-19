@@ -337,7 +337,7 @@ double GridObj::_LBM_smag(int id, double omega)
 	// Smagorinsky
 	double tau = 1.0 / omega;
 	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)) - tau);  //I HAVE TO CALCULATE Q!
-	double omega_s = 1 / (tau + tau_t);
+	return ( 1 / (tau + tau_t) );
 }
 
 // *****************************************************************************

@@ -49,6 +49,7 @@
 #include <fstream>
 #include <sstream>
 #include <numeric>
+#include <valarray>
 
 // Check OS is Windows or not
 #ifdef _WIN32

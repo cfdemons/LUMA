@@ -19,6 +19,8 @@
 #include "../inc/MpiManager.h"
 #include "../inc/GridUtils.h"
 
+#include "../inc/Matrix.h"
+
 // *****************************************************************************
 /// \brief	Optimised LBM multi-grid kernel.
 ///
@@ -334,7 +336,9 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 /// \return Smagorinsky-modified omega value
 double GridObj::_LBM_smag(int id, double omega)
 {
-	// Smagorinsky
+	//Calculate the non equilibrium stress tensor. 
+	Matrix2D<double> nonEquiStress[L_DIMS][L_DIMS];
+
 	double tau = 1.0 / omega;
 	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)) - tau);  //I HAVE TO CALCULATE Q!
 	return ( 1 / (tau + tau_t) );

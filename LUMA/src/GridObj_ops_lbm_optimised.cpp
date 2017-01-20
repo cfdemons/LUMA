@@ -337,7 +337,7 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 double GridObj::_LBM_smag(int id, double omega)
 {
 	//Calculate the non equilibrium stress tensor
-	Matrix2D<double> nonEquiStress[L_DIMS][L_DIMS];
+	Matrix2D<double> nonEquiStress(3,3);
 	//std::valarray<double> fneq[L_NUM_VELS];
 	double fneq[L_NUM_VELS];
  
@@ -357,12 +357,12 @@ double GridObj::_LBM_smag(int id, double omega)
 
 	//Fill in the lower diagonal of the non equilibrium stress tensor (since this tensor is symmetric)
 	for (int i = 1; i < L_DIMS; ++i){
-		for (j = 0; j < i; ++j){
+		for (int j = 0; j < i; ++j){
 			nonEquiStress[i][j] = nonEquiStress[j][i];
 		}
 	}
 
-	double Q = sqrt(2.0*nonEquiStress%nonEquiStress);
+	double Q = sqrt(2.0*(nonEquiStress%nonEquiStress));
 
 	double tau = 1.0 / omega;
 	double tau_t = 0.5 * (sqrt((tau * tau) + 18.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)*Q) - tau);  //I HAVE TO CALCULATE Q!

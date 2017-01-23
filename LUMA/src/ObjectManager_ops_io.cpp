@@ -243,19 +243,22 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 /// \param	tval	time value at which the write out is being performed.
 void ObjectManager::io_vtkIBBWriter(double tval) {
 
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
+
     // Loop through each iBody
     for (size_t ib = 0; ib < iBody.size(); ib++) {
 
         // Create file name then output file stream
         std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << std::to_string(mpim->my_rank) << "." << (int)tval << ".vtk";
 
         std::ofstream fout;
         fout.open( fileName.str().c_str() );
 
         // Add header information
         fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << ib << " at time t = " << (int)tval << "\n";
+        fout << "IB Output for body ID " << ib << ", rank " << std::to_string(mpim->my_rank) << " at time t = " << (int)tval << "\n";
         fout << "ASCII\n";
         fout << "DATASET POLYDATA\n";
 
@@ -278,19 +281,9 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
 
         // Write out the connectivity of each Lagrange marker
         size_t nLines = iBody[ib].markers.size() - 1;
-
-        if (iBody[ib].closed_surface == false)
-            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-        else if (iBody[ib].closed_surface == true)
-            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
-
+        fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
         for (size_t i = 0; i < nLines; i++) {
             fout << 2 << " " << i << " " << i + 1 << std::endl;
-        }
-
-        // If iBody[ib] is a closed surface then join last point to first point
-        if (iBody[ib].closed_surface == true) {
-            fout << 2 << " " << nLines << " " << 0 << std::endl;
         }
 
         fout.close();

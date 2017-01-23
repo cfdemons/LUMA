@@ -18,6 +18,7 @@
 #include "stdafx.h"
 class GridObj;
 #include "GridUtils.h"
+#include "MpiManager.h"
 
 /// \brief	Container class to hold marker information.
 class MarkerData {
@@ -119,6 +120,7 @@ protected:
 template <typename MarkerType>
 Body<MarkerType>::Body(void)
 {
+	this->_Owner = nullptr;
 };
 /// Default destructor
 template <typename MarkerType>

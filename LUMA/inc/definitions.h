@@ -67,7 +67,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 

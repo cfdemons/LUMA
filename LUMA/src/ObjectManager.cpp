@@ -49,7 +49,9 @@ void ObjectManager::destroyInstance() {
 
 // ************************************************************************* //
 /// Default constructor
-ObjectManager::ObjectManager(void) { };
+ObjectManager::ObjectManager(void) {
+	_Grids = nullptr;
+};
 
 /// Default destructor
 ObjectManager::~ObjectManager(void) {

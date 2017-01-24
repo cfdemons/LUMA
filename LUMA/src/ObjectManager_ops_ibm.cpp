@@ -162,7 +162,6 @@ void ObjectManager::ibm_initialise() {
 		ibm_findEpsilon(ib);
 
 	}
-
 }
 
 // *****************************************************************************
@@ -208,10 +207,10 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	int inear, jnear;							// Nearest node indices (global indices)
 	std::vector<double> nearpos;				// Position of the nearest marker
 	int knear;
+	int s = 0;										// The sth support marker which has been found
 
 #ifdef L_BUILD_FOR_MPI
 	int estimated_rank_offset[3] = { 0, 0, 0 };
-	iBody[ib].markers[m].support_rank.push_back(mpim->my_rank);	// Add this rank for owning the first support point
 #endif
 
 	// Find closest support node
@@ -237,6 +236,16 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Vector to store estimated positions of the possible support points
 	double estimated_position[3] = { 0, 0, 0 };
+
+	// Get the position for the first support point (which already exists from the addMarker method)
+	estimated_position[eXDirection] = nearpos[eXDirection];
+	estimated_position[eYDirection] = nearpos[eYDirection];
+#if (L_DIMS == 3)
+	estimated_position[eZDirection] = nearpos[eZDirection];
+#endif
+
+	// Get the deltaval for the first support point
+	ibm_initialiseSupport(ib, m, s, estimated_position);
 
 #ifdef L_IBM_DEBUG
 	// DEBUG -- Write out support as they are found
@@ -303,6 +312,9 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 					else
 					{
 
+						// Increment the support point counter
+						s++;
+
 						// Lies within support region so add support point data
 						iBody[ib].markers[m].supp_i.push_back(i);
 						iBody[ib].markers[m].supp_j.push_back(j);
@@ -347,6 +359,9 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 						estimated_rank_offset[eZDirection] = 0;
 #endif
 #endif
+						/* Initialise delta information for the set of support points
+							 * including those not on this rank using estimated positions. */
+						ibm_initialiseSupport(ib, m, s, estimated_position);
 
 #ifdef L_IBM_DEBUG
 						// DEBUG -- add this support point to the list
@@ -369,14 +384,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 	// Store normalised area of support region
 	iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
-
-	/* Initialise delta information for the set of support points 
-	 * including those not on this rank using estimated positions. */
-	for (int s = 0; s < static_cast<int>(iBody[ib].markers[m].supp_i.size()); s++)
-	{
-		ibm_initialiseSupport(ib, m, s, estimated_position);
-	}
-
 }
 
 // *****************************************************************************

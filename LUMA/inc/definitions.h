@@ -148,11 +148,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 40		///< Number of lattice sites per unit length
+#define L_RESOLUTION 1		///< Number of lattice sites per unit length
 
 // Physical dimensions
-#define L_BX 2.0		///< End of domain-x
-#define L_BY 1.0 		///< End of domain-y
+#define L_BX 20.0		///< End of domain-x
+#define L_BY 10.0 		///< End of domain-y
 #define L_BZ 1.0		///< End of domain-z
 
 // Physical velocity
@@ -202,12 +202,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_IBB_ON_GRID_LEV L_IB_ON_LEV		///< Provide grid level on which object should be added
 	#define L_IBB_ON_GRID_REG L_IB_ON_REG		///< Provide grid region on which object should be added
 	// Following specified in physical distances
-	#define L_START_IBB_X 0.5		///< Start X of object bounding box
-	#define L_START_IBB_Y 0.35		///< Start Y of object bounding box
+	#define L_START_IBB_X 5.0		///< Start X of object bounding box
+	#define L_START_IBB_Y 2.0		///< Start Y of object bounding box
 	#define L_CENTRE_IBB_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_IBB_LENGTH 0.3		///< The object input is scaled based on this dimension
+	#define L_IBB_LENGTH 6.0		///< The object input is scaled based on this dimension
 	#define L_IBB_SCALE_DIRECTION eYDirection	///< Scale in this direction (specify as enumeration)
-	#define L_IBB_REF_LENGTH 0.2	///< Reference length to be used in the definition of Reynolds number
+	#define L_IBB_REF_LENGTH 6.0	///< Reference length to be used in the definition of Reynolds number
 
 // Default global properties
 #define L_NUM_MARKERS 31		///< Number of Lagrange points to use when building a prefab body (approximately)

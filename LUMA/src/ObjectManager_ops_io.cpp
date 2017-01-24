@@ -471,7 +471,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	do {
 
 		// If on this rank get its indices
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g) && !GridUtils::isOnRecvLayer(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
 		{
 			// Increment counter
 			a++;

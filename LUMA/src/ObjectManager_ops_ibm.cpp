@@ -245,16 +245,17 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		+ "/IBsupport_" + std::to_string(ib)
 		+ "_rank" + std::to_string(mpim->my_rank)
 		+ ".out", std::ios::app);
+
+		// Write out the first (nearest) support marker
 	if (m == 0)
-	{
 		supportout << "Marker\tRank\tX\tY\tZ" << std::endl;
-		supportout
-			<< m << "\t"
-			<< iBody[ib].markers[m].support_rank.back() << "\t"
-			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
-			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
-			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << std::endl;		
-	}
+	supportout
+		<< m << "\t"
+		<< iBody[ib].markers[m].support_rank.back() << "\t"
+		<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
+		<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
+		<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << std::endl;
+
 #endif
 
 
@@ -302,16 +303,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 					else
 					{
 
-#ifdef L_IBM_DEBUG
-						// DEBUG -- add this support point to the list
-						supportout
-							<< m << "\t"
-							<< iBody[ib].markers[m].support_rank.back() << "\t"
-							<< estimated_position[eXDirection] << "\t"
-							<< estimated_position[eYDirection] << "\t"
-							<< estimated_position[eZDirection] << std::endl;
-#endif
-
 						// Lies within support region so add support point data
 						iBody[ib].markers[m].supp_i.push_back(i);
 						iBody[ib].markers[m].supp_j.push_back(j);
@@ -348,6 +339,23 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 							// Owned by a neighbour so correct the support rank
 							iBody[ib].markers[m].support_rank.back() = mpim->neighbour_rank[owner_direction];
 						}
+
+						// Reset estimated rank offset
+						estimated_rank_offset[eXDirection] = 0;
+						estimated_rank_offset[eYDirection] = 0;
+#if (L_DIMS == 3)
+						estimated_rank_offset[eZDirection] = 0;
+#endif
+#endif
+
+#ifdef L_IBM_DEBUG
+						// DEBUG -- add this support point to the list
+						supportout
+							<< m << "\t"
+							<< iBody[ib].markers[m].support_rank.back() << "\t"
+							<< estimated_position[eXDirection] << "\t"
+							<< estimated_position[eYDirection] << "\t"
+							<< estimated_position[eZDirection] << std::endl;
 #endif
 					}
 				}

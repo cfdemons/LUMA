@@ -490,8 +490,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->z.erase(_PCpts->z.begin() + a);
 		}
 
-		*GridUtils::logfile << std::to_string(loc) << std::endl;
-
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes

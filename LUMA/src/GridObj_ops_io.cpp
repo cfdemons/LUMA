@@ -842,12 +842,14 @@ int GridObj::io_hdf5(double tval) {
 	if (level == 0)	{
 		// Global communicator
 		status = H5Pset_fapl_mpio(
-			plist_id, mpim->world_comm, info);
+			plist_id, mpim->world_comm, info
+			);
 	}
 	else {
 		// Appropriate sub-grid communicator
 		status = H5Pset_fapl_mpio(
-			plist_id, mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS], info);
+			plist_id, mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS], info
+			);
 	}
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
 

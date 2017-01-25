@@ -173,7 +173,7 @@ void MpiManager::mpi_init() {
 	 * discrete voxel centre of the previous grid. */
 
 	// Get base dh
-	double dh = L_BX / L_N;
+	double dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
 	int idx;
 
 	// Loop over every sub-grid
@@ -325,7 +325,8 @@ void MpiManager::mpi_gridbuild( ) {
 	cellsLastDomain[2] = 0;
 
 	//Loop over dimensions
-	for (size_t d = 0; d < L_DIMS; d++){
+	for (size_t d = 0; d < L_DIMS; d++)
+	{
 
 		//Calculate the size of each domain
 		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
@@ -336,19 +337,23 @@ void MpiManager::mpi_gridbuild( ) {
 		//Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
 		{
-			L_ERROR("Last core in dir = " + std::to_string(d) + " has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x, logout);
+			L_ERROR("Last core in dir = " + std::to_string(d) + 
+				" has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x.", logout);
 		}
 	}
 
 	//Fill the cRankSize arrays
 	int ind = 0;
-	for (int i = 0; i < numCores[0]; i++){
+	for (int i = 0; i < numCores[0]; i++)
+	{
 		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
 
-		for (int j = 0; j < numCores[1]; j++){
+		for (int j = 0; j < numCores[1]; j++)
+		{
 			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
 
-			for (int k = 0; k < numCores[2]; k++){
+			for (int k = 0; k < numCores[2]; k++)
+			{
 				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
 				cRankSizeX[ind] = sX;
 				cRankSizeY[ind] = sY;
@@ -365,9 +370,9 @@ void MpiManager::mpi_gridbuild( ) {
 	// Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++) {
 
-		if (MPI_dims[d] == 1) {
+		if (dimensions[d] == 1) {
 			// If only 1 rank in this direction local grid is same size a global grid
-			local_size.push_back( global_dims[d] );
+			local_size.push_back( global_size[d][0] );
 
 		} else {
 
@@ -511,27 +516,25 @@ void MpiManager::mpi_gridbuild( ) {
 		)
 	) {
 
-		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." +
-
-			// Tell user size it should be
-				" Z (left/right): " +
-				cRankSizeZ[neighbour_rank[0]] / dh + " needed " + local_size[2]-2 + ", " +
-				cRankSizeZ[neighbour_rank[1]] / dh + " needed " + local_size[2]-2 + ", " +
-				" Z (up/down): " +
-				cRankSizeZ[neighbour_rank[4]] / dh + " needed " + local_size[2]-2 + ", " +
-				cRankSizeZ[neighbour_rank[5]] / dh + " needed " + local_size[2]-2 + ", " +
-				" Y (left/right): " +
-				cRankSizeY[neighbour_rank[0]] / dh + " needed " + local_size[1]-2 + ", " +
-				cRankSizeY[neighbour_rank[1]] / dh + " needed " + local_size[1]-2 + ", " +
-				" Y (front/back): " +
-				cRankSizeY[neighbour_rank[8]] / dh + " needed " + local_size[1]-2 + ", " +
-				cRankSizeY[neighbour_rank[9]] / dh + " needed " + local_size[1]-2 + ", " +
-				" X (up/down): " +
-				cRankSizeX[neighbour_rank[4]] / dh + " needed " + local_size[0]-2 + ", " +
-				cRankSizeX[neighbour_rank[5]] / dh + " needed " + local_size[0]-2 + ", " +
-				" X (front/back): " +
-				cRankSizeX[neighbour_rank[8]] / dh + " needed " + local_size[0]-2 + ", " +
-				cRankSizeX[neighbour_rank[9]] / dh + " needed " + local_size[0]-2
+		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting. " +
+			std::to_string("Z (left/right): ") +
+			std::to_string(cRankSizeZ[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
+			std::to_string(cRankSizeZ[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
+			" Z (up/down): " +
+			std::to_string(cRankSizeZ[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
+			std::to_string(cRankSizeZ[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
+			" Y (left/right): " +
+			std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+			std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+			" Y (front/back): " +
+			std::to_string(cRankSizeY[neighbour_rank[8]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+			std::to_string(cRankSizeY[neighbour_rank[9]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+			" X (up/down): " +
+			std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
+			std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
+			" X (front/back): " +
+			std::to_string(cRankSizeX[neighbour_rank[8]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
+			std::to_string(cRankSizeX[neighbour_rank[9]] / dh) + " needed " + std::to_string(local_size[0]-2)
 
 		, MpiManager::logout);
 
@@ -548,15 +551,14 @@ void MpiManager::mpi_gridbuild( ) {
 		)
 	) {
 
-		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." +
+		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting. " +
 
-			// Tell user size it should be
-			" Y (left/right): " +
-			cRankSizeY[neighbour_rank[0]] / dh + " needed " + local_size[1]-2 + ", " +
-			cRankSizeY[neighbour_rank[1]] / dh + " needed " + local_size[1]-2 + ", " +
+			std::string("Y (left/right): ") +
+			std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
+			std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
 			" X (up/down): " +
-			cRankSizeX[neighbour_rank[4]] / dh << " needed " + local_size[0]-2 + ", " +
-			cRankSizeX[neighbour_rank[5]] / dh << " needed " + local_size[0]-2
+			std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0] - 2) + ", " +
+			std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0] - 2)
 
 			, MpiManager::logout);
 

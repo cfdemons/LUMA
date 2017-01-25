@@ -65,7 +65,8 @@ template <typename T>
 void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim,
 	GridObj *g, T *data, hid_t hdf_datatype,
-	bool *TL_present, int TL_thickness, MpiManager::phdf5_struct hdf_data) {
+	bool *TL_present, int TL_thickness,
+	MpiManager::phdf5_struct hdf_data) {
 
 
 	// Writable region indicies from the MPIM

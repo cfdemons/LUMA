@@ -69,4 +69,6 @@ int IBInfo::mapToMpiStruct(eIBInfoType type)
 
 		break;
 	}
+
+	return 0;
 }

@@ -50,6 +50,7 @@
 #include <sstream>
 #include <numeric>
 #include <assert.h>
+#include <string>
 
 // Check OS is Windows or not
 #ifdef _WIN32

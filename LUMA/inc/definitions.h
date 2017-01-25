@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -138,8 +138,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_RESOLUTION 40		///< Number of lattice sites per unit length
 
 // Physical dimensions
-#define L_BY 50 		///< End of domain-y
-#define L_BZ 25		///< End of domain-z
+#define L_BX 1.0
+#define L_BY 1.0 		///< End of domain-y
+#define L_BZ 1.0		///< End of domain-z
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]

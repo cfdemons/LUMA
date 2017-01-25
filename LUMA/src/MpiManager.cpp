@@ -336,7 +336,7 @@ void MpiManager::mpi_gridbuild( ) {
 		//Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
 		{
-			L_ERROR("Last core in dir = " + std::to_string(d) + " has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x, logout);
+			L_ERROR("Last core in dir = " + std::to_string(d) + " has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x", logout);
 		}
 	}
 
@@ -365,9 +365,9 @@ void MpiManager::mpi_gridbuild( ) {
 	// Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++) {
 
-		if (MPI_dims[d] == 1) {
+		if (dimensions[d] == 1) {
 			// If only 1 rank in this direction local grid is same size a global grid
-			local_size.push_back( global_dims[d] );
+			local_size.push_back( global_size[d][0] );
 
 		} else {
 
@@ -548,17 +548,17 @@ void MpiManager::mpi_gridbuild( ) {
 		)
 	) {
 
-		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." +
+		//L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting." +
 
-			// Tell user size it should be
-			" Y (left/right): " +
-			cRankSizeY[neighbour_rank[0]] / dh + " needed " + local_size[1]-2 + ", " +
-			cRankSizeY[neighbour_rank[1]] / dh + " needed " + local_size[1]-2 + ", " +
-			" X (up/down): " +
-			cRankSizeX[neighbour_rank[4]] / dh << " needed " + local_size[0]-2 + ", " +
-			cRankSizeX[neighbour_rank[5]] / dh << " needed " + local_size[0]-2
+		//	// Tell user size it should be
+		//	" Y (left/right): " +
+		//	std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+		//	std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
+		//	" X (up/down): " +
+		//	std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
+		//	std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0]-2)
 
-			, MpiManager::logout);
+		//	, MpiManager::logout);
 
 		 }
 
@@ -1280,7 +1280,7 @@ void MpiManager::mpi_updateLoadInfo() {
 	}
 
 	// Pass active cell count to master
-	long *cell_counts;
+	long *cell_counts = nullptr;
 	if (my_rank == 0) {
 
 		// Allocate space for receive buffer

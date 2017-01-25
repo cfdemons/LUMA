@@ -42,17 +42,18 @@ class IBInfo
 public:
 	// Default Constructor
 	IBInfo();
-	IBInfo(IBBody *iBody, eIBInfoType type);
+	IBInfo(IBBody *iBody, int m, eIBInfoType type);
 
 	// Methods
-	int mapToMpiStruct(eIBInfoType type);
+	int mapToMpiStruct(eIBInfoType type, MPI_Datatype *mpi_struct_type);
 
-private:
+public:
+
 	// Possible member data
-	std::vector<double> voxel_centre_X;
-	std::vector<double> voxel_centre_Y;
-	std::vector<double> voxel_centre_Z;
-	std::vector<double> delta_sum;
+	double markerX;
+	double markerY;
+	double markerZ;
+	//std::vector<double> deltaVals;	// ** Could solve this using arrays with a buffer size that will always have enough space for information (plus a value telling you how many support points there are)
 
 };
 

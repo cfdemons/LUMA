@@ -574,12 +574,51 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 #ifdef L_BUILD_FOR_MPI
 
-	// Create message object
-	IBInfo *msg_deltas = new IBInfo(&iBody[ib], eIBDeltaSum);
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
 
-	// TODO: The following sections of implementation
+	// Create the vector of structs that needs to be sent
+	std::vector<IBInfo> msg_deltas;
+	for (int m = 0; m < iBody[ib].markers.size(); m++)
+		msg_deltas.emplace_back(&iBody[ib], m, eIBDeltaSum);
 
-	// Map the IBInfo to an MPI_Type_struct object
+
+	if (mpim->my_rank == 1) {
+		std::cout << "Rank " << mpim->my_rank << std::endl;
+		std::cout << "Size of vector is " << msg_deltas.size() << std::endl;
+		for (int i = 0; i < msg_deltas.size(); i++) {
+			std::cout << msg_deltas[i].markerX << " " << msg_deltas[i].markerY << " " <<  msg_deltas[i].markerZ << std::endl;
+		}
+	}
+
+	// Map the IBInfo to an MPI_Type_struct object (just use the first element of vector to get the mapping)
+	MPI_Datatype mpi_struct_type;
+	msg_deltas[0].mapToMpiStruct(eIBDeltaSum, &mpi_struct_type);
+
+
+	if (mpim->my_rank == 1) {
+		int vecSizeSend = msg_deltas.size();
+		MPI_Send(&vecSizeSend, 1, MPI_INT, 0, 99, MPI_COMM_WORLD);
+
+		MPI_Send(&msg_deltas.front(), vecSizeSend, mpi_struct_type, 0, 98, MPI_COMM_WORLD);
+	}
+
+	std::vector<IBInfo> msg_deltasRecv;
+	if (mpim->my_rank == 0) {
+		int vecSizeRecv;
+		MPI_Recv(&vecSizeRecv, 1, MPI_INT, 1, 99, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+		msg_deltasRecv.resize(vecSizeRecv);
+//		std::cout << "Size of vector is " << vecSizeRecv << std::endl;
+//		std::cout << "Size of vector is " << msg_deltasRecv.size() << std::endl;
+		MPI_Recv(&msg_deltasRecv.front(), vecSizeRecv, mpi_struct_type, 1, 98, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+		std::cout << "Rank " << mpim->my_rank << std::endl;
+		std::cout << "Size of vector is " << msg_deltasRecv.size() << std::endl;
+		for (int i = 0; i < msg_deltasRecv.size(); i++) {
+			std::cout << msg_deltasRecv[i].markerX << " " << msg_deltasRecv[i].markerY << " " << msg_deltasRecv[i].markerZ << std::endl;
+		}
+	}
 
 
 	// Send to managing rank
@@ -601,7 +640,7 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 
 	// Destroy objects once we have finished
-	delete msg_deltas;
+	//delete msg_deltas;
 	delete msg_epsilon;
 
 #endif
@@ -671,9 +710,6 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 
 #ifdef L_IBM_DEBUG
-
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
 
 	// DEBUG -- write out A
 	std::ofstream Aout;

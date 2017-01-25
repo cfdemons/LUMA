@@ -556,11 +556,11 @@ void MpiManager::mpi_gridbuild( ) {
 			std::string("Y (left/right): ") +
 			std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
 			std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
-		//	" X (up/down): " +
+			" X (up/down): " +
 			std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0] - 2) + ", " +
 			std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0] - 2)
 
-		//	, MpiManager::logout);
+			, MpiManager::logout);
 
 		 }
 
@@ -1282,7 +1282,7 @@ void MpiManager::mpi_updateLoadInfo() {
 	}
 
 	// Pass active cell count to master
-	long *cell_counts = nullptr;
+	long *cell_counts;
 	if (my_rank == 0) {
 
 		// Allocate space for receive buffer

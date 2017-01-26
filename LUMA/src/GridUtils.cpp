@@ -601,8 +601,7 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 	else
 	{
 		if (loc != nullptr) *loc = eNone;
-		result = false;
-		return result;
+		return false;
 	}
 
 	// If a grid is supplied then get its index on the grid
@@ -646,15 +645,12 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 			pGrid.XPos[i] < mpim->global_edges[eXMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;	// Possibility of intersection
-			break;
+			break; 
 		}
 	}
-	// If got to end of voxels and not in range then does not intersect
-	if (i == pGrid.N_lim - 1)
-	{
-		result = false;
-		return result;
-	}
+	// If result has not be changed to true then no X intersect so return false result
+	if (!result) return result;
+	else result = false;	// If not reset search result flag
 
 	// Y //
 	for (i = 0; i < pGrid.M_lim; ++i)
@@ -666,13 +662,11 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 			break;
 		}
 	}
-	if (i == pGrid.M_lim - 1)
-	{
-		result = false;
-		return result;
-	}
-
+	if (!result) return result;
+	
 #if (L_DIMS == 3)
+	else result = false;
+
 	// Z //
 	for (i = 0; i < pGrid.K_lim; ++i)
 	{
@@ -683,11 +677,7 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 			break;
 		}
 	}
-	if (i == pGrid.K_lim - 1)
-	{
-		result = false;
-		return result;
-	}
+	if (!result) return result;
 #endif
 
 	return result;
@@ -1193,7 +1183,8 @@ void GridUtils::getEnclosingVoxel(double x, double y, double z, const GridObj *g
 void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirection dir, int *ijk) {
 
 	// Declarations
-	int offset, idx;
+	int offset, idxLower, idxUpper;
+	double offset_baseline;
 
 	// Get MpiManager instance
 	MpiManager *mpim = MpiManager::getInstance();
@@ -1202,20 +1193,52 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 
 	if (dir == eXDirection)
 	{
-		idx = eXMin;
+		idxLower = eXMin;
+		idxUpper = eXMax;
 	}
 	else if (dir == eYDirection)
 	{
-		idx = eYMin;
+		idxLower = eYMin;
+		idxUpper = eYMax;
 	}
 	else if (dir == eZDirection)
 	{
-		idx = eZMin;
+		idxLower = eZMin;
+		idxUpper = eZMax;
+	}
+
+	// Set offset baseline to grid start edge of grid
+	offset_baseline = mpim->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
+
+	/* If less than the lower grid core edge but is on the upper halo
+	 * then must be a TL site in a periodically wrapped upper halo. */
+	if (xyz < mpim->rank_core_edge[idxLower][mpim->my_rank] && 
+		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxUpper)))
+	{
+		// Set to projected position off top of rank core to get correct ijk
+		xyz = mpim->rank_core_edge[idxUpper][mpim->my_rank] + 
+			abs(xyz - mpim->global_edges[idxLower][g->level]);
+
+		// Set offset baseline to the upper edge of rank core
+		offset_baseline = mpim->rank_core_edge[idxUpper][mpim->my_rank];
+	}
+
+	/* If greater than the upper grid core edge but is on the lower halo
+	* then must be a TL site in a periodically wrapped lower halo. */
+	else if (xyz > mpim->rank_core_edge[idxUpper][mpim->my_rank] && 
+		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxLower)))
+	{
+		// Set to projected position off bottom of rank core to get correct ijk
+		xyz = mpim->rank_core_edge[idxLower][mpim->my_rank] - 
+			abs(xyz - mpim->global_edges[idxUpper][g->level]);
+
+		// Set offset baseline to the upper edge of rank core
+		offset_baseline = mpim->rank_core_edge[idxLower][mpim->my_rank];
 	}
 
 	// Compute number of complete cells between point and edge of rank core
 	*ijk = static_cast<int>(
-		std::floor((xyz - mpim->rank_core_edge[idx][mpim->my_rank]) / g->dh)
+		std::floor((xyz - mpim->rank_core_edge[idxLower][mpim->my_rank]) / g->dh)
 		);
 
 	/* Compute offset from global edge i.e. number of voxels between grid edge and 
@@ -1223,8 +1246,7 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	 * there may be round-off errors which might give an non-zero answer when zero 
 	 * was expected) */
 	offset = static_cast<int>(
-		std::round((mpim->rank_core_edge[idx][mpim->my_rank] - 
-		mpim->global_edges[idx][g->level + g->region_number * L_NUM_LEVELS]) / g->dh)
+		std::round((mpim->rank_core_edge[idxLower][mpim->my_rank] - offset_baseline) / g->dh)
 		);
 
 	/* If the origin is not on the halo but outside this rank to the left then offset
@@ -1243,8 +1265,6 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 
 	// Correct the ijk position
 	*ijk += offset;
-
-
 
 	return;
 

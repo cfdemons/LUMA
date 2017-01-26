@@ -62,14 +62,12 @@ public :
 	int neighbour_coords[L_DIMS][L_MPI_DIRS];	///< Coordinates in MPI topology of neighbour ranks
 
 	// Sizes of each of the MPI domains
-#ifdef L_MPI_PLANAR_DECOMPOSITION
 	/// Number of sites in X direction for each custom rank.
 	std::vector<int> cRankSizeX;
 	/// Number of sites in Y direction for each custom rank.
 	std::vector<int> cRankSizeY;
 	/// Number of sites in Z direction for each custom rank.
 	std::vector<int> cRankSizeZ;
-#endif
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)

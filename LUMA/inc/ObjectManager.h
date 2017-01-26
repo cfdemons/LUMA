@@ -102,6 +102,10 @@ public:
 						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
 																	// linear system required by finding epsilon
 
+	// IBM-MPI methods //
+	void ibm_mpi_communicate(eIBInfoType type, IBBody *iBody, std::vector<IBInfo> &numMarkers);
+	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<IBInfo> &numMarkers);
+
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
 	void ibm_positionUpdate(int ib);			// Updates the position of deformable body markers.

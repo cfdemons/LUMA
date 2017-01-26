@@ -375,6 +375,10 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.9 }, { 0.75 } };
 // Set dependent options
 #if (L_DIMS == 3)
 
+	#ifdef L_IBM_ON
+		#define L_SUPPORT_SIZE 27
+	#endif
+
 	#ifdef L_USE_KBC_COLLISION
 		#define L_NUM_VELS 27		///< Number of lattice velocities
 	#else
@@ -384,6 +388,11 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = { { 0.9 }, { 0.75 } };
 	#define L_MPI_DIRS 26	///< Number of MPI directions
 
 #else
+
+	#ifdef L_IBM_ON
+		#define L_SUPPORT_SIZE 9
+	#endif
+
 	#define L_NUM_VELS 9		// Use D2Q9
 
 	// MPI config to 2D

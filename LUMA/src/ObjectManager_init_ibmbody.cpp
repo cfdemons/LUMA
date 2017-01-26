@@ -369,8 +369,6 @@ void ObjectManager::ibm_buildBody(int body_type) {
 void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner) {
 
 	// Add new body
-	iBody.emplace_back(owner, iBody.size());
 	iBody.back().makeBody(_PCpts);
-
 }
 // ************************************************************************** //

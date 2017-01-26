@@ -42,6 +42,13 @@ IBBody::IBBody(GridObj* g, size_t id)
 	this->_Owner = g;
 	this->id = id;
 	this->groupID = 0;	// Default ID
+
+#ifdef L_BUILD_FOR_MPI
+
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
+	this->owningRank = this->id % mpim->num_ranks;	// Set owning rank (need a better way of doing this probably)
+#endif
 };
 
 /// Default destructor

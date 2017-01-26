@@ -158,9 +158,15 @@ void ObjectManager::ibm_initialise() {
 			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
 
+#ifdef L_BUILD_FOR_MPI
+
+		// Get the owning rank of the iBody to gather how many markers it needs from each process
+		std::vector<IBInfo> numMarkers;
+		ibm_mpi_communicate(eBodyNumMarkers, &iBody[ib], numMarkers);
+#endif
+
 		// Find epsilon for the body
 		ibm_findEpsilon(ib);
-
 	}
 }
 
@@ -576,49 +582,6 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
-
-	// Create the vector of structs that needs to be sent
-	std::vector<IBInfo> msg_deltas;
-	for (int m = 0; m < iBody[ib].markers.size(); m++)
-		msg_deltas.emplace_back(&iBody[ib], m, eIBDeltaSum);
-
-
-	if (mpim->my_rank == 1) {
-		std::cout << "Rank " << mpim->my_rank << std::endl;
-		std::cout << "Size of vector is " << msg_deltas.size() << std::endl;
-		for (int i = 0; i < msg_deltas.size(); i++) {
-			std::cout << msg_deltas[i].markerX << " " << msg_deltas[i].markerY << " " <<  msg_deltas[i].markerZ << std::endl;
-		}
-	}
-
-	// Map the IBInfo to an MPI_Type_struct object (just use the first element of vector to get the mapping)
-	MPI_Datatype mpi_struct_type;
-	msg_deltas[0].mapToMpiStruct(eIBDeltaSum, &mpi_struct_type);
-
-
-	if (mpim->my_rank == 1) {
-		int vecSizeSend = msg_deltas.size();
-		MPI_Send(&vecSizeSend, 1, MPI_INT, 0, 99, MPI_COMM_WORLD);
-
-		MPI_Send(&msg_deltas.front(), vecSizeSend, mpi_struct_type, 0, 98, MPI_COMM_WORLD);
-	}
-
-	std::vector<IBInfo> msg_deltasRecv;
-	if (mpim->my_rank == 0) {
-		int vecSizeRecv;
-		MPI_Recv(&vecSizeRecv, 1, MPI_INT, 1, 99, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-		msg_deltasRecv.resize(vecSizeRecv);
-//		std::cout << "Size of vector is " << vecSizeRecv << std::endl;
-//		std::cout << "Size of vector is " << msg_deltasRecv.size() << std::endl;
-		MPI_Recv(&msg_deltasRecv.front(), vecSizeRecv, mpi_struct_type, 1, 98, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-		std::cout << "Rank " << mpim->my_rank << std::endl;
-		std::cout << "Size of vector is " << msg_deltasRecv.size() << std::endl;
-		for (int i = 0; i < msg_deltasRecv.size(); i++) {
-			std::cout << msg_deltasRecv[i].markerX << " " << msg_deltasRecv[i].markerY << " " << msg_deltasRecv[i].markerZ << std::endl;
-		}
-	}
 
 
 	// Send to managing rank

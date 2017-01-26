@@ -23,11 +23,8 @@ class IBBody;
 ///	\enum eIBInfoType
 ///	\brief	Type of container required.
 enum eIBInfoType {
+	eBodyNumMarkers,
 	eIBDeltaSum,
-	eIBEpsilon,
-	eIBVelocityInterpolation,
-	eIBVelocitySpreading,
-	eIBMarkerPositions
 };
 
 
@@ -42,19 +39,26 @@ class IBInfo
 public:
 	// Default Constructor
 	IBInfo();
-	IBInfo(IBBody *iBody, int m, eIBInfoType type);
+	IBInfo(eIBInfoType type, IBBody *iBody, std::vector<int> &buffer);
+	IBInfo(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer);
 
 	// Methods
-	int mapToMpiStruct(eIBInfoType type, MPI_Datatype *mpi_struct_type);
+
 
 public:
 
-	// Possible member data
+	// Needed for all cases
+	MPI_Datatype mpi_type;
+
+	// Data needed for sending to body owner
+	int sendingRank;
+	int nMarkers;
+
+	// Data needed for epsilon calculation
 	double markerX;
 	double markerY;
 	double markerZ;
-	//std::vector<double> deltaVals;	// ** Could solve this using arrays with a buffer size that will always have enough space for information (plus a value telling you how many support points there are)
-
+	double deltaVals[L_SUPPORT_SIZE];
 };
 
 #endif	// L_IBINFO_H

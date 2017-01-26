@@ -25,8 +25,36 @@ IBInfo::IBInfo()
 
 /// \brief Custom constructor for different types of message containers.
 ///	\param	iBody	pointer to the iBody being packed.
+///	\param	m		marker.
 ///	\param	type	the type of container to be created.
-IBInfo::IBInfo(IBBody *iBody, int m, eIBInfoType type)
+IBInfo::IBInfo(eIBInfoType type, IBBody *iBody, std::vector<int> &buffer) {
+
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	switch (type)
+	{
+
+	case eBodyNumMarkers:
+
+		// Set the sending rank and the number of markers it has to send to the owning rank
+		this->sendingRank = mpim->my_rank;
+		this->nMarkers = iBody->markers.size();
+		this->mpi_type = MPI_INT;
+
+		// Fill the vector with required data
+		buffer.push_back(this->sendingRank);
+		buffer.push_back(this->nMarkers);
+
+		break;
+	}
+}
+
+/// \brief Custom constructor for different types of message containers.
+///	\param	iBody	pointer to the iBody being packed.
+///	\param	m		marker.
+///	\param	type	the type of container to be created.
+IBInfo::IBInfo(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer)
 {
 
 	switch (type)
@@ -41,66 +69,8 @@ IBInfo::IBInfo(IBBody *iBody, int m, eIBInfoType type)
 		markerZ = iBody->markers[m].position[eZDirection];
 
 		// Delta values
-		//deltaVals = iBody->markers[m].deltaval;
-
-		break;
-
-		// Add other cases here
-
-	}
-}
-
-///	\brief Maps a version of the IBInfo structure to an MPI_Struct datatype.
-///	\param	type	type of container you want to map.
-///	\return	handle to the MPI struct data.
-int IBInfo::mapToMpiStruct(eIBInfoType type, MPI_Datatype *mpi_struct_type)
-{
-
-	switch (type)
-	{
-
-	case eIBDeltaSum:
-
-		// Create the necessary info for creating the MPI_Type_struct
-		// Number of items to send
-		int count = 3;
-
-		// Size of each array that is being sent
-		int array_of_block_lengths[count];
-		array_of_block_lengths[0] = 1;
-		array_of_block_lengths[1] = 1;
-		array_of_block_lengths[2] = 1;
-		//array_of_block_lengths[3] = deltaVals.size();
-
-		// Get the address of each element that is being sent
-		MPI_Aint markX_addr, markY_addr, markZ_addr, markDelta_addr;
-		MPI_Get_address(&(this->markerX), &markX_addr);
-		MPI_Get_address(&(this->markerY), &markY_addr);
-		MPI_Get_address(&(this->markerZ), &markZ_addr);
-		//MPI_Get_address(&(this->deltaVals.front()), &markDelta_addr);
-
-		// Offsets of the addresses
-		MPI_Aint array_of_displacements[count];
-		array_of_displacements[0] = 0;
-		array_of_displacements[1] = markY_addr - markX_addr;
-		array_of_displacements[2] = markZ_addr - markX_addr;
-		//array_of_displacements[3] = markDelta_addr - markX_addr;
-
-//		std::cout << markX_addr << " " << markY_addr << " " << markZ_addr << " " << markDelta_addr << std::endl;
-//		std::cout << array_of_displacements[0] << " " << array_of_displacements[1] << " " << array_of_displacements[2] << " " << array_of_displacements[3] << std::endl;
-//		std::cout << array_of_block_lengths[0] << " " << array_of_block_lengths[1] << " " << array_of_block_lengths[2] << " " << array_of_block_lengths[3] << std::endl;
-
-
-		// Specify the datatypes
-		MPI_Datatype array_of_types[count];
-		array_of_types[0] = MPI_DOUBLE;
-		array_of_types[1] = MPI_DOUBLE;
-		array_of_types[2] = MPI_DOUBLE;
-		//array_of_types[3] = MPI_DOUBLE;
-
-		// Create and commit the new datatype
-		MPI_Type_create_struct(count, array_of_block_lengths, array_of_displacements, array_of_types, mpi_struct_type);
-		MPI_Type_commit(mpi_struct_type);
+		for (int i = 0; i < iBody->markers[m].deltaval.size(); i++)
+			deltaVals[i] = iBody->markers[m].deltaval[i];
 
 		break;
 	}

@@ -500,6 +500,10 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
+	// Every process still needs to create the iBody
+	if (objtype == eIBBCloud)
+		iBody.emplace_back(g, iBody.size());
+
 	// If there are points left
 	if (!_PCpts->x.empty())	{
 
@@ -544,7 +548,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			break;
 
 		}
-
 	}
 }
 // *****************************************************************************

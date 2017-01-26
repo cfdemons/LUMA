@@ -46,6 +46,7 @@ protected:
 
 	bool flex_rigid;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool deformable;					///< Flag to indicate deformable body: false == rigid; true == deformable
+	int owningRank;						///< ID of the owning rank which will calculate epsilon and structural deformation
 	int groupID;						///< ID of IBbody group -- position updates can be driven from a flexible body in a group
 
 	// Flexible body properties

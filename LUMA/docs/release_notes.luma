@@ -2,7 +2,8 @@ version		=	1.4.0-alpha
 
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.
 
-Issue #104	:	Added option to automatically calculate MPI planar domain decompos
+Issue #104	:	Relaxed restriction requiring uniform decomposition by using a slice generator to decompose.
+Issue #114	:	Allowed the embedding of sub-grids in walls once again after coordinate system and initialisation change.
 
 version		=	1.3.0
 

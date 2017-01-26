@@ -38,8 +38,7 @@ MpiManager::MpiManager()
 	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
 	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
 
-	//Resize the planar mpi domains if L_MPI_PLANAR_DECOMPOSITION is activated
-#ifdef L_MPI_PLANAR_DECOMPOSITION
+	// Resize the MPI domains
 	size_t xSize, ySize, zSize;
 	xSize = L_MPI_XCORES;
 	ySize = L_MPI_YCORES;
@@ -51,7 +50,6 @@ MpiManager::MpiManager()
 	cRankSizeX.resize(xSize*ySize*zSize);
 	cRankSizeY.resize(xSize*ySize*zSize);
 	cRankSizeZ.resize(xSize*ySize*zSize);
-#endif
 }
 
 /// \brief	Default destructor.
@@ -193,10 +191,10 @@ void MpiManager::mpi_init() {
 			global_edges[eZMax][idx] = std::round(cRefEndZ[lev - 1][reg] / dh) * dh;
 
 			// Populate sizes
-			global_size[eXDirection][idx] = static_cast<int>((global_edges[eXMax][idx] - global_edges[eXMin][idx]) / (dh / 2.0));
-			global_size[eYDirection][idx] = static_cast<int>((global_edges[eYMax][idx] - global_edges[eYMin][idx]) / (dh / 2.0));
+			global_size[eXDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eXMax][idx] - global_edges[eXMin][idx]) / dh));
+			global_size[eYDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eYMax][idx] - global_edges[eYMin][idx]) / dh));
 #if (L_DIMS == 3)
-			global_size[eZDirection][idx] = static_cast<int>((global_edges[eZMax][idx] - global_edges[eZMin][idx]) / (dh / 2.0));
+			global_size[eZDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eZMax][idx] - global_edges[eZMin][idx]) / dh));
 #else
 			global_size[eZDirection][idx] = 1;
 #endif
@@ -216,7 +214,7 @@ void MpiManager::mpi_init() {
 
 #ifdef L_MPI_VERBOSE
 	// Print out grid edges to file
-	*logout << "Grid Edges computed and stored as:" << std::endl;
+	*logout << "Global Grid Edges computed and stored as:" << std::endl;
 
 	for (int lev = 0; lev <= L_NUM_LEVELS; ++lev)
 	{
@@ -272,12 +270,11 @@ void MpiManager::mpi_init() {
 		}
 		*logout << "\t): Rank " << neighbour_rank[dir] << std::endl;
 
-#ifdef L_MPI_PLANAR_DECOMPOSITION
 	// If using custom sizes, user must set the L_MPI_ZCORES to 1
 	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
 		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", MpiManager::logout);
 	}
-#endif
+
 #endif
 
 	}
@@ -300,10 +297,8 @@ void MpiManager::mpi_gridbuild( ) {
 	double Lx = L_BX;
 	double dh = Lx / static_cast<double>(L_N);
 
-#ifdef L_MPI_PLANAR_DECOMPOSITION
-	//Fill up the cRankSize arrays with the coordinates of each mpi region. 
-
-	//Auxiliar variables
+	// Fill up the cRankSize arrays with the coordinates of each mpi region. 
+	// Auxiliary variables
 	int numCells[3];
 	int numCores[3];
 	numCells[0] = L_N;
@@ -320,21 +315,21 @@ void MpiManager::mpi_gridbuild( ) {
 	int cellsInDomains[3];
 	int cellsLastDomain[3];
 
-	//Set the last position to 0, just in case we are working with L_DIMS = 2
+	// Set the last position to 0, just in case we are working with L_DIMS = 2
 	cellsInDomains[2] = 0;
 	cellsLastDomain[2] = 0;
 
-	//Loop over dimensions
+	// Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++)
 	{
 
-		//Calculate the size of each domain
+		// Calculate the size of each domain
 		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
 
-		//Calculate the size of the last domain
+		// Calculate the size of the last domain
 		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d]*numCores[d] - numCells[d]);
 
-		//Throw an error if cellsInLast domain is <=0
+		// Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
 		{
 			L_ERROR("Last core in dir = " + std::to_string(d) + 
@@ -342,7 +337,7 @@ void MpiManager::mpi_gridbuild( ) {
 		}
 	}
 
-	//Fill the cRankSize arrays
+	// Fill the cRankSize arrays
 	int ind = 0;
 	for (int i = 0; i < numCores[0]; i++)
 	{
@@ -363,9 +358,6 @@ void MpiManager::mpi_gridbuild( ) {
 		}
 	}
 
-
-#endif 
-
 	// Compute required local grid size
 	// Loop over dimensions
 	for (size_t d = 0; d < L_DIMS; d++) {
@@ -377,9 +369,6 @@ void MpiManager::mpi_gridbuild( ) {
 		} else {
 
 			// Else, find local grid size
-#ifdef L_MPI_PLANAR_DECOMPOSITION
-
-			
 			// Get grids sizes from the arrays
 			switch (d)
 			{
@@ -396,23 +385,11 @@ void MpiManager::mpi_gridbuild( ) {
 			default:
 				break;
 			}
-
-
-
-#else
-			local_size.push_back((global_size[d][0] / dimensions[d]) + 2); // Simple uniform decomposition + overlap
-
-
-
-#endif
 		}
 	}
 
 	// Find positions of edges of each grid excluding the overlap (recv layer)
-#ifdef L_MPI_PLANAR_DECOMPOSITION
-
 	// If using custom sizing need to cumulatively establish how far from origin
-
 	int adj_rank;
 
 	// X edges
@@ -461,25 +438,6 @@ void MpiManager::mpi_gridbuild( ) {
 	rank_core_edge[eZMin][my_rank] = 0.0;
 #endif
 
-
-	
-#else	// Using uniform decomposition
-
-	// Find positions of edges of coarse grid core (excluding the overlap recv layer)
-	rank_core_edge[eXMax][my_rank] = (L_BX / L_MPI_XCORES) * (rank_coords[0] + 1);
-	rank_core_edge[eXMin][my_rank] = rank_core_edge[eXMax][my_rank] - (L_BX / L_MPI_XCORES);
-	rank_core_edge[eYMax][my_rank] = (L_BY / L_MPI_YCORES) * (rank_coords[1] + 1);
-	rank_core_edge[eYMin][my_rank] = rank_core_edge[eYMax][my_rank] - (L_BY / L_MPI_YCORES);
-#if (L_DIMS == 3)
-	rank_core_edge[eZMax][my_rank] = (L_BZ / L_MPI_ZCORES) * (rank_coords[2] + 1);
-	rank_core_edge[eZMin][my_rank] = rank_core_edge[eZMax][my_rank] - (L_BZ / L_MPI_ZCORES);
-#else
-	rank_core_edge[eZMax][my_rank] = L_BZ;
-	rank_core_edge[eZMin][my_rank] = 0.0;
-#endif
-
-#endif
-
 	MPI_Barrier(world_comm);
 
 #ifdef L_MPI_VERBOSE
@@ -496,76 +454,6 @@ void MpiManager::mpi_gridbuild( ) {
 		", " << rank_core_edge[eZMin][my_rank] << "-" << rank_core_edge[eZMax][my_rank] <<
 		")" << std:: endl;
 #endif
-
-
-	// Check my grid size dimensions with the neighbours to make sure it all lines up
-#ifdef L_MPI_PLANAR_DECOMPOSITION
-
-	// 3D check
-#if (L_DIMS == 3)
-	if (
-		(
-		cRankSizeZ[neighbour_rank[0]] / dh != local_size[2] - 2 || cRankSizeZ[neighbour_rank[1]] / dh != local_size[2] - 2 ||
-		cRankSizeY[neighbour_rank[0]] / dh != local_size[1] - 2 || cRankSizeY[neighbour_rank[1]] / dh != local_size[1] - 2
-		 ) || (
-		 cRankSizeZ[neighbour_rank[4]] / dh != local_size[2] - 2 || cRankSizeZ[neighbour_rank[5]] / dh != local_size[2] - 2 ||
-		 cRankSizeX[neighbour_rank[4]] / dh != local_size[0] - 2 || cRankSizeX[neighbour_rank[5]] / dh != local_size[0] - 2
-		 ) || (
-		 cRankSizeX[neighbour_rank[8]] / dh != local_size[0] - 2 || cRankSizeX[neighbour_rank[9]] / dh != local_size[0] - 2 ||
-		 cRankSizeY[neighbour_rank[8]] / dh != local_size[1] - 2 || cRankSizeY[neighbour_rank[9]] / dh != local_size[1] - 2
-		)
-	) {
-
-		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting. " +
-			std::to_string("Z (left/right): ") +
-			std::to_string(cRankSizeZ[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
-			std::to_string(cRankSizeZ[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
-			" Z (up/down): " +
-			std::to_string(cRankSizeZ[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
-			std::to_string(cRankSizeZ[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[2]-2) + ", " +
-			" Y (left/right): " +
-			std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
-			std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
-			" Y (front/back): " +
-			std::to_string(cRankSizeY[neighbour_rank[8]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
-			std::to_string(cRankSizeY[neighbour_rank[9]] / dh) + " needed " + std::to_string(local_size[1]-2) + ", " +
-			" X (up/down): " +
-			std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
-			std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
-			" X (front/back): " +
-			std::to_string(cRankSizeX[neighbour_rank[8]] / dh) + " needed " + std::to_string(local_size[0]-2) + ", " +
-			std::to_string(cRankSizeX[neighbour_rank[9]] / dh) + " needed " + std::to_string(local_size[0]-2)
-
-		, MpiManager::logout);
-
-		 }
-
-#else
-
-	// 2D check
-	if (
-		(
-		cRankSizeY[neighbour_rank[0]] / dh != local_size[1] - 2 || cRankSizeY[neighbour_rank[1]] / dh != local_size[1] - 2
-		) || (
-		cRankSizeX[neighbour_rank[4]] / dh != local_size[0] - 2 || cRankSizeX[neighbour_rank[5]] / dh != local_size[0] - 2
-		)
-	) {
-
-		L_ERROR("Error: Block sizes have been specified in the wrong order, faces do not line up. Exiting. " +
-
-			std::string("Y (left/right): ") +
-			std::to_string(cRankSizeY[neighbour_rank[0]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
-			std::to_string(cRankSizeY[neighbour_rank[1]] / dh) + " needed " + std::to_string(local_size[1] - 2) + ", " +
-			" X (up/down): " +
-			std::to_string(cRankSizeX[neighbour_rank[4]] / dh) + " needed " + std::to_string(local_size[0] - 2) + ", " +
-			std::to_string(cRankSizeX[neighbour_rank[5]] / dh) + " needed " + std::to_string(local_size[0] - 2)
-
-			, MpiManager::logout);
-
-		 }
-
-#endif // L_DIMS == 3
-#endif // L_MPI_PLANAR_DECOMPOSITION
 
 }
 

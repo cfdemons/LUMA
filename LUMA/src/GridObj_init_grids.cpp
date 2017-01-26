@@ -580,7 +580,8 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	}
 
 	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
-	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank]) {
+	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
+	{
 		// Set grid limits to end edge of the rank
 		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
 	}
@@ -609,15 +610,14 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		CoarseLimsY[eMinimum] = position;
 	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
 		CoarseLimsY[eMinimum] = 0;
-
+	
 	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position))
 		CoarseLimsY[eMaximum] = position;
 	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eYMax][mpim->my_rank])
 		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-
 	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
 		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-
+	
 	if (mpim->global_size[eYDirection][mpim_idx] == 2 * mpim->global_size[eYDirection][mpim_idx - 1])
 	{
 		CoarseLimsY[eMinimum] = 0;

@@ -103,8 +103,14 @@ public:
 																	// linear system required by finding epsilon
 
 	// IBM-MPI methods //
-	void ibm_mpi_communicate(eIBInfoType type, IBBody *iBody, std::vector<IBInfo> &numMarkers);
-	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<IBInfo> &numMarkers);
+	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<int> &buffer);
+	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer);
+
+	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<int> &rankID, std::vector<int> &numMarkers);
+
+	void ibm_getNumMarkers(eIBInfoType type, IBBody *iBody, std::vector<int> &rankID, std::vector<int> &numMarkers);
+	void ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<double> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers);
+
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.

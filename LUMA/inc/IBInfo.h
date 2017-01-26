@@ -24,6 +24,7 @@ class IBBody;
 ///	\brief	Type of container required.
 enum eIBInfoType {
 	eBodyNumMarkers,
+	eBodyMarkerPositions,
 	eIBDeltaSum,
 };
 

@@ -158,13 +158,6 @@ void ObjectManager::ibm_initialise() {
 			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
 
-#ifdef L_BUILD_FOR_MPI
-
-		// Get the owning rank of the iBody to gather how many markers it needs from each process
-		std::vector<IBInfo> numMarkers;
-		ibm_mpi_communicate(eBodyNumMarkers, &iBody[ib], numMarkers);
-#endif
-
 		// Find epsilon for the body
 		ibm_findEpsilon(ib);
 	}
@@ -583,6 +576,19 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
 
+	// Get the owning rank of the iBody to gather how many markers it needs from each process
+	std::vector<int> rankID;
+	std::vector<int> numMarkers;
+	ibm_getNumMarkers(eBodyNumMarkers, &iBody[ib], rankID, numMarkers);
+
+	// Send the marker positions
+	std::vector<double> markerPos;
+	ibm_getMarkerPositions(eBodyMarkerPositions, &iBody[ib], markerPos, rankID, numMarkers);
+
+
+
+
+
 
 	// Send to managing rank
 
@@ -594,7 +600,6 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 
 	// Create new message with all epsilon values for every point
-	IBInfo *msg_epsilon = new IBInfo();
 
 	// Send messages to all ranks
 
@@ -603,8 +608,6 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 
 	// Destroy objects once we have finished
-	//delete msg_deltas;
-	delete msg_epsilon;
 
 #endif
 

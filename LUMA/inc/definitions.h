@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 50000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -121,9 +121,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
+
 
 /*
 *******************************************************************************
@@ -133,11 +134,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 40		///< Number of coarse lattice sites per unit length
 
 // Non-dimensional domain dimensions
-#define L_BX 15		///< End of domain in X (non-dimensional units)
-#define L_BY 4 		///< End of domain in Y (non-dimensional units)
+#define L_BX 10		///< End of domain in X (non-dimensional units)
+#define L_BY 10 	///< End of domain in Y (non-dimensional units)
 #define L_BZ 10		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -162,7 +163,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 150			///< Desired Reynolds number
 
 // nu computed based on above selections
 
@@ -299,13 +300,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Bounce-back objects from point clouds
 #define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_OBJECT_ON_GRID_LEV 3		///< Provide grid level on which object should be added 
+	#define L_OBJECT_ON_GRID_LEV 2		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_OBJECT_X ((L_BX  / 2 - 1) / 2)		///< Start of object bounding box in X direction
-	#define L_START_OBJECT_Y (static_cast<double>(L_BY) / static_cast<double>(L_M))			///< Start of object bounding box in Y direction
-	#define L_CENTRE_OBJECT_Z (L_BZ / 2)			///< Centre of object bounding box in Z direction
-	#define L_OBJECT_LENGTH 1.0						///< The object input is scaled based on this dimension
+	#define L_START_OBJECT_X ((L_BX - 0.94) / 2.0)		///< Start of object bounding box in X direction
+	#define L_START_OBJECT_Y ((L_BY - 0.34) / 2.0)		///< Start of object bounding box in Y direction
+	#define L_CENTRE_OBJECT_Z 0.5			///< Centre of object bounding box in Z direction
+	#define L_OBJECT_LENGTH 0.94			///< The object input is scaled based on this dimension
 	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
 	#define L_OBJECT_REF_LENGTH 1.0		///< Reference length to be used in the definition of Reynolds number
 
@@ -331,39 +332,38 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
-static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BX / 2 - 4) / 2.0) },
-	{ ((L_BX / 2 - 3) / 2.0) },
-	{ ((L_BX / 2 - 2) / 2.0) }
+static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
+{ 	{ ((L_BX - 3) / 2.0) },
+	{ ((L_BX - 2) / 2.0) }
 };
-static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BX / 2 + 7) / 2.0) },
-	{ ((L_BX / 2 + 5) / 2.0) },
-	{ ((L_BX / 2 + 3) / 2.0) }
+static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = 
+{
+	{ ((L_BX + 3) / 2.0) },
+	{ ((L_BX + 2) / 2.0) }
 };
-static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0 },
-	{ 0 },
-	{ 0 }
+static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
+{
+	{ ((L_BY - 3) / 2.0) },
+	{ ((L_BY - 2) / 2.0) }
 };
-static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.5 },
-	{ 2.0 },
-	{ 1.5 }
+static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
+{
+	{ ((L_BY + 3) / 2.0) },
+	{ ((L_BY + 2) / 2.0) }
 };
-static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BZ - 4) / 2.0) },
+static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
+{
 	{ ((L_BZ - 3) / 2.0) },
 	{ ((L_BZ - 2) / 2.0) }
 };
-static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BZ + 4) / 2.0) },
+static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
+{
 	{ ((L_BZ + 3) / 2.0) },
 	{ ((L_BZ + 2) / 2.0) }
 };

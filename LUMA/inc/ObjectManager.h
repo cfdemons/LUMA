@@ -95,7 +95,7 @@ public:
 	void ibm_initialiseSupport(int ib, int m, 
 		int s, double estimated_position[]);		// Initialises data associated with the support points.
 	void ibm_computeForce(int ib);			// Compute restorative force at each marker in ib-th body.
-	double ibm_findEpsilon(int ib);			// Method to find epsilon weighting parameter for ib-th body.
+	double ibm_findEpsilon();			// Method to find epsilon weighting parameter for ib-th body.
 	void ibm_moveBodies();					// Update all IBBody positions and support.
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
 		std::vector<double>& bVector, std::vector<double>& epsilon,
@@ -106,10 +106,12 @@ public:
 	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<int> &buffer);
 	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer);
 
+	void ibm_mpi_pack(IBBody *iBody, std::vector<double> &buffer);
+
 	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<int> &rankID, std::vector<int> &numMarkers);
 	void ibm_mpi_unpack(eIBInfoType type, std::vector<std::vector<double>> &bufferRecv, std::vector<int> &rankID, std::vector<int> &numMarkers, std::vector<std::vector<double>> &markerPos);
 
-	void ibm_getNumMarkers(eIBInfoType type, IBBody *iBody, std::vector<int> &rankID, std::vector<int> &numMarkers);
+	void ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBody> &iBodyEps);
 	void ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<std::vector<double>> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers);
 
 

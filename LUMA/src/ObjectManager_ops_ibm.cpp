@@ -113,7 +113,7 @@ void ObjectManager::ibm_moveBodies() {
 
 #ifndef L_STOP_EPSILON_RECOMPUTE
 			// Recompute epsilon
-			ibm_findEpsilon(ib);
+			ibm_findEpsilon();
 #endif
 
 		}
@@ -157,14 +157,11 @@ void ObjectManager::ibm_initialise() {
 		{
 			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
-
-
-		MPI_Barrier(mpim->world_comm);
-		exit(0);
-
-		// Find epsilon for the body
-		ibm_findEpsilon(ib);
 	}
+
+	// Find epsilon for the body
+	ibm_findEpsilon();
+
 }
 
 // *****************************************************************************
@@ -574,7 +571,7 @@ void ObjectManager::ibm_spread(int ib) {
 // *****************************************************************************
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
-double ObjectManager::ibm_findEpsilon(int ib) {
+double ObjectManager::ibm_findEpsilon() {
 
 	/***** TODO: In order to compute epsilon using this linear system a single process needs 
 	to know all the delta values of all the support points in the body to build the whole system. 
@@ -586,15 +583,13 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
 
-	// Get the owning rank of the iBody to gather how many markers it needs from each process
-	std::vector<int> rankID;
-	std::vector<int> numMarkers;
-	ibm_getNumMarkers(eBodyNumMarkers, &iBody[ib], rankID, numMarkers);
+	// Each rank owns a vector of iBodys which is sized according to how many iBodys that rank owns
+	std::vector<IBBody> iBodyEps;
 
-	// Send the marker positions
-	std::vector<std::vector<double>> markerPos;
-	ibm_getMarkerPositions(eBodyMarkerPositions, &iBody[ib], markerPos, rankID, numMarkers);
+	// Populate the iBody class with all the information required to calculate epsilon
+	ibm_getEpsInfo(this->iBody, iBodyEps);
 
+	int ib = 0;
 
 
 

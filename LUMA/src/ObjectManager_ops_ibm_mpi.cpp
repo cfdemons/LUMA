@@ -25,40 +25,123 @@
 ///	\param	type		type of communication.
 ///	\param	iBody		the current IB body.
 ///	\param	numMarkers	where the buffer is being unpacked to
-void ObjectManager::ibm_getNumMarkers(eIBInfoType type, IBBody *iBody, std::vector<int> &rankID, std::vector<int> &numMarkers) {
+void ObjectManager::ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBody> &iBodyEps) {
 
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
 
-	switch (type)
-	{
-	case eBodyNumMarkers:
-		{
-			// Data type to be sent
-			MPI_Datatype mpi_type = MPI_INT;
+	// Values needed for send
+	MPI_Request send_requests[iBody.size()] = {MPI_REQUEST_NULL};
+	int sendCount = 0;
 
-			// Get how many markers from each rank the owning rank should ask for and pack into buffer
-			std::vector<int> bufferSend;
-			ibm_mpi_pack(type, iBody, bufferSend);
+	// Each rank needs a vector with the body IDs it is responsible for
+	std::vector<int> ownedBodies;
 
-			// Instantiate the receive buffer
-			std::vector<int> bufferRecv;
+	// Create a vector sized for number of total iBodies as can't be reused
+	std::vector<std::vector<double>> bufferSend;
+	bufferSend.resize(iBody.size());
 
-			// Only resize buffer if this is the owning rank
-			if (mpim->my_rank == iBody->owningRank)
-				bufferRecv.resize(bufferSend.size() * mpim->num_ranks);
+	// Loop through each iBody
+	for (int ib = 0; ib < iBody.size(); ib++) {
 
-			// Send to owning rank (root process)
-			MPI_Gather(&bufferSend.front(), bufferSend.size(), mpi_type, &bufferRecv.front(), bufferSend.size(), mpi_type, iBody->owningRank, mpim->world_comm);
+		// Check if it is responsible for this body
+		if (mpim->my_rank == iBody[ib].owningRank)
+			ownedBodies.push_back(ib);
 
-			// Unpack back into required vectors class
-			if (mpim->my_rank == iBody->owningRank)
-				ibm_mpi_unpack(type, bufferRecv, bufferSend.size(), rankID, numMarkers);
+		// Only send if there is marker data for this body
+		if (iBody[ib].markers.size() > 0) {
 
-			break;
+			// Pack into send buffer (see implementation for details on data storage)
+			ibm_mpi_pack(&iBody[ib], bufferSend[ib]);
+
+			// Send the data with a non-blocking send
+			MPI_Isend(&bufferSend[ib].front(), bufferSend[ib].size(), MPI_DOUBLE, iBody[ib].owningRank, iBody[ib].owningRank, mpim->world_comm, &send_requests[ib]);
+			sendCount++;
+			std::cout << "Rank " << mpim->my_rank << " has sent a message to rank " << iBody[ib].owningRank << std::endl;
 		}
 	}
+
+
+	// Values needed for send
+	int bufferSize;
+	std::vector<double> bufferRecvTemp;
+	std::vector<std::vector<double>> bufferRecv;
+	bufferRecv.resize(iBody.size());
+	MPI_Status probeStatus;
+	int probeFlag;
+	int testFlag;
+
+	// Loop through each iBody
+	for (int ib = 0; ib < ownedBodies.size(); ib++) {
+
+		// Wait until all messages for a particular body have been sent
+		MPI_Test(&send_requests[ownedBodies[ib]], &testFlag, MPI_STATUS_IGNORE);
+		std::cout << "Testflag = " << testFlag << std::endl;
+
+		// While there is a send for this rank waiting to be received
+		while (testFlag == 0) {
+
+			// Now check for sends this rank needs to receive
+			MPI_Iprobe(MPI_ANY_SOURCE, mpim->my_rank, mpim->world_comm, &probeFlag, &probeStatus);
+
+			std::cout << "Rank " << mpim->my_rank << " has found a message from " << probeStatus.MPI_SOURCE << " addressed to " << probeStatus.MPI_TAG << std::endl;
+
+			// Get buffer size for receiving and resize the vector
+			MPI_Get_count(&probeStatus, MPI_DOUBLE, &bufferSize);
+			bufferRecvTemp.resize(bufferSize);
+
+			// Receive the message
+			MPI_Recv(&bufferRecvTemp.front(), bufferSize, MPI_DOUBLE, probeStatus.MPI_SOURCE, probeStatus.MPI_TAG, mpim->world_comm, MPI_STATUS_IGNORE);
+
+			// Put it into the main buffer
+			bufferRecv[ib].insert(bufferRecv[ib].end(), bufferRecvTemp.begin(), bufferRecvTemp.end());
+
+			// Now check for sends this rank needs to receive
+			MPI_Test(&send_requests[ownedBodies[ib]], &testFlag, MPI_STATUS_IGNORE);
+			std::cout << "Testflag = " << testFlag << std::endl;
+
+		}
+	}
+
+
+	if (mpim->my_rank == 0) {
+		std::cout << "Rank " << mpim->my_rank << std::endl;
+		for (int i = 0; i < bufferRecv.size(); i++) {
+			for (int j = 0; j < bufferRecv[i].size(); j++) {
+				std::cout << bufferRecv[i][j] << " ";
+			}
+			std::cout << std::endl;
+		}
+	}
+
+
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
+
 }
+
+
+
+///	\brief Packs the send buffer into bufferSend.
+///	\param	type			type of communication.
+///	\param	iBody			pointer to the current iBody
+///	\param	buffer			the sender buffer that is being packed.
+void ObjectManager::ibm_mpi_pack(IBBody *iBody, std::vector<double> &buffer) {
+
+
+	// The data storage for this buffer is x, y, (z), area, dilation for each marker
+	// Loop through each marker and insert values
+	for (int m = 0; m < iBody->markers.size(); m++) {
+		buffer.push_back(iBody->markers[m].position[eXDirection]);
+		buffer.push_back(iBody->markers[m].position[eYDirection]);
+#if (L_DIMS == 3)
+		buffer.push_back(iBody->markers[m].position[eZDirection]);
+#endif
+		buffer.push_back(iBody->markers[m].local_area);
+		buffer.push_back(iBody->markers[m].dilation);
+	}
+}
+
 
 // *****************************************************************************
 ///	\brief Performs MPI communication depending on enumeration type case.

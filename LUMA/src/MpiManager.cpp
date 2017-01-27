@@ -272,7 +272,7 @@ void MpiManager::mpi_init() {
 
 	// If using custom sizes, user must set the L_MPI_ZCORES to 1
 	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
-		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", MpiManager::logout);
+		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", MpiManager::logout, my_rank);
 	}
 
 #endif
@@ -333,7 +333,7 @@ void MpiManager::mpi_gridbuild( ) {
 		if (cellsLastDomain[d] <= 0)
 		{
 			L_ERROR("Last core in dir = " + std::to_string(d) + 
-				" has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x.", logout);
+				" has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x.", logout, my_rank);
 		}
 	}
 

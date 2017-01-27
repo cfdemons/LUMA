@@ -294,7 +294,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 			double a = -GridUtils::dotprod(n,w0);
 			double b = GridUtils::dotprod(n,dir);
 
-			if (abs(b) < 1e-9) {
+			if (abs(b) < L_SMALL_NUMBER) {
 				if (a == 0) continue;	// Triangle and line are in the same plane
 				else continue;			// Triangle and line are disjoint
 			}

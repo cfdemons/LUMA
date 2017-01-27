@@ -488,7 +488,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 		file.open("./input/restart_LBM_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::in);
 		if (!file.is_open()) {
-			L_ERROR("Error opening LBM restart file. Exiting.", GridUtils::logfile);
+			L_ERROR("Error opening LBM restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;

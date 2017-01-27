@@ -165,7 +165,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 		file.open("./input/restart_IBBody_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
-			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile);
+			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 		}
 
 		// Read in one line of file at a time
@@ -185,7 +185,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		// Check number of bodies is correct
 		if (iBody.size() != num_bod) {
-			L_ERROR("Number of IBM bodies does not match the number specified in the restart file. Exiting.", GridUtils::logfile);
+			L_ERROR("Number of IBM bodies does not match the number specified in the restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 		}
 
 		// Loop over bodies
@@ -205,7 +205,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 			// Check number of markers the same
 			if (iBody[b].markers.size() != num_mark) {
 				L_ERROR("Number of IBM markers does not match the number specified for body " +
-					std::to_string(b) + " in the restart file. Exiting.", GridUtils::logfile);
+					std::to_string(b) + " in the restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 			}
 
 			// Read in marker data
@@ -361,7 +361,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Handle failure to open
 	if (!file.is_open()) {
-		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile);
+		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Get grid pointer
@@ -410,7 +410,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile);
+		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile, mpim->my_rank);
 	}
 	else {
 		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;

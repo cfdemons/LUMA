@@ -64,7 +64,7 @@ void GridObj::LBM_init_getInletProfile() {
 	inletfile.open("./input/inlet_profile.in", std::ios::in);
 	if (!inletfile.is_open()) {
 		// Error opening file
-		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
+		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 
 	} else {
 
@@ -162,7 +162,7 @@ void GridObj::LBM_init_getInletProfile() {
 
 	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0) {
 		// No data read in
-		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile);
+		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 #endif // L_PARABOLIC_INLET
 
@@ -296,14 +296,16 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 
 #if (L_DIMS == 3)
 	// Check that lattice volumes are cubes in 3D
-	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 || abs((Lx/L_N) - (Lz/L_K)) > 1e-8 ) {
-		L_ERROR("Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting.", GridUtils::logfile);
+	if (abs((Lx / L_N) - (Ly / L_M)) > L_SMALL_NUMBER || abs((Lx / L_N) - (Lz / L_K)) > L_SMALL_NUMBER) {
+		L_ERROR("Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting.", 
+			GridUtils::logfile, mpim->my_rank);
 	}
 	
 #else
 	// 2D so need square lattice cells
-	if ( abs((Lx/L_N) - (Ly/L_M)) > 1e-8 ) {
-		L_ERROR("Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting.", GridUtils::logfile);
+	if ( abs((Lx/L_N) - (Ly/L_M)) > L_SMALL_NUMBER ) {
+		L_ERROR("Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting.",
+			GridUtils::logfile, mpim->my_rank);
 	}
 
 #endif
@@ -529,6 +531,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	 * on a min receiver layer which is also periodic.
 	 */
 	int position = 0;
+	int position2 = 0;
 	eLocationOnRank loc = eNone;
 	double subgrid_start_voxel_centre;
 	double subgrid_end_voxel_centre;
@@ -586,16 +589,24 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
 	}
 
-	// If global sizes indicate that span of sub-grid matches that of parent, must be completely periodic so adjust mappings
-	if (mpim->global_size[eXDirection][mpim_idx] == 2 * mpim->global_size[eXDirection][mpim_idx - 1])
-	{
-		// Set as if middle of complete block
-		CoarseLimsX[eMinimum] = 0;
-		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+	/* If start and finish on same process then we test to see if sites are next 
+	 * to each other and coalesce the TL edges. */
 
-		// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
-		mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = false;
-		mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = false;
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position2))
+	{
+
+		// Check sites are next to each other in space
+		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			// Set as if middle of complete block
+			CoarseLimsX[eMinimum] = 0;
+			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+
+			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
+			mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = false;
+		}
 	}
 	
 
@@ -618,12 +629,16 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
 		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
 	
-	if (mpim->global_size[eYDirection][mpim_idx] == 2 * mpim->global_size[eYDirection][mpim_idx - 1])
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
 	{
-		CoarseLimsY[eMinimum] = 0;
-		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-		mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = false;
-		mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = false;
+		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			CoarseLimsY[eMinimum] = 0;
+			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
+			mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = false;
+		}
 	}
 
 
@@ -647,12 +662,16 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
 		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
 
-	if (mpim->global_size[eZDirection][mpim_idx] == 2 * mpim->global_size[eZDirection][mpim_idx - 1])
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
 	{
-		CoarseLimsZ[eMinimum] = 0;
-		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
-		mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = false;
-		mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = false;
+		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			CoarseLimsZ[eMinimum] = 0;
+			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
+			mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = false;
+		}
 	}
 #else
 	// Reset the refined region z-limits if only 2D
@@ -675,7 +694,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		(CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) ||
 		(CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum])
 		) {		
-		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile);
+		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile, mpim->my_rank);
 	}	
 
 
@@ -867,7 +886,7 @@ void GridObj::LBM_initSolidLab() {
 		) {
 
 		// Block outside grid
-		L_ERROR("Block is placed outside or on the TL of the selected grid. Exiting.", GridUtils::logfile);
+		L_ERROR("Block is placed outside or on the TL of the selected grid. Exiting.", GridUtils::logfile, mpim->my_rank);
 	}
 
 
@@ -919,7 +938,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Check for potential singularity in BC
 	if (L_UMAX == 1 || L_UREF == 1) {
 		// Singularity so exit
-		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile);
+		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Search position vector to see if left hand wall on this rank
@@ -1156,34 +1175,41 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 				);
 				
 				// Get parent site label using local indices
-				par_label = pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim);
+				par_label = pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim);
 								
 				// If parent is a "TL to lower" then add "TL to upper" label
 				if (par_label == eTransitionToFiner) { 
-					LatTyp(i,j,k,M_lim,K_lim) = eTransitionToCoarser;
+					LatTyp(i, j, k, M_lim, K_lim) = eTransitionToCoarser;
                 
 					// Else if parent is a "refined" label then label as coarse
 				} else if (par_label == eRefined) { 
-					LatTyp(i,j,k,M_lim,K_lim) = eFluid;
+					LatTyp(i, j, k, M_lim, K_lim) = eFluid;
                 
 					// Else parent label is some other kind of boundary so copy the
 					// label to retain the behaviour onto this grid
 				} else { 
-					LatTyp(i,j,k,M_lim,K_lim) = par_label;
+					LatTyp(i, j, k, M_lim, K_lim) = par_label;
 					
 					// If last site to be updated in fine block, change parent label
 					// to ensure boundary values are pulled from fine grid
-					if ((j % 2) != 0 && (i % 2) != 0) {
-						if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eSolid || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedSolid) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedSolid;
+					if (
+						(j % 2) != 0 && (i % 2) != 0
+#if (L_DIMS == 3)
+						&& (k % 2 != 0)
+#endif
+						) {
+						if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eSolid || 
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedSolid)
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedSolid;
 
-						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eSymmetry || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedSymmetry) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedSymmetry;
+						else if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eSymmetry || 
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedSymmetry)
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedSymmetry;
 						
-						} else if (pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eInlet || pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) == eRefinedInlet) {
-							pGrid.LatTyp(p[0],p[1],p[2],Mp_lim,Kp_lim) = eRefinedInlet;
+						else if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eInlet || 
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedInlet)
+							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedInlet;
 
-						}
 					}
 				}
             }

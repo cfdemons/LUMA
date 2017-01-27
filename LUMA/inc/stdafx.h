@@ -76,6 +76,7 @@
 
 // Squared operator
 #define SQ(x) ((x) * (x))
+#define L_SMALL_NUMBER 1e-8
 
 // Include definitions
 #include "definitions.h"
@@ -120,9 +121,9 @@ testout.close(); \
 ///
 ///	\param	msg		string to be printed to the log file.
 ///	\param	logfile	pointer to the logfile where the message is to be written.
-inline void errorfcn(const std::string &msg, std::ofstream *logfile)
+inline void errorfcn(const std::string &msg, std::ofstream *logfile, unsigned int mpi_rank = 0)
 {
-	std::cout << "Error: See Log File" << std::endl;
+	std::cout << "Rank " + std::to_string(mpi_rank) + " Error: See Log File" << std::endl;
 	*logfile << msg << std::endl;
 	logfile->close();
 #ifdef L_BUILD_FOR_MPI

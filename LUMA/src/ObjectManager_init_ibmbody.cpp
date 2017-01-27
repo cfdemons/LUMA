@@ -37,7 +37,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Check that the owning grid was found and exists
 	if ( iBody.back()._Owner == NULL ) {
-		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile);
+		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 
@@ -307,7 +307,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// Delete TE markers
 		std::vector<int> logvec;
 		for (size_t m = 0; m < iBody.back().markers.size(); m++) {
-			if (fabs(iBody.back().markers[m].position[1] - start_y) < 1e-6) {				
+			if (fabs(iBody.back().markers[m].position[1] - start_y) < L_SMALL_NUMBER) {
 				logvec.push_back(static_cast<int>(m));
 			}
 		}

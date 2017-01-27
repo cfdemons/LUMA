@@ -41,7 +41,6 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-//#define L_DEBUG_STREAM			///< Writes out the number and type of streaming operations used to test streaming exclusions
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
@@ -67,7 +66,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 50			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -96,7 +95,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 5000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 10000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -132,13 +131,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_DIMS 3			///< Number of dimensions to the problem
 #define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
 
 // Non-dimensional domain dimensions
 #define L_BX 15		///< End of domain in X (non-dimensional units)
-#define L_BY 4 		///< End of domain in Y (non-dimensional units)
-#define L_BZ 10		///< End of domain in Z (non-dimensional units)
+#define L_BY 4		///< End of domain in Y (non-dimensional units)
+#define L_BZ 4		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -268,10 +267,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Solids
 //#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_WALL_THICKNESS_BOTTOM (L_BX/L_N)		///< Thickness of wall
-#define L_WALL_THICKNESS_TOP (L_BX/L_N)			///< Thickness of top wall
-#define L_WALL_THICKNESS_FRONT (L_BX/L_N)		///< Thickness of front (3D) wall
-#define L_WALL_THICKNESS_BACK (L_BX/L_N)		///< Thickness of back (3D) wall
+#define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
+#define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
+#define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of front (3D) wall
+#define L_WALL_THICKNESS_BACK (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of back (3D) wall
 
 
 
@@ -358,14 +357,14 @@ static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 1.5 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BZ - 4) / 2.0) },
-	{ ((L_BZ - 3) / 2.0) },
-	{ ((L_BZ - 2) / 2.0) }
+	{ ((L_BZ - 3.0) / 2.0) },
+	{ ((L_BZ - 2.5) / 2.0) },
+	{ ((L_BZ - 2.0) / 2.0) }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ ((L_BZ + 4) / 2.0) },
-	{ ((L_BZ + 3) / 2.0) },
-	{ ((L_BZ + 2) / 2.0) }
+	{ ((L_BZ + 3.0) / 2.0) },
+	{ ((L_BZ + 2.5) / 2.0) },
+	{ ((L_BZ + 2.0) / 2.0) }
 };
 
 #endif

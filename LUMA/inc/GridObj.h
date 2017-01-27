@@ -175,6 +175,7 @@ public :
 	void LBM_initGrid(std::vector<int> local_size,
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
+	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initBoundLab();					// Initialise labels for walls
 	void LBM_initSolidLab();					// Initialise labels for solid objects
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions

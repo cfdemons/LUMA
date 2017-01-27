@@ -1210,8 +1210,6 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	// Set offset baseline to grid start edge of grid
 	offset_baseline = mpim->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
 
-	if (dir == eZDirection && g->level == 2) *logfile << "**Offset Baseline = " << offset_baseline << std::endl;
-
 	/* If less than the lower grid core edge but is on the upper halo
 	 * then must be a TL site in a periodically wrapped upper halo. */
 	if (xyz < mpim->rank_core_edge[idxLower][mpim->my_rank] && 
@@ -1238,14 +1236,10 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 		offset_baseline = mpim->rank_core_edge[idxLower][mpim->my_rank];
 	}
 
-	if (dir == eZDirection && g->level == 2) *logfile << "**Offset Baseline = " << offset_baseline << std::endl;
-
 	// Compute number of complete cells between point and edge of rank core
 	*ijk = static_cast<int>(
 		std::floor((xyz - mpim->rank_core_edge[idxLower][mpim->my_rank]) / g->dh)
 		);
-
-	if (dir == eZDirection && g->level == 2) *logfile << "**ijk = " << *ijk << " @ " << g->ZPos[*ijk] << std::endl;
 
 	/* Compute offset from global edge i.e. number of voxels between grid edge and 
 	 * rank egde. We round it as although they are exact (as they are MPIM quantities
@@ -1255,8 +1249,6 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 		std::round((mpim->rank_core_edge[idxLower][mpim->my_rank] - offset_baseline) / g->dh)
 		);
 
-	if (dir == eZDirection && g->level == 2) *logfile << "**offset = " << offset << std::endl;
-
 	/* If the origin is not on the halo but outside this rank to the left then offset
 	 * is at most the width of the halo in voxels. This offset can be negative if the 
 	 * grid starts somewhere on this rank. Does not check though to see whether it is 
@@ -1264,8 +1256,6 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	 * the grid supplied. */
 	if (offset > static_cast<int>(1.0 / g->refinement_ratio))
 		offset = static_cast<int>(1.0 / g->refinement_ratio);
-
-	if (dir == eZDirection && g->level == 2) *logfile << "**offset = " << offset << std::endl;
 
 	// If on L0, always add a halo offset of 1 for MPI builds
 #ifdef L_BUILD_FOR_MPI
@@ -1275,8 +1265,6 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 
 	// Correct the ijk position
 	*ijk += offset;
-
-	if (dir == eZDirection && g->level == 2) *logfile << "**Final ijk = " << *ijk << std::endl;
 
 	return;
 

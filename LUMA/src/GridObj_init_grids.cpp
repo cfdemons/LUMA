@@ -499,204 +499,22 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 }
 	
 
-
 // ****************************************************************************
 /// \brief	Method to initialise all sub-grid quantities.
 /// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
+	// Get an instance of the MPIM
+	MpiManager *mpim = MpiManager::getInstance();
+	int mpim_idx = level + region_number * L_NUM_LEVELS;
+
 	// Define scales
 	dh = pGrid.dh / 2;
 	dt = pGrid.dt / 2;
 	
-	/* MPI specific setup:
-	 * 
-	 * Store coarse grid refinement limits as indicies local to the parent grid
-	 * on this rank.
-	 *
-	 * These are stored as local indices as they are used to map between the 
-	 * fine and coarse grid cells during multi-grid operations. Therefore, we 
-	 * must only store local values relevant to the grid on the rank to ensure
-	 * mapping is correct.
-	 *
-	 * When not using MPI, these can be computed from the definitions file values
-	 * which specify the extent of the refinement at that level.
-	 * However, when using MPI, the edges of the refined grid might not be on this 
-	 * rank so we must round the coarse limits to the edge of the parent grid so 
-	 * the correct offset is supplied to the mapping routine.
-	 *
-	 * When dealing with sub-grids embedded in walls, it is more complicated. If the 
-	 * sub-grid starts on a max receiver layer which is also a periodic overlap then
-	 * we need to make sure the limits are set properly. Likewise if the sub-grid ends
-	 * on a min receiver layer which is also periodic.
-	 */
-	int position = 0;
-	int position2 = 0;
-	eLocationOnRank loc = eNone;
-	double subgrid_start_voxel_centre;
-	double subgrid_end_voxel_centre;
-	int mpim_idx = level + region_number * L_NUM_LEVELS;
-	MpiManager *mpim = MpiManager::getInstance();
-	
-	// X //
-
-	// Set voxel centre positions from knowledge of grid edges
-	subgrid_start_voxel_centre = mpim->global_edges[eXMin][mpim_idx] + dh / 2.0;
-	subgrid_end_voxel_centre = mpim->global_edges[eXMax][mpim_idx] - dh / 2.0;
-
-	// Set TL to on by default
-	mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = true;
-
-	// Start Limit: Find whether edge of refined region is on this grid at all and return its local index
-
-	// Starts on this rank
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position))
-	{
-		// Set limit to ijk of enclosing voxel
-		CoarseLimsX[eMinimum] = position;
-	}
-		
-	/* Starts on some rank to the left of this one. Note: Using the core edge position 
-	 * is fine as if it was in the halo the above call would have returned true. */
-	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
-	{
-		// Set limit to start edge of the rank
-		CoarseLimsX[eMinimum] = 0;
-	}
-
-
-	// End Limit: Find whether last sub-grid site position is on this grid at all and return its local index
-	
-	// Ends on this rank
-	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position))
-	{
-		// Set limit to ijk of enclosing voxel
-		CoarseLimsX[eMaximum] = position;
-	}
-
-	// Ends on some rank to the right of this one
-	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eXMax][mpim->my_rank])
-	{
-		// Set limit to end edge of the rank
-		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
-	}
-
-	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
-	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
-	{
-		// Set grid limits to end edge of the rank
-		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
-	}
-
-	/* If start and finish on same process then we test to see if sites are next 
-	 * to each other and coalesce the TL edges. */
-
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position) &&
-		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position2))
-	{
-
-		// Check sites are next to each other in space
-		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
-		{
-			// Set as if middle of complete block
-			CoarseLimsX[eMinimum] = 0;
-			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
-
-			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
-			mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = false;
-		}
-	}
-	
-
-
-	// Y //
-	subgrid_start_voxel_centre = mpim->global_edges[eYMin][mpim_idx] + dh / 2;
-	subgrid_end_voxel_centre = mpim->global_edges[eYMax][mpim_idx] - dh / 2;
-	mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = true;
-
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position))
-		CoarseLimsY[eMinimum] = position;
-	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
-		CoarseLimsY[eMinimum] = 0;
-	
-	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position))
-		CoarseLimsY[eMaximum] = position;
-	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eYMax][mpim->my_rank])
-		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
-		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-	
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
-		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
-	{
-		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
-		{
-			CoarseLimsY[eMinimum] = 0;
-			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-			mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = false;
-		}
-	}
-
-
-#if (L_DIMS == 3)
-	// Z //
-	subgrid_start_voxel_centre = mpim->global_edges[eZMin][mpim_idx] + dh / 2;
-	subgrid_end_voxel_centre = mpim->global_edges[eZMax][mpim_idx] - dh / 2;
-	mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = true;
-
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position))
-		CoarseLimsZ[eMinimum] = position;
-	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
-		CoarseLimsZ[eMinimum] = 0;
-
-	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position))
-		CoarseLimsZ[eMaximum] = position;
-	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eZMax][mpim->my_rank])
-		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
-
-	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
-		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
-
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
-		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
-	{
-		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
-		{
-			CoarseLimsZ[eMinimum] = 0;
-			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
-			mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = false;
-		}
-	}
-#else
-	// Reset the refined region z-limits if only 2D
-	for (int i = 0; i < 2; i++) {
-		CoarseLimsZ[i] = 0;
-	}
-#endif
-
-
-	*GridUtils::logfile << "Local Coarse Lims are " << 
-		CoarseLimsX[eMinimum] << "-" << CoarseLimsX[eMaximum] << ", " << 
-		CoarseLimsY[eMinimum] << "-" << CoarseLimsY[eMaximum] << ", " <<
-		CoarseLimsZ[eMinimum] << "-" << CoarseLimsZ[eMaximum] << std::endl;
-
-	/* If sub-grid wraps periodically we do not support it wrapping back round to the same rank
-	 * again as this will confuse the mapping function so we error here. */
-
-	if (
-		(CoarseLimsX[eMaximum] < CoarseLimsX[eMinimum] && CoarseLimsX[eMinimum] - 1 != CoarseLimsX[eMaximum]) ||
-		(CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) ||
-		(CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum])
-		) {		
-		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile, mpim->my_rank);
-	}	
-
+	/* Get coarse grid refinement limits as indicies local to the parent grid
+	 * on this rank. */
+	LBM_initGridToGridMappings(pGrid);
 
 	
 	/* Note that the CoarseLims are local values used to identify how much and which part of the 
@@ -704,7 +522,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	 * refined patch defined by the input file if broken up across ranks. So we get the offset 
 	 * in position from the local refined patch edges specific to this rank. */
 
-	// Get positons of local refined patch edges
+	// Get positions of local refined patch edges
 	double posOffsetX[2] = { pGrid.XPos[ CoarseLimsX[eMinimum] ], pGrid.XPos[ CoarseLimsX[eMaximum] ] };
 	double posOffsetY[2] = { pGrid.YPos[ CoarseLimsY[eMinimum] ], pGrid.YPos[ CoarseLimsY[eMaximum] ] };
 #if (L_DIMS == 3)
@@ -713,12 +531,13 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	double posOffsetZ[2] = { 0.0, 0.0 };
 #endif
 
-	// Get local grid size of the sub grid based on limits
+	// Get local grid size of the sub grid based on local ijk limits
 	int local_size[L_DIMS] = {
-		(int)((CoarseLimsX[eMaximum] - CoarseLimsX[eMinimum] + .5) * 2) + 1,
-		(int)((CoarseLimsY[eMaximum] - CoarseLimsY[eMinimum] + .5) * 2) + 1
+		static_cast<int>((CoarseLimsX[eMaximum] - CoarseLimsX[eMinimum] + .5) * 2) + 1,
+		static_cast<int>((CoarseLimsY[eMaximum] - CoarseLimsY[eMinimum] + .5) * 2) + 1
 #if (L_DIMS == 3)
-		, (int)((CoarseLimsZ[eMaximum] - CoarseLimsZ[eMinimum] + .5) * 2) + 1
+		,
+		static_cast<int>((CoarseLimsZ[eMaximum] - CoarseLimsZ[eMinimum] + .5) * 2) + 1
 #endif
 	};
 
@@ -742,8 +561,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
-
-	
+		
 
 	// Global edge origins (voxel centre position of first cell on grid)
 	XOrigin = mpim->global_edges[eXMin][mpim_idx] + dh / 2;
@@ -759,7 +577,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Resize
 	LatTyp.resize( N_lim * M_lim * K_lim );
-
 
 	// Default labelling of coarse
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
@@ -826,6 +643,313 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Lattice viscosity is constant across subgrids
 	nu = pGrid.nu;
+
+}
+
+
+// ****************************************************************************
+/// \brief	Method to initialise the mapping parameters between this grid and 
+///			the supplied parent.
+///
+///			The mappings computed by this method are local ijk references to allow
+///			correct coupling during multi-grid operations.
+///
+/// \param	pGrid	reference to parent grid.
+void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
+{
+	/* Coarse Limits stored as local indices as they are used to map between the
+	 * fine and coarse grid cells during multi - grid operations.Therefore, we
+	 * must only store local values relevant to the grid on the rank to ensure
+	 * mapping is correct.
+	 *
+	 * When not using MPI, these can be computed from the definitions file values
+	 * which specify the extent of the refinement at that level.
+	 * However, when using MPI, the edges of the refined grid might not be on this
+	 * rank so we must round the coarse limits to the edge of the parent grid so
+	 * the correct offset is supplied to the mapping routine.
+	 *
+	 * When dealing with sub - grids embedded in walls, it is more complicated.If the
+	 * sub - grid starts on a max receiver layer which is also a periodic overlap then
+	 * we need to make sure the limits are set properly.Likewise if the sub - grid ends
+	 * on a min receiver layer which is also periodic. */
+
+	int position = 0;
+	int position2 = 0;
+	eLocationOnRank loc = eNone;
+	double subgrid_start_voxel_centre;
+	double subgrid_end_voxel_centre;
+	int mpim_idx = level + region_number * L_NUM_LEVELS;
+	MpiManager *mpim = MpiManager::getInstance();
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Cell width on parent = " << pGrid.dh << std::endl;
+#endif
+
+	// X //
+
+	// Set voxel centre positions from knowledge of grid edges
+	subgrid_start_voxel_centre = mpim->global_edges[eXMin][mpim_idx] + dh / 2.0;
+	subgrid_end_voxel_centre = mpim->global_edges[eXMax][mpim_idx] - dh / 2.0;
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "X: Start and end voxel centres are at: " << 
+		subgrid_start_voxel_centre << " & " << subgrid_end_voxel_centre << std::endl;
+#endif
+
+	// Set TL to on by default
+	mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = true;
+	mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = true;
+
+	// Start Limit: Find whether edge of refined region is on this grid at all and return its local index
+
+	// Starts on this rank
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position))
+	{
+		// Set limit to ijk of enclosing voxel
+		CoarseLimsX[eMinimum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "X: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+
+	/* Starts on some rank to the left of this one. Note: Using the core edge position
+	* is fine as if it was in the halo the above call would have returned true. */
+	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
+	{
+		// Set limit to start edge of the rank
+		CoarseLimsX[eMinimum] = 0;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "X: Starts on earlier rank" << std::endl;
+#endif
+	}
+
+
+	// End Limit: Find whether last sub-grid site position is on this grid at all and return its local index
+
+	// Ends on this rank
+	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position))
+	{
+		// Set limit to ijk of enclosing voxel
+		CoarseLimsX[eMaximum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "X: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+
+	// Ends on some rank to the right of this one
+	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eXMax][mpim->my_rank])
+	{
+		// Set limit to end edge of the rank
+		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "X: Ends on later rank" << std::endl;
+#endif
+	}
+
+	// Else the end must be on a rank to the left and hence grid wraps periodically so set end to right-hand edge
+	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
+	{
+		// Set grid limits to end edge of the rank
+		CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "X: Ends on earlier rank" << std::endl;
+#endif
+	}
+
+	/* If start and finish on same process then we test to see if sites are next
+	* to each other and coalesce the TL edges. */
+
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position2))
+	{
+
+		// Check sites are next to each other in space
+		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			// Set as if middle of complete block
+			CoarseLimsX[eMinimum] = 0;
+			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+
+			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
+			mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = false;
+
+#ifdef L_INIT_VERBOSE
+			*GridUtils::logfile << "X: Periodically wrapped and joined" << std::endl;
+#endif
+		}
+	}
+
+
+
+	// Y //
+	subgrid_start_voxel_centre = mpim->global_edges[eYMin][mpim_idx] + dh / 2;
+	subgrid_end_voxel_centre = mpim->global_edges[eYMax][mpim_idx] - dh / 2;
+	mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = true;
+	mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = true;
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Y: Start and end voxel centres are at: " <<
+		subgrid_start_voxel_centre << " & " << subgrid_end_voxel_centre << std::endl;
+#endif
+
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position))
+	{
+		CoarseLimsY[eMinimum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Y: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
+	{
+		CoarseLimsY[eMinimum] = 0;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Y: Starts on earlier rank" << std::endl;
+#endif
+	}
+
+	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position))
+	{
+		CoarseLimsY[eMaximum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Y: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eYMax][mpim->my_rank])
+	{
+		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Y: Ends on later rank" << std::endl;
+#endif
+	}
+	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
+	{
+		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Y: Ends on earlier rank" << std::endl;
+#endif
+	}
+
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
+	{
+		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			CoarseLimsY[eMinimum] = 0;
+			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
+			mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = false;
+
+#ifdef L_INIT_VERBOSE
+			*GridUtils::logfile << "Y: Periodically wrapped and joined" << std::endl;
+#endif
+		}
+	}
+
+
+#if (L_DIMS == 3)
+	// Z //
+	subgrid_start_voxel_centre = mpim->global_edges[eZMin][mpim_idx] + dh / 2;
+	subgrid_end_voxel_centre = mpim->global_edges[eZMax][mpim_idx] - dh / 2;
+	mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = true;
+	mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = true;
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Z: Start and end voxel centres are at: " <<
+		subgrid_start_voxel_centre << " & " << subgrid_end_voxel_centre << std::endl;
+#endif
+
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position))
+	{
+		CoarseLimsZ[eMinimum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Z: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
+	{
+		CoarseLimsZ[eMinimum] = 0;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Z: Starts on earlier rank" << std::endl;
+#endif
+	}
+
+	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position))
+	{
+		CoarseLimsZ[eMaximum] = position;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Z: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+#endif
+	}
+	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eZMax][mpim->my_rank])
+	{
+		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Z: Ends on later rank" << std::endl;
+#endif
+	}
+	else if (subgrid_end_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
+	{
+		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
+
+#ifdef L_INIT_VERBOSE
+		*GridUtils::logfile << "Z: Ends on earlier rank" << std::endl;
+#endif
+	}
+
+	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
+		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
+	{
+		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		{
+			CoarseLimsZ[eMinimum] = 0;
+			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
+			mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = false;
+			mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = false;
+
+#ifdef L_INIT_VERBOSE
+			*GridUtils::logfile << "Z: Periodically wrapped and joined" << std::endl;
+#endif
+		}
+	}
+#else
+	// Reset the refined region z-limits if only 2D
+	for (int i = 0; i < 2; i++) {
+		CoarseLimsZ[i] = 0;
+	}
+#endif
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Local Coarse Lims are " <<
+		CoarseLimsX[eMinimum] << "-" << CoarseLimsX[eMaximum] << ", " <<
+		CoarseLimsY[eMinimum] << "-" << CoarseLimsY[eMaximum] << ", " <<
+		CoarseLimsZ[eMinimum] << "-" << CoarseLimsZ[eMaximum] << std::endl;
+#endif
+
+	/* If sub-grid wraps periodically we do not support it wrapping back round to the same rank
+	* again as this will confuse the mapping function so we error here. */
+
+	if (
+		(CoarseLimsX[eMaximum] < CoarseLimsX[eMinimum] && CoarseLimsX[eMinimum] - 1 != CoarseLimsX[eMaximum]) ||
+		(CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) ||
+		(CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum])
+		) {
+		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile, mpim->my_rank);
+	}
 
 }
 

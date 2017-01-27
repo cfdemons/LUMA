@@ -120,7 +120,7 @@ testout.close(); \
 ///
 ///	\param	msg		string to be printed to the log file.
 ///	\param	logfile	pointer to the logfile where the message is to be written.
-inline void errorfcn(std::string msg, std::ofstream *logfile)
+inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 {
 	std::cout << "Error: See Log File" << std::endl;
 	*logfile << msg << std::endl;

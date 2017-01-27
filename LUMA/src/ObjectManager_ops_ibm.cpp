@@ -582,10 +582,8 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 	ibm_getNumMarkers(eBodyNumMarkers, &iBody[ib], rankID, numMarkers);
 
 	// Send the marker positions
-	std::vector<double> markerPos;
+	std::vector<std::vector<double>> markerPos;
 	ibm_getMarkerPositions(eBodyMarkerPositions, &iBody[ib], markerPos, rankID, numMarkers);
-
-
 
 
 

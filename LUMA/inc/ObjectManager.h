@@ -107,9 +107,10 @@ public:
 	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer);
 
 	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<int> &rankID, std::vector<int> &numMarkers);
+	void ibm_mpi_unpack(eIBInfoType type, std::vector<std::vector<double>> &bufferRecv, std::vector<int> &rankID, std::vector<int> &numMarkers, std::vector<std::vector<double>> &markerPos);
 
 	void ibm_getNumMarkers(eIBInfoType type, IBBody *iBody, std::vector<int> &rankID, std::vector<int> &numMarkers);
-	void ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<double> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers);
+	void ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<std::vector<double>> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers);
 
 
 	// Flexible body methods

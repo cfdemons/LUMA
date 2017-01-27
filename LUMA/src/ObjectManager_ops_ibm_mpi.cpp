@@ -65,7 +65,7 @@ void ObjectManager::ibm_getNumMarkers(eIBInfoType type, IBBody *iBody, std::vect
 ///	\param	type		type of communication.
 ///	\param	iBody		the current IB body.
 ///	\param	numMarkers	where the buffer is being unpacked to
-void ObjectManager::ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<double> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers) {
+void ObjectManager::ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std::vector<std::vector<double>> &markerPos, std::vector<int> &rankID, std::vector<int> &numMarkers) {
 
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
@@ -81,11 +81,6 @@ void ObjectManager::ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std:
 			std::vector<double> bufferSend;
 			if (iBody->markers.size() > 0)
 				ibm_mpi_pack(type, iBody, bufferSend);
-
-//			if (mpim->my_rank == 1) {
-//				for (int i = 0; i < bufferSend.size(); i++)
-//					std::cout << bufferSend[i] << " ";
-//			}
 
 			// Instantiate the receive buffer
 			std::vector<std::vector<double>> bufferRecv;
@@ -109,28 +104,9 @@ void ObjectManager::ibm_getMarkerPositions(eIBInfoType type, IBBody *iBody, std:
 				}
 			}
 
-			if (mpim->my_rank == iBody->owningRank) {
-				std::cout << "Rank " << mpim->my_rank << std::endl;
-				for (int i = 0; i < bufferRecv.size(); i++) {
-					for (int j = 0; j < bufferRecv[i].size(); j++) {
-						std::cout << bufferRecv[i][j] << " ";
-					}
-					std::cout << std::endl;
-				}
-			}
-
-
-			MPI_Barrier(mpim->world_comm);
-			exit(0);
-
-
-//
-//			// Send to owning rank (root process)
-//			MPI_Gather(&bufferSend.front(), bufferSend.size(), mpi_type, &bufferRecv.front(), bufferSend.size(), mpi_type, iBody->owningRank, mpim->world_comm);
-//
-//			// Unpack back into required vectors class
-//			if (mpim->my_rank == iBody->owningRank)
-//				ibm_mpi_unpack(type, bufferRecv, bufferSend.size(), rankID, numMarkers);
+			// Unpack back into required vectors class
+			if (mpim->my_rank == iBody->owningRank)
+				ibm_mpi_unpack(type, bufferRecv, rankID, numMarkers, markerPos);
 
 			break;
 		}
@@ -185,6 +161,44 @@ void ObjectManager::ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<do
 				buffer[m*L_DIMS+2] = iBody->markers[m].position[eZDirection];
 #endif
 
+			}
+
+			break;
+		}
+	}
+}
+
+
+///	\brief Unpacks the receive buffer back into IBInfo class.
+///	\param	type			type of communication.
+///	\param	bufferRecv		the receiver buffer that is being unpacked.
+///	\param	numMarkers		where the buffer is being unpacked to
+void ObjectManager::ibm_mpi_unpack(eIBInfoType type, std::vector<std::vector<double>> &bufferRecv, std::vector<int> &rankID, std::vector<int> &numMarkers, std::vector<std::vector<double>> &markerPos) {
+
+
+
+	switch (type)
+	{
+	case eBodyMarkerPositions:
+		{
+
+			// Get the total number of markers
+			int nMarkers = std::accumulate(numMarkers.begin(), numMarkers.end(), 0);
+
+			// Resize the marker position vector
+			markerPos.resize(nMarkers);
+
+			// Loop through all markers and feed in x, y (and z) positions
+			int count = 0;
+			for (int i = 0; i < bufferRecv.size(); i++) {
+				for (int j = 0; j < numMarkers[i]; j++) {
+					markerPos[count].push_back(bufferRecv[i][j*L_DIMS]);
+					markerPos[count].push_back(bufferRecv[i][j*L_DIMS+1]);
+#if (L_DIMS == 3)
+					markerPos[count].push_back(bufferRecv[i][j*L_DIMS+2]);
+#endif
+					count++;
+				}
 			}
 
 			break;

@@ -56,6 +56,10 @@ public:
 	std::vector<int> supp_j;	///< Y-indices of lattice sites in support of this marker
 	std::vector<int> supp_k;	///< Z-indices of lattice sites in support of this marker
 
+	std::vector<double> supp_x;	///< X-position of lattice sites in support of this marker
+	std::vector<double> supp_y;	///< Y-position of lattice sites in support of this marker
+	std::vector<double> supp_z;	///< Z-position of lattice sites in support of this marker
+
 	/// Array of indices indicating on which rank the given support point resides
 	std::vector<int> support_rank;
 

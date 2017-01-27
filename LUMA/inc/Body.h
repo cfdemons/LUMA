@@ -155,6 +155,11 @@ void Body<MarkerType>::addMarker(double x, double y, double z)
 	this->markers.back().supp_i.push_back(ijk[0]);
 	this->markers.back().supp_j.push_back(ijk[1]);
 	this->markers.back().supp_k.push_back(ijk[2]);
+
+	this->markers.back().supp_x.push_back(_Owner->XPos[ijk[eXDirection]]);
+	this->markers.back().supp_y.push_back(_Owner->YPos[ijk[eYDirection]]);
+	this->markers.back().supp_z.push_back(_Owner->ZPos[ijk[eZDirection]]);
+
 	this->markers.back().support_rank.push_back(MpiManager::getInstance()->my_rank);
 };
 

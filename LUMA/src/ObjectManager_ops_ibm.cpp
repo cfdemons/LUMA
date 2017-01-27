@@ -158,6 +158,10 @@ void ObjectManager::ibm_initialise() {
 			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
 
+
+		MPI_Barrier(mpim->world_comm);
+		exit(0);
+
 		// Find epsilon for the body
 		ibm_findEpsilon(ib);
 	}
@@ -236,6 +240,8 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	// Vector to store estimated positions of the possible support points
 	double estimated_position[3] = { 0, 0, 0 };
 
+
+
 	// Get the position for the first support point (which already exists from the addMarker method)
 	estimated_position[eXDirection] = nearpos[eXDirection];
 	estimated_position[eYDirection] = nearpos[eYDirection];
@@ -260,9 +266,9 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	supportout
 		<< m << "\t"
 		<< iBody[ib].markers[m].support_rank.back() << "\t"
-		<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
-		<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
-		<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << std::endl;
+		<< iBody[ib].markers[m].supp_x.back() << "\t"
+		<< iBody[ib].markers[m].supp_y.back() << "\t"
+		<< iBody[ib].markers[m].supp_z.back() << std::endl;
 
 #endif
 
@@ -319,6 +325,10 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 						iBody[ib].markers[m].supp_j.push_back(j);
 						iBody[ib].markers[m].supp_k.push_back(k);
 
+						iBody[ib].markers[m].supp_x.push_back(estimated_position[eXDirection]);
+						iBody[ib].markers[m].supp_y.push_back(estimated_position[eYDirection]);
+						iBody[ib].markers[m].supp_z.push_back(estimated_position[eZDirection]);
+
 						// Add owning rank as this one for now
 						iBody[ib].markers[m].support_rank.push_back(mpim->my_rank);
 
@@ -367,9 +377,9 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 						supportout
 							<< m << "\t"
 							<< iBody[ib].markers[m].support_rank.back() << "\t"
-							<< estimated_position[eXDirection] << "\t"
-							<< estimated_position[eYDirection] << "\t"
-							<< estimated_position[eZDirection] << std::endl;
+							<< iBody[ib].markers[m].supp_x.back() << "\t"
+							<< iBody[ib].markers[m].supp_y.back() << "\t"
+							<< iBody[ib].markers[m].supp_z.back() << std::endl;
 #endif
 					}
 				}

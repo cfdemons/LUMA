@@ -32,10 +32,13 @@ void ObjectManager::ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBod
 
 	// Values needed for send
 	MPI_Request send_requests[iBody.size()] = {MPI_REQUEST_NULL};
-	int sendCount = 0;
+	MPI_Request barrier_requests[iBody.size()] = {MPI_REQUEST_NULL};
 
 	// Each rank needs a vector with the body IDs it is responsible for
 	std::vector<int> ownedBodies;
+
+	// Vector of where each rank has sent messages
+	std::vector<int> sentToRank(mpim->num_ranks, 0);
 
 	// Create a vector sized for number of total iBodies as can't be reused
 	std::vector<std::vector<double>> bufferSend;
@@ -55,9 +58,12 @@ void ObjectManager::ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBod
 			ibm_mpi_pack(&iBody[ib], bufferSend[ib]);
 
 			// Send the data with a non-blocking send
-			MPI_Isend(&bufferSend[ib].front(), bufferSend[ib].size(), MPI_DOUBLE, iBody[ib].owningRank, iBody[ib].owningRank, mpim->world_comm, &send_requests[ib]);
-			sendCount++;
+			MPI_Isend(&bufferSend[ib].front(), bufferSend[ib].size(), MPI_DOUBLE, iBody[ib].owningRank, ib, mpim->world_comm, &send_requests[ib]);
 			std::cout << "Rank " << mpim->my_rank << " has sent a message to rank " << iBody[ib].owningRank << std::endl;
+
+
+			// Add to the sentToRank vector
+			sentToRank[iBody[ib].owningRank] += 1;
 		}
 	}
 
@@ -66,44 +72,54 @@ void ObjectManager::ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBod
 	int bufferSize;
 	std::vector<double> bufferRecvTemp;
 	std::vector<std::vector<double>> bufferRecv;
-	bufferRecv.resize(iBody.size());
+	bufferRecv.resize(ownedBodies.size());
 	MPI_Status probeStatus;
 	int probeFlag;
-	int testFlag;
+	int receiveCount = 0;
+
+	// Resize the iBodyEps vector
+	iBodyEps.resize(ownedBodies.size());
+
+	// Do an AllReduce so that each process knows how many sends it is expecting to receive
+	std::vector<int> expectingReceives(mpim->num_ranks, 0);
+	MPI_Allreduce(&sentToRank.front(), &expectingReceives.front(), mpim->num_ranks, MPI_INT, MPI_SUM, mpim->world_comm);
 
 	// Loop through each iBody
 	for (int ib = 0; ib < ownedBodies.size(); ib++) {
 
-		// Wait until all messages for a particular body have been sent
-		MPI_Test(&send_requests[ownedBodies[ib]], &testFlag, MPI_STATUS_IGNORE);
-		std::cout << "Testflag = " << testFlag << std::endl;
-
-		// While there is a send for this rank waiting to be received
-		while (testFlag == 0) {
+		// If there is a message waiting to be received
+		while (receiveCount < expectingReceives[mpim->my_rank]) {
 
 			// Now check for sends this rank needs to receive
-			MPI_Iprobe(MPI_ANY_SOURCE, mpim->my_rank, mpim->world_comm, &probeFlag, &probeStatus);
+			MPI_Iprobe(MPI_ANY_SOURCE, ownedBodies[ib], mpim->world_comm, &probeFlag, &probeStatus);
 
-			std::cout << "Rank " << mpim->my_rank << " has found a message from " << probeStatus.MPI_SOURCE << " addressed to " << probeStatus.MPI_TAG << std::endl;
+			// If a message is there
+			if (probeFlag == 1) {
 
-			// Get buffer size for receiving and resize the vector
-			MPI_Get_count(&probeStatus, MPI_DOUBLE, &bufferSize);
-			bufferRecvTemp.resize(bufferSize);
+				// Get the size of the message
+				MPI_Get_count(&probeStatus, MPI_DOUBLE, &bufferSize);
 
-			// Receive the message
-			MPI_Recv(&bufferRecvTemp.front(), bufferSize, MPI_DOUBLE, probeStatus.MPI_SOURCE, probeStatus.MPI_TAG, mpim->world_comm, MPI_STATUS_IGNORE);
+				// Resize the receving buffer
+				bufferRecvTemp.resize(bufferSize);
 
-			// Put it into the main buffer
-			bufferRecv[ib].insert(bufferRecv[ib].end(), bufferRecvTemp.begin(), bufferRecvTemp.end());
+				// Receive the message
+				MPI_Recv(&bufferRecvTemp.front(), bufferSize, MPI_DOUBLE, probeStatus.MPI_SOURCE, probeStatus.MPI_TAG, mpim->world_comm, MPI_STATUS_IGNORE);
+				std::cout << "Rank " << mpim->my_rank << " has received a message from rank " << probeStatus.MPI_SOURCE << " addressed to rank " << probeStatus.MPI_TAG << std::endl;
 
-			// Now check for sends this rank needs to receive
-			MPI_Test(&send_requests[ownedBodies[ib]], &testFlag, MPI_STATUS_IGNORE);
-			std::cout << "Testflag = " << testFlag << std::endl;
+				// Put it into the main buffer
+				bufferRecv[ib].insert(bufferRecv[ib].end(), bufferRecvTemp.begin(), bufferRecvTemp.end());
 
+				// Increment the receive counter
+				receiveCount++;
+			}
 		}
+
+		// Unpack into the proper iBody format
+//		ibm_mpi_unpack(bufferRecv[ib], iBodyEps[ib]);
 	}
 
 
+	// Write out the message that has been received
 	if (mpim->my_rank == 0) {
 		std::cout << "Rank " << mpim->my_rank << std::endl;
 		for (int i = 0; i < bufferRecv.size(); i++) {
@@ -117,7 +133,6 @@ void ObjectManager::ibm_getEpsInfo(std::vector<IBBody> &iBody, std::vector<IBBod
 
 	MPI_Barrier(mpim->world_comm);
 	exit(0);
-
 }
 
 

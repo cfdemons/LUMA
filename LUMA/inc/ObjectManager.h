@@ -107,6 +107,7 @@ public:
 	void ibm_mpi_pack(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer);
 
 	void ibm_mpi_pack(IBBody *iBody, std::vector<double> &buffer);
+	void ibm_mpi_unpack(std::vector<std::vector<double>> &bufferRecv, std::vector<IBBody> &iBodyEps);
 
 	void ibm_mpi_unpack(eIBInfoType type, std::vector<int> &bufferRecv, int bufferSendSize, std::vector<int> &rankID, std::vector<int> &numMarkers);
 	void ibm_mpi_unpack(eIBInfoType type, std::vector<std::vector<double>> &bufferRecv, std::vector<int> &rankID, std::vector<int> &numMarkers, std::vector<std::vector<double>> &markerPos);

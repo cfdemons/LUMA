@@ -3,8 +3,9 @@ version		=	1.4.0-alpha
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.
 				Additional bug fixes in labelling and coarse limit interpretation.
 
+Issue #116	:	Fixed issue with compiling with probe output turned on.	
 Issue #104	:	Relaxed restriction requiring uniform decomposition by using a slice generator to decompose.
-Issue #114	:	Allowed the embedding of sub-grids in walls once again after coordinate system and initialisation change.
+Issue #114	:	Allowed the embedding of sub-grids in walls once again after coordinate system and initialisation change -- **WIP**
 
 version		=	1.3.0
 

@@ -508,7 +508,7 @@ int main( int argc, char* argv[] )
 #ifdef L_PROBE_OUTPUT
 		if (Grids.t % L_PROBE_OUT_FREQ == 0) {
 
-			for (int n = 0; n < MpiManager::num_ranks; n++) {
+			for (int n = 0; n < mpim->num_ranks; n++) {
 
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef L_BUILD_FOR_MPI

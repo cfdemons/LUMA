@@ -51,7 +51,14 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	*GridUtils::logfile << "ObjectManagerBFL: Applying voxel grid filter..." << std::endl;
 
 	// Place first BFL marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0]);
+	for (size_t a = 0; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
+			break;
+		}
+	}
 
 	// Increment counters
 	int curr_marker = 0;
@@ -59,11 +66,13 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	counter.push_back(1);
 
 	// Loop over array of points
-	for (size_t a = 1; a < _PCpts->x.size(); a++) {
-
-		// Pass to point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
-
+	for (size_t a = 1; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0]))
+		{
+			// Pass to point builder
+			markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		}
 	}
 
 	*GridUtils::logfile << "ObjectManagerBFL: Object represented by " << std::to_string(markers.size()) << 

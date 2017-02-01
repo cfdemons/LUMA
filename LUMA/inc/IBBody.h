@@ -35,6 +35,7 @@ public:
 	IBBody(void);
 	virtual ~IBBody(void);
 	IBBody(GridObj* g, size_t id);
+	IBBody(GridObj* g, size_t id, PCpts* _PCpts);
 
 protected:
 
@@ -83,8 +84,6 @@ public:
 	// Method to construct a 3D plate
 	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 		bool flex_rigid, bool deform, int group, bool plate);
-	// Method to construct body from points read in from file
-	void makeBody(PCpts* _PCpts);
 
 };
 

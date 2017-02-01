@@ -613,10 +613,11 @@ void GridObj::io_probeOutput() {
 				eLocationOnRank *loc = nullptr;
 				std::vector<int> ijk;
 				if (!GridUtils::isOnThisRank(x,y,z,loc,this,&ijk)) continue;
-
-				// Write out value and add tab
-				for (d = 0; d < L_DIMS; d++) {
-					probefile << u(ijk[0], ijk[1], ijk[2],d,M_lim,K_lim,L_DIMS) << "\t";
+	
+				// Write out velocity components and add tab
+				for (d = 0; d < L_DIMS; d++)
+				{
+					probefile << u(ijk[0], ijk[1], ijk[2], d, M_lim, K_lim, L_DIMS) << "\t";
 				}
 
 			}

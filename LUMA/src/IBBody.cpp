@@ -44,6 +44,73 @@ IBBody::IBBody(GridObj* g, size_t id)
 	this->groupID = 0;	// Default ID
 };
 
+// ***************************************************************************************************
+/// \brief	Constructor to build a body in place using a point cloud,
+///
+///			Flexibility and deformable properties taken from definitions.
+///
+/// \param _PCpts pointer to pointer cloud data.
+IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
+{
+
+	// Set some default body properties
+	this->deformable = L_IBB_MOVABLE;
+	this->flex_rigid = L_IBB_FLEXIBLE;
+	this->_Owner = g;
+	this->id = id;
+	this->groupID = 0;
+
+	// Declare local variables
+	std::vector<int> locals;
+
+	// Voxel grid filter //
+
+	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
+
+	// Place first marker
+	for (size_t a = 0; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], this->flex_rigid);
+		}
+		break;
+	}
+
+	// Increment counters
+	int curr_marker = 0;
+	std::vector<int> counter;
+	counter.push_back(1);
+
+	// Loop over array of points
+	for (size_t a = 1; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			// Pass to overridden point builder
+			markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
+		}
+	}
+
+	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
+		" markers using 1 marker / voxel voxelisation." << std::endl;
+
+	// Add dynamic positions in physical units
+	for (size_t i = 0; i < markers.size(); i++) {
+		markers[i].position_old.push_back(markers[i].position[0]);
+		markers[i].position_old.push_back(markers[i].position[1]);
+		markers[i].position_old.push_back(markers[i].position[2]);
+	}
+
+	// Define spacing based on first two markers
+	this->spacing = GridUtils::vecnorm(
+		markers[1].position[0] - markers[0].position[0],
+		markers[1].position[1] - markers[0].position[1],
+		markers[1].position[2] - markers[0].position[2]
+		);
+
+}
+
 /// Default destructor
 IBBody::~IBBody(void) { }
 
@@ -545,61 +612,6 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	return spacing;
 
-
-}
-
-// ***************************************************************************************************
-/// \brief	Method to build a body from a point cloud.
-///
-///			Flexibility and deformable properties taken from definitions.
-///
-/// \param _PCpts pointer to pointer cloud data.
-void IBBody::makeBody(PCpts* _PCpts) {
-
-
-	// Set some default body properties
-	this->deformable = L_IBB_MOVABLE;
-	this->flex_rigid = L_IBB_FLEXIBLE;
-
-	// Declare local variables
-	std::vector<int> locals;
-
-	// Voxel grid filter //
-
-	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
-
-	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], this->flex_rigid);
-
-	// Increment counters
-	int curr_marker = 0;
-	std::vector<int> counter;
-	counter.push_back(1);
-
-	// Loop over array of points
-	for (size_t a = 1; a < _PCpts->x.size(); a++) {
-
-		// Pass to overridden point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
-
-	}
-
-	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
-		" markers using 1 marker / voxel voxelisation." << std::endl;
-
-	// Add dynamic positions in physical units
-	for (size_t i = 0; i < markers.size(); i++) {
-		markers[i].position_old.push_back(markers[i].position[0]);
-		markers[i].position_old.push_back(markers[i].position[1]);
-		markers[i].position_old.push_back(markers[i].position[2]);
-	}
-
-	// Define spacing based on first two markers
-	this->spacing = GridUtils::vecnorm(
-		markers[1].position[0] - markers[0].position[0],
-		markers[1].position[1] - markers[0].position[1],
-		markers[1].position[2] - markers[0].position[2]
-		);
 
 }
 

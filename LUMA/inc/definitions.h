@@ -49,7 +49,7 @@
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_HDF_DEBUG					///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -79,7 +79,7 @@
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
-//#define L_PROBE_OUTPUT						///< Turn on probe output
+//#define L_PROBE_OUTPUT							///< Turn on probe output
 #define L_PROBE_OUT_FREQ 250					///< Write out frequency of probe output
 const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
 const static double cProbeLimsX[2] = {0.1, 0.2};	///< Limits of X plane for array of probes
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 50000		///< Number of time steps to run simulation for
+#define L_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -132,11 +132,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 3		///< Number of coarse lattice sites per unit length
 
 // Non-dimensional domain dimensions
-#define L_BX 12		///< End of domain in X (non-dimensional units)
+#define L_BX 9		///< End of domain in X (non-dimensional units)
 #define L_BY 4		///< End of domain in Y (non-dimensional units)
 #define L_BZ 4		///< End of domain in Z (non-dimensional units)
 

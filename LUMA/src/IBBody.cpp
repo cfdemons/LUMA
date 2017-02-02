@@ -44,6 +44,75 @@ IBBody::IBBody(GridObj* g, size_t id)
 	this->groupID = 0;	// Default ID
 };
 
+// ***************************************************************************************************
+/// \brief	Constructor to build a body in place using a point cloud,
+///
+///			Flexibility and deformable properties taken from definitions.
+///
+/// \param g		pointer to owner grid
+/// \param id		ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data.
+IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
+{
+
+	// Set some default body properties
+	this->deformable = L_IBB_MOVABLE;
+	this->flex_rigid = L_IBB_FLEXIBLE;
+	this->_Owner = g;
+	this->id = id;
+	this->groupID = 0;
+
+	// Declare local variables
+	std::vector<int> locals;
+
+	// Voxel grid filter //
+
+	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
+
+	// Place first marker
+	for (size_t a = 0; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], this->flex_rigid);
+		}
+		break;
+	}
+
+	// Increment counters
+	int curr_marker = 0;
+	std::vector<int> counter;
+	counter.push_back(1);
+
+	// Loop over array of points
+	for (size_t a = 1; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			// Pass to overridden point builder
+			markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
+		}
+	}
+
+	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
+		" markers using 1 marker / voxel voxelisation." << std::endl;
+
+	// Add dynamic positions in physical units
+	for (size_t i = 0; i < markers.size(); i++) {
+		markers[i].position_old.push_back(markers[i].position[0]);
+		markers[i].position_old.push_back(markers[i].position[1]);
+		markers[i].position_old.push_back(markers[i].position[2]);
+	}
+
+	// Define spacing based on first two markers
+	this->spacing = GridUtils::vecnorm(
+		markers[1].position[0] - markers[0].position[0],
+		markers[1].position[1] - markers[0].position[1],
+		markers[1].position[2] - markers[0].position[2]
+		);
+
+}
+
 /// Default destructor
 IBBody::~IBBody(void) { }
 
@@ -175,7 +244,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(L_IBB_W,L_IBB_L) != 0 && fmod(len,wid) != 0 && fmod(len,L_IBB_D) != 0 && fmod(dep,len) != 0) {
-		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -226,7 +296,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) +
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
-		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -286,7 +357,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
-		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -305,7 +377,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -352,7 +425,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Just in case anything goes wrong here...
 	if (markers.size() != num_points) {
-		L_ERROR("Body is not closed. Exiting.", GridUtils::logfile);
+		L_ERROR("Body is not closed. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 }
@@ -374,7 +447,8 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
-		L_ERROR("Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting.", GridUtils::logfile);
+		L_ERROR("Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting.", 
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Designate BCs
@@ -443,7 +517,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Exit if called in 2D
 	if ( L_DIMS == 2 ) {
-		L_ERROR("Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting.", GridUtils::logfile);
+		L_ERROR("Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Designate body as being flexible or rigid and an open surface
@@ -471,7 +546,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
-		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -490,7 +566,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.", GridUtils::logfile);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -537,61 +614,6 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	return spacing;
 
-
-}
-
-// ***************************************************************************************************
-/// \brief	Method to build a body from a point cloud.
-///
-///			Flexibility and deformable properties taken from definitions.
-///
-/// \param _PCpts pointer to pointer cloud data.
-void IBBody::makeBody(PCpts* _PCpts) {
-
-
-	// Set some default body properties
-	this->deformable = L_IBB_MOVABLE;
-	this->flex_rigid = L_IBB_FLEXIBLE;
-
-	// Declare local variables
-	std::vector<int> locals;
-
-	// Voxel grid filter //
-
-	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
-
-	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], this->flex_rigid);
-
-	// Increment counters
-	int curr_marker = 0;
-	std::vector<int> counter;
-	counter.push_back(1);
-
-	// Loop over array of points
-	for (size_t a = 1; a < _PCpts->x.size(); a++) {
-
-		// Pass to overridden point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
-
-	}
-
-	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
-		" markers using 1 marker / voxel voxelisation." << std::endl;
-
-	// Add dynamic positions in physical units
-	for (size_t i = 0; i < markers.size(); i++) {
-		markers[i].position_old.push_back(markers[i].position[0]);
-		markers[i].position_old.push_back(markers[i].position[1]);
-		markers[i].position_old.push_back(markers[i].position[2]);
-	}
-
-	// Define spacing based on first two markers
-	this->spacing = GridUtils::vecnorm(
-		markers[1].position[0] - markers[0].position[0],
-		markers[1].position[1] - markers[0].position[1],
-		markers[1].position[2] - markers[0].position[2]
-		);
 
 }
 

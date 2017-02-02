@@ -32,6 +32,10 @@ void \hyperlink{class_grid_obj_afbaf6155b26acb6a21dcf7be68520607}{L\+B\+M\+\_\+i
 \begin{DoxyCompactList}\small\item\em Method to initialise all L0 lattice quantities. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a697f4d7fc6c9ed18e609528847b1e175}{L\+B\+M\+\_\+init\+Sub\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
 \begin{DoxyCompactList}\small\item\em Method to initialise all sub-\/grid quantities. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_a7a4c2d4eb5bc8f312d0998a55b38f0e2}{L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings} (\hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+\begin{DoxyCompactList}\small\item\em Method to initialise the mapping parameters between this grid and the supplied parent. \end{DoxyCompactList}\item 
+void \hyperlink{class_grid_obj_a32da287cacc2cbd15c3cee482ea4b010}{L\+B\+M\+\_\+init\+Position\+Vector} (double start\+\_\+pos, double end\+\_\+pos, \hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir)
+\begin{DoxyCompactList}\small\item\em Method to initialise the position vector on the grid between the start and end positions supplied. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a4b6edceeda49496365e725eb67931961}{L\+B\+M\+\_\+init\+Bound\+Lab} ()
 \begin{DoxyCompactList}\small\item\em Method to initialise wall and object labels on L0. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5dd08730d7cdea576bb4b337786a9bcf}{L\+B\+M\+\_\+init\+Solid\+Lab} ()
@@ -46,17 +50,17 @@ void \hyperlink{class_grid_obj_ab69942450175d12c75f4b8d33b06c905}{L\+B\+M\+\_\+m
 \begin{DoxyCompactList}\small\item\em Site-\/specific macroscopic update. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_a5701631be6333e512c7fc8dd6ecabf85}{L\+B\+M\+\_\+reset\+Forces} ()
 \begin{DoxyCompactList}\small\item\em Method to reset body forces. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}{bc\+\_\+apply\+Bounce\+Back} (int label, int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_a2dc94b1d2e3f14a1a086b8bfa078839b}{bc\+\_\+apply\+Bounce\+Back} (int label, int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply half-\/way bounce-\/back. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}{bc\+\_\+apply\+Spec\+Reflect} (int label, int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_ae1d63a43d1dee6c7b25880c8a9bb97c9}{bc\+\_\+apply\+Spec\+Reflect} (int label, int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply half-\/way specular reflection. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_a5602705b2575b09e27dd0065de3542f6}{bc\+\_\+apply\+Regularised} (int label, int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_a5602705b2575b09e27dd0065de3542f6}{bc\+\_\+apply\+Regularised} (int label, int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply regularised velocity inlet. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_a385c4803f4803e380a520ac9b3dcb31d}{bc\+\_\+apply\+Extrapolation} (int label, int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_a385c4803f4803e380a520ac9b3dcb31d}{bc\+\_\+apply\+Extrapolation} (int label, int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply extrapolation outlet. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{bc\+\_\+apply\+Bfl} (int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_aeff3b54617b7ae65f08c96e653f9035f}{bc\+\_\+apply\+Bfl} (int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply B\+FL bounce-\/back. \end{DoxyCompactList}\item 
-void \hyperlink{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{bc\+\_\+apply\+Nrbc} (int i, int j, int k)
+\hyperlink{stdafx_8h_ac1e8a42306d8e67cb94ca31c3956ee78}{D\+E\+P\+R\+E\+C\+A\+T\+ED} void \hyperlink{class_grid_obj_ae4fd999e7334c8ec8e1118c92e0c7338}{bc\+\_\+apply\+Nrbc} (int i, int j, int k)
 \begin{DoxyCompactList}\small\item\em Method to apply N\+R\+BC. \end{DoxyCompactList}\item 
 void \hyperlink{class_grid_obj_ab0d47be7ccafaa84b5d43da69e2082b9}{L\+B\+M\+\_\+add\+Sub\+Grid} (int Region\+Number)
 \begin{DoxyCompactList}\small\item\em Wrapper method to add sub-\/grid to this grid. \end{DoxyCompactList}\item 
@@ -537,6 +541,48 @@ Method to initialise all L0 lattice quantities.
 {\em local\+\_\+size} & local grid size on this rank including halo. \\
 \hline
 {\em rank\+\_\+core\+\_\+edge} & absolute positions of the rank edges (excludes overlapping halo). \\
+\hline
+\end{DoxyParams}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings@{L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings}}
+\index{L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings@{L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings(\+Grid\+Obj \&p\+Grid)}{LBM_initGridToGridMappings(GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Grid\+To\+Grid\+Mappings (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} \&}]{p\+Grid}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a7a4c2d4eb5bc8f312d0998a55b38f0e2}{}\label{class_grid_obj_a7a4c2d4eb5bc8f312d0998a55b38f0e2}
+
+
+Method to initialise the mapping parameters between this grid and the supplied parent. 
+
+The mappings computed by this method are local ijk references to allow correct coupling during multi-\/grid operations.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Grid} & reference to parent grid. \\
+\hline
+\end{DoxyParams}
+\index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Position\+Vector@{L\+B\+M\+\_\+init\+Position\+Vector}}
+\index{L\+B\+M\+\_\+init\+Position\+Vector@{L\+B\+M\+\_\+init\+Position\+Vector}!Grid\+Obj@{Grid\+Obj}}
+\subsubsection[{\texorpdfstring{L\+B\+M\+\_\+init\+Position\+Vector(double start\+\_\+pos, double end\+\_\+pos, e\+Cartesian\+Direction dir)}{LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Obj\+::\+L\+B\+M\+\_\+init\+Position\+Vector (
+\begin{DoxyParamCaption}
+\item[{double}]{start\+\_\+pos, }
+\item[{double}]{end\+\_\+pos, }
+\item[{{\bf e\+Cartesian\+Direction}}]{dir}
+\end{DoxyParamCaption}
+)}\hypertarget{class_grid_obj_a32da287cacc2cbd15c3cee482ea4b010}{}\label{class_grid_obj_a32da287cacc2cbd15c3cee482ea4b010}
+
+
+Method to initialise the position vector on the grid between the start and end positions supplied. 
+
+This method can be used for either serial or parallel initialisation as the halo and any wrap around is automatically taken into consideration. As such, the start position can be after the end position and the resulting vector will wrap at the correct point.
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+\_\+pos} & position of the first voxel centre in the vector. \\
+\hline
+{\em end\+\_\+pos} & position of the last voxel centre in the vector. \\
+\hline
+{\em dir} & direction of the vector. \\
 \hline
 \end{DoxyParams}
 \index{Grid\+Obj@{Grid\+Obj}!L\+B\+M\+\_\+init\+Refined\+Lab@{L\+B\+M\+\_\+init\+Refined\+Lab}}

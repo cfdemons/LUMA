@@ -132,6 +132,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a697f4d7fc6c9ed18e609528847b1e175"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a697f4d7fc6c9ed18e609528847b1e175">LBM_initSubGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
 <tr class="memdesc:a697f4d7fc6c9ed18e609528847b1e175"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise all sub-grid quantities.  <a href="#a697f4d7fc6c9ed18e609528847b1e175">More...</a><br /></td></tr>
 <tr class="separator:a697f4d7fc6c9ed18e609528847b1e175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a4c2d4eb5bc8f312d0998a55b38f0e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a7a4c2d4eb5bc8f312d0998a55b38f0e2">LBM_initGridToGridMappings</a> (<a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
+<tr class="memdesc:a7a4c2d4eb5bc8f312d0998a55b38f0e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise the mapping parameters between this grid and the supplied parent.  <a href="#a7a4c2d4eb5bc8f312d0998a55b38f0e2">More...</a><br /></td></tr>
+<tr class="separator:a7a4c2d4eb5bc8f312d0998a55b38f0e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32da287cacc2cbd15c3cee482ea4b010"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a32da287cacc2cbd15c3cee482ea4b010">LBM_initPositionVector</a> (double start_pos, double end_pos, <a class="el" href="stdafx_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir)</td></tr>
+<tr class="memdesc:a32da287cacc2cbd15c3cee482ea4b010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise the position vector on the grid between the start and end positions supplied.  <a href="#a32da287cacc2cbd15c3cee482ea4b010">More...</a><br /></td></tr>
+<tr class="separator:a32da287cacc2cbd15c3cee482ea4b010"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b6edceeda49496365e725eb67931961"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a4b6edceeda49496365e725eb67931961">LBM_initBoundLab</a> ()</td></tr>
 <tr class="memdesc:a4b6edceeda49496365e725eb67931961"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to initialise wall and object labels on L0.  <a href="#a4b6edceeda49496365e725eb67931961">More...</a><br /></td></tr>
 <tr class="separator:a4b6edceeda49496365e725eb67931961"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,22 +159,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5701631be6333e512c7fc8dd6ecabf85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5701631be6333e512c7fc8dd6ecabf85">LBM_resetForces</a> ()</td></tr>
 <tr class="memdesc:a5701631be6333e512c7fc8dd6ecabf85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to reset body forces.  <a href="#a5701631be6333e512c7fc8dd6ecabf85">More...</a><br /></td></tr>
 <tr class="separator:a5701631be6333e512c7fc8dd6ecabf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2dc94b1d2e3f14a1a086b8bfa078839b">bc_applyBounceBack</a> (int label, int i, int j, int k)</td></tr>
+<tr class="memitem:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a2dc94b1d2e3f14a1a086b8bfa078839b">bc_applyBounceBack</a> (int label, int i, int j, int k)</td></tr>
 <tr class="memdesc:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply half-way bounce-back.  <a href="#a2dc94b1d2e3f14a1a086b8bfa078839b">More...</a><br /></td></tr>
 <tr class="separator:a2dc94b1d2e3f14a1a086b8bfa078839b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae1d63a43d1dee6c7b25880c8a9bb97c9">bc_applySpecReflect</a> (int label, int i, int j, int k)</td></tr>
+<tr class="memitem:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae1d63a43d1dee6c7b25880c8a9bb97c9">bc_applySpecReflect</a> (int label, int i, int j, int k)</td></tr>
 <tr class="memdesc:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply half-way specular reflection.  <a href="#ae1d63a43d1dee6c7b25880c8a9bb97c9">More...</a><br /></td></tr>
 <tr class="separator:ae1d63a43d1dee6c7b25880c8a9bb97c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5602705b2575b09e27dd0065de3542f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5602705b2575b09e27dd0065de3542f6">bc_applyRegularised</a> (int label, int i, int j, int k)</td></tr>
+<tr class="memitem:a5602705b2575b09e27dd0065de3542f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a5602705b2575b09e27dd0065de3542f6">bc_applyRegularised</a> (int label, int i, int j, int k)</td></tr>
 <tr class="memdesc:a5602705b2575b09e27dd0065de3542f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply regularised velocity inlet.  <a href="#a5602705b2575b09e27dd0065de3542f6">More...</a><br /></td></tr>
 <tr class="separator:a5602705b2575b09e27dd0065de3542f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a385c4803f4803e380a520ac9b3dcb31d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a385c4803f4803e380a520ac9b3dcb31d">bc_applyExtrapolation</a> (int label, int i, int j, int k)</td></tr>
+<tr class="memitem:a385c4803f4803e380a520ac9b3dcb31d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#a385c4803f4803e380a520ac9b3dcb31d">bc_applyExtrapolation</a> (int label, int i, int j, int k)</td></tr>
 <tr class="memdesc:a385c4803f4803e380a520ac9b3dcb31d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply extrapolation outlet.  <a href="#a385c4803f4803e380a520ac9b3dcb31d">More...</a><br /></td></tr>
 <tr class="separator:a385c4803f4803e380a520ac9b3dcb31d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeff3b54617b7ae65f08c96e653f9035f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aeff3b54617b7ae65f08c96e653f9035f">bc_applyBfl</a> (int i, int j, int k)</td></tr>
+<tr class="memitem:aeff3b54617b7ae65f08c96e653f9035f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#aeff3b54617b7ae65f08c96e653f9035f">bc_applyBfl</a> (int i, int j, int k)</td></tr>
 <tr class="memdesc:aeff3b54617b7ae65f08c96e653f9035f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply BFL bounce-back.  <a href="#aeff3b54617b7ae65f08c96e653f9035f">More...</a><br /></td></tr>
 <tr class="separator:aeff3b54617b7ae65f08c96e653f9035f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae4fd999e7334c8ec8e1118c92e0c7338">bc_applyNrbc</a> (int i, int j, int k)</td></tr>
+<tr class="memitem:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdafx_8h.html#ac1e8a42306d8e67cb94ca31c3956ee78">DEPRECATED</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ae4fd999e7334c8ec8e1118c92e0c7338">bc_applyNrbc</a> (int i, int j, int k)</td></tr>
 <tr class="memdesc:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to apply NRBC.  <a href="#ae4fd999e7334c8ec8e1118c92e0c7338">More...</a><br /></td></tr>
 <tr class="separator:ae4fd999e7334c8ec8e1118c92e0c7338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0d47be7ccafaa84b5d43da69e2082b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_obj.html#ab0d47be7ccafaa84b5d43da69e2082b9">LBM_addSubGrid</a> (int RegionNumber)</td></tr>
@@ -949,6 +955,74 @@ Friends</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">local_size</td><td>local grid size on this rank including halo. </td></tr>
     <tr><td class="paramname">rank_core_edge</td><td>absolute positions of the rank edges (excludes overlapping halo). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7a4c2d4eb5bc8f312d0998a55b38f0e2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::LBM_initGridToGridMappings </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
+          <td class="paramname"><em>pGrid</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Method to initialise the mapping parameters between this grid and the supplied parent. </p>
+<p>The mappings computed by this method are local ijk references to allow correct coupling during multi-grid operations.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pGrid</td><td>reference to parent grid. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a32da287cacc2cbd15c3cee482ea4b010"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GridObj::LBM_initPositionVector </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>start_pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>end_pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="stdafx_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramname"><em>dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Method to initialise the position vector on the grid between the start and end positions supplied. </p>
+<p>This method can be used for either serial or parallel initialisation as the halo and any wrap around is automatically taken into consideration. As such, the start position can be after the end position and the resulting vector will wrap at the correct point.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_pos</td><td>position of the first voxel centre in the vector. </td></tr>
+    <tr><td class="paramname">end_pos</td><td>position of the last voxel centre in the vector. </td></tr>
+    <tr><td class="paramname">dir</td><td>direction of the vector. </td></tr>
   </table>
   </dd>
 </dl>

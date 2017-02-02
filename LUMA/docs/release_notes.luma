@@ -1,7 +1,13 @@
 version		=	1.4.0-alpha
 
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.
+				Additional bug fixes in labelling and coarse limit interpretation.
+				Fixed rare but major bug that occurs with HDF writable region definition when only a corner of a grid is built on a rank exclusively on a halo region. Changed implementation to fix.
+				Improvements to initialisation clarity and debug messaging.
+				Old boundary condition methods marked as DEPRECATED.
+				IBBody constructor for PC added to move away from teh "make_body()" wrappers which are messy.
 
+Issue #116	:	Fixed issue with compiling with probe output turned on.	
 Issue #104	:	Relaxed restriction requiring uniform decomposition by using a slice generator to decompose.
 Issue #114	:	Allowed the embedding of sub-grids in walls once again after coordinate system and initialisation change.
 

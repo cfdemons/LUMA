@@ -148,12 +148,14 @@ int main( int argc, char* argv[] )
 
 #ifdef L_BUILD_FOR_MPI
 	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
-	if (	L_MPI_XCORES < 2 || L_MPI_YCORES < 2
+	if (
+		L_MPI_XCORES < 2 || L_MPI_YCORES < 2
 #if (L_DIMS == 3)
 		|| L_MPI_ZCORES < 2
 #endif
-		) {
-		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
+		)
+	{
+		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile, mpim->my_rank);
 	}
 #endif
 
@@ -506,7 +508,7 @@ int main( int argc, char* argv[] )
 #ifdef L_PROBE_OUTPUT
 		if (Grids.t % L_PROBE_OUT_FREQ == 0) {
 
-			for (int n = 0; n < MpiManager::num_ranks; n++) {
+			for (int n = 0; n < mpim->num_ranks; n++) {
 
 				// Wait for rank accessing the file and only access if this rank's turn
 #ifdef L_BUILD_FOR_MPI

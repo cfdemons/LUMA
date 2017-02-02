@@ -20,10 +20,12 @@ Inheritance diagram for I\+B\+Body\+:\begin{figure}[H]
 \item 
 \hyperlink{class_i_b_body_a5fbec47db22b9d525724f232d1d81037}{I\+B\+Body} (void)
 \begin{DoxyCompactList}\small\item\em Constructor which sets group ID to zero by default. \end{DoxyCompactList}\item 
-\hyperlink{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{$\sim$\+I\+B\+Body} (void)
+virtual \hyperlink{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{$\sim$\+I\+B\+Body} (void)
 \begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
 \hyperlink{class_i_b_body_a737e9f9ecfff9a1ea0741b03a43c3478}{I\+B\+Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id})
 \begin{DoxyCompactList}\small\item\em Constructor which assigns the owner grid. \end{DoxyCompactList}\item 
+\hyperlink{class_i_b_body_a8c95ff82ebef5f8e86519f656576cbce}{I\+B\+Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id}, \hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\begin{DoxyCompactList}\small\item\em Constructor to build a body in place using a point cloud,. \end{DoxyCompactList}\item 
 void \hyperlink{class_i_b_body_aafa9573e6787bf3b6f07fd3880452b89}{add\+Marker} (double x, double y, double z, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
 \begin{DoxyCompactList}\small\item\em Method to add an IB marker to the body. \end{DoxyCompactList}\item 
 virtual void \hyperlink{class_i_b_body_a16cf21facacb49727c2e1feda473d080}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid})
@@ -35,9 +37,7 @@ void \hyperlink{class_i_b_body_a5c3f3da65bdaca7bee4ebea5a06b8bdd}{make\+Body} (s
 void \hyperlink{class_i_b_body_ab83346d555202a5cf669c7e309dc856a}{make\+Body} (int numbermarkers, std\+::vector$<$ double $>$ start\+\_\+point, double fil\+\_\+length, std\+::vector$<$ double $>$ angles, std\+::vector$<$ int $>$ \hyperlink{class_i_b_body_ad9fa313d9cb2c2c463740eed5a1faf16}{B\+Cs}, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group)
 \begin{DoxyCompactList}\small\item\em Method to seed markers for a flexible filament. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_body_a34380e523aef0978495d52bc91f3d74b}{make\+Body} (std\+::vector$<$ double $>$ width\+\_\+length, double angle, std\+::vector$<$ double $>$ centre, bool \hyperlink{class_i_b_body_a526f3e83b45b991a79941ee745698ea5}{flex\+\_\+rigid}, bool deform, int group, bool plate)
-\begin{DoxyCompactList}\small\item\em Method to seed markers for a 3D plate inclined from the XZ plane. \end{DoxyCompactList}\item 
-void \hyperlink{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{make\+Body} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
-\begin{DoxyCompactList}\small\item\em Method to build a body from a point cloud. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Method to seed markers for a 3D plate inclined from the XZ plane. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -86,7 +86,7 @@ Constructor which sets group ID to zero by default.
 \begin{DoxyParamCaption}
 \item[{void}]{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{}\label{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}{}\label{class_i_b_body_afe26e702d31e91f562aecd04a5f5c7f0}
 
 
 Default destructor. 
@@ -110,6 +110,30 @@ Also sets the group ID to zero.
 {\em g} & pointer to owner grid \\
 \hline
 {\em id} & ID of body in array of bodies. \\
+\hline
+\end{DoxyParams}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\index{I\+B\+Body@{I\+B\+Body}!I\+B\+Body@{I\+B\+Body}}
+\subsubsection[{\texorpdfstring{I\+B\+Body(\+Grid\+Obj $\ast$g, size\+\_\+t id, P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{IBBody(GridObj *g, size_t id, PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Body\+::\+I\+B\+Body (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$}]{g, }
+\item[{size\+\_\+t}]{id, }
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)}\hypertarget{class_i_b_body_a8c95ff82ebef5f8e86519f656576cbce}{}\label{class_i_b_body_a8c95ff82ebef5f8e86519f656576cbce}
+
+
+Constructor to build a body in place using a point cloud,. 
+
+Flexibility and deformable properties taken from definitions.
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & pointer to owner grid \\
+\hline
+{\em id} & ID of body in array of bodies. \\
+\hline
+{\em \+\_\+\+P\+Cpts} & pointer to point cloud data. \\
 \hline
 \end{DoxyParams}
 
@@ -270,24 +294,6 @@ Method to seed markers for a 3D plate inclined from the XZ plane.
 {\em group} & ID indicating which group the body is part of for collective operations. \\
 \hline
 {\em plate} & arbitrary argument to allow overload otherwise would have the same signature as a filament builder. \\
-\hline
-\end{DoxyParams}
-\index{I\+B\+Body@{I\+B\+Body}!make\+Body@{make\+Body}}
-\index{make\+Body@{make\+Body}!I\+B\+Body@{I\+B\+Body}}
-\subsubsection[{\texorpdfstring{make\+Body(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{makeBody(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}void I\+B\+Body\+::make\+Body (
-\begin{DoxyParamCaption}
-\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
-\end{DoxyParamCaption}
-)}\hypertarget{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}{}\label{class_i_b_body_aad21167e57221cb4faf5a15ffebc438d}
-
-
-Method to build a body from a point cloud. 
-
-Flexibility and deformable properties taken from definitions.
-
-
-\begin{DoxyParams}{Parameters}
-{\em \+\_\+\+P\+Cpts} & pointer to pointer cloud data. \\
 \hline
 \end{DoxyParams}
 \index{I\+B\+Body@{I\+B\+Body}!marker\+Adder@{marker\+Adder}}

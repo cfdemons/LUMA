@@ -165,7 +165,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 		file.open("./input/restart_IBBody_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
-			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile);
+			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 		}
 
 		// Read in one line of file at a time
@@ -185,7 +185,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		// Check number of bodies is correct
 		if (iBody.size() != num_bod) {
-			L_ERROR("Number of IBM bodies does not match the number specified in the restart file. Exiting.", GridUtils::logfile);
+			L_ERROR("Number of IBM bodies does not match the number specified in the restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 		}
 
 		// Loop over bodies
@@ -205,7 +205,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 			// Check number of markers the same
 			if (iBody[b].markers.size() != num_mark) {
 				L_ERROR("Number of IBM markers does not match the number specified for body " +
-					std::to_string(b) + " in the restart file. Exiting.", GridUtils::logfile);
+					std::to_string(b) + " in the restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
 			}
 
 			// Read in marker data
@@ -361,7 +361,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Handle failure to open
 	if (!file.is_open()) {
-		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile);
+		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Get grid pointer
@@ -410,7 +410,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile);
+		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile, mpim->my_rank);
 	}
 	else {
 		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
@@ -473,7 +473,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
-#endif
 	a = 0;
 	do {
 
@@ -493,7 +492,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes
-#ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
@@ -507,52 +505,49 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// If there are points left
-	if (!_PCpts->x.empty())	{
+	// Perform a different post-processing action depending on the type of body
+	switch (objtype)
+	{
 
-		// Perform a different post-processing action depending on the type of body
-		switch (objtype)
-		{
-
-		case eBBBCloud:
+	case eBBBCloud:
 #ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Labelling..." << std::endl;
+		*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
-			// Label the grid sites
-			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+		// Label the grid sites
+		for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get indices
-				GridUtils::getEnclosingVoxel(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g, &ijk);
-
+			// Get indices if on this rank
+			if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
+			{
 				// Update Typing Matrix
 				if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
 				{
 					g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
 				}
 			}
-			break;
-
-		case eBFLCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call BFL body builder
-			bfl_buildBody(_PCpts);
-			break;
-
-		case eIBBCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call IBM body builder
-			ibm_buildBody(_PCpts, g);
-			break;
-
 		}
+		break;
+
+	case eBFLCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call BFL body builder
+		bfl_buildBody(_PCpts);
+		break;
+
+	case eIBBCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call IBM body builder
+		ibm_buildBody(_PCpts, g);
+		break;
 
 	}
+
 }
 // *****************************************************************************
 /// \brief	Write out the forces on a solid object.

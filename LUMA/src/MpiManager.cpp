@@ -86,10 +86,6 @@ void MpiManager::destroyInstance() {
 ///			MPIM with a basic set of grid information used by other methods.
 void MpiManager::mpi_init() {
 
-	// Set max ranks to 1 and current rank to 0 for now.
-	num_ranks = 1;
-	my_rank = 0;
-
 #ifdef L_BUILD_FOR_MPI
 	// Create communicator and topology
 	int MPI_periodic[L_DIMS], MPI_reorder;
@@ -108,6 +104,13 @@ void MpiManager::mpi_init() {
 
 	// Store coordinates in the new topology
 	MPI_Cart_coords(world_comm, my_rank, L_DIMS, rank_coords);
+
+#else
+
+	// Default serial values
+	my_rank = 0;
+	num_ranks = 1;
+	for (int d = 0; d < L_DIMS; ++d) rank_coords[d] = 0;
 
 #endif
 
@@ -128,10 +131,11 @@ void MpiManager::mpi_init() {
 #endif
 
 
-#ifdef L_MPI_VERBOSE
+
 	// Open logfile now my_rank has been assigned
 	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".out", std::ios::out );
 
+#ifdef L_MPI_VERBOSE
 	// Write out coordinates
 	*logout << "Coordinates on rank " << my_rank << " are (";
 	for (size_t d = 0; d < L_DIMS; d++) {
@@ -272,7 +276,7 @@ void MpiManager::mpi_init() {
 
 	// If using custom sizes, user must set the L_MPI_ZCORES to 1
 	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
-		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", MpiManager::logout);
+		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", MpiManager::logout, my_rank);
 	}
 
 #endif
@@ -333,7 +337,7 @@ void MpiManager::mpi_gridbuild( ) {
 		if (cellsLastDomain[d] <= 0)
 		{
 			L_ERROR("Last core in dir = " + std::to_string(d) + 
-				" has 0 or less cells. Exiting. Please change the number of cores in this direction. Note: d=0 is x.", logout);
+				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout, my_rank);
 		}
 	}
 
@@ -830,24 +834,27 @@ int MpiManager::mpi_buildCommunicators() {
 		(p_data.back().i_end - p_data.back().i_start + 1) *
 		(p_data.back().j_end - p_data.back().j_start + 1) *
 		(p_data.back().k_end - p_data.back().k_start + 1);
-
-
-
+	
 
 
 	// Loop over the possible sub-grid combinations
 	for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 		for (int lev = 1; lev <= L_NUM_LEVELS; lev++) {
 
+#if defined L_HDF_DEBUG
+			*logout << "Looking to add sub-grid L" << lev << " R" << reg << " to writable communicator...";
+#endif
+
 			// Try gain access to the sub-grid on this rank
 			GridObj *targetGrid = NULL;
 			GridUtils::getGrid(Grids, lev, reg, targetGrid);
 
 			// If sub-grid found
-			if (targetGrid != NULL) {
+			if (targetGrid != NULL)
+			{
 
 #if defined L_HDF_DEBUG
-				*logout << "Looking to add sub-grid L" << lev << " R" << reg << " to writable communicator..." << std::endl;
+				*logout << "Grid Found." << std::endl;
 #endif
 
 				/* Since we are doing this only for HDF5 we can exclude those ranks
@@ -893,29 +900,19 @@ int MpiManager::mpi_buildCommunicators() {
 				continue;
 
 #else
-				// Retrieve corresponding buffer recv size info struct
-				MpiManager::buffer_struct bri;
-				MpiManager* mpim = MpiManager::getInstance();
-				for (MpiManager::buffer_struct bs : mpim->buffer_recv_info) {
-					if (bs.level == targetGrid->level && bs.region == targetGrid->region_number) {
-						bri = bs;
-						break;
-					}
-				}
-
 				/* First we define the writable region limits in local indices 
 				 * taking into account the elements that sit in the halo 
 				 * (recv layer) which will not be written out.
-				 * Note that a non-zero buffer size indicates that some portion of
-				 * the grid lies on a neighbour rank (either its halo or the core 
-				 * of the grid). However, the index offset for the writable region
-				 * needs to know how much of the grid is on the neighbour and apply
-				 * a suitable correction. We do this by starting at the grid edges 
-				 * shift the index if that site is on a receiver layer. Once off the 
-				 * receiver layer (i.e. out of the halo) we have computed the offset.
+				 * We can do this simply by looking up the position of the last and 
+				 * first sites on the grid and checking to see whether they need 
+				 * moving off the halo (recv layer).
+				 * We do this by starting at the grid edges shift the index if that
+				 * site is on a receiver layer. Once off the receiver layer (i.e. 
+				 * out of the halo) we have computed the offset.
 				 * This fixes a previous issue where it was assumed that the shift 
 				 * always be a full halo shift which is not true if a TL is in the 
-				 * halo.*/
+				 * halo and also fixes an issue that could have arisen if only a
+				 * corner of a grid was built exclusively on the halo. */
 
 				// Declarations
 				int shifted_index;
@@ -929,94 +926,71 @@ int MpiManager::mpi_buildCommunicators() {
 				p_data.back().k_end = 0;
 
 
-
-				// Check x-directions for presence of halo (i.e. non-zero buffer size)				
-				if (bri.size[1]) {
-					shifted_index = N_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMax));
-					p_data.back().i_end = shifted_index;	// Index has now shifted off halo
+				// Check upper x-direction edge for presence of halo
+				shifted_index = N_lim;
+				do --shifted_index; 
+				while (shifted_index >= 0 && GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMax));
+				p_data.back().i_end = shifted_index;	// Index has now shifted off halo
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != N_lim - 1)
 					*logout << "Upper X halo found. Thickness = " << (N_lim - 1) - shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().i_end = N_lim - 1;	// No halo so end index is edge of grid
-				}
-
-				if (bri.size[0]) {
-					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMin));
-					p_data.back().i_start = shifted_index;
+				// Check lower x-direction edge for presence of halo
+				shifted_index = -1;
+				do ++shifted_index;
+				while (shifted_index < N_lim && GridUtils::isOnRecvLayer(targetGrid->XPos[shifted_index], eXMin));
+				p_data.back().i_start = shifted_index;
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != 0)
 					*logout << "Lower X halo found. Thickness = " << shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().i_start = 0;
-				}
-
-				// Check y-directions for halo
-				if (bri.size[5]) {
-					shifted_index = M_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMax));
-					p_data.back().j_end = shifted_index;
+				// Check y-directions
+				shifted_index = M_lim;
+				do --shifted_index;
+				while (shifted_index >= 0 && GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMax));
+				p_data.back().j_end = shifted_index;
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != M_lim - 1)
 					*logout << "Upper Y halo found. Thickness = " << (M_lim - 1) - shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().j_end = M_lim - 1;
-				}
-
-				if (bri.size[4]) {
-					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMin));
-					p_data.back().j_start = shifted_index;
+				shifted_index = -1;
+				do ++shifted_index;
+				while (shifted_index < M_lim && GridUtils::isOnRecvLayer(targetGrid->YPos[shifted_index], eYMin));
+				p_data.back().j_start = shifted_index;
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != 0)
 					*logout << "Lower Y halo found. Thickness = " << shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().j_start = 0;
-				}
-
 #if (L_DIMS == 3)
 				// Check z-directions for halo
-				if (bri.size[9]) {
-					shifted_index = K_lim;
-					do --shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMax));
-					p_data.back().k_end = shifted_index;
+				shifted_index = K_lim;
+				do --shifted_index;
+				while (shifted_index >= 0 && GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMax));
+				p_data.back().k_end = shifted_index;
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != K_lim - 1)
 					*logout << "Upper Z halo found. Thickness = " << (K_lim - 1) - shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().k_end = K_lim - 1;
-				}
-
-				if (bri.size[8]) {
-					shifted_index = -1;
-					do ++shifted_index; while (GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMin));
-					p_data.back().k_start = shifted_index;
+				shifted_index = -1;
+				do ++shifted_index;
+				while (shifted_index < K_lim && GridUtils::isOnRecvLayer(targetGrid->ZPos[shifted_index], eZMin));
+				p_data.back().k_start = shifted_index;
 
 #if defined L_HDF_DEBUG
+				if (shifted_index != 0)
 					*logout << "Lower Z halo found. Thickness = " << shifted_index << std::endl;
 #endif
 
-				}
-				else {
-					p_data.back().k_start = 0;
-				}
 #else
 				p_data.back().k_start = 0;
 				p_data.back().k_end = 0;
@@ -1093,9 +1067,16 @@ int MpiManager::mpi_buildCommunicators() {
 #endif	// !L_BUILD_FOR_MPI
 
 			}
-			else {
+
+			// Grid not on this rank
+			else
+			{
 				// Grid not on this rank so exclude from communicator
 				colour = MPI_UNDEFINED;
+
+#if defined L_HDF_DEBUG
+				*logout << "Grid not found." << std::endl;
+#endif
 			}
 
 #ifdef L_BUILD_FOR_MPI
@@ -1105,9 +1086,15 @@ int MpiManager::mpi_buildCommunicators() {
 			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NUM_LEVELS]);
 
 #if defined L_HDF_DEBUG
-			*logout << "Region " << reg << ", Level " << lev << 
-				" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] << " and colour " << colour << 
-				" and writable data size " << p_data.back().writable_data_count << std::endl;
+
+			// Only write out communicator info if this rank was added to the communicator
+			if (colour != MPI_UNDEFINED)
+			{
+				*logout << "Grid has writable data of size " << p_data.back().writable_data_count << 
+					": Region " << reg << ", Level " << lev <<
+					" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] << 
+					" and colour " << colour << std::endl;
+			}
 #endif
 
 #endif	// L_BUILD_FOR_MPI
@@ -1115,7 +1102,7 @@ int MpiManager::mpi_buildCommunicators() {
 		}
 	}
 
-	*GridUtils::logfile << "Complete. Status = " << status << std::endl;
+	*GridUtils::logfile << "Communicator build complete. Status = " << status << std::endl;
 
 	return status;
 }

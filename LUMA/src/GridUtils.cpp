@@ -265,7 +265,7 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != x.size()) {
-		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile);
+		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile, MpiManager::getInstance()->my_rank);
 	}
 
 	// Initialise answer
@@ -836,7 +836,7 @@ bool GridUtils::isOnSenderLayer(double site_position, enum eCartMinMax edge) {
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer(). Exiting.", logfile);
+		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer(). Exiting.", logfile, mpim->my_rank);
 	}
 
 	return false;
@@ -918,7 +918,7 @@ bool GridUtils::isOnRecvLayer(double site_position, enum eCartMinMax edge) {
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnRecvLayer(). Exiting.", logfile);
+		L_ERROR("Invalid direction specified in GridUtils::isOnRecvLayer(). Exiting.", logfile, mpim->my_rank);
 	}
 
 	return false;
@@ -1028,7 +1028,7 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, cons
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile);
+		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile, mpim->my_rank);
 	}
 
 	if (position >= left_edge && position < right_edge) return true;

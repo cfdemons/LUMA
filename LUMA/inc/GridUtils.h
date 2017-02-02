@@ -26,15 +26,6 @@ enum eLocationOnRank
 	
 };
 
-/// \enum eCartesianDirection
-/// \brief Enumeration for directional options.
-enum eCartesianDirection
-{
-	eXDirection,	///< X-direction
-	eYDirection,	///< Y-direction
-	eZDirection		///< Z-direction
-};
-
 /// \enum eMinMax
 /// \brief	Enumeration for minimum and maximum.
 ///

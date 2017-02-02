@@ -417,6 +417,10 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	}
 	H5Sselect_none(filespace);
 
+#ifdef L_HDF_DEBUG
+	*GridUtils::logfile << "Write Complete." << std::endl;
+#endif
+
 	// Close property list
 	status = H5Pclose(plist_id);
 	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file access mode list failed: " << status << std::endl;

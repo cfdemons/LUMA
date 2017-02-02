@@ -21,16 +21,26 @@
 \begin{DoxyCompactList}\small\item\em Not a Number declaration (Unix) \end{DoxyCompactList}\item 
 \#define \hyperlink{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}{SQ}(x)~((x) $\ast$ (x))
 \item 
+\#define \hyperlink{stdafx_8h_ac4bd0cde24a2ac187747b517bc5e4f50}{L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER}~1e-\/8
+\item 
 \#define \hyperlink{stdafx_8h_af8d3b25556396facf0f8c19decc56200}{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}
 \item 
 \#define \hyperlink{stdafx_8h_a785727f822adc2d7112e0158817a88ba}{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}~12345
 \begin{DoxyCompactList}\small\item\em Error definition. \end{DoxyCompactList}\item 
-\#define \hyperlink{stdafx_8h_a48538932682d4fe3cdf01547db361240}{L\+\_\+\+E\+R\+R\+OR}~\hyperlink{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{errorfcn}
+\#define \hyperlink{stdafx_8h_a48538932682d4fe3cdf01547db361240}{L\+\_\+\+E\+R\+R\+OR}~\hyperlink{stdafx_8h_a39e9206df29bcf9ad0f454b5b8759cd8}{errorfcn}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} \{ \hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{e\+X\+Direction}, 
+\hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}{e\+Y\+Direction}, 
+\hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}{e\+Z\+Direction}
+ \}\begin{DoxyCompactList}\small\item\em Enumeration for directional options. \end{DoxyCompactList}
 \end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{errorfcn} (std\+::string msg, std\+::ofstream $\ast$logfile)
+void \hyperlink{stdafx_8h_a39e9206df29bcf9ad0f454b5b8759cd8}{errorfcn} (const std\+::string \&msg, std\+::ofstream $\ast$logfile, unsigned int mpi\+\_\+rank=0)
 \begin{DoxyCompactList}\small\item\em Fatal Error function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
@@ -52,22 +62,6 @@ const double \hyperlink{stdafx_8h_ae51e162e8ad5da2cef261f3936312f64}{cs}
 \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}}
 \index{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES@{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}{L_DACTION_WRITE_OUT_FORCES}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+D\+A\+C\+T\+I\+O\+N\+\_\+\+W\+R\+I\+T\+E\+\_\+\+O\+U\+T\+\_\+\+F\+O\+R\+C\+ES}\hypertarget{stdafx_8h_af8d3b25556396facf0f8c19decc56200}{}\label{stdafx_8h_af8d3b25556396facf0f8c19decc56200}
-{\bfseries Value\+:}
-\begin{DoxyCode}
-std::ofstream testout; \(\backslash\)
-testout.open(\hyperlink{class_grid_utils_a9b58748e9e05e84852962d7abc7942e3}{GridUtils::path\_str} + \textcolor{stringliteral}{"/force\_i\_LB.out"}, std::ios::app); \(\backslash\)
-testout << \textcolor{stringliteral}{"\(\backslash\)nNEW TIME STEP"} << std::endl; \(\backslash\)
-for (\textcolor{keywordtype}{size\_t} j = 1; j < M\_lim - 1; j++) \{ \(\backslash\)
-    for (\textcolor{keywordtype}{size\_t} i = 0; i < N\_lim; i++) \{ \(\backslash\)
-        for (\textcolor{keywordtype}{size\_t} v = 0; v < \hyperlink{definitions_8h_a947c7e248feb63ae57fb828c03c4c001}{L\_NUM\_VELS}; v++) \{ \(\backslash\)
-            testout << force\_i(i, j, 0, v, M\_lim, K\_lim, L\_NUM\_VELS) << \textcolor{stringliteral}{"\(\backslash\)t"}; \(\backslash\)
-        \} \(\backslash\)
-        testout << std::endl; \(\backslash\)
-    \} \(\backslash\)
-    testout << std::endl; \(\backslash\)
-\} \(\backslash\)
-testout.close(); \(\backslash\)
-\end{DoxyCode}
 \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}}
 \index{L\+\_\+\+E\+R\+R\+OR@{L\+\_\+\+E\+R\+R\+OR}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+\_\+\+E\+R\+R\+OR}{L_ERROR}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+E\+R\+R\+OR~{\bf errorfcn}}\hypertarget{stdafx_8h_a48538932682d4fe3cdf01547db361240}{}\label{stdafx_8h_a48538932682d4fe3cdf01547db361240}
@@ -78,6 +72,9 @@ Error function shorthand \index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+I\+S\+\_\+\+N\+
 
 Not a Number declaration (Unix) 
 
+\index{stdafx.\+h@{stdafx.\+h}!L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER@{L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER}}
+\index{L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER@{L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER}!stdafx.\+h@{stdafx.\+h}}
+\subsubsection[{\texorpdfstring{L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER}{L_SMALL_NUMBER}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+\_\+\+S\+M\+A\+L\+L\+\_\+\+N\+U\+M\+B\+ER~1e-\/8}\hypertarget{stdafx_8h_ac4bd0cde24a2ac187747b517bc5e4f50}{}\label{stdafx_8h_ac4bd0cde24a2ac187747b517bc5e4f50}
 \index{stdafx.\+h@{stdafx.\+h}!L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED@{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}}
 \index{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED@{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}!stdafx.\+h@{stdafx.\+h}}
 \subsubsection[{\texorpdfstring{L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED}{LUMA_FAILED}}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+U\+M\+A\+\_\+\+F\+A\+I\+L\+ED~12345}\hypertarget{stdafx_8h_a785727f822adc2d7112e0158817a88ba}{}\label{stdafx_8h_a785727f822adc2d7112e0158817a88ba}
@@ -94,15 +91,37 @@ Error definition.
 )~((x) $\ast$ (x))}\hypertarget{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}{}\label{stdafx_8h_ac3644f84794a8bfdacf39c4b2c2495fc}
 
 
+\subsection{Enumeration Type Documentation}
+\index{stdafx.\+h@{stdafx.\+h}!e\+Cartesian\+Direction@{e\+Cartesian\+Direction}}
+\index{e\+Cartesian\+Direction@{e\+Cartesian\+Direction}!stdafx.\+h@{stdafx.\+h}}
+\subsubsection[{\texorpdfstring{e\+Cartesian\+Direction}{eCartesianDirection}}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf e\+Cartesian\+Direction}}\hypertarget{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{}\label{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}
+
+
+Enumeration for directional options. 
+
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{e\+X\+Direction@{e\+X\+Direction}!stdafx.\+h@{stdafx.\+h}}\index{stdafx.\+h@{stdafx.\+h}!e\+X\+Direction@{e\+X\+Direction}}\item[{\em 
+e\+X\+Direction\hypertarget{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}{}\label{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfad4dd14faf6e5bc9c5715c4d862460dd1}
+}]X-\/direction. \index{e\+Y\+Direction@{e\+Y\+Direction}!stdafx.\+h@{stdafx.\+h}}\index{stdafx.\+h@{stdafx.\+h}!e\+Y\+Direction@{e\+Y\+Direction}}\item[{\em 
+e\+Y\+Direction\hypertarget{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}{}\label{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaa7bbd2aae59b6658e96adc4763b64eaf}
+}]Y-\/direction. \index{e\+Z\+Direction@{e\+Z\+Direction}!stdafx.\+h@{stdafx.\+h}}\index{stdafx.\+h@{stdafx.\+h}!e\+Z\+Direction@{e\+Z\+Direction}}\item[{\em 
+e\+Z\+Direction\hypertarget{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}{}\label{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cfaffcff45f9a6cb12a79a6fa2b1d815027}
+}]Z-\/direction. \end{description}
+\end{Desc}
+
+
 \subsection{Function Documentation}
 \index{stdafx.\+h@{stdafx.\+h}!errorfcn@{errorfcn}}
 \index{errorfcn@{errorfcn}!stdafx.\+h@{stdafx.\+h}}
-\subsubsection[{\texorpdfstring{errorfcn(std\+::string msg, std\+::ofstream $\ast$logfile)}{errorfcn(std::string msg, std::ofstream *logfile)}}]{\setlength{\rightskip}{0pt plus 5cm}void errorfcn (
+\subsubsection[{\texorpdfstring{errorfcn(const std\+::string \&msg, std\+::ofstream $\ast$logfile, unsigned int mpi\+\_\+rank=0)}{errorfcn(const std::string &msg, std::ofstream *logfile, unsigned int mpi_rank=0)}}]{\setlength{\rightskip}{0pt plus 5cm}void errorfcn (
 \begin{DoxyParamCaption}
-\item[{std\+::string}]{msg, }
-\item[{std\+::ofstream $\ast$}]{logfile}
+\item[{const std\+::string \&}]{msg, }
+\item[{std\+::ofstream $\ast$}]{logfile, }
+\item[{unsigned int}]{mpi\+\_\+rank = {\ttfamily 0}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}{}\label{stdafx_8h_a3140284e45db79e0be3c624f16474cbd}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{stdafx_8h_a39e9206df29bcf9ad0f454b5b8759cd8}{}\label{stdafx_8h_a39e9206df29bcf9ad0f454b5b8759cd8}
 
 
 Fatal Error function. 
@@ -114,6 +133,8 @@ Writes error to the user and further information to the supplied logfile. Inline
 {\em msg} & string to be printed to the log file. \\
 \hline
 {\em logfile} & pointer to the logfile where the message is to be written. \\
+\hline
+{\em mpi\+\_\+rank} & rank writing out the message. \\
 \hline
 \end{DoxyParams}
 

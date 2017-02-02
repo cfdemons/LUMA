@@ -49,7 +49,9 @@ IBBody::IBBody(GridObj* g, size_t id)
 ///
 ///			Flexibility and deformable properties taken from definitions.
 ///
-/// \param _PCpts pointer to pointer cloud data.
+/// \param g		pointer to owner grid
+/// \param id		ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data.
 IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
 {
 

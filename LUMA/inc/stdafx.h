@@ -119,8 +119,9 @@ testout.close(); \
 ///			Writes error to the user and further information to the supplied logfile.
 ///			Inlined since this header is included everywhere.
 ///
-///	\param	msg		string to be printed to the log file.
-///	\param	logfile	pointer to the logfile where the message is to be written.
+///	\param	msg			string to be printed to the log file.
+///	\param	logfile		pointer to the logfile where the message is to be written.
+///	\param	mpi_rank	rank writing out the message.
 inline void errorfcn(const std::string &msg, std::ofstream *logfile, unsigned int mpi_rank = 0)
 {
 	std::cout << "Rank " + std::to_string(mpi_rank) + " Error: See Log File" << std::endl;
@@ -132,7 +133,14 @@ inline void errorfcn(const std::string &msg, std::ofstream *logfile, unsigned in
 	exit(LUMA_FAILED);
 }
 
-
+/// \enum eCartesianDirection
+/// \brief Enumeration for directional options.
+enum eCartesianDirection
+{
+	eXDirection,	///< X-direction
+	eYDirection,	///< Y-direction
+	eZDirection		///< Z-direction
+};
 
 
 #endif

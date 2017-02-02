@@ -761,7 +761,7 @@ int GridObj::io_hdf5(double tval) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 #ifdef L_MPI_VERBOSE
-	*mpim->logout << "Rank " << mpim->my_rank << ": Writing out Level " << level << ", Region " << region_number << std::endl;
+	*mpim->logout << "Writing out Level " << level << ", Region " << region_number << std::endl;
 #endif
 
 	/***********************/
@@ -830,347 +830,361 @@ int GridObj::io_hdf5(double tval) {
 	// PARALLEL CASE //
 	///////////////////
 
-	if (!p_data.writable_data_count) {
-		*GridUtils::logfile << "Skipping HDF5 write as no writable data on this grid..." << std::endl;
-		return -2;
-	}
-
-	// Create file parallel access property list
-	MPI_Info info = MPI_INFO_NULL;
-	plist_id = H5Pcreate(H5P_FILE_ACCESS);
-
-	// Set communicator to be used
-	if (level == 0)	{
-		// Global communicator
-		status = H5Pset_fapl_mpio(
-			plist_id, mpim->world_comm, info
-			);
-	}
-	else {
-		// Appropriate sub-grid communicator
-		status = H5Pset_fapl_mpio(
-			plist_id, mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS], info
-			);
-	}
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
-
-#else
-
-	// Simple serial property list
-	plist_id = H5P_DEFAULT;
-#endif
-
-	// Create/open file using the property list defined above
-	if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
-	else file_id = H5Fopen(FILE_NAME.c_str(), H5F_ACC_RDWR, plist_id);
-	if (file_id == static_cast<hid_t>(NULL)) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
-	status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
-
-
-	/***********************/
-	/****** DATA SETUP *****/
-	/***********************/
-
-	// Create group
-	group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		
-	// Compute dataspaces (file space data in MPIM and ex. TL where appropriate)
-	int idx = level + region_number * L_NUM_LEVELS;
-	dimsf[0] = mpim->global_size[eXDirection][idx]
-		- mpim->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness;
-	dimsf[1] = mpim->global_size[eYDirection][idx]
-		- mpim->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness;
-#if (L_DIMS == 3)
-	dimsf[2] = mpim->global_size[eZDirection][idx]
-		- mpim->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
-		- mpim->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness;
-#endif
-	filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
-
-	// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
-	dimsm[0] = p_data.writable_data_count;
-	memspace = H5Screate_simple(1, dimsm, NULL);
-
-
-	/***********************/
-	/***** ATTRIBUTES ******/
-	/***********************/
-
-	if (t == 0) {
-
-		// Create 1D attribute buffers
-		int buffer_int_array[L_DIMS];
-		int buffer_int = 0;
-		double buffer_double = 0.0;
-		buffer_int_array[0] = static_cast<int>(dimsf[0]);
-		buffer_int_array[1] = static_cast<int>(dimsf[1]);
-	#if (L_DIMS == 3)
-		buffer_int_array[2] = static_cast<int>(dimsf[2]);
-	#endif
-
-		// Write Grid Size
-		dimsa[0] = L_DIMS;
-		attspace = H5Screate_simple(1, dimsa, NULL);
-		attrib_id = H5Acreate(file_id, "GridSize", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int_array[0]);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-		status = H5Sclose(attspace);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
-		
-		// Write Timesteps
-		buffer_int = L_TIMESTEPS;
-		dimsa[0] = 1;
-		attspace = H5Screate_simple(1, dimsa, NULL);
-		attrib_id = H5Acreate(file_id, "Timesteps", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-
-		// Write Out Frequency
-		buffer_int = L_OUT_EVERY;
-		attrib_id = H5Acreate(file_id, "OutputFrequency", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-
-		// Write dh
-		buffer_double = dh;
-		attrib_id = H5Acreate(file_id, "Dx", H5T_NATIVE_DOUBLE, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_DOUBLE, &buffer_double);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-
-		// Write Levels
-		buffer_int = L_NUM_LEVELS + 1;
-		attrib_id = H5Acreate(file_id, "NumberOfGrids", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-
-		// Write Regions
-		buffer_int = L_NUM_REGIONS;
-		attrib_id = H5Acreate(file_id, "NumberOfRegions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-
-		// Write Dimensions
-		buffer_int = L_DIMS;
-		attrib_id = H5Acreate(file_id, "Dimensions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
-		status = H5Aclose(attrib_id);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
-		status = H5Sclose(attspace);
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
-
-	}
-
-
-
-	/***********************/
-	/******* SCALARS *******/
-	/***********************/
-
-	// WRITE LATTYP
-	variable_name = time_string + "/LatTyp";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &LatTyp[0], H5T_NATIVE_INT, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE RHO
-	variable_name = time_string + "/Rho";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &rho[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
-
-	// WRITE RHO_TIMEAV
-	variable_name = time_string + "/Rho_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &rho_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-#endif
-
-
-
-	/***********************/
-	/******* VECTORS *******/
-	/***********************/
-
-	// WRITE UX
-	variable_name = time_string + "/Ux";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UY
-	variable_name = time_string + "/Uy";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UZ
-#if (L_DIMS == 3)
-	variable_name = time_string + "/Uz";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-#endif
-
-#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
-
-	// WRITE UX_TIMEAV
-	variable_name = time_string + "/Ux_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UY_TIMEAV
-	variable_name = time_string + "/Uy_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UZ_TIMEAV
-#if (L_DIMS == 3)
-	variable_name = time_string + "/Uz_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-#endif
-
-
-	/***********************/
-	/*** PRODUCT VECTORS ***/
-	/***********************/
-
-	// WRITE UXUX_TIMEAV
-	variable_name = time_string + "/UxUx_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UXUY_TIMEAV
-	variable_name = time_string + "/UxUy_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UYUY_TIMEAV
-	variable_name = time_string + "/UyUy_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-#if (L_DIMS == 3)
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[3], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-#else
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-#endif
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-#if (L_DIMS == 3)
-	// WRITE UXUZ_TIMEAV
-	variable_name = time_string + "/UxUz_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UYUZ_TIMEAV
-	variable_name = time_string + "/UyUz_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[4], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-	// WRITE UZUZ_TIMEAV
-	variable_name = time_string + "/UzUz_TimeAv";
-	dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[5], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-	status = H5Dclose(dataset_id); // Close dataset
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-#endif
-
-#endif
-
-	// Only write positions on first time step as these don't change
-	if (t == 0)
-
+	if (p_data.writable_data_count)
 	{
 
+		// Create file parallel access property list
+		MPI_Info info = MPI_INFO_NULL;
+		plist_id = H5Pcreate(H5P_FILE_ACCESS);
+
+		// Set communicator to be used
+		if (level == 0)	{
+			// Global communicator
+			status = H5Pset_fapl_mpio(
+				plist_id, mpim->world_comm, info
+				);
+		}
+		else {
+			// Appropriate sub-grid communicator
+			status = H5Pset_fapl_mpio(
+				plist_id, mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS], info
+				);
+		}
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Set file access list failed: " << status << std::endl;
+
+#else
+
+		// Simple serial property list
+		plist_id = H5P_DEFAULT;
+#endif
+
+		// Create/open file using the property list defined above
+		if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+		else file_id = H5Fopen(FILE_NAME.c_str(), H5F_ACC_RDWR, plist_id);
+		if (file_id == static_cast<hid_t>(NULL)) *GridUtils::logfile << "HDF5 ERROR: Open file failed!" << std::endl;
+		status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
+
+
 		/***********************/
-		/****** POSITIONS ******/
+		/****** DATA SETUP *****/
 		/***********************/
 
-		// WRITE POSITION X
-		variable_name = time_string + "/XPos";
-		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		hdf5_writeDataSet(memspace, filespace, dataset_id, ePosX, N_lim, M_lim, K_lim, this, &XPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-		status = H5Dclose(dataset_id); // Close dataset
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+		// Create group
+		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-		// WRITE POSITION Y
-		variable_name = time_string + "/YPos";
-		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		hdf5_writeDataSet(memspace, filespace, dataset_id, ePosY, N_lim, M_lim, K_lim, this, &YPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
-		status = H5Dclose(dataset_id); // Close dataset
-		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
-
-
-		// WRITE POSITION Z
+		// Compute dataspaces (file space data in MPIM and ex. TL where appropriate)
+		int idx = level + region_number * L_NUM_LEVELS;
+		dimsf[0] = mpim->global_size[eXDirection][idx]
+			- mpim->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
+			- mpim->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness;
+		dimsf[1] = mpim->global_size[eYDirection][idx]
+			- mpim->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
+			- mpim->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness;
 #if (L_DIMS == 3)
-		variable_name = time_string + "/ZPos";
+		dimsf[2] = mpim->global_size[eZDirection][idx]
+			- mpim->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
+			- mpim->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness;
+#endif
+		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
+
+		// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
+		dimsm[0] = p_data.writable_data_count;
+		memspace = H5Screate_simple(1, dimsm, NULL);
+
+
+		/***********************/
+		/***** ATTRIBUTES ******/
+		/***********************/
+
+		if (t == 0) {
+
+			// Create 1D attribute buffers
+			int buffer_int_array[L_DIMS];
+			int buffer_int = 0;
+			double buffer_double = 0.0;
+			buffer_int_array[0] = static_cast<int>(dimsf[0]);
+			buffer_int_array[1] = static_cast<int>(dimsf[1]);
+#if (L_DIMS == 3)
+			buffer_int_array[2] = static_cast<int>(dimsf[2]);
+#endif
+
+			// Write Grid Size
+			dimsa[0] = L_DIMS;
+			attspace = H5Screate_simple(1, dimsa, NULL);
+			attrib_id = H5Acreate(file_id, "GridSize", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int_array[0]);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+			status = H5Sclose(attspace);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
+
+			// Write Timesteps
+			buffer_int = L_TIMESTEPS;
+			dimsa[0] = 1;
+			attspace = H5Screate_simple(1, dimsa, NULL);
+			attrib_id = H5Acreate(file_id, "Timesteps", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+			// Write Out Frequency
+			buffer_int = L_OUT_EVERY;
+			attrib_id = H5Acreate(file_id, "OutputFrequency", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+			// Write dh
+			buffer_double = dh;
+			attrib_id = H5Acreate(file_id, "Dx", H5T_NATIVE_DOUBLE, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_DOUBLE, &buffer_double);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+			// Write Levels
+			buffer_int = L_NUM_LEVELS + 1;
+			attrib_id = H5Acreate(file_id, "NumberOfGrids", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+			// Write Regions
+			buffer_int = L_NUM_REGIONS;
+			attrib_id = H5Acreate(file_id, "NumberOfRegions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+
+			// Write Dimensions
+			buffer_int = L_DIMS;
+			attrib_id = H5Acreate(file_id, "Dimensions", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
+			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;
+			status = H5Aclose(attrib_id);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
+			status = H5Sclose(attspace);
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
+
+		}
+
+
+
+		/***********************/
+		/******* SCALARS *******/
+		/***********************/
+
+		// WRITE LATTYP
+		variable_name = time_string + "/LatTyp";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &LatTyp[0], H5T_NATIVE_INT, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE RHO
+		variable_name = time_string + "/Rho";
 		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-		hdf5_writeDataSet(memspace, filespace, dataset_id, ePosZ, N_lim, M_lim, K_lim, this, &ZPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &rho[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
+
+		// WRITE RHO_TIMEAV
+		variable_name = time_string + "/Rho_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, N_lim, M_lim, K_lim, this, &rho_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+#endif
+
+
+
+		/***********************/
+		/******* VECTORS *******/
+		/***********************/
+
+		// WRITE UX
+		variable_name = time_string + "/Ux";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UY
+		variable_name = time_string + "/Uy";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UZ
+#if (L_DIMS == 3)
+		variable_name = time_string + "/Uz";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &u[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
 		status = H5Dclose(dataset_id); // Close dataset
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 #endif
 
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
+
+		// WRITE UX_TIMEAV
+		variable_name = time_string + "/Ux_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UY_TIMEAV
+		variable_name = time_string + "/Uy_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UZ_TIMEAV
+#if (L_DIMS == 3)
+		variable_name = time_string + "/Uz_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eVector, N_lim, M_lim, K_lim, this, &ui_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+
+		/***********************/
+		/*** PRODUCT VECTORS ***/
+		/***********************/
+
+		// WRITE UXUX_TIMEAV
+		variable_name = time_string + "/UxUx_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UXUY_TIMEAV
+		variable_name = time_string + "/UxUy_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[1], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UYUY_TIMEAV
+		variable_name = time_string + "/UyUy_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+#if (L_DIMS == 3)
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[3], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+#else
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+#endif
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+#if (L_DIMS == 3)
+		// WRITE UXUZ_TIMEAV
+		variable_name = time_string + "/UxUz_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[2], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UYUZ_TIMEAV
+		variable_name = time_string + "/UyUz_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[4], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE UZUZ_TIMEAV
+		variable_name = time_string + "/UzUz_TimeAv";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eProductVector, N_lim, M_lim, K_lim, this, &uiuj_timeav[5], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+#endif
+
+		// Only write positions on first time step as these don't change
+		if (t == 0)
+
+		{
+
+			/***********************/
+			/****** POSITIONS ******/
+			/***********************/
+
+			// WRITE POSITION X
+			variable_name = time_string + "/XPos";
+			dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+			hdf5_writeDataSet(memspace, filespace, dataset_id, ePosX, N_lim, M_lim, K_lim, this, &XPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+			status = H5Dclose(dataset_id); // Close dataset
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+			// WRITE POSITION Y
+			variable_name = time_string + "/YPos";
+			dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+			hdf5_writeDataSet(memspace, filespace, dataset_id, ePosY, N_lim, M_lim, K_lim, this, &YPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+			status = H5Dclose(dataset_id); // Close dataset
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+
+			// WRITE POSITION Z
+#if (L_DIMS == 3)
+			variable_name = time_string + "/ZPos";
+			dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+			hdf5_writeDataSet(memspace, filespace, dataset_id, ePosZ, N_lim, M_lim, K_lim, this, &ZPos[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, p_data);
+			status = H5Dclose(dataset_id); // Close dataset
+			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+#endif
+
+		}
+
+
+		// Close memspace
+		status = H5Sclose(memspace);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
+
+		// Close filespace
+		status = H5Sclose(filespace);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close filespace failed: " << status << std::endl;
+
+		// Close group
+		status = H5Gclose(group_id);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close group failed: " << status << std::endl;
+
+		// Close file
+		status = H5Fclose(file_id);
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
+
 	}
 
+	// No writable data
+	else
+	{
+		*GridUtils::logfile << "Skipping HDF5 write as no writable data on L" << level << " R" << region_number << "..." << std::endl;
 
-	// Close memspace
-	status = H5Sclose(memspace);
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
+#ifdef L_HDF_DEBUG
+		// Check that the communicator was setup properly
+		if (mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS] != MPI_COMM_NULL)
+		{
+			L_ERROR("Communicator has a non-null value despite having no writable data: " +
+				std::to_string(mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]),
+				GridUtils::logfile, mpim->my_rank);
+		}
+#endif
+	}
 
-	// Close filespace
-	status = H5Sclose(filespace);
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close filespace failed: " << status << std::endl;
-
-	// Close group
-	status = H5Gclose(group_id);
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close group failed: " << status << std::endl;
-
-	// Close file
-	status = H5Fclose(file_id);
-	if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
-
-
-
-	// Call recursively on any present sub-grids
+	// Try call recursively on any present sub-grids
 	for (GridObj& g : subGrid) g.io_hdf5(tval);
 
 	return 0;

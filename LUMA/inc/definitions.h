@@ -41,15 +41,15 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE				///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG					///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -120,7 +120,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 3		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
@@ -132,8 +132,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 3		///< Number of coarse lattice sites per unit length
+#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_RESOLUTION 5		///< Number of coarse lattice sites per unit length
 
 // Non-dimensional domain dimensions
 #define L_BX 9		///< End of domain in X (non-dimensional units)
@@ -299,10 +299,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Bounce-back objects from point clouds
 #define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
-	#define L_OBJECT_ON_GRID_LEV 3		///< Provide grid level on which object should be added 
+	#define L_OBJECT_ON_GRID_LEV 5		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_OBJECT_X 2.5		///< Start of object bounding box in X direction
+	#define L_START_OBJECT_X 2.75		///< Start of object bounding box in X direction
 	#define L_START_OBJECT_Y (static_cast<double>(L_BY) / static_cast<double>(L_M))			///< Start of object bounding box in Y direction
 	#define L_CENTRE_OBJECT_Z (static_cast<double>(L_BZ) / 2.0)			///< Centre of object bounding box in Z direction
 	#define L_OBJECT_LENGTH 1.0						///< The object input is scaled based on this dimension
@@ -331,7 +331,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 5		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
@@ -340,32 +340,44 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 1.0 },
 	{ 1.5 },
-	{ 2.0 }
+	{ 2.0 },
+	{ 2.25 },
+	{ 2.5 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 7.0 },
 	{ 6.0 },
-	{ 5.0 }
+	{ 5.0 },
+	{ 4.5 },
+	{ 4.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 0.0 },
+	{ 0.0 },
 	{ 0.0 },
 	{ 0.0 },
 	{ 0.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 1.35 },
+	{ 1.30 },
 	{ 1.25 },
 	{ 1.0 },
 	{ 0.75 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ ((static_cast<double>(L_BZ) - 3.5) / 2.0) },
 	{ ((static_cast<double>(L_BZ) - 3.0) / 2.0) },
 	{ ((static_cast<double>(L_BZ) - 2.5) / 2.0) },
-	{ ((static_cast<double>(L_BZ) - 2.0) / 2.0) }
+	{ ((static_cast<double>(L_BZ) - 2.0) / 2.0) },
+	{ ((static_cast<double>(L_BZ) - 1.75) / 2.0) }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ ((static_cast<double>(L_BZ) + 3.5) / 2.0) },
 	{ ((static_cast<double>(L_BZ) + 3.0) / 2.0) },
 	{ ((static_cast<double>(L_BZ) + 2.5) / 2.0) },
-	{ ((static_cast<double>(L_BZ) + 2.0) / 2.0) }
+	{ ((static_cast<double>(L_BZ) + 2.0) / 2.0) },
+	{ ((static_cast<double>(L_BZ) + 1.75) / 2.0) }
 };
 
 #endif

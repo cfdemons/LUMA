@@ -275,6 +275,10 @@ void GridObj::LBM_initGrid( ) {
 /// \param	rank_core_edge	absolute positions of the rank edges (excludes overlapping halo).
 void GridObj::LBM_initGrid( std::vector<int> local_size, 
 							std::vector< std::vector<double> > rank_core_edge ) {
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Initialising grid level 0..." << std::endl;
+#endif
 	
 	// Store physical spacing
 	// Global dimensions
@@ -496,6 +500,10 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
 	 */
 
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Initialisation Complete.";
+#endif
+
 }
 	
 
@@ -504,34 +512,25 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 /// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Initialising sub-grid level " << level << ", region " << region_number << "..." << std::endl;
+#endif
+
 	// Get an instance of the MPIM
 	MpiManager *mpim = MpiManager::getInstance();
 	int mpim_idx = level + region_number * L_NUM_LEVELS;
 
 	// Define scales
-	dh = pGrid.dh / 2;
-	dt = pGrid.dt / 2;
+	dh = pGrid.dh / 2.0;
+	dt = pGrid.dt / 2.0;
 	
 	/* Get coarse grid refinement limits as indicies local to the parent grid
 	 * on this rank. */
 	LBM_initGridToGridMappings(pGrid);
-
 	
-	/* Note that the CoarseLims are local values used to identify how much and which part of the 
-	 * parent grid is covered by the child sub-grid and might not conincide with edges of global 
-	 * refined patch defined by the input file if broken up across ranks. So we get the offset 
-	 * in position from the local refined patch edges specific to this rank. */
-
-	// Get positions of local refined patch edges
-	double posOffsetX[2] = { pGrid.XPos[ CoarseLimsX[eMinimum] ], pGrid.XPos[ CoarseLimsX[eMaximum] ] };
-	double posOffsetY[2] = { pGrid.YPos[ CoarseLimsY[eMinimum] ], pGrid.YPos[ CoarseLimsY[eMaximum] ] };
-#if (L_DIMS == 3)
-	double posOffsetZ[2] = { pGrid.ZPos[ CoarseLimsZ[eMinimum] ], pGrid.ZPos[ CoarseLimsZ[eMinimum] ] };
-#else
-	double posOffsetZ[2] = { 0.0, 0.0 };
-#endif
-
-	// Get local grid size of the sub grid based on local ijk limits
+	/* Get local grid size of the sub grid based on local ijk limits.
+	 * i.e. how much of the parent grid it covers. Volumetric formulation with refinement
+	 * factor of 2 makes this easy. */
 	int local_size[L_DIMS] = {
 		static_cast<int>((CoarseLimsX[eMaximum] - CoarseLimsX[eMinimum] + .5) * 2) + 1,
 		static_cast<int>((CoarseLimsY[eMaximum] - CoarseLimsY[eMinimum] + .5) * 2) + 1
@@ -554,10 +553,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Generate POSITION VECTORS of nodes
 	
 	// Populate the position vectors
-	XPos = GridUtils::linspace(posOffsetX[0] - dh / 2, (posOffsetX[0] - dh / 2) + (N_lim - 1) * dh, N_lim );
-	YPos = GridUtils::linspace(posOffsetY[0] - dh / 2, (posOffsetY[0] - dh / 2) + (M_lim - 1) * dh, M_lim );
+	LBM_initPositionVector(pGrid.XPos[CoarseLimsX[eMinimum]] - dh / 2.0, pGrid.XPos[CoarseLimsX[eMaximum]] - dh / 2.0, eXDirection);
+	LBM_initPositionVector(pGrid.YPos[CoarseLimsY[eMinimum]] - dh / 2.0, pGrid.YPos[CoarseLimsY[eMaximum]] - dh / 2.0, eYDirection);
 #if L_DIMS == 3
-	ZPos = GridUtils::linspace(posOffsetZ[0] - dh / 2, (posOffsetZ[0] - dh / 2) + (K_lim - 1) * dh, K_lim );
+	LBM_initPositionVector(pGrid.ZPos[CoarseLimsZ[eMinimum]] - dh / 2.0, pGrid.ZPos[CoarseLimsZ[eMaximum]] - dh / 2.0, eZDirection);
 #else
 	ZPos.insert( ZPos.begin(), 1 ); // 2D default
 #endif
@@ -585,7 +584,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	LBM_initRefinedLab(pGrid);
 
 	
-	
 	// Assign MACROSCOPIC quantities
 
 #ifdef L_USE_INLET_PROFILE
@@ -601,6 +599,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho( );
+
 
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
@@ -619,7 +618,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	f.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	feq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
-	
+
 
 	// Loop over grid
 	for (int i = 0; i != N_lim; ++i) {
@@ -643,6 +642,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Lattice viscosity is constant across subgrids
 	nu = pGrid.nu;
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Initialisation Complete." << std::endl;
+#endif
 
 }
 
@@ -951,6 +954,76 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile, mpim->my_rank);
 	}
 
+}
+
+// ****************************************************************************
+/// \brief	Method to initialise the position vector on the grid between the 
+///			start and end positions supplied.
+///
+///			This method can be used for either serial or parallel initialisation
+///			as the halo and any wrap around is automatically taken into consideration.
+///			As such, the start position can be after the end position and the resulting
+///			vector will wrap at the correct point.
+///
+/// \param	start_pos	position of the first voxel centre in the vector.
+///	\param	end_pos		position of the last voxel centre in the vector.
+///	\param	dir			direction of the vector.
+void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir)
+{
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Building position vector for grid level " << level << ", direction " << dir << "...";
+#endif
+
+	int mpim_idx = level + region_number * L_NUM_LEVELS;
+	MpiManager *mpim = MpiManager::getInstance();
+	int start_idx = 0, end_idx = 0;
+	std::vector<double> *arr = nullptr;
+	int req_size = 0;
+
+	switch (dir)
+	{
+	case eXDirection:
+		start_idx = eXMin;
+		end_idx = eXMax;
+		arr = &XPos;
+		req_size = N_lim;
+		break;
+
+	case eYDirection:
+		start_idx = eYMin;
+		end_idx = eYMax;
+		arr = &YPos;
+		req_size = M_lim;
+		break;
+
+	case eZDirection:
+		start_idx = eZMin;
+		end_idx = eZMax;
+		arr = &ZPos;
+		req_size = K_lim;
+		break;
+
+	default:
+		break;
+	}
+
+	// Get limits of the grid for wrap around of positions
+	double start_lim = mpim->global_edges[start_idx][mpim_idx];
+	double end_lim = mpim->global_edges[end_idx][mpim_idx];
+
+	// Construct one at a time taking into account periodicity if necessary
+	arr->push_back(start_pos);
+	do
+	{
+		if (arr->back() + dh > end_lim) arr->push_back(start_lim + dh / 2);
+		else arr->push_back(arr->back() + dh);
+	}
+	while (arr->size() < req_size);
+
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Complete." << std::endl;
+#endif
 }
 
 // ****************************************************************************

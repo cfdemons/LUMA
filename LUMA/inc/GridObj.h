@@ -176,6 +176,7 @@ public :
 		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
+	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
 	void LBM_initSolidLab();					// Initialise labels for solid objects
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
@@ -187,12 +188,12 @@ public :
 	void LBM_resetForces();							// Resets the force vectors on the grid
 
 	// Boundary operations
-	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
-	void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
-	void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
-	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
-	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
+	DEPRECATED void bc_applyBounceBack(int label, int i, int j, int k);		// Application of HWBB BC
+	DEPRECATED void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
+	DEPRECATED void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
+	DEPRECATED void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
+	DEPRECATED void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
+	DEPRECATED void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number

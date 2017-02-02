@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ibbody',['IBBody',['../class_i_b_body.html#a5fbec47db22b9d525724f232d1d81037',1,'IBBody::IBBody(void)'],['../class_i_b_body.html#a737e9f9ecfff9a1ea0741b03a43c3478',1,'IBBody::IBBody(GridObj *g, size_t id)']]],
+  ['ibbody',['IBBody',['../class_i_b_body.html#a5fbec47db22b9d525724f232d1d81037',1,'IBBody::IBBody(void)'],['../class_i_b_body.html#a737e9f9ecfff9a1ea0741b03a43c3478',1,'IBBody::IBBody(GridObj *g, size_t id)'],['../class_i_b_body.html#a8c95ff82ebef5f8e86519f656576cbce',1,'IBBody::IBBody(GridObj *g, size_t id, PCpts *_PCpts)']]],
   ['ibinfo',['IBInfo',['../class_i_b_info.html#ab1b7ff9861d5920fdb50cbcc7c8154a7',1,'IBInfo::IBInfo()'],['../class_i_b_info.html#ab0c04478c166732f951433f0f654028b',1,'IBInfo::IBInfo(IBBody *iBody, eIBInfoType type)']]],
   ['ibm_5fapply',['ibm_apply',['../class_object_manager.html#a2ec2df889c396d94d2fe1807c10847bb',1,'ObjectManager']]],
   ['ibm_5fbanbks',['ibm_banbks',['../class_object_manager.html#a7bf970976700f9949bb08d8dc7f8e637',1,'ObjectManager']]],

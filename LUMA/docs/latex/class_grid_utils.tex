@@ -50,7 +50,7 @@ static bool \hyperlink{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{is\+O
 \begin{DoxyCompactList}\small\item\em Finds out whether halo containng i,j,k links to neighbour rank periodically. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a707d0044f6b3376399b972e73c4b1dd7}{is\+On\+This\+Rank} (double x, double y, double z, \hyperlink{_grid_utils_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid=nullptr, std\+::vector$<$ int $>$ $\ast$pos=nullptr)
 \begin{DoxyCompactList}\small\item\em Finds out whether site with supplied position is on the current rank. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a0e23991df730bfa61749d00484d4ce5f}{is\+On\+This\+Rank} (double xyz, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid=nullptr, int $\ast$pos=nullptr)
+static bool \hyperlink{class_grid_utils_a0e23991df730bfa61749d00484d4ce5f}{is\+On\+This\+Rank} (double xyz, \hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid=nullptr, int $\ast$pos=nullptr)
 \begin{DoxyCompactList}\small\item\em Finds out whether the supplied position can be found on the current rank. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a14da5d778eb6d81fbcd5c9331a8082dd}{intersects\+Refined\+Region} (const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid, int Reg\+Num)
 \begin{DoxyCompactList}\small\item\em Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided. \end{DoxyCompactList}\item 
@@ -68,7 +68,7 @@ static bool \hyperlink{class_grid_utils_acb35c1a485e74c0b2794b84573b5e50f}{is\+O
 \begin{DoxyCompactList}\small\item\em Tests whether a site is on a given grid. \end{DoxyCompactList}\item 
 static void \hyperlink{class_grid_utils_ad0c030776101d001fda37eb7f90d2b20}{get\+Enclosing\+Voxel} (double x, double y, double z, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ int $>$ $\ast$ijk)
 \begin{DoxyCompactList}\small\item\em Get local voxel indices on grid in which provided position lies. \end{DoxyCompactList}\item 
-static void \hyperlink{class_grid_utils_a20901145122cf56507713abe0467638c}{get\+Enclosing\+Voxel} (double x, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, int $\ast$ijk)
+static void \hyperlink{class_grid_utils_a20901145122cf56507713abe0467638c}{get\+Enclosing\+Voxel} (double x, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, \hyperlink{stdafx_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, int $\ast$ijk)
 \begin{DoxyCompactList}\small\item\em Get local voxel indices on grid in which provided position lies. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_a78d9c31d1c15198d1455627d1fa29804}{is\+On\+Transition\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
 \begin{DoxyCompactList}\small\item\em Check whether site is on a TL. \end{DoxyCompactList}\item 
@@ -1053,10 +1053,12 @@ Num\+Type scalar quantity
 \begin{DoxyCode}
 = 
     \{
-        \{1, 0, 2, 3, 7, 6, 5, 4, 8\}, 
-        \{1, 0, 2, 3, 4, 6, 5, 4, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\},
-        \{0, 1, 3, 2, 6, 7, 4, 5, 8\}
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\}, 
+        \{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\},
+        \{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18\}
     \}
 \end{DoxyCode}
 

@@ -4,6 +4,8 @@ var searchData=
   ['lbm_5finit_5fgetinletprofile',['LBM_init_getInletProfile',['../class_grid_obj.html#a023713976673d029103690a91c5415f9',1,'GridObj']]],
   ['lbm_5finitboundlab',['LBM_initBoundLab',['../class_grid_obj.html#a4b6edceeda49496365e725eb67931961',1,'GridObj']]],
   ['lbm_5finitgrid',['LBM_initGrid',['../class_grid_obj.html#aeea74cc13001620abec1ba819233f714',1,'GridObj::LBM_initGrid()'],['../class_grid_obj.html#afbaf6155b26acb6a21dcf7be68520607',1,'GridObj::LBM_initGrid(std::vector&lt; int &gt; local_size, std::vector&lt; std::vector&lt; double &gt; &gt; GlobalLimsPos)']]],
+  ['lbm_5finitgridtogridmappings',['LBM_initGridToGridMappings',['../class_grid_obj.html#a7a4c2d4eb5bc8f312d0998a55b38f0e2',1,'GridObj']]],
+  ['lbm_5finitpositionvector',['LBM_initPositionVector',['../class_grid_obj.html#a32da287cacc2cbd15c3cee482ea4b010',1,'GridObj']]],
   ['lbm_5finitrefinedlab',['LBM_initRefinedLab',['../class_grid_obj.html#a3ba133d06625fb576ca0909b946033b2',1,'GridObj']]],
   ['lbm_5finitrho',['LBM_initRho',['../class_grid_obj.html#aac0e8a3fe74c69b3308ef3e19100f95c',1,'GridObj']]],
   ['lbm_5finitsolidlab',['LBM_initSolidLab',['../class_grid_obj.html#a5dd08730d7cdea576bb4b337786a9bcf',1,'GridObj']]],

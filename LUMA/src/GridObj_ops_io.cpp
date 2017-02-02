@@ -856,7 +856,8 @@ int GridObj::io_hdf5(double tval) {
 
 		// Simple serial property list
 		plist_id = H5P_DEFAULT;
-#endif
+
+#endif // L_BUILD_FOR_MPI
 
 		// Create/open file using the property list defined above
 		if (t == 0) file_id = H5Fcreate(FILE_NAME.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
@@ -1003,7 +1004,7 @@ int GridObj::io_hdf5(double tval) {
 		status = H5Dclose(dataset_id); // Close dataset
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
-#endif
+#endif // L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 
 
@@ -1112,7 +1113,7 @@ int GridObj::io_hdf5(double tval) {
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 #endif
 
-#endif
+#endif // L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 		// Only write positions on first time step as these don't change
 		if (t == 0)
@@ -1166,6 +1167,7 @@ int GridObj::io_hdf5(double tval) {
 		status = H5Fclose(file_id);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file failed: " << status << std::endl;
 
+#ifdef L_BUILD_FOR_MPI
 	}
 
 	// No writable data
@@ -1182,7 +1184,9 @@ int GridObj::io_hdf5(double tval) {
 				GridUtils::logfile, mpim->my_rank);
 		}
 #endif
+
 	}
+#endif	// L_BUILD_FOR_MPI
 
 	// Try call recursively on any present sub-grids
 	for (GridObj& g : subGrid) g.io_hdf5(tval);

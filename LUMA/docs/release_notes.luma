@@ -5,8 +5,12 @@ General		:	Wholesale changes to coordinate systems and hence changes in the init
 				Fixed rare but major bug that occurs with HDF writable region definition when only a corner of a grid is built on a rank exclusively on a halo region. Changed implementation to fix.
 				Improvements to initialisation clarity and debug messaging.
 				Old boundary condition methods marked as DEPRECATED.
-				IBBody constructor for PC added to move away from teh "make_body()" wrappers which are messy.
+				IBBody constructor for PC added to move away from the "make_body()" wrappers which are messy.
+				Created new Enumerations header and added more headers to the stdafx.h header.
+				Extended the error function to create an info function as well for more consistent logging.
 
+Isseu #107	:	Improved inheritence relationships for the Body class to reduce code duplication.
+Issue #106	:	Added new Grid Manager class to improve handling of grid information. MPI manager now only should be instantiated when using MPI.
 Issue #116	:	Fixed issue with compiling with probe output turned on.	
 Issue #104	:	Relaxed restriction requiring uniform decomposition by using a slice generator to decompose.
 Issue #114	:	Allowed the embedding of sub-grids in walls once again after coordinate system and initialisation change.

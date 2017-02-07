@@ -65,28 +65,57 @@
 #include <cstring>
 
 #endif
-
 #include <stdio.h>
 
+
+/****************************************************/
+// Enumerations //
+/****************************************************/
+
+#include "Enumerations.h"
+
+
+/****************************************************/
+// Our headers (include after the ernumerations) //
+/****************************************************/
+
+// Include definitions, singletons and headers to be made available everywhere for convenience.
+#include "definitions.h"
+#include "GridManager.h"
+#include <mpi.h>
+#include "MpiManager.h"
+#include "GridUtils.h"
+
+
+/****************************************************/
+// Our definitions //
+/****************************************************/
+
 #ifdef _WIN32
-	#define L_IS_NAN _isnan			///< Not a Number declaration (Windows)
+#define L_IS_NAN _isnan			///< Not a Number declaration (Windows)
 #else
-	#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
+#define L_IS_NAN std::isnan		///< Not a Number declaration (Unix)
 #endif
 
 // Squared operator
 #define SQ(x) ((x) * (x))
+
+// Small number for comparing floats to zero
 #define L_SMALL_NUMBER 1e-8
 
-// Include definitions
-#include "definitions.h"
+// Failure coede
+#define LUMA_FAILED 12345
 
 // Global variable references
 extern const int c[3][L_NUM_VELS];				///< Lattice velocities
 extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
 extern const double w[L_NUM_VELS];				///< Quadrature weights
-extern const double cs;						///< Lattice sound speed
+extern const double cs;							///< Lattice sound speed
 
+
+/****************************************************/
+// Our global functions //
+/****************************************************/
 
 // Debug stuff -- maybe I should put all these debug statements into some static
 // class and just compile blank functions if not in debugging mode?
@@ -112,7 +141,6 @@ testout.close(); \
 
 
 /// Error definition
-#define LUMA_FAILED 12345
 #define L_ERROR errorfcn	///< Error function shorthand
 /// \brief Fatal Error function.
 ///
@@ -121,26 +149,35 @@ testout.close(); \
 ///
 ///	\param	msg			string to be printed to the log file.
 ///	\param	logfile		pointer to the logfile where the message is to be written.
-///	\param	mpi_rank	rank writing out the message.
-inline void errorfcn(const std::string &msg, std::ofstream *logfile, unsigned int mpi_rank = 0)
+inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 {
-	std::cout << "Rank " + std::to_string(mpi_rank) + " Error: See Log File" << std::endl;
-	*logfile << msg << std::endl;
+#ifdef L_BUILD_FOR_MPI
+	std::cout << "Rank " + std::to_string(MpiManager::getInstance()->my_rank);
+#endif
+
+	std::cout << " Error: See Log File" << std::endl;
+	*logfile << "ERROR: " << msg << std::endl;
 	logfile->close();
+
 #ifdef L_BUILD_FOR_MPI
 	MPI_Finalize();
 #endif
 	exit(LUMA_FAILED);
 }
 
-/// \enum eCartesianDirection
-/// \brief Enumeration for directional options.
-enum eCartesianDirection
+/// Regular writer
+#define L_INFO infofcn	///< Info function shorthand
+/// \brief Info / logger function.
+///
+///			Writes string to the supplied logfile.
+///			Inlined since this header is included everywhere.
+///
+///	\param	msg			string to be printed to the log file.
+///	\param	logfile		pointer to the logfile where the message is to be written.
+inline void infofcn(const std::string &msg, std::ofstream *logfile)
 {
-	eXDirection,	///< X-direction
-	eYDirection,	///< Y-direction
-	eZDirection		///< Z-direction
-};
 
+	*logfile << "Info: " << msg << std::endl;
+}
 
 #endif

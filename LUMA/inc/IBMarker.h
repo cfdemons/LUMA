@@ -35,22 +35,34 @@ public:
 	/// Default constructor
 	IBMarker(void)
 	{
+		position.push_back(0.0);
+		position.push_back(0.0);
+		position.push_back(0.0);
+
+		supp_i.push_back(0);
+		supp_j.push_back(0);
+		supp_k.push_back(0);
+
+#ifdef L_BUILD_FOR_MPI
+		support_rank.push_back(MpiManager::getInstance()->my_rank);
+#else
+		support_rank.push_back(0);
+#endif
+
+		// TODO: Initialise the rest of the IB Marker properties here. 
+
 	};
 	/// Default destructor
 	~IBMarker(void)
 	{
 	};
 
-	// Custom constructors
-	IBMarker(double xPos, double yPos, double zPos, bool flex_rigid = false);
+	// Custom constructor to add support etc.
+	IBMarker(double xPos, double yPos, double zPos, GridObj const * const body_owner, bool isFlexible = false);
 
 protected:
 
-	/*	
-	***************************************************************************************************************
-	********************************************* Member Data *****************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Data **************/
 	
 	// General vectors
 	std::vector<double> fluid_vel;		///< Fluid velocity interpolated from lattice nodes
@@ -62,7 +74,7 @@ protected:
 	std::vector<double> deltaval;		///< Value of delta function for a given support node
 
 	// Scalars
-	bool flex_rigid;		///< Indication as to whether marker is part of a moving or flexible body: false == rigid/fixed; true == flexible/moving
+	bool isFlexible;		///< Indication as to whether marker is part of a structural or moving body calculation
 	double epsilon;			///< Scaling parameter
 	double local_area;		///< Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like LBM)
 	double dilation;		///< Dilation parameter in lattice units (same in all directions for uniform Eulerian grid)

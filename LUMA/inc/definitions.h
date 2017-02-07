@@ -41,15 +41,15 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
-//#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
-//#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
+#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
+#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -67,7 +67,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 100				///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -96,7 +96,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 5000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 1000				///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TIMESTEPS 1000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -134,6 +134,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 40		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.1		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 10		///< End of domain in X (non-dimensional units)
@@ -196,7 +197,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Default global properties
 #define L_NUM_MARKERS 31		///< Number of Lagrange points to use when building a prefab body (approximately)
-#define L_IBB_MOVABLE false		///< Default deformable property of body to be built (whether it moves or not)
+#define L_IBB_MOVABLE false		///< Default isMovable property of body to be built (whether it moves or not)
 #define L_IBB_FLEXIBLE false	///< Whether a structural calculation needs to be performed on the body
 
 

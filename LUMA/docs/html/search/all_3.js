@@ -13,6 +13,7 @@ var searchData=
   ['cranksizey',['cRankSizeY',['../class_mpi_manager.html#a4d583991c966c8eb44a52cbbb6ae4662',1,'MpiManager']]],
   ['cranksizez',['cRankSizeZ',['../class_mpi_manager.html#a17c2968f4c799dcadfa7bb8788eabaa1',1,'MpiManager']]],
   ['createoutputdirectory',['createOutputDirectory',['../class_grid_utils.html#af931614cb5eab6b906aa01106089b628',1,'GridUtils']]],
+  ['createwritabledatastore',['createWritableDataStore',['../class_grid_manager.html#abfcd828cbd33d4b8bb8d50dd7b2ac189',1,'GridManager::createWritableDataStore(HDFstruct *&amp;datastruct)'],['../class_grid_manager.html#a19e1e7c6646d9158b1b2e46ae2db8468',1,'GridManager::createWritableDataStore(GridObj const *const targetGrid)']]],
   ['crefendx',['cRefEndX',['../definitions_8h.html#a61aa5ca3588321a09b1aa72bae933eea',1,'definitions.h']]],
   ['crefendy',['cRefEndY',['../definitions_8h.html#a4bb5438d954456d284125efddc29d355',1,'definitions.h']]],
   ['crefendz',['cRefEndZ',['../definitions_8h.html#afdc56d7f3bb98f44e36d6c6f411b7b30',1,'definitions.h']]],

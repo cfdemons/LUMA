@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['marker',['Marker',['../class_marker.html',1,'']]],
-  ['markerdata',['MarkerData',['../class_marker_data.html',1,'']]],
-  ['mpimanager',['MpiManager',['../class_mpi_manager.html',1,'']]]
+  ['layer_5fedges',['layer_edges',['../struct_mpi_manager_1_1layer__edges.html',1,'MpiManager']]]
 ];

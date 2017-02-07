@@ -18,8 +18,6 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 using namespace std;
 
@@ -64,7 +62,7 @@ void GridObj::LBM_init_getInletProfile() {
 	inletfile.open("./input/inlet_profile.in", std::ios::in);
 	if (!inletfile.is_open()) {
 		// Error opening file
-		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
+		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
 
 	} else {
 
@@ -162,7 +160,7 @@ void GridObj::LBM_init_getInletProfile() {
 
 	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0) {
 		// No data read in
-		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
+		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile);
 	}
 #endif // L_PARABOLIC_INLET
 
@@ -238,46 +236,21 @@ void GridObj::LBM_initRho ( ) {
 }
 
 // ****************************************************************************
-/// \brief	Wrapper to initialise all L0 lattice quantities.
-///
-///			This method wraps the MPI-specific version. It is called by the 
-///			serial build and sets the MPI-specific arguments to default values
-///			before calling the full initialiser.
-void GridObj::LBM_initGrid( ) {
-
-	// Set default value for the following MPI-specific settings
-	std::vector<int> local_size;
-	std::vector< std::vector<double> > rank_core_edge;
-
-	// Set local size to total grid size
-	local_size.push_back(static_cast<int>(L_N));
-	local_size.push_back(static_cast<int>(L_M));
-	local_size.push_back(static_cast<int>(L_K));
-
-	// Set edges of the core grid on this rank to limits of the domain for serial
-	rank_core_edge.resize(6, std::vector<double>(2) );
-	rank_core_edge[eXMin][0] = 0.0;
-	rank_core_edge[eXMax][0] = L_BX;
-	rank_core_edge[eYMin][0] = 0.0;
-	rank_core_edge[eYMax][0] = L_BY;
-	rank_core_edge[eZMin][0] = 0.0;
-	rank_core_edge[eZMax][0] = L_BZ;
-
-	// Call MPI initialiser with these default options
-	LBM_initGrid(local_size, rank_core_edge);
-
-}
-
-
-// ****************************************************************************
 /// \brief	Method to initialise all L0 lattice quantities.
-/// \param	local_size	local grid size on this rank including halo.
-/// \param	rank_core_edge	absolute positions of the rank edges (excludes overlapping halo).
-void GridObj::LBM_initGrid( std::vector<int> local_size, 
-							std::vector< std::vector<double> > rank_core_edge ) {
+void GridObj::LBM_initGrid() {
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Initialising grid level 0..." << std::endl;
+#endif
+
+	// Get GM instance
+	GridManager *gm = GridManager::getInstance();
+
+#ifdef L_BUILD_FOR_MPI
+
+	// Get MpiManager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
 #endif
 	
 	// Store physical spacing
@@ -290,8 +263,7 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Physical time step = physical grid spacing
 	dt = dh;
 
-	// Get MpiManager instance
-	MpiManager *mpim = MpiManager::getInstance();	
+	
 
 
 	////////////////////////////
@@ -302,14 +274,14 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Check that lattice volumes are cubes in 3D
 	if (abs((Lx / L_N) - (Ly / L_M)) > L_SMALL_NUMBER || abs((Lx / L_N) - (Lz / L_K)) > L_SMALL_NUMBER) {
 		L_ERROR("Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting.", 
-			GridUtils::logfile, mpim->my_rank);
+			GridUtils::logfile);
 	}
 	
 #else
 	// 2D so need square lattice cells
 	if ( abs((Lx/L_N) - (Ly/L_M)) > L_SMALL_NUMBER ) {
 		L_ERROR("Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting.",
-			GridUtils::logfile, mpim->my_rank);
+			GridUtils::logfile);
 	}
 
 #endif
@@ -320,10 +292,10 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	///////////////////
 
 	// Get local grid sizes (includes halo)
-	N_lim = local_size[eXDirection];
-	M_lim = local_size[eYDirection];
+	N_lim = gm->local_size[eXDirection];
+	M_lim = gm->local_size[eYDirection];
 #if (L_DIMS == 3)
-	K_lim = local_size[eZDirection];
+	K_lim = gm->local_size[eZDirection];
 #else
 	K_lim = 1;
 #endif
@@ -337,9 +309,9 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 #ifdef L_BUILD_FOR_MPI
 
 	// Create position vectors excluding overlap
-	XPos = GridUtils::linspace( rank_core_edge[eXMin][mpim->my_rank] + dh/2, rank_core_edge[eXMax][mpim->my_rank] - dh/2, N_lim - 2 );
-	YPos = GridUtils::linspace( rank_core_edge[eYMin][mpim->my_rank] + dh/2, rank_core_edge[eYMax][mpim->my_rank] - dh/2, M_lim - 2 );
-	ZPos = GridUtils::linspace( rank_core_edge[eZMin][mpim->my_rank] + dh/2, rank_core_edge[eZMax][mpim->my_rank] - dh/2, K_lim - 2 );
+	XPos = GridUtils::linspace(mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2, N_lim - 2);
+	YPos = GridUtils::linspace(mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2, M_lim - 2);
+	ZPos = GridUtils::linspace(mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2, K_lim - 2);
 
 	// Add overlap sites taking into account periodicity
 	XPos.insert( XPos.begin(), fmod(XPos[0] - dh + Lx, Lx) );
@@ -355,21 +327,21 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	// Update the sender/recv layer positions in the MpiManager
 
 	// X
-	mpim->sender_layer_pos.X[eLeftMin]	= XPos[1] - dh/2;					mpim->sender_layer_pos.X[eLeftMax]	= XPos[1] + dh/2;
-	mpim->sender_layer_pos.X[eRightMin] = XPos[local_size[0] - 2] - dh/2;	mpim->sender_layer_pos.X[eRightMax] = XPos[local_size[0] - 2] + dh/2;
-	mpim->recv_layer_pos.X[eLeftMin]	= XPos[0] - dh/2;					mpim->recv_layer_pos.X[eLeftMax]	= XPos[0] + dh/2;
-	mpim->recv_layer_pos.X[eRightMin]	= XPos[local_size[0] - 1] - dh/2;	mpim->recv_layer_pos.X[eRightMax]	= XPos[local_size[0] - 1] + dh/2;
+	mpim->sender_layer_pos.X[eLeftMin]	= XPos[1] - dh/2;						mpim->sender_layer_pos.X[eLeftMax]	= XPos[1] + dh/2;
+	mpim->sender_layer_pos.X[eRightMin] = XPos[gm->local_size[0] - 2] - dh / 2;	mpim->sender_layer_pos.X[eRightMax] = XPos[gm->local_size[0] - 2] + dh / 2;
+	mpim->recv_layer_pos.X[eLeftMin]	= XPos[0] - dh/2;						mpim->recv_layer_pos.X[eLeftMax]	= XPos[0] + dh/2;
+	mpim->recv_layer_pos.X[eRightMin]	= XPos[gm->local_size[0] - 1] - dh / 2;	mpim->recv_layer_pos.X[eRightMax]	= XPos[gm->local_size[0] - 1] + dh / 2;
 	// Y
-	mpim->sender_layer_pos.Y[eLeftMin]	= YPos[1] - dh/2;					mpim->sender_layer_pos.Y[eLeftMax]	= YPos[1] + dh/2;
-	mpim->sender_layer_pos.Y[eRightMin] = YPos[local_size[1] - 2] - dh/2;	mpim->sender_layer_pos.Y[eRightMax] = YPos[local_size[1] - 2] + dh/2;
-	mpim->recv_layer_pos.Y[eLeftMin]	= YPos[0] - dh/2;					mpim->recv_layer_pos.Y[eLeftMax]	= YPos[0] + dh/2;
-	mpim->recv_layer_pos.Y[eRightMin]	= YPos[local_size[1] - 1] - dh/2;	mpim->recv_layer_pos.Y[eRightMax]	= YPos[local_size[1] - 1] + dh/2;
+	mpim->sender_layer_pos.Y[eLeftMin]	= YPos[1] - dh/2;						mpim->sender_layer_pos.Y[eLeftMax]	= YPos[1] + dh/2;
+	mpim->sender_layer_pos.Y[eRightMin] = YPos[gm->local_size[1] - 2] - dh / 2;	mpim->sender_layer_pos.Y[eRightMax] = YPos[gm->local_size[1] - 2] + dh / 2;
+	mpim->recv_layer_pos.Y[eLeftMin]	= YPos[0] - dh/2;						mpim->recv_layer_pos.Y[eLeftMax]	= YPos[0] + dh/2;
+	mpim->recv_layer_pos.Y[eRightMin]	= YPos[gm->local_size[1] - 1] - dh / 2;	mpim->recv_layer_pos.Y[eRightMax]	= YPos[gm->local_size[1] - 1] + dh / 2;
 	// Z
 #if (L_DIMS == 3)
-	mpim->sender_layer_pos.Z[eLeftMin]	= ZPos[1] - dh/2;					mpim->sender_layer_pos.Z[eLeftMax]	= ZPos[1] + dh/2;
-	mpim->sender_layer_pos.Z[eRightMin] = ZPos[local_size[2] - 2] - dh/2;	mpim->sender_layer_pos.Z[eRightMax] = ZPos[local_size[2] - 2] + dh/2;
-	mpim->recv_layer_pos.Z[eLeftMin]	= ZPos[0] - dh/2;					mpim->recv_layer_pos.Z[eLeftMax]	= ZPos[0] + dh/2;
-	mpim->recv_layer_pos.Z[eRightMin]	= ZPos[local_size[2] - 1] - dh/2;	mpim->recv_layer_pos.Z[eRightMax]	= ZPos[local_size[2] - 1] + dh/2;
+	mpim->sender_layer_pos.Z[eLeftMin]	= ZPos[1] - dh/2;						mpim->sender_layer_pos.Z[eLeftMax]	= ZPos[1] + dh/2;
+	mpim->sender_layer_pos.Z[eRightMin] = ZPos[gm->local_size[2] - 2] - dh/2;	mpim->sender_layer_pos.Z[eRightMax] = ZPos[gm->local_size[2] - 2] + dh/2;
+	mpim->recv_layer_pos.Z[eLeftMin]	= ZPos[0] - dh/2;						mpim->recv_layer_pos.Z[eLeftMax]	= ZPos[0] + dh/2;
+	mpim->recv_layer_pos.Z[eRightMin]	= ZPos[gm->local_size[2] - 1] - dh/2;	mpim->recv_layer_pos.Z[eRightMax]	= ZPos[gm->local_size[2] - 1] + dh/2;
 #endif
 
 #ifdef L_MPI_VERBOSE
@@ -390,7 +362,8 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	XPos = GridUtils::linspace(dh / 2, L_BX - dh / 2, static_cast<int>(L_N));
 	YPos = GridUtils::linspace(dh / 2, L_BY - dh / 2, static_cast<int>(L_M));
 	ZPos = GridUtils::linspace(dh / 2, L_BZ - dh / 2, static_cast<int>(L_K));
-#endif
+
+#endif	// L_BUILD_FOR_MPI
 
 	// Absolute origins (position of first site on grid)
 	XOrigin = dh / 2.0;
@@ -500,6 +473,12 @@ void GridObj::LBM_initGrid( std::vector<int> local_size,
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
 	 */
 
+#ifndef L_BUILD_FOR_MPI
+	// Update the writable data in the grid manager
+	// When using MPI this is done when building the communicators.
+	gm->createWritableDataStore(this);
+#endif
+
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Initialisation Complete.";
 #endif
@@ -516,9 +495,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	*GridUtils::logfile << "Initialising sub-grid level " << level << ", region " << region_number << "..." << std::endl;
 #endif
 
-	// Get an instance of the MPIM
-	MpiManager *mpim = MpiManager::getInstance();
-	int mpim_idx = level + region_number * L_NUM_LEVELS;
+	// Get GM instance
+	GridManager *gm = GridManager::getInstance();
+	int gm_idx = level + region_number * L_NUM_LEVELS;
 
 	// Define scales
 	dh = pGrid.dh / 2.0;
@@ -563,10 +542,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 		
 
 	// Global edge origins (voxel centre position of first cell on grid)
-	XOrigin = mpim->global_edges[eXMin][mpim_idx] + dh / 2;
-	YOrigin = mpim->global_edges[eYMin][mpim_idx] + dh / 2;
+	XOrigin = gm->global_edges[eXMin][gm_idx] + dh / 2;
+	YOrigin = gm->global_edges[eYMin][gm_idx] + dh / 2;
 #if (L_DIMS == 3)
-	ZOrigin = mpim->global_edges[eZMin][mpim_idx] + dh / 2;
+	ZOrigin = gm->global_edges[eZMin][gm_idx] + dh / 2;
 #else
 	ZOrigin = 0.0;
 #endif
@@ -660,6 +639,8 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 /// \param	pGrid	reference to parent grid.
 void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 {
+
+	// If not using MPI then it is easy
 	/* Coarse Limits stored as local indices as they are used to map between the
 	 * fine and coarse grid cells during multi - grid operations.Therefore, we
 	 * must only store local values relevant to the grid on the rank to ensure
@@ -681,8 +662,13 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	eLocationOnRank loc = eNone;
 	double subgrid_start_voxel_centre;
 	double subgrid_end_voxel_centre;
-	int mpim_idx = level + region_number * L_NUM_LEVELS;
+	int gm_idx = level + region_number * L_NUM_LEVELS;
+	GridManager *gm = GridManager::getInstance();
+
+#ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
+	
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Cell width on parent = " << pGrid.dh << std::endl;
@@ -691,8 +677,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	// X //
 
 	// Set voxel centre positions from knowledge of grid edges
-	subgrid_start_voxel_centre = mpim->global_edges[eXMin][mpim_idx] + dh / 2.0;
-	subgrid_end_voxel_centre = mpim->global_edges[eXMax][mpim_idx] - dh / 2.0;
+	subgrid_start_voxel_centre = gm->global_edges[eXMin][gm_idx] + dh / 2.0;
+	subgrid_end_voxel_centre = gm->global_edges[eXMax][gm_idx] - dh / 2.0;
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "X: Start and end voxel centres are at: " << 
@@ -700,8 +686,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 #endif
 
 	// Set TL to on by default
-	mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = true;
+	gm->subgrid_tlayer_key[eXMin][gm_idx - 1] = true;
+	gm->subgrid_tlayer_key[eXMax][gm_idx - 1] = true;
 
 	// Start Limit: Find whether edge of refined region is on this grid at all and return its local index
 
@@ -716,6 +702,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 #endif
 	}
 
+#ifdef L_BUILD_FOR_MPI
+
 	/* Starts on some rank to the left of this one. Note: Using the core edge position
 	* is fine as if it was in the halo the above call would have returned true. */
 	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eXMin][mpim->my_rank])
@@ -727,6 +715,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "X: Starts on earlier rank" << std::endl;
 #endif
 	}
+
+#endif // L_BUILD_FOR_MPI
 
 
 	// End Limit: Find whether last sub-grid site position is on this grid at all and return its local index
@@ -741,6 +731,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "X: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
 #endif
 	}
+
+#ifdef L_BUILD_FOR_MPI
 
 	// Ends on some rank to the right of this one
 	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eXMax][mpim->my_rank])
@@ -764,6 +756,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 #endif
 	}
 
+#endif
+
 	/* If start and finish on same process then we test to see if sites are next
 	* to each other and coalesce the TL edges. */
 
@@ -779,8 +773,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
 
 			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
-			mpim->subgrid_tlayer_key[eXMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eXMax][mpim_idx - 1] = false;
+			gm->subgrid_tlayer_key[eXMin][gm_idx - 1] = false;
+			gm->subgrid_tlayer_key[eXMax][gm_idx - 1] = false;
 
 #ifdef L_INIT_VERBOSE
 			*GridUtils::logfile << "X: Periodically wrapped and joined" << std::endl;
@@ -791,10 +785,10 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 
 
 	// Y //
-	subgrid_start_voxel_centre = mpim->global_edges[eYMin][mpim_idx] + dh / 2;
-	subgrid_end_voxel_centre = mpim->global_edges[eYMax][mpim_idx] - dh / 2;
-	mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = true;
+	subgrid_start_voxel_centre = gm->global_edges[eYMin][gm_idx] + dh / 2;
+	subgrid_end_voxel_centre = gm->global_edges[eYMax][gm_idx] - dh / 2;
+	gm->subgrid_tlayer_key[eYMin][gm_idx - 1] = true;
+	gm->subgrid_tlayer_key[eYMax][gm_idx - 1] = true;
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Y: Start and end voxel centres are at: " <<
@@ -809,6 +803,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Y: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
 #endif
 	}
+
+#ifdef L_BUILD_FOR_MPI
 	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eYMin][mpim->my_rank])
 	{
 		CoarseLimsY[eMinimum] = 0;
@@ -817,6 +813,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Y: Starts on earlier rank" << std::endl;
 #endif
 	}
+#endif
 
 	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position))
 	{
@@ -826,6 +823,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Y: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
 #endif
 	}
+
+#ifdef L_BUILD_FOR_MPI
 	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eYMax][mpim->my_rank])
 	{
 		CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
@@ -842,6 +841,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Y: Ends on earlier rank" << std::endl;
 #endif
 	}
+#endif
 
 	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
@@ -850,8 +850,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		{
 			CoarseLimsY[eMinimum] = 0;
 			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
-			mpim->subgrid_tlayer_key[eYMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eYMax][mpim_idx - 1] = false;
+			gm->subgrid_tlayer_key[eYMin][gm_idx - 1] = false;
+			gm->subgrid_tlayer_key[eYMax][gm_idx - 1] = false;
 
 #ifdef L_INIT_VERBOSE
 			*GridUtils::logfile << "Y: Periodically wrapped and joined" << std::endl;
@@ -862,10 +862,10 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 
 #if (L_DIMS == 3)
 	// Z //
-	subgrid_start_voxel_centre = mpim->global_edges[eZMin][mpim_idx] + dh / 2;
-	subgrid_end_voxel_centre = mpim->global_edges[eZMax][mpim_idx] - dh / 2;
-	mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = true;
-	mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = true;
+	subgrid_start_voxel_centre = gm->global_edges[eZMin][gm_idx] + dh / 2;
+	subgrid_end_voxel_centre = gm->global_edges[eZMax][gm_idx] - dh / 2;
+	gm->subgrid_tlayer_key[eZMin][gm_idx - 1] = true;
+	gm->subgrid_tlayer_key[eZMax][gm_idx - 1] = true;
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Z: Start and end voxel centres are at: " <<
@@ -880,6 +880,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Z: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
 #endif
 	}
+
+#ifdef L_BUILD_FOR_MPI
 	else if (subgrid_start_voxel_centre < mpim->rank_core_edge[eZMin][mpim->my_rank])
 	{
 		CoarseLimsZ[eMinimum] = 0;
@@ -888,6 +890,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Z: Starts on earlier rank" << std::endl;
 #endif
 	}
+#endif
 
 	if (GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position))
 	{
@@ -897,6 +900,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Z: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
 #endif
 	}
+
+#ifdef L_BUILD_FOR_MPI
 	else if (subgrid_end_voxel_centre > mpim->rank_core_edge[eZMax][mpim->my_rank])
 	{
 		CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
@@ -913,6 +918,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		*GridUtils::logfile << "Z: Ends on earlier rank" << std::endl;
 #endif
 	}
+#endif
 
 	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
@@ -921,8 +927,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		{
 			CoarseLimsZ[eMinimum] = 0;
 			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
-			mpim->subgrid_tlayer_key[eZMin][mpim_idx - 1] = false;
-			mpim->subgrid_tlayer_key[eZMax][mpim_idx - 1] = false;
+			gm->subgrid_tlayer_key[eZMin][gm_idx - 1] = false;
+			gm->subgrid_tlayer_key[eZMax][gm_idx - 1] = false;
 
 #ifdef L_INIT_VERBOSE
 			*GridUtils::logfile << "Z: Periodically wrapped and joined" << std::endl;
@@ -936,13 +942,6 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	}
 #endif
 
-#ifdef L_INIT_VERBOSE
-	*GridUtils::logfile << "Local Coarse Lims are " <<
-		CoarseLimsX[eMinimum] << "-" << CoarseLimsX[eMaximum] << ", " <<
-		CoarseLimsY[eMinimum] << "-" << CoarseLimsY[eMaximum] << ", " <<
-		CoarseLimsZ[eMinimum] << "-" << CoarseLimsZ[eMaximum] << std::endl;
-#endif
-
 	/* If sub-grid wraps periodically we do not support it wrapping back round to the same rank
 	* again as this will confuse the mapping function so we error here. */
 
@@ -951,9 +950,15 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		(CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) ||
 		(CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum])
 		) {
-		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile, mpim->my_rank);
+		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile);
 	}
 
+#ifdef L_INIT_VERBOSE
+	*GridUtils::logfile << "Local Coarse Lims are " <<
+		CoarseLimsX[eMinimum] << "-" << CoarseLimsX[eMaximum] << ", " <<
+		CoarseLimsY[eMinimum] << "-" << CoarseLimsY[eMaximum] << ", " <<
+		CoarseLimsZ[eMinimum] << "-" << CoarseLimsZ[eMaximum] << std::endl;
+#endif
 }
 
 // ****************************************************************************
@@ -975,8 +980,9 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 	*GridUtils::logfile << "Building position vector for grid level " << level << ", direction " << dir << "...";
 #endif
 
-	int mpim_idx = level + region_number * L_NUM_LEVELS;
-	MpiManager *mpim = MpiManager::getInstance();
+	GridManager *gm = GridManager::getInstance();
+
+	int gm_idx = level + region_number * L_NUM_LEVELS;
 	int start_idx = 0, end_idx = 0;
 	std::vector<double> *arr = nullptr;
 	int req_size = 0;
@@ -1009,8 +1015,8 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 	}
 
 	// Get limits of the grid for wrap around of positions
-	double start_lim = mpim->global_edges[start_idx][mpim_idx];
-	double end_lim = mpim->global_edges[end_idx][mpim_idx];
+	double start_lim = gm->global_edges[start_idx][gm_idx];
+	double end_lim = gm->global_edges[end_idx][gm_idx];
 
 	// Construct one at a time taking into account periodicity if necessary
 	arr->push_back(start_pos);
@@ -1030,8 +1036,6 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 /// \brief	Method to initialise label-based solids
 void GridObj::LBM_initSolidLab() {
 
-	MpiManager *mpim = MpiManager::getInstance();
-
 #ifdef L_SOLID_BLOCK_ON
 	// Return if not to be put on the current grid
 	if (L_BLOCK_ON_GRID_LEV != level || L_BLOCK_ON_GRID_REG != region_number) return;
@@ -1039,6 +1043,7 @@ void GridObj::LBM_initSolidLab() {
 	// Declarations
 	int i, j, k;
 	int idx = level + region_number * L_NUM_LEVELS;
+	GridManager *gm = GridManager::getInstance();
 
 	/* Check solid block contained on the grid specified in the definitions file.
 	 * If not then exit as user has specifed block outside the grid on which they want it 
@@ -1062,14 +1067,14 @@ void GridObj::LBM_initSolidLab() {
 
 		(
 		(
-		L_BLOCK_MAX_X > mpim->global_edges[eXMax][idx] || 
-		L_BLOCK_MIN_X < mpim->global_edges[eXMin][idx] || 
-		L_BLOCK_MAX_Y > mpim->global_edges[eYMax][idx] || 
-		L_BLOCK_MIN_Y < mpim->global_edges[eYMin][idx] 
+		L_BLOCK_MAX_X > gm->global_edges[eXMax][idx] || 
+		L_BLOCK_MIN_X < gm->global_edges[eXMin][idx] || 
+		L_BLOCK_MAX_Y > gm->global_edges[eYMax][idx] || 
+		L_BLOCK_MIN_Y < gm->global_edges[eYMin][idx] 
 #if (L_DIMS == 3)
 		||
-		L_BLOCK_MAX_Z > mpim->global_edges[eZMax][idx] || 
-		L_BLOCK_MIN_Z < mpim->global_edges[eZMin][idx]
+		L_BLOCK_MAX_Z > gm->global_edges[eZMax][idx] || 
+		L_BLOCK_MIN_Z < gm->global_edges[eZMin][idx]
 #endif
 		)
 		||
@@ -1083,7 +1088,7 @@ void GridObj::LBM_initSolidLab() {
 		) {
 
 		// Block outside grid
-		L_ERROR("Block is placed outside or on the TL of the selected grid. Exiting.", GridUtils::logfile, mpim->my_rank);
+		L_ERROR("Block is placed outside or on the TL of the selected grid. Exiting.", GridUtils::logfile);
 	}
 
 
@@ -1135,7 +1140,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Check for potential singularity in BC
 	if (L_UMAX == 1 || L_UREF == 1) {
 		// Singularity so exit
-		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
+		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile);
 	}
 
 	// Search position vector to see if left hand wall on this rank
@@ -1292,12 +1297,12 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 	// Get edges and indication of TL presence on the refined region from MPIM
 	double edges[6];		// Use eCartMinMax to access
 	bool TL_present[6];		// Use eCartMinMax to access
-	int mpim_idx = level + region_number * L_NUM_LEVELS;
-	MpiManager *mpim = MpiManager::getInstance();
+	int gm_idx = level + region_number * L_NUM_LEVELS;
+	GridManager *gm = GridManager::getInstance();
 	for (d = 0; d < 6; ++d)
 	{
-		edges[d] = mpim->global_edges[d][mpim_idx];
-		TL_present[d] = mpim->subgrid_tlayer_key[d][mpim_idx - 1];
+		edges[d] = gm->global_edges[d][gm_idx];
+		TL_present[d] = gm->subgrid_tlayer_key[d][gm_idx - 1];
 	}
 
 	// Loop over parent lattice and add "refined" and "TL to lower" labels

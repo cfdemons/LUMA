@@ -15,29 +15,27 @@ M\+PI Manager class.
 struct \hyperlink{struct_mpi_manager_1_1buffer__struct}{buffer\+\_\+struct}
 \begin{DoxyCompactList}\small\item\em Structure storing buffers sizes in each direction for particular grid. \end{DoxyCompactList}\item 
 struct \hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges}
-\begin{DoxyCompactList}\small\item\em Structure containing absolute positions of the edges of halos. \end{DoxyCompactList}\item 
-struct \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct}
-\begin{DoxyCompactList}\small\item\em Structure for storing halo information for H\+D\+F5. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Structure containing absolute positions of the edges of halos. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
 void \hyperlink{class_mpi_manager_a02adaa06e139dfca2bc71e1a1dbf25c7}{mpi\+\_\+init} ()
 \begin{DoxyCompactList}\small\item\em Initialisation routine. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}{mpi\+\_\+gridbuild} ()
+void \hyperlink{class_mpi_manager_aaf238b84474a99b665cecb88f9176175}{mpi\+\_\+gridbuild} (\hyperlink{class_grid_manager}{Grid\+Manager} $\ast$const grid\+\_\+man)
 \begin{DoxyCompactList}\small\item\em Domain decomposition. \end{DoxyCompactList}\item 
-int \hyperlink{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}{mpi\+\_\+build\+Communicators} ()
+int \hyperlink{class_mpi_manager_a2e81c798922da79025f422106d084567}{mpi\+\_\+build\+Communicators} (\hyperlink{class_grid_manager}{Grid\+Manager} $\ast$const grid\+\_\+man)
 \begin{DoxyCompactList}\small\item\em Define writable sub-\/grid communicators. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}{mpi\+\_\+update\+Load\+Info} ()
+void \hyperlink{class_mpi_manager_a7668d7a8991ed30f7c0fb789deb68482}{mpi\+\_\+update\+Load\+Info} (\hyperlink{class_grid_manager}{Grid\+Manager} $\ast$const grid\+\_\+man)
 \begin{DoxyCompactList}\small\item\em Update the load balancing information stored in the \hyperlink{class_mpi_manager}{Mpi\+Manager}. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}{mpi\+\_\+buffer\+\_\+pack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+void \hyperlink{class_mpi_manager_a376700ed4ead05d85cc6adf1b64b76b6}{mpi\+\_\+buffer\+\_\+pack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$const g)
 \begin{DoxyCompactList}\small\item\em Method to pack the communication buffer. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}{mpi\+\_\+buffer\+\_\+unpack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+void \hyperlink{class_mpi_manager_a063eba01ef8efa3fd34dc2ff325dd9f5}{mpi\+\_\+buffer\+\_\+unpack} (int dir, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$const g)
 \begin{DoxyCompactList}\small\item\em Method to unpack the communication buffer. \end{DoxyCompactList}\item 
 void \hyperlink{class_mpi_manager_a1bf713399e26a5ffbc03147e0a20c585}{mpi\+\_\+buffer\+\_\+size} ()
 \begin{DoxyCompactList}\small\item\em Pre-\/calcualtion of the buffer sizes. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}{mpi\+\_\+buffer\+\_\+size\+\_\+send} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&g)
+void \hyperlink{class_mpi_manager_a4d91c1912933394167a3a63bae09be43}{mpi\+\_\+buffer\+\_\+size\+\_\+send} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$const g)
 \begin{DoxyCompactList}\small\item\em Method to pre-\/compute the size of the sender layer buffer. \end{DoxyCompactList}\item 
-void \hyperlink{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}{mpi\+\_\+buffer\+\_\+size\+\_\+recv} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&g)
+void \hyperlink{class_mpi_manager_ae337c25ae5543d598ef937bfb5590c63}{mpi\+\_\+buffer\+\_\+size\+\_\+recv} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$const g)
 \begin{DoxyCompactList}\small\item\em Method to pre-\/compute the size of the receiver layer buffer. \end{DoxyCompactList}\item 
 void \hyperlink{class_mpi_manager_ab498bdf0822e2747f83c187d682dd934}{mpi\+\_\+writeout\+\_\+buf} (std\+::string filename, int dir)
 \begin{DoxyCompactList}\small\item\em Buffer A\+S\+C\+II writer. \end{DoxyCompactList}\item 
@@ -71,30 +69,18 @@ std\+::vector$<$ int $>$ \hyperlink{class_mpi_manager_a17c2968f4c799dcadfa7bb878
 \begin{DoxyCompactList}\small\item\em Number of sites in Z direction for each custom rank. \end{DoxyCompactList}\item 
 M\+P\+I\+\_\+\+Comm \hyperlink{class_mpi_manager_a0926101699de914f6be018885bea25b1}{sub\+Grid\+\_\+comm} \mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Communicators for sub-\/grid / region combinations. \end{DoxyCompactList}\item 
-std\+::vector$<$ \hyperlink{struct_mpi_manager_1_1phdf5__struct}{phdf5\+\_\+struct} $>$ \hyperlink{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{p\+\_\+data}
-\begin{DoxyCompactList}\small\item\em Vector of structures containing halo descriptors for block writing (H\+D\+F5) \end{DoxyCompactList}\item 
 int \hyperlink{class_mpi_manager_a8329212abc23e5fa3e32e961b7823b5b}{my\+\_\+rank}
 \begin{DoxyCompactList}\small\item\em Rank number. \end{DoxyCompactList}\item 
 int \hyperlink{class_mpi_manager_af5156a5e4519f43230b6b84792464e48}{num\+\_\+ranks}
 \begin{DoxyCompactList}\small\item\em Total number of ranks in M\+PI Cartesian topology. \end{DoxyCompactList}\item 
 int \hyperlink{class_mpi_manager_a54a3ad1d90d1508ebc82f81655d917f8}{rank\+\_\+coords} \mbox{[}\hyperlink{definitions_8h_a31d5945080ee5c34edc32e6f74c724c8}{L\+\_\+\+D\+I\+MS}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Coordinates in M\+PI Cartesian topology. \end{DoxyCompactList}\item 
-int \hyperlink{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}{global\+\_\+size} \mbox{[}3\mbox{]}\mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}
-\begin{DoxyCompactList}\small\item\em Overall size of each grid (excluding halo of course). \end{DoxyCompactList}\item 
-double \hyperlink{class_mpi_manager_a26f0512e19009451431d6d0ba59bf81a}{global\+\_\+edges} \mbox{[}6\mbox{]}\mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}
-\begin{DoxyCompactList}\small\item\em Absolute position of grid edges (excluding halo of course). \end{DoxyCompactList}\item 
-bool \hyperlink{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}{subgrid\+\_\+tlayer\+\_\+key} \mbox{[}6\mbox{]}\mbox{[}\hyperlink{definitions_8h_a2ce7c3facc5f789b0e201757516539a5}{L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast$\hyperlink{definitions_8h_a3efeae83589481193d81da498e7f746a}{L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}
-\begin{DoxyCompactList}\small\item\em Boolean flag array to indicate the presence of a TL on sub-\/grid edges. \end{DoxyCompactList}\item 
-std\+::vector$<$ int $>$ \hyperlink{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}{local\+\_\+size}
-\begin{DoxyCompactList}\small\item\em Dimensions of coarse lattice represented on this rank (includes halo). \end{DoxyCompactList}\item 
 std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_a0211cd784c9ed1514d5968599e794313}{rank\+\_\+core\+\_\+edge}
 \begin{DoxyCompactList}\small\item\em Absolute positions of edges of the core region represented on this rank. \end{DoxyCompactList}\item 
 \hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges} \hyperlink{class_mpi_manager_a0cb9f8f024ec0a186374995fb203ea1e}{sender\+\_\+layer\+\_\+pos}
 \begin{DoxyCompactList}\small\item\em Structure containing sender layer edge positions. \end{DoxyCompactList}\item 
 \hyperlink{struct_mpi_manager_1_1layer__edges}{layer\+\_\+edges} \hyperlink{class_mpi_manager_ad1ff57a97ec56efc1690dd3a5a52fd64}{recv\+\_\+layer\+\_\+pos}
 \begin{DoxyCompactList}\small\item\em Structure containing receiver layer edge positions. \end{DoxyCompactList}\item 
-\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$ \hyperlink{class_mpi_manager_ad5ce72a2047a4cbb38f76d71c96571d8}{Grids}
-\begin{DoxyCompactList}\small\item\em Pointer to grid hierarchy. \end{DoxyCompactList}\item 
 std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_aafbb74832f69a915927b9bf252bd971d}{f\+\_\+buffer\+\_\+send}
 \begin{DoxyCompactList}\small\item\em Array of resizeable outgoing buffers used for data transfer. \end{DoxyCompactList}\item 
 std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{class_mpi_manager_ab8f1eeab50fd4812b3a51af1a6c43713}{f\+\_\+buffer\+\_\+recv}
@@ -148,12 +134,12 @@ Instance creator.
 
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+pack@{mpi\+\_\+buffer\+\_\+pack}}
 \index{mpi\+\_\+buffer\+\_\+pack@{mpi\+\_\+buffer\+\_\+pack}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+pack(int dir, Grid\+Obj $\ast$g)}{mpi_buffer_pack(int dir, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+pack (
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+pack(int dir, Grid\+Obj $\ast$const g)}{mpi_buffer_pack(int dir, GridObj *const g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+pack (
 \begin{DoxyParamCaption}
 \item[{int}]{dir, }
-\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\item[{{\bf Grid\+Obj} $\ast$const}]{g}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}{}\label{class_mpi_manager_ae1b33a4a24d9abf528528a296aa1d92d}
+)}\hypertarget{class_mpi_manager_a376700ed4ead05d85cc6adf1b64b76b6}{}\label{class_mpi_manager_a376700ed4ead05d85cc6adf1b64b76b6}
 
 
 Method to pack the communication buffer. 
@@ -164,7 +150,7 @@ Communication buffer is packed with distribution values from the supplied grid. 
 \begin{DoxyParams}{Parameters}
 {\em dir} & communication direction. \\
 \hline
-{\em g} & grid doing the communication. \\
+{\em g} & grid from which information is being sent during the communication. \\
 \hline
 \end{DoxyParams}
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size@{mpi\+\_\+buffer\+\_\+size}}
@@ -180,11 +166,11 @@ Pre-\/calcualtion of the buffer sizes.
 
 Wrapper method for computing the buffer sizes for every grid on the rank, both sender and receiver. Must be called post-\/initialisation. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size\+\_\+recv@{mpi\+\_\+buffer\+\_\+size\+\_\+recv}}
 \index{mpi\+\_\+buffer\+\_\+size\+\_\+recv@{mpi\+\_\+buffer\+\_\+size\+\_\+recv}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+recv(\+Grid\+Obj $\ast$\&g)}{mpi_buffer_size_recv(GridObj *&g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+recv (
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+recv(\+Grid\+Obj $\ast$const g)}{mpi_buffer_size_recv(GridObj *const g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+recv (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} $\ast$\&}]{g}
+\item[{{\bf Grid\+Obj} $\ast$const}]{g}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}{}\label{class_mpi_manager_afa7547c05583bf6c52ea48cc1dc13336}
+)}\hypertarget{class_mpi_manager_ae337c25ae5543d598ef937bfb5590c63}{}\label{class_mpi_manager_ae337c25ae5543d598ef937bfb5590c63}
 
 
 Method to pre-\/compute the size of the receiver layer buffer. 
@@ -198,11 +184,11 @@ A halo consists of a receiver (outer) and sender (inner) layer. This method comp
 \end{DoxyParams}
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+size\+\_\+send@{mpi\+\_\+buffer\+\_\+size\+\_\+send}}
 \index{mpi\+\_\+buffer\+\_\+size\+\_\+send@{mpi\+\_\+buffer\+\_\+size\+\_\+send}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+send(\+Grid\+Obj $\ast$\&g)}{mpi_buffer_size_send(GridObj *&g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+send (
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+size\+\_\+send(\+Grid\+Obj $\ast$const g)}{mpi_buffer_size_send(GridObj *const g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+size\+\_\+send (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} $\ast$\&}]{g}
+\item[{{\bf Grid\+Obj} $\ast$const}]{g}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}{}\label{class_mpi_manager_af26d2a0a2430f7c1b5def5f954a10f1d}
+)}\hypertarget{class_mpi_manager_a4d91c1912933394167a3a63bae09be43}{}\label{class_mpi_manager_a4d91c1912933394167a3a63bae09be43}
 
 
 Method to pre-\/compute the size of the sender layer buffer. 
@@ -216,12 +202,12 @@ A halo consists of a receiver (outer) and sender (inner) layer. This method comp
 \end{DoxyParams}
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+buffer\+\_\+unpack@{mpi\+\_\+buffer\+\_\+unpack}}
 \index{mpi\+\_\+buffer\+\_\+unpack@{mpi\+\_\+buffer\+\_\+unpack}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+unpack(int dir, Grid\+Obj $\ast$g)}{mpi_buffer_unpack(int dir, GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+unpack (
+\subsubsection[{\texorpdfstring{mpi\+\_\+buffer\+\_\+unpack(int dir, Grid\+Obj $\ast$const g)}{mpi_buffer_unpack(int dir, GridObj *const g)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+buffer\+\_\+unpack (
 \begin{DoxyParamCaption}
 \item[{int}]{dir, }
-\item[{{\bf Grid\+Obj} $\ast$}]{g}
+\item[{{\bf Grid\+Obj} $\ast$const}]{g}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}{}\label{class_mpi_manager_abf5e0511918b4ae6ec524d737618e341}
+)}\hypertarget{class_mpi_manager_a063eba01ef8efa3fd34dc2ff325dd9f5}{}\label{class_mpi_manager_a063eba01ef8efa3fd34dc2ff325dd9f5}
 
 
 Method to unpack the communication buffer. 
@@ -237,16 +223,23 @@ Communication buffer is unpacked onto the supplied grid. Amount and region of un
 \end{DoxyParams}
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+build\+Communicators@{mpi\+\_\+build\+Communicators}}
 \index{mpi\+\_\+build\+Communicators@{mpi\+\_\+build\+Communicators}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+build\+Communicators()}{mpi_buildCommunicators()}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::mpi\+\_\+build\+Communicators (
+\subsubsection[{\texorpdfstring{mpi\+\_\+build\+Communicators(\+Grid\+Manager $\ast$const grid\+\_\+man)}{mpi_buildCommunicators(GridManager *const grid_man)}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::mpi\+\_\+build\+Communicators (
 \begin{DoxyParamCaption}
-{}
+\item[{{\bf Grid\+Manager} $\ast$const}]{grid\+\_\+man}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}{}\label{class_mpi_manager_a749fa958cb7343183a69ca6191b45286}
+)}\hypertarget{class_mpi_manager_a2e81c798922da79025f422106d084567}{}\label{class_mpi_manager_a2e81c798922da79025f422106d084567}
 
 
 Define writable sub-\/grid communicators. 
 
-When using H\+D\+F5 in parallel, collective IO operations require all processes to write a non-\/zero amount of data to the same file. This method examines availability of sub-\/grid and writable data on the grid (if found) and ensures it is added to a new communicator. Must be called A\+F\+T\+ER the grids and buffers have been initialised. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+communicate@{mpi\+\_\+communicate}}
+When using H\+D\+F5 in parallel, collective IO operations require all processes to write a non-\/zero amount of data to the same file. This method examines availability of sub-\/grid and writable data on the grid (if found) and ensures it is added to a new communicator. Must be called A\+F\+T\+ER the grids and buffers have been initialised.
+
+
+\begin{DoxyParams}{Parameters}
+{\em grid\+\_\+man} & pointer to non-\/null grid manager. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+communicate@{mpi\+\_\+communicate}}
 \index{mpi\+\_\+communicate@{mpi\+\_\+communicate}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{mpi\+\_\+communicate(int level, int regnum)}{mpi_communicate(int level, int regnum)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+communicate (
 \begin{DoxyParamCaption}
@@ -287,16 +280,23 @@ The M\+PI directional vectors do not necessarily correspond to the lattice model
 \end{DoxyParams}
 \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+gridbuild@{mpi\+\_\+gridbuild}}
 \index{mpi\+\_\+gridbuild@{mpi\+\_\+gridbuild}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+gridbuild()}{mpi_gridbuild()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+gridbuild (
+\subsubsection[{\texorpdfstring{mpi\+\_\+gridbuild(\+Grid\+Manager $\ast$const grid\+\_\+man)}{mpi_gridbuild(GridManager *const grid_man)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+gridbuild (
 \begin{DoxyParamCaption}
-{}
+\item[{{\bf Grid\+Manager} $\ast$const}]{grid\+\_\+man}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}{}\label{class_mpi_manager_a7f07e85131147b55eec643c791ec2ba0}
+)}\hypertarget{class_mpi_manager_aaf238b84474a99b665cecb88f9176175}{}\label{class_mpi_manager_aaf238b84474a99b665cecb88f9176175}
 
 
 Domain decomposition. 
 
-Method to decompose the domain and identify local grid sizes. Parameters defined here are used in \hyperlink{class_grid_obj}{Grid\+Obj} construction. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+init@{mpi\+\_\+init}}
+Method to decompose the domain and identify local grid sizes. Parameters defined here are used in \hyperlink{class_grid_obj}{Grid\+Obj} construction. Grid manager must have been initialised before calleing this hence the requirement o have it as a non-\/null input parameter.
+
+
+\begin{DoxyParams}{Parameters}
+{\em grid\+\_\+man} & Pointer to an initialised grid manager. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+init@{mpi\+\_\+init}}
 \index{mpi\+\_\+init@{mpi\+\_\+init}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{mpi\+\_\+init()}{mpi_init()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+init (
 \begin{DoxyParamCaption}
@@ -309,16 +309,23 @@ Initialisation routine.
 
 Method is responsible for initialising the M\+PI topolgy and associated data. Must be called immediately after M\+P\+I\+\_\+init(). For serial vuilds this gets called simply to intialise the M\+P\+IM with a basic set of grid information used by other methods. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+update\+Load\+Info@{mpi\+\_\+update\+Load\+Info}}
 \index{mpi\+\_\+update\+Load\+Info@{mpi\+\_\+update\+Load\+Info}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{mpi\+\_\+update\+Load\+Info()}{mpi_updateLoadInfo()}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+update\+Load\+Info (
+\subsubsection[{\texorpdfstring{mpi\+\_\+update\+Load\+Info(\+Grid\+Manager $\ast$const grid\+\_\+man)}{mpi_updateLoadInfo(GridManager *const grid_man)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+update\+Load\+Info (
 \begin{DoxyParamCaption}
-{}
+\item[{{\bf Grid\+Manager} $\ast$const}]{grid\+\_\+man}
 \end{DoxyParamCaption}
-)}\hypertarget{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}{}\label{class_mpi_manager_ae6a8b1a857a00cdc4ed115512db050f4}
+)}\hypertarget{class_mpi_manager_a7668d7a8991ed30f7c0fb789deb68482}{}\label{class_mpi_manager_a7668d7a8991ed30f7c0fb789deb68482}
 
 
 Update the load balancing information stored in the \hyperlink{class_mpi_manager}{Mpi\+Manager}. 
 
-This method is executed by all processes. Counts the A\+C\+T\+I\+VE cells on the current rank and pushes the information to the master (rank 0) which writes this information to an output file if required. Must be called after the grids have been built or will return zero. \index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}}
+This method is executed by all processes. Counts the A\+C\+T\+I\+VE cells on the current rank and pushes the information to the master (rank 0) which writes this information to an output file if required. Must be called after the grids have been built or will return zero.
+
+
+\begin{DoxyParams}{Parameters}
+{\em grid\+\_\+man} & pointer to non-\/null grid manager. \\
+\hline
+\end{DoxyParams}
+\index{Mpi\+Manager@{Mpi\+Manager}!mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}}
 \index{mpi\+\_\+writeout\+\_\+buf@{mpi\+\_\+writeout\+\_\+buf}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{mpi\+\_\+writeout\+\_\+buf(std\+::string filename, int dir)}{mpi_writeout_buf(std::string filename, int dir)}}]{\setlength{\rightskip}{0pt plus 5cm}void Mpi\+Manager\+::mpi\+\_\+writeout\+\_\+buf (
 \begin{DoxyParamCaption}
@@ -389,34 +396,6 @@ Array of resizeable incoming buffers used for data transfer.
 
 Array of resizeable outgoing buffers used for data transfer. 
 
-\index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+edges@{global\+\_\+edges}}
-\index{global\+\_\+edges@{global\+\_\+edges}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{global\+\_\+edges}{global_edges}}]{\setlength{\rightskip}{0pt plus 5cm}double Mpi\+Manager\+::global\+\_\+edges\mbox{[}6\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}}\hypertarget{class_mpi_manager_a26f0512e19009451431d6d0ba59bf81a}{}\label{class_mpi_manager_a26f0512e19009451431d6d0ba59bf81a}
-
-
-Absolute position of grid edges (excluding halo of course). 
-
-Since L0 can only be region = 0 this array should be accessed as \mbox{[}level + region\+\_\+number $\ast$ L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS\mbox{]} in a loop where level cannot be 0. To retrieve L0 info, simply access \mbox{[}0\mbox{]}. The first index should be accessed using the enumerator e\+Cartesian\+Min\+Max. \index{Mpi\+Manager@{Mpi\+Manager}!global\+\_\+size@{global\+\_\+size}}
-\index{global\+\_\+size@{global\+\_\+size}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{global\+\_\+size}{global_size}}]{\setlength{\rightskip}{0pt plus 5cm}int Mpi\+Manager\+::global\+\_\+size\mbox{[}3\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}+1\mbox{]}}\hypertarget{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}{}\label{class_mpi_manager_a3cdf6e1ce19f22daa9e84bc88bf4382d}
-
-
-Overall size of each grid (excluding halo of course). 
-
-Since L0 can only be region = 0 this array should be accessed as \mbox{[}level + region\+\_\+number $\ast$ L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS\mbox{]} in a loop where level cannot be 0. To retrieve L0 info, simply access \mbox{[}0\mbox{]}. \index{Mpi\+Manager@{Mpi\+Manager}!Grids@{Grids}}
-\index{Grids@{Grids}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{Grids}{Grids}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Grid\+Obj}$\ast$ Mpi\+Manager\+::\+Grids}\hypertarget{class_mpi_manager_ad5ce72a2047a4cbb38f76d71c96571d8}{}\label{class_mpi_manager_ad5ce72a2047a4cbb38f76d71c96571d8}
-
-
-Pointer to grid hierarchy. 
-
-\index{Mpi\+Manager@{Mpi\+Manager}!local\+\_\+size@{local\+\_\+size}}
-\index{local\+\_\+size@{local\+\_\+size}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{local\+\_\+size}{local_size}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ Mpi\+Manager\+::local\+\_\+size}\hypertarget{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}{}\label{class_mpi_manager_ad4a918a4cd19e644ff3295b2854fc6af}
-
-
-Dimensions of coarse lattice represented on this rank (includes halo). 
-
 \index{Mpi\+Manager@{Mpi\+Manager}!logout@{logout}}
 \index{logout@{logout}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{logout}{logout}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::ofstream$\ast$ Mpi\+Manager\+::logout}\hypertarget{class_mpi_manager_a9a0dd93f57d78f568048197c95311832}{}\label{class_mpi_manager_a9a0dd93f57d78f568048197c95311832}
@@ -467,13 +446,6 @@ Define 3D such that first 8 mimic the 2D ones. Opposites are simply the next or 
 
 
 Total number of ranks in M\+PI Cartesian topology. 
-
-\index{Mpi\+Manager@{Mpi\+Manager}!p\+\_\+data@{p\+\_\+data}}
-\index{p\+\_\+data@{p\+\_\+data}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{p\+\_\+data}{p_data}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf phdf5\+\_\+struct}$>$ Mpi\+Manager\+::p\+\_\+data}\hypertarget{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}{}\label{class_mpi_manager_a03972530e718d5b0a7f119e9c6132179}
-
-
-Vector of structures containing halo descriptors for block writing (H\+D\+F5) 
 
 \index{Mpi\+Manager@{Mpi\+Manager}!rank\+\_\+coords@{rank\+\_\+coords}}
 \index{rank\+\_\+coords@{rank\+\_\+coords}!Mpi\+Manager@{Mpi\+Manager}}
@@ -531,14 +503,7 @@ Structure containing sender layer edge positions.
 
 Communicators for sub-\/grid / region combinations. 
 
-\index{Mpi\+Manager@{Mpi\+Manager}!subgrid\+\_\+tlayer\+\_\+key@{subgrid\+\_\+tlayer\+\_\+key}}
-\index{subgrid\+\_\+tlayer\+\_\+key@{subgrid\+\_\+tlayer\+\_\+key}!Mpi\+Manager@{Mpi\+Manager}}
-\subsubsection[{\texorpdfstring{subgrid\+\_\+tlayer\+\_\+key}{subgrid_tlayer_key}}]{\setlength{\rightskip}{0pt plus 5cm}bool Mpi\+Manager\+::subgrid\+\_\+tlayer\+\_\+key\mbox{[}6\mbox{]}\mbox{[}{\bf L\+\_\+\+N\+U\+M\+\_\+\+L\+E\+V\+E\+LS} $\ast${\bf L\+\_\+\+N\+U\+M\+\_\+\+R\+E\+G\+I\+O\+NS}\mbox{]}}\hypertarget{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}{}\label{class_mpi_manager_a18d53c4f9968cccec36127d33776e3d4}
-
-
-Boolean flag array to indicate the presence of a TL on sub-\/grid edges. 
-
-It is not a given that a sub-\/grid has a TL on every edge of the grid. Specifically if we have a sub-\/grid which is perodic (or in future, which merges with another sub-\/grid?). The H\+D\+F5 writer needs to know whether to exclude sites to account for TL or not so we store information here from the sub-\/grid initialisation. The first index should be accessed using the enumerator e\+Cartesian\+Min\+Max. If no sub-\/grids present then adopts a default 6x1 size. \index{Mpi\+Manager@{Mpi\+Manager}!world\+\_\+comm@{world\+\_\+comm}}
+\index{Mpi\+Manager@{Mpi\+Manager}!world\+\_\+comm@{world\+\_\+comm}}
 \index{world\+\_\+comm@{world\+\_\+comm}!Mpi\+Manager@{Mpi\+Manager}}
 \subsubsection[{\texorpdfstring{world\+\_\+comm}{world_comm}}]{\setlength{\rightskip}{0pt plus 5cm}M\+P\+I\+\_\+\+Comm Mpi\+Manager\+::world\+\_\+comm}\hypertarget{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}{}\label{class_mpi_manager_aec1ed834d1a8fa19f87499fb0d5cd332}
 

@@ -23,55 +23,52 @@ IBInfo::IBInfo()
 	// Default constructor
 }
 
-///// \brief Custom constructor for different types of message containers.
-/////	\param	iBody	pointer to the iBody being packed.
-/////	\param	m		marker.
-/////	\param	type	the type of container to be created.
-//IBInfo::IBInfo(eIBInfoType type, IBBody *iBody, std::vector<int> &buffer) {
-//
-//	// Get MPI Manager Instance
-//	MpiManager *mpim = MpiManager::getInstance();
-//
-//	switch (type)
-//	{
-//
-//	case eBodyNumMarkers:
-//
-//		// Set the sending rank and the number of markers it has to send to the owning rank
-//		this->sendingRank = mpim->my_rank;
-//		this->nMarkers = iBody->markers.size();
-//		this->mpi_type = MPI_INT;
-//
-//		// Fill the vector with required data
-//		buffer.push_back(this->sendingRank);
-//		buffer.push_back(this->nMarkers);
-//
-//		break;
-//	}
-//}
-//
-///// \brief Custom constructor for different types of message containers.
-/////	\param	iBody	pointer to the iBody being packed.
-/////	\param	m		marker.
-/////	\param	type	the type of container to be created.
-//IBInfo::IBInfo(eIBInfoType type, IBBody *iBody, std::vector<double> &buffer)
-//{
-//
-//	switch (type)
-//	{
-//
-//	case eIBDeltaSum:
-//
-//		// Pack voxel_centres for each marker and sum of delta functions
-//		// First support point should be the closest
-//		markerX = iBody->markers[m].position[eXDirection];
-//		markerY = iBody->markers[m].position[eYDirection];
-//		markerZ = iBody->markers[m].position[eZDirection];
-//
-//		// Delta values
-//		for (int i = 0; i < iBody->markers[m].deltaval.size(); i++)
-//			deltaVals[i] = iBody->markers[m].deltaval[i];
-//
-//		break;
-//	}
-//}
+/// \brief Custom constructor for different types of message containers.
+///	\param	iBody	pointer to the iBody being packed.
+///	\param	type	the type fo container to be created.
+IBInfo::IBInfo(IBBody *iBody, eIBInfoType type)
+{
+
+	switch (type)
+	{
+
+	case eIBDeltaSum:
+		// Pack voxel_centres for each marker and sum of delta functions
+		for (size_t m = 0; m < iBody->markers.size(); ++m)
+		{
+			// First support point should be the closest
+			voxel_centre_X.push_back(iBody->_Owner->XPos[iBody->markers[m].supp_i[0]]);
+			voxel_centre_Y.push_back(iBody->_Owner->YPos[iBody->markers[m].supp_j[0]]);
+			voxel_centre_Z.push_back(iBody->_Owner->ZPos[iBody->markers[m].supp_k[0]]);
+
+			// Sum of deltas
+			delta_sum.push_back(
+				std::accumulate(iBody->markers[m].deltaval.begin(), iBody->markers[m].deltaval.end(), 0.0)
+				);
+		}
+		break;
+
+		// Add other cases here
+
+	}
+}
+
+///	\brief Maps a version of the IBInfo structure to an MPI_Struct datatype.
+///	\param	type	type of container you want to map.
+///	\return	handle to the MPI struct data.
+int IBInfo::mapToMpiStruct(eIBInfoType type)
+{
+
+	switch (type)
+	{
+
+	case eIBDeltaSum:
+
+		// TODO: Map to a sturcture
+		//return MPI_Type_struct();
+
+		break;
+	}
+
+	return 0;
+}

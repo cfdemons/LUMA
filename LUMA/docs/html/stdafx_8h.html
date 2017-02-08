@@ -106,7 +106,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;cstring&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="_enumerations_8h_source.html">Enumerations.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="definitions_8h_source.html">definitions.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_grid_manager_8h_source.html">GridManager.h</a>&quot;</code><br />
+<code>#include &lt;mpi.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="_mpi_manager_8h_source.html">MpiManager.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_grid_utils_8h_source.html">GridUtils.h</a>&quot;</code><br />
 </div>
 <p><a href="stdafx_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -119,19 +124,27 @@ Macros</h2></td></tr>
 <tr class="separator:a7a997b38125dd4556b664304fb414ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3644f84794a8bfdacf39c4b2c2495fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#ac3644f84794a8bfdacf39c4b2c2495fc">SQ</a>(x)&#160;&#160;&#160;((x) * (x))</td></tr>
 <tr class="separator:ac3644f84794a8bfdacf39c4b2c2495fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4bd0cde24a2ac187747b517bc5e4f50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#ac4bd0cde24a2ac187747b517bc5e4f50">L_SMALL_NUMBER</a>&#160;&#160;&#160;1e-8</td></tr>
+<tr class="separator:ac4bd0cde24a2ac187747b517bc5e4f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a785727f822adc2d7112e0158817a88ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a785727f822adc2d7112e0158817a88ba">LUMA_FAILED</a>&#160;&#160;&#160;12345</td></tr>
+<tr class="separator:a785727f822adc2d7112e0158817a88ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8d3b25556396facf0f8c19decc56200"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#af8d3b25556396facf0f8c19decc56200">L_DACTION_WRITE_OUT_FORCES</a></td></tr>
 <tr class="separator:af8d3b25556396facf0f8c19decc56200"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a785727f822adc2d7112e0158817a88ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a785727f822adc2d7112e0158817a88ba">LUMA_FAILED</a>&#160;&#160;&#160;12345</td></tr>
-<tr class="memdesc:a785727f822adc2d7112e0158817a88ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error definition.  <a href="#a785727f822adc2d7112e0158817a88ba">More...</a><br /></td></tr>
-<tr class="separator:a785727f822adc2d7112e0158817a88ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48538932682d4fe3cdf01547db361240"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a48538932682d4fe3cdf01547db361240">L_ERROR</a>&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a3140284e45db79e0be3c624f16474cbd">errorfcn</a></td></tr>
+<tr class="memitem:a48538932682d4fe3cdf01547db361240"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a48538932682d4fe3cdf01547db361240">L_ERROR</a>&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a718daa66b55ff00c6c5f1d3f7620ef1c">errorfcn</a></td></tr>
+<tr class="memdesc:a48538932682d4fe3cdf01547db361240"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error definition.  <a href="#a48538932682d4fe3cdf01547db361240">More...</a><br /></td></tr>
 <tr class="separator:a48538932682d4fe3cdf01547db361240"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44e93e627399c941f83961cf839eaaf2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a44e93e627399c941f83961cf839eaaf2">L_INFO</a>&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a20db562eaf6d8430c70e044b8e590c43">infofcn</a></td></tr>
+<tr class="memdesc:a44e93e627399c941f83961cf839eaaf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Regular writer.  <a href="#a44e93e627399c941f83961cf839eaaf2">More...</a><br /></td></tr>
+<tr class="separator:a44e93e627399c941f83961cf839eaaf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a3140284e45db79e0be3c624f16474cbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a3140284e45db79e0be3c624f16474cbd">errorfcn</a> (std::string msg, std::ofstream *logfile)</td></tr>
-<tr class="memdesc:a3140284e45db79e0be3c624f16474cbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fatal Error function.  <a href="#a3140284e45db79e0be3c624f16474cbd">More...</a><br /></td></tr>
-<tr class="separator:a3140284e45db79e0be3c624f16474cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a718daa66b55ff00c6c5f1d3f7620ef1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a718daa66b55ff00c6c5f1d3f7620ef1c">errorfcn</a> (const std::string &amp;msg, std::ofstream *logfile)</td></tr>
+<tr class="memdesc:a718daa66b55ff00c6c5f1d3f7620ef1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fatal Error function.  <a href="#a718daa66b55ff00c6c5f1d3f7620ef1c">More...</a><br /></td></tr>
+<tr class="separator:a718daa66b55ff00c6c5f1d3f7620ef1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20db562eaf6d8430c70e044b8e590c43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdafx_8h.html#a20db562eaf6d8430c70e044b8e590c43">infofcn</a> (const std::string &amp;msg, std::ofstream *logfile)</td></tr>
+<tr class="memdesc:a20db562eaf6d8430c70e044b8e590c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Info / logger function.  <a href="#a20db562eaf6d8430c70e044b8e590c43">More...</a><br /></td></tr>
+<tr class="separator:a20db562eaf6d8430c70e044b8e590c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -170,9 +183,7 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">std::ofstream testout; \</div><div class="line">testout.open(<a class="code" href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">GridUtils::path_str</a> + <span class="stringliteral">&quot;/force_i_LB.out&quot;</span>, std::ios::app); \</div><div class="line">testout &lt;&lt; <span class="stringliteral">&quot;\nNEW TIME STEP&quot;</span> &lt;&lt; std::endl; \</div><div class="line">for (<span class="keywordtype">size_t</span> j = 1; j &lt; M_lim - 1; j++) { \</div><div class="line">    for (<span class="keywordtype">size_t</span> i = 0; i &lt; N_lim; i++) { \</div><div class="line">        for (<span class="keywordtype">size_t</span> v = 0; v &lt; <a class="code" href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a>; v++) { \</div><div class="line">            testout &lt;&lt; force_i(i, j, 0, v, M_lim, K_lim, L_NUM_VELS) &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>; \</div><div class="line">        } \</div><div class="line">        testout &lt;&lt; std::endl; \</div><div class="line">    } \</div><div class="line">    testout &lt;&lt; std::endl; \</div><div class="line">} \</div><div class="line">testout.close(); \</div><div class="ttc" id="definitions_8h_html_a947c7e248feb63ae57fb828c03c4c001"><div class="ttname"><a href="definitions_8h.html#a947c7e248feb63ae57fb828c03c4c001">L_NUM_VELS</a></div><div class="ttdeci">#define L_NUM_VELS</div><div class="ttdef"><b>Definition:</b> definitions.h:387</div></div>
-<div class="ttc" id="class_grid_utils_html_a9b58748e9e05e84852962d7abc7942e3"><div class="ttname"><a href="class_grid_utils.html#a9b58748e9e05e84852962d7abc7942e3">GridUtils::path_str</a></div><div class="ttdeci">static std::string path_str</div><div class="ttdoc">Static string representing output path. </div><div class="ttdef"><b>Definition:</b> GridUtils.h:86</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a class="anchor" id="a48538932682d4fe3cdf01547db361240"></a>
@@ -180,11 +191,28 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define L_ERROR&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a3140284e45db79e0be3c624f16474cbd">errorfcn</a></td>
+          <td class="memname">#define L_ERROR&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a718daa66b55ff00c6c5f1d3f7620ef1c">errorfcn</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Error definition. </p>
 <p>Error function shorthand </p>
+
+</div>
+</div>
+<a class="anchor" id="a44e93e627399c941f83961cf839eaaf2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define L_INFO&#160;&#160;&#160;<a class="el" href="stdafx_8h.html#a20db562eaf6d8430c70e044b8e590c43">infofcn</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Regular writer. </p>
+<p>Info function shorthand </p>
 
 </div>
 </div>
@@ -202,6 +230,18 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ac4bd0cde24a2ac187747b517bc5e4f50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define L_SMALL_NUMBER&#160;&#160;&#160;1e-8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a785727f822adc2d7112e0158817a88ba"></a>
 <div class="memitem">
 <div class="memproto">
@@ -211,8 +251,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Error definition. </p>
 
 </div>
 </div>
@@ -233,7 +271,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a3140284e45db79e0be3c624f16474cbd"></a>
+<a class="anchor" id="a718daa66b55ff00c6c5f1d3f7620ef1c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -243,7 +281,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void errorfcn </td>
           <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>msg</em>, </td>
         </tr>
         <tr>
@@ -267,6 +305,50 @@ Variables</h2></td></tr>
 
 <p>Fatal Error function. </p>
 <p>Writes error to the user and further information to the supplied logfile. Inlined since this header is included everywhere.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>string to be printed to the log file. </td></tr>
+    <tr><td class="paramname">logfile</td><td>pointer to the logfile where the message is to be written. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a20db562eaf6d8430c70e044b8e590c43"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void infofcn </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>msg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ofstream *&#160;</td>
+          <td class="paramname"><em>logfile</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Info / logger function. </p>
+<p>Writes string to the supplied logfile. Inlined since this header is included everywhere.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">msg</td><td>string to be printed to the log file. </td></tr>

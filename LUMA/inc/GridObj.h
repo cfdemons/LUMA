@@ -19,44 +19,6 @@
 #include "stdafx.h"
 #include "IVector.h"
 
-/// \enum  eType
-/// \brief Lattice typing labels
-enum eType
-{
-	eSolid,					///< Rigid, solid site
-	eFluid,					///< Fluid site
-	eRefined,				///< Fluid site which is represented on a finer grid
-	eTransitionToCoarser,	///< Fluid site coupled to a coarser grid
-	eTransitionToFiner,		///< Fluid site coupled to a finer grid
-	eBFL,					///< Site containing a BFL marker
-	eSymmetry,				///< Symmetry boundary
-	eInlet,					///< Inlet boundary
-	eOutlet,				///< Outlet boundary
-	eRefinedSolid,			///< Rigid, solid site represented on a finer grid
-	eRefinedSymmetry,		///< Symmtery boundary represented on a finer grid
-	eRefinedInlet			///< Inlet site represented on a finer grid
-};
-
-/// \enum  eBCType
-/// \brief Flag for indicating which BCs to apply
-enum eBCType
-{
-	eBCAll,				///< Apply all BCs
-	eBCSolidSymmetry,	///< Apply just solid and symmetry BCs
-	eBCInlet,			///< Apply just inlet BCs
-	eBCOutlet,			///< Apply just outlet BCs
-	eBCInletOutlet,		///< Apply inlet and outlet BCs
-	eBCBFL				///< Apply just BFL BCs
-};
-
-/// \enum  eIOFlag
-/// \brief Flag for indicating write or read action for IO methods
-enum eIOFlag
-{
-	eWrite,				///< Write to file
-	eRead,				///< Read from file
-};
-
 /// \brief	Grid class.
 ///
 ///			This class represents a grid (lattice) and is capable of owning a 
@@ -75,16 +37,10 @@ public:
 	GridObj( ); // Default constructor
 	GridObj(int level); // Basic grid constructor
 	GridObj(int RegionNumber, GridObj& pGrid); // Sub grid constructor with region and reference to parent grid for initialisation
-	// MPI L0 constructor with local size and global edges
-	GridObj(int level, std::vector<int> local_size,	std::vector< std::vector<double> > GlobalLimsPos);
 	~GridObj( ); // Default destructor
 
 
-	/*
-	***************************************************************************************************************
-	********************************************* Member Data *****************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Data **************/
 
 private :
 
@@ -160,11 +116,7 @@ public :
 	double ZOrigin;		///< Position of grid front edge
 
 
-	/*
-	***************************************************************************************************************
-	********************************************* Member Methods **************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Methods **************/
 
 public :
 
@@ -172,9 +124,9 @@ public :
 	void LBM_initVelocity();		// Initialise the velocity field
 	void LBM_initRho();				// Initialise the density field
 	void LBM_initGrid();			// Non-MPI wrapper for initialiser
-	void LBM_initGrid(std::vector<int> local_size,
-		std::vector< std::vector<double> > GlobalLimsPos);		// Initialise top level grid with fields and labels
 	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
+	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
+	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
 	void LBM_initSolidLab();					// Initialise labels for solid objects
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
@@ -186,12 +138,12 @@ public :
 	void LBM_resetForces();							// Resets the force vectors on the grid
 
 	// Boundary operations
-	void bc_applyBounceBack(int label, int i, int j, int k);	// Application of HWBB BC
-	void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
-	void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
-	void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
-	void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
-	void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
+	DEPRECATED void bc_applyBounceBack(int label, int i, int j, int k);		// Application of HWBB BC
+	DEPRECATED void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
+	DEPRECATED void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
+	DEPRECATED void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
+	DEPRECATED void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
+	DEPRECATED void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number

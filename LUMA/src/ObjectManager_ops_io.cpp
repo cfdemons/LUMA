@@ -15,18 +15,15 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/GridUtils.h"
 #include "../inc/PCpts.h"
 #include "../inc/GridObj.h"
-#include "../inc/MpiManager.h"
 
 // ************************************************************************** //
 /// \brief Write out position of immersed boundary bodies.
 /// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_writeBodyPosition(int timestep) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -34,7 +31,7 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 			// Open file for given time step
 			std::ofstream jout;
 			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_position_" + std::to_string(timestep) + 
-				"_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::out);
+				"_rank" + std::to_string(rank) + ".out", std::ios::out);
 			jout << "x" + std::to_string(timestep) + ", y" + std::to_string(timestep) + ", z" << std::endl;
 
 			// Write out position
@@ -61,15 +58,14 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 /// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_writeLiftDrag(int timestep) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::out);
+			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(rank) + ".out", std::ios::out);
 			jout << "L" + std::to_string(timestep) + ", D" + std::to_string(timestep) << std::endl;
 
 			// Sum variables
@@ -97,8 +93,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 /// \param	level	level of the grid begin written/read
 void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	if (IO_flag == eWrite) {
 
@@ -107,10 +102,10 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		if (level == 0) {
 			// Overwrite as first to write
-			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::out);
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::out);
 		} else if (level == 0) {
 			// Append
-			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::out | std::ios::app);
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::out | std::ios::app);
 		} else {
 			// Must be a subgrid which doesn't own any IB-bodies so return
 			return;
@@ -140,7 +135,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 						<< iBody[b].markers[m].position[2] << "\t";
 
 
-				if (iBody[b].flex_rigid) {
+				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
 					file << iBody[b].markers[m].position_old[0] << "\t"
@@ -162,7 +157,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 		std::ifstream file;
 
 		// We only enter this routine if on correct level so no need to check
-		file.open("./input/restart_IBBody_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::in);
+		file.open("./input/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
 			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile);
@@ -216,7 +211,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 						>> iBody[b].markers[m].position[1]
 						>> iBody[b].markers[m].position[2];
 
-				if (iBody[b].flex_rigid) {
+				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
 					iss		>> iBody[b].markers[m].position_old[0]
@@ -362,8 +357,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
-	MpiManager *mpim = MpiManager::getInstance();
-	int mpim_idx = g->level + g->region_number * L_NUM_LEVELS;
+
+	// Get rank for debugging
+	int rank = GridUtils::safeGetRank();
 
 	// Round bounding box dimensions to nearest voxel edge on this grid
 	body_start_x = std::round(body_start_x / g->dh) * g->dh;
@@ -414,6 +410,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
+
 	double scale_factor;
 	// Scale slightly smaller (to voxel centres) to ensure symmetrical distribution of voxels
 	if (scale_direction == eXDirection) {
@@ -447,9 +444,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Write out the points after scaling and shifting
 #ifdef L_CLOUD_DEBUG
 	if (!_PCpts->x.empty()) {
-		if (mpim->my_rank == 0) {
+		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(mpim->my_rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
 				fileout << std::endl;
@@ -466,7 +463,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
-#endif
 	a = 0;
 	do {
 
@@ -486,12 +482,11 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes
-#ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(mpim->my_rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
 			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
 			fileout << std::endl;
@@ -500,55 +495,51 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// Every process still needs to create the iBody
-	if (objtype == eIBBCloud)
-		iBody.emplace_back(g, iBody.size());
+	// Perform a different post-processing action depending on the type of body
+	switch (objtype)
+	{
 
-	// If there are points left
-	if (!_PCpts->x.empty())	{
+	case eBBBCloud:
 
-		// Perform a different post-processing action depending on the type of body
-		switch (objtype)
-		{
-
-		case eBBBCloud:
 #ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Labelling..." << std::endl;
+		*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
-			// Label the grid sites
-			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get indices
-				GridUtils::getEnclosingVoxel(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g, &ijk);
+		// Label the grid sites
+		for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
+			// Get indices if on this rank
+			if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
+			{
 				// Update Typing Matrix
 				if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
 				{
 					g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
 				}
 			}
-			break;
-
-		case eBFLCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call BFL body builder
-			bfl_buildBody(_PCpts);
-			break;
-
-		case eIBBCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call IBM body builder
-			ibm_buildBody(_PCpts, g);
-			break;
-
 		}
+		break;
+
+	case eBFLCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call BFL body builder
+		bfl_buildBody(_PCpts);
+		break;
+
+	case eIBBCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call IBM body builder
+		ibm_buildBody(_PCpts, g);
+		break;
+
 	}
+
 }
 // *****************************************************************************
 /// \brief	Write out the forces on a solid object.
@@ -558,8 +549,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 /// \param	tval	time value at which write out is taking place.
 void ObjectManager::io_writeForceOnObject(double tval) {
 	
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	// Get grid on which object resides
 	GridObj *g = NULL;
@@ -572,7 +562,7 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 		fout.precision(L_OUTPUT_PRECISION);
 		// Filename
 		std::stringstream fileName;
-		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << mpim->my_rank << ".csv";
+		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << rank << ".csv";
 		// Open file
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
 		// Write out the header (first time step only)

@@ -14,10 +14,7 @@
  */
 
 #include "../inc/stdafx.h"
-#include <mpi.h>
-#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 
 // ****************************************************************************
@@ -28,7 +25,7 @@
 ///			communication direction (MPI directions).
 ///
 /// \param	g	grid being inspected.
-void MpiManager::mpi_buffer_size_send(GridObj*& g) {
+void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 	
 	int count, i, j, k, dir;	// Local counters
 	// Local grid sizes

@@ -14,36 +14,36 @@ Generic body class.
 \item 
 \hyperlink{class_body_a684a431c9215429149f36949ab007353}{Body} (void)
 \begin{DoxyCompactList}\small\item\em Default Constructor. \end{DoxyCompactList}\item 
-\hyperlink{class_body_a62fb64b91f20eeef2d454994bdbc8b37}{$\sim$\+Body} (void)
+virtual \hyperlink{class_body_a62fb64b91f20eeef2d454994bdbc8b37}{$\sim$\+Body} (void)
 \begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
 \hyperlink{class_body_a5b5eaa43a6dcf5e3fdd996c126aa21ea}{Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id})
-\begin{DoxyCompactList}\small\item\em Custom constructor setting owning grid. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Custom constructor setting owning grid. \end{DoxyCompactList}\item 
+\hyperlink{class_body_a4676f710995ea5834c6dfde4f54e9067}{Body} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id}, \hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\begin{DoxyCompactList}\small\item\em Custom constructor to call method to build from point cloud. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{class_body_aa965f7b498528230aa2f56a9abf6bf06}{add\+Marker} (double x, double y, double z)
+virtual void \hyperlink{class_body_aa965f7b498528230aa2f56a9abf6bf06}{add\+Marker} (double x, double y, double z)
 \begin{DoxyCompactList}\small\item\em Add marker to the body. \end{DoxyCompactList}\item 
 \hyperlink{class_marker_data}{Marker\+Data} $\ast$ \hyperlink{class_body_a530c704d7737af163c9ed06d42a373f0}{get\+Marker\+Data} (double x, double y, double z)
 \begin{DoxyCompactList}\small\item\em Retrieve marker data. \end{DoxyCompactList}\item 
-void \hyperlink{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}{marker\+Adder} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)
-\begin{DoxyCompactList}\small\item\em Downsampling marker adding method. \end{DoxyCompactList}\item 
-bool \hyperlink{class_body_aa7733bbcd85af5fa4e8822889fba7b33}{is\+In\+Voxel} (double x, double y, double z, int curr\+\_\+mark)
-\begin{DoxyCompactList}\small\item\em Determines whether a point is inside another marker\textquotesingle{}s support voxel. \end{DoxyCompactList}\item 
-bool \hyperlink{class_body_a3ed926c01461f32d64b4a5405e920e36}{is\+Voxel\+Marker\+Voxel} (double x, double y, double z)
-\begin{DoxyCompactList}\small\item\em Determines whether a point is inside an existing marker\textquotesingle{}s support voxel. \end{DoxyCompactList}\end{DoxyCompactItemize}
+void \hyperlink{class_body_a8554d1d9ae99cc5f500f6266712339e3}{pass\+To\+Voxel\+Filter} (double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)
+\begin{DoxyCompactList}\small\item\em Downsampling voxel-\/grid filter to take a point and add it to current body. \end{DoxyCompactList}\item 
+void \hyperlink{class_body_a55d0e9759bcf50fdea300b2fe4520baf}{build\+From\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts)
+\begin{DoxyCompactList}\small\item\em Method to build a body from point cloud data. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
 double \hyperlink{class_body_a1d4ac2e6fdbc946d5eab0973fd78770b}{spacing}
-\begin{DoxyCompactList}\small\item\em Spacing of the markers in physical units. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Reference spacing of the markers. \end{DoxyCompactList}\item 
 std\+::vector$<$ Marker\+Type $>$ \hyperlink{class_body_a4e0ac821f2331ec67793a44e36c855e3}{markers}
 \begin{DoxyCompactList}\small\item\em Array of markers which make up the body. \end{DoxyCompactList}\item 
 bool \hyperlink{class_body_a2701bdb00789d26ed72d6138d2e21bcb}{closed\+\_\+surface}
-\begin{DoxyCompactList}\small\item\em Flag to specify whether or not it is a closed surface (for output) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Flag to specify whether or not it is a closed surface (i.\+e. last marker should link to first) \end{DoxyCompactList}\item 
 \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$ \hyperlink{class_body_a5197f31e50222c32adefb795a93d7156}{\+\_\+\+Owner}
 \begin{DoxyCompactList}\small\item\em Pointer to owning grid. \end{DoxyCompactList}\item 
 size\+\_\+t \hyperlink{class_body_a9d5166d7419f303190b6c6543e67e815}{id}
-\begin{DoxyCompactList}\small\item\em ID of body in array of bodies. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Unique ID of the body. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
@@ -72,7 +72,7 @@ Default Constructor.
 \begin{DoxyParamCaption}
 \item[{void}]{}
 \end{DoxyParamCaption}
-)}\hypertarget{class_body_a62fb64b91f20eeef2d454994bdbc8b37}{}\label{class_body_a62fb64b91f20eeef2d454994bdbc8b37}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_body_a62fb64b91f20eeef2d454994bdbc8b37}{}\label{class_body_a62fb64b91f20eeef2d454994bdbc8b37}
 
 
 Default destructor. 
@@ -93,7 +93,29 @@ Custom constructor setting owning grid.
 \begin{DoxyParams}{Parameters}
 {\em g} & pointer to grid which owns this body. \\
 \hline
-{\em id} & indicates position of body in array of bodies. \\
+{\em id} & indicates unique number of body in array of bodies. \\
+\hline
+\end{DoxyParams}
+\index{Body@{Body}!Body@{Body}}
+\index{Body@{Body}!Body@{Body}}
+\subsubsection[{\texorpdfstring{Body(\+Grid\+Obj $\ast$g, size\+\_\+t id, P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{Body(GridObj *g, size_t id, PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ {\bf Body}$<$ Marker\+Type $>$\+::{\bf Body} (
+\begin{DoxyParamCaption}
+\item[{{\bf Grid\+Obj} $\ast$}]{g, }
+\item[{size\+\_\+t}]{id, }
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)}\hypertarget{class_body_a4676f710995ea5834c6dfde4f54e9067}{}\label{class_body_a4676f710995ea5834c6dfde4f54e9067}
+
+
+Custom constructor to call method to build from point cloud. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em g} & pointer to grid which owns this body. \\
+\hline
+{\em id} & indicates unique number of body in array of bodies. \\
+\hline
+{\em \+\_\+\+P\+Cpts} & pointer to point cloud data. \\
 \hline
 \end{DoxyParams}
 
@@ -107,7 +129,7 @@ Custom constructor setting owning grid.
 \item[{double}]{y, }
 \item[{double}]{z}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_aa965f7b498528230aa2f56a9abf6bf06}{}\label{class_body_aa965f7b498528230aa2f56a9abf6bf06}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\hypertarget{class_body_aa965f7b498528230aa2f56a9abf6bf06}{}\label{class_body_aa965f7b498528230aa2f56a9abf6bf06}
 
 
 Add marker to the body. 
@@ -119,6 +141,22 @@ Add marker to the body.
 {\em y} & global Y-\/position of marker. \\
 \hline
 {\em z} & global Z-\/position of marker. \\
+\hline
+\end{DoxyParams}
+\index{Body@{Body}!build\+From\+Cloud@{build\+From\+Cloud}}
+\index{build\+From\+Cloud@{build\+From\+Cloud}!Body@{Body}}
+\subsubsection[{\texorpdfstring{build\+From\+Cloud(\+P\+Cpts $\ast$\+\_\+\+P\+Cpts)}{buildFromCloud(PCpts *_PCpts)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ void {\bf Body}$<$ Marker\+Type $>$\+::build\+From\+Cloud (
+\begin{DoxyParamCaption}
+\item[{{\bf P\+Cpts} $\ast$}]{\+\_\+\+P\+Cpts}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a55d0e9759bcf50fdea300b2fe4520baf}{}\label{class_body_a55d0e9759bcf50fdea300b2fe4520baf}
+
+
+Method to build a body from point cloud data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+\+P\+Cpts} & point cloud data from which to build body. \\
 \hline
 \end{DoxyParams}
 \index{Body@{Body}!get\+Marker\+Data@{get\+Marker\+Data}}
@@ -134,7 +172,7 @@ Add marker to the body.
 
 Retrieve marker data. 
 
-Return marker and voxel/primary support data associated with supplied global position.
+Return marker whose primary support data is nearest the supplied global position.
 
 
 \begin{DoxyParams}{Parameters}
@@ -148,62 +186,9 @@ Return marker and voxel/primary support data associated with supplied global pos
 \begin{DoxyReturn}{Returns}
 \hyperlink{class_marker_data}{Marker\+Data} marker data structure returned. If no marker found, structure is marked as invalid. 
 \end{DoxyReturn}
-\index{Body@{Body}!is\+In\+Voxel@{is\+In\+Voxel}}
-\index{is\+In\+Voxel@{is\+In\+Voxel}!Body@{Body}}
-\subsubsection[{\texorpdfstring{is\+In\+Voxel(double x, double y, double z, int curr\+\_\+mark)}{isInVoxel(double x, double y, double z, int curr_mark)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ bool {\bf Body}$<$ Marker\+Type $>$\+::is\+In\+Voxel (
-\begin{DoxyParamCaption}
-\item[{double}]{x, }
-\item[{double}]{y, }
-\item[{double}]{z, }
-\item[{int}]{curr\+\_\+mark}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_aa7733bbcd85af5fa4e8822889fba7b33}{}\label{class_body_aa7733bbcd85af5fa4e8822889fba7b33}
-
-
-Determines whether a point is inside another marker\textquotesingle{}s support voxel. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em x} & X-\/position of point. \\
-\hline
-{\em y} & Y-\/position of point. \\
-\hline
-{\em z} & Z-\/position of point. \\
-\hline
-{\em curr\+\_\+mark} & ID of the marker. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-true of false 
-\end{DoxyReturn}
-\index{Body@{Body}!is\+Voxel\+Marker\+Voxel@{is\+Voxel\+Marker\+Voxel}}
-\index{is\+Voxel\+Marker\+Voxel@{is\+Voxel\+Marker\+Voxel}!Body@{Body}}
-\subsubsection[{\texorpdfstring{is\+Voxel\+Marker\+Voxel(double x, double y, double z)}{isVoxelMarkerVoxel(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ bool {\bf Body}$<$ Marker\+Type $>$\+::is\+Voxel\+Marker\+Voxel (
-\begin{DoxyParamCaption}
-\item[{double}]{x, }
-\item[{double}]{y, }
-\item[{double}]{z}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a3ed926c01461f32d64b4a5405e920e36}{}\label{class_body_a3ed926c01461f32d64b4a5405e920e36}
-
-
-Determines whether a point is inside an existing marker\textquotesingle{}s support voxel. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em x} & X-\/position of point. \\
-\hline
-{\em y} & Y-\/position of point. \\
-\hline
-{\em z} & Z-\/position of point. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-true of false 
-\end{DoxyReturn}
-\index{Body@{Body}!marker\+Adder@{marker\+Adder}}
-\index{marker\+Adder@{marker\+Adder}!Body@{Body}}
-\subsubsection[{\texorpdfstring{marker\+Adder(double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)}{markerAdder(double x, double y, double z, int &curr_mark, std::vector< int > &counter)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ void {\bf Body}$<$ Marker\+Type $>$\+::marker\+Adder (
+\index{Body@{Body}!pass\+To\+Voxel\+Filter@{pass\+To\+Voxel\+Filter}}
+\index{pass\+To\+Voxel\+Filter@{pass\+To\+Voxel\+Filter}!Body@{Body}}
+\subsubsection[{\texorpdfstring{pass\+To\+Voxel\+Filter(double x, double y, double z, int \&curr\+\_\+mark, std\+::vector$<$ int $>$ \&counter)}{passToVoxelFilter(double x, double y, double z, int &curr_mark, std::vector< int > &counter)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type $>$ void {\bf Body}$<$ Marker\+Type $>$\+::pass\+To\+Voxel\+Filter (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
@@ -211,22 +196,22 @@ true of false
 \item[{int \&}]{curr\+\_\+mark, }
 \item[{std\+::vector$<$ int $>$ \&}]{counter}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}{}\label{class_body_a3a1ba74da8020cc3ee7f4fffde0b4477}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a8554d1d9ae99cc5f500f6266712339e3}{}\label{class_body_a8554d1d9ae99cc5f500f6266712339e3}
 
 
-Downsampling marker adding method. 
+Downsampling voxel-\/grid filter to take a point and add it to current body. 
 
-This method tries to add a marker to body at the global location given but obeys the rules of a voxel-\/grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice.
+This method attempts to add a marker to body at the global location but obeys the rules of a voxel-\/grid filter to ensure markers are distributed such that their spacing roughly matches the background lattice. It is usually called in side a loop and requires a few extra pieces of information to be tracked throughout.
 
 
 \begin{DoxyParams}{Parameters}
 {\em x} & desired global X-\/position of new marker. \\
 \hline
-{\em y} & desired global\+Y-\/position of new marker. \\
+{\em y} & desired global Y-\/position of new marker. \\
 \hline
-{\em z} & desired global\+Z-\/position of new marker. \\
+{\em z} & desired global Z-\/position of new marker. \\
 \hline
-{\em curr\+\_\+mark} & is a reference to the ID of last marker. \\
+{\em curr\+\_\+mark} & is a reference to the ID of last marker added. \\
 \hline
 {\em counter} & is a reference to the total number of markers in the body. \\
 \hline
@@ -246,14 +231,14 @@ Pointer to owning grid.
 \subsubsection[{\texorpdfstring{closed\+\_\+surface}{closed_surface}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type$>$ bool {\bf Body}$<$ Marker\+Type $>$\+::closed\+\_\+surface\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a2701bdb00789d26ed72d6138d2e21bcb}{}\label{class_body_a2701bdb00789d26ed72d6138d2e21bcb}
 
 
-Flag to specify whether or not it is a closed surface (for output) 
+Flag to specify whether or not it is a closed surface (i.\+e. last marker should link to first) 
 
 \index{Body@{Body}!id@{id}}
 \index{id@{id}!Body@{Body}}
 \subsubsection[{\texorpdfstring{id}{id}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type$>$ size\+\_\+t {\bf Body}$<$ Marker\+Type $>$\+::id\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a9d5166d7419f303190b6c6543e67e815}{}\label{class_body_a9d5166d7419f303190b6c6543e67e815}
 
 
-ID of body in array of bodies. 
+Unique ID of the body. 
 
 \index{Body@{Body}!markers@{markers}}
 \index{markers@{markers}!Body@{Body}}
@@ -267,7 +252,7 @@ Array of markers which make up the body.
 \subsubsection[{\texorpdfstring{spacing}{spacing}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Marker\+Type$>$ double {\bf Body}$<$ Marker\+Type $>$\+::spacing\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_body_a1d4ac2e6fdbc946d5eab0973fd78770b}{}\label{class_body_a1d4ac2e6fdbc946d5eab0973fd78770b}
 
 
-Spacing of the markers in physical units. 
+Reference spacing of the markers. 
 
 
 

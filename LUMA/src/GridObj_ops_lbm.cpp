@@ -21,8 +21,6 @@ streaming and macroscopic calulcation.
 #include "../inc/GridObj.h"
 #include "../inc/IVector.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 using namespace std;
 

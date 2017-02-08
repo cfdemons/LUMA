@@ -22,25 +22,11 @@
 
 #include "stdafx.h"
 #include "hdf5.h"	// Load C API
-#include "MpiManager.h"
 
 #define H5_BUILT_AS_DYNAMIC_LIB
 #define HDF5_EXT_ZLIB
 #define HDF5_EXT_SZIP
 
-/// \enum	eHdf5SlabType
-///	\brief	Defines the type of storage arrangement of the variable in memory.
-///
-///			The write wrapper can then extract the data from memeory and write it
-///			to an HDF5 file using a particular hyperslab selection.
-enum eHdf5SlabType {
-	eScalar,		///< 2/3D data	-- One variable per grid site
-	eVector,		///< 2/3D data	-- L_DIMS variables per grid site
-	eProductVector,	///< 1D data	-- 3*L_DIMS-3 variables per grid site
-	ePosX,			///< 1D data	-- Single L_dim vector per dimension
-	ePosY,			///< 1D data	-- Single L_dim vector per dimension
-	ePosZ			///< 1D data	-- Single L_dim vector per dimension
-};
 
 //***************************************************************************//
 /// \brief	Helper method to write out using HDF5.
@@ -65,7 +51,8 @@ template <typename T>
 void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim,
 	GridObj *g, T *data, hid_t hdf_datatype,
-	bool *TL_present, int TL_thickness, MpiManager::phdf5_struct hdf_data) {
+	bool *TL_present, int TL_thickness,
+	HDFstruct hdf_data) {
 
 
 	// Writable region indicies from the MPIM
@@ -415,6 +402,10 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 		H5Eprint(H5E_DEFAULT, stderr);
 	}
 	H5Sselect_none(filespace);
+
+#ifdef L_HDF_DEBUG
+	*GridUtils::logfile << "Write Complete." << std::endl;
+#endif
 
 	// Close property list
 	status = H5Pclose(plist_id);

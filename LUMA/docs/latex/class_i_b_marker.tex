@@ -22,7 +22,7 @@ Inheritance diagram for I\+B\+Marker\+:\begin{figure}[H]
 \begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_i_b_marker_a0f3e177c42c3d616a2bbf96c0a9c1099}{$\sim$\+I\+B\+Marker} (void)
 \begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
-\hyperlink{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}{I\+B\+Marker} (double x\+Pos, double y\+Pos, double z\+Pos, bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}=false)
+\hyperlink{class_i_b_marker_a85e4b09f83c97e3dacfa2615d5907e62}{I\+B\+Marker} (double x\+Pos, double y\+Pos, double z\+Pos, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const body\+\_\+owner, bool \hyperlink{class_i_b_marker_a190d90424dc97a7d83669f81dd8273a8}{is\+Flexible}=false)
 \begin{DoxyCompactList}\small\item\em Custom constructor with position. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
@@ -37,8 +37,8 @@ std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a6a55fe2293f288ae339036e
 \begin{DoxyCompactList}\small\item\em Vector containing the physical coordinates (x,y,z) of the marker at t-\/1. Used for moving bodies. \end{DoxyCompactList}\item 
 std\+::vector$<$ double $>$ \hyperlink{class_i_b_marker_a82296e15048c55bd121245d85b076168}{deltaval}
 \begin{DoxyCompactList}\small\item\em Value of delta function for a given support node. \end{DoxyCompactList}\item 
-bool \hyperlink{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{flex\+\_\+rigid}
-\begin{DoxyCompactList}\small\item\em Indication as to whether marker is part of a moving or flexible body\+: false == rigid/fixed; true == flexible/moving. \end{DoxyCompactList}\item 
+bool \hyperlink{class_i_b_marker_a190d90424dc97a7d83669f81dd8273a8}{is\+Flexible}
+\begin{DoxyCompactList}\small\item\em Indication as to whether marker is part of a structural or moving body calculation. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_marker_a8127c61f723299ba0bf04439c1fb1c1e}{epsilon}
 \begin{DoxyCompactList}\small\item\em Scaling parameter. \end{DoxyCompactList}\item 
 double \hyperlink{class_i_b_marker_aa332dcba1676eae4fbb6d0fa6caca809}{local\+\_\+area}
@@ -87,14 +87,15 @@ Default destructor.
 
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
 \index{I\+B\+Marker@{I\+B\+Marker}!I\+B\+Marker@{I\+B\+Marker}}
-\subsubsection[{\texorpdfstring{I\+B\+Marker(double x\+Pos, double y\+Pos, double z\+Pos, bool flex\+\_\+rigid=false)}{IBMarker(double xPos, double yPos, double zPos, bool flex_rigid=false)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::\+I\+B\+Marker (
+\subsubsection[{\texorpdfstring{I\+B\+Marker(double x\+Pos, double y\+Pos, double z\+Pos, Grid\+Obj const $\ast$const body\+\_\+owner, bool is\+Flexible=false)}{IBMarker(double xPos, double yPos, double zPos, GridObj const *const body_owner, bool isFlexible=false)}}]{\setlength{\rightskip}{0pt plus 5cm}I\+B\+Marker\+::\+I\+B\+Marker (
 \begin{DoxyParamCaption}
 \item[{double}]{x\+Pos, }
 \item[{double}]{y\+Pos, }
 \item[{double}]{z\+Pos, }
-\item[{bool}]{flex\+\_\+rigid = {\ttfamily false}}
+\item[{{\bf Grid\+Obj} const $\ast$const}]{body\+\_\+owner, }
+\item[{bool}]{is\+Flexible = {\ttfamily false}}
 \end{DoxyParamCaption}
-)}\hypertarget{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}{}\label{class_i_b_marker_ae3a7dc30b6910d1aa405810a2e3956b3}
+)}\hypertarget{class_i_b_marker_a85e4b09f83c97e3dacfa2615d5907e62}{}\label{class_i_b_marker_a85e4b09f83c97e3dacfa2615d5907e62}
 
 
 Custom constructor with position. 
@@ -107,7 +108,9 @@ Custom constructor with position.
 \hline
 {\em z\+Pos} & z-\/position of marker. \\
 \hline
-{\em flex\+\_\+rigid} & flag to indicate whether marker is movable or not. \\
+{\em body\+\_\+owner} & Grid on which primary support point is to be found \\
+\hline
+{\em is\+Flexible} & flag to indicate whether marker is movable or not. \\
 \hline
 \end{DoxyParams}
 
@@ -153,13 +156,6 @@ Dilation parameter in lattice units (same in all directions for uniform Eulerian
 
 Scaling parameter. 
 
-\index{I\+B\+Marker@{I\+B\+Marker}!flex\+\_\+rigid@{flex\+\_\+rigid}}
-\index{flex\+\_\+rigid@{flex\+\_\+rigid}!I\+B\+Marker@{I\+B\+Marker}}
-\subsubsection[{\texorpdfstring{flex\+\_\+rigid}{flex_rigid}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Marker\+::flex\+\_\+rigid\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}{}\label{class_i_b_marker_a826fd907814ce9c6e40bcbdbd359ec7e}
-
-
-Indication as to whether marker is part of a moving or flexible body\+: false == rigid/fixed; true == flexible/moving. 
-
 \index{I\+B\+Marker@{I\+B\+Marker}!fluid\+\_\+vel@{fluid\+\_\+vel}}
 \index{fluid\+\_\+vel@{fluid\+\_\+vel}!I\+B\+Marker@{I\+B\+Marker}}
 \subsubsection[{\texorpdfstring{fluid\+\_\+vel}{fluid_vel}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ I\+B\+Marker\+::fluid\+\_\+vel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}{}\label{class_i_b_marker_aa31ccf45de61bfccc60876ac9e98909a}
@@ -173,6 +169,13 @@ Fluid velocity interpolated from lattice nodes.
 
 
 Restorative force vector on marker. 
+
+\index{I\+B\+Marker@{I\+B\+Marker}!is\+Flexible@{is\+Flexible}}
+\index{is\+Flexible@{is\+Flexible}!I\+B\+Marker@{I\+B\+Marker}}
+\subsubsection[{\texorpdfstring{is\+Flexible}{isFlexible}}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+B\+Marker\+::is\+Flexible\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{class_i_b_marker_a190d90424dc97a7d83669f81dd8273a8}{}\label{class_i_b_marker_a190d90424dc97a7d83669f81dd8273a8}
+
+
+Indication as to whether marker is part of a structural or moving body calculation. 
 
 \index{I\+B\+Marker@{I\+B\+Marker}!local\+\_\+area@{local\+\_\+area}}
 \index{local\+\_\+area@{local\+\_\+area}!I\+B\+Marker@{I\+B\+Marker}}

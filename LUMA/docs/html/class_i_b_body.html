@@ -120,27 +120,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a737e9f9ecfff9a1ea0741b03a43c3478"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a737e9f9ecfff9a1ea0741b03a43c3478">IBBody</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g, size_t <a class="el" href="class_body.html#a9d5166d7419f303190b6c6543e67e815">id</a>)</td></tr>
 <tr class="memdesc:a737e9f9ecfff9a1ea0741b03a43c3478"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor which assigns the owner grid.  <a href="#a737e9f9ecfff9a1ea0741b03a43c3478">More...</a><br /></td></tr>
 <tr class="separator:a737e9f9ecfff9a1ea0741b03a43c3478"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafa9573e6787bf3b6f07fd3880452b89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#aafa9573e6787bf3b6f07fd3880452b89">addMarker</a> (double x, double y, double z, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>)</td></tr>
-<tr class="memdesc:aafa9573e6787bf3b6f07fd3880452b89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to add an IB marker to the body.  <a href="#aafa9573e6787bf3b6f07fd3880452b89">More...</a><br /></td></tr>
-<tr class="separator:aafa9573e6787bf3b6f07fd3880452b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16cf21facacb49727c2e1feda473d080"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a16cf21facacb49727c2e1feda473d080">markerAdder</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>)</td></tr>
-<tr class="memdesc:a16cf21facacb49727c2e1feda473d080"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling marker adding method (overload)  <a href="#a16cf21facacb49727c2e1feda473d080">More...</a><br /></td></tr>
-<tr class="separator:a16cf21facacb49727c2e1feda473d080"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af26b0107e612dab7cd1e73bac1f4f234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#af26b0107e612dab7cd1e73bac1f4f234">makeBody</a> (double radius, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>, bool moving, int group)</td></tr>
-<tr class="memdesc:af26b0107e612dab7cd1e73bac1f4f234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a sphere / circle.  <a href="#af26b0107e612dab7cd1e73bac1f4f234">More...</a><br /></td></tr>
-<tr class="separator:af26b0107e612dab7cd1e73bac1f4f234"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c3f3da65bdaca7bee4ebea5a06b8bdd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a5c3f3da65bdaca7bee4ebea5a06b8bdd">makeBody</a> (std::vector&lt; double &gt; width_length_depth, std::vector&lt; double &gt; angles, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>, bool deform, int group)</td></tr>
-<tr class="memdesc:a5c3f3da65bdaca7bee4ebea5a06b8bdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a cuboid / rectangle.  <a href="#a5c3f3da65bdaca7bee4ebea5a06b8bdd">More...</a><br /></td></tr>
-<tr class="separator:a5c3f3da65bdaca7bee4ebea5a06b8bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab83346d555202a5cf669c7e309dc856a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#ab83346d555202a5cf669c7e309dc856a">makeBody</a> (int numbermarkers, std::vector&lt; double &gt; start_point, double fil_length, std::vector&lt; double &gt; angles, std::vector&lt; int &gt; <a class="el" href="class_i_b_body.html#ad9fa313d9cb2c2c463740eed5a1faf16">BCs</a>, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>, bool deform, int group)</td></tr>
-<tr class="memdesc:ab83346d555202a5cf669c7e309dc856a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a flexible filament.  <a href="#ab83346d555202a5cf669c7e309dc856a">More...</a><br /></td></tr>
-<tr class="separator:ab83346d555202a5cf669c7e309dc856a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34380e523aef0978495d52bc91f3d74b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a34380e523aef0978495d52bc91f3d74b">makeBody</a> (std::vector&lt; double &gt; width_length, double angle, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a>, bool deform, int group, bool plate)</td></tr>
-<tr class="memdesc:a34380e523aef0978495d52bc91f3d74b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a 3D plate inclined from the XZ plane.  <a href="#a34380e523aef0978495d52bc91f3d74b">More...</a><br /></td></tr>
-<tr class="separator:a34380e523aef0978495d52bc91f3d74b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad21167e57221cb4faf5a15ffebc438d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#aad21167e57221cb4faf5a15ffebc438d">makeBody</a> (<a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts)</td></tr>
-<tr class="memdesc:aad21167e57221cb4faf5a15ffebc438d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to build a body from a point cloud.  <a href="#aad21167e57221cb4faf5a15ffebc438d">More...</a><br /></td></tr>
-<tr class="separator:aad21167e57221cb4faf5a15ffebc438d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c95ff82ebef5f8e86519f656576cbce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a8c95ff82ebef5f8e86519f656576cbce">IBBody</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g, size_t <a class="el" href="class_body.html#a9d5166d7419f303190b6c6543e67e815">id</a>, <a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts)</td></tr>
+<tr class="memdesc:a8c95ff82ebef5f8e86519f656576cbce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor to build a body in place using a point cloud,.  <a href="#a8c95ff82ebef5f8e86519f656576cbce">More...</a><br /></td></tr>
+<tr class="separator:a8c95ff82ebef5f8e86519f656576cbce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3915b9b08d1264c4f261e8b8585e5ffe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a3915b9b08d1264c4f261e8b8585e5ffe">makeBody</a> (double radius, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a>, bool <a class="el" href="class_i_b_body.html#a9f0773d31ac48e0f5b3174e6040732f9">isMovable</a>, int group)</td></tr>
+<tr class="memdesc:a3915b9b08d1264c4f261e8b8585e5ffe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a sphere / circle.  <a href="#a3915b9b08d1264c4f261e8b8585e5ffe">More...</a><br /></td></tr>
+<tr class="separator:a3915b9b08d1264c4f261e8b8585e5ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5339567c62f8cb4ae6db99c551bb6b9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a5339567c62f8cb4ae6db99c551bb6b9f">makeBody</a> (std::vector&lt; double &gt; width_length_depth, std::vector&lt; double &gt; angles, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a>, bool <a class="el" href="class_i_b_body.html#a9f0773d31ac48e0f5b3174e6040732f9">isMovable</a>, int group)</td></tr>
+<tr class="memdesc:a5339567c62f8cb4ae6db99c551bb6b9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a cuboid / rectangle.  <a href="#a5339567c62f8cb4ae6db99c551bb6b9f">More...</a><br /></td></tr>
+<tr class="separator:a5339567c62f8cb4ae6db99c551bb6b9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89bb54240accfc291f4db0b8e3c155bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a89bb54240accfc291f4db0b8e3c155bb">makeBody</a> (int numbermarkers, std::vector&lt; double &gt; start_point, double fil_length, std::vector&lt; double &gt; angles, std::vector&lt; int &gt; <a class="el" href="class_i_b_body.html#ad9fa313d9cb2c2c463740eed5a1faf16">BCs</a>, bool <a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a>, bool <a class="el" href="class_i_b_body.html#a9f0773d31ac48e0f5b3174e6040732f9">isMovable</a>, int group)</td></tr>
+<tr class="memdesc:a89bb54240accfc291f4db0b8e3c155bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a flexible filament.  <a href="#a89bb54240accfc291f4db0b8e3c155bb">More...</a><br /></td></tr>
+<tr class="separator:a89bb54240accfc291f4db0b8e3c155bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77be961607d7ce681f5b6c2fa277d59e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a77be961607d7ce681f5b6c2fa277d59e">makeBody</a> (std::vector&lt; double &gt; width_length, double angle, std::vector&lt; double &gt; centre, bool <a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a>, bool <a class="el" href="class_i_b_body.html#a9f0773d31ac48e0f5b3174e6040732f9">isMovable</a>, int group, bool plate)</td></tr>
+<tr class="memdesc:a77be961607d7ce681f5b6c2fa277d59e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to seed markers for a 3D plate inclined from the XZ plane.  <a href="#a77be961607d7ce681f5b6c2fa277d59e">More...</a><br /></td></tr>
+<tr class="separator:a77be961607d7ce681f5b6c2fa277d59e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bb2b18d33716b743439c21e6e729eec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a0bb2b18d33716b743439c21e6e729eec">addMarker</a> (double x, double y, double z, bool <a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a>)</td></tr>
+<tr class="memdesc:a0bb2b18d33716b743439c21e6e729eec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to add an IB marker to the body.  <a href="#a0bb2b18d33716b743439c21e6e729eec">More...</a><br /></td></tr>
+<tr class="separator:a0bb2b18d33716b743439c21e6e729eec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_body"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_body')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_body.html">Body&lt; IBMarker &gt;</a></td></tr>
 <tr class="memitem:a684a431c9215429149f36949ab007353 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a684a431c9215429149f36949ab007353">Body</a> (void)</td></tr>
 <tr class="memdesc:a684a431c9215429149f36949ab007353 inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default Constructor.  <a href="#a684a431c9215429149f36949ab007353">More...</a><br /></td></tr>
@@ -148,18 +145,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5b5eaa43a6dcf5e3fdd996c126aa21ea inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a5b5eaa43a6dcf5e3fdd996c126aa21ea">Body</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g, size_t <a class="el" href="class_body.html#a9d5166d7419f303190b6c6543e67e815">id</a>)</td></tr>
 <tr class="memdesc:a5b5eaa43a6dcf5e3fdd996c126aa21ea inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor setting owning grid.  <a href="#a5b5eaa43a6dcf5e3fdd996c126aa21ea">More...</a><br /></td></tr>
 <tr class="separator:a5b5eaa43a6dcf5e3fdd996c126aa21ea inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a62fb64b91f20eeef2d454994bdbc8b37">~Body</a> (void)</td></tr>
+<tr class="memitem:a4676f710995ea5834c6dfde4f54e9067 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a4676f710995ea5834c6dfde4f54e9067">Body</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *g, size_t <a class="el" href="class_body.html#a9d5166d7419f303190b6c6543e67e815">id</a>, <a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts)</td></tr>
+<tr class="memdesc:a4676f710995ea5834c6dfde4f54e9067 inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor to call method to build from point cloud.  <a href="#a4676f710995ea5834c6dfde4f54e9067">More...</a><br /></td></tr>
+<tr class="separator:a4676f710995ea5834c6dfde4f54e9067 inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a62fb64b91f20eeef2d454994bdbc8b37">~Body</a> (void)</td></tr>
 <tr class="memdesc:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor.  <a href="#a62fb64b91f20eeef2d454994bdbc8b37">More...</a><br /></td></tr>
 <tr class="separator:a62fb64b91f20eeef2d454994bdbc8b37 inherit pub_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a526f3e83b45b991a79941ee745698ea5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a526f3e83b45b991a79941ee745698ea5">flex_rigid</a></td></tr>
-<tr class="memdesc:a526f3e83b45b991a79941ee745698ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to indicate flexibility: false == rigid body; true == flexible filament.  <a href="#a526f3e83b45b991a79941ee745698ea5">More...</a><br /></td></tr>
-<tr class="separator:a526f3e83b45b991a79941ee745698ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac0ea66a55dcb0cf41deb2b9a82743e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#aac0ea66a55dcb0cf41deb2b9a82743e5">deformable</a></td></tr>
-<tr class="memdesc:aac0ea66a55dcb0cf41deb2b9a82743e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to indicate deformable body: false == rigid; true == deformable.  <a href="#aac0ea66a55dcb0cf41deb2b9a82743e5">More...</a><br /></td></tr>
-<tr class="separator:aac0ea66a55dcb0cf41deb2b9a82743e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58de7cc12e734b646904e81a56b18b4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a58de7cc12e734b646904e81a56b18b4e">isFlexible</a></td></tr>
+<tr class="memdesc:a58de7cc12e734b646904e81a56b18b4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to indicate flexibility: false == rigid body; true == flexible filament.  <a href="#a58de7cc12e734b646904e81a56b18b4e">More...</a><br /></td></tr>
+<tr class="separator:a58de7cc12e734b646904e81a56b18b4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f0773d31ac48e0f5b3174e6040732f9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a9f0773d31ac48e0f5b3174e6040732f9">isMovable</a></td></tr>
+<tr class="memdesc:a9f0773d31ac48e0f5b3174e6040732f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to indicate if body is movable or not.  <a href="#a9f0773d31ac48e0f5b3174e6040732f9">More...</a><br /></td></tr>
+<tr class="separator:a9f0773d31ac48e0f5b3174e6040732f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4674ade74a2b55ce60a656acfebb4a55"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_b_body.html#a4674ade74a2b55ce60a656acfebb4a55">groupID</a></td></tr>
 <tr class="memdesc:a4674ade74a2b55ce60a656acfebb4a55"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of IBbody group &ndash; position updates can be driven from a flexible body in a group.  <a href="#a4674ade74a2b55ce60a656acfebb4a55">More...</a><br /></td></tr>
 <tr class="separator:a4674ade74a2b55ce60a656acfebb4a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,19 +177,19 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:ad9fa313d9cb2c2c463740eed5a1faf16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_body"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_body')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="class_body.html">Body&lt; IBMarker &gt;</a></td></tr>
 <tr class="memitem:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a1d4ac2e6fdbc946d5eab0973fd78770b">spacing</a></td></tr>
-<tr class="memdesc:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spacing of the markers in physical units.  <a href="#a1d4ac2e6fdbc946d5eab0973fd78770b">More...</a><br /></td></tr>
+<tr class="memdesc:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference spacing of the markers.  <a href="#a1d4ac2e6fdbc946d5eab0973fd78770b">More...</a><br /></td></tr>
 <tr class="separator:a1d4ac2e6fdbc946d5eab0973fd78770b inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_i_b_marker.html">IBMarker</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a4e0ac821f2331ec67793a44e36c855e3">markers</a></td></tr>
 <tr class="memdesc:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of markers which make up the body.  <a href="#a4e0ac821f2331ec67793a44e36c855e3">More...</a><br /></td></tr>
 <tr class="separator:a4e0ac821f2331ec67793a44e36c855e3 inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a2701bdb00789d26ed72d6138d2e21bcb">closed_surface</a></td></tr>
-<tr class="memdesc:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to specify whether or not it is a closed surface (for output)  <a href="#a2701bdb00789d26ed72d6138d2e21bcb">More...</a><br /></td></tr>
+<tr class="memdesc:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)  <a href="#a2701bdb00789d26ed72d6138d2e21bcb">More...</a><br /></td></tr>
 <tr class="separator:a2701bdb00789d26ed72d6138d2e21bcb inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a5197f31e50222c32adefb795a93d7156">_Owner</a></td></tr>
 <tr class="memdesc:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to owning grid.  <a href="#a5197f31e50222c32adefb795a93d7156">More...</a><br /></td></tr>
 <tr class="separator:a5197f31e50222c32adefb795a93d7156 inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d5166d7419f303190b6c6543e67e815 inherit pro_attribs_class_body"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a9d5166d7419f303190b6c6543e67e815">id</a></td></tr>
-<tr class="memdesc:a9d5166d7419f303190b6c6543e67e815 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of body in array of bodies.  <a href="#a9d5166d7419f303190b6c6543e67e815">More...</a><br /></td></tr>
+<tr class="memdesc:a9d5166d7419f303190b6c6543e67e815 inherit pro_attribs_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unique ID of the body.  <a href="#a9d5166d7419f303190b6c6543e67e815">More...</a><br /></td></tr>
 <tr class="separator:a9d5166d7419f303190b6c6543e67e815 inherit pro_attribs_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -202,21 +202,18 @@ Friends</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_class_body"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_body')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_body.html">Body&lt; IBMarker &gt;</a></td></tr>
-<tr class="memitem:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa965f7b498528230aa2f56a9abf6bf06">addMarker</a> (double x, double y, double z)</td></tr>
+<tr class="memitem:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa965f7b498528230aa2f56a9abf6bf06">addMarker</a> (double x, double y, double z)</td></tr>
 <tr class="memdesc:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add marker to the body.  <a href="#aa965f7b498528230aa2f56a9abf6bf06">More...</a><br /></td></tr>
 <tr class="separator:aa965f7b498528230aa2f56a9abf6bf06 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a530c704d7737af163c9ed06d42a373f0 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_marker_data.html">MarkerData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a530c704d7737af163c9ed06d42a373f0">getMarkerData</a> (double x, double y, double z)</td></tr>
 <tr class="memdesc:a530c704d7737af163c9ed06d42a373f0 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve marker data.  <a href="#a530c704d7737af163c9ed06d42a373f0">More...</a><br /></td></tr>
 <tr class="separator:a530c704d7737af163c9ed06d42a373f0 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a3a1ba74da8020cc3ee7f4fffde0b4477">markerAdder</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter)</td></tr>
-<tr class="memdesc:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling marker adding method.  <a href="#a3a1ba74da8020cc3ee7f4fffde0b4477">More...</a><br /></td></tr>
-<tr class="separator:a3a1ba74da8020cc3ee7f4fffde0b4477 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#aa7733bbcd85af5fa4e8822889fba7b33">isInVoxel</a> (double x, double y, double z, int curr_mark)</td></tr>
-<tr class="memdesc:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether a point is inside another marker's support voxel.  <a href="#aa7733bbcd85af5fa4e8822889fba7b33">More...</a><br /></td></tr>
-<tr class="separator:aa7733bbcd85af5fa4e8822889fba7b33 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a3ed926c01461f32d64b4a5405e920e36">isVoxelMarkerVoxel</a> (double x, double y, double z)</td></tr>
-<tr class="memdesc:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether a point is inside an existing marker's support voxel.  <a href="#a3ed926c01461f32d64b4a5405e920e36">More...</a><br /></td></tr>
-<tr class="separator:a3ed926c01461f32d64b4a5405e920e36 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8554d1d9ae99cc5f500f6266712339e3 inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a8554d1d9ae99cc5f500f6266712339e3">passToVoxelFilter</a> (double x, double y, double z, int &amp;curr_mark, std::vector&lt; int &gt; &amp;counter)</td></tr>
+<tr class="memdesc:a8554d1d9ae99cc5f500f6266712339e3 inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downsampling voxel-grid filter to take a point and add it to current body.  <a href="#a8554d1d9ae99cc5f500f6266712339e3">More...</a><br /></td></tr>
+<tr class="separator:a8554d1d9ae99cc5f500f6266712339e3 inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55d0e9759bcf50fdea300b2fe4520baf inherit pro_methods_class_body"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_body.html#a55d0e9759bcf50fdea300b2fe4520baf">buildFromCloud</a> (<a class="el" href="class_p_cpts.html">PCpts</a> *_PCpts)</td></tr>
+<tr class="memdesc:a55d0e9759bcf50fdea300b2fe4520baf inherit pro_methods_class_body"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to build a body from point cloud data.  <a href="#a55d0e9759bcf50fdea300b2fe4520baf">More...</a><br /></td></tr>
+<tr class="separator:a55d0e9759bcf50fdea300b2fe4520baf inherit pro_methods_class_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Immersed boundary body. </p>
@@ -293,8 +290,51 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a8c95ff82ebef5f8e86519f656576cbce"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IBBody::IBBody </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_p_cpts.html">PCpts</a> *&#160;</td>
+          <td class="paramname"><em>_PCpts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor to build a body in place using a point cloud,. </p>
+<p>isFlexible and isMovable properties taken from definitions.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>pointer to owner grid </td></tr>
+    <tr><td class="paramname">id</td><td>ID of body in array of bodies. </td></tr>
+    <tr><td class="paramname">_PCpts</td><td>pointer to point cloud data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aafa9573e6787bf3b6f07fd3880452b89"></a>
+<a class="anchor" id="a0bb2b18d33716b743439c21e6e729eec"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -320,7 +360,7 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>&#160;</td>
+          <td class="paramname"><em>isFlexible</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -337,14 +377,14 @@ Additional Inherited Members</h2></td></tr>
     <tr><td class="paramname">x</td><td>global x-position of marker. </td></tr>
     <tr><td class="paramname">y</td><td>global y-position of marker. </td></tr>
     <tr><td class="paramname">z</td><td>global z-position of marker. </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>flag to indicate whether marker is movable or not. </td></tr>
+    <tr><td class="paramname">isFlexible</td><td>flag to indicate whether marker is movable or not. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="af26b0107e612dab7cd1e73bac1f4f234"></a>
+<a class="anchor" id="a3915b9b08d1264c4f261e8b8585e5ffe"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -364,13 +404,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>, </td>
+          <td class="paramname"><em>isFlexible</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>deform</em>, </td>
+          <td class="paramname"><em>isMovable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -391,8 +431,8 @@ Additional Inherited Members</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">radius</td><td>radius of circle/sphere. </td></tr>
     <tr><td class="paramname">centre</td><td>position vector of circle/sphere centre. </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
-    <tr><td class="paramname">deform</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
+    <tr><td class="paramname">isFlexible</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
+    <tr><td class="paramname">isMovable</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
     <tr><td class="paramname">group</td><td>ID indicating which group the body is part of for collective operations. </td></tr>
   </table>
   </dd>
@@ -400,7 +440,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a5c3f3da65bdaca7bee4ebea5a06b8bdd"></a>
+<a class="anchor" id="a5339567c62f8cb4ae6db99c551bb6b9f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -426,13 +466,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>, </td>
+          <td class="paramname"><em>isFlexible</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>deform</em>, </td>
+          <td class="paramname"><em>isMovable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -454,8 +494,8 @@ Additional Inherited Members</h2></td></tr>
     <tr><td class="paramname">width_length_depth</td><td>principal dimensions of cuboid / rectangle. </td></tr>
     <tr><td class="paramname">angles</td><td>principal orientation of cuboid / rectangle w.r.t. domain axes. </td></tr>
     <tr><td class="paramname">centre</td><td>position vector of cuboid / rectangle centre. </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
-    <tr><td class="paramname">deform</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
+    <tr><td class="paramname">isFlexible</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
+    <tr><td class="paramname">isMovable</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
     <tr><td class="paramname">group</td><td>ID indicating which group the body is part of for collective operations. </td></tr>
   </table>
   </dd>
@@ -463,7 +503,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab83346d555202a5cf669c7e309dc856a"></a>
+<a class="anchor" id="a89bb54240accfc291f4db0b8e3c155bb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -501,13 +541,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>, </td>
+          <td class="paramname"><em>isFlexible</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>deform</em>, </td>
+          <td class="paramname"><em>isMovable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -531,8 +571,8 @@ Additional Inherited Members</h2></td></tr>
     <tr><td class="paramname">fil_length</td><td>length of filament in physical units. </td></tr>
     <tr><td class="paramname">angles</td><td>two angles representing filament inclination w.r.t. domain axes (horizontal plane and vertical plane). </td></tr>
     <tr><td class="paramname">BCs</td><td>vector containing start and end boundary condition types (see class definition for valid values). </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
-    <tr><td class="paramname">deform</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
+    <tr><td class="paramname">isFlexible</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
+    <tr><td class="paramname">isMovable</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
     <tr><td class="paramname">group</td><td>ID indicating which group the body is part of for collective operations. </td></tr>
   </table>
   </dd>
@@ -540,7 +580,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a34380e523aef0978495d52bc91f3d74b"></a>
+<a class="anchor" id="a77be961607d7ce681f5b6c2fa277d59e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -566,13 +606,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>, </td>
+          <td class="paramname"><em>isFlexible</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>deform</em>, </td>
+          <td class="paramname"><em>isMovable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -600,107 +640,10 @@ Additional Inherited Members</h2></td></tr>
     <tr><td class="paramname">width_length</td><td>2D vector of principal dimensions of thin plate. </td></tr>
     <tr><td class="paramname">angle</td><td>inclination angle from horizontal. </td></tr>
     <tr><td class="paramname">centre</td><td>position vector of the plate centre. </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
-    <tr><td class="paramname">deform</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
+    <tr><td class="paramname">isFlexible</td><td>flag to indicate whether body is flexible and requires a structural calculation. </td></tr>
+    <tr><td class="paramname">isMovable</td><td>flag to indicate whether body is movable and requires relocation each time step. </td></tr>
     <tr><td class="paramname">group</td><td>ID indicating which group the body is part of for collective operations. </td></tr>
     <tr><td class="paramname">plate</td><td>arbitrary argument to allow overload otherwise would have the same signature as a filament builder. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="aad21167e57221cb4faf5a15ffebc438d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IBBody::makeBody </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_p_cpts.html">PCpts</a> *&#160;</td>
-          <td class="paramname"><em>_PCpts</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Method to build a body from a point cloud. </p>
-<p>Flexibility and deformable properties taken from definitions.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">_PCpts</td><td>pointer to pointer cloud data. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a16cf21facacb49727c2e1feda473d080"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IBBody::markerAdder </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>z</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int &amp;&#160;</td>
-          <td class="paramname"><em>curr_mark</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>counter</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>flex_rigid</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Downsampling marker adding method (overload) </p>
-<p>This method is an overload of the method in the parent class. This version takes the flexible/rigid flag and passes it to the overloaded <a class="el" href="class_i_b_body.html#aafa9573e6787bf3b6f07fd3880452b89" title="Method to add an IB marker to the body. ">addMarker()</a> method.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>desired X-position of new marker. </td></tr>
-    <tr><td class="paramname">y</td><td>desired Y-position of new marker. </td></tr>
-    <tr><td class="paramname">z</td><td>desired Z-position of new marker. </td></tr>
-    <tr><td class="paramname">curr_mark</td><td>is a reference to the ID of last marker. </td></tr>
-    <tr><td class="paramname">counter</td><td>is an array of the number of contributing points to a given marker position. </td></tr>
-    <tr><td class="paramname">flex_rigid</td><td>indicates whether markers added should form part of flexible or rigid body. </td></tr>
   </table>
   </dd>
 </dl>
@@ -771,28 +714,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aac0ea66a55dcb0cf41deb2b9a82743e5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool IBBody::deformable</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Flag to indicate deformable body: false == rigid; true == deformable. </p>
-
-</div>
-</div>
 <a class="anchor" id="a18cd092961f02ecde55363a4d342d098"></a>
 <div class="memitem">
 <div class="memproto">
@@ -812,28 +733,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Difference in density between fluid and solid in lattice units. </p>
-
-</div>
-</div>
-<a class="anchor" id="a526f3e83b45b991a79941ee745698ea5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool IBBody::flex_rigid</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Flag to indicate flexibility: false == rigid body; true == flexible filament. </p>
 
 </div>
 </div>
@@ -878,6 +777,50 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>ID of IBbody group &ndash; position updates can be driven from a flexible body in a group. </p>
+
+</div>
+</div>
+<a class="anchor" id="a58de7cc12e734b646904e81a56b18b4e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IBBody::isFlexible</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flag to indicate flexibility: false == rigid body; true == flexible filament. </p>
+
+</div>
+</div>
+<a class="anchor" id="a9f0773d31ac48e0f5b3174e6040732f9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IBBody::isMovable</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flag to indicate if body is movable or not. </p>
 
 </div>
 </div>

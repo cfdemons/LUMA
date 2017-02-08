@@ -14,10 +14,7 @@
  */
 
 #include "../inc/stdafx.h"
-#include <mpi.h>
-#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 // ****************************************************************************
 /// \brief	Method to unpack the communication buffer.
@@ -28,7 +25,7 @@
 ///
 /// \param	dir	communication direction.
 /// \param	g	grid doing the communication.
-void MpiManager::mpi_buffer_unpack( int dir, GridObj* g ) {
+void MpiManager::mpi_buffer_unpack( int dir, GridObj* const g ) {
 	
 	// Copy received information back to grid using the EXACT
 	// reverse algorithm of the copying procedure

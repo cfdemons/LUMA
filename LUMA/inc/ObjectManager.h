@@ -25,16 +25,6 @@
 class PCpts;
 class GridObj;
 
-
-/// \enum  eObjectType
-/// \brief Specifies the type of body being processed.
-enum eObjectType {
-	eBBBCloud,	///< Bounce-back body
-	eBFLCloud,	///< BFL body
-	eIBBCloud	///< Immersed boundary body
-};
-
-
 /// \brief	Object Manager class.
 ///
 ///			Class to manage all objects in the domain from creation through 
@@ -118,8 +108,8 @@ public:
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
-	void ibm_positionUpdate(int ib);			// Updates the position of deformable body markers.
-	void ibm_positionUpdateGroup(int group);	// Updates the positions of deformable bodies in a group.
+	void ibm_positionUpdate(int ib);			// Updates the position of movable body markers.
+	void ibm_positionUpdateGroup(int group);	// Updates the positions of movable bodies in a group.
 	// Methods to solve the Jacobian system associated with Jacowire
 	void ibm_banbks(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double b[]);

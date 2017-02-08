@@ -307,7 +307,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// Delete TE markers
 		std::vector<int> logvec;
 		for (size_t m = 0; m < iBody.back().markers.size(); m++) {
-			if (fabs(iBody.back().markers[m].position[1] - start_y) < 1e-6) {				
+			if (fabs(iBody.back().markers[m].position[1] - start_y) < L_SMALL_NUMBER) {
 				logvec.push_back(static_cast<int>(m));
 			}
 		}
@@ -369,6 +369,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner) {
 
 	// Add new body
-	iBody.back().makeBody(_PCpts);
+	iBody.emplace_back(owner, iBody.size(), _PCpts);
+
 }
 // ************************************************************************** //

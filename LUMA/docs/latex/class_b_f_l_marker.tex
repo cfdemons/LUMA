@@ -22,7 +22,7 @@ Inheritance diagram for B\+F\+L\+Marker\+:\begin{figure}[H]
 \begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
 \hyperlink{class_b_f_l_marker_a10ac169924a35ee14599992290540447}{$\sim$\+B\+F\+L\+Marker} (void)
 \begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
-\hyperlink{class_b_f_l_marker_a2ec501d3d93f2dbde8e56e6155ef3c09}{B\+F\+L\+Marker} (double x, double y, double z)
+\hyperlink{class_b_f_l_marker_a369aab6d44631b56ac1ffec5f6c7ceae}{B\+F\+L\+Marker} (double x, double y, double z, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const body\+\_\+owner)
 \begin{DoxyCompactList}\small\item\em Custom constructor with position. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
@@ -62,13 +62,14 @@ Default destructor.
 
 \index{B\+F\+L\+Marker@{B\+F\+L\+Marker}!B\+F\+L\+Marker@{B\+F\+L\+Marker}}
 \index{B\+F\+L\+Marker@{B\+F\+L\+Marker}!B\+F\+L\+Marker@{B\+F\+L\+Marker}}
-\subsubsection[{\texorpdfstring{B\+F\+L\+Marker(double x, double y, double z)}{BFLMarker(double x, double y, double z)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Marker\+::\+B\+F\+L\+Marker (
+\subsubsection[{\texorpdfstring{B\+F\+L\+Marker(double x, double y, double z, Grid\+Obj const $\ast$const body\+\_\+owner)}{BFLMarker(double x, double y, double z, GridObj const *const body_owner)}}]{\setlength{\rightskip}{0pt plus 5cm}B\+F\+L\+Marker\+::\+B\+F\+L\+Marker (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
-\item[{double}]{z}
+\item[{double}]{z, }
+\item[{{\bf Grid\+Obj} const $\ast$const}]{body\+\_\+owner}
 \end{DoxyParamCaption}
-)}\hypertarget{class_b_f_l_marker_a2ec501d3d93f2dbde8e56e6155ef3c09}{}\label{class_b_f_l_marker_a2ec501d3d93f2dbde8e56e6155ef3c09}
+)}\hypertarget{class_b_f_l_marker_a369aab6d44631b56ac1ffec5f6c7ceae}{}\label{class_b_f_l_marker_a369aab6d44631b56ac1ffec5f6c7ceae}
 
 
 Custom constructor with position. 
@@ -80,6 +81,8 @@ Custom constructor with position.
 {\em y} & y-\/position of marker \\
 \hline
 {\em z} & z-\/position of marker \\
+\hline
+{\em body\+\_\+owner} & Grid on which primary support is to be found. \\
 \hline
 \end{DoxyParams}
 

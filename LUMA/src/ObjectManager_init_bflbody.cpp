@@ -33,6 +33,6 @@ void ObjectManager::bfl_buildBody(int body_type) {
 void ObjectManager::bfl_buildBody(PCpts* _PCpts) {	
 
 	// Call body constructor and pass on pointer to hierarchy
-	pBody.emplace_back(_PCpts, _Grids, pBody.size());
+	pBody.emplace_back(_Grids, pBody.size(), _PCpts);
 
 }

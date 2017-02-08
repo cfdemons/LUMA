@@ -16,8 +16,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 // *****************************************************************************
 /// \brief	Optimised LBM multi-grid kernel.

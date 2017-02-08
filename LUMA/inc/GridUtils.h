@@ -16,60 +16,6 @@
 #ifndef GRIDUTILS_H
 #define GRIDUTILS_H
 
-/// \enum eLocationOnRank
-/// \brief Enumeration indicating the location of a site when queried using isOnThisRank()
-enum eLocationOnRank
-{
-	eNone,	///< No information provided (default).
-	eCore,	///< Site on core (including send layer).
-	eHalo	///< Site in halo (recv layer).
-	
-};
-
-/// \enum eCartesianDirection
-/// \brief Enumeration for directional options.
-enum eCartesianDirection
-{
-	eXDirection,	///< X-direction
-	eYDirection,	///< Y-direction
-	eZDirection		///< Z-direction
-};
-
-/// \enum eMinMax
-/// \brief	Enumeration for minimum and maximum.
-///
-///			Some utility methods need to know whether they should be looking
-///			at or for a maximum or minimum edge of a grid so we use this 
-///			enumeration to specify.
-enum eMinMax
-{
-	eMinimum,		///< Minimum
-	eMaximum		///< Maximum
-};
-
-/// \enum eCartMinMax
-/// \brief	Enumeration for the combination of eCartesianDirection and eMinMax 
-///			as these are often used together to index arrays.
-enum eCartMinMax
-{
-	eXMin,
-	eXMax,
-	eYMin,
-	eYMax,
-	eZMin,
-	eZMax
-};
-
-/// \enum eEdgeMinMax
-/// \brief	Enumeration for the combination of Left and Right min and max edges.
-enum eEdgeMinMax
-{
-	eLeftMin,
-	eLeftMax,
-	eRightMin,
-	eRightMax
-};
-
 #include "stdafx.h"
 #include "GridObj.h"
 
@@ -108,8 +54,8 @@ public:
 	static std::vector<int> getFineIndices(
 		int coarse_i, int x_start, int coarse_j, int y_start, int coarse_k, int z_start); // Function: getFineIndices
 	static std::vector<int> getCoarseIndices(
-		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start); // Function: getCoarseIndices
-	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);		// Function: dotprod
+		int fine_i, int x_start, int fine_j, int y_start, int fine_k, int z_start);				// Function: getCoarseIndices
+	static double dotprod(std::vector<double> vec1, std::vector<double> vec2);					// Function: dotprod
 	static std::vector<double> subtract(std::vector<double> a, std::vector<double> b);			// Function: subtract
 	static std::vector<double> add(std::vector<double> a, std::vector<double> b);				// Function: add
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
@@ -118,29 +64,30 @@ public:
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
-	static void getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
+	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
 
 	// MPI-related utilities
-	static bool isOverlapPeriodic(int i, int j, int k, const GridObj& pGrid);		// Is this halo periodically connected to neighbour
+	static bool isOverlapPeriodic(int i, int j, int k, GridObj const & pGrid);		// Is this halo periodically connected to neighbour
 	static bool isOnThisRank(double x, double y, double z, 
-		eLocationOnRank *loc = nullptr, const GridObj *grid = nullptr,
+		eLocationOnRank *loc = nullptr, GridObj const * const grid = nullptr,
 		std::vector<int> *pos = nullptr);											// Is a site on this MPI rank nad if so, where is it?
 	static bool isOnThisRank(double xyz, eCartesianDirection dir, 
-		eLocationOnRank *loc = nullptr, const GridObj *grid = nullptr, int *pos = nullptr);
-	static bool intersectsRefinedRegion(const GridObj& pGrid, int RegNum);			// Does the refined region interesect the current rank.
+		eLocationOnRank *loc = nullptr, GridObj const * const grid = nullptr, int *pos = nullptr);
+	static bool intersectsRefinedRegion(GridObj const & pGrid, int RegNum);	// Does the refined region interesect the current rank.
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);			// Is site on any sender layer
 	static bool isOnRecvLayer(double pos_x, double pos_y, double pos_z);			// Is site on any recv layer
 	static bool isOnSenderLayer(double site_position, eCartMinMax edge);			// Is site on specified sender layer
 	static bool isOnRecvLayer(double site_position, eCartMinMax edge);				// Is site on specified recv layer
 	static int getMpiDirection(int offset_vector[]);								// Get MPI direction from vector
+	static int safeGetRank();														// Parallel/Serial safe method to get rank
 
 	// Coordinate Management
-	static bool isOffGrid(int i, int j, int k, const GridObj *g);					// Is site off supplied grid
-	static void getEnclosingVoxel(double x, double y, double z, const GridObj *g, std::vector<int> *ijk);	// Take a position and a get a local ijk
-	static void getEnclosingVoxel(double x, const GridObj *g, eCartesianDirection dir, int *ijk);
-	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, const GridObj *grid);	// Is site on any TL to upper
-	static bool isOnTransitionLayer(double position, eCartMinMax edge, const GridObj *grid);		// Is site on specified TL to upper
+	static bool isOffGrid(int i, int j, int k, GridObj const * const g);					// Is site off supplied grid
+	static void getEnclosingVoxel(double x, double y, double z, GridObj const * const g, std::vector<int> *ijk);	// Take a position and a get a local ijk
+	static void getEnclosingVoxel(double x, GridObj const * const g, eCartesianDirection dir, int *ijk);
+	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);	// Is site on any TL to upper
+	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);			// Is site on specified TL to upper
 
 	// Templated functions //
 

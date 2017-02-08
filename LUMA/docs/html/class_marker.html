@@ -117,9 +117,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac34f00758cfb07bcf550209083633eb6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_marker.html#ac34f00758cfb07bcf550209083633eb6">~Marker</a> (void)</td></tr>
 <tr class="memdesc:ac34f00758cfb07bcf550209083633eb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor.  <a href="#ac34f00758cfb07bcf550209083633eb6">More...</a><br /></td></tr>
 <tr class="separator:ac34f00758cfb07bcf550209083633eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e5a9aa6f1002b5f2ce6c5220ee01225"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_marker.html#a1e5a9aa6f1002b5f2ce6c5220ee01225">Marker</a> (double x, double y, double z)</td></tr>
-<tr class="memdesc:a1e5a9aa6f1002b5f2ce6c5220ee01225"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor which locates marker.  <a href="#a1e5a9aa6f1002b5f2ce6c5220ee01225">More...</a><br /></td></tr>
-<tr class="separator:a1e5a9aa6f1002b5f2ce6c5220ee01225"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39d86412648446a87719fd9a68c4f34b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_marker.html#a39d86412648446a87719fd9a68c4f34b">Marker</a> (double x, double y, double z, <a class="el" href="class_grid_obj.html">GridObj</a> const *const body_owner)</td></tr>
+<tr class="memdesc:a39d86412648446a87719fd9a68c4f34b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor which locates marker.  <a href="#a39d86412648446a87719fd9a68c4f34b">More...</a><br /></td></tr>
+<tr class="separator:a39d86412648446a87719fd9a68c4f34b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -194,7 +194,7 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a1e5a9aa6f1002b5f2ce6c5220ee01225"></a>
+<a class="anchor" id="a39d86412648446a87719fd9a68c4f34b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -217,7 +217,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>z</em>&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
+          <td class="paramname"><em>body_owner</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -233,11 +239,13 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Custom constructor which locates marker. </p>
+<p>In order to properley initialise during construction, a grid should be passed in on which primary support point can be found.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">x</td><td>X-position of marker in physical units </td></tr>
-    <tr><td class="paramname">y</td><td>Y-position of marker in physical units </td></tr>
-    <tr><td class="paramname">z</td><td>Z-position of marker in physical units </td></tr>
+    <tr><td class="paramname">x</td><td>X-position of marker </td></tr>
+    <tr><td class="paramname">y</td><td>Y-position of marker </td></tr>
+    <tr><td class="paramname">z</td><td>Z-position of marker </td></tr>
+    <tr><td class="paramname">body_owner</td><td>Grid on which primary support point is to be found. </td></tr>
   </table>
   </dd>
 </dl>

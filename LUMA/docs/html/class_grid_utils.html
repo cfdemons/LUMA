@@ -149,51 +149,54 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:af3c54e468658879756c71b01abd028d5"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af3c54e468658879756c71b01abd028d5">getOpposite</a> (int direction)</td></tr>
 <tr class="memdesc:af3c54e468658879756c71b01abd028d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the opposite lattice direction to the one supplied.  <a href="#af3c54e468658879756c71b01abd028d5">More...</a><br /></td></tr>
 <tr class="separator:af3c54e468658879756c71b01abd028d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afac10170d3f6f96a32da6a783b815954"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#afac10170d3f6f96a32da6a783b815954">getGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *&amp;Grids, int level, int region, <a class="el" href="class_grid_obj.html">GridObj</a> *&amp;ptr)</td></tr>
-<tr class="memdesc:afac10170d3f6f96a32da6a783b815954"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to a given grid in the hierarchy.  <a href="#afac10170d3f6f96a32da6a783b815954">More...</a><br /></td></tr>
-<tr class="separator:afac10170d3f6f96a32da6a783b815954"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a7c13884020ab181ee8cb6dd2ea7e4fd7">isOverlapPeriodic</a> (int i, int j, int k, const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid)</td></tr>
-<tr class="memdesc:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether halo containng i,j,k links to neighbour rank periodically.  <a href="#a7c13884020ab181ee8cb6dd2ea7e4fd7">More...</a><br /></td></tr>
-<tr class="separator:a7c13884020ab181ee8cb6dd2ea7e4fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a707d0044f6b3376399b972e73c4b1dd7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a707d0044f6b3376399b972e73c4b1dd7">isOnThisRank</a> (double x, double y, double z, <a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *loc=nullptr, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid=nullptr, std::vector&lt; int &gt; *pos=nullptr)</td></tr>
-<tr class="memdesc:a707d0044f6b3376399b972e73c4b1dd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether site with supplied position is on the current rank.  <a href="#a707d0044f6b3376399b972e73c4b1dd7">More...</a><br /></td></tr>
-<tr class="separator:a707d0044f6b3376399b972e73c4b1dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e23991df730bfa61749d00484d4ce5f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a0e23991df730bfa61749d00484d4ce5f">isOnThisRank</a> (double xyz, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *loc=nullptr, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid=nullptr, int *pos=nullptr)</td></tr>
-<tr class="memdesc:a0e23991df730bfa61749d00484d4ce5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether the supplied position can be found on the current rank.  <a href="#a0e23991df730bfa61749d00484d4ce5f">More...</a><br /></td></tr>
-<tr class="separator:a0e23991df730bfa61749d00484d4ce5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a14da5d778eb6d81fbcd5c9331a8082dd">intersectsRefinedRegion</a> (const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;pGrid, int RegNum)</td></tr>
-<tr class="memdesc:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided.  <a href="#a14da5d778eb6d81fbcd5c9331a8082dd">More...</a><br /></td></tr>
-<tr class="separator:a14da5d778eb6d81fbcd5c9331a8082dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8af73cff3f009b0cc27c71af4dae0780"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a8af73cff3f009b0cc27c71af4dae0780">getGrid</a> (<a class="el" href="class_grid_obj.html">GridObj</a> *const Grids, int level, int region, <a class="el" href="class_grid_obj.html">GridObj</a> *&amp;ptr)</td></tr>
+<tr class="memdesc:a8af73cff3f009b0cc27c71af4dae0780"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to a given grid in the hierarchy.  <a href="#a8af73cff3f009b0cc27c71af4dae0780">More...</a><br /></td></tr>
+<tr class="separator:a8af73cff3f009b0cc27c71af4dae0780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac523515920794475c3577923562716bd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ac523515920794475c3577923562716bd">isOverlapPeriodic</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> const &amp;pGrid)</td></tr>
+<tr class="memdesc:ac523515920794475c3577923562716bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether halo containng i,j,k links to neighbour rank periodically.  <a href="#ac523515920794475c3577923562716bd">More...</a><br /></td></tr>
+<tr class="separator:ac523515920794475c3577923562716bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae21da9e811f7ea944a996eaa5d203da2"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ae21da9e811f7ea944a996eaa5d203da2">isOnThisRank</a> (double x, double y, double z, <a class="el" href="_enumerations_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *loc=nullptr, <a class="el" href="class_grid_obj.html">GridObj</a> const *const grid=nullptr, std::vector&lt; int &gt; *pos=nullptr)</td></tr>
+<tr class="memdesc:ae21da9e811f7ea944a996eaa5d203da2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether site with supplied position is on the current rank.  <a href="#ae21da9e811f7ea944a996eaa5d203da2">More...</a><br /></td></tr>
+<tr class="separator:ae21da9e811f7ea944a996eaa5d203da2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70ec04909851ae9c573e1d439f5c455d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a70ec04909851ae9c573e1d439f5c455d">isOnThisRank</a> (double xyz, <a class="el" href="_enumerations_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, <a class="el" href="_enumerations_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *loc=nullptr, <a class="el" href="class_grid_obj.html">GridObj</a> const *const grid=nullptr, int *pos=nullptr)</td></tr>
+<tr class="memdesc:a70ec04909851ae9c573e1d439f5c455d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether the supplied position can be found on the current rank.  <a href="#a70ec04909851ae9c573e1d439f5c455d">More...</a><br /></td></tr>
+<tr class="separator:a70ec04909851ae9c573e1d439f5c455d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1e1194072f958e70ad453b521008766"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af1e1194072f958e70ad453b521008766">intersectsRefinedRegion</a> (<a class="el" href="class_grid_obj.html">GridObj</a> const &amp;pGrid, int RegNum)</td></tr>
+<tr class="memdesc:af1e1194072f958e70ad453b521008766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided.  <a href="#af1e1194072f958e70ad453b521008766">More...</a><br /></td></tr>
+<tr class="separator:af1e1194072f958e70ad453b521008766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0692236725709af2d98872805fc84ae"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#af0692236725709af2d98872805fc84ae">isOnSenderLayer</a> (double pos_x, double pos_y, double pos_z)</td></tr>
 <tr class="memdesc:af0692236725709af2d98872805fc84ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an inner (sender) halo.  <a href="#af0692236725709af2d98872805fc84ae">More...</a><br /></td></tr>
 <tr class="separator:af0692236725709af2d98872805fc84ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfec29d90b6942de2f3c52c225a4d888"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#abfec29d90b6942de2f3c52c225a4d888">isOnRecvLayer</a> (double pos_x, double pos_y, double pos_z)</td></tr>
 <tr class="memdesc:abfec29d90b6942de2f3c52c225a4d888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an outer (receiver) halo.  <a href="#abfec29d90b6942de2f3c52c225a4d888">More...</a><br /></td></tr>
 <tr class="separator:abfec29d90b6942de2f3c52c225a4d888"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9179e27b25b1be249edd6d22455d57bd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a9179e27b25b1be249edd6d22455d57bd">isOnSenderLayer</a> (double site_position, <a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge)</td></tr>
+<tr class="memitem:a9179e27b25b1be249edd6d22455d57bd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a9179e27b25b1be249edd6d22455d57bd">isOnSenderLayer</a> (double site_position, <a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge)</td></tr>
 <tr class="memdesc:a9179e27b25b1be249edd6d22455d57bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an inner (sender) halo.  <a href="#a9179e27b25b1be249edd6d22455d57bd">More...</a><br /></td></tr>
 <tr class="separator:a9179e27b25b1be249edd6d22455d57bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a381a3ef0d42132313081b5c06f732092"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a381a3ef0d42132313081b5c06f732092">isOnRecvLayer</a> (double site_position, <a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge)</td></tr>
+<tr class="memitem:a381a3ef0d42132313081b5c06f732092"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a381a3ef0d42132313081b5c06f732092">isOnRecvLayer</a> (double site_position, <a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge)</td></tr>
 <tr class="memdesc:a381a3ef0d42132313081b5c06f732092"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on an outer (receiver) halo.  <a href="#a381a3ef0d42132313081b5c06f732092">More...</a><br /></td></tr>
 <tr class="separator:a381a3ef0d42132313081b5c06f732092"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a59da2eb58afd9e785b45b23ad962df"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a1a59da2eb58afd9e785b45b23ad962df">getMpiDirection</a> (int offset_vector[])</td></tr>
 <tr class="memdesc:a1a59da2eb58afd9e785b45b23ad962df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get direction in MPI topology from unit vector.  <a href="#a1a59da2eb58afd9e785b45b23ad962df">More...</a><br /></td></tr>
 <tr class="separator:a1a59da2eb58afd9e785b45b23ad962df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb35c1a485e74c0b2794b84573b5e50f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#acb35c1a485e74c0b2794b84573b5e50f">isOffGrid</a> (int i, int j, int k, const <a class="el" href="class_grid_obj.html">GridObj</a> *g)</td></tr>
-<tr class="memdesc:acb35c1a485e74c0b2794b84573b5e50f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests whether a site is on a given grid.  <a href="#acb35c1a485e74c0b2794b84573b5e50f">More...</a><br /></td></tr>
-<tr class="separator:acb35c1a485e74c0b2794b84573b5e50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0c030776101d001fda37eb7f90d2b20"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ad0c030776101d001fda37eb7f90d2b20">getEnclosingVoxel</a> (double x, double y, double z, const <a class="el" href="class_grid_obj.html">GridObj</a> *g, std::vector&lt; int &gt; *ijk)</td></tr>
-<tr class="memdesc:ad0c030776101d001fda37eb7f90d2b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#ad0c030776101d001fda37eb7f90d2b20">More...</a><br /></td></tr>
-<tr class="separator:ad0c030776101d001fda37eb7f90d2b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20901145122cf56507713abe0467638c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a20901145122cf56507713abe0467638c">getEnclosingVoxel</a> (double x, const <a class="el" href="class_grid_obj.html">GridObj</a> *g, <a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, int *ijk)</td></tr>
-<tr class="memdesc:a20901145122cf56507713abe0467638c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#a20901145122cf56507713abe0467638c">More...</a><br /></td></tr>
-<tr class="separator:a20901145122cf56507713abe0467638c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78d9c31d1c15198d1455627d1fa29804"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a78d9c31d1c15198d1455627d1fa29804">isOnTransitionLayer</a> (double pos_x, double pos_y, double pos_z, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid)</td></tr>
-<tr class="memdesc:a78d9c31d1c15198d1455627d1fa29804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a TL.  <a href="#a78d9c31d1c15198d1455627d1fa29804">More...</a><br /></td></tr>
-<tr class="separator:a78d9c31d1c15198d1455627d1fa29804"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae99e3fa97dcb3be1f6b88a55f232c2cd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ae99e3fa97dcb3be1f6b88a55f232c2cd">isOnTransitionLayer</a> (double position, <a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge, const <a class="el" href="class_grid_obj.html">GridObj</a> *grid)</td></tr>
-<tr class="memdesc:ae99e3fa97dcb3be1f6b88a55f232c2cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a specific TL (to upper).  <a href="#ae99e3fa97dcb3be1f6b88a55f232c2cd">More...</a><br /></td></tr>
-<tr class="separator:ae99e3fa97dcb3be1f6b88a55f232c2cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa92a1d400687f75e1fce1c8eb406e6"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a4fa92a1d400687f75e1fce1c8eb406e6">safeGetRank</a> ()</td></tr>
+<tr class="memdesc:a4fa92a1d400687f75e1fce1c8eb406e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safe method to get the rank number.  <a href="#a4fa92a1d400687f75e1fce1c8eb406e6">More...</a><br /></td></tr>
+<tr class="separator:a4fa92a1d400687f75e1fce1c8eb406e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a220d6b870c7b422a087324ad860d96f8"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a220d6b870c7b422a087324ad860d96f8">isOffGrid</a> (int i, int j, int k, <a class="el" href="class_grid_obj.html">GridObj</a> const *const g)</td></tr>
+<tr class="memdesc:a220d6b870c7b422a087324ad860d96f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests whether a site is on a given grid.  <a href="#a220d6b870c7b422a087324ad860d96f8">More...</a><br /></td></tr>
+<tr class="separator:a220d6b870c7b422a087324ad860d96f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eaf386de2bdd96502c595e73302c029"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a4eaf386de2bdd96502c595e73302c029">getEnclosingVoxel</a> (double x, double y, double z, <a class="el" href="class_grid_obj.html">GridObj</a> const *const g, std::vector&lt; int &gt; *ijk)</td></tr>
+<tr class="memdesc:a4eaf386de2bdd96502c595e73302c029"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#a4eaf386de2bdd96502c595e73302c029">More...</a><br /></td></tr>
+<tr class="separator:a4eaf386de2bdd96502c595e73302c029"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02c27032afa91f879536237b0373e014"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a02c27032afa91f879536237b0373e014">getEnclosingVoxel</a> (double x, <a class="el" href="class_grid_obj.html">GridObj</a> const *const g, <a class="el" href="_enumerations_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a> dir, int *ijk)</td></tr>
+<tr class="memdesc:a02c27032afa91f879536237b0373e014"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get local voxel indices on grid in which provided position lies.  <a href="#a02c27032afa91f879536237b0373e014">More...</a><br /></td></tr>
+<tr class="separator:a02c27032afa91f879536237b0373e014"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1f693d4b4438c83f994b83c54b11b6c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#aa1f693d4b4438c83f994b83c54b11b6c">isOnTransitionLayer</a> (double pos_x, double pos_y, double pos_z, <a class="el" href="class_grid_obj.html">GridObj</a> const *const grid)</td></tr>
+<tr class="memdesc:aa1f693d4b4438c83f994b83c54b11b6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a TL.  <a href="#aa1f693d4b4438c83f994b83c54b11b6c">More...</a><br /></td></tr>
+<tr class="separator:aa1f693d4b4438c83f994b83c54b11b6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05559ab787c9eccedde24be270a51c9"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#ae05559ab787c9eccedde24be270a51c9">isOnTransitionLayer</a> (double position, <a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a> edge, <a class="el" href="class_grid_obj.html">GridObj</a> const *const grid)</td></tr>
+<tr class="memdesc:ae05559ab787c9eccedde24be270a51c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether site is on a specific TL (to upper).  <a href="#ae05559ab787c9eccedde24be270a51c9">More...</a><br /></td></tr>
+<tr class="separator:ae05559ab787c9eccedde24be270a51c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplParams" colspan="2">template&lt;typename NumType &gt; </td></tr>
 <tr class="memitem:a78aa4876d7066bce253c52457e7b901d"><td class="memTemplItemLeft" align="right" valign="top">static NumType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_grid_utils.html#a78aa4876d7066bce253c52457e7b901d">vecnorm</a> (NumType a1, NumType a2, NumType a3)</td></tr>
 <tr class="memdesc:a78aa4876d7066bce253c52457e7b901d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the L2-norm.  <a href="#a78aa4876d7066bce253c52457e7b901d">More...</a><br /></td></tr>
@@ -557,7 +560,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ad0c030776101d001fda37eb7f90d2b20"></a>
+<a class="anchor" id="a4eaf386de2bdd96502c595e73302c029"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -585,7 +588,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>g</em>, </td>
         </tr>
         <tr>
@@ -622,7 +625,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a20901145122cf56507713abe0467638c"></a>
+<a class="anchor" id="a02c27032afa91f879536237b0373e014"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -638,13 +641,13 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>g</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
           <td class="paramname"><em>dir</em>, </td>
         </tr>
         <tr>
@@ -753,7 +756,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="afac10170d3f6f96a32da6a783b815954"></a>
+<a class="anchor" id="a8af73cff3f009b0cc27c71af4dae0780"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -763,7 +766,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="memname">void GridUtils::getGrid </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> *const&#160;</td>
           <td class="paramname"><em>Grids</em>, </td>
         </tr>
         <tr>
@@ -801,10 +804,10 @@ template&lt;typename NumType &gt; </div>
 <p>Takes a NULL pointer by reference and updates it when matching grid is found in hierarchy on this rank. If grid not found, pointer is returned without change and stays NULL. Can be used to test for the existence of a grid on a rank by passing in a NULL pointer and checking if a NULL pointer is returned.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">Grids</td><td>x-position of site. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">level</td><td>y-position of site. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">region</td><td>z-position of site. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">ptr</td><td>pointer containing address of grid in hierarchy. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">Grids</td><td>constant pointer to the grid at which to start searching. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">level</td><td>level desired. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">region</td><td>region desried. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ptr</td><td>reference to pointer where address of grid matching in hierarchy will be assigned. </td></tr>
   </table>
   </dd>
 </dl>
@@ -878,7 +881,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a14da5d778eb6d81fbcd5c9331a8082dd"></a>
+<a class="anchor" id="af1e1194072f958e70ad453b521008766"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -888,7 +891,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="memname">bool GridUtils::intersectsRefinedRegion </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const &amp;&#160;</td>
           <td class="paramname"><em>pGrid</em>, </td>
         </tr>
         <tr>
@@ -923,7 +926,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="acb35c1a485e74c0b2794b84573b5e50f"></a>
+<a class="anchor" id="a220d6b870c7b422a087324ad860d96f8"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -951,7 +954,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>g</em>&#160;</td>
         </tr>
         <tr>
@@ -1049,7 +1052,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
           <td class="paramname"><em>edge</em>&#160;</td>
         </tr>
         <tr>
@@ -1146,7 +1149,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
           <td class="paramname"><em>edge</em>&#160;</td>
         </tr>
         <tr>
@@ -1175,7 +1178,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a707d0044f6b3376399b972e73c4b1dd7"></a>
+<a class="anchor" id="ae21da9e811f7ea944a996eaa5d203da2"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1203,13 +1206,13 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *&#160;</td>
           <td class="paramname"><em>loc</em> = <code>nullptr</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>grid</em> = <code>nullptr</code>, </td>
         </tr>
         <tr>
@@ -1248,7 +1251,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0e23991df730bfa61749d00484d4ce5f"></a>
+<a class="anchor" id="a70ec04909851ae9c573e1d439f5c455d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1264,19 +1267,19 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#afbad8e4a2f1e9903755b1bd2fe8273cf">eCartesianDirection</a>&#160;</td>
           <td class="paramname"><em>dir</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#a478f1e2cf9934de79a892e60980598dc">eLocationOnRank</a> *&#160;</td>
           <td class="paramname"><em>loc</em> = <code>nullptr</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>grid</em> = <code>nullptr</code>, </td>
         </tr>
         <tr>
@@ -1314,7 +1317,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a78d9c31d1c15198d1455627d1fa29804"></a>
+<a class="anchor" id="aa1f693d4b4438c83f994b83c54b11b6c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1342,7 +1345,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>grid</em>&#160;</td>
         </tr>
         <tr>
@@ -1373,7 +1376,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="ae99e3fa97dcb3be1f6b88a55f232c2cd"></a>
+<a class="anchor" id="ae05559ab787c9eccedde24be270a51c9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1389,13 +1392,13 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="_grid_utils_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_enumerations_8h.html#a0cc91691e907a6a03b129d18a62fe33d">eCartMinMax</a>&#160;</td>
           <td class="paramname"><em>edge</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const *const&#160;</td>
           <td class="paramname"><em>grid</em>&#160;</td>
         </tr>
         <tr>
@@ -1425,7 +1428,7 @@ template&lt;typename NumType &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a7c13884020ab181ee8cb6dd2ea7e4fd7"></a>
+<a class="anchor" id="ac523515920794475c3577923562716bd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1453,7 +1456,7 @@ template&lt;typename NumType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_grid_obj.html">GridObj</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_grid_obj.html">GridObj</a> const &amp;&#160;</td>
           <td class="paramname"><em>g</em>&#160;</td>
         </tr>
         <tr>
@@ -1620,6 +1623,33 @@ template&lt;typename NumType &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a vector with uniformly spaced integer values between min and max. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4fa92a1d400687f75e1fce1c8eb406e6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GridUtils::safeGetRank </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Safe method to get the rank number. </p>
+<p>This is a serial/parallel agnostic method to get the rank number. This is necessary as often we just want to access the rank number for logging purposes and don't want to have to wrap every call to avoid attempts to use the MPI manager in non-MPI code.</p>
+<dl class="section return"><dt>Returns</dt><dd>integer specifying the rank number. Zero if using serial code. </dd></dl>
 
 </div>
 </div>

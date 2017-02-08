@@ -44,35 +44,37 @@ static std\+::vector$<$ double $>$ \hyperlink{class_grid_utils_a0051918813c63802
 \begin{DoxyCompactList}\small\item\em Multiplies matrix A by vector x. \end{DoxyCompactList}\item 
 static int \hyperlink{class_grid_utils_af3c54e468658879756c71b01abd028d5}{get\+Opposite} (int direction)
 \begin{DoxyCompactList}\small\item\em Gets the opposite lattice direction to the one supplied. \end{DoxyCompactList}\item 
-static void \hyperlink{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{get\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&Grids, int level, int region, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&ptr)
+static void \hyperlink{class_grid_utils_a8af73cff3f009b0cc27c71af4dae0780}{get\+Grid} (\hyperlink{class_grid_obj}{Grid\+Obj} $\ast$const Grids, int level, int region, \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$\&ptr)
 \begin{DoxyCompactList}\small\item\em Get a pointer to a given grid in the hierarchy. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{is\+Overlap\+Periodic} (int i, int j, int k, const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid)
+static bool \hyperlink{class_grid_utils_ac523515920794475c3577923562716bd}{is\+Overlap\+Periodic} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} const \&p\+Grid)
 \begin{DoxyCompactList}\small\item\em Finds out whether halo containng i,j,k links to neighbour rank periodically. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a707d0044f6b3376399b972e73c4b1dd7}{is\+On\+This\+Rank} (double x, double y, double z, \hyperlink{_grid_utils_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid=nullptr, std\+::vector$<$ int $>$ $\ast$pos=nullptr)
+static bool \hyperlink{class_grid_utils_ae21da9e811f7ea944a996eaa5d203da2}{is\+On\+This\+Rank} (double x, double y, double z, \hyperlink{_enumerations_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const grid=nullptr, std\+::vector$<$ int $>$ $\ast$pos=nullptr)
 \begin{DoxyCompactList}\small\item\em Finds out whether site with supplied position is on the current rank. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a0e23991df730bfa61749d00484d4ce5f}{is\+On\+This\+Rank} (double xyz, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_grid_utils_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid=nullptr, int $\ast$pos=nullptr)
+static bool \hyperlink{class_grid_utils_a70ec04909851ae9c573e1d439f5c455d}{is\+On\+This\+Rank} (double xyz, \hyperlink{_enumerations_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, \hyperlink{_enumerations_8h_a478f1e2cf9934de79a892e60980598dc}{e\+Location\+On\+Rank} $\ast$loc=nullptr, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const grid=nullptr, int $\ast$pos=nullptr)
 \begin{DoxyCompactList}\small\item\em Finds out whether the supplied position can be found on the current rank. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a14da5d778eb6d81fbcd5c9331a8082dd}{intersects\+Refined\+Region} (const \hyperlink{class_grid_obj}{Grid\+Obj} \&p\+Grid, int Reg\+Num)
+static bool \hyperlink{class_grid_utils_af1e1194072f958e70ad453b521008766}{intersects\+Refined\+Region} (\hyperlink{class_grid_obj}{Grid\+Obj} const \&p\+Grid, int Reg\+Num)
 \begin{DoxyCompactList}\small\item\em Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_af0692236725709af2d98872805fc84ae}{is\+On\+Sender\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an inner (sender) halo. \end{DoxyCompactList}\item 
 static bool \hyperlink{class_grid_utils_abfec29d90b6942de2f3c52c225a4d888}{is\+On\+Recv\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an outer (receiver) halo. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a9179e27b25b1be249edd6d22455d57bd}{is\+On\+Sender\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
+static bool \hyperlink{class_grid_utils_a9179e27b25b1be249edd6d22455d57bd}{is\+On\+Sender\+Layer} (double site\+\_\+position, \hyperlink{_enumerations_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an inner (sender) halo. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a381a3ef0d42132313081b5c06f732092}{is\+On\+Recv\+Layer} (double site\+\_\+position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
+static bool \hyperlink{class_grid_utils_a381a3ef0d42132313081b5c06f732092}{is\+On\+Recv\+Layer} (double site\+\_\+position, \hyperlink{_enumerations_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge)
 \begin{DoxyCompactList}\small\item\em Check whether site is on an outer (receiver) halo. \end{DoxyCompactList}\item 
 static int \hyperlink{class_grid_utils_a1a59da2eb58afd9e785b45b23ad962df}{get\+Mpi\+Direction} (int offset\+\_\+vector\mbox{[}$\,$\mbox{]})
 \begin{DoxyCompactList}\small\item\em Get direction in M\+PI topology from unit vector. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_acb35c1a485e74c0b2794b84573b5e50f}{is\+Off\+Grid} (int i, int j, int k, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g)
+static int \hyperlink{class_grid_utils_a4fa92a1d400687f75e1fce1c8eb406e6}{safe\+Get\+Rank} ()
+\begin{DoxyCompactList}\small\item\em Safe method to get the rank number. \end{DoxyCompactList}\item 
+static bool \hyperlink{class_grid_utils_a220d6b870c7b422a087324ad860d96f8}{is\+Off\+Grid} (int i, int j, int k, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const g)
 \begin{DoxyCompactList}\small\item\em Tests whether a site is on a given grid. \end{DoxyCompactList}\item 
-static void \hyperlink{class_grid_utils_ad0c030776101d001fda37eb7f90d2b20}{get\+Enclosing\+Voxel} (double x, double y, double z, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, std\+::vector$<$ int $>$ $\ast$ijk)
+static void \hyperlink{class_grid_utils_a4eaf386de2bdd96502c595e73302c029}{get\+Enclosing\+Voxel} (double x, double y, double z, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const g, std\+::vector$<$ int $>$ $\ast$ijk)
 \begin{DoxyCompactList}\small\item\em Get local voxel indices on grid in which provided position lies. \end{DoxyCompactList}\item 
-static void \hyperlink{class_grid_utils_a20901145122cf56507713abe0467638c}{get\+Enclosing\+Voxel} (double x, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$g, \hyperlink{_grid_utils_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, int $\ast$ijk)
+static void \hyperlink{class_grid_utils_a02c27032afa91f879536237b0373e014}{get\+Enclosing\+Voxel} (double x, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const g, \hyperlink{_enumerations_8h_afbad8e4a2f1e9903755b1bd2fe8273cf}{e\+Cartesian\+Direction} dir, int $\ast$ijk)
 \begin{DoxyCompactList}\small\item\em Get local voxel indices on grid in which provided position lies. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_a78d9c31d1c15198d1455627d1fa29804}{is\+On\+Transition\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
+static bool \hyperlink{class_grid_utils_aa1f693d4b4438c83f994b83c54b11b6c}{is\+On\+Transition\+Layer} (double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const grid)
 \begin{DoxyCompactList}\small\item\em Check whether site is on a TL. \end{DoxyCompactList}\item 
-static bool \hyperlink{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}{is\+On\+Transition\+Layer} (double position, \hyperlink{_grid_utils_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge, const \hyperlink{class_grid_obj}{Grid\+Obj} $\ast$grid)
+static bool \hyperlink{class_grid_utils_ae05559ab787c9eccedde24be270a51c9}{is\+On\+Transition\+Layer} (double position, \hyperlink{_enumerations_8h_a0cc91691e907a6a03b129d18a62fe33d}{e\+Cart\+Min\+Max} edge, \hyperlink{class_grid_obj}{Grid\+Obj} const $\ast$const grid)
 \begin{DoxyCompactList}\small\item\em Check whether site is on a specific TL (to upper). \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Num\+Type $>$ }\\static Num\+Type \hyperlink{class_grid_utils_a78aa4876d7066bce253c52457e7b901d}{vecnorm} (Num\+Type a1, Num\+Type a2, Num\+Type a3)
 \begin{DoxyCompactList}\small\item\em Computes the L2-\/norm. \end{DoxyCompactList}\item 
@@ -273,15 +275,15 @@ local indices of the coarse grid site.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Enclosing\+Voxel@{get\+Enclosing\+Voxel}}
 \index{get\+Enclosing\+Voxel@{get\+Enclosing\+Voxel}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{get\+Enclosing\+Voxel(double x, double y, double z, const Grid\+Obj $\ast$g, std\+::vector$<$ int $>$ $\ast$ijk)}{getEnclosingVoxel(double x, double y, double z, const GridObj *g, std::vector< int > *ijk)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Enclosing\+Voxel (
+\subsubsection[{\texorpdfstring{get\+Enclosing\+Voxel(double x, double y, double z, Grid\+Obj const $\ast$const g, std\+::vector$<$ int $>$ $\ast$ijk)}{getEnclosingVoxel(double x, double y, double z, GridObj const *const g, std::vector< int > *ijk)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Enclosing\+Voxel (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
 \item[{double}]{z, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{g, }
+\item[{{\bf Grid\+Obj} const $\ast$const}]{g, }
 \item[{std\+::vector$<$ int $>$ $\ast$}]{ijk}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ad0c030776101d001fda37eb7f90d2b20}{}\label{class_grid_utils_ad0c030776101d001fda37eb7f90d2b20}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a4eaf386de2bdd96502c595e73302c029}{}\label{class_grid_utils_a4eaf386de2bdd96502c595e73302c029}
 
 
 Get local voxel indices on grid in which provided position lies. 
@@ -303,14 +305,14 @@ Wrapper for the overload which concentates all check into a vector.
 \end{DoxyParams}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Enclosing\+Voxel@{get\+Enclosing\+Voxel}}
 \index{get\+Enclosing\+Voxel@{get\+Enclosing\+Voxel}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{get\+Enclosing\+Voxel(double x, const Grid\+Obj $\ast$g, e\+Cartesian\+Direction dir, int $\ast$ijk)}{getEnclosingVoxel(double x, const GridObj *g, eCartesianDirection dir, int *ijk)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Enclosing\+Voxel (
+\subsubsection[{\texorpdfstring{get\+Enclosing\+Voxel(double x, Grid\+Obj const $\ast$const g, e\+Cartesian\+Direction dir, int $\ast$ijk)}{getEnclosingVoxel(double x, GridObj const *const g, eCartesianDirection dir, int *ijk)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Enclosing\+Voxel (
 \begin{DoxyParamCaption}
 \item[{double}]{xyz, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{g, }
+\item[{{\bf Grid\+Obj} const $\ast$const}]{g, }
 \item[{{\bf e\+Cartesian\+Direction}}]{dir, }
 \item[{int $\ast$}]{ijk}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a20901145122cf56507713abe0467638c}{}\label{class_grid_utils_a20901145122cf56507713abe0467638c}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a02c27032afa91f879536237b0373e014}{}\label{class_grid_utils_a02c27032afa91f879536237b0373e014}
 
 
 Get local voxel indices on grid in which provided position lies. 
@@ -366,14 +368,14 @@ local indices of the fine grid site.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Grid@{get\+Grid}}
 \index{get\+Grid@{get\+Grid}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{get\+Grid(\+Grid\+Obj $\ast$\&\+Grids, int level, int region, Grid\+Obj $\ast$\&ptr)}{getGrid(GridObj *&Grids, int level, int region, GridObj *&ptr)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Grid (
+\subsubsection[{\texorpdfstring{get\+Grid(\+Grid\+Obj $\ast$const Grids, int level, int region, Grid\+Obj $\ast$\&ptr)}{getGrid(GridObj *const Grids, int level, int region, GridObj *&ptr)}}]{\setlength{\rightskip}{0pt plus 5cm}void Grid\+Utils\+::get\+Grid (
 \begin{DoxyParamCaption}
-\item[{{\bf Grid\+Obj} $\ast$\&}]{Grids, }
+\item[{{\bf Grid\+Obj} $\ast$const}]{Grids, }
 \item[{int}]{level, }
 \item[{int}]{region, }
 \item[{{\bf Grid\+Obj} $\ast$\&}]{ptr}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_afac10170d3f6f96a32da6a783b815954}{}\label{class_grid_utils_afac10170d3f6f96a32da6a783b815954}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a8af73cff3f009b0cc27c71af4dae0780}{}\label{class_grid_utils_a8af73cff3f009b0cc27c71af4dae0780}
 
 
 Get a pointer to a given grid in the hierarchy. 
@@ -382,13 +384,13 @@ Takes a N\+U\+LL pointer by reference and updates it when matching grid is found
 
 
 \begin{DoxyParams}[1]{Parameters}
- & {\em Grids} & x-\/position of site. \\
+ & {\em Grids} & constant pointer to the grid at which to start searching. \\
 \hline
- & {\em level} & y-\/position of site. \\
+ & {\em level} & level desired. \\
 \hline
- & {\em region} & z-\/position of site. \\
+ & {\em region} & region desried. \\
 \hline
-\mbox{\tt out}  & {\em ptr} & pointer containing address of grid in hierarchy. \\
+\mbox{\tt out}  & {\em ptr} & reference to pointer where address of grid matching in hierarchy will be assigned. \\
 \hline
 \end{DoxyParams}
 \index{Grid\+Utils@{Grid\+Utils}!get\+Mpi\+Direction@{get\+Mpi\+Direction}}
@@ -433,12 +435,12 @@ opposite direction in lattice model.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!intersects\+Refined\+Region@{intersects\+Refined\+Region}}
 \index{intersects\+Refined\+Region@{intersects\+Refined\+Region}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{intersects\+Refined\+Region(const Grid\+Obj \&p\+Grid, int Reg\+Num)}{intersectsRefinedRegion(const GridObj &pGrid, int RegNum)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::intersects\+Refined\+Region (
+\subsubsection[{\texorpdfstring{intersects\+Refined\+Region(\+Grid\+Obj const \&p\+Grid, int Reg\+Num)}{intersectsRefinedRegion(GridObj const &pGrid, int RegNum)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::intersects\+Refined\+Region (
 \begin{DoxyParamCaption}
-\item[{const {\bf Grid\+Obj} \&}]{p\+Grid, }
+\item[{{\bf Grid\+Obj} const \&}]{p\+Grid, }
 \item[{int}]{Reg\+Num}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a14da5d778eb6d81fbcd5c9331a8082dd}{}\label{class_grid_utils_a14da5d778eb6d81fbcd5c9331a8082dd}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_af1e1194072f958e70ad453b521008766}{}\label{class_grid_utils_af1e1194072f958e70ad453b521008766}
 
 
 Finds out whether all or part of specified refined region intersects with the space occupied by the grid provided. 
@@ -457,14 +459,14 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+Off\+Grid@{is\+Off\+Grid}}
 \index{is\+Off\+Grid@{is\+Off\+Grid}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+Off\+Grid(int i, int j, int k, const Grid\+Obj $\ast$g)}{isOffGrid(int i, int j, int k, const GridObj *g)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Off\+Grid (
+\subsubsection[{\texorpdfstring{is\+Off\+Grid(int i, int j, int k, Grid\+Obj const $\ast$const g)}{isOffGrid(int i, int j, int k, GridObj const *const g)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Off\+Grid (
 \begin{DoxyParamCaption}
 \item[{int}]{i, }
 \item[{int}]{j, }
 \item[{int}]{k, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{g}
+\item[{{\bf Grid\+Obj} const $\ast$const}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_acb35c1a485e74c0b2794b84573b5e50f}{}\label{class_grid_utils_acb35c1a485e74c0b2794b84573b5e50f}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a220d6b870c7b422a087324ad860d96f8}{}\label{class_grid_utils_a220d6b870c7b422a087324ad860d96f8}
 
 
 Tests whether a site is on a given grid. 
@@ -587,16 +589,16 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+This\+Rank@{is\+On\+This\+Rank}}
 \index{is\+On\+This\+Rank@{is\+On\+This\+Rank}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(double x, double y, double z, e\+Location\+On\+Rank $\ast$loc=nullptr, const Grid\+Obj $\ast$grid=nullptr, std\+::vector$<$ int $>$ $\ast$pos=nullptr)}{isOnThisRank(double x, double y, double z, eLocationOnRank *loc=nullptr, const GridObj *grid=nullptr, std::vector< int > *pos=nullptr)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
+\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(double x, double y, double z, e\+Location\+On\+Rank $\ast$loc=nullptr, Grid\+Obj const $\ast$const grid=nullptr, std\+::vector$<$ int $>$ $\ast$pos=nullptr)}{isOnThisRank(double x, double y, double z, eLocationOnRank *loc=nullptr, GridObj const *const grid=nullptr, std::vector< int > *pos=nullptr)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
 \begin{DoxyParamCaption}
 \item[{double}]{x, }
 \item[{double}]{y, }
 \item[{double}]{z, }
 \item[{{\bf e\+Location\+On\+Rank} $\ast$}]{loc = {\ttfamily nullptr}, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{grid = {\ttfamily nullptr}, }
+\item[{{\bf Grid\+Obj} const $\ast$const}]{grid = {\ttfamily nullptr}, }
 \item[{std\+::vector$<$ int $>$ $\ast$}]{pos = {\ttfamily nullptr}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a707d0044f6b3376399b972e73c4b1dd7}{}\label{class_grid_utils_a707d0044f6b3376399b972e73c4b1dd7}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae21da9e811f7ea944a996eaa5d203da2}{}\label{class_grid_utils_ae21da9e811f7ea944a996eaa5d203da2}
 
 
 Finds out whether site with supplied position is on the current rank. 
@@ -623,15 +625,15 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+This\+Rank@{is\+On\+This\+Rank}}
 \index{is\+On\+This\+Rank@{is\+On\+This\+Rank}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(double xyz, e\+Cartesian\+Direction dir, e\+Location\+On\+Rank $\ast$loc=nullptr, const Grid\+Obj $\ast$grid=nullptr, int $\ast$pos=nullptr)}{isOnThisRank(double xyz, eCartesianDirection dir, eLocationOnRank *loc=nullptr, const GridObj *grid=nullptr, int *pos=nullptr)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
+\subsubsection[{\texorpdfstring{is\+On\+This\+Rank(double xyz, e\+Cartesian\+Direction dir, e\+Location\+On\+Rank $\ast$loc=nullptr, Grid\+Obj const $\ast$const grid=nullptr, int $\ast$pos=nullptr)}{isOnThisRank(double xyz, eCartesianDirection dir, eLocationOnRank *loc=nullptr, GridObj const *const grid=nullptr, int *pos=nullptr)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+This\+Rank (
 \begin{DoxyParamCaption}
 \item[{double}]{xyz, }
 \item[{{\bf e\+Cartesian\+Direction}}]{dir, }
 \item[{{\bf e\+Location\+On\+Rank} $\ast$}]{loc = {\ttfamily nullptr}, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{grid = {\ttfamily nullptr}, }
+\item[{{\bf Grid\+Obj} const $\ast$const}]{grid = {\ttfamily nullptr}, }
 \item[{int $\ast$}]{pos = {\ttfamily nullptr}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a0e23991df730bfa61749d00484d4ce5f}{}\label{class_grid_utils_a0e23991df730bfa61749d00484d4ce5f}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a70ec04909851ae9c573e1d439f5c455d}{}\label{class_grid_utils_a70ec04909851ae9c573e1d439f5c455d}
 
 
 Finds out whether the supplied position can be found on the current rank. 
@@ -656,14 +658,14 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}}
 \index{is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, const Grid\+Obj $\ast$grid)}{isOnTransitionLayer(double pos_x, double pos_y, double pos_z, const GridObj *grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
+\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double pos\+\_\+x, double pos\+\_\+y, double pos\+\_\+z, Grid\+Obj const $\ast$const grid)}{isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const *const grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
 \begin{DoxyParamCaption}
 \item[{double}]{pos\+\_\+x, }
 \item[{double}]{pos\+\_\+y, }
 \item[{double}]{pos\+\_\+z, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{grid}
+\item[{{\bf Grid\+Obj} const $\ast$const}]{grid}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a78d9c31d1c15198d1455627d1fa29804}{}\label{class_grid_utils_a78d9c31d1c15198d1455627d1fa29804}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_aa1f693d4b4438c83f994b83c54b11b6c}{}\label{class_grid_utils_aa1f693d4b4438c83f994b83c54b11b6c}
 
 
 Check whether site is on a TL. 
@@ -686,13 +688,13 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}}
 \index{is\+On\+Transition\+Layer@{is\+On\+Transition\+Layer}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double position, e\+Cart\+Min\+Max edge, const Grid\+Obj $\ast$grid)}{isOnTransitionLayer(double position, eCartMinMax edge, const GridObj *grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
+\subsubsection[{\texorpdfstring{is\+On\+Transition\+Layer(double position, e\+Cart\+Min\+Max edge, Grid\+Obj const $\ast$const grid)}{isOnTransitionLayer(double position, eCartMinMax edge, GridObj const *const grid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+On\+Transition\+Layer (
 \begin{DoxyParamCaption}
 \item[{double}]{position, }
 \item[{{\bf e\+Cart\+Min\+Max}}]{edge, }
-\item[{const {\bf Grid\+Obj} $\ast$}]{grid}
+\item[{{\bf Grid\+Obj} const $\ast$const}]{grid}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}{}\label{class_grid_utils_ae99e3fa97dcb3be1f6b88a55f232c2cd}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ae05559ab787c9eccedde24be270a51c9}{}\label{class_grid_utils_ae05559ab787c9eccedde24be270a51c9}
 
 
 Check whether site is on a specific TL (to upper). 
@@ -713,14 +715,14 @@ boolean answer.
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!is\+Overlap\+Periodic@{is\+Overlap\+Periodic}}
 \index{is\+Overlap\+Periodic@{is\+Overlap\+Periodic}!Grid\+Utils@{Grid\+Utils}}
-\subsubsection[{\texorpdfstring{is\+Overlap\+Periodic(int i, int j, int k, const Grid\+Obj \&p\+Grid)}{isOverlapPeriodic(int i, int j, int k, const GridObj &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Overlap\+Periodic (
+\subsubsection[{\texorpdfstring{is\+Overlap\+Periodic(int i, int j, int k, Grid\+Obj const \&p\+Grid)}{isOverlapPeriodic(int i, int j, int k, GridObj const &pGrid)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Grid\+Utils\+::is\+Overlap\+Periodic (
 \begin{DoxyParamCaption}
 \item[{int}]{i, }
 \item[{int}]{j, }
 \item[{int}]{k, }
-\item[{const {\bf Grid\+Obj} \&}]{g}
+\item[{{\bf Grid\+Obj} const \&}]{g}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}{}\label{class_grid_utils_a7c13884020ab181ee8cb6dd2ea7e4fd7}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_ac523515920794475c3577923562716bd}{}\label{class_grid_utils_ac523515920794475c3577923562716bd}
 
 
 Finds out whether halo containng i,j,k links to neighbour rank periodically. 
@@ -809,6 +811,22 @@ Creates a linearly-\/spaced vector of integers.
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 a vector with uniformly spaced integer values between min and max. 
+\end{DoxyReturn}
+\index{Grid\+Utils@{Grid\+Utils}!safe\+Get\+Rank@{safe\+Get\+Rank}}
+\index{safe\+Get\+Rank@{safe\+Get\+Rank}!Grid\+Utils@{Grid\+Utils}}
+\subsubsection[{\texorpdfstring{safe\+Get\+Rank()}{safeGetRank()}}]{\setlength{\rightskip}{0pt plus 5cm}int Grid\+Utils\+::safe\+Get\+Rank (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{class_grid_utils_a4fa92a1d400687f75e1fce1c8eb406e6}{}\label{class_grid_utils_a4fa92a1d400687f75e1fce1c8eb406e6}
+
+
+Safe method to get the rank number. 
+
+This is a serial/parallel agnostic method to get the rank number. This is necessary as often we just want to access the rank number for logging purposes and don\textquotesingle{}t want to have to wrap every call to avoid attempts to use the M\+PI manager in non-\/\+M\+PI code.
+
+\begin{DoxyReturn}{Returns}
+integer specifying the rank number. Zero if using serial code. 
 \end{DoxyReturn}
 \index{Grid\+Utils@{Grid\+Utils}!strided\+Copy@{strided\+Copy}}
 \index{strided\+Copy@{strided\+Copy}!Grid\+Utils@{Grid\+Utils}}

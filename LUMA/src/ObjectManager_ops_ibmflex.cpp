@@ -16,7 +16,7 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
+
 
 // *****************************************************************************
 /// \brief	Structural calculation of flexible cilia.
@@ -27,6 +27,8 @@
 ///
 /// \param	ib	index of body to which calculation is to be applied.
 void ObjectManager::ibm_jacowire(int ib) {
+
+	int rank = GridUtils::safeGetRank();
 
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
@@ -182,7 +184,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 	MpiManager *mpim = MpiManager::getInstance();
 	// DEBUG -- write out G vector
 	std::ofstream Gout;
-	Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+	Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 	Gout << "\nNEW TIME STEP" << std::endl;
 	for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
 		Gout << G[i] << std::endl;
@@ -339,7 +341,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			resout << res[i] << std::endl;
@@ -366,7 +368,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out pos vector
 		std::ofstream posout;
-		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		posout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			posout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << std::endl;
@@ -377,7 +379,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out ten vector
 		std::ofstream tenout;
-		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		tenout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			tenout << iBody[ib].tension[i] << std::endl;
@@ -399,7 +401,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out desired vel vector
 		std::ofstream velout;
-		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		velout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			velout << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
@@ -547,25 +549,25 @@ void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 #undef SWAP
 
 // *****************************************************************************
-/// \brief	Update the position of a deformable iBody.
+/// \brief	Update the position of a movable iBody.
 ///
 ///			Wrapper for applying external forcing or structural calculations to
-///			iBodies marked as deformable. Updates support on completion.
+///			iBodies marked as movable. Updates support on completion.
 ///
 /// \param	ib	index of body to which calculation is to be applied.
 void ObjectManager::ibm_positionUpdate(int ib) {
 
 	// If a flexible body then launch structural solver to find new positions
-	if (iBody[ib].flex_rigid) {
+	if (iBody[ib].isFlexible) {
 
 		// Do jacowire calculation
 		ibm_jacowire(ib);
 
-	} else {	// Body is deformable but not flexible so positional update comes from
+	} else {	// Body is movable but not flexible so positional update comes from
 				// external forcing
 
 
-		// Call some routine for external forcing here...
+		// TODO: Call some routine for external forcing here...
 
 
 	}
@@ -589,9 +591,9 @@ void ObjectManager::ibm_positionUpdate(int ib) {
 }
 
 // *****************************************************************************
-/// \brief	Update the position of a group of deformable iBodies.
+/// \brief	Update the position of a group of movable iBodies.
 ///
-///			Updates the position of a group of non-flexible moving (deformable) 
+///			Updates the position of a group of non-flexible movable 
 ///			bodies by using the first flexible body in the group as the driver.
 ///			Must be called after all previous positional update routines have 
 ///			been called.
@@ -603,7 +605,7 @@ void ObjectManager::ibm_positionUpdateGroup(int group) {
 	int ib_flex = 0;
 	for (int i = 0; i < static_cast<int>(iBody.size()); i++) {
 
-		if (iBody[i].flex_rigid && iBody[i].groupID == group) {
+		if (iBody[i].isFlexible && iBody[i].groupID == group) {
 			ib_flex = i;
 			break;
 		}
@@ -613,10 +615,10 @@ void ObjectManager::ibm_positionUpdateGroup(int group) {
 	// Loop over bodies in group
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
-		// If body is deformable but not flexible give it a positional update from flexible
+		// If body is movable but not flexible give it a positional update from flexible
 		if (iBody[ib].groupID == group &&
-			iBody[ib].deformable &&
-			iBody[ib].flex_rigid == false) {
+			iBody[ib].isMovable &&
+			iBody[ib].isFlexible == false) {
 
 			// Copy the position vectors of flexible markers in x and y directions
 			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {

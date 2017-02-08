@@ -41,9 +41,9 @@ double \hyperlink{class_object_manager_adad4317bfbe5bae833c4ffa3e4538d92}{ibm\+\
 void \hyperlink{class_object_manager_a956c12cba071c6b8844371c03433f82c}{ibm\+\_\+jacowire} (int ib)
 \begin{DoxyCompactList}\small\item\em Structural calculation of flexible cilia. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}{ibm\+\_\+position\+Update} (int ib)
-\begin{DoxyCompactList}\small\item\em Update the position of a deformable i\+Body. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Update the position of a movable i\+Body. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}{ibm\+\_\+position\+Update\+Group} (int group)
-\begin{DoxyCompactList}\small\item\em Update the position of a group of deformable i\+Bodies. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Update the position of a group of movable i\+Bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a7bf970976700f9949bb08d8dc7f8e637}{ibm\+\_\+banbks} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double b\mbox{[}$\,$\mbox{]})
 \begin{DoxyCompactList}\small\item\em Solution of a banded diagonal linear system. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a77eb5ec758b5956e0a609fa1fba2f8e8}{ibm\+\_\+bandec} (double $\ast$$\ast$a, long n, int m1, int m2, double $\ast$$\ast$al, unsigned long indx\mbox{[}$\,$\mbox{]}, double $\ast$d)
@@ -60,9 +60,9 @@ void \hyperlink{class_object_manager_aca1fa71a37c8e02ebe40fdc932350c15}{io\+\_\+
 \begin{DoxyCompactList}\small\item\em Write out position of immersed boundary bodies. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_a7f3c0860b78203671cd858532492555d}{io\+\_\+write\+Lift\+Drag} (int timestep)
 \begin{DoxyCompactList}\small\item\em Write out forces on the markers of immersed boundary bodies. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_aaa4689c73e755a1214356154a76a06fa}{io\+\_\+restart} (\hyperlink{_grid_obj_8h_ad1926c22ad82853adff44c4b76b97827}{e\+I\+O\+Flag} I\+O\+\_\+flag, int level)
+void \hyperlink{class_object_manager_aaa4689c73e755a1214356154a76a06fa}{io\+\_\+restart} (\hyperlink{_enumerations_8h_ad1926c22ad82853adff44c4b76b97827}{e\+I\+O\+Flag} I\+O\+\_\+flag, int level)
 \begin{DoxyCompactList}\small\item\em Read/write IB body information to restart file. \end{DoxyCompactList}\item 
-void \hyperlink{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{io\+\_\+read\+In\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{_object_manager_8h_a7b78fa3db30dfb9c1efc82bf886fe184}{e\+Object\+Type} objtype)
+void \hyperlink{class_object_manager_a5c11d747c3df9e91d5fc2dac836d7b7e}{io\+\_\+read\+In\+Cloud} (\hyperlink{class_p_cpts}{P\+Cpts} $\ast$\+\_\+\+P\+Cpts, \hyperlink{_enumerations_8h_a7b78fa3db30dfb9c1efc82bf886fe184}{e\+Object\+Type} objtype)
 \begin{DoxyCompactList}\small\item\em Read in point cloud data. \end{DoxyCompactList}\item 
 void \hyperlink{class_object_manager_adf65260d81584613fa33f2e7658f1b36}{io\+\_\+write\+Force\+On\+Object} (double tval)
 \begin{DoxyCompactList}\small\item\em Write out the forces on a solid object. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -509,9 +509,9 @@ Wrapper for relocating markers of an i\+Body be calling appropriate positional u
 )}\hypertarget{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}{}\label{class_object_manager_a8315e05afcfbfd1bac21d3d53391bd4e}
 
 
-Update the position of a deformable i\+Body. 
+Update the position of a movable i\+Body. 
 
-Wrapper for applying external forcing or structural calculations to i\+Bodies marked as deformable. Updates support on completion.
+Wrapper for applying external forcing or structural calculations to i\+Bodies marked as movable. Updates support on completion.
 
 
 \begin{DoxyParams}{Parameters}
@@ -527,9 +527,9 @@ Wrapper for applying external forcing or structural calculations to i\+Bodies ma
 )}\hypertarget{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}{}\label{class_object_manager_a4108e20548dc7b2b4a3852dd33e6a2d1}
 
 
-Update the position of a group of deformable i\+Bodies. 
+Update the position of a group of movable i\+Bodies. 
 
-Updates the position of a group of non-\/flexible moving (deformable) bodies by using the first flexible body in the group as the driver. Must be called after all previous positional update routines have been called.
+Updates the position of a group of non-\/flexible movable bodies by using the first flexible body in the group as the driver. Must be called after all previous positional update routines have been called.
 
 
 \begin{DoxyParams}{Parameters}

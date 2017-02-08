@@ -20,15 +20,6 @@
 // Forward declare
 class IBBody;
 
-///	\enum eIBInfoType
-///	\brief	Type of container required.
-enum eIBInfoType {
-	eBodyNumMarkers,
-	eBodyMarkerPositions,
-	eIBDeltaSum,
-};
-
-
 ///	\brief	Structure for passing IB information between MPI processes.
 ///
 ///			This structure has a series of different constructors depending on 

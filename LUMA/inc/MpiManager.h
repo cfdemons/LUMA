@@ -17,7 +17,9 @@
 #define MPIMAN_H
 
 #include "stdafx.h"
+#include "HDFstruct.h"
 class GridObj;
+class GridManager;
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
@@ -35,16 +37,13 @@ class MpiManager
 {
 
 private :
-	MpiManager(void);		///< Private constructor
-	~MpiManager(void);		///< Private destructor
+	MpiManager();			///< Private constructor
+	~MpiManager();			///< Private destructor
 	static MpiManager* me;	///< Pointer to self
 
 public :
-	/*
-	***************************************************************************************************************
-	********************************************* Member Data *****************************************************
-	***************************************************************************************************************
-	*/
+
+	/************** Member Data **************/
 
 	// MPI world data (all public)
 	MPI_Comm world_comm;	///< Global MPI communicator
@@ -60,6 +59,14 @@ public :
 	int dimensions[L_DIMS];						///< Size of MPI Cartesian topology
 	int neighbour_rank[L_MPI_DIRS];				///< Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[L_DIMS][L_MPI_DIRS];	///< Coordinates in MPI topology of neighbour ranks
+
+	// Sizes of each of the MPI domains
+	/// Number of sites in X direction for each custom rank.
+	std::vector<int> cRankSizeX;
+	/// Number of sites in Y direction for each custom rank.
+	std::vector<int> cRankSizeY;
+	/// Number of sites in Z direction for each custom rank.
+	std::vector<int> cRankSizeZ;
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)
@@ -67,71 +74,12 @@ public :
 #else
 	MPI_Comm subGrid_comm[1];	// Default to size = 1
 #endif
-
-	/// \struct phdf5_struct
-	/// \brief	Structure for storing halo information for HDF5.
-	///
-	///			Structure also stores the amount of writable data on the grid.
-	struct phdf5_struct {
-	
-		int i_start;	///< Starting i-index for writable region
-		int i_end;		///< Ending i-index for writable region
-		int j_start;	///< Starting j-index for writable region
-		int j_end;		///< Ending j-index for writable region
-		int k_start;	///< Starting k-index for writable region
-		int k_end;		///< Ending k-index for writable region
-
-		// Identifiers
-		int level;		///< Grid level to which these data correspond
-		int region;		///< Region number to which these data correspond
-
-		/// Writable data count
-		unsigned int writable_data_count = 0;
-	};
-	std::vector<phdf5_struct> p_data;			///< Vector of structures containing halo descriptors for block writing (HDF5)
 	
 	// Commonly used properties of the rank / topology
 	int my_rank;				///< Rank number
 	int num_ranks;				///< Total number of ranks in MPI Cartesian topology
-	int rank_coords[L_DIMS];		///< Coordinates in MPI Cartesian topology
+	int rank_coords[L_DIMS];	///< Coordinates in MPI Cartesian topology
 
-
-	// Grid data
-	/// \brief	Overall size of each grid (excluding halo of course).
-	///
-	///			Since L0 can only be region = 0 this array should be accessed as 
-	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
-	///			cannot be 0. To retrieve L0 info, simply access [0].
-	///
-	int global_size[3][L_NUM_LEVELS * L_NUM_REGIONS + 1];
-
-	/// \brief	Absolute position of grid edges (excluding halo of course).
-	///
-	///			Since L0 can only be region = 0 this array should be accessed as 
-	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
-	///			cannot be 0. To retrieve L0 info, simply access [0]. The first index
-	///			should be accessed using the enumerator eCartesianMinMax.
-	///
-	double global_edges[6][L_NUM_LEVELS * L_NUM_REGIONS + 1];
-
-	/// \brief	Boolean flag array to indicate the presence of a TL on sub-grid edges.
-	///
-	///			It is not a given that a sub-grid has a TL on every edge of the grid.
-	///			Specifically if we have a sub-grid which is perodic (or in future, which
-	///			merges with another sub-grid?). The HDF5 writer needs to know whether 
-	///			to exclude sites to account for TL or not so we store information here
-	///			from the sub-grid initialisation. The first index should be accessed 
-	///			using the enumerator eCartesianMinMax. If no sub-grids present then 
-	///			adopts a default 6x1 size.
-	///
-#if (L_NUM_LEVELS == 0)
-	bool subgrid_tlayer_key[6][1];
-#else
-	bool subgrid_tlayer_key[6][L_NUM_LEVELS * L_NUM_REGIONS];
-#endif
-
-	/// Dimensions of coarse lattice represented on this rank (includes halo).
-	std::vector<int> local_size;
 
 	/// \brief	Absolute positions of edges of the core region represented on this rank.
 	///
@@ -139,6 +87,7 @@ public :
 	///			Rows are x,y,z start and end pairs and columns are rank number.
 	///			Access the rows using the eCartMinMax enumeration.
 	std::vector< std::vector<double> > rank_core_edge;
+
 
 	/// \struct layer_edges
 	/// \brief	Structure containing absolute positions of the edges of halos.
@@ -154,9 +103,6 @@ public :
 	};
 	layer_edges sender_layer_pos;	///< Structure containing sender layer edge positions.
 	layer_edges recv_layer_pos;		///< Structure containing receiver layer edge positions.
-	
-	/// Pointer to grid hierarchy
-	GridObj* Grids;
 	
 
 	// Buffer data
@@ -181,32 +127,28 @@ public :
 
 
 
-	/*
-	***************************************************************************************************************
-	********************************************* Member Methods **************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Methods **************/
 
 	// Singleton design
 	static MpiManager* getInstance();	// Get the pointer to the singleton instance (create it if necessary)
 	static void destroyInstance();
 
 	// Initialisation
-	void mpi_init();		// Initialisation of MpiManager & Cartesian topology
-	void mpi_gridbuild( );	// Do domain decomposition to build local grid dimensions
-	int mpi_buildCommunicators();	// Create a new communicator for each sub-grid and region combo
-	void mpi_updateLoadInfo();	// Method to compute the number of active cells on the rank and pass to master
+	void mpi_init();											// Initialisation of MpiManager & Cartesian topology
+	void mpi_gridbuild(GridManager* const grid_man);			// Do domain decomposition to build local grid dimensions
+	int mpi_buildCommunicators(GridManager* const grid_man);	// Create a new communicator for each sub-grid and region combo
+	void mpi_updateLoadInfo(GridManager* const grid_man);		// Method to compute the number of active cells on the rank and pass to master
 
 	// Buffer methods
-	void mpi_buffer_pack( int dir, GridObj* g );		// Pack the buffer ready for data transfer on the supplied grid in specified direction
-	void mpi_buffer_unpack( int dir, GridObj* g );		// Unpack the buffer back to the grid given
-	void mpi_buffer_size();								// Set buffer size information for grids in hierarchy given and 
-														// set pointer to hierarchy for subsequent access
-	void mpi_buffer_size_send( GridObj*& g );			// Routine to find the size of the sending buffer on supplied grid
-	void mpi_buffer_size_recv( GridObj*& g );			// Routine to find the size of the receiving buffer on supplied grid
+	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction
+	void mpi_buffer_unpack(int dir, GridObj* const g);		// Unpack the buffer back to the grid given
+	void mpi_buffer_size();									// Set buffer size information for grids in hierarchy given and 
+															// set pointer to hierarchy for subsequent access
+	void mpi_buffer_size_send( GridObj* const g );			// Routine to find the size of the sending buffer on supplied grid
+	void mpi_buffer_size_recv( GridObj* const g );			// Routine to find the size of the receiving buffer on supplied grid
 
 	// IO
-	void mpi_writeout_buf( std::string filename, int dir );		// Write out the buffers of direction dir to file
+	void mpi_writeout_buf(std::string filename, int dir);		// Write out the buffers of direction dir to file
 
 	// Comms
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region

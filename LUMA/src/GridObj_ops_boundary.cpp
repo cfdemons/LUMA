@@ -19,7 +19,6 @@
 #include "../inc/GridObj.h"
 #include "../inc/BFLBody.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/GridUtils.h"
 
 // ****************************************************************************
 /// \brief	Method to apply half-way bounce-back.

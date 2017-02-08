@@ -18,9 +18,9 @@
 #include "stdafx.h"
 class GridObj;
 class PCpts;
+#include "PCpts.h"
 #include "GridUtils.h"
 #include "MarkerData.h"
-
 
 /// \brief	Generic body class.
 ///
@@ -358,3 +358,4 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 };
 
 #endif
+

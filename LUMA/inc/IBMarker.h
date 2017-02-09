@@ -26,6 +26,7 @@ class IBMarker : public Marker {
 
 	// Make ObjectManager a friend class so it can access the protected data of IBMarker objects
 	friend class ObjectManager;
+
 	// Same for IBBody
 	friend class IBBody;
 	friend class IBInfo;
@@ -35,30 +36,18 @@ public:
 	/// Default constructor
 	IBMarker(void)
 	{
-		position.push_back(0.0);
-		position.push_back(0.0);
-		position.push_back(0.0);
-
-		supp_i.push_back(0);
-		supp_j.push_back(0);
-		supp_k.push_back(0);
-
-#ifdef L_BUILD_FOR_MPI
-		support_rank.push_back(MpiManager::getInstance()->my_rank);
-#else
-		support_rank.push_back(0);
-#endif
 
 		// TODO: Initialise the rest of the IB Marker properties here. 
 
 	};
+
 	/// Default destructor
 	~IBMarker(void)
 	{
 	};
 
 	// Custom constructor to add support etc.
-	IBMarker(double xPos, double yPos, double zPos, GridObj const * const body_owner, bool isFlexible = false);
+	IBMarker(double xPos, double yPos, double zPos, GridObj const * const body_owner);
 
 protected:
 
@@ -74,11 +63,9 @@ protected:
 	std::vector<double> deltaval;		///< Value of delta function for a given support node
 
 	// Scalars
-	bool isFlexible;		///< Indication as to whether marker is part of a structural or moving body calculation
 	double epsilon;			///< Scaling parameter
 	double local_area;		///< Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like LBM)
 	double dilation;		///< Dilation parameter in lattice units (same in all directions for uniform Eulerian grid)
-
 };
 
 #endif

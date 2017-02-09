@@ -49,11 +49,7 @@ public:
 		supp_j.push_back(0);
 		supp_k.push_back(0);
 
-#ifdef L_BUILD_FOR_MPI
-		support_rank.push_back(MpiManager::getInstance()->my_rank);
-#else
-		support_rank.push_back(0);
-#endif
+		support_rank.push_back(GridUtils::safeGetRank());
 
 	};
 
@@ -84,11 +80,7 @@ public:
 		supp_j.push_back(ijk[1]);
 		supp_k.push_back(ijk[2]);
 
-#ifdef L_BUILD_FOR_MPI
-		support_rank.push_back(MpiManager::getInstance()->my_rank);
-#else
-		support_rank.push_back(0);
-#endif
+		support_rank.push_back(GridUtils::safeGetRank());
 	}
 
 };

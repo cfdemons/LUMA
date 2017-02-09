@@ -35,7 +35,7 @@ void ObjectManager::ibm_apply() {
 		// DEBUG -- write out support coordinates
 		std::ofstream suppout;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(_rank) + ".out",std::ios::app);
+			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 			suppout << "\nNEW TIME STEP" << std::endl;
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
@@ -205,18 +205,18 @@ double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 /// \param	m	marker whose support is to be found.
 void ObjectManager::ibm_findSupport(int ib, int m) {
 
+	// Get the rank
 	int rank = GridUtils::safeGetRank();
 
 	// Declarations
 	int inear, jnear;							// Nearest node indices (global indices)
 	std::vector<double> nearpos;				// Position of the nearest marker
 	int knear;
+	int s = 0;										// The sth support marker which has been found
 
 #ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
-
 	int estimated_rank_offset[3] = { 0, 0, 0 };
-	iBody[ib].markers[m].support_rank.push_back(rank);	// Add this rank for owning the first support point
 #endif
 
 	// Find closest support node
@@ -228,38 +228,55 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		iBody[ib]._Owner,
 		&nearijk
 		);
+
 	inear = nearijk[eXDirection];
 	jnear = nearijk[eYDirection];
 	knear = nearijk[eZDirection];
 
 	// Get position of nearest node
-	nearpos.push_back(iBody[ib]._Owner->XPos[nearijk[eXDirection]]);
-	nearpos.push_back(iBody[ib]._Owner->YPos[nearijk[eYDirection]]);
-	nearpos.push_back(iBody[ib]._Owner->ZPos[nearijk[eZDirection]]);
+	nearpos.push_back(iBody[ib]._Owner->XPos[inear]);
+	nearpos.push_back(iBody[ib]._Owner->YPos[jnear]);
+	nearpos.push_back(iBody[ib]._Owner->ZPos[knear]);
 
 	// Side length of support region defined as 3 x dilation parameter
 	iBody[ib].markers[m].dilation = 1.0;
 
+	// Store normalised area of support region
+	iBody[ib].markers[m].local_area = 1.0;
+
 	// Vector to store estimated positions of the possible support points
 	double estimated_position[3] = { 0, 0, 0 };
 
+	// Get the position for the first support point (which already exists from the addMarker method)
+	estimated_position[eXDirection] = nearpos[eXDirection];
+	estimated_position[eYDirection] = nearpos[eYDirection];
+#if (L_DIMS == 3)
+	estimated_position[eZDirection] = nearpos[eZDirection];
+#endif
+
+	// Get the deltaval for the first support point
+	ibm_initialiseSupport(ib, m, s, estimated_position);
+
 #ifdef L_IBM_DEBUG
+
 	// DEBUG -- Write out support as they are found
 	std::ofstream supportout;
 	supportout.open(GridUtils::path_str
 		+ "/IBsupport_" + std::to_string(ib)
 		+ "_rank" + std::to_string(rank)
 		+ ".out", std::ios::app);
+
+		// Write out the first (nearest) support marker
 	if (m == 0)
-	{
-		supportout << "Marker\tRank\tX\tY\tZ" << std::endl;
-		supportout
-			<< m << "\t"
-			<< iBody[ib].markers[m].support_rank.back() << "\t"
-			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
-			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
-			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << std::endl;		
-	}
+		supportout << "Marker\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
+
+	supportout
+		<< m << "\t"
+		<< iBody[ib].markers[m].support_rank.back() << "\t"
+		<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
+		<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
+		<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << "\t"
+		<< iBody[ib].markers[m].deltaval.back() << std::endl;
 #endif
 
 
@@ -307,15 +324,8 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 					else
 					{
 
-#ifdef L_IBM_DEBUG
-						// DEBUG -- add this support point to the list
-						supportout
-							<< m << "\t"
-							<< iBody[ib].markers[m].support_rank.back() << "\t"
-							<< estimated_position[eXDirection] << "\t"
-							<< estimated_position[eYDirection] << "\t"
-							<< estimated_position[eZDirection] << std::endl;
-#endif
+						// Increment the support point counter
+						s++;
 
 						// Lies within support region so add support point data
 						iBody[ib].markers[m].supp_i.push_back(i);
@@ -324,7 +334,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 						// Add owning rank as this one for now
 						iBody[ib].markers[m].support_rank.push_back(rank);
-
 
 #ifdef L_BUILD_FOR_MPI
 						/* Estimate which rank this point belongs to by seeing which
@@ -353,6 +362,28 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 							// Owned by a neighbour so correct the support rank
 							iBody[ib].markers[m].support_rank.back() = mpim->neighbour_rank[owner_direction];
 						}
+
+						// Reset estimated rank offset
+						estimated_rank_offset[eXDirection] = 0;
+						estimated_rank_offset[eYDirection] = 0;
+#if (L_DIMS == 3)
+						estimated_rank_offset[eZDirection] = 0;
+#endif
+#endif
+						/* Initialise delta information for the set of support points
+							 * including those not on this rank using estimated positions. */
+						ibm_initialiseSupport(ib, m, s, estimated_position);
+
+#ifdef L_IBM_DEBUG
+						// DEBUG -- add this support point to the list
+						supportout
+							<< m << "\t"
+							<< iBody[ib].markers[m].support_rank.back() << "\t"
+							<< estimated_position[eXDirection] << "\t"
+							<< estimated_position[eYDirection] << "\t"
+							<< estimated_position[eZDirection] << "\t"
+							<< iBody[ib].markers[m].deltaval.back() << std::endl;
+
 #endif
 					}
 				}
@@ -363,17 +394,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 #ifdef L_IBM_DEBUG
 	supportout.close();
 #endif
-
-	// Store normalised area of support region
-	iBody[ib].markers[m].local_area = 1; // Area remains constant at the local grid level
-
-	/* Initialise delta information for the set of support points 
-	 * including those not on this rank using estimated positions. */
-	for (int s = 0; s < static_cast<int>(iBody[ib].markers[m].supp_i.size()); s++)
-	{
-		ibm_initialiseSupport(ib, m, s, estimated_position);
-	}
-
 }
 
 // *****************************************************************************

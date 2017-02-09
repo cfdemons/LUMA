@@ -58,6 +58,7 @@ IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
 	// Set some default body properties
 	this->isMovable = L_IBB_MOVABLE;
 	this->isFlexible = L_IBB_FLEXIBLE;
+	this->closed_surface = false;
 	this->_Owner = g;
 	this->id = id;
 	this->groupID = 0;
@@ -84,7 +85,7 @@ IBBody::~IBBody(void)
 void IBBody::addMarker(double x, double y, double z, bool isFlexible) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
-	markers.emplace_back(x, y, z, _Owner, isFlexible);
+	markers.emplace_back(x, y, z, _Owner);
 
 }
 

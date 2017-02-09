@@ -17,7 +17,6 @@
 
 #include "stdafx.h"
 class GridObj;
-class PCpts;
 #include "PCpts.h"
 #include "GridUtils.h"
 #include "MarkerData.h"
@@ -317,18 +316,10 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	std::vector<int> locals;
 
 	// Voxel grid filter //
-
 	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
-	for (size_t a = 0; a < _PCpts->x.size(); a++)
-	{
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
-		{
-			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
-		}
-		break;
-	}
+	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0]);
 
 	// Increment counters
 	int curr_marker = 0;
@@ -338,23 +329,19 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	// Loop over array of points
 	for (size_t a = 1; a < _PCpts->x.size(); a++)
 	{
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
-		{
-			// Pass to overridden point builder
-			passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
-		}
+		// Pass to overridden point builder
+		passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
 	}
 
 	*GridUtils::logfile << "ObjectManager: Object represented by " << std::to_string(markers.size()) <<
 		" markers using 1 marker / voxel voxelisation." << std::endl;
 
-	// Define spacing based on first two markers
+	// Define spacing based on first two markers	// TODO Make spacing a marker member
 	this->spacing = GridUtils::vecnorm(
 		markers[1].position[0] - markers[0].position[0],
 		markers[1].position[1] - markers[0].position[1],
 		markers[1].position[2] - markers[0].position[2]
 		);
-
 };
 
 #endif

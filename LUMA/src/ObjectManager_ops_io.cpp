@@ -238,19 +238,22 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 /// \param	tval	time value at which the write out is being performed.
 void ObjectManager::io_vtkIBBWriter(double tval) {
 
+	// Get the rank
+	int rank = GridUtils::safeGetRank();
+
     // Loop through each iBody
     for (size_t ib = 0; ib < iBody.size(); ib++) {
 
         // Create file name then output file stream
         std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
 
         std::ofstream fout;
         fout.open( fileName.str().c_str() );
 
         // Add header information
         fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << ib << " at time t = " << (int)tval << "\n";
+        fout << "IB Output for body ID " << ib << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
         fout << "ASCII\n";
         fout << "DATASET POLYDATA\n";
 
@@ -259,15 +262,9 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
         fout << "POINTS " << iBody[ib].markers.size() << " float\n";
         for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 
-#if (L_DIMS == 3)
-				fout	<< iBody[ib].markers[i].position[0] << " " 
-						<< iBody[ib].markers[i].position[1] << " " 
-						<< iBody[ib].markers[i].position[2] << std::endl;
-#else
-				fout	<< iBody[ib].markers[i].position[0] << " " 
-						<< iBody[ib].markers[i].position[1] << " " 
-						<< 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
-#endif
+        	fout	<< iBody[ib].markers[i].position[0] << " "
+					<< iBody[ib].markers[i].position[1] << " "
+					<< iBody[ib].markers[i].position[2] << std::endl;
         }
 
 
@@ -470,11 +467,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
+#endif
 	a = 0;
 	do {
 
 		// If on this rank get its indices
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g) && !GridUtils::isOnRecvLayer(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
 		{
 			// Increment counter
 			a++;
@@ -489,6 +487,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes
+#ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
@@ -502,49 +501,54 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// Perform a different post-processing action depending on the type of body
-	switch (objtype)
-	{
+	// If there are points left
+	if (!_PCpts->x.empty())	{
 
-	case eBBBCloud:
+
+		// Perform a different post-processing action depending on the type of body
+		switch (objtype)
+		{
+
+		case eBBBCloud:
 
 #ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Labelling..." << std::endl;
+			*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
 
-		// Label the grid sites
-		for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+			// Label the grid sites
+			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-			// Get indices if on this rank
-			if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
-			{
-				// Update Typing Matrix
-				if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
+				// Get indices if on this rank
+				if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
 				{
-					g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+					// Update Typing Matrix
+					if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
+					{
+						g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+					}
 				}
 			}
+			break;
+
+		case eBFLCloud:
+
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
+			// Call BFL body builder
+			bfl_buildBody(_PCpts);
+			break;
+
+		case eIBBCloud:
+
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
+			// Call IBM body builder
+			ibm_buildBody(_PCpts, g);
+			break;
+
 		}
-		break;
-
-	case eBFLCloud:
-
-#ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
-#endif
-		// Call BFL body builder
-		bfl_buildBody(_PCpts);
-		break;
-
-	case eIBBCloud:
-
-#ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
-#endif
-		// Call IBM body builder
-		ibm_buildBody(_PCpts, g);
-		break;
-
 	}
 
 }

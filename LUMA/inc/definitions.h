@@ -41,15 +41,15 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 #define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
-#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+//#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -303,12 +303,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_OBJECT_ON_GRID_LEV 2		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_OBJECT_X (9.06 / 2.0)		///< Start of object bounding box in X direction
-	#define L_START_OBJECT_Y (9.66 / 2.0)		///< Start of object bounding box in Y direction
-	#define L_CENTRE_OBJECT_Z 5.0				///< Centre of object bounding box in Z direction
-	#define L_OBJECT_LENGTH 0.94						///< The object input is scaled based on this dimension
+	#define L_START_OBJECT_X 0.7		///< Start of object bounding box in X direction
+	#define L_START_OBJECT_Y 0.4		///< Start of object bounding box in Y direction
+	#define L_CENTRE_OBJECT_Z 0.5		///< Centre of object bounding box in Z direction
+	#define L_OBJECT_LENGTH 0.2			///< The object input is scaled based on this dimension
 	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_OBJECT_REF_LENGTH 1.0		///< Reference length to be used in the definition of Reynolds number
+	#define L_OBJECT_REF_LENGTH 0.2		///< Reference length to be used in the definition of Reynolds number
 
 
 // BFL objects

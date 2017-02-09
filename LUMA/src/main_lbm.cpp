@@ -408,6 +408,14 @@ int main( int argc, char* argv[] )
 	Grids.io_hdf5(Grids.t);
 #endif
 
+#if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
+	*GridUtils::logfile << "Writing out to VTK file..." << endl;
+	objMan->io_vtkIBBWriter(Grids.t);
+#endif
+
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
+
 
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 

@@ -95,7 +95,7 @@ public :
 	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
 
 	// Grid Scalars
-	double dh;						///< Physical lattice spacing (same for x, y and z)
+	double dh;						///< Dimensionless lattice spacing (same for x, y and z)
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size

@@ -48,6 +48,54 @@ public:
 	{
 		return (ulat*currentGrid->dh*L_PHYSICAL_U) / currentGrid->dt;
 	}
+	
+	// *****************************************************************************
+	/// \brief	Velocity in dimensionless units to LBM units.
+	///
+	/// \param ud	Dimensionless velocity.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM velocity
+	template <typename T>
+	static T ud2ulbm(T ud, GridObj* currentGrid)
+	{
+		return (ud*currentGrid->dt) / currentGrid->dh;
+	}
+
+	// *****************************************************************************
+	/// \brief	lenght in dimensionless units to LBM units.
+	///
+	/// \param ld	Dimensionless length.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM length
+	template <typename T>
+	static T ld2llbm(T ld, GridObj* currentGrid)
+	{
+		return ld/currentGrid->dh;
+	}
+
+	// *****************************************************************************
+	/// \brief	Kinematic viscosity in dimensionless units to LBM units.
+	///
+	/// \param nud	Dimensionless kinematic viscosity.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM kinematic viscosity
+	template <typename T>
+	static T nud2nulbm(T nud, GridObj* currentGrid)
+	{
+		return (nud*dt)/(dx*dx);
+	}
+
+	// *****************************************************************************
+	/// \brief	Acceleration in dimensionless units to LBM units.
+	///
+	/// \param ad	Dimensionless acceleration.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM acceleration
+	template <typename T>
+	static T ad2albm(T ad, GridObj* currentGrid)
+	{
+		return (ad*dt*dt) / dx;
+	}
 
 	
 };

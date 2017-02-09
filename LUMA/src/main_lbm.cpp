@@ -197,7 +197,11 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
 	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_UREF) << std::endl;
 	// Reynolds Number
+#ifdef L_NU
+	*GridUtils::logfile << "Reynolds Number = " << std::to_string(1/L_NU) << endl;
+#else
 	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_RE) << endl;
+#endif
 
 
 	/*

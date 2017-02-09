@@ -42,14 +42,14 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 #define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
-#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
+//#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 #define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 
 
@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100				///< How many timesteps before whole grid output
@@ -89,7 +89,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Gravity
 //#define L_GRAVITY_ON						///< Turn on gravity force
-/// Expression for the gravity force
+/// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 0.0001
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
@@ -154,16 +154,18 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_UREF 0.04				///< Reference velocity for scaling
-#define L_UMAX L_UREF*1.5		///< Max velocity of inlet profile
+//#define L_UREF 0.04				///< Reference velocity for scaling
+#define L_UMAX 1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 0.04			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
-#define L_RHOIN 1			///< Initial density
+#define L_RHOIN 1			///< Initial density. In lattice units. 
+//#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
 #define L_RE 150			///< Desired Reynolds number
+
 
 // nu computed based on above selections
 
@@ -298,7 +300,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Bounce-back objects from point clouds
-#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
 
 	#define L_OBJECT_ON_GRID_LEV 2		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added

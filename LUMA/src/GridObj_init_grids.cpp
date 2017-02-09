@@ -258,10 +258,13 @@ void GridObj::LBM_initGrid() {
 	double Lx = L_BX;
 	double Ly = L_BY;
 	double Lz = L_BZ;
-	dh = 2 * (Lx / (2 * static_cast<double>(L_N)));
+	dh = Lx / static_cast<double>(L_N);
 
-	// Physical time step = physical grid spacing
-	dt = dh;
+	// Store temporal spacing
+	dt = L_TIMESTEP;
+
+	//Gravity in LBM units
+	g = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
 
 	
 
@@ -441,28 +444,34 @@ void GridObj::LBM_initGrid() {
 
 
 	// Initialise OTHER parameters
-	// Compute kinematic viscosity based on target Reynolds number
-#if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
-	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-	nu = (L_IBB_R*2 / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
-	// If IBM rectangle use y-dimension (in lattice units)
-	nu = (L_IBB_L / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
-	// If IBM object read from file then use scale length as reference
-	nu = (L_IBB_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_SOLID_FROM_FILE
-	// Use object length
-	nu = (L_OBJECT_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_BFL_ON
-	// Use bfl body length
-	nu = (L_BFL_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined WALLS_ON
-	// If no object then use domain height
-	nu = (L_BY / dh - std::round(L_WALL_THICKNESS_BOTTOM / dh) - std::round(L_WALL_THICKNESS_TOP / dh)) * L_UREF / L_RE;	// Based on actual width of channel
+//	// Compute kinematic viscosity based on target Reynolds number
+//#if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
+//	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
+//	nu = (L_IBB_R*2 / dh) * L_UREF / L_RE;
+//#elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
+//	// If IBM rectangle use y-dimension (in lattice units)
+//	nu = (L_IBB_L / dh) * L_UREF / L_RE;
+//#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
+//	// If IBM object read from file then use scale length as reference
+//	nu = (L_IBB_REF_LENGTH / dh) * L_UREF / L_RE;
+//#elif defined L_SOLID_FROM_FILE
+//	// Use object length
+//	nu = (L_OBJECT_REF_LENGTH / dh) * L_UREF / L_RE;
+//#elif defined L_BFL_ON
+//	// Use bfl body length
+//	nu = (L_BFL_REF_LENGTH / dh) * L_UREF / L_RE;
+//#elif defined WALLS_ON
+//	// If no object then use domain height
+//	nu = (L_BY / dh - std::round(L_WALL_THICKNESS_BOTTOM / dh) - std::round(L_WALL_THICKNESS_TOP / dh)) * L_UREF / L_RE;	// Based on actual width of channel
+//#else
+//	// Use reference length of 1.0
+//	nu = (1.0 / dh) * L_UREF / L_RE;
+//#endif
+
+#ifdef L_NU
+	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
-	// Use reference length of 1.0
-	nu = (1.0 / dh) * L_UREF / L_RE;
+	nu = GridUnits::nud2nulbm(1/L_RE, this);
 #endif
 
 	// Relaxation frequency on L0
@@ -502,6 +511,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Define scales
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
+	g = pGrid.g;
 	
 	/* Get coarse grid refinement limits as indicies local to the parent grid
 	 * on this rank. */

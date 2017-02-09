@@ -75,7 +75,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef L_GRAVITY_ON
-	Froude = pow(L_UREF,2) / L_GRAVITY_FORCE * length_lu;
+	Froude = pow(L_UREF,2) / iBody[ib]._Owner_>g * length_lu;
 #else
 	Froude = 0.0;
 #endif

@@ -82,7 +82,7 @@ public:
 	template <typename T>
 	static T nud2nulbm(T nud, GridObj* currentGrid)
 	{
-		return (nud*dt)/(dx*dx);
+		return (nud*currentGrid->dt)/(currentGrid->dh*currentGrid->dh);
 	}
 
 	// *****************************************************************************
@@ -92,9 +92,9 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return LBM acceleration
 	template <typename T>
-	static T ad2albm(T ad, GridObj* currentGrid)
+	static T fd2flbm(T ad, GridObj* currentGrid)
 	{
-		return (ad*dt*dt) / dx;
+		return (ad*currentGrid->dt*currentGrid->dt) / currentGrid->dh;
 	}
 
 	

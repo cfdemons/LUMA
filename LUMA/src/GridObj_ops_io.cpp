@@ -19,7 +19,7 @@
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/hdf5luma.h"
-#include "../inc/GridUnits.h"
+//#include "../inc/GridUnits.h"
 
 using namespace std;
 

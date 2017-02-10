@@ -44,6 +44,7 @@ protected:
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	GridObj* _Owner;					///< Pointer to owning grid
 	size_t id;							///< Unique ID of the body
+	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
 
 
 	// ************************ Methods ************************ //
@@ -100,6 +101,12 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 {
 	this->_Owner = g;
 	this->id = id;
+
+#ifdef L_BUILD_FOR_MPI
+	this->owningRank = id % MpiManager::getInstance()->num_ranks;
+#else
+	this->owningRank = 0;
+#endif
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);

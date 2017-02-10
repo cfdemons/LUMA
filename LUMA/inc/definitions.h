@@ -67,7 +67,7 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 10				///< How many timesteps before whole grid output
+#define L_OUT_EVERY 100				///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -94,7 +94,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 1000				///< Frequency of write out of restart file
 
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -134,7 +134,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
 #define L_RESOLUTION 31		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 1e-5		///< The timestep in non-dimensional units
+#define L_TIMESTEP 1.68574402E-04		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX (2 + 2/static_cast<double>(L_RESOLUTION))		///< Size of domain in X including boundary cells (non-dimensional units)
@@ -152,8 +152,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE	///< Use an inlet profile
-//#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_USE_INLET_PROFILE	///< Use an inlet profile
+#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_UMAX 1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here

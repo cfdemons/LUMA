@@ -474,7 +474,7 @@ void GridObj::LBM_initGrid() {
 #ifdef L_NU
 	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
-	nu = GridUnits::nud2nulbm(1/L_RE, this);
+	nu = GridUnits::nud2nulbm(1/static_cast<double>(L_RE), this);
 #endif
 
 	// Relaxation frequency on L0

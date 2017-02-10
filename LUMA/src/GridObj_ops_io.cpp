@@ -394,11 +394,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 	GridManager *gm = GridManager::getInstance();
 
 	// Rank string
-#ifdef L_BUILD_FOR_MPI
-	std::string rnk_str = std::to_string(MpiManager::getInstance()->my_rank);
-#else
-	std::string rnk_str = 0;
-#endif
+	std::string rnk_str = std::to_string(GridUtils::safeGetRank());
 
 
 	if (IO_flag == eWrite) {

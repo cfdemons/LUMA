@@ -44,7 +44,7 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = L_UMAX * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+		ux_in[j] = GridUnits::ud2ulbm(L_UMAX,this) * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}
@@ -193,10 +193,10 @@ void GridObj::LBM_initVelocity ( ) {
 				 * have either been read in from an input file or defined by an expression 
 				 * given in the definitions.
 				 */
-				u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-				u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+				u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+				u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-				u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+				u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 
@@ -265,6 +265,9 @@ void GridObj::LBM_initGrid() {
 
 	//Gravity in LBM units
 	g = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
+
+	//Reference velocity in LBM units
+	uref = GridUnits::ud2ulbm(1, this);
 
 	
 
@@ -512,6 +515,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
 	g = pGrid.g;
+	uref = pGrid.uref;
 	
 	/* Get coarse grid refinement limits as indicies local to the parent grid
 	 * on this rank. */
@@ -1148,9 +1152,9 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Left hand face only
 
 	// Check for potential singularity in BC
-	if (L_UMAX == 1 || L_UREF == 1) {
+	if (GridUnits::ud2ulbm(L_UMAX,this) == 1 || uref == 1) {
 		// Singularity so exit
-		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile);
+		L_ERROR("Inlet BC fails with L_UX0 in LBM units = 1, choose something else. Exiting.", GridUtils::logfile);
 	}
 
 	// Search position vector to see if left hand wall on this rank

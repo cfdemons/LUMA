@@ -44,7 +44,7 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return physical velocity
 	template <typename T>
-	static T ulat2uphys(T ulat, GridObj* currentGrid)
+	static double ulat2uphys(T ulat, GridObj* currentGrid)
 	{
 		return (ulat*currentGrid->dh*L_PHYSICAL_U) / currentGrid->dt;
 	}
@@ -56,7 +56,7 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return LBM velocity
 	template <typename T>
-	static T ud2ulbm(T ud, GridObj* currentGrid)
+	static double ud2ulbm(T ud, GridObj* currentGrid)
 	{
 		return (ud*currentGrid->dt) / currentGrid->dh;
 	}
@@ -68,7 +68,7 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return LBM length
 	template <typename T>
-	static T ld2llbm(T ld, GridObj* currentGrid)
+	static double ld2llbm(T ld, GridObj* currentGrid)
 	{
 		return ld/currentGrid->dh;
 	}
@@ -80,7 +80,7 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return LBM kinematic viscosity
 	template <typename T>
-	static T nud2nulbm(T nud, GridObj* currentGrid)
+	static double nud2nulbm(T nud, GridObj* currentGrid)
 	{
 		return (nud*currentGrid->dt)/(currentGrid->dh*currentGrid->dh);
 	}
@@ -92,7 +92,7 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return LBM acceleration
 	template <typename T>
-	static T fd2flbm(T ad, GridObj* currentGrid)
+	static double fd2flbm(T ad, GridObj* currentGrid)
 	{
 		return (ad*currentGrid->dt*currentGrid->dt) / currentGrid->dh;
 	}

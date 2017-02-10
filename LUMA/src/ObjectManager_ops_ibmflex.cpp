@@ -75,13 +75,13 @@ void ObjectManager::ibm_jacowire(int ib) {
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef L_GRAVITY_ON
-	Froude = pow(L_UREF,2) / iBody[ib]._Owner_>g * length_lu;
+	Froude = pow(iBody[ib]._Owner->uref,2) / iBody[ib]._Owner->g * length_lu;
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow((1 / pow(2, iBody[ib]._Owner->level)) / (length_lu / L_UREF), 2);
+	double beta = ds_sqrd / pow((1 / pow(2, iBody[ib]._Owner->level)) / (length_lu / iBody[ib]._Owner->uref), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -100,7 +100,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
 	// Populate force vectors with non-dimensional forces (divide by spacing/dh = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(L_UREF, 2);
+	double Fref = iBody[ib].delta_rho * pow(iBody[ib]._Owner->uref, 2);
 	for (i = 0; i < Fx.size(); i++) {
 		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dh)));
 		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dh)));

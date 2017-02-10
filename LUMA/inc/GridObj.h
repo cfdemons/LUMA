@@ -103,6 +103,7 @@ public :
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency
 	double g;						///< Gravity force
+	double uref;					///< Reference velocity
 
 	// Timing variables
 	double timeav_mpi_overhead;		///< Time-averaged time of MPI communication

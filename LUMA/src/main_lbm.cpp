@@ -195,7 +195,7 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dh) << endl;
 	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
 	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(L_UREF) << std::endl;
+	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(Grids.uref) << std::endl;
 	// Reynolds Number
 #ifdef L_NU
 	*GridUtils::logfile << "Reynolds Number = " << std::to_string(1/L_NU) << endl;

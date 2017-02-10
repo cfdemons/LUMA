@@ -446,31 +446,6 @@ void GridObj::LBM_initGrid() {
 	fNew = f;
 
 
-	// Initialise OTHER parameters
-//	// Compute kinematic viscosity based on target Reynolds number
-//#if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
-//	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-//	nu = (L_IBB_R*2 / dh) * L_UREF / L_RE;
-//#elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
-//	// If IBM rectangle use y-dimension (in lattice units)
-//	nu = (L_IBB_L / dh) * L_UREF / L_RE;
-//#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
-//	// If IBM object read from file then use scale length as reference
-//	nu = (L_IBB_REF_LENGTH / dh) * L_UREF / L_RE;
-//#elif defined L_SOLID_FROM_FILE
-//	// Use object length
-//	nu = (L_OBJECT_REF_LENGTH / dh) * L_UREF / L_RE;
-//#elif defined L_BFL_ON
-//	// Use bfl body length
-//	nu = (L_BFL_REF_LENGTH / dh) * L_UREF / L_RE;
-//#elif defined WALLS_ON
-//	// If no object then use domain height
-//	nu = (L_BY / dh - std::round(L_WALL_THICKNESS_BOTTOM / dh) - std::round(L_WALL_THICKNESS_TOP / dh)) * L_UREF / L_RE;	// Based on actual width of channel
-//#else
-//	// Use reference length of 1.0
-//	nu = (1.0 / dh) * L_UREF / L_RE;
-//#endif
-
 #ifdef L_NU
 	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
@@ -484,6 +459,19 @@ void GridObj::LBM_initGrid() {
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
 	 */
+
+	//Check that the relaxation frequency is within acceptable values. Suggest a better value for dt to the user if omega is not within acceptable limits. 
+	//Note that the use of BGKSMAG allows for omega >=2
+#ifndef L_USE_BGKSMAG
+	if (omega >= 2.0) {
+		*GridUtils::logfile << "LBM relaxation frequency omega too large, probably due to a too large L_TIMESTEP. a L_TIMESTEP = " << (dh*dh*(0.51 - 0.5)*cs*cs) / nu << " will give a valid omega = 1.96" << std::endl;
+		L_ERROR("LBM relaxation frequency omega too large. See log file for more information. Exiting.", GridUtils::logfile);
+	}
+#endif
+	//Check if there are incompressibility issues, and warn the user if this is the case
+	if (uref > (0.17*cs)) {
+		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results";
+	}
 
 #ifndef L_BUILD_FOR_MPI
 	// Update the writable data in the grid manager

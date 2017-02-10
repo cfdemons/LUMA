@@ -198,7 +198,9 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(Grids.uref) << std::endl;
 	// Reynolds Number
 #ifdef L_NU
+#if L_NU != 0
 	*GridUtils::logfile << "Reynolds Number = " << std::to_string(1/L_NU) << endl;
+#endif
 #else
 	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_RE) << endl;
 #endif

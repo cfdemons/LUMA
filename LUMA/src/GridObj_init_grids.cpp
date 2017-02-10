@@ -464,13 +464,16 @@ void GridObj::LBM_initGrid() {
 	//Note that the use of BGKSMAG allows for omega >=2
 #ifndef L_USE_BGKSMAG
 	if (omega >= 2.0) {
-		*GridUtils::logfile << "LBM relaxation frequency omega too large, probably due to a too large L_TIMESTEP. a L_TIMESTEP = " << (dh*dh*(0.51 - 0.5)*cs*cs) / nu << " will give a valid omega = 1.96" << std::endl;
-		L_ERROR("LBM relaxation frequency omega too large. See log file for more information. Exiting.", GridUtils::logfile);
+		L_ERROR("LBM relaxation frequency omega too large. Check viscosity value. Exiting.", GridUtils::logfile);
 	}
 #endif
 	//Check if there are incompressibility issues, and warn the user if this is the case
 	if (uref > (0.17*cs)) {
-		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results";
+		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results." << std::endl;
+		*GridUtils::logfile << "Try L_TIMESTEP = " << (dh*dh*(0.7 - 0.5)*cs*cs) / nu << std::endl;
+		if (uref >= cs){
+			L_ERROR("Reference velocity in LBM units equal or larger than the speed of sound cs, results of the simulation are not valid. Exiting.", GridUtils::logfile);
+		}
 	}
 
 #ifndef L_BUILD_FOR_MPI

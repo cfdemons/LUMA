@@ -521,7 +521,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 #ifdef L_GRAVITY_ON
 	// Add gravity
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * g * refinement_ratio;
+		rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Now compute force_i components from Cartesian force vector

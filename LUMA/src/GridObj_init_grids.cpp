@@ -264,7 +264,7 @@ void GridObj::LBM_initGrid() {
 	dt = L_TIMESTEP;
 
 	//Gravity in LBM units
-	g = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
+	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
 
 	//Reference velocity in LBM units
 	uref = GridUnits::ud2ulbm(1, this);
@@ -505,7 +505,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Define scales
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
-	g = pGrid.g;
+	gravity = pGrid.gravity;
 	uref = pGrid.uref;
 	
 	/* Get coarse grid refinement limits as indicies local to the parent grid

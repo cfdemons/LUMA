@@ -102,7 +102,7 @@ public :
 	int t;							///< Number of completed iterations on this level
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency
-	double g;						///< Gravity force
+	double gravity;					///< Gravity force
 	double uref;					///< Reference velocity
 
 	// Timing variables

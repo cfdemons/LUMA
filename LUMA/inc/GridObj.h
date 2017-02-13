@@ -95,13 +95,15 @@ public :
 	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
 
 	// Grid Scalars
-	double dh;						///< Physical lattice spacing (same for x, y and z)
+	double dh;						///< Dimensionless lattice spacing (same for x, y and z)
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size
 	int t;							///< Number of completed iterations on this level
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency
+	double gravity;					///< Gravity force
+	double uref;					///< Reference velocity
 
 	// Timing variables
 	double timeav_mpi_overhead;		///< Time-averaged time of MPI communication
@@ -123,7 +125,7 @@ public :
 	// Initialisation functions
 	void LBM_initVelocity();		// Initialise the velocity field
 	void LBM_initRho();				// Initialise the density field
-	void LBM_initGrid();			// Non-MPI wrapper for initialiser
+	void LBM_initGrid();			// Grid initialiser
 	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector

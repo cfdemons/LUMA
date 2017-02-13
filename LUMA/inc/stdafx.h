@@ -85,6 +85,7 @@
 #include <mpi.h>
 #include "MpiManager.h"
 #include "GridUtils.h"
+#include "GridUnits.h"
 
 
 /****************************************************/

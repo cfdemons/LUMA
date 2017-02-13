@@ -213,13 +213,13 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 						// Get appropriate normal velocity (+ve u_normal = incoming flow)
 						switch (n) {
 						case 0:
-							u_normal = c[normal_dir][v_outgoing] * L_UX0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UX0,this);
 							break;
 						case 1:
-							u_normal = c[normal_dir][v_outgoing] * L_UY0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UY0,this);
 							break;
 						case 2:
-							u_normal = c[normal_dir][v_outgoing] * L_UZ0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UZ0,this);
 							break;
 						default:
 							u_normal = 0.0;
@@ -271,10 +271,10 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 			// Set macroscopic quantities to desired values
 			rho(i,j,k,M_lim,K_lim) = rho_wall;
-			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 			// Update feq to match the desired density and velocity and
@@ -348,10 +348,10 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 			// Set macroscopic quantities to default values
 			rho(i,j,k,M_lim,K_lim) = L_RHOIN;
-			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 			// Set f to default values

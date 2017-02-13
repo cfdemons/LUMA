@@ -44,7 +44,7 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = L_UMAX * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+		ux_in[j] = GridUnits::ud2ulbm(L_UMAX,this) * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}
@@ -193,10 +193,10 @@ void GridObj::LBM_initVelocity ( ) {
 				 * have either been read in from an input file or defined by an expression 
 				 * given in the definitions.
 				 */
-				u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-				u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+				u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+				u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-				u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+				u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 
@@ -258,10 +258,16 @@ void GridObj::LBM_initGrid() {
 	double Lx = L_BX;
 	double Ly = L_BY;
 	double Lz = L_BZ;
-	dh = 2 * (Lx / (2 * static_cast<double>(L_N)));
+	dh = Lx / static_cast<double>(L_N);
 
-	// Physical time step = physical grid spacing
-	dt = dh;
+	// Store temporal spacing
+	dt = L_TIMESTEP;
+
+	//Gravity in LBM units
+	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
+
+	//Reference velocity in LBM units
+	uref = GridUnits::ud2ulbm(1, this);
 
 	
 
@@ -440,29 +446,10 @@ void GridObj::LBM_initGrid() {
 	fNew = f;
 
 
-	// Initialise OTHER parameters
-	// Compute kinematic viscosity based on target Reynolds number
-#if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
-	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-	nu = (L_IBB_R*2 / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
-	// If IBM rectangle use y-dimension (in lattice units)
-	nu = (L_IBB_L / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
-	// If IBM object read from file then use scale length as reference
-	nu = (L_IBB_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_SOLID_FROM_FILE
-	// Use object length
-	nu = (L_OBJECT_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_BFL_ON
-	// Use bfl body length
-	nu = (L_BFL_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined WALLS_ON
-	// If no object then use domain height
-	nu = (L_BY / dh - std::round(L_WALL_THICKNESS_BOTTOM / dh) - std::round(L_WALL_THICKNESS_TOP / dh)) * L_UREF / L_RE;	// Based on actual width of channel
+#ifdef L_NU
+	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
-	// Use reference length of 1.0
-	nu = (1.0 / dh) * L_UREF / L_RE;
+	nu = GridUnits::nud2nulbm(1/static_cast<double>(L_RE), this);
 #endif
 
 	// Relaxation frequency on L0
@@ -472,6 +459,22 @@ void GridObj::LBM_initGrid() {
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
 	 */
+
+	//Check that the relaxation frequency is within acceptable values. Suggest a better value for dt to the user if omega is not within acceptable limits. 
+	//Note that the use of BGKSMAG allows for omega >=2
+#ifndef L_USE_BGKSMAG
+	if (omega >= 2.0) {
+		L_ERROR("LBM relaxation frequency omega too large. Check viscosity value. Exiting.", GridUtils::logfile);
+	}
+#endif
+	//Check if there are incompressibility issues, and warn the user if this is the case
+	if (uref > (0.17*cs)) {
+		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results." << std::endl;
+		*GridUtils::logfile << "Try L_TIMESTEP = " << (dh*dh*(0.7 - 0.5)*cs*cs) / nu << std::endl;
+		if (uref >= cs){
+			L_ERROR("Reference velocity in LBM units equal or larger than the speed of sound cs, results of the simulation are not valid. Exiting.", GridUtils::logfile);
+		}
+	}
 
 #ifndef L_BUILD_FOR_MPI
 	// Update the writable data in the grid manager
@@ -502,6 +505,8 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Define scales
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
+	gravity = pGrid.gravity;
+	uref = pGrid.uref;
 	
 	/* Get coarse grid refinement limits as indicies local to the parent grid
 	 * on this rank. */
@@ -1138,9 +1143,9 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Left hand face only
 
 	// Check for potential singularity in BC
-	if (L_UMAX == 1 || L_UREF == 1) {
+	if (GridUnits::ud2ulbm(L_UMAX,this) == 1 || uref == 1) {
 		// Singularity so exit
-		L_ERROR("Inlet BC fails with L_UX0 = 1, choose something else. Exiting.", GridUtils::logfile);
+		L_ERROR("Inlet BC fails with L_UX0 in LBM units = 1, choose something else. Exiting.", GridUtils::logfile);
 	}
 
 	// Search position vector to see if left hand wall on this rank

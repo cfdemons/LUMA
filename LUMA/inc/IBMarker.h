@@ -47,7 +47,7 @@ public:
 	};
 
 	// Custom constructor to add support etc.
-	IBMarker(double xPos, double yPos, double zPos, GridObj const * const body_owner);
+	IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj const * const body_owner);
 
 protected:
 

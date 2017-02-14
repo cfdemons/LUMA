@@ -36,7 +36,7 @@ public:
 	~BFLMarker(void);
 
 	// Constructor
-	BFLMarker(double x, double y, double z, GridObj const * const body_owner);
+	BFLMarker(double x, double y, double z, int markerID, GridObj const * const body_owner);
 
 };
 

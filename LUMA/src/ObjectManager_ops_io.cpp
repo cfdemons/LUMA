@@ -398,6 +398,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->z.push_back(0);
 #endif
 
+		// Insert the ID of the point within this point cloud (needed later for assigning marker IDs)
+		_PCpts->id.push_back(_PCpts->id.size());
+
 	}
 	file.close();
 
@@ -452,7 +455,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			std::ofstream fileout;
 			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
-				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;
 			}
 			fileout.close();
@@ -472,7 +475,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	do {
 
 		// If on this rank get its indices
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g) && !GridUtils::isOnRecvLayer(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
 		{
 			// Increment counter
 			a++;
@@ -482,6 +485,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
 			_PCpts->y.erase(_PCpts->y.begin() + a);
 			_PCpts->z.erase(_PCpts->z.begin() + a);
+			_PCpts->id.erase(_PCpts->id.begin() + a);
+
 		}
 
 	} while (a < static_cast<int>(_PCpts->x.size()));
@@ -494,7 +499,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		std::ofstream fileout;
 		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
-			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 			fileout << std::endl;
 		}
 		fileout.close();

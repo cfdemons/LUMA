@@ -33,6 +33,7 @@ public:
 	std::vector<double> x;		///< Vector of X positions
 	std::vector<double> y;		///< Vector of Y positions
 	std::vector<double> z;		///< Vector of Z positions
+	std::vector<int> id;		///< Vector of point IDs
 };
 
 #endif

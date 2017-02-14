@@ -149,9 +149,9 @@ void ObjectManager::ibm_initialise() {
 		// DEBUG -- write out marker coordinates
 		std::ofstream bodyout;
 		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out");
-		bodyout << "x\ty\tz" << std::endl;
+		bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << std::endl;
+			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << "\t" << iBody[ib].markers[i].id << std::endl;
 		}
 		bodyout.close();
 #endif

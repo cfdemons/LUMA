@@ -66,6 +66,23 @@ IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
 	// Call inherited method to build from point cloud
 	this->buildFromCloud(_PCpts);
 
+	// Delete any markers which are on the receiver layer as not needed for IBM
+	int a = 0;
+	do {
+
+		// If on receiver layer then delete that marker
+		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
+		{
+			this->markers.erase(this->markers.begin() + a);
+		}
+		// If not, keep and move onto next one
+		else {
+
+			// Increment counter
+			a++;
+		}
+
+	} while (a < static_cast<int>(this->markers.size()));
 }
 
 /// Default destructor
@@ -82,10 +99,10 @@ IBBody::~IBBody(void)
 /// \param y			global y-position of marker.
 /// \param z			global z-position of marker.
 /// \param isFlexible	flag to indicate whether marker is movable or not.
-void IBBody::addMarker(double x, double y, double z, bool isFlexible) {
+void IBBody::addMarker(double x, double y, double z, int markerID) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
-	markers.emplace_back(x, y, z, _Owner);
+	markers.emplace_back(x, y, z, markerID, _Owner);
 
 }
 

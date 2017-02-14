@@ -36,6 +36,8 @@ public:
 	/// Array of indices indicating on which rank the given support point resides
 	std::vector<int> support_rank;
 
+	int id;						///< ID of marker within its owning body
+
 
 public:
 	/// Default constructor
@@ -68,11 +70,13 @@ public:
 	/// \param	y			Y-position of marker
 	/// \param	z			Z-position of marker
 	///	\param	body_owner	Grid on which primary support point is to be found.
-	Marker(double x, double y, double z, GridObj const * const body_owner)
+	Marker(double x, double y, double z, int markerID, GridObj const * const body_owner)
 	{
+
 		position.push_back(x);
 		position.push_back(y);
 		position.push_back(z);
+
 
 		std::vector<int> ijk;
 		GridUtils::getEnclosingVoxel(x, y, z, body_owner, &ijk);
@@ -81,6 +85,8 @@ public:
 		supp_k.push_back(ijk[2]);
 
 		support_rank.push_back(GridUtils::safeGetRank());
+
+		id = markerID;
 	}
 
 };

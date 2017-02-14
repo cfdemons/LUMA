@@ -73,7 +73,7 @@ public:
 		bool isFlexible, bool isMovable, int group, bool plate);
 
 	// Overload base class function for adding markers with flexible flag already specified
-	void addMarker(double x, double y, double z, bool isFlexible);
+	void addMarker(double x, double y, double z, int markerID);
 
 };
 

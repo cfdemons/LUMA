@@ -49,9 +49,9 @@ protected:
 
 	// ************************ Methods ************************ //
 
-	virtual void addMarker(double x, double y, double z);			// Add a marker (can be overrriden)
+	virtual void addMarker(double x, double y, double z, int markerID);			// Add a marker (can be overrriden)
 	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
-	void passToVoxelFilter(double x, double y, double z,
+	void passToVoxelFilter(double x, double y, double z, int markerID,
 		int& curr_mark, std::vector<int>& counter);					// Voxelising marker adder
 
 private:
@@ -101,6 +101,7 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 {
 	this->_Owner = g;
 	this->id = id;
+	this->closed_surface = false;
 
 #ifdef L_BUILD_FOR_MPI
 	this->owningRank = id % MpiManager::getInstance()->num_ranks;
@@ -118,10 +119,11 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 /// \param	y global Y-position of marker.
 /// \param	z global Z-position of marker.
 template <typename MarkerType>
-void Body<MarkerType>::addMarker(double x, double y, double z)
+void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 {
+
 	// Add a new marker object to the array
-	markers.emplace_back(x, y, z, _Owner);
+	markers.emplace_back(x, y, z, markerID, _Owner);
 
 };
 
@@ -187,7 +189,7 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 /// \param curr_mark is a reference to the ID of last marker added.
 ///	\param counter is a reference to the total number of markers in the body.
 template <typename MarkerType>
-void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
+void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int markerID, int& curr_mark, std::vector<int>& counter) {
 
 	// If point in current voxel
 	if (isInVoxel(x, y, z, curr_mark)) {
@@ -234,7 +236,7 @@ void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int& curr
 		counter.push_back(1);
 
 		// Create new marker as this is a new marker voxel
-		addMarker(x, y, z);
+		addMarker(x, y, z, markerID);
 
 	}
 
@@ -326,7 +328,7 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0]);
+	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
 
 	// Increment counters
 	int curr_marker = 0;
@@ -337,7 +339,7 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	for (size_t a = 1; a < _PCpts->x.size(); a++)
 	{
 		// Pass to overridden point builder
-		passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], _PCpts->id[a], curr_marker, counter);
 	}
 
 	*GridUtils::logfile << "ObjectManager: Object represented by " << std::to_string(markers.size()) <<

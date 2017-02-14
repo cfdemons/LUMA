@@ -34,7 +34,7 @@ BFLMarker::~BFLMarker(void)
 /// \param y			y-position of marker
 /// \param z			z-position of marker
 ///	\param body_owner	Grid on which primary support is to be found.
-BFLMarker::BFLMarker(double x, double y, double z, GridObj const * const body_owner)
+BFLMarker::BFLMarker(double x, double y, double z, int markerID, GridObj const * const body_owner)
 {
 	// Add its position
 	position.push_back(x);

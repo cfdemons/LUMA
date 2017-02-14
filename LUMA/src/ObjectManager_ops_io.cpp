@@ -246,14 +246,14 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
 
         // Create file name then output file stream
         std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
+        fileName << GridUtils::path_str + "/vtk_IBout.Body" << iBody[ib].id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
 
         std::ofstream fout;
         fout.open( fileName.str().c_str() );
 
         // Add header information
         fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << ib << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
+        fout << "IB Output for body ID " << iBody[ib].id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
         fout << "ASCII\n";
         fout << "DATASET POLYDATA\n";
 
@@ -289,6 +289,143 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
     }
 }
 
+// ************************************************************************** //
+/// \brief	Read in geometry config file.
+///
+///			Input data must be in correct format as specified in documentation.
+///
+void ObjectManager::io_readInGeomConfig() {
+
+	// Open config file
+	std::ifstream file;
+	file.open("./input/geometry.config", std::ios::in);
+
+	// Handle failure to open
+	if (!file.is_open()) {
+		L_ERROR("Error opening geometry configuration file. Exiting.", GridUtils::logfile);
+	}
+
+	// Type of case (the first entry on each line is the keyword describing the body case)
+	std::string bodyCase;
+
+	// Start reading in config file
+	int bodyID = 0;
+	while(file) {
+
+		// Get type of body
+		file >> bodyCase;
+
+		// ** READ FROM FILE ** //
+		if (bodyCase == "FROM_FILE") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			std::string fileName; file >> fileName;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double startX; file >> startX;
+			double startY; file >> startY;
+			double centreZ; file >> centreZ;
+			double length; file >> length;
+			std::string direction; file >> direction;
+
+			// Get body type
+			eObjectType bodyType;
+			if (boundaryType == "BBB")
+				bodyType = eBBBCloud;
+			else if (boundaryType == "BFL")
+				bodyType = eBFLCloud;
+			else if (boundaryType == "IBM")
+				bodyType = eIBBCloud;
+
+			// Get direction
+			eCartesianDirection cartDirection;
+			if (direction == "eXDirection")
+				cartDirection = eXDirection;
+			else if (direction == "eYDirection")
+				cartDirection = eYDirection;
+			else if (direction == "eZDirection")
+				cartDirection = eZDirection;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
+
+			// Read in data from point cloud file
+			PCpts* _PCpts = NULL;
+			_PCpts = new PCpts();
+			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection);
+			delete _PCpts;
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+
+		}
+
+		// Incremement body ID and set case to none
+		bodyID++;
+		bodyCase = "NONE";
+	}
+	file.close();
+
+
+//
+//#ifdef L_IBM_ON
+//
+//	*GridUtils::logfile << "Initialising IBM Objects..." << std::endl;
+//
+//	// Build a body
+//	//		body_type == 1 is a rectangle/cuboid with rigid IBM,
+//	//		body_type == 2 is a circle/sphere with rigid IBM,
+//	//		body_type == 3 is a multi-body test case featuring both the above with rigid IBM
+//	//		body_type == 4 is a single inextensible flexible filament with Jacowire IBM
+//	//		body_type == 5 is an array of flexible filaments with Jacowire IBM
+//	//		body_type == 6 is a plate in 2D with rigid IBM
+//	//		body_type == 7 is the same as the previous case but with a Jacowire flexible flap added to the trailing edge
+//	//		body_type == 8 is a plate in 3D with rigid IBM
+//	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
+//
+//#if defined L_INSERT_RECTANGLE_CUBOID
+//	this->ibm_buildBody(1);
+//	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
+//
+//#elif defined L_INSERT_CIRCLE_SPHERE
+//	this->ibm_buildBody(2);
+//	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
+//
+//#elif defined L_INSERT_BOTH
+//	this->ibm_buildBody(3);
+//	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
+//
+//#elif defined L_INSERT_FILAMENT
+//	this->ibm_buildBody(4);
+//	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
+//
+//#elif defined L_INSERT_FILARRAY
+//	this->ibm_buildBody(5);
+//	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
+//
+//#elif defined L_2D_RIGID_PLATE_IBM
+//	this->ibm_buildBody(6);
+//	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
+//
+//#elif defined L_2D_PLATE_WITH_FLAP
+//	this->ibm_buildBody(7);
+//	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
+//
+//#elif defined L_3D_RIGID_PLATE_IBM
+//	this->ibm_buildBody(8);
+//	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
+//
+//#elif defined L_3D_PLATE_WITH_FLAP
+//	this->ibm_buildBody(9);
+//	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
+//
+//#endif
+//
+//
+//
+//
+//#endif // End IBM_ON
+
+}
+
 
 // ************************************************************************** //
 /// \brief	Read in point cloud data.
@@ -298,58 +435,19 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
 ///
 /// \param	_PCpts	pointer to empty point cloud data container.
 /// \param	objtype	type of object to be read in.
-void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
+void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName, int on_grid_lev, int on_grid_reg,
+		double body_start_x, double body_start_y, double body_centre_z, double body_length, eCartesianDirection scale_direction) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
 	int a = 0;
 
 	// Case-specific variables
-	int on_grid_lev, on_grid_reg;
-	double body_length, body_start_x, body_start_y, body_centre_z;
-	eCartesianDirection scale_direction;
 	GridObj* g = NULL;
 
 	// Open input file
 	std::ifstream file;
-	switch (objtype) {
-
-	case eBBBCloud:
-		file.open("./input/bbb_input.in", std::ios::in);
-		on_grid_lev = L_OBJECT_ON_GRID_LEV;
-		on_grid_reg = L_OBJECT_ON_GRID_REG;
-		body_length = L_OBJECT_LENGTH;
-		body_start_x = L_START_OBJECT_X;
-		body_start_y = L_START_OBJECT_Y;
-		body_centre_z = L_CENTRE_OBJECT_Z;
-		scale_direction = L_OBJECT_SCALE_DIRECTION;
-		break;
-
-	case eBFLCloud:
-		file.open("./input/bfl_input.in", std::ios::in);
-		on_grid_lev = L_BFL_ON_GRID_LEV;
-		on_grid_reg = L_BFL_ON_GRID_REG;
-		body_length = L_BFL_LENGTH;
-		body_start_x = L_START_BFL_X;
-		body_start_y = L_START_BFL_Y;
-		body_centre_z = L_CENTRE_BFL_Z;
-		scale_direction = L_BFL_SCALE_DIRECTION;
-		break;
-
-	case eIBBCloud:
-		file.open("./input/ibb_input.in", std::ios::in);
-
-		// Definitions are in phsyical units so convert to LUs
-		on_grid_lev = L_IBB_ON_GRID_LEV;
-		on_grid_reg = L_IBB_ON_GRID_REG;
-		body_length = L_IBB_LENGTH;
-		body_start_x = L_START_IBB_X;
-		body_start_y = L_START_IBB_Y;
-		body_centre_z = L_CENTRE_IBB_Z;
-		scale_direction = L_IBB_SCALE_DIRECTION;
-		break;
-
-	}
+	file.open("./input/" + fileName, std::ios::in);
 
 	// Handle failure to open
 	if (!file.is_open()) {
@@ -436,6 +534,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Shift to voxel centre not to edge
 	double shift_x = (body_start_x + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	double shift_y = (body_start_y + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	double z_start_position = body_centre_z - (scaled_body_length / 2);
@@ -453,7 +552,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	if (!_PCpts->x.empty()) {
 		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;
@@ -497,7 +596,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
 			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 			fileout << std::endl;
@@ -541,7 +640,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call BFL body builder
-			bfl_buildBody(_PCpts);
+			bfl_buildBody(_PCpts, bodyID);
 			break;
 
 		case eIBBCloud:
@@ -550,12 +649,11 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call IBM body builder
-			ibm_buildBody(_PCpts, g);
+			ibm_buildBody(_PCpts, g, bodyID);
 			break;
 
 		}
 	}
-
 }
 // *****************************************************************************
 /// \brief	Write out the forces on a solid object.

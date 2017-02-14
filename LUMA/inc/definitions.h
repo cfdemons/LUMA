@@ -181,6 +181,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_GEOMETRY_FILE					///< If define LUMA will read for geometry config file
 
 // Read in IB Body from File
 #define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file

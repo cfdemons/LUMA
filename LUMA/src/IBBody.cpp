@@ -67,9 +67,9 @@ IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
 	this->buildFromCloud(_PCpts);
 
 	// Delete any markers which are on the receiver layer as not needed for IBM
+	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
 	int a = 0;
 	do {
-
 		// If on receiver layer then delete that marker
 		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
 		{
@@ -81,7 +81,6 @@ IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
 			// Increment counter
 			a++;
 		}
-
 	} while (a < static_cast<int>(this->markers.size()));
 }
 

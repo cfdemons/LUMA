@@ -366,10 +366,10 @@ void ObjectManager::ibm_buildBody(int body_type) {
 /// \brief Wrapper for building a body from a point cloud.
 /// \param	_PCpts	pointer to point cloud data.
 /// \param	owner	pointer to the grid on which the body is to be placed.
-void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner) {
+void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner, int bodyID) {
 
 	// Add new body
-	iBody.emplace_back(owner, iBody.size(), _PCpts);
+	iBody.emplace_back(owner, bodyID, _PCpts);
 
 }
 // ************************************************************************** //

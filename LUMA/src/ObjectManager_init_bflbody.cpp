@@ -30,9 +30,9 @@ void ObjectManager::bfl_buildBody(int body_type) {
 
 /// \brief	Wrapper for building BFL body from point cloud.
 /// \param	_PCpts	pointer to point cloud data.
-void ObjectManager::bfl_buildBody(PCpts* _PCpts) {	
+void ObjectManager::bfl_buildBody(PCpts* _PCpts, int bodyID) {
 
 	// Call body constructor and pass on pointer to hierarchy
-	pBody.emplace_back(_Grids, pBody.size(), _PCpts);
+	pBody.emplace_back(_Grids, bodyID, _PCpts);
 
 }

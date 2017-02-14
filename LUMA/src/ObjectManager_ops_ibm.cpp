@@ -35,7 +35,7 @@ void ObjectManager::ibm_apply() {
 		// DEBUG -- write out support coordinates
 		std::ofstream suppout;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(iBody[ib].id) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 			suppout << "\nNEW TIME STEP" << std::endl;
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
@@ -52,7 +52,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out epsilon values
 		std::ofstream epout;
-		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		epout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			epout << iBody[ib].markers[m].epsilon << std::endl;
@@ -66,7 +66,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out interpolate velocity values
 		std::ofstream predout;
-		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		predout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			predout << iBody[ib].markers[m].fluid_vel[0] << "\t" << iBody[ib].markers[m].fluid_vel[1] << std::endl;
@@ -80,7 +80,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out Lagrange force values
 		std::ofstream forceout;
-		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		forceout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
@@ -148,7 +148,7 @@ void ObjectManager::ibm_initialise() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out marker coordinates
 		std::ofstream bodyout;
-		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out");
+		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
 		bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << "\t" << iBody[ib].markers[i].id << std::endl;
@@ -262,7 +262,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	// DEBUG -- Write out support as they are found
 	std::ofstream supportout;
 	supportout.open(GridUtils::path_str
-		+ "/IBsupport_" + std::to_string(ib)
+		+ "/IBsupport_" + std::to_string(iBody[ib].id)
 		+ "_rank" + std::to_string(rank)
 		+ ".out", std::ios::app);
 
@@ -493,7 +493,7 @@ void ObjectManager::ibm_interpol(int ib) {
 
 	// DEBUG -- write out res vector
 	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 	testout << "\nNEW TIME STEP" << std::endl;
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
@@ -562,7 +562,7 @@ void ObjectManager::ibm_spread(int ib) {
 
 	// DEBUG -- write out res vector
 	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 	testout << "\nNEW TIME STEP" << std::endl;
 	// Get size of grid
 	size_t M_lim = iBody[ib]._Owner->M_lim;
@@ -698,7 +698,7 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 	// DEBUG -- write out A
 	std::ofstream Aout;
-	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out");
+	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
 	for (size_t i = 0; i < A.size(); i++) {
 		Aout << "\n";
 		for (size_t j = 0; j < A.size(); j++) {

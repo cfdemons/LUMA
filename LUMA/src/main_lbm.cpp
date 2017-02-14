@@ -231,73 +231,13 @@ int main( int argc, char* argv[] )
 
 	// Create Object Manager
 	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
-	PCpts* _PCpts = NULL;
 	*GridUtils::logfile << "Object Manager Created." << endl;
+	
 
-#ifdef L_IBM_ON
-
-	*GridUtils::logfile << "Initialising IBM Objects..." << endl;
-
-	// Build a body
-	//		body_type == 1 is a rectangle/cuboid with rigid IBM,
-	//		body_type == 2 is a circle/sphere with rigid IBM,
-	//		body_type == 3 is a multi-body test case featuring both the above with rigid IBM
-	//		body_type == 4 is a single inextensible flexible filament with Jacowire IBM
-	//		body_type == 5 is an array of flexible filaments with Jacowire IBM
-	//		body_type == 6 is a plate in 2D with rigid IBM
-	//		body_type == 7 is the same as the previous case but with a Jacowire flexible flap added to the trailing edge
-	//		body_type == 8 is a plate in 3D with rigid IBM
-	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
-
-#if defined L_INSERT_RECTANGLE_CUBOID
-	objMan->ibm_buildBody(1);
-	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
-
-#elif defined L_INSERT_CIRCLE_SPHERE
-	objMan->ibm_buildBody(2);
-	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
-
-#elif defined L_INSERT_BOTH
-	objMan->ibm_buildBody(3);
-	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
-
-#elif defined L_INSERT_FILAMENT
-	objMan->ibm_buildBody(4);
-	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
-
-#elif defined L_INSERT_FILARRAY
-	objMan->ibm_buildBody(5);
-	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
-
-#elif defined L_2D_RIGID_PLATE_IBM
-	objMan->ibm_buildBody(6);
-	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
-
-#elif defined L_2D_PLATE_WITH_FLAP
-	objMan->ibm_buildBody(7);
-	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
-
-#elif defined L_3D_RIGID_PLATE_IBM
-	objMan->ibm_buildBody(8);
-	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
-
-#elif defined L_3D_PLATE_WITH_FLAP
-	objMan->ibm_buildBody(9);
-	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
-
-#endif
-
-#ifdef L_IBB_FROM_FILE
-
-	*GridUtils::logfile << "Initialising IB Body from File..." << endl;
-
-	// Read in data from point cloud file
-	_PCpts = new PCpts();
-	objMan->io_readInCloud(_PCpts, eIBBCloud);
-	delete _PCpts;
-	*GridUtils::logfile << "Finished creating IBB Objects..." << endl;
-
-#endif
+	// Read in the geometry config file
+#ifdef L_GEOMETRY_FILE
+	*GridUtils::logfile << "Reading geometry configuration file..." << endl;
+	objMan->io_readInGeomConfig();
 
 #if !defined L_RESTARTING
 
@@ -305,35 +245,7 @@ int main( int argc, char* argv[] )
 	objMan->ibm_initialise();
 
 #endif
-
-#endif // End IBM_ON
-
-#ifdef L_BFL_ON
-
-
-	*GridUtils::logfile << "Initialising BFL Objects from File..." << endl;
-
-	// Read in input file to arrays
-	_PCpts = new PCpts();
-	objMan->io_readInCloud(_PCpts, eBFLCloud);
-	delete _PCpts;
-	*GridUtils::logfile << "Finished creating BFL Objects..." << endl;
-	
-
 #endif
-
-#ifdef L_SOLID_FROM_FILE
-
-	*GridUtils::logfile << "Initialising Solid Objects from File..." << endl;
-
-	// Read in data from point cloud file
-	_PCpts = new PCpts();
-	objMan->io_readInCloud(_PCpts, eBBBCloud);
-	delete _PCpts;
-	*GridUtils::logfile << "Finished creating Solid Objects..." << endl;
-
-#endif
-
 
 	/*
 	****************************************************************************

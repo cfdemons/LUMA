@@ -31,7 +31,6 @@ using namespace std;
 void GridObj::LBM_init_getInletProfile() {
 
 	size_t j;
-	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
 
 #ifdef L_PARABOLIC_INLET
 
@@ -52,49 +51,53 @@ void GridObj::LBM_init_getInletProfile() {
 #else
 
 	size_t i;
-	double y, tmp;
+	double y; // , tmp;
 
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
-	// Buffer information from file
-	std::ifstream inletfile;
-	inletfile.open("./input/inlet_profile.in", std::ios::in);
-	if (!inletfile.is_open()) {
-		// Error opening file
-		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
+	std::vector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
+	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
 
-	} else {
+	//// Buffer information from file
+	//std::ifstream inletfile;
+	//inletfile.open("./input/inlet_profile.in", std::ios::in);
+	//if (!inletfile.is_open()) {
+	//	// Error opening file
+	//	L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
 
-		std::string line_in;	// String to store line
-		std::istringstream iss;	// Buffer stream
+	//} else {
 
-		while( !inletfile.eof() ) {
+	//	std::string line_in;	// String to store line
+	//	std::istringstream iss;	// Buffer stream
 
-			// Get line and put in buffer
-			std::getline(inletfile,line_in,'\n');
-			iss.str(line_in);
-			iss.seekg(0); // Reset buffer position to start of buffer
+	//	while( !inletfile.eof() ) {
 
-			// Get y position
-			iss >> tmp;
-			ybuffer.push_back(tmp);
+	//		// Get line and put in buffer
+	//		std::getline(inletfile,line_in,'\n');
+	//		iss.str(line_in);
+	//		iss.seekg(0); // Reset buffer position to start of buffer
 
-			// Get x velocity
-			iss >> tmp;
-			uxbuffer.push_back(tmp);
+	//		// Get y position
+	//		iss >> tmp;
+	//		ybuffer.push_back(tmp);
 
-			// Get y velocity
-			iss >> tmp;
-			uybuffer.push_back(tmp);
+	//		// Get x velocity
+	//		iss >> tmp;
+	//		uxbuffer.push_back(tmp);
 
-			// Get z velocity
-			iss >> tmp;
-			uzbuffer.push_back(tmp);
+	//		// Get y velocity
+	//		iss >> tmp;
+	//		uybuffer.push_back(tmp);
 
-		}
+	//		// Get z velocity
+	//		iss >> tmp;
+	//		uzbuffer.push_back(tmp);
 
-	}
+	//	}
+
+	//}
+
 
 
 	// Resize vectors

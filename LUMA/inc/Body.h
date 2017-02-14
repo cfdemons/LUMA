@@ -35,6 +35,8 @@ public:
 	virtual ~Body(void);		// Default destructor
 	Body(GridObj* g, size_t id);					// Custom constructor assigning owning grid
 	Body(GridObj* g, size_t id, PCpts* _PCpts);		// Custom constructor to build from point cloud data
+	Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+			double length, std::vector<double> &angles);	// Custom constructor to build filament
 
 	// ************************ Members ************************ //
 
@@ -111,6 +113,67 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
+};
+
+/// \brief Custom constructor to call method to build filament.
+///
+/// \param g pointer to grid which owns this body.
+/// \param id indicates unique number of body in array of bodies.
+/// \param _PCpts pointer to point cloud data.
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+		double length, std::vector<double> &angles)
+{
+
+	// Set body properties
+	this->_Owner = g;
+	this->id = bodyID;
+	this->closed_surface = false;
+
+#ifdef L_BUILD_FOR_MPI
+	this->owningRank = id % MpiManager::getInstance()->num_ranks;
+#else
+	this->owningRank = 0;
+#endif
+
+	// Get angles
+	double body_angle_v = angles[0];
+#if (L_DIM == 3)
+	double body_angle_h = angles[1];
+#else
+	double body_angle_h = 0.0;
+#endif
+
+	// Compute spacing
+	int numMarkers = floor(length / g->dh) + 1;
+	spacing = length / (numMarkers - 1);							// Physical spacing between markers
+	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
+
+	// Add all markers
+	for (int i = 0; i < numMarkers; i++) {
+		addMarker(	start_position[0] + i * spacing_h * cos(body_angle_h * L_PI / 180.0),
+					start_position[1] + i * spacing * sin(body_angle_v * L_PI / 180.0),
+					start_position[2] + i * spacing_h * sin(body_angle_h * L_PI / 180.0),
+					i);
+	}
+
+	// After adding all markers get rid the ones that don't exist on this rank
+	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+	eLocationOnRank loc = eNone;
+	int a = 0;
+	do {
+		// If not on rank then delete that marker
+		if (!GridUtils::isOnThisRank(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection], &loc, g))
+		{
+			this->markers.erase(this->markers.begin() + a);
+		}
+		// If it is, keep and move onto next one
+		else {
+
+			// Increment counter
+			a++;
+		}
+	} while (a < static_cast<int>(this->markers.size()));
 };
 
 

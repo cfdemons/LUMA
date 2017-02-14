@@ -36,6 +36,7 @@ public:
 	/// Array of indices indicating on which rank the given support point resides
 	std::vector<int> support_rank;
 
+	// Marker ID within body (needed for building structural matrices)
 	int id;						///< ID of marker within its owning body
 
 
@@ -53,6 +54,7 @@ public:
 
 		support_rank.push_back(GridUtils::safeGetRank());
 
+		id = 0;
 	};
 
 	/// Default destructor

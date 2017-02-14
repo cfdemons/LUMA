@@ -36,6 +36,8 @@ public:
 	~IBBody(void);
 	IBBody(GridObj* g, size_t id);
 	IBBody(GridObj* g, size_t id, PCpts* _PCpts);
+	IBBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
 
 protected:
 
@@ -43,13 +45,6 @@ protected:
 
 	bool isFlexible;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool isMovable;						///< Flag to indicate if body is movable or not.
-	int groupID;						///< ID of IBbody group -- position updates can be driven from a flexible body in a group
-
-	// Flexible body properties
-	double delta_rho;					///< Difference in density between fluid and solid in lattice units
-	double flexural_rigidity;			///< Young's modulus E * Second moment of area I
-	std::vector<double> tension;		///< Tension between the current marker and its neighbour
-	std::vector<int> BCs;				///< BCs type flags (flexible bodies)
 
 
 	/************** Member Methods **************/
@@ -71,9 +66,6 @@ public:
 	// Method to construct a 3D plate
 	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
 		bool isFlexible, bool isMovable, int group, bool plate);
-
-	// Overload base class function for adding markers with flexible flag already specified
-	void addMarker(double x, double y, double z, int markerID);
 
 };
 

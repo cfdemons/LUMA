@@ -141,4 +141,12 @@ enum eHdf5SlabType {
 	ePosZ			///< 1D data	-- Single L_dim vector per dimension
 };
 
+/// \enum  eMoveableType
+/// \brief Specifies the whether body is movable, flexible or rigid.
+enum eMoveableType {
+	eFlexible,	///< Bounce-back body
+	eMovable,	///< BFL body
+	eRigid	///< Immersed boundary body
+};
+
 #endif

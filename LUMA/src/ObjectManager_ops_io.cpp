@@ -329,6 +329,9 @@ void ObjectManager::io_readInGeomConfig() {
 			double length; file >> length;
 			std::string direction; file >> direction;
 
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
+
+
 			// Get body type
 			eObjectType bodyType;
 			if (boundaryType == "BBB")
@@ -347,18 +350,80 @@ void ObjectManager::io_readInGeomConfig() {
 			else if (direction == "eZDirection")
 				cartDirection = eZDirection;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
-
 			// Read in data from point cloud file
 			PCpts* _PCpts = NULL;
 			_PCpts = new PCpts();
 			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection);
 			delete _PCpts;
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
-
 		}
 
-		// Incremement body ID and set case to none
+		// ** INSERT FILAMENT ** //
+		else if (bodyCase == "FILAMENT") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double startX; file >> startX;
+			double startY; file >> startY;
+			double startZ; file >> startZ;
+			double length; file >> length;
+			double angleVert; file >> angleVert;
+			double angleHorz; file >> angleHorz;
+			std::string flex_rigid; file >> flex_rigid;
+			std::string BC; file >> BC;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+
+			// Sort data
+			std::vector<double> start_position, angles;
+			start_position.push_back(startX);
+			start_position.push_back(startY);
+			start_position.push_back(startZ);
+			angles.push_back(angleVert);
+			angles.push_back(angleHorz);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				moveProperty = eFlexible;
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get fixed BC
+			bool clamped;
+			if (BC == "CLAMPED")
+				clamped = true;
+			else if (BC == "SUPPORTED")
+				clamped = false;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, bodyID, lev, reg, start_position, length, angles, moveProperty, clamped);
+
+					// If no markers then get rid of the body
+					if (iBody.back().markers.size() == 0)
+						iBody.erase(iBody.end());
+				}
+				else if (boundaryType == "BFL") {
+					std::cout << "BFL" << std::endl;
+//					pBody.emplace_back(bodyID, lev, reg, start_position, length, angles);
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
+		// Increment body ID and set case to none
 		bodyID++;
 		bodyCase = "NONE";
 	}

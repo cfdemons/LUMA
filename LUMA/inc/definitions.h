@@ -88,13 +88,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Gravity
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 0.0//0.9149347
+#define L_GRAVITY_FORCE 0.9149347
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 100				///< Frequency of write out of restart file
 
@@ -133,13 +133,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 31		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 1		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 1.68574402E-04		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX (2 + 2/static_cast<double>(L_RESOLUTION))		///< Size of domain in X including boundary cells (non-dimensional units)
-#define L_BY (2 + 2/static_cast<double>(L_RESOLUTION))		///< Size of domain in Y including boundary cells (non-dimensional units)
-#define L_BZ (2 + 2/static_cast<double>(L_RESOLUTION))		///< Size of domain in Z including boundary cells (non-dimensional units)
+#define L_BX 4		///< Size of domain in X including boundary cells (non-dimensional units)
+#define L_BY 3		///< Size of domain in Y including boundary cells (non-dimensional units)
+#define L_BZ 4		///< Size of domain in Z including boundary cells (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]

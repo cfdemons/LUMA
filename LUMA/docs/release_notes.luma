@@ -8,7 +8,8 @@ General		:	Wholesale changes to coordinate systems and hence changes in the init
 				IBBody constructor for PC added to move away from the "make_body()" wrappers which are messy.
 				Created new Enumerations header and added more headers to the stdafx.h header.
 				Extended the error function to create an info function as well for more consistent logging.
-				User input except L_RHOIN is now expected in dimensionless units
+				User input except L_RHOIN is now expected in dimensionless units.
+				Documentation moved to VM @ 130.88.97.222.
 
 Issue #5    :   User input except L_RHOIN is now expected in dimensionless units. L_RHOIN is expected in LBM units. 
 				NOTE: The simulation time and the interval at which the results are written is still in number of time steps (i.e. in LBM units)   				

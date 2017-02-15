@@ -69,9 +69,9 @@ protected:
 
 /// Default Constructor
 template <typename MarkerType>
-Body<MarkerType>::Body(void)
+Body<MarkerType>::Body(void) 
+	: _Owner(nullptr)
 {
-	this->_Owner = nullptr;
 };
 /// Default destructor
 template <typename MarkerType>
@@ -84,10 +84,9 @@ Body<MarkerType>::~Body(void)
 /// \param g pointer to grid which owns this body.
 /// \param id indicates unique number of body in array of bodies.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t id)
+Body<MarkerType>::Body(GridObj* g, size_t id) 
+	: _Owner(g), id(id)
 {
-	this->_Owner = g;
-	this->id = id;
 };
 
 
@@ -98,10 +97,8 @@ Body<MarkerType>::Body(GridObj* g, size_t id)
 /// \param _PCpts pointer to point cloud data.
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
+	: _Owner(g), id(id)
 {
-	this->_Owner = g;
-	this->id = id;
-
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
 };

@@ -59,47 +59,6 @@ void GridObj::LBM_init_getInletProfile() {
 	std::vector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
 	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
 
-	//// Buffer information from file
-	//std::ifstream inletfile;
-	//inletfile.open("./input/inlet_profile.in", std::ios::in);
-	//if (!inletfile.is_open()) {
-	//	// Error opening file
-	//	L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
-
-	//} else {
-
-	//	std::string line_in;	// String to store line
-	//	std::istringstream iss;	// Buffer stream
-
-	//	while( !inletfile.eof() ) {
-
-	//		// Get line and put in buffer
-	//		std::getline(inletfile,line_in,'\n');
-	//		iss.str(line_in);
-	//		iss.seekg(0); // Reset buffer position to start of buffer
-
-	//		// Get y position
-	//		iss >> tmp;
-	//		ybuffer.push_back(tmp);
-
-	//		// Get x velocity
-	//		iss >> tmp;
-	//		uxbuffer.push_back(tmp);
-
-	//		// Get y velocity
-	//		iss >> tmp;
-	//		uybuffer.push_back(tmp);
-
-	//		// Get z velocity
-	//		iss >> tmp;
-	//		uzbuffer.push_back(tmp);
-
-	//	}
-
-	//}
-
-
-
 	// Resize vectors
 	ux_in.resize(M_lim);
 	uy_in.resize(M_lim);
@@ -179,10 +138,9 @@ void GridObj::LBM_init_getInletProfile() {
 void GridObj::LBM_initVelocity ( ) {
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
-	//Create vectors to store the data in the file
-	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
+	*GridUtils::logfile << "Loading initial velocity..." << std::endl;
 
-	//Read the data from the input file
+	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
 	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
 
 	//Check that the data in the file has the same number of points as the current grid. 

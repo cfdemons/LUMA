@@ -305,6 +305,23 @@ void ObjectManager::io_readInGeomConfig() {
 		L_ERROR("Error opening geometry configuration file. Exiting.", GridUtils::logfile);
 	}
 
+	// Skip comment lines in config file
+	int fileOffset;
+	std::string line;
+	file.seekg(std::ios::beg);
+	do {
+
+		// Get the current position within the file
+		fileOffset = file.tellg();
+
+		// Get the whole line
+		getline(file, line);
+
+	} while (line[0] == '#');
+
+	// Reset file position to the start of the last read line
+	file.seekg(fileOffset, std::ios::beg);
+
 	// Type of case (the first entry on each line is the keyword describing the body case)
 	std::string bodyCase;
 

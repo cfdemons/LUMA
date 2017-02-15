@@ -191,30 +191,21 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 
 	// Following code for point generation on unit sphere actually seeds
 	// using Fibonacci sphere technique. Code is not my own but works.
+	int numMarkers = floor(4.0 * L_PI * pow(radius, 2.0) / pow(g->dh, 2.0));
 	double inc = L_PI * (3 - sqrt(5));
-	double off = 2.0 / (float)L_NUM_MARKERS ;
-	for (int k = 0; k < L_NUM_MARKERS; k++) {
+	double off = 2.0 / (float)numMarkers ;
+	for (int k = 0; k < numMarkers; k++) {
 		double y = k * off - 1 + (off / 2);
 		double r = sqrt(1 - y*y);
 		double phi = k * inc;
 
 		// Add Lagrange marker to body (scale by radius)
-		addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), isFlexible);
+		addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), k);
 	}
-
-	// Spacing (assuming all Lagrange markers are uniformly spaced)
-	std::vector<double> diff;
-	for (int d = 0; d < L_DIMS; d++) {
-		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
-	}
-	spacing = GridUtils::vecnorm( diff );
-
-
-
 #else
 
 	// Build circle (2D)
-	double numMarkers = 2.0 * L_PI * radius / g->dh;
+	int numMarkers = floor(2.0 * L_PI * radius / g->dh);
 	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
@@ -224,6 +215,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 					centre[2],
 					i );
 	}
+#endif
 
 	// Spacing
 	std::vector<double> diff;
@@ -231,7 +223,6 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
-#endif
 
 	// Delete markers which exist off rank
 	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;

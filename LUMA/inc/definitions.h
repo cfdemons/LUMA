@@ -95,6 +95,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 100				///< Frequency of write out of restart file
 

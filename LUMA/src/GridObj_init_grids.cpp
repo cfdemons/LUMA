@@ -178,6 +178,20 @@ void GridObj::LBM_init_getInletProfile() {
 ///			file.
 void GridObj::LBM_initVelocity ( ) {
 
+#ifdef L_INIT_VELOCITY_FROM_FILE
+	//Create vectors to store the data in the file
+	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
+
+	//Read the data from the input file
+	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
+
+	//Check that the data in the file has the same number of points as the current grid. 
+	//The initial velocity data is copied directly to the cells,not interpolated, so the number of points has to match the number of cells.
+	if (x_coord.size() != (N_lim*M_lim*K_lim)) {
+		L_ERROR("The number of points in the initial velocity file does not match the number of cells in the LBM grid -- change L_BX/L_BY/L_BZ/L_RESOLUTION or change the file initial_velocity.in. Exiting.",
+			GridUtils::logfile);
+	}
+#endif
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {

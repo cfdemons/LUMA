@@ -157,13 +157,13 @@ void GridObj::LBM_initVelocity ( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 #ifdef L_INIT_VELOCITY_FROM_FILE
-				u(i, j, k, 0, M_lim, K_lim, L_DIMS) = ux(i,j,k,M_lim,K_lim);
-				u(i, j, k, 1, M_lim, K_lim, L_DIMS) = uy(i,j,k,M_lim,K_lim);
+				u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(ux(i,j,k,M_lim,K_lim),this);
+				u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uy(i,j,k,M_lim,K_lim),this);
 #if (L_DIMS == 3)
-				u(i, j, k, 2, M_lim, K_lim, L_DIMS) = uz(i,j,k,M_lim,K_lim);
+				u(i, j, k, 2, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uz(i,j,k,M_lim,K_lim),this);
 #endif
 
-#elif L_NO_FLOW				
+#elif defined L_NO_FLOW				
 				for (size_t d = 0; d < L_DIMS; d++) {
 
 					// No flow case

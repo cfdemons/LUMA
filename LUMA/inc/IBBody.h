@@ -34,9 +34,9 @@ public:
 	// Constructor and destructor
 	IBBody(void);
 	~IBBody(void);
-	IBBody(GridObj* g, size_t id);
-	IBBody(GridObj* g, size_t id, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
-	IBBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
+	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);
+	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
 		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
 
 protected:

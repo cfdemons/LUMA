@@ -34,8 +34,9 @@ public:
 	BFLBody(void);
 	~BFLBody(void);
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
-	BFLBody(GridObj *g, size_t id, PCpts *_PCpts);
-	BFLBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+	BFLBody(GridObj *g, int bodyID, PCpts *_PCpts);
+	BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,	double radius);
+	BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
 		double length, std::vector<double> &angles);
 
 protected:

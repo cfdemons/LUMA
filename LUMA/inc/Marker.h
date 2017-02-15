@@ -39,6 +39,9 @@ public:
 	// Marker ID within body (needed for building structural matrices)
 	int id;						///< ID of marker within its owning body
 
+	// Marker ID within body (needed for building structural matrices)
+	double ds;						///< Spacing between this marker and neighbours (can't set in constructor)
+
 
 public:
 	/// Default constructor
@@ -57,6 +60,7 @@ public:
 		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
 		id = 0;
+		ds = 0.0;
 	};
 
 	/// Default destructor
@@ -93,6 +97,7 @@ public:
 		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
 		id = markerID;
+		ds = 0.0;
 	}
 };
 

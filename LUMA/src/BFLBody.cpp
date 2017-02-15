@@ -38,7 +38,7 @@ BFLBody::~BFLBody(void)
 /// \param g_hierarchy pointer to grid hierarchy
 /// \param id	ID of body in array of bodies.
 /// \param _PCpts pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, size_t id, PCpts* _PCpts) : Body(g, id, _PCpts)
+BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) : Body(g, bodyID, _PCpts)
 {
 
 #ifdef L_BFL_DEBUG
@@ -117,8 +117,88 @@ BFLBody::BFLBody(GridObj* g, size_t id, PCpts* _PCpts) : Body(g, id, _PCpts)
 /// \param g_hierarchy pointer to grid hierarchy
 /// \param id	ID of body in array of bodies.
 /// \param _PCpts pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
 		double length, std::vector<double> &angles) : Body(g, bodyID, lev, reg, start_position, length, angles)
+{
+
+#ifdef L_BFL_DEBUG
+	std::ofstream file;
+	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
+	file.precision(L_OUTPUT_PRECISION);
+	for (size_t n = 0; n < markers.size(); n++) {
+		file << std::to_string(n) << ", " <<
+			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
+			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
+}
+	file.close();
+#endif
+
+	// Labelling //
+	*GridUtils::logfile << "ObjectManagerBFL: Labelling lattice voxels..." << std::endl;
+
+	int N_lim = _Owner->N_lim;
+	int M_lim = _Owner->M_lim;
+	int K_lim = _Owner->K_lim;
+
+	// Get each marker in turn
+	for (Marker& m : markers) {
+
+		// Label as BFL site
+		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
+	}
+
+
+	// Compute Q //
+	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
+
+	// Initialise Q stores to the "invalid" value
+	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> (
+		markers.size(), -1.0 ) );
+
+	// Loop over local grid and inspect the streaming operations
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {
+			for (int k = 0; k < K_lim; k++) {
+
+				// If site is a BFL voxel
+				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
+
+					// Compute Q for all stream vectors storing on source voxel BFL marker
+#if (L_DIMS == 3)
+					computeQ(i,j,k,_Owner);
+#else
+					computeQ(i,j,_Owner);
+#endif
+
+				}
+			}
+		}
+	}
+
+	// Computation of Q complete
+	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
+
+#ifdef L_BFL_DEBUG
+	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
+	file.precision(L_OUTPUT_PRECISION);
+	for (std::vector<double> i : Q) {
+		for (size_t n = 0; n < markers.size(); n++) {
+			file << i[n] << '\t';
+		}
+		file << std::endl;
+	}
+	file.close();
+#endif
+}
+
+
+/*********************************************/
+/// \brief Custom constructor to create a circle or sphere.
+/// \param g_hierarchy pointer to grid hierarchy
+/// \param id	ID of body in array of bodies.
+/// \param _PCpts pointer to point cloud data
+BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+		double radius) : Body(g, bodyID, lev, reg, centre_point, radius)
 {
 
 #ifdef L_BFL_DEBUG

@@ -33,16 +33,17 @@ public:
 
 	Body(void);					// Default Constructor
 	virtual ~Body(void);		// Default destructor
-	Body(GridObj* g, size_t id, PCpts* _PCpts);					// Custom constructor to build from point cloud data
-	Body(GridObj* g, size_t bodyID, int lev,
+	Body(GridObj* g, int bodyID, PCpts* _PCpts);									// Custom constructor to build from point cloud data
+	Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius);
+	Body(GridObj* g, int bodyID, int lev,
 			int reg, std::vector<double> &start_position,
-			double length, std::vector<double> &angles);		// Custom constructor to build filament
+			double length, std::vector<double> &angles);						// Custom constructor to build filament
 
 	// ************************ Members ************************ //
 
 protected:
 	GridObj* _Owner;					///< Pointer to owning grid
-	size_t id;							///< Unique ID of the body
+	int id;								///< Unique ID of the body
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
@@ -91,11 +92,11 @@ Body<MarkerType>::~Body(void)
 /// \param id indicates unique number of body in array of bodies.
 /// \param _PCpts pointer to point cloud data.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
+Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 {
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
-	this->id = id;
+	this->id = bodyID;
 	this->closed_surface = false;
 
 	// Set the rank which owns this body
@@ -118,13 +119,13 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 /// \param id indicates unique number of body in array of bodies.
 /// \param _PCpts pointer to point cloud data.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg,
+Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 		std::vector<double> &start_position, double length, std::vector<double> &angles)
 {
 
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
-	this->id = id;
+	this->id = bodyID;
 	this->closed_surface = false;
 
 	// Set the rank which owns this body
@@ -154,6 +155,83 @@ Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg,
 					start_position[2] + i * spacing_h * sin(body_angle_h * L_PI / 180.0),
 					i);
 	}
+
+	// Delete markers which exist off rank
+	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+	deleteOffRankMarkers();
+};
+
+
+/// \brief Custom constructor to call method to build filament.
+///
+/// \param g pointer to grid which owns this body.
+/// \param id indicates unique number of body in array of bodies.
+/// \param _PCpts pointer to point cloud data.
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
+		std::vector<double> &centre, double radius)
+{
+
+	// Set the body base class parameters from constructor inputs
+	this->_Owner = g;
+	this->id = bodyID;
+	this->closed_surface = false;
+
+	// Set the rank which owns this body
+#ifdef L_BUILD_FOR_MPI
+	this->owningRank = id % MpiManager::getInstance()->num_ranks;
+#else
+	this->owningRank = 0;
+#endif
+
+	// Build sphere (3D)
+#if (L_DIMS == 3)	// TODO Sort out 3D sphere builder
+
+	// Sphere //
+
+	// Following code for point generation on unit sphere actually seeds
+	// using Fibonacci sphere technique. Code is not my own but works.
+	double inc = L_PI * (3 - sqrt(5));
+	double off = 2.0 / (float)L_NUM_MARKERS ;
+	for (int k = 0; k < L_NUM_MARKERS; k++) {
+		double y = k * off - 1 + (off / 2);
+		double r = sqrt(1 - y*y);
+		double phi = k * inc;
+
+		// Add Lagrange marker to body (scale by radius)
+		addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), isFlexible);
+	}
+
+	// Spacing (assuming all Lagrange markers are uniformly spaced)
+	std::vector<double> diff;
+	for (int d = 0; d < L_DIMS; d++) {
+		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
+	}
+	spacing = GridUtils::vecnorm( diff );
+
+
+
+#else
+
+	// Build circle (2D)
+	double numMarkers = 2.0 * L_PI * radius / g->dh;
+	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
+	for (size_t i = 0; i < theta.size(); i++) {
+
+		// Add Lagrange marker to body
+		addMarker(	centre[0] + radius * cos(theta[i]),
+					centre[1] + radius * sin(theta[i]),
+					centre[2],
+					i );
+	}
+
+	// Spacing
+	std::vector<double> diff;
+	for (int d = 0; d < L_DIMS; d++) {
+		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
+	}
+	spacing = GridUtils::vecnorm( diff );
+#endif
 
 	// Delete markers which exist off rank
 	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;

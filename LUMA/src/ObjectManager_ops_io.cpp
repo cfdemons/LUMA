@@ -443,6 +443,62 @@ void ObjectManager::io_readInGeomConfig() {
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}
 
+		// ** INSERT CIRCLE/SPHERE ** //
+		else if (bodyCase == "CIRCLE_SPHERE") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double centreX; file >> centreX;
+			double centreY; file >> centreY;
+			double centreZ; file >> centreZ;
+			double radius; file >> radius;
+			std::string flex_rigid; file >> flex_rigid;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+
+			// Sort data
+			std::vector<double> centre_point, angles;
+			centre_point.push_back(centreX);
+			centre_point.push_back(centreY);
+			centre_point.push_back(centreZ);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, bodyID, lev, reg, centre_point, radius, moveProperty);
+
+					// If no markers then get rid of the body
+					if (iBody.back().markers.size() == 0)
+						iBody.erase(iBody.end());
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, bodyID, lev, reg, centre_point, radius);
+
+					// If no markers then get rid of the body
+					if (pBody.back().markers.size() == 0)
+						pBody.erase(pBody.end());
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
 		// Increment body ID and set case to none
 		bodyID++;
 		bodyCase = "NONE";

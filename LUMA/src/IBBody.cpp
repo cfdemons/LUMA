@@ -30,17 +30,7 @@ IBBody::IBBody()
 	this->id = 0;
 }
 
-/// \brief	Constructor which assigns the owner grid.
-///
-///			Also sets the group ID to zero.
-///
-/// \param g	pointer to owner grid
-/// \param id	ID of body in array of bodies.
-IBBody::IBBody(GridObj* g, size_t id)
-{
-	this->_Owner = g;
-	this->id = id;
-};
+
 
 // ***************************************************************************************************
 /// \brief	Constructor to build a body in place using a point cloud,
@@ -50,7 +40,7 @@ IBBody::IBBody(GridObj* g, size_t id)
 /// \param g		pointer to owner grid
 /// \param id		ID of body in array of bodies.
 /// \param _PCpts	pointer to point cloud data.
-IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts, eMoveableType moveProperty, bool clamped) : Body(g, id, _PCpts)
+IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped) : Body(g, bodyID, _PCpts)
 {
 
 	// Set movable and flexible parameters
@@ -81,8 +71,41 @@ IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts, eMoveableType moveProperty,
 /// \param g		pointer to owner grid
 /// \param id		ID of body in array of bodies.
 /// \param _PCpts	pointer to point cloud data.
-IBBody::IBBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+IBBody::IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
 		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped) : Body(g, bodyID, lev, reg, start_position, length, angles)
+{
+
+	// Set movable and flexible parameters
+	if (moveProperty == eFlexible) {
+		this->isFlexible = true;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eMovable) {
+		this->isFlexible = false;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eRigid) {
+		this->isFlexible = false;
+		this->isMovable = false;
+	}
+
+	// Delete any markers which are on the receiver layer as not needed for IBM
+	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
+	deleteRecvLayerMarkers();
+
+}
+
+
+// ***************************************************************************************************
+/// \brief	Constructor to build a circle or sphere,
+///
+///			isFlexible and isMovable properties taken from definitions.
+///
+/// \param g		pointer to owner grid
+/// \param id		ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data.
+IBBody::IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+		double radius, eMoveableType moveProperty) : Body(g, bodyID, lev, reg, centre_point, radius)
 {
 
 	// Set movable and flexible parameters

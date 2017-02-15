@@ -75,8 +75,6 @@ public:
 
 	// IBM methods //
 	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
-	void ibm_buildBody(int body_type);		// Build a new pre-fab IBM body
-	void ibm_buildBody(PCpts* _PCpts, GridObj *owner, int bodyID);		// Overloaded build-body to build from point cloud
 	void ibm_initialise();					// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
 	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
@@ -102,11 +100,6 @@ public:
 	void ibm_bandec(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double *d);
 
-
-	// BFL methods //
-	void bfl_buildBody(int body_type);		// Build a new pre-fab bounce-back body
-	void bfl_buildBody(PCpts* _PCpts, int bodyID);		// Overload to build from point cloud data
-
 	// Force calculation
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
@@ -117,7 +110,7 @@ public:
 	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName,
 			int on_grid_lev, int on_grid_reg, double body_start_x, double body_start_y,
-			double body_centre_z, double body_length, eCartesianDirection scale_direction);	// Method to read in Point Cloud data
+			double body_centre_z, double body_length, eCartesianDirection scale_direction, eMoveableType moveProperty, bool clamped);	// Method to read in Point Cloud data
 	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
 	void io_readInGeomConfig();		// Read in geometry configuration file
 };

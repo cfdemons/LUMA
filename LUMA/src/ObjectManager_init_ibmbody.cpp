@@ -20,10 +20,10 @@
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
 
-// ************************************************************************** //
-/// \brief Builds a prefab immersed boundary body.
-/// \param	body_type	type of body to be built.
-void ObjectManager::ibm_buildBody(int body_type) {
+//// ************************************************************************** //
+///// \brief Builds a prefab immersed boundary body.
+///// \param	body_type	type of body to be built.
+//void ObjectManager::ibm_buildBody(int body_type) {
 
 //	// Declarations
 //	std::vector<double> dimensions, centrepoint, start_position, end_position;
@@ -361,15 +361,5 @@ void ObjectManager::ibm_buildBody(int body_type) {
 //
 //	}
 
-}
-// ************************************************************************** //
-/// \brief Wrapper for building a body from a point cloud.
-/// \param	_PCpts	pointer to point cloud data.
-/// \param	owner	pointer to the grid on which the body is to be placed.
-void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner, int bodyID) {
-
-	// Add new body
-	iBody.emplace_back(owner, bodyID, _PCpts);
-
-}
+//}
 // ************************************************************************** //

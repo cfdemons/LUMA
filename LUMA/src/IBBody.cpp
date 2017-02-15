@@ -50,35 +50,26 @@ IBBody::IBBody(GridObj* g, size_t id)
 /// \param g		pointer to owner grid
 /// \param id		ID of body in array of bodies.
 /// \param _PCpts	pointer to point cloud data.
-IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
+IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts, eMoveableType moveProperty, bool clamped) : Body(g, id, _PCpts)
 {
 
-	// Set some default body properties
-	this->isMovable = L_IBB_MOVABLE;
-	this->isFlexible = L_IBB_FLEXIBLE;
-	this->closed_surface = false;
-	this->_Owner = g;
-	this->id = id;
-
-	// Call inherited method to build from point cloud
-	this->buildFromCloud(_PCpts);
+	// Set movable and flexible parameters
+	if (moveProperty == eFlexible) {
+		this->isFlexible = true;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eMovable) {
+		this->isFlexible = false;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eRigid) {
+		this->isFlexible = false;
+		this->isMovable = false;
+	}
 
 	// Delete any markers which are on the receiver layer as not needed for IBM
 	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	int a = 0;
-	do {
-		// If on receiver layer then delete that marker
-		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
-		{
-			this->markers.erase(this->markers.begin() + a);
-		}
-		// If not, keep and move onto next one
-		else {
-
-			// Increment counter
-			a++;
-		}
-	} while (a < static_cast<int>(this->markers.size()));
+	deleteRecvLayerMarkers();
 }
 
 
@@ -110,20 +101,8 @@ IBBody::IBBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> 
 
 	// Delete any markers which are on the receiver layer as not needed for IBM
 	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	int a = 0;
-	do {
-		// If on receiver layer then delete that marker
-		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
-		{
-			this->markers.erase(this->markers.begin() + a);
-		}
-		// If not, keep and move onto next one
-		else {
+	deleteRecvLayerMarkers();
 
-			// Increment counter
-			a++;
-		}
-	} while (a < static_cast<int>(this->markers.size()));
 }
 
 /// Default destructor

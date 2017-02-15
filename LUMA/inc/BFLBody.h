@@ -26,7 +26,7 @@ class PCpts;
 class BFLBody :
 	public Body<BFLMarker>
 {
-
+	friend class ObjectManager;
 	friend class GridObj;
 
 public:
@@ -35,6 +35,8 @@ public:
 	~BFLBody(void);
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
 	BFLBody(GridObj *g, size_t id, PCpts *_PCpts);
+	BFLBody(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
+		double length, std::vector<double> &angles);
 
 protected:
 

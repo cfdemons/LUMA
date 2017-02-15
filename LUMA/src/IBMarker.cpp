@@ -21,6 +21,7 @@
 /// \param xPos			x-position of marker.
 /// \param yPos			y-position of marker.
 /// \param zPos			z-position of marker.
+/// \param markerID		ID of marker within body
 ///	\param body_owner	Grid on which primary support point is to be found
 IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj const * const body_owner) : Marker(xPos, yPos, zPos, markerID, body_owner) {
 

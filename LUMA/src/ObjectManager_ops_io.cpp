@@ -328,9 +328,10 @@ void ObjectManager::io_readInGeomConfig() {
 			double centreZ; file >> centreZ;
 			double length; file >> length;
 			std::string direction; file >> direction;
+			std::string flex_rigid; file >> flex_rigid;
+			std::string BC; file >> BC;
 
 			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
-
 
 			// Get body type
 			eObjectType bodyType;
@@ -350,10 +351,26 @@ void ObjectManager::io_readInGeomConfig() {
 			else if (direction == "eZDirection")
 				cartDirection = eZDirection;
 
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				moveProperty = eFlexible;
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get fixed BC
+			bool clamped;
+			if (BC == "CLAMPED")
+				clamped = true;
+			else if (BC == "SUPPORTED")
+				clamped = false;
+
 			// Read in data from point cloud file
 			PCpts* _PCpts = NULL;
 			_PCpts = new PCpts();
-			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection);
+			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection, moveProperty, clamped);
 			delete _PCpts;
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}
@@ -416,8 +433,11 @@ void ObjectManager::io_readInGeomConfig() {
 						iBody.erase(iBody.end());
 				}
 				else if (boundaryType == "BFL") {
-					std::cout << "BFL" << std::endl;
-//					pBody.emplace_back(bodyID, lev, reg, start_position, length, angles);
+					pBody.emplace_back(g, bodyID, lev, reg, start_position, length, angles);
+
+					// If no markers then get rid of the body
+					if (pBody.back().markers.size() == 0)
+						pBody.erase(pBody.end());
 				}
 			}
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
@@ -501,7 +521,7 @@ void ObjectManager::io_readInGeomConfig() {
 /// \param	_PCpts	pointer to empty point cloud data container.
 /// \param	objtype	type of object to be read in.
 void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName, int on_grid_lev, int on_grid_reg,
-		double body_start_x, double body_start_y, double body_centre_z, double body_length, eCartesianDirection scale_direction) {
+		double body_start_x, double body_start_y, double body_centre_z, double body_length, eCartesianDirection scale_direction, eMoveableType moveProperty, bool clamped) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
@@ -704,8 +724,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
-			// Call BFL body builder
-			bfl_buildBody(_PCpts, bodyID);
+			// Call constructor to build BFL body
+			pBody.emplace_back(g, bodyID, _PCpts);
 			break;
 
 		case eIBBCloud:
@@ -713,8 +733,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 #ifdef L_CLOUD_DEBUG
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
-			// Call IBM body builder
-			ibm_buildBody(_PCpts, g, bodyID);
+			// Call constructor to build IBM body
+			iBody.emplace_back(g, bodyID, _PCpts, moveProperty, clamped);
 			break;
 
 		}

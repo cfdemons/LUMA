@@ -44,16 +44,18 @@ public:
 	/// Default constructor
 	Marker(void)
 	{
+		// Set marker position to zero by default
 		position.push_back(0.0);
 		position.push_back(0.0);
 		position.push_back(0.0);
 
+		// Set the i, j, and k for the closest voxel to zero
 		supp_i.push_back(0);
 		supp_j.push_back(0);
 		supp_k.push_back(0);
 
+		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
-
 		id = 0;
 	};
 
@@ -71,26 +73,27 @@ public:
 	/// \param	x			X-position of marker
 	/// \param	y			Y-position of marker
 	/// \param	z			Z-position of marker
+	/// \param markerID		ID of marker within body
 	///	\param	body_owner	Grid on which primary support point is to be found.
 	Marker(double x, double y, double z, int markerID, GridObj const * const body_owner)
 	{
 
+		// Set marker position
 		position.push_back(x);
 		position.push_back(y);
 		position.push_back(z);
 
-
+		// Get the i, j, and k for the closest voxel to markers
 		std::vector<int> ijk;
 		GridUtils::getEnclosingVoxel(x, y, z, body_owner, &ijk);
 		supp_i.push_back(ijk[0]);
 		supp_j.push_back(ijk[1]);
 		supp_k.push_back(ijk[2]);
 
+		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
-
 		id = markerID;
 	}
-
 };
 
 #endif

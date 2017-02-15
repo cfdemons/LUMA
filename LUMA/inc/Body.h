@@ -33,35 +33,38 @@ public:
 
 	Body(void);					// Default Constructor
 	virtual ~Body(void);		// Default destructor
-	Body(GridObj* g, size_t id);					// Custom constructor assigning owning grid
-	Body(GridObj* g, size_t id, PCpts* _PCpts);		// Custom constructor to build from point cloud data
-	Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
-			double length, std::vector<double> &angles);	// Custom constructor to build filament
+	Body(GridObj* g, size_t id, PCpts* _PCpts);					// Custom constructor to build from point cloud data
+	Body(GridObj* g, size_t bodyID, int lev,
+			int reg, std::vector<double> &start_position,
+			double length, std::vector<double> &angles);		// Custom constructor to build filament
 
 	// ************************ Members ************************ //
 
 protected:
-	double spacing;						///< Reference spacing of the markers
-	std::vector<MarkerType> markers;	///< Array of markers which make up the body
-	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	GridObj* _Owner;					///< Pointer to owning grid
 	size_t id;							///< Unique ID of the body
+	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
+	std::vector<MarkerType> markers;	///< Array of markers which make up the body
+	double spacing;						///< Reference spacing of the markers
 
 
 	// ************************ Methods ************************ //
 
-	virtual void addMarker(double x, double y, double z, int markerID);			// Add a marker (can be overrriden)
-	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
+	virtual void addMarker(double x, double y, double z, int markerID);		// Add a marker (can be overrriden)
+	MarkerData* getMarkerData(double x, double y, double z);				// Retireve nearest marker data
 	void passToVoxelFilter(double x, double y, double z, int markerID,
-		int& curr_mark, std::vector<int>& counter);					// Voxelising marker adder
+		int& curr_mark, std::vector<int>& counter);							// Voxelising marker adder
+	void deleteRecvLayerMarkers();											// Delete any markers which are on receiver layer
+	void deleteOffRankMarkers();											// Delete any markers which don't exist on this rank
 
 private:
-	bool isInVoxel(double x, double y, double z, int curr_mark);	// Check a point is inside an existing marker voxel
-	bool isVoxelMarkerVoxel(double x, double y, double z);			// Check whether nearest voxel is a marker voxel
+	bool isInVoxel(double x, double y, double z, int curr_mark);			// Check a point is inside an existing marker voxel
+	bool isVoxelMarkerVoxel(double x, double y, double z);					// Check whether nearest voxel is a marker voxel
+
 
 protected:
-	void buildFromCloud(PCpts *_PCpts);								// Method to build body from point cloud
+	void buildFromCloud(PCpts *_PCpts);										// Method to build body from point cloud
 
 
 };
@@ -75,23 +78,12 @@ Body<MarkerType>::Body(void)
 {
 	this->_Owner = nullptr;
 };
+
 /// Default destructor
 template <typename MarkerType>
 Body<MarkerType>::~Body(void)
 {
 };
-
-/// \brief Custom constructor setting owning grid.
-///
-/// \param g pointer to grid which owns this body.
-/// \param id indicates unique number of body in array of bodies.
-template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t id)
-{
-	this->_Owner = g;
-	this->id = id;
-};
-
 
 /// \brief Custom constructor to call method to build from point cloud.
 ///
@@ -101,10 +93,12 @@ Body<MarkerType>::Body(GridObj* g, size_t id)
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 {
+	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = id;
 	this->closed_surface = false;
 
+	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI
 	this->owningRank = id % MpiManager::getInstance()->num_ranks;
 #else
@@ -113,6 +107,9 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
+
+	// Define spacing based on first two markers	// TODO Make spacing a marker member
+	this->spacing = _Owner->dh;
 };
 
 /// \brief Custom constructor to call method to build filament.
@@ -121,22 +118,23 @@ Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
 /// \param id indicates unique number of body in array of bodies.
 /// \param _PCpts pointer to point cloud data.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<double> &start_position,
-		double length, std::vector<double> &angles)
+Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg,
+		std::vector<double> &start_position, double length, std::vector<double> &angles)
 {
 
-	// Set body properties
+	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
-	this->id = bodyID;
+	this->id = id;
 	this->closed_surface = false;
 
+	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI
 	this->owningRank = id % MpiManager::getInstance()->num_ranks;
 #else
 	this->owningRank = 0;
 #endif
 
-	// Get angles
+	// Get horizontal and vertical angles
 	double body_angle_v = angles[0];
 #if (L_DIM == 3)
 	double body_angle_h = angles[1];
@@ -157,13 +155,58 @@ Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<
 					i);
 	}
 
-	// After adding all markers get rid the ones that don't exist on this rank
+	// Delete markers which exist off rank
 	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+	deleteOffRankMarkers();
+};
+
+
+/// \brief	Add marker to the body.
+/// \param	x			global X-position of marker.
+/// \param	y			global Y-position of marker.
+/// \param	z 			global Z-position of marker.
+/// \param markerID		ID of marker within body
+template <typename MarkerType>
+void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
+{
+
+	// Add a new marker object to the array
+	markers.emplace_back(x, y, z, markerID, _Owner);
+
+};
+/// \brief	Delete markers which have been built but exist off rank.
+template <typename MarkerType>
+void Body<MarkerType>::deleteRecvLayerMarkers()
+{
+	// Loop through markers in body and delete ones which are on receiver layer
+	int a = 0;
+	do {
+		// If on receiver layer then delete that marker
+		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
+		{
+			this->markers.erase(this->markers.begin() + a);
+		}
+		// If not, keep and move onto next one
+		else {
+
+			// Increment counter
+			a++;
+		}
+	} while (a < static_cast<int>(this->markers.size()));
+}
+
+
+/// \brief	Delete markers which have been built but exist off rank.
+template <typename MarkerType>
+void Body<MarkerType>::deleteOffRankMarkers()
+{
+
+	// Loop through markers in body and delete ones which are not on this rank
 	eLocationOnRank loc = eNone;
 	int a = 0;
 	do {
 		// If not on rank then delete that marker
-		if (!GridUtils::isOnThisRank(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection], &loc, g))
+		if (!GridUtils::isOnThisRank(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection], &loc, this->_Owner))
 		{
 			this->markers.erase(this->markers.begin() + a);
 		}
@@ -174,20 +217,6 @@ Body<MarkerType>::Body(GridObj* g, size_t bodyID, int lev, int reg, std::vector<
 			a++;
 		}
 	} while (a < static_cast<int>(this->markers.size()));
-};
-
-
-/// \brief	Add marker to the body.
-/// \param	x global X-position of marker.
-/// \param	y global Y-position of marker.
-/// \param	z global Z-position of marker.
-template <typename MarkerType>
-void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
-{
-
-	// Add a new marker object to the array
-	markers.emplace_back(x, y, z, markerID, _Owner);
-
 };
 
 /*********************************************/
@@ -383,7 +412,6 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
-
 	// Declare local variables
 	std::vector<int> locals;
 
@@ -407,13 +435,6 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 
 	*GridUtils::logfile << "ObjectManager: Object represented by " << std::to_string(markers.size()) <<
 		" markers using 1 marker / voxel voxelisation." << std::endl;
-
-	// Define spacing based on first two markers	// TODO Make spacing a marker member
-	this->spacing = GridUtils::vecnorm(
-		markers[1].position[0] - markers[0].position[0],
-		markers[1].position[1] - markers[0].position[1],
-		markers[1].position[2] - markers[0].position[2]
-		);
 };
 
 #endif

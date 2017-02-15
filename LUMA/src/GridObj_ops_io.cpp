@@ -881,18 +881,27 @@ int GridObj::io_hdf5(double tval) {
 		// Create group
 		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-		// Compute dataspaces (file space data in MPIM and ex. TL where appropriate)
+		// Compute dataspaces (file space data in GM and ex. TL where appropriate)
 		int idx = level + region_number * L_NUM_LEVELS;
-		dimsf[0] = gm->global_size[eXDirection][idx]
-			- gm->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
-			- gm->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness;
-		dimsf[1] = gm->global_size[eYDirection][idx]
-			- gm->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
-			- gm->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness;
+		dimsf[0] = gm->global_size[eXDirection][idx];
+		dimsf[1] = gm->global_size[eYDirection][idx];
+		if (level > 0)
+		{
+			dimsf[0] -= 
+				(gm->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness);
+			dimsf[1] -=
+				(gm->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness);
+		}
 #if (L_DIMS == 3)
-		dimsf[2] = gm->global_size[eZDirection][idx]
-			- gm->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
-			- gm->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness;
+		dimsf[2] = gm->global_size[eZDirection][idx];
+		if (level > 0)
+		{
+			dimsf[2] -=
+				(gm->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness);
+		}
 #endif
 		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
 

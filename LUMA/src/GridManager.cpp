@@ -204,8 +204,8 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 		p_data->j_end = M_lim - 1;
 		p_data->j_start = 0;
 #if (L_DIMS == 3)
-		p_data->k_end = K_lim - 2;
-		p_data->k_start = 1;
+		p_data->k_end = K_lim - 1;
+		p_data->k_start = 0;
 #endif
 
 #endif	// L_BUILD_FOR_MPI

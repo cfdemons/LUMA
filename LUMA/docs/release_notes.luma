@@ -11,6 +11,7 @@ General		:	Wholesale changes to coordinate systems and hence changes in the init
 				User input except L_RHOIN is now expected in dimensionless units.
 				Documentation moved to VM @ 130.88.97.222.
 
+Issue #121	:	Fixed bug in 3D serial cases with Grid Manager initialisation that caused the wrong writable region to be set and corrupted HDF5 data.
 Issue #5    :   User input except L_RHOIN is now expected in dimensionless units. L_RHOIN is expected in LBM units. 
 				NOTE: The simulation time and the interval at which the results are written is still in number of time steps (i.e. in LBM units)   				
 Issue #107	:	Improved inheritence relationships for the Body class to reduce code duplication.

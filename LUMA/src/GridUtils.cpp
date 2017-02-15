@@ -1109,7 +1109,7 @@ void GridUtils::createOutputDirectory(std::string path_str) {
 /// \param  ux          vector where the x component of the velocity will be stored
 /// \param  uy          vector where the y component of the velocity will be stored
 /// \param  uz          vector where the z component of the velocity will be stored
-void GridUtils::readVelocityFromFile(std::string path_str, std::vector<double>& x_coord, std::vector<double>& y_coord, std::vector<double>& z_coord, std::vector<double>& ux, std::vector<double>& uy, std::vector<double>& uz)
+void GridUtils::readVelocityFromFile(std::string path_str, IVector<double>& x_coord, IVector<double>& y_coord, IVector<double>& z_coord, IVector<double>& ux, IVector<double>& uy, IVector<double>& uz)
 {
 	// Indicate to log
 	*GridUtils::logfile << "Reading file..." << std::endl;

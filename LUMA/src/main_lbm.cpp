@@ -216,6 +216,15 @@ int main( int argc, char* argv[] )
 
 		*GridUtils::logfile << "Initialising sub-grids..." << endl;
 
+#ifdef L_INIT_VELOCITY_FROM_FILE
+		/*Loading the initial velocity field from a file is icompatible with subgrids 
+		  because the subgrid initializer routine calls GridObject::initVelocity(), which will read
+		  the velocity data from the file and try to put it in the subgrid (without interpolating). The number of data
+		  points in the file might be different from the number of cells in the subgrid, so the initialization routine
+		  will crash */
+		L_ERROR("Loading the initial velocity field from a file is icompatible with subgrids. Exiting.", GridUtils::logfile);
+#endif
+
 		// Loop over number of regions and add subgrids to Grids
 		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 

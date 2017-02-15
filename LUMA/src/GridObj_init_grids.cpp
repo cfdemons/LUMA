@@ -56,7 +56,7 @@ void GridObj::LBM_init_getInletProfile() {
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
-	std::vector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
+	IVector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
 	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
 
 	// Resize vectors
@@ -140,7 +140,7 @@ void GridObj::LBM_initVelocity ( ) {
 #ifdef L_INIT_VELOCITY_FROM_FILE
 	*GridUtils::logfile << "Loading initial velocity..." << std::endl;
 
-	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
+	IVector<double> x_coord, y_coord, z_coord, ux, uy, uz;
 	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
 
 	//Check that the data in the file has the same number of points as the current grid. 
@@ -156,7 +156,14 @@ void GridObj::LBM_initVelocity ( ) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				
-#ifdef L_NO_FLOW				
+#ifdef L_INIT_VELOCITY_FROM_FILE
+				u(i, j, k, 0, M_lim, K_lim, L_DIMS) = ux(i,j,k,M_lim,K_lim);
+				u(i, j, k, 1, M_lim, K_lim, L_DIMS) = uy(i,j,k,M_lim,K_lim);
+#if (L_DIMS == 3)
+				u(i, j, k, 2, M_lim, K_lim, L_DIMS) = uz(i,j,k,M_lim,K_lim);
+#endif
+
+#elif L_NO_FLOW				
 				for (size_t d = 0; d < L_DIMS; d++) {
 
 					// No flow case

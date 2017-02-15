@@ -128,6 +128,38 @@ IBBody::IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &ce
 
 }
 
+// ***************************************************************************************************
+/// \brief	Constructor to build a circle or sphere,
+///
+///			isFlexible and isMovable properties taken from definitions.
+///
+/// \param g		pointer to owner grid
+/// \param id		ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data.
+IBBody::IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty) : Body(g, bodyID, lev, reg, centre_point, dimensions, angles)
+{
+
+	// Set movable and flexible parameters
+	if (moveProperty == eFlexible) {
+		this->isFlexible = true;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eMovable) {
+		this->isFlexible = false;
+		this->isMovable = true;
+	}
+	else if (moveProperty == eRigid) {
+		this->isFlexible = false;
+		this->isMovable = false;
+	}
+
+	// Delete any markers which are on the receiver layer as not needed for IBM
+	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
+	deleteRecvLayerMarkers();
+
+}
+
 /// Default destructor
 IBBody::~IBBody(void)
 {

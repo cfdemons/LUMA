@@ -36,6 +36,8 @@ public:
 	~IBBody(void);
 	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
 	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);
+	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty);
 	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
 		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
 

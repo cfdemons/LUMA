@@ -35,6 +35,8 @@ public:
 	virtual ~Body(void);		// Default destructor
 	Body(GridObj* g, int bodyID, PCpts* _PCpts);									// Custom constructor to build from point cloud data
 	Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius);
+	Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+				std::vector<double> &dimensions, std::vector<double> &angles);
 	Body(GridObj* g, int bodyID, int lev,
 			int reg, std::vector<double> &start_position,
 			double length, std::vector<double> &angles);						// Custom constructor to build filament
@@ -223,6 +225,137 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
 	}
 	spacing = GridUtils::vecnorm( diff );
+
+	// Delete markers which exist off rank
+	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+	deleteOffRankMarkers();
+};
+
+
+/// \brief Custom constructor to call method to build filament.
+///
+/// \param g pointer to grid which owns this body.
+/// \param id indicates unique number of body in array of bodies.
+/// \param _PCpts pointer to point cloud data.
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre,
+		std::vector<double> &width_length_depth, std::vector<double> &angles)
+{
+
+	// Set the body base class parameters from constructor inputs
+	this->_Owner = g;
+	this->id = bodyID;
+	this->closed_surface = false;
+
+	// Set the rank which owns this body
+#ifdef L_BUILD_FOR_MPI
+	this->owningRank = id % MpiManager::getInstance()->num_ranks;
+#else
+	this->owningRank = 0;
+#endif
+
+	// Shorter variable names for convenience
+	double length = width_length_depth[0];
+	double height = width_length_depth[1];
+	double depth = width_length_depth[2];
+
+	// Get number of markers in each direction
+	int numMarkersLength = floor(length / g->dh) + 1;
+	int numMarkersHeight = floor(height / g->dh) + 1;
+	int numMarkersDepth = floor(depth / g->dh) + 1;
+
+	// Get total number of markers and check
+#if (L_DIMS == 3)
+	int numMarkers = numMarkersLength * numMarkersHeight * numMarkersDepth - ((numMarkersLength - 2) * (numMarkersHeight - 2) * (numMarkersDepth - 2));
+
+	// Check side lengths to make sure we can ensure points on the corners
+	if (numMarkers < 24) {
+		L_ERROR("Resolution not high enough to build cuboid this small. Change its dimensions. Exiting.",
+		GridUtils::logfile);
+	}
+#else
+	int numMarkers = numMarkersLength * numMarkersHeight - ((numMarkersLength - 2) * (numMarkersHeight - 2));
+
+	// Check side lengths to make sure we can ensure points on the corners
+	if (numMarkers < 8) {
+		L_ERROR("Resolution not high enough to build square this small. Change its dimensions. Exiting.",
+		GridUtils::logfile);
+	}
+#endif
+
+	// Start locations of point generator
+	double x, y, z, xdash, ydash, zdash;
+
+	// Get spacing between markers
+	double spacingLength = length / (numMarkersLength - 1);
+	double spacingHeight = height / (numMarkersHeight - 1);
+	double spacingDepth = depth / (numMarkersDepth - 1);
+
+	// Marker ID
+	int markerID = 0;
+
+#if (L_DIMS == 3)
+
+	// Build cuboid
+	for (int i = 0; i < numMarkersLength; i++) {
+		for (int j = 0; j < numMarkersHeight; j++) {
+			for (int k = 0; k < numMarkersDepth; k++) {
+
+
+				// x and y position
+				x = -length / 2.0 + i * spacingLength;
+				y = -height / 2.0 + j * spacingHeight;
+				z = -depth / 2.0 + k * spacingDepth;
+
+				// Only add the marker if the point is on an edge
+				if ((i == 0 || i == numMarkersLength - 1) || (j == 0 || j == numMarkersHeight - 1) || (k == 0 || k == numMarkersDepth - 1)) {
+
+					// Transform x y and z based on rotation
+					xdash = (x * cos(angles[0] * L_PI / 180) - y * sin(angles[0] * L_PI / 180)) * cos(angles[1] * L_PI / 180) - z * sin(angles[1] * L_PI / 180);
+					ydash = (y * cos(angles[0] * L_PI / 180) + x * sin(angles[0] * L_PI / 180);
+					zdash = (x * cos(angles[0] * L_PI / 180) - y * sin(angles[0] * L_PI / 180)) * sin(angles[1] * L_PI / 180) + z * cos(angles[1] * L_PI / 180);
+					xdash = xdash + centre[0];
+					ydash = ydash + centre[1];
+					zdash = zdash + centre[2];
+
+					// Add marker
+					addMarker(xdash, ydash, zdash, markerID);
+					markerID++;
+				}
+			}
+		}
+	}
+
+
+#else
+
+	// Build square
+	for (int i = 0; i < numMarkersLength; i++) {
+		for (int j = 0; j < numMarkersHeight; j++) {
+
+			// x and y position
+			x = -length / 2.0 + i * spacingLength;
+			y = -height / 2.0 + j * spacingHeight;
+			z = 0.0;
+
+			// Only add the marker if the point is on an edge
+			if ((i == 0 || i == numMarkersLength - 1) || (j == 0 || j == numMarkersHeight - 1)) {
+
+				// Transform x y and z based on rotation
+				xdash = x * cos(angles[0] * L_PI / 180) - y * sin(angles[0] * L_PI / 180);
+				ydash = x * sin(angles[0] * L_PI / 180) + y * cos(angles[0] * L_PI / 180);
+				zdash = z;
+				xdash = xdash + centre[0];
+				ydash = ydash + centre[1];
+				zdash = zdash + centre[2];
+
+				// Add marker
+				addMarker(xdash, ydash, zdash, markerID);
+				markerID++;
+			}
+		}
+	}
+#endif
 
 	// Delete markers which exist off rank
 	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;

@@ -138,38 +138,51 @@ void GridObj::LBM_init_getInletProfile() {
 void GridObj::LBM_initVelocity ( ) {
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
+
 	*GridUtils::logfile << "Loading initial velocity..." << std::endl;
 
-	IVector<double> x_coord, y_coord, z_coord, ux, uy, uz;
+	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
 	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
+	int gridSize = L_N*L_M*L_K;
 
-	//Check that the data in the file has the same number of points as the current grid. 
-	//The initial velocity data is copied directly to the cells,not interpolated, so the number of points has to match the number of cells.
-	if (x_coord.size() != (N_lim*M_lim*K_lim)) {
-		L_ERROR("The number of points in the initial velocity file does not match the number of cells in the LBM grid -- change L_BX/L_BY/L_BZ/L_RESOLUTION or change the file initial_velocity.in. Exiting.",
+	// Check that the data in the file has the same number of points as the current grid. 
+	// The initial velocity data is copied directly to the cells,not interpolated, so the number of points has to match the number of cells.
+	if (x_coord.size() < gridSize) {
+		L_ERROR("The initial velocity file has less points than the LBM grid -- change L_BX/L_BY/L_BZ/L_RESOLUTION or change the file initial_velocity.in. Exiting.",
 			GridUtils::logfile);
 	}
+	else if (x_coord.size() > gridSize) {
+		*GridUtils::logfile << "WARNING: The initial velocity file has more points than the LBM grid. LUMA will only read as many points as the LBM grid has." << std::endl; 
+	}
+
+	// Loop over the data and assign the part the corresponds to the current processor. 
+	for (int i = 0; i < gridSize; i++){
+		eLocationOnRank loc;
+		std::vector<int> indices;
+		if (GridUtils::isOnThisRank(x_coord[i], y_coord[i], z_coord[i], &loc, this, &indices)){
+			u(indices[0], indices[1], indices[2], 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(ux[i], this);
+			u(indices[0], indices[1], indices[2], 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uy[i], this);
+#if (L_DIMS == 3)
+			u(indices[0], indices[1], indices[2], 2, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uz[i], this);
 #endif
+
+		}
+
+	}
+
+#else    // L_INIT_VELOCITY_FROM_FILE is not defined
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
 				
-#ifdef L_INIT_VELOCITY_FROM_FILE
-				u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(ux(i,j,k,M_lim,K_lim),this);
-				u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uy(i,j,k,M_lim,K_lim),this);
-#if (L_DIMS == 3)
-				u(i, j, k, 2, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uz(i,j,k,M_lim,K_lim),this);
-#endif
-
-#elif defined L_NO_FLOW				
+#ifdef L_NO_FLOW				
 				for (size_t d = 0; d < L_DIMS; d++) {
 
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
-
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
 				 * have either been read in from an input file or defined by an expression 
@@ -196,6 +209,8 @@ void GridObj::LBM_initVelocity ( ) {
 			}
 		}
 	}
+
+#endif
 
 }
 

@@ -43,7 +43,7 @@ private:
 public:
 	// IO utilities
 	static void createOutputDirectory(std::string path_str);		// Output directory creator
-	static void readVelocityFromFile(std::string path_str, IVector<double>& x_coord, IVector<double>& y_coord, IVector<double>& z_coord, IVector<double>& ux, IVector<double>& uy, IVector<double>& uz);  //Reads coordinates and velocity data from file_name. Stores the coordinates of each point in the vectors x, y and z and the velocity components in the vectors ux, uy and uz. It expects the file to have a column for uz even with L_DIMS = 2 
+	static void readVelocityFromFile(std::string path_str, std::vector<double>& x_coord, std::vector<double>& y_coord, std::vector<double>& z_coord, std::vector<double>& ux, std::vector<double>& uy, std::vector<double>& uz);  //Reads coordinates and velocity data from file_name. Stores the coordinates of each point in the vectors x, y and z and the velocity components in the vectors ux, uy and uz. It expects the file to have a column for uz even with L_DIMS = 2 
 
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace

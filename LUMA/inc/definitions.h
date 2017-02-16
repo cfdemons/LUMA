@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 1				///< How many timesteps before whole grid output
@@ -134,13 +134,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 1		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 32		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 1.68574402E-04		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 4		///< Size of domain in X including boundary cells (non-dimensional units)
-#define L_BY 3		///< Size of domain in Y including boundary cells (non-dimensional units)
-#define L_BZ 4		///< Size of domain in Z including boundary cells (non-dimensional units)
+#define L_BX 1		///< Size of domain in X including boundary cells (non-dimensional units)
+#define L_BY 1		///< Size of domain in Y including boundary cells (non-dimensional units)
+#define L_BZ 1		///< Size of domain in Z including boundary cells (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -153,7 +153,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
+//#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 #define L_UMAX 1.5		       ///< Max velocity of inlet profile
 
@@ -250,23 +250,23 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Inlets
-#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
+//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Periodicity
-//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
+#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
 #define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of front (3D) wall

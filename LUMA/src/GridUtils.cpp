@@ -1097,6 +1097,76 @@ void GridUtils::createOutputDirectory(std::string path_str) {
 }
 
 // ****************************************************************************
+/// \brief	Reads coordinates and velocity data from a file. 
+///
+///			The file format is x_coord  y_coord  z_coord ux uy uz 
+///			It expects the file to have a column for z_coord and a column for uz even with L_DIMS = 2
+///
+/// \param	path_str	full path and filename as string.
+/// \param  x_coord     vector where the x coordinate of each point will be stored
+/// \param  y_coord     vector where the y coordinate of each point will be stored
+/// \param  z_coord     vector where the z coordinate of each point will be stored
+/// \param  ux          vector where the x component of the velocity will be stored
+/// \param  uy          vector where the y component of the velocity will be stored
+/// \param  uz          vector where the z component of the velocity will be stored
+void GridUtils::readVelocityFromFile(std::string path_str, std::vector<double>& x_coord, std::vector<double>& y_coord, std::vector<double>& z_coord, std::vector<double>& ux, std::vector<double>& uy, std::vector<double>& uz)
+{
+	// Indicate to log
+	*GridUtils::logfile << "Reading file..." << std::endl;
+
+	double tmp;
+	
+	// Buffer information from file
+	std::ifstream datafile;
+	datafile.open(path_str, std::ios::in);
+	if (!datafile.is_open()) {
+		// Error opening file
+		L_ERROR("Cannot open velocity data file named " + path_str + ". Exiting.", GridUtils::logfile);
+
+	}
+	else {
+
+		std::string line_in;	// String to store line
+		std::istringstream iss;	// Buffer stream
+
+		while (!datafile.eof()) {
+
+			// Get line and put in buffer
+			std::getline(datafile, line_in, '\n');
+			iss.str(line_in);
+			iss.seekg(0); // Reset buffer position to start of buffer
+
+			// Get x position
+			iss >> tmp;
+			x_coord.push_back(tmp);
+
+			// Get y position
+			iss >> tmp;
+			y_coord.push_back(tmp);
+
+			// Get z position
+			iss >> tmp;
+			z_coord.push_back(tmp);
+
+			// Get x velocity
+			iss >> tmp;
+			ux.push_back(tmp);
+
+			// Get y velocity
+			iss >> tmp;
+			uy.push_back(tmp);
+
+			// Get z velocity
+			iss >> tmp;
+			uz.push_back(tmp);
+
+		}
+
+	}
+
+}
+
+// ****************************************************************************
 /// \brief	Tests whether a site is on a given grid.
 /// \param	i	local i-index.
 /// \param	j	local j-index.

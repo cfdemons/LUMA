@@ -31,7 +31,6 @@ using namespace std;
 void GridObj::LBM_init_getInletProfile() {
 
 	size_t j;
-	std::vector<double> ybuffer, uxbuffer, uybuffer, uzbuffer;
 
 #ifdef L_PARABOLIC_INLET
 
@@ -52,50 +51,13 @@ void GridObj::LBM_init_getInletProfile() {
 #else
 
 	size_t i;
-	double y, tmp;
+	double y; // , tmp;
 
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
-	// Buffer information from file
-	std::ifstream inletfile;
-	inletfile.open("./input/inlet_profile.in", std::ios::in);
-	if (!inletfile.is_open()) {
-		// Error opening file
-		L_ERROR("Cannot open inlet profile file named \"inlet_profile.in\". Exiting.", GridUtils::logfile);
-
-	} else {
-
-		std::string line_in;	// String to store line
-		std::istringstream iss;	// Buffer stream
-
-		while( !inletfile.eof() ) {
-
-			// Get line and put in buffer
-			std::getline(inletfile,line_in,'\n');
-			iss.str(line_in);
-			iss.seekg(0); // Reset buffer position to start of buffer
-
-			// Get y position
-			iss >> tmp;
-			ybuffer.push_back(tmp);
-
-			// Get x velocity
-			iss >> tmp;
-			uxbuffer.push_back(tmp);
-
-			// Get y velocity
-			iss >> tmp;
-			uybuffer.push_back(tmp);
-
-			// Get z velocity
-			iss >> tmp;
-			uzbuffer.push_back(tmp);
-
-		}
-
-	}
-
+	IVector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
+	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
 
 	// Resize vectors
 	ux_in.resize(M_lim);
@@ -175,6 +137,40 @@ void GridObj::LBM_init_getInletProfile() {
 ///			file.
 void GridObj::LBM_initVelocity ( ) {
 
+#ifdef L_INIT_VELOCITY_FROM_FILE
+
+	*GridUtils::logfile << "Loading initial velocity..." << std::endl;
+
+	std::vector<double> x_coord, y_coord, z_coord, ux, uy, uz;
+	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
+	int gridSize = L_N*L_M*L_K;
+
+	// Check that the data in the file has the same number of points as the current grid. 
+	// The initial velocity data is copied directly to the cells,not interpolated, so the number of points has to match the number of cells.
+	if (x_coord.size() < gridSize) {
+		L_ERROR("The initial velocity file has less points than the LBM grid -- change L_BX/L_BY/L_BZ/L_RESOLUTION or change the file initial_velocity.in. Exiting.",
+			GridUtils::logfile);
+	}
+	else if (x_coord.size() > gridSize) {
+		*GridUtils::logfile << "WARNING: The initial velocity file has more points than the LBM grid. LUMA will only read as many points as the LBM grid has." << std::endl; 
+	}
+
+	// Loop over the data and assign the part the corresponds to the current processor. 
+	for (int i = 0; i < gridSize; i++){
+		eLocationOnRank loc;
+		std::vector<int> indices;
+		if (GridUtils::isOnThisRank(x_coord[i], y_coord[i], z_coord[i], &loc, this, &indices)){
+			u(indices[0], indices[1], indices[2], 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(ux[i], this);
+			u(indices[0], indices[1], indices[2], 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uy[i], this);
+#if (L_DIMS == 3)
+			u(indices[0], indices[1], indices[2], 2, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uz[i], this);
+#endif
+
+		}
+
+	}
+
+#else    // L_INIT_VELOCITY_FROM_FILE is not defined
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -187,7 +183,6 @@ void GridObj::LBM_initVelocity ( ) {
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
-
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
 				 * have either been read in from an input file or defined by an expression 
@@ -214,6 +209,8 @@ void GridObj::LBM_initVelocity ( ) {
 			}
 		}
 	}
+
+#endif
 
 }
 

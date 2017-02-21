@@ -16,8 +16,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 #include "../inc/Matrix.h"
 
@@ -222,9 +220,9 @@ void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 	// Get indices of child site
 	std::vector<int> cInd =
 		GridUtils::getFineIndices(
-		i, childGrid->CoarseLimsX[0],
-		j, childGrid->CoarseLimsY[0],
-		k, childGrid->CoarseLimsZ[0]);
+		i, childGrid->CoarseLimsX[eMinimum],
+		j, childGrid->CoarseLimsY[eMinimum],
+		k, childGrid->CoarseLimsZ[eMinimum]);
 
 	// Pull average value of f from child cluster
 	double fNew_local = 0.0;
@@ -269,9 +267,9 @@ void GridObj::_LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z) {
 	// Get parent indices
 	std::vector<int> pInd =
 		GridUtils::getCoarseIndices(
-		src_x, CoarseLimsX[0],
-		src_y, CoarseLimsY[0],
-		src_z, CoarseLimsZ[0]);
+		src_x, CoarseLimsX[eMinimum],
+		src_y, CoarseLimsY[eMinimum],
+		src_z, CoarseLimsZ[eMinimum]);
 
 	// Pull value from parent
 	fNew[v + id * L_NUM_VELS] =
@@ -459,9 +457,9 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 		// Get indices
 		std::vector<int> cInd =
 			GridUtils::getFineIndices(
-			i, childGrid->CoarseLimsX[0],
-			j, childGrid->CoarseLimsY[0],
-			k, childGrid->CoarseLimsZ[0]);
+			i, childGrid->CoarseLimsX[eMinimum],
+			j, childGrid->CoarseLimsY[eMinimum],
+			k, childGrid->CoarseLimsZ[eMinimum]);
 
 		// Get sizes
 		int cM_lim = childGrid->M_lim;
@@ -566,7 +564,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 #ifdef L_GRAVITY_ON
 	// Add gravity
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * L_GRAVITY_FORCE * refinement_ratio;
+		rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Now compute force_i components from Cartesian force vector

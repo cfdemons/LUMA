@@ -16,7 +16,7 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
+
 
 // *****************************************************************************
 /// \brief	Structural calculation of flexible cilia.
@@ -27,6 +27,8 @@
 ///
 /// \param	ib	index of body to which calculation is to be applied.
 void ObjectManager::ibm_jacowire(int ib) {
+
+	int rank = GridUtils::safeGetRank();
 
     ///////// Initialisation /////////
     double tolerance = 1.0e-9;		// Tolerance of iterative solver
@@ -63,23 +65,23 @@ void ObjectManager::ibm_jacowire(int ib) {
 
 	// Define quantities used in the routines below
 	// Length of filament in lu
-	double length_lu = L_IBB_FILAMENT_LENGTH / iBody[ib]._Owner->dx;
+	double length_lu = L_IBB_FILAMENT_LENGTH / iBody[ib]._Owner->dh;
 
 
 	// Marker spacing in normalised instrinsic coordinates
-	double ds_nondim = iBody[ib].spacing / (length_lu * iBody[ib]._Owner->dx);
+	double ds_nondim = iBody[ib].spacing / (length_lu * iBody[ib]._Owner->dh);
 
 	// Square of non-dimensional spacing
 	double ds_sqrd = pow(ds_nondim,2);
 
 #ifdef L_GRAVITY_ON
-	Froude = pow(L_UREF,2) / L_GRAVITY_FORCE * length_lu;
+	Froude = pow(iBody[ib]._Owner->uref,2) / iBody[ib]._Owner->gravity * length_lu;
 #else
 	Froude = 0.0;
 #endif
 
 	// Beta = spacing^2 (lu) / reference time^2 (lu) = ds_nondim^2 / (dt / (length (lu) / u (lu) )^2 )
-	double beta = ds_sqrd / pow((1 / pow(2, iBody[ib]._Owner->level)) / (length_lu / L_UREF), 2);
+	double beta = ds_sqrd / pow((1 / pow(2, iBody[ib]._Owner->level)) / (length_lu / iBody[ib]._Owner->uref), 2);
 
 
 	// Simply supported end position in filament-normalised coordinates units and tension in between it and the next marker
@@ -90,18 +92,18 @@ void ObjectManager::ibm_jacowire(int ib) {
 	// Get initial positions of markers in filament-normalised coordinates [0,+/-1] for below
 	std::vector<double> x, y;
 	for (i = 0; i < n; i++) {
-		x.push_back((iBody[ib].markers[i + 1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * iBody[ib]._Owner->dx));
-		y.push_back((iBody[ib].markers[i + 1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * iBody[ib]._Owner->dy));
+		x.push_back((iBody[ib].markers[i + 1].position[0] - iBody[ib].markers[0].position[0]) / (length_lu * iBody[ib]._Owner->dh));
+		y.push_back((iBody[ib].markers[i + 1].position[1] - iBody[ib].markers[0].position[1]) / (length_lu * iBody[ib]._Owner->dh));
 	}
 
 	// Create body force vectors
 	std::vector<double> Fx(iBody[ib].markers.size(), 0.0), Fy(iBody[ib].markers.size(), 0.0);
 
-	// Populate force vectors with non-dimensional forces (divide by spacing/dx = marker spacing in lattice units)
-	double Fref = iBody[ib].delta_rho * pow(L_UREF, 2);
+	// Populate force vectors with non-dimensional forces (divide by spacing/dh = marker spacing in lattice units)
+	double Fref = iBody[ib].delta_rho * pow(iBody[ib]._Owner->uref, 2);
 	for (i = 0; i < Fx.size(); i++) {
-		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dx)));
-		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dx)));
+		Fx[i] = -iBody[ib].markers[i].force_xyz[0] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dh)));
+		Fy[i] = -iBody[ib].markers[i].force_xyz[1] / (Fref / (iBody[ib].markers[i].epsilon / (iBody[ib].spacing / iBody[ib]._Owner->dh)));
 	}
 
 	// Normalised position (x,y,z)/L at t+1 for each marker are computed using extrapolation of the current (t) position
@@ -110,10 +112,10 @@ void ObjectManager::ibm_jacowire(int ib) {
 	for (i = 0; i < n; i++) {
 		xstar.push_back( 
 			((2 * iBody[ib].markers[i+1].position[0] - iBody[ib].markers[i+1].position_old[0]) - iBody[ib].markers[0].position[0]) 
-			/ (iBody[ib]._Owner->dx * length_lu));
+			/ (iBody[ib]._Owner->dh * length_lu));
 		ystar.push_back( 
 			((2 * iBody[ib].markers[i+1].position[1] - iBody[ib].markers[i+1].position_old[1]) - iBody[ib].markers[0].position[1]) 
-			/ (iBody[ib]._Owner->dy * length_lu));
+			/ (iBody[ib]._Owner->dh * length_lu));
 	}
 
 
@@ -178,14 +180,16 @@ void ObjectManager::ibm_jacowire(int ib) {
 
 
 #ifdef L_IBM_DEBUG
-		// DEBUG -- write out G vector
-		std::ofstream Gout;
-		Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
-		Gout << "\nNEW TIME STEP" << std::endl;
-		for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
-			Gout << G[i] << std::endl;
-		}
-		Gout.close();
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
+	// DEBUG -- write out G vector
+	std::ofstream Gout;
+	Gout.open(GridUtils::path_str + "/Gvector_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+	Gout << "\nNEW TIME STEP" << std::endl;
+	for (i = 0; i < 3*iBody[ib].markers.size(); i++) {
+		Gout << G[i] << std::endl;
+	}
+	Gout.close();
 #endif
 
 
@@ -337,7 +341,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out res vector
 		std::ofstream resout;
-		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		resout.open(GridUtils::path_str + "/res_vector_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		resout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < 3*iBody[ib].markers.size(); i++) {
 			resout << res[i] << std::endl;
@@ -355,8 +359,8 @@ void ObjectManager::ibm_jacowire(int ib) {
         // Current physical position comes from the newly computed positions
 		if (i != 0) { // New position vectors exclude the simply supported end and start from next node in so i-1
 			// Convert filament-normalised coordinates back to lu then to physical spacing then add offset of simply supported end
-			iBody[ib].markers[i].position[0] = (x[i - 1] * length_lu * iBody[ib]._Owner->dx) + iBody[ib].markers[0].position[0];
-			iBody[ib].markers[i].position[1] = (y[i - 1] * length_lu * iBody[ib]._Owner->dy) + iBody[ib].markers[0].position[1];
+			iBody[ib].markers[i].position[0] = (x[i - 1] * length_lu * iBody[ib]._Owner->dh) + iBody[ib].markers[0].position[0];
+			iBody[ib].markers[i].position[1] = (y[i - 1] * length_lu * iBody[ib]._Owner->dh) + iBody[ib].markers[0].position[1];
 		}
     }
 
@@ -364,7 +368,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out pos vector
 		std::ofstream posout;
-		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		posout.open(GridUtils::path_str + "/pos_vectors_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		posout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			posout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << std::endl;
@@ -375,7 +379,7 @@ void ObjectManager::ibm_jacowire(int ib) {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out ten vector
 		std::ofstream tenout;
-		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		tenout.open(GridUtils::path_str + "/ten_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		tenout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			tenout << iBody[ib].tension[i] << std::endl;
@@ -387,17 +391,17 @@ void ObjectManager::ibm_jacowire(int ib) {
 	// Desired velocity (in lattice units) on the makers is computed using a first order estimate based on position change
     for (i = 0; i < iBody[ib].markers.size(); i++) {
 		iBody[ib].markers[i].desired_vel[0] = 
-			( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / iBody[ib]._Owner->dx ) 
+			( (iBody[ib].markers[i].position[0] - iBody[ib].markers[i].position_old[0]) / iBody[ib]._Owner->dh ) 
 			/ (1 / pow(2,iBody[ib]._Owner->level));
 		iBody[ib].markers[i].desired_vel[1] = 
-			( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / iBody[ib]._Owner->dy ) 
+			( (iBody[ib].markers[i].position[1] - iBody[ib].markers[i].position_old[1]) / iBody[ib]._Owner->dh ) 
 			/ (1 / pow(2,iBody[ib]._Owner->level));
     }
 
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out desired vel vector
 		std::ofstream velout;
-		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::app);
+		velout.open(GridUtils::path_str + "/vel_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 		velout << "\nNEW TIME STEP" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			velout << iBody[ib].markers[i].desired_vel[0] << "\t" << iBody[ib].markers[i].desired_vel[1] << std::endl;
@@ -545,25 +549,25 @@ void ObjectManager::ibm_banbks(double **a, long n, int m1, int m2, double **al,
 #undef SWAP
 
 // *****************************************************************************
-/// \brief	Update the position of a deformable iBody.
+/// \brief	Update the position of a movable iBody.
 ///
 ///			Wrapper for applying external forcing or structural calculations to
-///			iBodies marked as deformable. Updates support on completion.
+///			iBodies marked as movable. Updates support on completion.
 ///
 /// \param	ib	index of body to which calculation is to be applied.
 void ObjectManager::ibm_positionUpdate(int ib) {
 
 	// If a flexible body then launch structural solver to find new positions
-	if (iBody[ib].flex_rigid) {
+	if (iBody[ib].isFlexible) {
 
 		// Do jacowire calculation
 		ibm_jacowire(ib);
 
-	} else {	// Body is deformable but not flexible so positional update comes from
+	} else {	// Body is movable but not flexible so positional update comes from
 				// external forcing
 
 
-		// Call some routine for external forcing here...
+		// TODO: Call some routine for external forcing here...
 
 
 	}
@@ -587,9 +591,9 @@ void ObjectManager::ibm_positionUpdate(int ib) {
 }
 
 // *****************************************************************************
-/// \brief	Update the position of a group of deformable iBodies.
+/// \brief	Update the position of a group of movable iBodies.
 ///
-///			Updates the position of a group of non-flexible moving (deformable) 
+///			Updates the position of a group of non-flexible movable 
 ///			bodies by using the first flexible body in the group as the driver.
 ///			Must be called after all previous positional update routines have 
 ///			been called.
@@ -601,7 +605,7 @@ void ObjectManager::ibm_positionUpdateGroup(int group) {
 	int ib_flex = 0;
 	for (int i = 0; i < static_cast<int>(iBody.size()); i++) {
 
-		if (iBody[i].flex_rigid && iBody[i].groupID == group) {
+		if (iBody[i].isFlexible && iBody[i].groupID == group) {
 			ib_flex = i;
 			break;
 		}
@@ -611,10 +615,10 @@ void ObjectManager::ibm_positionUpdateGroup(int group) {
 	// Loop over bodies in group
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
-		// If body is deformable but not flexible give it a positional update from flexible
+		// If body is movable but not flexible give it a positional update from flexible
 		if (iBody[ib].groupID == group &&
-			iBody[ib].deformable &&
-			iBody[ib].flex_rigid == false) {
+			iBody[ib].isMovable &&
+			iBody[ib].isFlexible == false) {
 
 			// Copy the position vectors of flexible markers in x and y directions
 			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {

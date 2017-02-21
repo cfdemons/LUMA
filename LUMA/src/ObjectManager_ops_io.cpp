@@ -15,15 +15,15 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/GridUtils.h"
 #include "../inc/PCpts.h"
 #include "../inc/GridObj.h"
-#include "../inc/MpiManager.h"
 
 // ************************************************************************** //
 /// \brief Write out position of immersed boundary bodies.
 /// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_writeBodyPosition(int timestep) {
+
+	int rank = GridUtils::safeGetRank();
 
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
@@ -31,7 +31,7 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 			// Open file for given time step
 			std::ofstream jout;
 			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_position_" + std::to_string(timestep) + 
-				"_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+				"_rank" + std::to_string(rank) + ".out", std::ios::out);
 			jout << "x" + std::to_string(timestep) + ", y" + std::to_string(timestep) + ", z" << std::endl;
 
 			// Write out position
@@ -58,12 +58,14 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 /// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_writeLiftDrag(int timestep) {
 
+	int rank = GridUtils::safeGetRank();
+
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(rank) + ".out", std::ios::out);
 			jout << "L" + std::to_string(timestep) + ", D" + std::to_string(timestep) << std::endl;
 
 			// Sum variables
@@ -91,6 +93,8 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 /// \param	level	level of the grid begin written/read
 void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
+	int rank = GridUtils::safeGetRank();
+
 	if (IO_flag == eWrite) {
 
 		// Output stream
@@ -98,10 +102,10 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		if (level == 0) {
 			// Overwrite as first to write
-			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::out);
 		} else if (level == 0) {
 			// Append
-			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out | std::ios::app);
+			file.open(GridUtils::path_str + "/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::out | std::ios::app);
 		} else {
 			// Must be a subgrid which doesn't own any IB-bodies so return
 			return;
@@ -131,7 +135,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 						<< iBody[b].markers[m].position[2] << "\t";
 
 
-				if (iBody[b].flex_rigid) {
+				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
 					file << iBody[b].markers[m].position_old[0] << "\t"
@@ -153,12 +157,10 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 		std::ifstream file;
 
 		// We only enter this routine if on correct level so no need to check
-		file.open("./input/restart_IBBody_Rnk" + std::to_string(MpiManager::my_rank) + ".out", std::ios::in);
+		file.open("./input/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::in);
 
 		if (!file.is_open()) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "Error opening IBM restart file. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+			L_ERROR("Error opening IBM restart file. Exiting.", GridUtils::logfile);
 		}
 
 		// Read in one line of file at a time
@@ -178,9 +180,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		// Check number of bodies is correct
 		if (iBody.size() != num_bod) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "Number of IBM bodies does not match the number specified in the restart file. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+			L_ERROR("Number of IBM bodies does not match the number specified in the restart file. Exiting.", GridUtils::logfile);
 		}
 
 		// Loop over bodies
@@ -199,10 +199,8 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 			// Check number of markers the same
 			if (iBody[b].markers.size() != num_mark) {
-				std::cout << "Error: See Log File" << std::endl;
-				*GridUtils::logfile << "Number of IBM markers does not match the number specified for body " <<
-					b << " in the restart file. Exiting." << std::endl;
-				exit(LUMA_FAILED);
+				L_ERROR("Number of IBM markers does not match the number specified for body " +
+					std::to_string(b) + " in the restart file. Exiting.", GridUtils::logfile);
 			}
 
 			// Read in marker data
@@ -213,7 +211,7 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 						>> iBody[b].markers[m].position[1]
 						>> iBody[b].markers[m].position[2];
 
-				if (iBody[b].flex_rigid) {
+				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
 					iss		>> iBody[b].markers[m].position_old[0]
@@ -310,7 +308,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	int a = 0;
 
 	// Case-specific variables
-	int on_grid_lev, on_grid_reg, body_length, body_start_x, body_start_y, body_centre_z;
+	int on_grid_lev, on_grid_reg;
+	double body_length, body_start_x, body_start_y, body_centre_z;
 	eCartesianDirection scale_direction;
 	GridObj* g = NULL;
 
@@ -346,11 +345,10 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		// Definitions are in phsyical units so convert to LUs
 		on_grid_lev = L_IBB_ON_GRID_LEV;
 		on_grid_reg = L_IBB_ON_GRID_REG;
-		GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
-		body_length = static_cast<int>(L_IBB_LENGTH / g->dx);
-		body_start_x = static_cast<int>(L_START_IBB_X / g->dx);
-		body_start_y = static_cast<int>(L_START_IBB_Y / g->dx);
-		body_centre_z = static_cast<int>(L_CENTRE_IBB_Z / g->dx);
+		body_length = L_IBB_LENGTH;
+		body_start_x = L_START_IBB_X;
+		body_start_y = L_START_IBB_Y;
+		body_centre_z = L_CENTRE_IBB_Z;
 		scale_direction = L_IBB_SCALE_DIRECTION;
 		break;
 
@@ -358,9 +356,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Handle failure to open
 	if (!file.is_open()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Error opening cloud input file. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile);
 	}
 
 	// Get grid pointer
@@ -368,6 +364,15 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
+
+	// Get rank for debugging
+	int rank = GridUtils::safeGetRank();
+
+	// Round bounding box dimensions to nearest voxel edge on this grid
+	body_start_x = std::round(body_start_x / g->dh) * g->dh;
+	body_start_y = std::round(body_start_y / g->dh) * g->dh;
+	body_centre_z = std::round(body_centre_z / g->dh) * g->dh + g->dh / 2.0;	// Centre shifted to voxel centre
+	body_length = std::round(body_length / g->dh) * g->dh;
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -401,39 +406,39 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	// Error if no data
 	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Failed to read object data from cloud input file." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile);
 	}
 	else {
 		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
 	}
 
 
-	// Rescale coordinates and shift to global lattice units
-	// (option to scale based on whatever bounding box dimension chosen)
+	// Rescale coordinates to fit into size required
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Rescaling..." << std::endl;
 #endif
+
 	double scale_factor;
+	// Scale slightly smaller (to voxel centres) to ensure symmetrical distribution of voxels
 	if (scale_direction == eXDirection) {
-		scale_factor = (body_length * g->dx) /
+		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
 	else if (scale_direction == eYDirection) {
-		scale_factor = (body_length * g->dy) /
+		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
 	else if (scale_direction == eZDirection) {
-		scale_factor = (body_length * g->dz) /
+		scale_factor = (body_length - g->dh) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
 
-	double shift_x = (g->XOrigin + body_start_x * g->dx) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
-	double shift_y = (g->YOrigin + body_start_y * g->dy) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	// Shift to voxel centre not to edge
+	double shift_x = (body_start_x + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_y = (body_start_y + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-	double z_start_position = g->ZOrigin + (body_centre_z * g->dx) - (scaled_body_length / 2);
+	double z_start_position = body_centre_z - (scaled_body_length / 2);
 	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 
 	// Apply to each point to convert to global positions
@@ -446,9 +451,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Write out the points after scaling and shifting
 #ifdef L_CLOUD_DEBUG
 	if (!_PCpts->x.empty()) {
-		if (MpiManager::my_rank == 0) {
+		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(MpiManager::my_rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
 				fileout << std::endl;
@@ -458,25 +463,21 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// Declare local variables
-	std::vector<int> locals;
-	std::vector<int> globals;
+	// Declare local indices
+	std::vector<int> ijk;
+	eLocationOnRank loc = eNone;
 
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
-#endif
 	a = 0;
 	do {
 
-		// Get global voxel index from scaled positions
-		globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g);
-
-		// If on this rank
-		if (GridUtils::isOnThisRank(globals[0], globals[1], globals[2], *g)) {
+		// If on this rank get its indices
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
+		{
 			// Increment counter
 			a++;
-
 		}
 		// If not, erase
 		else {
@@ -487,14 +488,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
-
 	// Write out the points remaining in for debugging purposes
-#ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(MpiManager::my_rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
 			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
 			fileout << std::endl;
@@ -503,54 +502,51 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	}
 #endif
 
-	// If there are points left
-	if (!_PCpts->x.empty())	{
+	// Perform a different post-processing action depending on the type of body
+	switch (objtype)
+	{
 
-		// Perform a different post-processing action depending on the type of body
-		switch (objtype)
-		{
+	case eBBBCloud:
 
-		case eBBBCloud:
 #ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Labelling..." << std::endl;
+		*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
-			// Label the grid sites
-			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get global voxel index from scaled positions
-				globals = GridUtils::getVoxInd(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], g);
+		// Label the grid sites
+		for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-				// Get local indices
-				GridUtils::global_to_local(globals[0], globals[1], globals[2], g, locals);
-
+			// Get indices if on this rank
+			if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
+			{
 				// Update Typing Matrix
-				if (g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) == eFluid)
+				if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
 				{
-					g->LatTyp(locals[0], locals[1], locals[2], g->YInd.size(), g->ZInd.size()) = eSolid;
+					g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
 				}
 			}
-			break;
-		case eBFLCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call BFL body builder
-			bfl_buildBody(_PCpts);
-			break;
-
-		case eIBBCloud:
-
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
-			// Call IBM body builder
-			ibm_buildBody(_PCpts, g);
-			break;
-
 		}
+		break;
+
+	case eBFLCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call BFL body builder
+		bfl_buildBody(_PCpts);
+		break;
+
+	case eIBBCloud:
+
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
+		// Call IBM body builder
+		ibm_buildBody(_PCpts, g);
+		break;
 
 	}
+
 }
 // *****************************************************************************
 /// \brief	Write out the forces on a solid object.
@@ -559,6 +555,8 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 ///			momentum exchange. Each rank writes its own file. Output is a CSV file.
 /// \param	tval	time value at which write out is taking place.
 void ObjectManager::io_writeForceOnObject(double tval) {
+	
+	int rank = GridUtils::safeGetRank();
 
 	// Get grid on which object resides
 	GridObj *g = NULL;
@@ -571,7 +569,7 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 		fout.precision(L_OUTPUT_PRECISION);
 		// Filename
 		std::stringstream fileName;
-		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << MpiManager::my_rank << ".csv";
+		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << rank << ".csv";
 		// Open file
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
 		// Write out the header (first time step only)

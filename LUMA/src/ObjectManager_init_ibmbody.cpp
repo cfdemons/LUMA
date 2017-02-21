@@ -37,9 +37,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Check that the owning grid was found and exists
 	if ( iBody.back()._Owner == NULL ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Could not find the subgrid where the immersed boundary is meant to lie." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile);
 	}
 
 
@@ -83,8 +81,8 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// =========================== Build both with custom dimensions ===========================  //
 
 		// Dimensions
-		centrepoint.push_back( 2*(double)(L_BX-L_AX)/5 );
-		centrepoint.push_back( 2*(double)(L_BY - L_AY)/5 );
+		centrepoint.push_back( 2*(double)L_BX/5 );
+		centrepoint.push_back( 2*(double)L_BY/5 );
 		centrepoint.push_back(L_IBB_Z);
 		dimensions.push_back(L_IBB_W);
 		dimensions.push_back(L_IBB_L);
@@ -105,8 +103,8 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		angles.push_back(0.0);
 #endif
 		// Position
-		centrepoint[0] = 3*(double)(L_BX - L_AX)/5;
-		centrepoint[1] = 3*(double)(L_BY - L_AY)/5;
+		centrepoint[0] = 3*(double)L_BX/5;
+		centrepoint[1] = 3*(double)L_BY/5;
 		centrepoint[2] = L_IBB_Z;
 
 		// Build rectangle
@@ -309,7 +307,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 		// Delete TE markers
 		std::vector<int> logvec;
 		for (size_t m = 0; m < iBody.back().markers.size(); m++) {
-			if (fabs(iBody.back().markers[m].position[1] - start_y) < 1e-6) {				
+			if (fabs(iBody.back().markers[m].position[1] - start_y) < L_SMALL_NUMBER) {
 				logvec.push_back(static_cast<int>(m));
 			}
 		}
@@ -371,8 +369,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 void ObjectManager::ibm_buildBody(PCpts* _PCpts, GridObj *owner) {
 
 	// Add new body
-	iBody.emplace_back(owner, iBody.size());
-	iBody.back().makeBody(_PCpts);
+	iBody.emplace_back(owner, iBody.size(), _PCpts);
 
 }
 // ************************************************************************** //

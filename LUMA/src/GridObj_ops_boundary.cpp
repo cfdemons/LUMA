@@ -19,107 +19,6 @@
 #include "../inc/GridObj.h"
 #include "../inc/BFLBody.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/GridUtils.h"
-
-
-// ****************************************************************************
-/// \brief	Method to apply boundary conditions on lattice.
-///
-///			This method will exmaine the entire lattice for sites which require 
-///			a boundary condition but only apply the boundary condition requested
-///			in the bc_type_flag argument.
-///
-/// \param	bc_type_flag	Flag indicating which set of BCs to apply.
-void GridObj::LBM_boundary(int bc_type_flag) {
-
-	// Get object manager instance
-	ObjectManager *objman = ObjectManager::getInstance();
-
-	// Reset object forces for force calculation
-	if ((bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) && 
-		level == L_OBJECT_ON_GRID_LEV && region_number == L_OBJECT_ON_GRID_REG) {
-		objman->forceOnObjectX = 0.0;
-		objman->forceOnObjectY = 0.0;
-		objman->forceOnObjectZ = 0.0;
-	}
-
-
-	// Loop over grid, identify BC required & apply BC
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-
-
-				/*	******************************************************************************************
-					************************************* Solid Sites ****************************************
-					******************************************************************************************	*/
-    
-				// Apply to solid sites
-				if ( (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid)
-					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry) ) {
-
-					// Apply half-way bounce-back
-					bc_applyBounceBack(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
-
-#ifdef L_LD_OUT
-					// Compute lift and drag contribution of this site
-					objman->computeLiftDrag(i, j, k, this);
-#endif
-
-				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eSymmetry || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSymmetry)
-					&& (bc_type_flag == eBCAll || bc_type_flag == eBCSolidSymmetry)) {
-
-					// Apply half-way specular reflection
-					bc_applySpecReflect(LatTyp(i,j,k,M_lim,K_lim),i,j,k);
-
-
-				/*	******************************************************************************************
-					************************************* Inlet Sites ****************************************
-					******************************************************************************************	*/
-    
-				} else if ( (LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) 
-					&& (bc_type_flag == eBCAll || bc_type_flag == eBCInlet || bc_type_flag == eBCInletOutlet) ) {
-
-					// Choose option
-#if (defined L_INLET_ON && defined L_INLET_REGULARISED)
-					// Apply regularised BC
-					bc_applyRegularised(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
-#endif
-					// Do-Nothing BC is applied by default in a different way
-
-    
-				/*	******************************************************************************************
-					************************************ Outlet Sites ****************************************
-					******************************************************************************************	*/
-    
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == eOutlet && 
-					(bc_type_flag == eBCAll || bc_type_flag == eBCOutlet || bc_type_flag == eBCInletOutlet) ) {
-
-					// !! RIGHT HAND WALL ONLY !!
-#ifdef L_OUTLET_ON
-					// Apply extrapolation
-					bc_applyExtrapolation(LatTyp(i,j,k,M_lim,K_lim), i, j, k);
-#endif
-
-
-
-				/*	******************************************************************************************
-					************************************** BFL Sites *****************************************
-					******************************************************************************************	*/
-    
-				} else if (LatTyp(i,j,k,M_lim,K_lim) == eBFL && (bc_type_flag == eBCAll || bc_type_flag == eBCBFL) ) {
-
-					bc_applyBfl(i,j,k);
-						
-
-				}	// End of BC type control flow
-			
-			}	// End of lattice site loop
-		}
-	}
-    
-}
-
 
 // ****************************************************************************
 /// \brief	Method to apply half-way bounce-back.
@@ -268,7 +167,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 		dest_z = k+c[2][v_outgoing];
 
 		// If this site is off-grid then cannot determine orientation of wall
-		if (GridUtils::isOffGrid(dest_x,dest_y,dest_z,*this)) {
+		if (GridUtils::isOffGrid(dest_x, dest_y, dest_z, this)) {
 
 			continue;
 
@@ -314,13 +213,13 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 						// Get appropriate normal velocity (+ve u_normal = incoming flow)
 						switch (n) {
 						case 0:
-							u_normal = c[normal_dir][v_outgoing] * L_UX0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UX0,this);
 							break;
 						case 1:
-							u_normal = c[normal_dir][v_outgoing] * L_UY0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UY0,this);
 							break;
 						case 2:
-							u_normal = c[normal_dir][v_outgoing] * L_UZ0;
+							u_normal = c[normal_dir][v_outgoing] * GridUnits::ud2ulbm(L_UZ0,this);
 							break;
 						default:
 							u_normal = 0.0;
@@ -372,16 +271,16 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 			// Set macroscopic quantities to desired values
 			rho(i,j,k,M_lim,K_lim) = rho_wall;
-			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 			// Update feq to match the desired density and velocity and
 			// apply off-equilibrium bounce-back to unknown populations
 			for (n = 0; n < L_NUM_VELS; n++) {
-				feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i,j,k,n);
+				feq(i,j,k,n,M_lim,K_lim,L_NUM_VELS) = _LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, n);
 
 
 				// Different "if conditions" for corners/edges and normal walls
@@ -421,7 +320,7 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 				f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = 
 
-					LBM_collide(i,j,k,v) +
+					_LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v) +
 						
 					(w[v] / (2 * pow(cs,4))) * (
 					( (pow(c[0][v],2) - pow(cs,2)) * Sxx ) + 
@@ -449,15 +348,15 @@ void GridObj::bc_applyRegularised(int label, int i, int j, int k) {
 
 			// Set macroscopic quantities to default values
 			rho(i,j,k,M_lim,K_lim) = L_RHOIN;
-			u(i,j,k,0,M_lim,K_lim,L_DIMS) = L_UX0;
-			u(i,j,k,1,M_lim,K_lim,L_DIMS) = L_UY0;
+			u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
+			u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
-			u(i,j,k,2,M_lim,K_lim,L_DIMS) = L_UZ0;
+			u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
 			// Set f to default values
 			for (int v = 0; v < L_NUM_VELS; v++) {
-				feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = LBM_collide(i,j,k,v);
+				feq(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = _LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
 				f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = feq(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
 			}
 		}
@@ -690,33 +589,5 @@ void GridObj::bc_applySpecReflect(int label, int i, int j, int k) {
 
 }
 
-
-// ****************************************************************************
-/// \brief	Helper method to set macroscopic quantities of solid sites.
-///
-///			Velocity is set to zero and density is set to initial density.
-///			Applies to eSolid and eRefinedSolid sites only.
-void GridObj::bc_solidSiteReset( ) {
-
-	// Loop over grid
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-				
-				// Reset solid site velocities to zero
-				if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
-					
-					u(i,j,k,0,M_lim,K_lim,L_DIMS) = 0.0;
-					u(i,j,k,1,M_lim,K_lim,L_DIMS) = 0.0;
-#if (L_DIMS == 3)
-					u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
-#endif
-				}
-
-			}
-		}
-	}
-
-}
 // ****************************************************************************
 // ****************************************************************************

@@ -17,63 +17,9 @@
 
 #include "stdafx.h"
 class GridObj;
+class PCpts;
 #include "GridUtils.h"
-
-/// \brief	Container class to hold marker information.
-class MarkerData {
-
-public:
-
-	/// \brief Constructor.
-	/// \param i i-index of primary support site
-	/// \param j j-index of primary support site
-	/// \param k k-index of primary support site
-	/// \param x x-position of marker
-	/// \param y y-position of marker
-	/// \param z z-position of marker
-	/// \param ID marker number in a given body
-	MarkerData(int i, int j, int k, double x, double y, double z, int ID) {
-
-		// Custom constructor
-		this->i = i;
-		this->j = j;
-		this->k = k;
-		this->x = x;
-		this->y = y;
-		this->z = z;
-		this->ID = ID;
-
-	};
-
-	/// \brief	Default Constructor.
-	///
-	///			Initialise with invalid marker indicator which 
-	///			is to set the x position to NaN.
-	MarkerData(void) {
-
-		// Give invalid ID number at construction time
-		this->ID = -1;
-
-	};
-
-	/// Default destructor
-	~MarkerData(void) {};
-
-	// Voxel indices
-	int i;	///< i-index of primary support site
-	int j;	///< j-index of primary support site
-	int k;	///< k-index of primary support site
-
-	/// Marker ID (position in array of markers)
-	int ID;
-
-	// Marker position
-	double x;	///< x-position of marker
-	double y;	///< y-position of marker
-	double z;	///< z-position of marker
-
-};
-
+#include "MarkerData.h"
 
 
 /// \brief	Generic body class.
@@ -86,28 +32,34 @@ class Body
 
 public:
 
-	Body(void);			// Default Constructor
-	~Body(void);		// Default destructor
-	Body(GridObj* g, size_t id);	// Custom constructor assigning grid hierarchy
+	Body(void);					// Default Constructor
+	virtual ~Body(void);		// Default destructor
+	Body(GridObj* g, size_t id);					// Custom constructor assigning owning grid
+	Body(GridObj* g, size_t id, PCpts* _PCpts);		// Custom constructor to build from point cloud data
 
 	// ************************ Members ************************ //
 
 protected:
-	double spacing;						///< Spacing of the markers in physical units
+	double spacing;						///< Reference spacing of the markers
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
-	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (for output)
+	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	GridObj* _Owner;					///< Pointer to owning grid
-	size_t id;							///< ID of body in array of bodies
+	size_t id;							///< Unique ID of the body
 
 
 	// ************************ Methods ************************ //
 
-	void addMarker(double x, double y, double z);					// Add a marker
+	virtual void addMarker(double x, double y, double z);			// Add a marker (can be overrriden)
 	MarkerData* getMarkerData(double x, double y, double z);		// Retireve nearest marker data
-	void markerAdder(double x, double y, double z,
+	void passToVoxelFilter(double x, double y, double z,
 		int& curr_mark, std::vector<int>& counter);					// Voxelising marker adder
+
+private:
 	bool isInVoxel(double x, double y, double z, int curr_mark);	// Check a point is inside an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z);			// Check whether nearest voxel is a marker voxel
+
+protected:
+	void buildFromCloud(PCpts *_PCpts);								// Method to build body from point cloud
 
 
 };
@@ -117,7 +69,8 @@ protected:
 
 /// Default Constructor
 template <typename MarkerType>
-Body<MarkerType>::Body(void)
+Body<MarkerType>::Body(void) 
+	: _Owner(nullptr)
 {
 };
 /// Default destructor
@@ -129,13 +82,27 @@ Body<MarkerType>::~Body(void)
 /// \brief Custom constructor setting owning grid.
 ///
 /// \param g pointer to grid which owns this body.
-/// \param id indicates position of body in array of bodies.
+/// \param id indicates unique number of body in array of bodies.
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, size_t id)
+Body<MarkerType>::Body(GridObj* g, size_t id) 
+	: _Owner(g), id(id)
 {
-	this->_Owner = g;
-	this->id = id;
 };
+
+
+/// \brief Custom constructor to call method to build from point cloud.
+///
+/// \param g pointer to grid which owns this body.
+/// \param id indicates unique number of body in array of bodies.
+/// \param _PCpts pointer to point cloud data.
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
+	: _Owner(g), id(id)
+{
+	// Call method to build from point cloud
+	this->buildFromCloud(_PCpts);
+};
+
 
 /// \brief	Add marker to the body.
 /// \param	x global X-position of marker.
@@ -145,50 +112,49 @@ template <typename MarkerType>
 void Body<MarkerType>::addMarker(double x, double y, double z)
 {
 	// Add a new marker object to the array
-	markers.emplace_back(x, y, z);
+	markers.emplace_back(x, y, z, _Owner);
 
-	// Add nearest node as basic support
-	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
-	this->markers.back().supp_i.push_back(globals[0]);
-	this->markers.back().supp_j.push_back(globals[1]);
-	this->markers.back().supp_k.push_back(globals[2]);
 };
 
 /*********************************************/
 /// \brief	Retrieve marker data.
 ///
-///			Return marker and voxel/primary support data associated with
+///			Return marker whose primary support data is nearest the
 ///			supplied global position.
 ///
-/// \param x global X-position nearest to marker to be retrieved.
-/// \param y global Y-position nearest to marker to be retrieved.
-/// \param z global Z-position nearest to marker to be retrieved.
+/// \param x X-position nearest to marker to be retrieved.
+/// \param y Y-position nearest to marker to be retrieved.
+/// \param z Z-position nearest to marker to be retrieved.
 /// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid.
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
-	// Get global indices of voxel associated with the supplied position
-	std::vector<int> vox = GridUtils::getVoxInd(x, y, z, _Owner);
+	// Get indices of voxel associated with the supplied position
+	std::vector<int> vox;
+	eLocationOnRank *loc = nullptr;
+	if (GridUtils::isOnThisRank(x, y, z, loc, _Owner, &vox))
+	{
 
-	// Find all marker IDs that match these indices
-	for (int i = 0; i < static_cast<int>(markers.size()); ++i) {
-		if (markers[i].supp_i[0] == vox[0] &&
-			markers[i].supp_j[0] == vox[1] &&
-			markers[i].supp_k[0] == vox[2]) {
+		// Find marker whose primary support point matches these indices
+		for (int i = 0; i < static_cast<int>(markers.size()); ++i) {
+			if (markers[i].supp_i[0] == vox[0] &&
+				markers[i].supp_j[0] == vox[1] &&
+				markers[i].supp_k[0] == vox[2]) {
 
-			// Indice represents the target ID so create new MarkerData store on the heap
-			MarkerData* m_MarkerData = new MarkerData(
-				markers[i].supp_i[0],
-				markers[i].supp_j[0],
-				markers[i].supp_k[0],
-				markers[i].position[0],
-				markers[i].position[1],
-				markers[i].position[2],
-				i
-				);
-			return m_MarkerData;	// Return the pointer to store information
+				// Indice represents the target ID so create new MarkerData store on the heap
+				MarkerData* m_MarkerData = new MarkerData(
+					markers[i].supp_i[0],
+					markers[i].supp_j[0],
+					markers[i].supp_k[0],
+					markers[i].position[0],
+					markers[i].position[1],
+					markers[i].position[2],
+					i
+					);
+				return m_MarkerData;	// Return the pointer to store information
+			}
+
 		}
-
 	}
 
 	// If not found then create empty MarkerData store using default constructor
@@ -198,20 +164,21 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 };
 
 /*********************************************/
-/// \brief	Downsampling marker adding method
+/// \brief	Downsampling voxel-grid filter to take a point and add it to current body.
 ///
-///			This method tries to add a marker to body at the global location 
-///			given but obeys the rules of a voxel-grid filter to ensure markers are
+///			This method attempts to add a marker to body at the global location 
+///			but obeys the rules of a voxel-grid filter to ensure markers are
 ///			distributed such that their spacing roughly matches the 
-///			background lattice.
+///			background lattice. It is usually called in side a loop and requires
+///			a few extra pieces of information to be tracked throughout.
 ///
 /// \param x desired global X-position of new marker.
-/// \param y desired globalY-position of new marker.
-/// \param z desired globalZ-position of new marker.
-/// \param curr_mark is a reference to the ID of last marker.
+/// \param y desired global Y-position of new marker.
+/// \param z desired global Z-position of new marker.
+/// \param curr_mark is a reference to the ID of last marker added.
 ///	\param counter is a reference to the total number of markers in the body.
 template <typename MarkerType>
-void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
+void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int& curr_mark, std::vector<int>& counter) {
 
 	// If point in current voxel
 	if (isInVoxel(x, y, z, curr_mark)) {
@@ -267,6 +234,9 @@ void Body<MarkerType>::markerAdder(double x, double y, double z, int& curr_mark,
 
 /*********************************************/
 /// \brief	Determines whether a point is inside another marker's support voxel.
+///
+///			Typically called indirectly by the voxel-grid filter method and not directly.
+///
 /// \param x X-position of point.
 /// \param y Y-position of point.
 /// \param z Z-position of point.
@@ -277,16 +247,16 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
 	try {
 
-		// Try to retrieve the position of the marker identified by <curr_mark>
+		// Try to retrieve the position of the voxel centre belonging to <curr_mark>
 		// Assume that first support point is the closest to the marker position
-		int i = markers[curr_mark].supp_i[0];
-		int j = markers[curr_mark].supp_j[0];
-		int k = markers[curr_mark].supp_k[0];
+		double vx = _Owner->XPos[markers[curr_mark].supp_i[0]];
+		double vy = _Owner->YPos[markers[curr_mark].supp_j[0]];
+		double vz = _Owner->ZPos[markers[curr_mark].supp_k[0]];
 
 		// Test within
-		if ((x > i - (_Owner->dx / 2) && x <= i + (_Owner->dx / 2)) &&
-			(y > j - (_Owner->dx / 2) && y <= j + (_Owner->dx / 2)) &&
-			(z > k - (_Owner->dx / 2) && z <= k + (_Owner->dx / 2))
+		if ((x >= vx - (_Owner->dh / 2) && x < vx + (_Owner->dh / 2)) &&
+			(y >= vy - (_Owner->dh / 2) && y < vy + (_Owner->dh / 2)) &&
+			(z >= vz - (_Owner->dh / 2) && z < vz + (_Owner->dh / 2))
 			) return true;
 
 		// Catch all
@@ -304,9 +274,12 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
 /*********************************************/
 /// \brief	Determines whether a point is inside an existing marker's support voxel.
-/// \param x global X-position of point.
-/// \param y global Y-position of point.
-/// \param z global Z-position of point.
+///
+///			Typically called indirectly by the voxel-grid filter method and not directly.
+///
+/// \param x X-position of point.
+/// \param y Y-position of point.
+/// \param z Z-position of point.
 /// \return true of false
 // Returns boolean as to whether a given point is in an existing marker voxel
 template <typename MarkerType>
@@ -318,12 +291,66 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 	// True if the data store is not empty
 	if (m_data->ID != -1) {
 
-		delete m_data;	// Deallocate the store
+		delete m_data;	// Deallocate the store before leaving scope
 		return true;
 
 	}
 
+	delete m_data;
 	return false;
+
+};
+
+
+/*********************************************/
+/// \brief	Method to build a body from point cloud data.
+/// \param _PCpts	point cloud data from which to build body.
+// Returns boolean as to whether a given point is in an existing marker voxel
+template <typename MarkerType>
+void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
+{
+
+	// Declare local variables
+	std::vector<int> locals;
+
+	// Voxel grid filter //
+
+	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
+
+	// Place first marker
+	for (size_t a = 0; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
+		}
+		break;
+	}
+
+	// Increment counters
+	int curr_marker = 0;
+	std::vector<int> counter;
+	counter.push_back(1);
+
+	// Loop over array of points
+	for (size_t a = 1; a < _PCpts->x.size(); a++)
+	{
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
+		{
+			// Pass to overridden point builder
+			passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
+		}
+	}
+
+	*GridUtils::logfile << "ObjectManager: Object represented by " << std::to_string(markers.size()) <<
+		" markers using 1 marker / voxel voxelisation." << std::endl;
+
+	// Define spacing based on first two markers
+	this->spacing = GridUtils::vecnorm(
+		markers[1].position[0] - markers[0].position[0],
+		markers[1].position[1] - markers[0].position[1],
+		markers[1].position[2] - markers[0].position[2]
+		);
 
 };
 

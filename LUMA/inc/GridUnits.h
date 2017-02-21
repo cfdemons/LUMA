@@ -35,7 +35,7 @@ public:
 	/// \brief	Velocity in lattice units to velocity in physical units.
 	///
 	///			Converts velocity component from lattice units to m/s. 
-	///         It uses the L_PHYSICAL_U introduced by the user, dx and dt. 
+	///         It uses the L_PHYSICAL_U introduced by the user, dh and dt. 
 	///			You can introduce any L_PHYSICAL_U you want, but the reference lenght (usualy the width of the domain)
 	///         , the Re number and the LBM parameters will remain the same. So you will be implicitly changing the physical viscosity
 	///         of your fluid when you change L_PHYSICAL_U 
@@ -44,9 +44,57 @@ public:
 	/// \param currentGrid Pointer to the current grid. 
 	/// \return physical velocity
 	template <typename T>
-	static T ulat2uphys(T ulat, GridObj* currentGrid)
+	static double ulat2uphys(T ulat, GridObj* currentGrid)
 	{
-		return (ulat*currentGrid->dx*L_PHYSICAL_U) / currentGrid->dt;
+		return (ulat*currentGrid->dh*L_PHYSICAL_U) / currentGrid->dt;
+	}
+	
+	// *****************************************************************************
+	/// \brief	Velocity in dimensionless units to LBM units.
+	///
+	/// \param ud	Dimensionless velocity.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM velocity
+	template <typename T>
+	static double ud2ulbm(T ud, GridObj* currentGrid)
+	{
+		return (ud*currentGrid->dt) / currentGrid->dh;
+	}
+
+	// *****************************************************************************
+	/// \brief	lenght in dimensionless units to LBM units.
+	///
+	/// \param ld	Dimensionless length.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM length
+	template <typename T>
+	static double ld2llbm(T ld, GridObj* currentGrid)
+	{
+		return ld/currentGrid->dh;
+	}
+
+	// *****************************************************************************
+	/// \brief	Kinematic viscosity in dimensionless units to LBM units.
+	///
+	/// \param nud	Dimensionless kinematic viscosity.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM kinematic viscosity
+	template <typename T>
+	static double nud2nulbm(T nud, GridObj* currentGrid)
+	{
+		return (nud*currentGrid->dt)/(currentGrid->dh*currentGrid->dh);
+	}
+
+	// *****************************************************************************
+	/// \brief	Acceleration in dimensionless units to LBM units.
+	///
+	/// \param ad	Dimensionless acceleration.
+	/// \param currentGrid Pointer to the current grid. 
+	/// \return LBM acceleration
+	template <typename T>
+	static double fd2flbm(T ad, GridObj* currentGrid)
+	{
+		return (ad*currentGrid->dt*currentGrid->dt) / currentGrid->dh;
 	}
 
 	

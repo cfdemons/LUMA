@@ -1,0 +1,159 @@
+<CustomFilterDefinitions>
+  <CustomProxyDefinition name="Vorticity3D" group="filters">
+    <CompoundSourceProxy id="6228" servers="1">
+      <Proxy group="filters" type="Calculator" id="5331" servers="1" compound_name="Calculator1">
+        <Property name="AttributeMode" id="5331.AttributeMode" number_of_elements="1">
+          <Element index="0" value="2"/>
+          <Domain name="enum" id="5331.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="5331.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5331.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="5331.Function" number_of_elements="1">
+          <Element index="0" value="iHat*Ux+jHat*Uy+kHat*Uz"/>
+        </Property>
+        <Property name="Input" id="5331.Input" number_of_elements="1">
+          <Proxy value="5131" output_port="0"/>
+          <Domain name="groups" id="5331.Input.groups"/>
+          <Domain name="input_array" id="5331.Input.input_array"/>
+          <Domain name="input_type" id="5331.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="5331.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="5331.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="5331.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="5331.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="5331.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="Velocity"/>
+        </Property>
+        <Property name="ResultNormals" id="5331.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5331.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="5331.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5331.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Calculator" id="5762" servers="1" compound_name="Calculator2">
+        <Property name="AttributeMode" id="5762.AttributeMode" number_of_elements="1">
+          <Element index="0" value="2"/>
+          <Domain name="enum" id="5762.AttributeMode.enum">
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="CoordinateResults" id="5762.CoordinateResults" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5762.CoordinateResults.bool"/>
+        </Property>
+        <Property name="Function" id="5762.Function" number_of_elements="1">
+          <Element index="0" value="iHat*(Gradients_7-Gradients_5)-jHat*(Gradients_6-Gradients_2)+kHat*(Gradients_3-Gradients_1)"/>
+        </Property>
+        <Property name="Input" id="5762.Input" number_of_elements="1">
+          <Proxy value="5553" output_port="0"/>
+          <Domain name="groups" id="5762.Input.groups"/>
+          <Domain name="input_array" id="5762.Input.input_array"/>
+          <Domain name="input_type" id="5762.Input.input_type"/>
+        </Property>
+        <Property name="ReplaceInvalidValues" id="5762.ReplaceInvalidValues" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="5762.ReplaceInvalidValues.bool"/>
+        </Property>
+        <Property name="ReplacementValue" id="5762.ReplacementValue" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="range" id="5762.ReplacementValue.range"/>
+        </Property>
+        <Property name="ResultArrayName" id="5762.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="Vorticity"/>
+        </Property>
+        <Property name="ResultNormals" id="5762.ResultNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5762.ResultNormals.bool"/>
+        </Property>
+        <Property name="ResultTCoords" id="5762.ResultTCoords" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5762.ResultTCoords.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="CleanUnstructuredGrid" id="5131" servers="1" compound_name="CleantoGrid1">
+        <Property name="Input" id="5131.Input" number_of_elements="1">
+          <Domain name="groups" id="5131.Input.groups"/>
+          <Domain name="input_type" id="5131.Input.input_type"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="UnstructuredGradient" id="5553" servers="1" compound_name="GradientOfUnstructuredDataSet1">
+        <Property name="ComputeDivergence" id="5553.ComputeDivergence" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5553.ComputeDivergence.bool"/>
+        </Property>
+        <Property name="ComputeGradient" id="5553.ComputeGradient" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="5553.ComputeGradient.bool"/>
+        </Property>
+        <Property name="ComputeQCriterion" id="5553.ComputeQCriterion" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5553.ComputeQCriterion.bool"/>
+        </Property>
+        <Property name="ComputeVorticity" id="5553.ComputeVorticity" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5553.ComputeVorticity.bool"/>
+        </Property>
+        <Property name="DivergenceArrayName" id="5553.DivergenceArrayName" number_of_elements="1">
+          <Element index="0" value="Divergence"/>
+        </Property>
+        <Property name="FasterApproximation" id="5553.FasterApproximation" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="5553.FasterApproximation.bool"/>
+        </Property>
+        <Property name="Input" id="5553.Input" number_of_elements="1">
+          <Proxy value="5331" output_port="0"/>
+          <Domain name="groups" id="5553.Input.groups"/>
+          <Domain name="input_array" id="5553.Input.input_array"/>
+          <Domain name="input_type" id="5553.Input.input_type"/>
+        </Property>
+        <Property name="QCriterionArrayName" id="5553.QCriterionArrayName" number_of_elements="1">
+          <Element index="0" value="Q-criterion"/>
+        </Property>
+        <Property name="ResultArrayName" id="5553.ResultArrayName" number_of_elements="1">
+          <Element index="0" value="Gradients"/>
+        </Property>
+        <Property name="SelectInputScalars" id="5553.SelectInputScalars" number_of_elements="5">
+          <Element index="0" value=""/>
+          <Element index="1" value=""/>
+          <Element index="2" value=""/>
+          <Element index="3" value="1"/>
+          <Element index="4" value="Velocity"/>
+          <Domain name="array_list" id="5553.SelectInputScalars.array_list">
+            <String text="LatTyp"/>
+            <String text="Rho"/>
+            <String text="Ux"/>
+            <String text="Uy"/>
+            <String text="Uz"/>
+            <String text="Velocity"/>
+          </Domain>
+          <Domain name="field_list" id="5553.SelectInputScalars.field_list">
+            <Entry value="1" text="Cell Data"/>
+          </Domain>
+        </Property>
+        <Property name="VorticityArrayName" id="5553.VorticityArrayName" number_of_elements="1">
+          <Element index="0" value="Vorticity"/>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property name="Input" proxy_name="CleantoGrid1" exposed_name="Input"/>
+      </ExposedProperties>
+      <OutputPort name="Output" proxy="Calculator2" port_index="0"/>
+      <Hints>
+        <ShowInMenu/>
+      </Hints>
+    </CompoundSourceProxy>
+  </CustomProxyDefinition>
+</CustomFilterDefinitions>

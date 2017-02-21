@@ -20,13 +20,14 @@
 #include "../inc/IBBody.h"
 #include "../inc/IBMarker.h"
 #include "../inc/PCpts.h"
-#include "../inc/GridUtils.h"
 #include "../inc/ObjectManager.h"
 
 // ***************************************************************************************************
 /// \brief Constructor which sets group ID to zero by default.
 IBBody::IBBody()
 {
+	this->_Owner = nullptr;
+	this->id = 0;
 	this->groupID = 0;	// Default ID
 }
 
@@ -43,50 +44,71 @@ IBBody::IBBody(GridObj* g, size_t id)
 	this->groupID = 0;	// Default ID
 };
 
+// ***************************************************************************************************
+/// \brief	Constructor to build a body in place using a point cloud,
+///
+///			isFlexible and isMovable properties taken from definitions.
+///
+/// \param g		pointer to owner grid
+/// \param id		ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data.
+IBBody::IBBody(GridObj* g, size_t id, PCpts* _PCpts)
+{
+
+	// Set some default body properties
+	this->isMovable = L_IBB_MOVABLE;
+	this->isFlexible = L_IBB_FLEXIBLE;
+	this->_Owner = g;
+	this->id = id;
+	this->groupID = 0;
+
+	// Call inherited method to build from point cloud
+	this->buildFromCloud(_PCpts);
+
+}
+
 /// Default destructor
-IBBody::~IBBody(void) { }
+IBBody::~IBBody(void)
+{
+}
 
 // ***************************************************************************************************
 /// \brief	Method to add an IB marker to the body.
 ///
 ///			Adds marker at the given position with the given moving/non-moving flag.
 ///
-/// \param x global x-position of marker.
-/// \param y global y-position of marker.
-/// \param z global z-position of marker.
-/// \param flex_rigid flag to indicate whether marker is movable or not.
-void IBBody::addMarker(double x, double y, double z, bool flex_rigid) {
+/// \param x			global x-position of marker.
+/// \param y			global y-position of marker.
+/// \param z			global z-position of marker.
+/// \param isFlexible	flag to indicate whether marker is movable or not.
+void IBBody::addMarker(double x, double y, double z, bool isFlexible) {
 
 	// Extend array of particles by 1 and construct a new IBMarker object
-	markers.emplace_back(x, y, z, flex_rigid);
-
-	// Add nearest node as basic support
-	std::vector<int> globals = GridUtils::getVoxInd(x, y, z, _Owner);
-	this->markers.back().supp_i.push_back(globals[0]);
-	this->markers.back().supp_j.push_back(globals[1]);
-	this->markers.back().supp_k.push_back(globals[2]);
+	markers.emplace_back(x, y, z, _Owner, isFlexible);
 
 }
+
+/*************** PREFAB MAKE BODY METHODS ********************/
 
 // ***************************************************************************************************
 /// \brief	Method to seed markers for a sphere / circle.
 /// \param radius radius of circle/sphere.
 /// \param centre position vector of circle/sphere centre.
-/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
-/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param isFlexible flag to indicate whether body is flexible and requires a structural calculation.
+/// \param isMovable flag to indicate whether body is movable and requires relocation each time step.
 /// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(double radius, std::vector<double> centre,
-					   bool flex_rigid, bool deform, int group) {
+	bool isFlexible, bool isMovable, int group) {
 
 	// Designate body as beiong flexible or rigid and a closed surface
-	this->flex_rigid = flex_rigid;
+	this->isFlexible = isFlexible;
 	this->closed_surface = true;
 
-	// Designate deformable flag and groupID
-	if (flex_rigid) {
-		this->deformable = true;	// A flexible body must be deformable by definition
+	// Designate isMovable flag and groupID
+	if (isFlexible) {
+		this->isMovable = true;	// A flexible body must be movable by definition
 	} else {
-		this->deformable = deform;
+		this->isMovable = isMovable;
 	}
 	this->groupID = group;
 
@@ -104,7 +126,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
         double phi = k * inc;
 
 		// Add Lagrange marker to body (scale by radius)
-        addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), flex_rigid);
+        addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), isFlexible);
 	}
 
 	// Spacing (assuming all Lagrange markers are uniformly spaced)
@@ -124,7 +146,7 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 		// Add Lagrange marker to body
 		addMarker(	centre[0] + radius * cos(theta[i]),
 					centre[1] + radius * sin(theta[i]),
-					0.0, flex_rigid	);
+					0.0, isFlexible	);
 	}
 
 	// Spacing
@@ -142,21 +164,21 @@ void IBBody::makeBody(double radius, std::vector<double> centre,
 /// \param width_length_depth principal dimensions of cuboid / rectangle.
 /// \param angles principal orientation of cuboid / rectangle w.r.t. domain axes.
 /// \param centre position vector of cuboid / rectangle centre.
-/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
-/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param isFlexible flag to indicate whether body is flexible and requires a structural calculation.
+/// \param isMovable flag to indicate whether body is movable and requires relocation each time step.
 /// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
-					   bool flex_rigid, bool deform, int group) {
+					   bool isFlexible, bool isMovable, int group) {
 
 	// Designate body as being flexible or rigid and a closed surface
-	this->flex_rigid = flex_rigid;
+	this->isFlexible = isFlexible;
 	this->closed_surface = true;
 
-	// Designate deformable flag and groupID
-	if (flex_rigid) {
-		this->deformable = true;	// A flexible body must be deformable by definition
+	// Designate isMovable flag and groupID
+	if (isFlexible) {
+		this->isMovable = true;	// A flexible body must be movable by definition
 	} else {
-		this->deformable = deform;
+		this->isMovable = isFlexible;
 	}
 	this->groupID = group;
 
@@ -172,9 +194,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (fmod(L_IBB_W,L_IBB_L) != 0 && fmod(len,wid) != 0 && fmod(len,L_IBB_D) != 0 && fmod(dep,len) != 0) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -225,9 +246,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 			(2 * ( (pow(2,1) -1)*side_ratio_2 * (pow(2,1) -1) )) +
 			(2 * ( (pow(2,1) -1)*side_ratio_1 * (pow(2,1) -1)*side_ratio_2 ))
 		);
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -273,7 +293,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 						+ z*cos(angles[1] * L_PI / 180);
 
 					// Add marker
-					addMarker(xdash,ydash,zdash,flex_rigid);
+					addMarker(xdash,ydash,zdash,isFlexible);
 
 				}
 
@@ -287,9 +307,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(wid,len) != 0) && (fmod(len,wid) != 0)) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -308,9 +327,8 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -329,7 +347,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 	for (int i = 0; i < np_x; i++) {
 		for (int j = 0; j < np_y; j++) {
 			// 2D specification of z
-			z = (L_BZ - L_AZ)/2;
+			z = L_BZ/2;
 
 			// x and y positions
 			x = start_x + i*spacing;
@@ -346,7 +364,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 				zdash = z;
 
 				// Add marker
-				addMarker(xdash,ydash,zdash,flex_rigid);
+				addMarker(xdash,ydash,zdash,isFlexible);
 
 			}
 
@@ -357,9 +375,7 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 
 	// Just in case anything goes wrong here...
 	if (markers.size() != num_points) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Body is not closed. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Body is not closed. Exiting.", GridUtils::logfile);
 	}
 
 }
@@ -372,32 +388,31 @@ void IBBody::makeBody(std::vector<double> width_length_depth, std::vector<double
 /// \param angles two angles representing filament inclination w.r.t. domain axes 
 ///			(horizontal plane and vertical plane).
 /// \param BCs vector containing start and end boundary condition types (see class definition for valid values).
-/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
-/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param isFlexible flag to indicate whether body is flexible and requires a structural calculation.
+/// \param isMovable flag to indicate whether body is movable and requires relocation each time step.
 /// \param group ID indicating which group the body is part of for collective operations.
 void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles,
-					   std::vector<int> BCs, bool flex_rigid, bool deform, int group) {
+	std::vector<int> BCs, bool isFlexible, bool isMovable, int group) {
 
 
 	// **** Currently only allows start end to be simply supported or clamped and other end to be free ****
 	if ( BCs[1] != 0  || BCs[0] == 0 ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Only allowed to have a fixed starting end and a free ending end of a filament at the minute. Exiting.", 
+			GridUtils::logfile);
 	}
 
 	// Designate BCs
 	this->BCs = BCs;
 
 	// Designate the body as being flexible or rigid and an open surface
-	this->flex_rigid = flex_rigid;
+	this->isFlexible = isFlexible;
 	this->closed_surface = false;
 
-	// Designate deformable flag and groupID
-	if (flex_rigid) {
-		this->deformable = true;	// A flexible body must be deformable by definition
+	// Designate isMovable flag and groupID
+	if (isFlexible) {
+		this->isMovable = true;	// A flexible body must be movable by definition
 	} else {
-		this->deformable = deform;
+		this->isMovable = isFlexible;
 	}
 	this->groupID = group;
 
@@ -438,34 +453,34 @@ void IBBody::makeBody(int nummarkers, std::vector<double> start_point, double fi
 
 
 }
+
 // ***************************************************************************************************
 /// \brief	Method to seed markers for a 3D plate inclined from the XZ plane.
 /// \param width_length 2D vector of principal dimensions of thin plate.
 /// \param angle inclination angle from horizontal.
 /// \param centre position vector of the plate centre.
-/// \param flex_rigid flag to indicate whether body is flexible and requires a structural calculation.
-/// \param deform flag to indicate whether body is movable and requires relocation each time step.
+/// \param isFlexible flag to indicate whether body is flexible and requires a structural calculation.
+/// \param isMovable flag to indicate whether body is movable and requires relocation each time step.
 /// \param group ID indicating which group the body is part of for collective operations.
 /// \param plate arbitrary argument to allow overload otherwise would have the same signature as a filament builder.
 double IBBody::makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
-	bool flex_rigid, bool deform, int group, bool plate) {
+	bool isFlexible, bool isMovable, int group, bool plate) {
 
 	// Exit if called in 2D
 	if ( L_DIMS == 2 ) {
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("Plate builder must only be called in 3D. To build a 2D plate, use a rigid filament. Exiting.",
+			GridUtils::logfile);
 	}
 
 	// Designate body as being flexible or rigid and an open surface
-	this->flex_rigid = flex_rigid;
+	this->isFlexible = isFlexible;
     this->closed_surface = false;
 
-	// Designate deformable flag and groupID
-	if (flex_rigid) {
-		this->deformable = true;	// A flexible body must be deformable by definition
+	// Designate isMovable flag and groupID
+	if (isFlexible) {
+		this->isMovable = true;	// A flexible body must be movable by definition
 	} else {
-		this->deformable = deform;
+		this->isMovable = isFlexible;
 	}
 	this->groupID = group;
 
@@ -482,9 +497,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if ((fmod(len_z,len_x) != 0) && (fmod(len_x,len_z) != 0)) {
-			std::cout << "Error: See Log File" << std::endl;
-			*GridUtils::logfile << "IB body cannot be built with uniform points. Change its dimensions. Exiting." << std::endl;
-			exit(LUMA_FAILED);
+		L_ERROR("IB body cannot be built with uniform points. Change its dimensions. Exiting.",
+			GridUtils::logfile);
 		}
 
 	// Get ratio of sides and degree of point refinement
@@ -503,9 +517,8 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 	if (ref == 0) {
 		// Advisory of number of points
 		int advisory_num_points = (int)(4 + (2 * (pow(2,1) -1) ) + (2 * ( (side_ratio * pow(2,1)) -1) ) );
-		std::cout << "Error: See Log File" << std::endl;
-		*GridUtils::logfile << "IB body does not have enough points. Need " << advisory_num_points << " to build body. Exiting." << std::endl;
-		exit(LUMA_FAILED);
+		L_ERROR("IB body does not have enough points. Need " + std::to_string(advisory_num_points) + " to build body. Exiting.",
+			GridUtils::logfile);
 	}
 
 	// Number of points required to get uniform distribution and points on corners
@@ -533,7 +546,7 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 			z = start_z + (j*spacing);
 
 			// Add marker
-			addMarker(x,y,z,flex_rigid);
+			addMarker(x,y,z,isFlexible);
 
 
 		}
@@ -554,125 +567,3 @@ double IBBody::makeBody(std::vector<double> width_length, double angle, std::vec
 
 
 }
-
-// ***************************************************************************************************
-/// \brief	Method to build a body from a point cloud.
-///
-///			Flexibility and deformable properties taken from definitions.
-///
-/// \param _PCpts pointer to pointer cloud data.
-void IBBody::makeBody(PCpts* _PCpts) {
-
-
-	// Set some default body properties
-	this->deformable = L_IBB_MOVABLE;
-	this->flex_rigid = L_IBB_FLEXIBLE;
-
-	// Declare local variables
-	std::vector<int> locals;
-
-	// Voxel grid filter //
-
-	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
-
-	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], this->flex_rigid);
-
-	// Increment counters
-	int curr_marker = 0;
-	std::vector<int> counter;
-	counter.push_back(1);
-
-	// Loop over array of points
-	for (size_t a = 1; a < _PCpts->x.size(); a++) {
-
-		// Pass to overridden point builder
-		markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter, this->flex_rigid);
-
-	}
-
-	*GridUtils::logfile << "ObjectManagerIBB: Object represented by " << std::to_string(markers.size()) <<
-		" markers using 1 marker / voxel voxelisation." << std::endl;
-
-	// Add dynamic positions in physical units
-	for (size_t i = 0; i < markers.size(); i++) {
-		markers[i].position_old.push_back(markers[i].position[0]);
-		markers[i].position_old.push_back(markers[i].position[1]);
-		markers[i].position_old.push_back(markers[i].position[2]);
-	}
-
-	// Define spacing based on first two markers
-	this->spacing = GridUtils::vecnorm(
-		markers[1].position[0] - markers[0].position[0],
-		markers[1].position[1] - markers[0].position[1],
-		markers[1].position[2] - markers[0].position[2]
-		);
-
-}
-
-/*********************************************/
-/// \brief	Downsampling marker adding method (overload)
-///
-///			This method is an overload of the method in the parent class.
-///			This version takes the flexible/rigid flag and passes it to the 
-///			overloaded addMarker() method.
-///
-/// \param x desired global X-position of new marker.
-/// \param y desired globalY-position of new marker.
-/// \param z desired globalZ-position of new marker.
-/// \param curr_mark is a reference to the ID of last marker.
-///	\param counter is a reference to the total number of markers in the body.
-/// \param flex_rigid indicates whether markers added should form part of flexible or rigid body.
-void IBBody::markerAdder(double x, double y, double z, int& curr_mark, std::vector<int>& counter, bool flex_rigid) {
-
-	// If point in current voxel
-	if (isInVoxel(x, y, z, curr_mark)) {
-
-		// Increment point counter
-		counter[curr_mark]++;
-
-		// Update position of marker in current voxel
-		markers[curr_mark].position[0] =
-			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
-		markers[curr_mark].position[1] =
-			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
-		markers[curr_mark].position[2] =
-			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
-
-
-		// If point is in an existing voxel
-	}
-	else if (isVoxelMarkerVoxel(x, y, z)) {
-
-		// Recover voxel number
-		MarkerData* m_data = getMarkerData(x, y, z);
-		curr_mark = m_data->ID;
-
-		// Increment point counter
-		counter[curr_mark]++;
-
-		// Update position of marker in current voxel
-		markers[curr_mark].position[0] =
-			((markers[curr_mark].position[0] * (counter[curr_mark] - 1)) + x) / counter[curr_mark];
-		markers[curr_mark].position[1] =
-			((markers[curr_mark].position[1] * (counter[curr_mark] - 1)) + y) / counter[curr_mark];
-		markers[curr_mark].position[2] =
-			((markers[curr_mark].position[2] * (counter[curr_mark] - 1)) + z) / counter[curr_mark];
-
-		delete m_data;
-
-	}
-	// Must be in a new marker voxel
-	else {
-
-		// Reset counter and increment voxel index
-		curr_mark = static_cast<int>(counter.size());
-		counter.push_back(1);
-
-		// Create new marker as this is a new marker voxel
-		addMarker(x, y, z, flex_rigid);
-
-	}
-
-
-};

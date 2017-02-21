@@ -16,7 +16,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 
 // Static declarations
@@ -49,7 +48,9 @@ void ObjectManager::destroyInstance() {
 
 // ************************************************************************* //
 /// Default constructor
-ObjectManager::ObjectManager(void) { };
+ObjectManager::ObjectManager(void) {
+	_Grids = nullptr;
+};
 
 /// Default destructor
 ObjectManager::~ObjectManager(void) {
@@ -103,19 +104,19 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			int ydest = j + c[1][n];
 			int zdest = k + c[2][n];
 
+			// Reject site on grid edges (like single-cell walls)
+			if (GridUtils::isOffGrid(xdest, ydest, zdest, g)) return;
+
 			// Only apply if streams to a fluid site
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
 
 				forceOnObjectX +=
-					c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
-					c[0][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 				forceOnObjectY += 
-					c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
-					c[1][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 				forceOnObjectZ +=
-					c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS) - 
-					c[2][n] * g->f(i, j, k, n, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 
 			}
 		}

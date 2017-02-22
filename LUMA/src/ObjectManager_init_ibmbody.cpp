@@ -37,7 +37,7 @@ void ObjectManager::ibm_buildBody(int body_type) {
 
 	// Check that the owning grid was found and exists
 	if ( iBody.back()._Owner == NULL ) {
-		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile, MpiManager::getInstance()->my_rank);
+		L_ERROR("Could not find the subgrid where the immersed boundary is meant to lie.", GridUtils::logfile);
 	}
 
 

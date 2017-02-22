@@ -14,8 +14,6 @@
  */
 
 #include "../inc/stdafx.h"
-#include "../inc/GridUtils.h"
-#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
 
 // Mappings of directions for specular reflection: col == normal direction, row == velocity
@@ -265,7 +263,7 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != x.size()) {
-		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile, MpiManager::getInstance()->my_rank);
+		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile);
 	}
 
 	// Initialise answer
@@ -402,7 +400,7 @@ int GridUtils::getOpposite(int direction) {
 /// \param	k	local k-index of recv layer site being queried.
 /// \param	g	grid on which point being queried resides.
 /// \return	boolean answer.
-bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
+bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj const & g) {
 
 	// Local declarations
 	int exp_rank_coords[L_DIMS], act_rank_coords[L_DIMS], dimensions[L_DIMS];
@@ -481,23 +479,24 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, const GridObj& g) {
 /// \param[out]	loc		description of the location of the point.
 /// \return	boolean answer.
 bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc, 
-	const GridObj *grid, std::vector<int> *pos) {
+	GridObj const * const grid, std::vector<int> *pos) {
 	
-	// Get instance of MpiManager
-	MpiManager *mpim = MpiManager::getInstance();
-
 	// Initialise result
 	bool result = false;
 	bool new_vector = false;
+
+#ifdef L_BUILD_FOR_MPI
+	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 	
 	// Check whether point within the edges of grid core
 	if (
-		mpim->rank_core_edge[eXMin][mpim->my_rank] <= x && x < mpim->rank_core_edge[eXMax][mpim->my_rank] &&
-		mpim->rank_core_edge[eYMin][mpim->my_rank] <= y && y < mpim->rank_core_edge[eYMax][mpim->my_rank]
+		mpim->rank_core_edge[eXMin][rank] <= x && x < mpim->rank_core_edge[eXMax][rank] &&
+		mpim->rank_core_edge[eYMin][rank] <= y && y < mpim->rank_core_edge[eYMax][rank]
 
 #if (L_DIMS == 3)
 		&&
-		mpim->rank_core_edge[eZMin][mpim->my_rank] <= z && z < mpim->rank_core_edge[eZMax][mpim->my_rank]
+		mpim->rank_core_edge[eZMin][rank] <= z && z < mpim->rank_core_edge[eZMax][rank]
 #endif		
 		)
 	{
@@ -511,6 +510,28 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc,
 		if (loc != nullptr) *loc = eHalo;
 		result = true;
 	}
+
+#else
+
+	// In serial always on Core or not on grid at all
+	GridManager *gm = GridManager::getInstance();
+
+	// Check with coarsest grid limits
+	if (
+		gm->global_edges[eXMin][0] <= x && x < gm->global_edges[eXMax][0] &&
+		gm->global_edges[eYMin][0] <= y && y < gm->global_edges[eYMax][0]
+#if (L_DIMS == 3)
+		&&
+		gm->global_edges[eZMin][0] <= z && z < gm->global_edges[eZMax][0]
+#endif
+		)
+	{
+		if (loc != nullptr) *loc = eCore;
+		result = true;
+	}
+
+
+#endif	// L_BUILD_FOR_MPI
 
 	// Not on either core or halo so not on grid
 	else
@@ -552,10 +573,7 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc,
 /// \param[out]	pos	the local index of the found site.
 /// \return	boolean answer.
 bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir, 
-	eLocationOnRank *loc, const GridObj *grid, int *pos) {
-
-	// Get instance of MpiManager
-	MpiManager *mpim = MpiManager::getInstance();
+	eLocationOnRank *loc, GridObj const * const grid, int *pos) {
 
 	// Initialise result
 	bool result = false;
@@ -580,8 +598,14 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 		break;
 	}
 
+
+#ifdef L_BUILD_FOR_MPI
+
+	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
+
 	// Is on core?
-	if (mpim->rank_core_edge[lims[0]][mpim->my_rank] <= xyz && xyz < mpim->rank_core_edge[lims[1]][mpim->my_rank])
+	if (mpim->rank_core_edge[lims[0]][rank] <= xyz && xyz < mpim->rank_core_edge[lims[1]][rank])
 	{
 		if (loc != nullptr) *loc = eCore;
 		result = true;
@@ -596,6 +620,20 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 		if (loc != nullptr) *loc = eHalo;
 		result = true;
 	}
+
+#else
+
+	// In serial always on Core or not on grid at all
+	GridManager *gm = GridManager::getInstance();
+
+	// Check with coarsest grid limits
+	if (gm->global_edges[lims[0]][0] <= xyz && xyz < gm->global_edges[lims[1]][0])
+	{
+		if (loc != nullptr) *loc = eCore;
+		result = true;
+	}
+
+#endif	// L_BUILD_FOR_MPI
 
 	// Not on grid
 	else
@@ -626,13 +664,13 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 /// \param	pGrid	parent grid at appropriate level.
 /// \param	RegNum	region number desired.
 /// \return	boolean answer.
-bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
+bool GridUtils::intersectsRefinedRegion(GridObj const & pGrid, int RegNum) {
 
 
 	/* To check this condition we need at least one of the voxel centres on the 
-	 * grid to have a position within the edges of the refined region. The MPIM
+	 * grid to have a position within the edges of the refined region. The GM
 	 * has the grid edge information against which we can check the voxels. */
-	MpiManager *mpim = MpiManager::getInstance();
+	GridManager *gm = GridManager::getInstance();
 	bool result = false;
 	size_t i;
 		
@@ -641,8 +679,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	for (i = 0; i < pGrid.N_lim; ++i)
 	{
 		// If voxel centre intersects range of refined region
-		if (pGrid.XPos[i] > mpim->global_edges[eXMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.XPos[i] < mpim->global_edges[eXMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.XPos[i] > gm->global_edges[eXMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.XPos[i] < gm->global_edges[eXMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;	// Possibility of intersection
 			break; 
@@ -655,8 +693,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	// Y //
 	for (i = 0; i < pGrid.M_lim; ++i)
 	{
-		if (pGrid.YPos[i] > mpim->global_edges[eYMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.YPos[i] < mpim->global_edges[eYMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.YPos[i] > gm->global_edges[eYMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.YPos[i] < gm->global_edges[eYMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;
 			break;
@@ -670,8 +708,8 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 	// Z //
 	for (i = 0; i < pGrid.K_lim; ++i)
 	{
-		if (pGrid.ZPos[i] > mpim->global_edges[eZMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
-			pGrid.ZPos[i] < mpim->global_edges[eZMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
+		if (pGrid.ZPos[i] > gm->global_edges[eZMin][(pGrid.level + 1) + RegNum * L_NUM_LEVELS] &&
+			pGrid.ZPos[i] < gm->global_edges[eZMax][(pGrid.level + 1) + RegNum * L_NUM_LEVELS])
 		{
 			result = true;
 			break;
@@ -693,11 +731,11 @@ bool GridUtils::intersectsRefinedRegion(const GridObj& pGrid, int RegNum) {
 ///			existence of a grid on a rank by passing in a NULL pointer and 
 ///			checking if a NULL pointer is returned.
 ///
-/// \param		Grids	x-position of site.
-/// \param		level	y-position of site.
-/// \param		region	z-position of site.
-/// \param[out] ptr		pointer containing address of grid in hierarchy.
-void GridUtils::getGrid(GridObj*& Grids, int level, int region, GridObj*& ptr) {
+/// \param		Grids	constant pointer to the grid at which to start searching.
+/// \param		level	level desired.
+/// \param		region	region desried.
+/// \param[out] ptr		reference to pointer where address of grid matching in hierarchy will be assigned.
+void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr) {
 
 	// Check supplied grid for a match
 	if (Grids->level == level && Grids->region_number == region) {
@@ -836,7 +874,7 @@ bool GridUtils::isOnSenderLayer(double site_position, enum eCartMinMax edge) {
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer(). Exiting.", logfile, mpim->my_rank);
+		L_ERROR("Invalid direction specified in GridUtils::isOnSenderLayer(). Exiting.", logfile);
 	}
 
 	return false;
@@ -918,7 +956,7 @@ bool GridUtils::isOnRecvLayer(double site_position, enum eCartMinMax edge) {
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnRecvLayer(). Exiting.", logfile, mpim->my_rank);
+		L_ERROR("Invalid direction specified in GridUtils::isOnRecvLayer(). Exiting.", logfile);
 	}
 
 	return false;
@@ -935,7 +973,7 @@ bool GridUtils::isOnRecvLayer(double site_position, enum eCartMinMax edge) {
 /// \param	pos_z	z-position of site.
 /// \param	grid	given grid on which to check.
 /// \return	boolean answer.
-bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, const GridObj *grid)
+bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const  * const grid)
 {
 
 	if (
@@ -967,13 +1005,13 @@ bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, co
 /// \param	edge			combination of cartesian direction and choice of edge.
 /// \param	grid		given grid on which to check.
 /// \return	boolean answer.
-bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, const GridObj *grid) {
+bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, GridObj const * grid) {
 
 	// L0 has no TL so always return false
 	if (grid->level == 0) return false;
 
-	// Get MpiManager instance
-	MpiManager *mpim = MpiManager::getInstance();
+	// Get GM instance
+	GridManager *gm = GridManager::getInstance();
 
 	/* TL defined by absolute position of inner edge relative to the refined limits (outer edge).
 	 * The actual location of this region is obtainable through by adding / subtracting the width
@@ -987,48 +1025,48 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, cons
 	if (edge == eXMax)
 	{
 		// If no TL as indicated at grid initialisation time then return
-		if (!mpim->subgrid_tlayer_key[eXMax][idx - 1]) return false;
+		if (!gm->subgrid_tlayer_key[eXMax][idx - 1]) return false;
 
 		// Define TL
-		right_edge = mpim->global_edges[eXMax][idx];
+		right_edge = gm->global_edges[eXMax][idx];
 		left_edge = right_edge - 2.0 * grid->dh;
 	}
 	else if (edge == eXMin)
 	{
-		if (!mpim->subgrid_tlayer_key[eXMin][idx - 1]) return false;
-		left_edge = mpim->global_edges[eXMin][idx];
+		if (!gm->subgrid_tlayer_key[eXMin][idx - 1]) return false;
+		left_edge = gm->global_edges[eXMin][idx];
 		right_edge = left_edge + 2.0 * grid->dh;
 	}
 	else if (edge == eYMax)
 	{
-		if (!mpim->subgrid_tlayer_key[eYMax][idx - 1]) return false;
-		right_edge = mpim->global_edges[eYMax][idx];
+		if (!gm->subgrid_tlayer_key[eYMax][idx - 1]) return false;
+		right_edge = gm->global_edges[eYMax][idx];
 		left_edge = right_edge - 2.0 * grid->dh;
 	}
 	else if (edge == eYMin)
 	{
-		if (!mpim->subgrid_tlayer_key[eYMin][idx - 1]) return false;
-		left_edge = mpim->global_edges[eYMin][idx];
+		if (!gm->subgrid_tlayer_key[eYMin][idx - 1]) return false;
+		left_edge = gm->global_edges[eYMin][idx];
 		right_edge = left_edge + 2.0 * grid->dh;
 	}
 	else if (edge == eZMax)
 	{
-		if (!mpim->subgrid_tlayer_key[eZMax][idx - 1]) return false;
-		right_edge = mpim->global_edges[eZMax][idx];
+		if (!gm->subgrid_tlayer_key[eZMax][idx - 1]) return false;
+		right_edge = gm->global_edges[eZMax][idx];
 		left_edge = right_edge - 2.0 * grid->dh;
 
 	}
 	else if (edge == eZMin)
 	{
-		if (!mpim->subgrid_tlayer_key[eZMin][idx - 1]) return false;
-		left_edge = mpim->global_edges[eZMin][idx];
+		if (!gm->subgrid_tlayer_key[eZMin][idx - 1]) return false;
+		left_edge = gm->global_edges[eZMin][idx];
 		right_edge = left_edge + 2.0 * grid->dh;
 
 	}
 	else
 	{
 		// Invalid string indicating direction
-		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile, mpim->my_rank);
+		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile);
 	}
 
 	if (position >= left_edge && position < right_edge) return true;
@@ -1049,31 +1087,83 @@ void GridUtils::createOutputDirectory(std::string path_str) {
 	// Create output directory if it does not already exist
 	std::string command = "mkdir -p " + path_str;
 
-	// Get MpiManager
-	MpiManager *mpim = MpiManager::getInstance();
-
-	// Only get rank 0 to create output directory
-#ifdef L_BUILD_FOR_MPI
-
-	#ifdef _WIN32   // Running on Windows
-		if (mpim->my_rank == 0)
+#ifdef _WIN32   // Running on Windows
 			CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
-	#else   // Running on Unix system
-		if (mpim->my_rank == 0)
+#else
 			system(command.c_str());
-	#endif // _WIN32
-
-#else // L_BUILD_FOR_MPI
-
-	#ifdef _WIN32   // Running on Windows
-		CreateDirectoryA((LPCSTR)path_str.c_str(), NULL);
-	#else   // Running on Unix system
-		system(command.c_str());
-	#endif // _WIN32
-
-#endif // L_BUILD_FOR_MPI
+#endif // _WIN32
 
 	return;	// TODO: Handle directory creation errors
+}
+
+// ****************************************************************************
+/// \brief	Reads coordinates and velocity data from a file. 
+///
+///			The file format is x_coord  y_coord  z_coord ux uy uz 
+///			It expects the file to have a column for z_coord and a column for uz even with L_DIMS = 2
+///
+/// \param	path_str	full path and filename as string.
+/// \param  x_coord     vector where the x coordinate of each point will be stored
+/// \param  y_coord     vector where the y coordinate of each point will be stored
+/// \param  z_coord     vector where the z coordinate of each point will be stored
+/// \param  ux          vector where the x component of the velocity will be stored
+/// \param  uy          vector where the y component of the velocity will be stored
+/// \param  uz          vector where the z component of the velocity will be stored
+void GridUtils::readVelocityFromFile(std::string path_str, std::vector<double>& x_coord, std::vector<double>& y_coord, std::vector<double>& z_coord, std::vector<double>& ux, std::vector<double>& uy, std::vector<double>& uz)
+{
+	// Indicate to log
+	*GridUtils::logfile << "Reading file..." << std::endl;
+
+	double tmp;
+	
+	// Buffer information from file
+	std::ifstream datafile;
+	datafile.open(path_str, std::ios::in);
+	if (!datafile.is_open()) {
+		// Error opening file
+		L_ERROR("Cannot open velocity data file named " + path_str + ". Exiting.", GridUtils::logfile);
+
+	}
+	else {
+
+		std::string line_in;	// String to store line
+		std::istringstream iss;	// Buffer stream
+
+		while (!datafile.eof()) {
+
+			// Get line and put in buffer
+			std::getline(datafile, line_in, '\n');
+			iss.str(line_in);
+			iss.seekg(0); // Reset buffer position to start of buffer
+
+			// Get x position
+			iss >> tmp;
+			x_coord.push_back(tmp);
+
+			// Get y position
+			iss >> tmp;
+			y_coord.push_back(tmp);
+
+			// Get z position
+			iss >> tmp;
+			z_coord.push_back(tmp);
+
+			// Get x velocity
+			iss >> tmp;
+			ux.push_back(tmp);
+
+			// Get y velocity
+			iss >> tmp;
+			uy.push_back(tmp);
+
+			// Get z velocity
+			iss >> tmp;
+			uz.push_back(tmp);
+
+		}
+
+	}
+
 }
 
 // ****************************************************************************
@@ -1083,7 +1173,7 @@ void GridUtils::createOutputDirectory(std::string path_str) {
 /// \param	k	local k-index.
 /// \param	g	grid on which to check.
 /// \return boolean answer.
-bool GridUtils::isOffGrid(int i, int j, int k, const GridObj *g) {
+bool GridUtils::isOffGrid(int i, int j, int k, GridObj const * const g) {
 
 	if (
 		(i >= g->N_lim || i < 0) ||
@@ -1137,7 +1227,7 @@ int GridUtils::getMpiDirection(int offset_vector[])
 /// \param	z	z-position.
 /// \param	g	lattice on which to look for enclosing voxel.
 /// \param	ijk	pointer to vector where indices are to be placed.
-void GridUtils::getEnclosingVoxel(double x, double y, double z, const GridObj *g, std::vector<int> *ijk) {
+void GridUtils::getEnclosingVoxel(double x, double y, double z, GridObj const * const g, std::vector<int> *ijk) {
 
 	// Declarations
 	ijk->clear();
@@ -1180,14 +1270,14 @@ void GridUtils::getEnclosingVoxel(double x, double y, double z, const GridObj *g
 /// \param	g	lattice on which to look for enclosing voxel.
 ///	\param	dir	1D direction.
 /// \param	ijk	pointer to local index storage location.
-void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirection dir, int *ijk) {
+void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesianDirection dir, int *ijk) {
 
 	// Declarations
 	int offset, idxLower, idxUpper;
-	double offset_baseline;
+	double offset_baseline, local_edge;
 
-	// Get MpiManager instance
-	MpiManager *mpim = MpiManager::getInstance();
+	// Get GM instance
+	GridManager *gm = GridManager::getInstance();
 	
 	// Find how far point is from edge of grid core and round to nearest voxel.
 
@@ -1207,38 +1297,48 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 		idxUpper = eZMax;
 	}
 
-	// Set offset baseline to grid start edge of grid
-	offset_baseline = mpim->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
+	// Set offset baseline to grid start edge of grid for serial builds
+	offset_baseline = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
+	local_edge = offset_baseline;
+
+#ifdef L_BUILD_FOR_MPI
+	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	/* If less than the lower grid core edge but is on the upper halo
 	 * then must be a TL site in a periodically wrapped upper halo. */
-	if (xyz < mpim->rank_core_edge[idxLower][mpim->my_rank] && 
+	if (xyz < mpim->rank_core_edge[idxLower][rank] && 
 		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxUpper)))
 	{
 		// Set to projected position off top of rank core to get correct ijk
-		xyz = mpim->rank_core_edge[idxUpper][mpim->my_rank] + 
-			abs(xyz - mpim->global_edges[idxLower][g->level]);
+		xyz = mpim->rank_core_edge[idxUpper][rank] + 
+			abs(xyz - gm->global_edges[idxLower][g->level]);
 
 		// Set offset baseline to the upper edge of rank core
-		offset_baseline = mpim->rank_core_edge[idxUpper][mpim->my_rank];
+		offset_baseline = mpim->rank_core_edge[idxUpper][rank];
 	}
 
 	/* If greater than the upper grid core edge but is on the lower halo
 	* then must be a TL site in a periodically wrapped lower halo. */
-	else if (xyz > mpim->rank_core_edge[idxUpper][mpim->my_rank] && 
+	else if (xyz > mpim->rank_core_edge[idxUpper][rank] && 
 		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxLower)))
 	{
 		// Set to projected position off bottom of rank core to get correct ijk
-		xyz = mpim->rank_core_edge[idxLower][mpim->my_rank] - 
-			abs(xyz - mpim->global_edges[idxUpper][g->level]);
+		xyz = mpim->rank_core_edge[idxLower][rank] - 
+			abs(xyz - gm->global_edges[idxUpper][g->level]);
 
 		// Set offset baseline to the upper edge of rank core
-		offset_baseline = mpim->rank_core_edge[idxLower][mpim->my_rank];
+		offset_baseline = mpim->rank_core_edge[idxLower][rank];
 	}
+
+	// Get local lower edge
+	local_edge = mpim->rank_core_edge[idxLower][rank];
+
+#endif // L_BUILD_FOR_MPI
 
 	// Compute number of complete cells between point and edge of rank core
 	*ijk = static_cast<int>(
-		std::floor((xyz - mpim->rank_core_edge[idxLower][mpim->my_rank]) / g->dh)
+		std::floor((xyz - local_edge) / g->dh)
 		);
 
 	/* Compute offset from global edge i.e. number of voxels between grid edge and 
@@ -1246,7 +1346,7 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	 * there may be round-off errors which might give an non-zero answer when zero 
 	 * was expected) */
 	offset = static_cast<int>(
-		std::round((mpim->rank_core_edge[idxLower][mpim->my_rank] - offset_baseline) / g->dh)
+		std::round((local_edge - offset_baseline) / g->dh)
 		);
 
 	/* If the origin is not on the halo but outside this rank to the left then offset
@@ -1267,5 +1367,32 @@ void GridUtils::getEnclosingVoxel(double xyz, const GridObj *g, eCartesianDirect
 	*ijk += offset;
 
 	return;
+
+}
+
+
+// ****************************************************************************
+/// \brief	Safe method to get the rank number.
+///
+///			This is a serial/parallel agnostic method to get the rank number.
+///			This is necessary as often we just want to access the rank number for
+///			logging purposes and don't want to have to wrap every call to avoid
+///			attempts to use the MPI manager in non-MPI code.
+///
+///	\returns	integer specifying the rank number. Zero if using serial code.
+int GridUtils::safeGetRank()
+{
+	
+#ifdef L_BUILD_FOR_MPI
+
+	// Get MPI Manager Instance
+	MpiManager *mpim = MpiManager::getInstance();
+	return mpim->my_rank;
+
+#else
+
+	return 0;
+
+#endif
 
 }

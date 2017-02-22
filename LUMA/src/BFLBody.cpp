@@ -15,10 +15,8 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/BFLBody.h"
-#include "../inc/MpiManager.h"
 #include "../inc/PCpts.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 
 // Implementation of BFL body class //
@@ -37,60 +35,29 @@ BFLBody::~BFLBody(void)
 
 /*********************************************/
 /// \brief Custom constructor to populate body from array of points.
-/// \param _PCpts pointer to point cloud data
 /// \param g_hierarchy pointer to grid hierarchy
 /// \param id	ID of body in array of bodies.
-BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
+/// \param _PCpts pointer to point cloud data
+BFLBody::BFLBody(GridObj* g_hierarchy, size_t id, PCpts* _PCpts) {
 
 	// Assign pointer to owning grid
 	GridUtils::getGrid(g_hierarchy, L_BFL_ON_GRID_LEV, L_BFL_ON_GRID_REG, this->_Owner);
 	this->id = id;
-
-	// Voxel grid filter //
-
-	*GridUtils::logfile << "ObjectManagerBFL: Applying voxel grid filter..." << std::endl;
-
-	// Place first BFL marker
-	for (size_t a = 0; a < _PCpts->x.size(); a++)
-	{
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]))
-		{
-			addMarker(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a]);
-			break;
-		}
-	}
-
-	// Increment counters
-	int curr_marker = 0;
-	std::vector<int> counter;
-	counter.push_back(1);
-
-	// Loop over array of points
-	for (size_t a = 1; a < _PCpts->x.size(); a++)
-	{
-		if (GridUtils::isOnThisRank(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0]))
-		{
-			// Pass to point builder
-			markerAdder(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], curr_marker, counter);
-		}
-	}
-
-	*GridUtils::logfile << "ObjectManagerBFL: Object represented by " << std::to_string(markers.size()) << 
-		" markers using 1 marker / voxel voxelisation." << std::endl;
+	
+	// Call method to build from cloud
+	this->buildFromCloud(_PCpts);
 
 #ifdef L_BFL_DEBUG
 	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
 	for (size_t n = 0; n < markers.size(); n++) {
 		file << std::to_string(n) << ", " << 
 			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
 			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
-	}
+}
 	file.close();
 #endif
-
-
 
 	// Labelling //
 	*GridUtils::logfile << "ObjectManagerBFL: Labelling lattice voxels..." << std::endl;
@@ -102,9 +69,8 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	// Get each marker in turn
 	for (Marker& m : markers) {
 
-		// When using MPI need to convert the global indices of the support sites to local indices for array access
+		// Label as BFL site
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
-
 	}
 
 
@@ -141,7 +107,7 @@ BFLBody::BFLBody(PCpts* _PCpts, GridObj* g_hierarchy, size_t id) {
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
 #ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
 	for (std::vector<double> i : Q) {
 		for (size_t n = 0; n < markers.size(); n++) {

@@ -33,16 +33,12 @@ public:
 	// Default constructor and destructor
 	BFLBody(void);
 	~BFLBody(void);
-	// Custom constructor which takes pointer to point cloud data and a pointer to the grid hierarchy for the labelling
-	BFLBody(PCpts *_PCpts, GridObj *g_hierarchy, size_t id);
+	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
+	BFLBody(GridObj *g, size_t id, PCpts *_PCpts);
 
 protected:
 
-	/*
-	***************************************************************************************************************
-	********************************************* Member Data *****************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Data **************/
 
 	/// \brief	Distance between adjacent lattice site and the surface of the body.
 	///
@@ -52,11 +48,7 @@ protected:
 	std::vector< std::vector<double> > Q;
 
 
-	/*
-	***************************************************************************************************************
-	********************************************* Member Methods **************************************************
-	***************************************************************************************************************
-	*/
+	/************** Member Methods **************/
 
 	// Compute Q routine + overload
 	void computeQ(int i, int j, int k, GridObj* g);

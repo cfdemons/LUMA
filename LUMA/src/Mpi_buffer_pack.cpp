@@ -14,10 +14,7 @@
  */
 
 #include "../inc/stdafx.h"
-#include <mpi.h>
-#include "../inc/MpiManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 
 // ****************************************************************************
@@ -28,8 +25,8 @@
 ///			of the communication being prepared.
 ///
 /// \param	dir	communication direction.
-/// \param	g	grid doing the communication.
-void MpiManager::mpi_buffer_pack( int dir, GridObj* g ) {
+/// \param	g	grid from which information is being sent during the communication.
+void MpiManager::mpi_buffer_pack(int dir, GridObj* const g) {
 	
 	/* Imagine every grid overlap has an inner region with complete information post-stream
 	 * and an outer region with incomplete information post-stream.

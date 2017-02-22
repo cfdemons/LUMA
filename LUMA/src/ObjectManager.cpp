@@ -16,7 +16,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/GridObj.h"
-#include "../inc/GridUtils.h"
 
 
 // Static declarations

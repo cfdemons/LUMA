@@ -16,16 +16,17 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 
 // *****************************************************************************
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply() {
 
+#ifdef L_BUILD_FOR_MPI
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
+	int rank = GridUtils::safeGetRank();
 
 	// Loop over array of IB_bodies and perform IB operations
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
@@ -34,7 +35,7 @@ void ObjectManager::ibm_apply() {
 		// DEBUG -- write out support coordinates
 		std::ofstream suppout;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::app);
+			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(ib) + "_" + std::to_string(m) + "_rank" + std::to_string(_rank) + ".out",std::ios::app);
 			suppout << "\nNEW TIME STEP" << std::endl;
 			suppout << "x\ty\tz" << std::endl;
 			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
@@ -51,7 +52,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out epsilon values
 		std::ofstream epout;
-		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::app);
+		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		epout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			epout << iBody[ib].markers[m].epsilon << std::endl;
@@ -65,7 +66,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out interpolate velocity values
 		std::ofstream predout;
-		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::app);
+		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		predout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			predout << iBody[ib].markers[m].fluid_vel[0] << "\t" << iBody[ib].markers[m].fluid_vel[1] << std::endl;
@@ -79,7 +80,7 @@ void ObjectManager::ibm_apply() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out Lagrange force values
 		std::ofstream forceout;
-		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out",std::ios::app);
+		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		forceout << "\nNEW TIME STEP" << std::endl;
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
@@ -101,12 +102,12 @@ void ObjectManager::ibm_apply() {
 ///
 void ObjectManager::ibm_moveBodies() {
 
-	// Loop over bodies launching positional update if deformable to compute new locations of markers
+	// Loop over bodies launching positional update if movable to compute new locations of markers
 	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
-		// If body is deformable it needs a positional update
-		if (iBody[ib].deformable) {
+		// If body is movable it needs a positional update
+		if (iBody[ib].isMovable) {
 
 			// Call structural or forced positional update and recompute support
 			ibm_positionUpdate(ib);
@@ -135,8 +136,11 @@ void ObjectManager::ibm_moveBodies() {
 ///
 void ObjectManager::ibm_initialise() {
 
+#ifdef L_BUILD_FOR_MPI
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
+	int rank = GridUtils::safeGetRank();
 
 	// Loop over the number of bodies in the iBody array
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
@@ -144,7 +148,7 @@ void ObjectManager::ibm_initialise() {
 #ifdef L_IBM_DEBUG
 		// DEBUG -- write out marker coordinates
 		std::ofstream bodyout;
-		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out");
+		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out");
 		bodyout << "x\ty\tz" << std::endl;
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << std::endl;
@@ -201,8 +205,7 @@ double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 /// \param	m	marker whose support is to be found.
 void ObjectManager::ibm_findSupport(int ib, int m) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	// Declarations
 	int inear, jnear;							// Nearest node indices (global indices)
@@ -210,8 +213,10 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	int knear;
 
 #ifdef L_BUILD_FOR_MPI
+	MpiManager *mpim = MpiManager::getInstance();
+
 	int estimated_rank_offset[3] = { 0, 0, 0 };
-	iBody[ib].markers[m].support_rank.push_back(mpim->my_rank);	// Add this rank for owning the first support point
+	iBody[ib].markers[m].support_rank.push_back(rank);	// Add this rank for owning the first support point
 #endif
 
 	// Find closest support node
@@ -243,7 +248,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	std::ofstream supportout;
 	supportout.open(GridUtils::path_str
 		+ "/IBsupport_" + std::to_string(ib)
-		+ "_rank" + std::to_string(mpim->my_rank)
+		+ "_rank" + std::to_string(rank)
 		+ ".out", std::ios::app);
 	if (m == 0)
 	{
@@ -318,7 +323,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 						iBody[ib].markers[m].supp_k.push_back(k);
 
 						// Add owning rank as this one for now
-						iBody[ib].markers[m].support_rank.push_back(mpim->my_rank);
+						iBody[ib].markers[m].support_rank.push_back(rank);
 
 
 #ifdef L_BUILD_FOR_MPI
@@ -420,7 +425,7 @@ void ObjectManager::ibm_interpol(int ib) {
 #if (L_DIMS == 3)
 	size_t K_lim = iBody[ib]._Owner->K_lim;
 #endif
-
+	int rank = GridUtils::safeGetRank();
 
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
@@ -460,12 +465,15 @@ void ObjectManager::ibm_interpol(int ib) {
 	}
 
 #ifdef L_IBM_DEBUG
+
+#ifdef L_BUILD_FOR_MPI
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
 
 	// DEBUG -- write out res vector
 	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 	testout << "\nNEW TIME STEP" << std::endl;
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
@@ -499,6 +507,8 @@ void ObjectManager::ibm_computeForce(int ib) {
 /// \param	ib	iBody being operated on.
 void ObjectManager::ibm_spread(int ib) {
 
+	int rank = GridUtils::safeGetRank();
+
 	// For each marker
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 		// Loop over support nodes
@@ -525,12 +535,14 @@ void ObjectManager::ibm_spread(int ib) {
 
 #ifdef L_IBM_DEBUG
 
+#ifdef L_BUILD_FOR_MPI
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
 
 	// DEBUG -- write out res vector
 	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out", std::ios::app);
+	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
 	testout << "\nNEW TIME STEP" << std::endl;
 	// Get size of grid
 	size_t M_lim = iBody[ib]._Owner->M_lim;
@@ -551,6 +563,8 @@ void ObjectManager::ibm_spread(int ib) {
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
 double ObjectManager::ibm_findEpsilon(int ib) {
+
+	int rank = GridUtils::safeGetRank();
 
 	/***** TODO: In order to compute epsilon using this linear system a single process needs 
 	to know all the delta values of all the support points in the body to build the whole system. 
@@ -657,12 +671,14 @@ double ObjectManager::ibm_findEpsilon(int ib) {
 
 #ifdef L_IBM_DEBUG
 
+#ifdef L_BUILD_FOR_MPI
 	// Get MPI Manager Instance
 	MpiManager *mpim = MpiManager::getInstance();
+#endif
 
 	// DEBUG -- write out A
 	std::ofstream Aout;
-	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(ib) + "_rank" + std::to_string(mpim->my_rank) + ".out");
+	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(ib) + "_rank" + std::to_string(rank) + ".out");
 	for (size_t i = 0; i < A.size(); i++) {
 		Aout << "\n";
 		for (size_t j = 0; j < A.size(); j++) {

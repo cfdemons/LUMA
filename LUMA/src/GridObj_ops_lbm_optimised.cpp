@@ -16,8 +16,6 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/MpiManager.h"
-#include "../inc/GridUtils.h"
 
 // *****************************************************************************
 /// \brief	Optimised LBM multi-grid kernel.
@@ -523,7 +521,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 #ifdef L_GRAVITY_ON
 	// Add gravity
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * L_GRAVITY_FORCE * refinement_ratio;
+		rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Now compute force_i components from Cartesian force vector

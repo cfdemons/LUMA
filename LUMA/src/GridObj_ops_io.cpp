@@ -17,11 +17,9 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
-#include "../inc/MpiManager.h"
 #include "../inc/ObjectManager.h"
-#include "../inc/GridUtils.h"
 #include "../inc/hdf5luma.h"
-#include "../inc/GridUnits.h"
+//#include "../inc/GridUnits.h"
 
 using namespace std;
 
@@ -34,8 +32,7 @@ using namespace std;
 /// \param output_tag	text string added to top of output for identification.
 void GridObj::io_textout(std::string output_tag) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	// Create stream and open text file
 	ofstream gridoutput;
@@ -51,7 +48,7 @@ void GridObj::io_textout(std::string output_tag) {
 	else ex_str = to_string(CoarseLimsX[eMinimum]) + string("_") + to_string(CoarseLimsY[eMinimum]) + string("_") + to_string(CoarseLimsZ[eMinimum]);
 	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
-	mpirank = to_string(mpim->my_rank);
+	mpirank = to_string(rank);
 	// Build string
 	FNameG = string(GridUtils::path_str + "/Grids")
 			+ string("D") +  to_string(L_DIMS)
@@ -294,8 +291,7 @@ void GridObj::io_fgaout() {
 ///
 void GridObj::_io_fgaout(int timeStepL0) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 	
 	// Create stream and open text file
 	ofstream gridoutput;
@@ -312,7 +308,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 	//else ex_str = to_string(CoarseLimsX[eMinimum]) + string("_") + to_string(CoarseLimsY[eMinimum]) + string("_") + to_string(CoarseLimsZ[eMinimum]);
 	if (L_NUM_LEVELS == 0) NumReg_str = to_string(0);
 	else NumReg_str = to_string(region_number);
-	mpirank = to_string(mpim->my_rank);
+	mpirank = to_string(rank);
 	// Build string
 	FNameG = string(GridUtils::path_str + "/Grids")
 		+ string("D") + to_string(L_DIMS)
@@ -394,8 +390,12 @@ void GridObj::_io_fgaout(int timeStepL0) {
 /// \param IO_flag	flag to indicate whether a write or read
 void GridObj::io_restart(eIOFlag IO_flag) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	// Get GM Instance
+	GridManager *gm = GridManager::getInstance();
+
+	// Rank string
+	std::string rnk_str = std::to_string(GridUtils::safeGetRank());
+
 
 	if (IO_flag == eWrite) {
 
@@ -410,11 +410,11 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 		if (level == 0) {
 			// New file
-			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::out);
+			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + rnk_str + ".out", std::ios::out);
 		}
 		else {
 			// Append
-			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::out | std::ios::app);
+			file.open(GridUtils::path_str + "/restart_LBM_Rnk" + rnk_str + ".out", std::ios::out | std::ios::app);
 		}
 
 		// Counters
@@ -486,9 +486,9 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		// LBM Data -- READ //
 		//////////////////////
 
-		file.open("./input/restart_LBM_Rnk" + std::to_string(mpim->my_rank) + ".out", std::ios::in);
+		file.open("./input/restart_LBM_Rnk" + rnk_str + ".out", std::ios::in);
 		if (!file.is_open()) {
-			L_ERROR("Error opening LBM restart file. Exiting.", GridUtils::logfile, mpim->my_rank);
+			L_ERROR("Error opening LBM restart file. Exiting.", GridUtils::logfile);
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
@@ -512,7 +512,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 			// Get grid
 			GridObj *g = nullptr;
-			GridUtils::getGrid(mpim->Grids, in_level, in_regnum, g);
+			GridUtils::getGrid(gm->Grids, in_level, in_regnum, g);
 
 			// Read in positions
 			iss >> x >> y >> z;
@@ -564,15 +564,14 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 ///			file.
 void GridObj::io_probeOutput() {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 
 	// Declarations
 	std::ofstream probefile;
 	int i, j, d;
 	double x, y, z;
 
-	if (t == L_PROBE_OUT_FREQ && mpim->my_rank == 0) {
+	if (t == L_PROBE_OUT_FREQ && rank == 0) {
 		// Overwrite existing first time through
 		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out);
 	} else {
@@ -581,8 +580,12 @@ void GridObj::io_probeOutput() {
 	}
 
 	// Start a new line if first rank
-	if (mpim->my_rank == 0) probefile << std::endl;
+	if (rank == 0) probefile << std::endl;
 
+	// Declarations
+	eLocationOnRank *loc = nullptr;
+	GridObj *g = nullptr;
+	std::vector<int> ijk;
 
 	// Probe spacing in each direction
 	double pspace[L_DIMS];
@@ -595,7 +598,7 @@ void GridObj::io_probeOutput() {
 		pspace[2] = abs(cProbeLimsZ[1] - cProbeLimsZ[0]) / (cNumProbes[2] - 1);
 #endif
 
-	// Loop over probe points
+	// Loop over probe points to compute positions
 	for (i = 0; i < cNumProbes[0]; i++) {
 		x = cProbeLimsX[0] + i*pspace[0];
 
@@ -608,22 +611,44 @@ void GridObj::io_probeOutput() {
 #else
 			z = 0.0; {
 #endif
+				// Set written flag
+				bool bProbeWritten = false;
 
-				// Is point on rank, if not move on
-				eLocationOnRank *loc = nullptr;
-				std::vector<int> ijk;
-				if (!GridUtils::isOnThisRank(x,y,z,loc,this,&ijk)) continue;
-	
-				// Write out velocity components and add tab
-				for (d = 0; d < L_DIMS; d++)
+				// Get each grid available on this rank in reverse order
+				for (int lev = L_NUM_LEVELS; lev >= 0; --lev)
 				{
-					probefile << u(ijk[0], ijk[1], ijk[2], d, M_lim, K_lim, L_DIMS) << "\t";
+					for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
+					{
+
+						// Get grid if available
+						GridUtils::getGrid(GridManager::getInstance()->Grids, lev, reg, g);
+						if (g == nullptr) continue;
+
+						// Determine if point is on this grid
+						if (!GridUtils::isOnThisRank(x, y, z, loc, g, &ijk)) continue;
+
+						// Don't want it if on a halo as it will be duplicated
+						if (*loc == eHalo) continue;
+
+						// As long as not on a TL to finer we can use it
+						if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eTransitionToFiner) continue;
+
+						// Write out velocity components and add tab
+						for (d = 0; d < L_DIMS; d++)
+						{
+							probefile << g->u(ijk[0], ijk[1], ijk[2], d, g->M_lim, g->K_lim, L_DIMS) << "\t";
+						}
+
+						bProbeWritten = true;
+						break;
+
+					}
+
+					if (bProbeWritten) break;
 				}
 
 			}
-
 		}
-
 	}
 
 	probefile.close();
@@ -641,13 +666,12 @@ void GridObj::io_probeOutput() {
 /// \param TAG	text identifier for the data.
 void GridObj::io_lite(double tval, std::string TAG) {
 
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
 	std::ofstream litefile;
 
 	// Filename
 	std::string filename ("./" + GridUtils::path_str + "/io_lite.Lev" + std::to_string(level) + ".Reg" + std::to_string(region_number)
-			+ ".Rnk" + std::to_string(mpim->my_rank) + "." + std::to_string((int)tval) + ".dat");
+			+ ".Rnk" + std::to_string(rank) + "." + std::to_string((int)tval) + ".dat");
 
 	// Create file
 	litefile.open(filename, std::ios::out);
@@ -673,7 +697,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 				{
 
 					// Write out rank
-					litefile << mpim->my_rank << "\t";
+					litefile << rank << "\t";
 				
 					// Write out type
 					litefile << LatTyp(i,j,k,M_lim,K_lim) << "\t";
@@ -757,11 +781,17 @@ void GridObj::io_lite(double tval, std::string TAG) {
 /// \param tval	time value being written out.
 int GridObj::io_hdf5(double tval) {
 
+	// Get GM
+	GridManager *gm = GridManager::getInstance();
+
 	// Get MPIM
+#ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
 
 #ifdef L_MPI_VERBOSE
 	*mpim->logout << "Writing out Level " << level << ", Region " << region_number << std::endl;
+#endif
+
 #endif
 
 	/***********************/
@@ -769,7 +799,9 @@ int GridObj::io_hdf5(double tval) {
 	/***********************/
 
 	// Construct filename
-	std::string FILE_NAME(GridUtils::path_str + "/hdf_R" + std::to_string(region_number) + "N" + std::to_string(level) + ".h5");
+	std::string FILE_NAME(GridUtils::path_str + 
+		"/hdf_R" + std::to_string(region_number) + 
+		"N" + std::to_string(level) + ".h5");
 
 	// ID declarations
 	hid_t file_id = static_cast<hid_t>(NULL);
@@ -789,7 +821,7 @@ int GridObj::io_hdf5(double tval) {
 	// Others
 	herr_t status = 0;
 	std::string variable_name;
-	MpiManager::phdf5_struct p_data;
+	HDFstruct p_data;
 	int TL_thickness;
 	bool TL_present[3];		// Access using eCartesianDirection
 
@@ -810,14 +842,15 @@ int GridObj::io_hdf5(double tval) {
 	else {
 		// TL thickness is 2 cells on sub-grids
 		TL_thickness = 2;
-		TL_present[eXDirection] = mpim->subgrid_tlayer_key[eXMin][level + region_number * L_NUM_LEVELS];
-		TL_present[eYDirection] = mpim->subgrid_tlayer_key[eYMin][level + region_number * L_NUM_LEVELS];
-		TL_present[eZDirection] = mpim->subgrid_tlayer_key[eZMin][level + region_number * L_NUM_LEVELS];
+		TL_present[eXDirection] = gm->subgrid_tlayer_key[eXMin][level + region_number * L_NUM_LEVELS];
+		TL_present[eYDirection] = gm->subgrid_tlayer_key[eYMin][level + region_number * L_NUM_LEVELS];
+		TL_present[eZDirection] = gm->subgrid_tlayer_key[eZMin][level + region_number * L_NUM_LEVELS];
 	}
 
 
-	// Retrieve writable data information for this grid from MPIM
-	for (MpiManager::phdf5_struct pd : mpim->p_data) {
+
+	// Retrieve writable data information for this grid from GM
+	for (HDFstruct pd : gm->p_data) {
 		if (pd.level == level && pd.region == region_number) {
 			p_data = pd;
 			break;
@@ -874,18 +907,27 @@ int GridObj::io_hdf5(double tval) {
 		// Create group
 		group_id = H5Gcreate(file_id, time_string.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-		// Compute dataspaces (file space data in MPIM and ex. TL where appropriate)
+		// Compute dataspaces (file space data in GM and ex. TL where appropriate)
 		int idx = level + region_number * L_NUM_LEVELS;
-		dimsf[0] = mpim->global_size[eXDirection][idx]
-			- mpim->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
-			- mpim->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness;
-		dimsf[1] = mpim->global_size[eYDirection][idx]
-			- mpim->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
-			- mpim->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness;
+		dimsf[0] = gm->global_size[eXDirection][idx];
+		dimsf[1] = gm->global_size[eYDirection][idx];
+		if (level > 0)
+		{
+			dimsf[0] -= 
+				(gm->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness);
+			dimsf[1] -=
+				(gm->subgrid_tlayer_key[eYMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eYMax][idx - 1] * TL_thickness);
+		}
 #if (L_DIMS == 3)
-		dimsf[2] = mpim->global_size[eZDirection][idx]
-			- mpim->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
-			- mpim->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness;
+		dimsf[2] = gm->global_size[eZDirection][idx];
+		if (level > 0)
+		{
+			dimsf[2] -=
+				(gm->subgrid_tlayer_key[eZMin][idx - 1] * TL_thickness
+				+ gm->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness);
+		}
 #endif
 		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
 
@@ -922,7 +964,7 @@ int GridObj::io_hdf5(double tval) {
 			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute space close failed: " << status << std::endl;
 
 			// Write Timesteps
-			buffer_int = L_TIMESTEPS;
+			buffer_int = L_TOTAL_TIMESTEPS;
 			dimsa[0] = 1;
 			attspace = H5Screate_simple(1, dimsa, NULL);
 			attrib_id = H5Acreate(file_id, "Timesteps", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
@@ -1181,7 +1223,7 @@ int GridObj::io_hdf5(double tval) {
 		{
 			L_ERROR("Communicator has a non-null value despite having no writable data: " +
 				std::to_string(mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]),
-				GridUtils::logfile, mpim->my_rank);
+				GridUtils::logfile);
 		}
 #endif
 

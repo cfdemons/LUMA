@@ -145,21 +145,25 @@ void GridObj::LBM_initVelocity ( ) {
 	GridUtils::readVelocityFromFile("./input/initial_velocity.in", x_coord, y_coord, z_coord, ux, uy, uz);
 	int gridSize = L_N*L_M*L_K;
 
-	// Check that the data in the file has the same number of points as the current grid. 
-	// The initial velocity data is copied directly to the cells,not interpolated, so the number of points has to match the number of cells.
+	/* Check that the data in the file has the same number of points as the current grid. 
+	 * The initial velocity data is copied directly to the cells, not interpolated, 
+	 * so the number of points has to match the number of cells. */
 	if (x_coord.size() < gridSize) {
 		L_ERROR("The initial velocity file has less points than the LBM grid -- change L_BX/L_BY/L_BZ/L_RESOLUTION or change the file initial_velocity.in. Exiting.",
 			GridUtils::logfile);
 	}
 	else if (x_coord.size() > gridSize) {
-		*GridUtils::logfile << "WARNING: The initial velocity file has more points than the LBM grid. LUMA will only read as many points as the LBM grid has." << std::endl; 
+		L_INFO("WARNING: The initial velocity file has more points than the LBM grid. LUMA will only read as many points as the LBM grid has.",
+			GridUtils::logfile);
 	}
 
 	// Loop over the data and assign the part the corresponds to the current processor. 
-	for (int i = 0; i < gridSize; i++){
+	for (int i = 0; i < gridSize; i++)
+	{
 		eLocationOnRank loc;
 		std::vector<int> indices;
-		if (GridUtils::isOnThisRank(x_coord[i], y_coord[i], z_coord[i], &loc, this, &indices)){
+		if (GridUtils::isOnThisRank(x_coord[i], y_coord[i], z_coord[i], &loc, this, &indices))
+		{
 			u(indices[0], indices[1], indices[2], 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(ux[i], this);
 			u(indices[0], indices[1], indices[2], 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(uy[i], this);
 #if (L_DIMS == 3)
@@ -178,7 +182,8 @@ void GridObj::LBM_initVelocity ( ) {
 			for (int k = 0; k < K_lim; k++) {
 				
 #ifdef L_NO_FLOW				
-				for (size_t d = 0; d < L_DIMS; d++) {
+				for (size_t d = 0; d < L_DIMS; d++)
+				{
 
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
@@ -186,8 +191,7 @@ void GridObj::LBM_initVelocity ( ) {
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
 				 * have either been read in from an input file or defined by an expression 
-				 * given in the definitions.
-				 */
+				 * given in the definitions. */
 				u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
 				u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
 #if (L_DIMS == 3)
@@ -196,7 +200,8 @@ void GridObj::LBM_initVelocity ( ) {
 
 
 #endif
-				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid) {
+				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid)
+				{
 					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = 0.0;
 					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = 0.0;
 #if (L_DIMS == 3)

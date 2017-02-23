@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 class GridObj;
-class PCpts;
+#include "PCpts.h"
 #include "GridUtils.h"
 #include "MarkerData.h"
 

@@ -583,7 +583,7 @@ void GridObj::io_probeOutput() {
 	if (rank == 0) probefile << std::endl;
 
 	// Declarations
-	eLocationOnRank *loc = nullptr;
+	eLocationOnRank loc = eNone;
 	GridObj *g = nullptr;
 	std::vector<int> ijk;
 
@@ -625,10 +625,10 @@ void GridObj::io_probeOutput() {
 						if (g == nullptr) continue;
 
 						// Determine if point is on this grid
-						if (!GridUtils::isOnThisRank(x, y, z, loc, g, &ijk)) continue;
+						if (!GridUtils::isOnThisRank(x, y, z, &loc, g, &ijk)) continue;
 
 						// Don't want it if on a halo as it will be duplicated
-						if (*loc == eHalo) continue;
+						if (loc == eHalo) continue;
 
 						// As long as not on a TL to finer we can use it
 						if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eTransitionToFiner) continue;

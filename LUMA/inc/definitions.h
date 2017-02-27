@@ -156,10 +156,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_UMAX 1.5		       ///< Max velocity of inlet profile
 
-// If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.04			///< Initial/inlet x-velocity
+// If not using an inlet profile, specify values or expressions here in dimensionless units
+#define L_UX0 0.5			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
@@ -259,10 +258,6 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Outlets
 #define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
-
-
-// Periodicity
-#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
 
 
 // Solids

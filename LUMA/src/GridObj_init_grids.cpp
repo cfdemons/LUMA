@@ -43,7 +43,7 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = GridUnits::ud2ulbm(L_UMAX,this) * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0,this) * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}
@@ -1145,7 +1145,7 @@ void GridObj::LBM_initBoundLab ( ) {
 	// Left hand face only
 
 	// Check for potential singularity in BC
-	if (GridUnits::ud2ulbm(L_UMAX,this) == 1 || uref == 1) {
+	if (GridUnits::ud2ulbm(L_UX0,this) == 1 || uref == 1) {
 		// Singularity so exit
 		L_ERROR("Inlet BC fails with L_UX0 in LBM units = 1, choose something else. Exiting.", GridUtils::logfile);
 	}

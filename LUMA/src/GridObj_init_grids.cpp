@@ -44,7 +44,7 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = L_UMAX * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+		ux_in[j] = L_UMAX * (1 - pow(((YPos[j] - dh) - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}

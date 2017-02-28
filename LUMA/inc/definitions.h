@@ -67,8 +67,8 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
+#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
@@ -88,7 +88,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Gravity
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force
 #define L_GRAVITY_FORCE 0.0001
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
@@ -96,7 +96,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 5000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 50000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -110,7 +110,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -133,12 +133,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 1		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 100		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.1		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 20.0		///< End of domain in X (non-dimensional units)
-#define L_BY 10.0		///< End of domain in Y (non-dimensional units)
+#define L_BX 2.2		///< End of domain in X (non-dimensional units)
+#define L_BY 0.43		///< End of domain in Y (non-dimensional units)
 #define L_BZ 1.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -152,9 +152,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE	///< Use an inlet profile
-//#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
-#define L_UREF 0.04				///< Reference velocity for scaling
+#define L_USE_INLET_PROFILE	///< Use an inlet profile
+#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_UREF 0.08				///< Reference velocity for scaling
 #define L_UMAX L_UREF*1.5		///< Max velocity of inlet profile
 
 // If not using an inlet profile, specify values or expressions here
@@ -163,9 +163,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density
-#define L_RE 150			///< Desired Reynolds number
+#define L_RE 20			///< Desired Reynolds number
 
-#define L_REF_LENGTH 6.0	///< Reference length to be used in the definition of Reynolds number
+#define L_REF_LENGTH 0.1	///< Reference length to be used in the definition of Reynolds number
 
 // nu computed based on above selections
 
@@ -196,23 +196,23 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Inlets
-//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Periodicity
-#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
+//#define L_PERIODIC_BOUNDARIES		///< Turn on periodic boundary conditions (doesn't do anything anymore -- periodic by default)
 
 
 // Solids
 #define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-//#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
 #define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of front (3D) wall
@@ -261,35 +261,29 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.5 },
-	{ 4.0 }
+	{ 0.1 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 },
-	{ 6.0 }
+	{ 0.5 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.5 },
-	{ 4.0 }
+	{ 0.11 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 },
-	{ 6.0 }
+	{ 0.31 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.5 },
-	{ 4.0 }
+	{ 0.0 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 },
-	{ 6.0 }
+	{ 6.5 }
 };
 
 #endif

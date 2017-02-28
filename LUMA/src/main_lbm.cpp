@@ -325,9 +325,6 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
-	exit(0);
-
-
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 
 

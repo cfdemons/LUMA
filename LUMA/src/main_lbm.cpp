@@ -320,7 +320,7 @@ int main( int argc, char* argv[] )
 	Grids.io_hdf5(Grids.t);
 #endif
 
-#if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
+#ifdef L_VTK_BODY_WRITE
 	*GridUtils::logfile << "Writing out to VTK file..." << endl;
 	objMan->io_vtkIBBWriter(Grids.t);
 #endif
@@ -385,7 +385,7 @@ int main( int argc, char* argv[] )
 			Grids.io_hdf5(Grids.t);
 #endif
 
-#if (defined L_IBM_ON && defined L_VTK_BODY_WRITE)
+#ifdef L_VTK_BODY_WRITE
 			objMan->io_vtkIBBWriter(Grids.t);
 #endif
 

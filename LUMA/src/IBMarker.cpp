@@ -17,19 +17,18 @@
 #include "../inc/IBMarker.h"
 
 // ***************************************************************************************************
-/// \brief Custom constructor with position.
+/// \brief Custom constructor for IBMarker (calls the non-default base constructor).
 /// \param xPos			x-position of marker.
 /// \param yPos			y-position of marker.
 /// \param zPos			z-position of marker.
+/// \param markerID		ID of marker within body
 ///	\param body_owner	Grid on which primary support point is to be found
-/// \param isFlexible	flag to indicate whether marker is movable or not.
-IBMarker::IBMarker(double xPos, double yPos, double zPos, GridObj const * const body_owner, bool isFlexible) {
+IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj const * const body_owner) : Marker(xPos, yPos, zPos, markerID, body_owner) {
 
-	// Assign position and type
-	this->isFlexible = isFlexible;
-	this->position.push_back(xPos);
-	this->position.push_back(yPos);
-	this->position.push_back(zPos);
+	// Initialise all values to zero
+	this->epsilon = 0.0;
+	this->local_area = 0.0;
+	this->dilation = 0.0;
 
 	// Stationary point
 	this->desired_vel.push_back(0.0);
@@ -40,18 +39,11 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, GridObj const * const 
 	this->fluid_vel.resize(L_DIMS);
 	this->force_xyz.resize(L_DIMS);
 
-	std::vector<int> ijk;
-	GridUtils::getEnclosingVoxel(xPos, yPos, zPos, body_owner, &ijk);
-	supp_i.push_back(ijk[eXDirection]);
-	supp_j.push_back(ijk[eYDirection]);
-	supp_k.push_back(ijk[eZDirection]);
-
-#ifdef L_BUILD_FOR_MPI
-	support_rank.push_back(MpiManager::getInstance()->my_rank);
-#else
-	support_rank.push_back(0);
-#endif
-
+	// Set old position to initial position
+	this->position_old.resize(this->position.size());
+	this->position_old[eXDirection] = this->position[eXDirection];
+	this->position_old[eYDirection] = this->position[eYDirection];
+	this->position_old[eZDirection] = this->position[eZDirection];
 }
 
 

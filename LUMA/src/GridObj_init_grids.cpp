@@ -188,6 +188,7 @@ void GridObj::LBM_initVelocity ( ) {
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
+
 #else
 				/* Input velocity is specified by individual vectors for x, y and z which 
 				 * have either been read in from an input file or defined by an expression 
@@ -390,10 +391,9 @@ void GridObj::LBM_initGrid() {
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
 
+
 	// Add boundary-specific labels
 	LBM_initBoundLab();
-
-
 
 	// Initialise L0 MACROSCOPIC quantities
 
@@ -469,6 +469,7 @@ void GridObj::LBM_initGrid() {
 		L_ERROR("LBM relaxation frequency omega too large. Check viscosity value. Exiting.", GridUtils::logfile);
 	}
 #endif
+
 	//Check if there are incompressibility issues, and warn the user if this is the case
 	if (uref > (0.17*cs)) {
 		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results." << std::endl;

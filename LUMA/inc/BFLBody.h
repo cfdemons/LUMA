@@ -26,15 +26,25 @@ class PCpts;
 class BFLBody :
 	public Body<BFLMarker>
 {
-
+	friend class ObjectManager;
 	friend class GridObj;
 
 public:
 	// Default constructor and destructor
 	BFLBody(void);
 	~BFLBody(void);
+
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
-	BFLBody(GridObj *g, size_t id, PCpts *_PCpts);
+	BFLBody(GridObj *g, int bodyID, PCpts *_PCpts);
+
+	// Custom constructor for building prefab circle or sphere
+	BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point, double radius);
+
+	// Custom constructor for building prefab filament
+	BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point, std::vector<double> &dimensions, std::vector<double> &angles);
+
+	// Custom constructor for building prefab square or cuboid
+	BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles);
 
 protected:
 

@@ -238,19 +238,22 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 /// \param	tval	time value at which the write out is being performed.
 void ObjectManager::io_vtkIBBWriter(double tval) {
 
+	// Get the rank
+	int rank = GridUtils::safeGetRank();
+
     // Loop through each iBody
     for (size_t ib = 0; ib < iBody.size(); ib++) {
 
         // Create file name then output file stream
         std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_IBout.Body" << ib << "." << (int)tval << ".vtk";
+        fileName << GridUtils::path_str + "/vtk_IBout.Body" << iBody[ib].id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
 
         std::ofstream fout;
         fout.open( fileName.str().c_str() );
 
         // Add header information
         fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << ib << " at time t = " << (int)tval << "\n";
+        fout << "IB Output for body ID " << iBody[ib].id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
         fout << "ASCII\n";
         fout << "DATASET POLYDATA\n";
 
@@ -259,15 +262,9 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
         fout << "POINTS " << iBody[ib].markers.size() << " float\n";
         for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
 
-#if (L_DIMS == 3)
-				fout	<< iBody[ib].markers[i].position[0] << " " 
-						<< iBody[ib].markers[i].position[1] << " " 
-						<< iBody[ib].markers[i].position[2] << std::endl;
-#else
-				fout	<< iBody[ib].markers[i].position[0] << " " 
-						<< iBody[ib].markers[i].position[1] << " " 
-						<< 1.0 << std::endl; // z = 1.0 as fluid ORIGIN is at z = 1.0
-#endif
+        	fout	<< iBody[ib].markers[i].position[0] << " "
+					<< iBody[ib].markers[i].position[1] << " "
+					<< iBody[ib].markers[i].position[2] << std::endl;
         }
 
 
@@ -290,6 +287,352 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
 
         fout.close();
     }
+
+    // Loop through each iBody
+    for (size_t pb = 0; pb < pBody.size(); pb++) {
+
+        // Create file name then output file stream
+        std::stringstream fileName;
+        fileName << GridUtils::path_str + "/vtk_BFLout.Body" << pBody[pb].id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
+
+        std::ofstream fout;
+        fout.open( fileName.str().c_str() );
+
+        // Add header information
+        fout << "# vtk DataFile Version 3.0f\n";
+        fout << "BFL Output for body ID " << pBody[pb].id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
+        fout << "ASCII\n";
+        fout << "DATASET POLYDATA\n";
+
+
+        // Write out the positions of each Lagrange marker
+        fout << "POINTS " << pBody[pb].markers.size() << " float\n";
+        for (size_t i = 0; i < pBody[pb].markers.size(); i++) {
+
+        	fout	<< pBody[pb].markers[i].position[0] << " "
+					<< pBody[pb].markers[i].position[1] << " "
+					<< pBody[pb].markers[i].position[2] << std::endl;
+        }
+
+
+        // Write out the connectivity of each Lagrange marker
+        size_t nLines = pBody[pb].markers.size() - 1;
+
+        if (pBody[pb].closed_surface == false)
+            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+        else if (pBody[pb].closed_surface == true)
+            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
+
+        for (size_t i = 0; i < nLines; i++) {
+            fout << 2 << " " << i << " " << i + 1 << std::endl;
+        }
+
+        // If iBody[ib] is a closed surface then join last point to first point
+        if (pBody[pb].closed_surface == true) {
+            fout << 2 << " " << nLines << " " << 0 << std::endl;
+        }
+
+        fout.close();
+    }
+}
+
+// ************************************************************************** //
+/// \brief	Read in geometry config file.
+///
+///			Input data must be in correct format as specified in documentation.
+///
+void ObjectManager::io_readInGeomConfig() {
+
+	// Open config file
+	std::ifstream file;
+	file.open("./input/geometry.config", std::ios::in);
+
+	// Handle failure to open
+	if (!file.is_open()) {
+		L_ERROR("Error opening geometry configuration file. Exiting.", GridUtils::logfile);
+	}
+
+	// Skip comment lines in config file
+	int fileOffset;
+	std::string line;
+	file.seekg(std::ios::beg);
+	do {
+
+		// Get the current position within the file
+		fileOffset = file.tellg();
+
+		// Get the whole line
+		getline(file, line);
+
+	} while (line[0] == '#');
+
+	// Reset file position to the start of the last read line
+	file.seekg(fileOffset, std::ios::beg);
+
+	// Type of case (the first entry on each line is the keyword describing the body case)
+	std::string bodyCase;
+
+	// Start reading in config file
+	int bodyID = 0;
+	while(file) {
+
+		// Get type of body
+		file >> bodyCase;
+
+		// ** READ FROM FILE ** //
+		if (bodyCase == "FROM_FILE") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			std::string fileName; file >> fileName;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double startX; file >> startX;
+			double startY; file >> startY;
+			double centreZ; file >> centreZ;
+			double length; file >> length;
+			std::string direction; file >> direction;
+			std::string flex_rigid; file >> flex_rigid;
+			std::string BC; file >> BC;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
+
+			// Get body type
+			eObjectType bodyType;
+			if (boundaryType == "BBB")
+				bodyType = eBBBCloud;
+			else if (boundaryType == "BFL")
+				bodyType = eBFLCloud;
+			else if (boundaryType == "IBM")
+				bodyType = eIBBCloud;
+
+			// Get direction
+			eCartesianDirection cartDirection;
+			if (direction == "eXDirection")
+				cartDirection = eXDirection;
+			else if (direction == "eYDirection")
+				cartDirection = eYDirection;
+			else if (direction == "eZDirection")
+				cartDirection = eZDirection;
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				moveProperty = eFlexible;
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get fixed BC
+			bool clamped;
+			if (BC == "CLAMPED")
+				clamped = true;
+			else if (BC == "SUPPORTED")
+				clamped = false;
+
+			// Read in data from point cloud file
+			PCpts* _PCpts = NULL;
+			_PCpts = new PCpts();
+			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection, moveProperty, clamped);
+			delete _PCpts;
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
+		// ** INSERT FILAMENT ** //
+		else if (bodyCase == "FILAMENT") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double startX; file >> startX;
+			double startY; file >> startY;
+			double startZ; file >> startZ;
+			double length; file >> length;
+			double angleVert; file >> angleVert;
+			double angleHorz; file >> angleHorz;
+			std::string flex_rigid; file >> flex_rigid;
+			std::string BC; file >> BC;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+
+			// Sort data
+			std::vector<double> start_position, angles;
+			start_position.push_back(startX);
+			start_position.push_back(startY);
+			start_position.push_back(startZ);
+			angles.push_back(angleVert);
+			angles.push_back(angleHorz);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				moveProperty = eFlexible;
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get fixed BC
+			bool clamped;
+			if (BC == "CLAMPED")
+				clamped = true;
+			else if (BC == "SUPPORTED")
+				clamped = false;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, bodyID, start_position, length, angles, moveProperty, clamped);
+
+					// If no markers then get rid of the body
+					if (iBody.back().markers.size() == 0)
+						iBody.erase(iBody.end());
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, bodyID, start_position, length, angles);
+
+					// If no markers then get rid of the body
+					if (pBody.back().markers.size() == 0)
+						pBody.erase(pBody.end());
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
+		// ** INSERT CIRCLE/SPHERE ** //
+		else if (bodyCase == "CIRCLE_SPHERE") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double centreX; file >> centreX;
+			double centreY; file >> centreY;
+			double centreZ; file >> centreZ;
+			double radius; file >> radius;
+			std::string flex_rigid; file >> flex_rigid;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+
+			// Sort data
+			std::vector<double> centre_point, angles;
+			centre_point.push_back(centreX);
+			centre_point.push_back(centreY);
+			centre_point.push_back(centreZ);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, bodyID, centre_point, radius, moveProperty);
+
+					// If no markers then get rid of the body
+					if (iBody.back().markers.size() == 0)
+						iBody.erase(iBody.end());
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, bodyID, centre_point, radius);
+
+					// If no markers then get rid of the body
+					if (pBody.back().markers.size() == 0)
+						pBody.erase(pBody.end());
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
+		// ** INSERT SQUARE/CUBE ** //
+		else if (bodyCase == "SQUARE_CUBE") {
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double centreX; file >> centreX;
+			double centreY; file >> centreY;
+			double centreZ; file >> centreZ;
+			double length; file >> length;
+			double height; file >> height;
+			double depth; file >> depth;
+			double angleVert; file >> angleVert;
+			double angleHorz; file >> angleHorz;
+			std::string flex_rigid; file >> flex_rigid;
+
+			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
+
+			// Sort data
+			std::vector<double> centre_point, dimensions, angles;
+			centre_point.push_back(centreX);
+			centre_point.push_back(centreY);
+			centre_point.push_back(centreZ);
+			dimensions.push_back(length);
+			dimensions.push_back(height);
+			dimensions.push_back(depth);
+			angles.push_back(angleVert);
+			angles.push_back(angleHorz);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
+			else if (flex_rigid == "MOVABLE")
+				moveProperty = eMovable;
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, bodyID, centre_point, dimensions, angles, moveProperty);
+
+					// If no markers then get rid of the body
+					if (iBody.back().markers.size() == 0)
+						iBody.erase(iBody.end());
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, bodyID, centre_point, dimensions, angles);
+
+					// If no markers then get rid of the body
+					if (pBody.back().markers.size() == 0)
+						pBody.erase(pBody.end());
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+		}
+
+		// Increment body ID and set case to none
+		bodyID++;
+		bodyCase = "NONE";
+	}
+	file.close();
 }
 
 
@@ -301,58 +644,19 @@ void ObjectManager::io_vtkIBBWriter(double tval) {
 ///
 /// \param	_PCpts	pointer to empty point cloud data container.
 /// \param	objtype	type of object to be read in.
-void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
+void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName, int on_grid_lev, int on_grid_reg,
+		double body_start_x, double body_start_y, double body_centre_z, double body_length, eCartesianDirection scale_direction, eMoveableType moveProperty, bool clamped) {
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
 	int a = 0;
 
 	// Case-specific variables
-	int on_grid_lev, on_grid_reg;
-	double body_length, body_start_x, body_start_y, body_centre_z;
-	eCartesianDirection scale_direction;
 	GridObj* g = NULL;
 
 	// Open input file
 	std::ifstream file;
-	switch (objtype) {
-
-	case eBBBCloud:
-		file.open("./input/bbb_input.in", std::ios::in);
-		on_grid_lev = L_OBJECT_ON_GRID_LEV;
-		on_grid_reg = L_OBJECT_ON_GRID_REG;
-		body_length = L_OBJECT_LENGTH;
-		body_start_x = L_START_OBJECT_X;
-		body_start_y = L_START_OBJECT_Y;
-		body_centre_z = L_CENTRE_OBJECT_Z;
-		scale_direction = L_OBJECT_SCALE_DIRECTION;
-		break;
-
-	case eBFLCloud:
-		file.open("./input/bfl_input.in", std::ios::in);
-		on_grid_lev = L_BFL_ON_GRID_LEV;
-		on_grid_reg = L_BFL_ON_GRID_REG;
-		body_length = L_BFL_LENGTH;
-		body_start_x = L_START_BFL_X;
-		body_start_y = L_START_BFL_Y;
-		body_centre_z = L_CENTRE_BFL_Z;
-		scale_direction = L_BFL_SCALE_DIRECTION;
-		break;
-
-	case eIBBCloud:
-		file.open("./input/ibb_input.in", std::ios::in);
-
-		// Definitions are in phsyical units so convert to LUs
-		on_grid_lev = L_IBB_ON_GRID_LEV;
-		on_grid_reg = L_IBB_ON_GRID_REG;
-		body_length = L_IBB_LENGTH;
-		body_start_x = L_START_IBB_X;
-		body_start_y = L_START_IBB_Y;
-		body_centre_z = L_CENTRE_IBB_Z;
-		scale_direction = L_IBB_SCALE_DIRECTION;
-		break;
-
-	}
+	file.open("./input/" + fileName, std::ios::in);
 
 	// Handle failure to open
 	if (!file.is_open()) {
@@ -401,6 +705,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 		_PCpts->z.push_back(0);
 #endif
 
+		// Insert the ID of the point within this point cloud (needed later for assigning marker IDs)
+		_PCpts->id.push_back(_PCpts->id.size());
+
 	}
 	file.close();
 
@@ -436,6 +743,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Shift to voxel centre not to edge
 	double shift_x = (body_start_x + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	double shift_y = (body_start_y + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	double z_start_position = body_centre_z - (scaled_body_length / 2);
@@ -453,9 +761,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	if (!_PCpts->x.empty()) {
 		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Rank" + std::to_string(rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
-				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;
 			}
 			fileout.close();
@@ -470,6 +778,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
+#endif
 	a = 0;
 	do {
 
@@ -484,69 +793,76 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype) {
 			_PCpts->x.erase(_PCpts->x.begin() + a);
 			_PCpts->y.erase(_PCpts->y.begin() + a);
 			_PCpts->z.erase(_PCpts->z.begin() + a);
+			_PCpts->id.erase(_PCpts->id.begin() + a);
+
 		}
 
 	} while (a < static_cast<int>(_PCpts->x.size()));
 
 	// Write out the points remaining in for debugging purposes
+#ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Rank" + std::to_string(rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out",std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
-			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]);
+			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 			fileout << std::endl;
 		}
 		fileout.close();
 	}
 #endif
 
-	// Perform a different post-processing action depending on the type of body
-	switch (objtype)
-	{
+	// If there are points left
+	if (!_PCpts->x.empty())	{
 
-	case eBBBCloud:
+
+		// Perform a different post-processing action depending on the type of body
+		switch (objtype)
+		{
+
+		case eBBBCloud:
 
 #ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Labelling..." << std::endl;
+			*GridUtils::logfile << "Labelling..." << std::endl;
 #endif
 
-		// Label the grid sites
-		for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+			// Label the grid sites
+			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 
-			// Get indices if on this rank
-			if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
-			{
-				// Update Typing Matrix
-				if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
+				// Get indices if on this rank
+				if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
 				{
-					g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+					// Update Typing Matrix
+					if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
+					{
+						g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+					}
 				}
 			}
+			break;
+
+		case eBFLCloud:
+
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
+			// Call constructor to build BFL body
+			pBody.emplace_back(g, bodyID, _PCpts);
+			break;
+
+		case eIBBCloud:
+
+#ifdef L_CLOUD_DEBUG
+			*GridUtils::logfile << "Building..." << std::endl;
+#endif
+			// Call constructor to build IBM body
+			iBody.emplace_back(g, bodyID, _PCpts, moveProperty, clamped);
+			break;
+
 		}
-		break;
-
-	case eBFLCloud:
-
-#ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
-#endif
-		// Call BFL body builder
-		bfl_buildBody(_PCpts);
-		break;
-
-	case eIBBCloud:
-
-#ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
-#endif
-		// Call IBM body builder
-		ibm_buildBody(_PCpts, g);
-		break;
-
 	}
-
 }
 // *****************************************************************************
 /// \brief	Write out the forces on a solid object.

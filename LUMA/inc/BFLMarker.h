@@ -27,6 +27,9 @@ class BFLMarker :
 	public Marker
 {
 
+	// Make ObjectManager a friend class so it can access the protected data of BFLMarker objects
+	friend class ObjectManager;
+
 	// Allow BFLbody to access the marker positions etc.
 	friend class BFLBody;
 
@@ -35,8 +38,8 @@ public:
 	BFLMarker(void);
 	~BFLMarker(void);
 
-	// Constructor
-	BFLMarker(double x, double y, double z, GridObj const * const body_owner);
+	// Custom constructor when positions are passed
+	BFLMarker(double x, double y, double z, int markerID, GridObj const * const body_owner);
 
 };
 

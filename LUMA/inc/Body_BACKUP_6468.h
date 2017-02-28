@@ -21,7 +21,6 @@ class GridObj;
 #include "GridUtils.h"
 #include "MarkerData.h"
 
-
 /// \brief	Generic body class.
 ///
 ///			Can consist of any type of Marker so templated.
@@ -100,6 +99,11 @@ Body<MarkerType>::~Body(void)
 /// \param bodyID	ID of body in array of bodies.
 /// \param _PCpts	pointer to point cloud data
 template <typename MarkerType>
+<<<<<<< HEAD
+Body<MarkerType>::Body(GridObj* g, size_t id) 
+	: _Owner(g), id(id)
+{
+=======
 Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 {
 	// Set the body base class parameters from constructor inputs
@@ -119,6 +123,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 
 	// Define spacing based on first two markers	// TODO Make spacing a marker member
 	this->spacing = _Owner->dh;
+>>>>>>> MPI_IBM
 };
 
 /*********************************************/
@@ -178,6 +183,13 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 /// \param centre		centre point of circle
 /// \param radius			radius of circle
 template <typename MarkerType>
+<<<<<<< HEAD
+Body<MarkerType>::Body(GridObj* g, size_t id, PCpts* _PCpts)
+	: _Owner(g), id(id)
+{
+	// Call method to build from point cloud
+	this->buildFromCloud(_PCpts);
+=======
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, double radius)
 {
 
@@ -368,6 +380,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	std:
 	// Delete markers which exist off rank
 	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
 	deleteOffRankMarkers();
+>>>>>>> MPI_IBM
 };
 
 
@@ -623,12 +636,10 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
-
 	// Declare local variables
 	std::vector<int> locals;
 
 	// Voxel grid filter //
-
 	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
@@ -651,3 +662,4 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 };
 
 #endif
+

@@ -21,7 +21,6 @@ class GridObj;
 #include "GridUtils.h"
 #include "MarkerData.h"
 
-
 /// \brief	Generic body class.
 ///
 ///			Can consist of any type of Marker so templated.
@@ -83,9 +82,9 @@ protected:
 
 /// Default Constructor
 template <typename MarkerType>
-Body<MarkerType>::Body(void) 
-	: _Owner(nullptr)
+Body<MarkerType>::Body(void)
 {
+	this->_Owner = nullptr;
 };
 
 /// Default destructor
@@ -623,12 +622,10 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
-
 	// Declare local variables
 	std::vector<int> locals;
 
 	// Voxel grid filter //
-
 	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
@@ -651,3 +648,4 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 };
 
 #endif
+

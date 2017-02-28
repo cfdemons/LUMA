@@ -44,10 +44,10 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
-#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
+//#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 1			///< How many timesteps before whole grid output
@@ -165,6 +165,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_RHOIN 1			///< Initial density
 #define L_RE 150			///< Desired Reynolds number
 
+#define L_REF_LENGTH 6.0	///< Reference length to be used in the definition of Reynolds number
+
 // nu computed based on above selections
 
 
@@ -176,69 +178,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Master IBM switches //
 #define L_IBM_ON						///< Turn on IBM
-#define L_IB_ON_LEV 0					///< Grid level for immersed boundary object (0 if no refined regions, -1 if no IBM)
-#define L_IB_ON_REG 0					///< Grid region for immersed boundary object (0 if no refined regions, -1 if no IBM)
 
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
-#define L_GEOMETRY_FILE					///< If define LUMA will read for geometry config file
-
-// Read in IB Body from File
-#define L_IBB_FROM_FILE			///< Build immersed bodies from a point cloud file
-
-	#define L_IBB_ON_GRID_LEV L_IB_ON_LEV		///< Provide grid level on which object should be added
-	#define L_IBB_ON_GRID_REG L_IB_ON_REG		///< Provide grid region on which object should be added
-	// Following specified in physical distances
-	#define L_START_IBB_X 5.0		///< Start X of object bounding box
-	#define L_START_IBB_Y 2.0		///< Start Y of object bounding box
-	#define L_CENTRE_IBB_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_IBB_LENGTH 6.0		///< The object input is scaled based on this dimension
-	#define L_IBB_SCALE_DIRECTION eYDirection	///< Scale in this direction (specify as enumeration)
-	#define L_IBB_REF_LENGTH 6.0	///< Reference length to be used in the definition of Reynolds number
-
-// Default global properties
-#define L_NUM_MARKERS 31		///< Number of Lagrange points to use when building a prefab body (approximately)
-#define L_IBB_MOVABLE false		///< Default isMovable property of body to be built (whether it moves or not)
-#define L_IBB_FLEXIBLE false	///< Whether a structural calculation needs to be performed on the body
-
-
-// Switches for inserting certain bodies (enable only one at once!)
-//#define L_INSERT_CIRCLE_SPHERE
-//#define L_INSERT_RECTANGLE_CUBOID
-//#define L_INSERT_BOTH
-//#define L_INSERT_FILAMENT
-//#define L_INSERT_FILARRAY
-//#define L_2D_RIGID_PLATE_IBM
-//#define L_2D_PLATE_WITH_FLAP
-//#define L_3D_RIGID_PLATE_IBM
-//#define L_3D_PLATE_WITH_FLAP
-
-// Physical dimensions of rigid IB body or flexible plate
-#define L_IBB_X 0.2		///< X Position of body centre
-#define L_IBB_Y 0.2		///< Y Position of body centre
-#define L_IBB_Z 0.0		///< Z Position of body centre
-#define L_IBB_W 0.5		///< Width (x) of IB body
-#define L_IBB_L 0.5		///< Length (y) of IB body
-#define L_IBB_D 0.5		///< Depth (z) of IB body
-#define L_IBB_R 0.05	///< Radius of IB body
-
-// Physical dimensions of flexible IB filament
-#define L_IBB_FILAMENT_LENGTH 0.5		///< Length of filament
-#define L_IBB_FILAMENT_START_X 0.2		///< Start X position of the filament
-#define L_IBB_FILAMENT_START_Y 0.5		///< Start Y position of the filament
-#define L_IBB_FILAMENT_START_Z 0.5		///< Start Z position of the filament
-
-// Angles of filament or plate
-#define L_IBB_ANGLE_VERT 90		///< Inclination of filament in XY plane
-#define L_IBB_ANGLE_HORZ 0		///< Inclination of filament in XZ plane
-
-// Boundary conditions of flexible filament or flexible plate
-#define L_FILAMENT_START_BC 2		///< Type of boundary condition at filament start:	0 == free; 1 = simply supported; 2 == clamped
-#define L_FILAMENT_END_BC 0			///< Type of boundary condition at filament end:	0 == free; 1 = simply supported; 2 == clamped
-
-// Mechanical properties of filament
-#define L_IBB_DELTA_RHO 1.0		///< Difference in density (lattice units) between solid and fluid
-#define L_IBB_EI 2.0			///< Flexural rigidity (lattice units) of filament
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 
 
 /*
@@ -310,21 +253,6 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_OBJECT_LENGTH 0.2			///< The object input is scaled based on this dimension
 	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
 	#define L_OBJECT_REF_LENGTH 0.2		///< Reference length to be used in the definition of Reynolds number
-
-
-// BFL objects
-//#define L_BFL_ON					///< Build BFL body from point cloud
-
-	#define L_BFL_ON_GRID_LEV 2		///< Provide grid level on which BFL body should be added 
-	#define L_BFL_ON_GRID_REG 0		///< Provide grid region on which BFL body should be added
-	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_BFL_X 0.9		///< Start of object bounding box in X direction
-	#define L_START_BFL_Y 0.4		///< Start of object bounding box in Y direction
-	#define L_CENTRE_BFL_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_BFL_LENGTH 0.2		///< The BFL object input is scaled based on this dimension
-	#define L_BFL_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_BFL_REF_LENGTH 0.2	///< Reference length to be used in the definition of Reynolds number
-
 
 
 /*
@@ -411,20 +339,9 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	#undef L_BLOCK_MAX_Z
 	#define L_BLOCK_MAX_Z 0.0
 
-	#undef L_IBB_D
-	#define L_IBB_D 0.0
-
-	// Set BFL start for 2D
+	// Set BBB start for 2D
 	#undef L_CENTRE_OBJECT_Z
 	#define L_CENTRE_OBJECT_Z 0.0
-
-	// Set Object start for 2D
-	#undef L_CENTRE_BFL_Z
-	#define L_CENTRE_BFL_Z 0.0
-
-	// Set IBB start for 2D
-	#undef L_CENTRE_IBB_Z
-	#define L_CENTRE_IBB_Z 0.0
 
 	// Set z inlet velocity
 	#undef L_UZ0

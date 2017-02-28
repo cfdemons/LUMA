@@ -35,9 +35,9 @@ BFLBody::~BFLBody(void)
 
 /*********************************************/
 /// \brief Custom constructor to populate body from array of points.
-/// \param g_hierarchy pointer to grid hierarchy
-/// \param id	ID of body in array of bodies.
-/// \param _PCpts pointer to point cloud data
+/// \param g		hierarchy pointer to grid hierarchy
+/// \param bodyID	ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data
 BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) : Body(g, bodyID, _PCpts)
 {
 
@@ -113,12 +113,14 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) : Body(g, bodyID, _PCpts
 
 
 /*********************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g_hierarchy pointer to grid hierarchy
-/// \param id	ID of body in array of bodies.
-/// \param _PCpts pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
-		double length, std::vector<double> &angles) : Body(g, bodyID, lev, reg, start_position, length, angles)
+/// \brief 	Custom constructor for building prefab filament
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param start_position	start position of base of filament
+/// \param length			length of filament
+/// \param angles			angle of filament
+BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
+		double length, std::vector<double> &angles) : Body(g, bodyID, start_position, length, angles)
 {
 
 #ifdef L_BFL_DEBUG
@@ -193,12 +195,13 @@ BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &
 
 
 /*********************************************/
-/// \brief Custom constructor to create a circle or sphere.
-/// \param g_hierarchy pointer to grid hierarchy
-/// \param id	ID of body in array of bodies.
-/// \param _PCpts pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
-		double radius) : Body(g, bodyID, lev, reg, centre_point, radius)
+/// \brief 	Custom constructor for building prefab circle/sphere
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre_point		centre point of circle
+/// \param radius			radius of circle
+BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+		double radius) : Body(g, bodyID, centre_point, radius)
 {
 
 #ifdef L_BFL_DEBUG
@@ -273,12 +276,14 @@ BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &
 
 
 /*********************************************/
-/// \brief Custom constructor to create a circle or sphere.
-/// \param g_hierarchy pointer to grid hierarchy
-/// \param id	ID of body in array of bodies.
-/// \param _PCpts pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
-		std::vector<double> &dimensions, std::vector<double> &angles) : Body(g, bodyID, lev, reg, centre_point, dimensions, angles)
+/// \brief 	Custom constructor for building square/cuboid
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre_point		centre point of square
+/// \param dimensions		dimensions of square
+/// \param angles			angle of square
+BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+		std::vector<double> &dimensions, std::vector<double> &angles) : Body(g, bodyID, centre_point, dimensions, angles)
 {
 
 #ifdef L_BFL_DEBUG

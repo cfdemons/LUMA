@@ -325,7 +325,6 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
-	MPI_Barrier(mpim->world_comm);
 	exit(0);
 
 

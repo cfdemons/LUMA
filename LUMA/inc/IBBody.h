@@ -34,11 +34,19 @@ public:
 	// Constructor and destructor
 	IBBody(void);
 	~IBBody(void);
+
+	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
 	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
-	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);
-	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
+
+	// Custom constructor for building prefab circle or sphere
+	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);
+
+	// Custom constructor for building prefab square or cuboid
+	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty);
-	IBBody(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &start_position,
+
+	// Custom constructor for building prefab filament
+	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
 
 protected:
@@ -52,22 +60,6 @@ protected:
 	/************** Member Methods **************/
 
 public:
-
-	//////////////////////////////////
-	// Prefab body building methods //
-	//////////////////////////////////
-
-	// Method to construct sphere/circle
-	void makeBody(double radius, std::vector<double> centre, bool isFlexible, bool isMovable, int group);
-	// Method to construct cuboid/rectangle
-	void makeBody(std::vector<double> width_length_depth, std::vector<double> angles, std::vector<double> centre,
-		bool isFlexible, bool isMovable, int group);
-	// Method to construct filament
-	void makeBody(int numbermarkers, std::vector<double> start_point, double fil_length, std::vector<double> angles, std::vector<int> BCs,
-		bool isFlexible, bool isMovable, int group);
-	// Method to construct a 3D plate
-	double makeBody(std::vector<double> width_length, double angle, std::vector<double> centre,
-		bool isFlexible, bool isMovable, int group, bool plate);
 
 };
 

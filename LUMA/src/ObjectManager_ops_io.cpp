@@ -443,14 +443,14 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, lev, reg, start_position, length, angles, moveProperty, clamped);
+					iBody.emplace_back(g, bodyID, start_position, length, angles, moveProperty, clamped);
 
 					// If no markers then get rid of the body
 					if (iBody.back().markers.size() == 0)
 						iBody.erase(iBody.end());
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, lev, reg, start_position, length, angles);
+					pBody.emplace_back(g, bodyID, start_position, length, angles);
 
 					// If no markers then get rid of the body
 					if (pBody.back().markers.size() == 0)
@@ -499,14 +499,14 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, lev, reg, centre_point, radius, moveProperty);
+					iBody.emplace_back(g, bodyID, centre_point, radius, moveProperty);
 
 					// If no markers then get rid of the body
 					if (iBody.back().markers.size() == 0)
 						iBody.erase(iBody.end());
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, lev, reg, centre_point, radius);
+					pBody.emplace_back(g, bodyID, centre_point, radius);
 
 					// If no markers then get rid of the body
 					if (pBody.back().markers.size() == 0)
@@ -564,14 +564,14 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, lev, reg, centre_point, dimensions, angles, moveProperty);
+					iBody.emplace_back(g, bodyID, centre_point, dimensions, angles, moveProperty);
 
 					// If no markers then get rid of the body
 					if (iBody.back().markers.size() == 0)
 						iBody.erase(iBody.end());
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, lev, reg, centre_point, dimensions, angles);
+					pBody.emplace_back(g, bodyID, centre_point, dimensions, angles);
 
 					// If no markers then get rid of the body
 					if (pBody.back().markers.size() == 0)
@@ -586,67 +586,6 @@ void ObjectManager::io_readInGeomConfig() {
 		bodyCase = "NONE";
 	}
 	file.close();
-
-
-//
-//#ifdef L_IBM_ON
-//
-//	*GridUtils::logfile << "Initialising IBM Objects..." << std::endl;
-//
-//	// Build a body
-//	//		body_type == 1 is a rectangle/cuboid with rigid IBM,
-//	//		body_type == 2 is a circle/sphere with rigid IBM,
-//	//		body_type == 3 is a multi-body test case featuring both the above with rigid IBM
-//	//		body_type == 4 is a single inextensible flexible filament with Jacowire IBM
-//	//		body_type == 5 is an array of flexible filaments with Jacowire IBM
-//	//		body_type == 6 is a plate in 2D with rigid IBM
-//	//		body_type == 7 is the same as the previous case but with a Jacowire flexible flap added to the trailing edge
-//	//		body_type == 8 is a plate in 3D with rigid IBM
-//	//		body_type == 9 is the same as the previous case but with a rigid but moving filament array commanded by a single 2D Jacowire filament
-//
-//#if defined L_INSERT_RECTANGLE_CUBOID
-//	this->ibm_buildBody(1);
-//	*GridUtils::logfile << "Case: Rectangle/Cuboid using IBM" << std::endl;
-//
-//#elif defined L_INSERT_CIRCLE_SPHERE
-//	this->ibm_buildBody(2);
-//	*GridUtils::logfile << "Case: Circle/Sphere using IBM" << std::endl;
-//
-//#elif defined L_INSERT_BOTH
-//	this->ibm_buildBody(3);
-//	*GridUtils::logfile << "Case: Rectangle/Cuboid + Circle/Sphere using IBM" << std::endl;
-//
-//#elif defined L_INSERT_FILAMENT
-//	this->ibm_buildBody(4);
-//	*GridUtils::logfile << "Case: Single 2D filament using Jacowire IBM" << std::endl;
-//
-//#elif defined L_INSERT_FILARRAY
-//	this->ibm_buildBody(5);
-//	*GridUtils::logfile << "Case: Array of filaments using Jacowire IBM" << std::endl;
-//
-//#elif defined L_2D_RIGID_PLATE_IBM
-//	this->ibm_buildBody(6);
-//	*GridUtils::logfile << "Case: 2D rigid plate using IBM" << std::endl;
-//
-//#elif defined L_2D_PLATE_WITH_FLAP
-//	this->ibm_buildBody(7);
-//	*GridUtils::logfile << "Case: 2D rigid plate using IBM with flexible flap" << std::endl;
-//
-//#elif defined L_3D_RIGID_PLATE_IBM
-//	this->ibm_buildBody(8);
-//	*GridUtils::logfile << "Case: 3D rigid plate using IBM" << std::endl;
-//
-//#elif defined L_3D_PLATE_WITH_FLAP
-//	this->ibm_buildBody(9);
-//	*GridUtils::logfile << "Case: 3D rigid plate using IBM with flexible 2D flap" << std::endl;
-//
-//#endif
-//
-//
-//
-//
-//#endif // End IBM_ON
-
 }
 
 

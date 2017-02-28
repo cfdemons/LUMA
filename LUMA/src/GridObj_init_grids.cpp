@@ -442,28 +442,9 @@ void GridObj::LBM_initGrid() {
 
 	// Initialise OTHER parameters
 	// Compute kinematic viscosity based on target Reynolds number
-#if defined L_IBM_ON && defined L_INSERT_CIRCLE_SPHERE
-	// If IBM circle use diameter (in lattice units i.e. rescale wrt to physical spacing)
-	nu = (L_IBB_R*2 / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_INSERT_RECTANGLE_CUBOID
-	// If IBM rectangle use y-dimension (in lattice units)
-	nu = (L_IBB_L / dh) * L_UREF / L_RE;
-#elif defined L_IBM_ON && defined L_IBB_FROM_FILE
-	// If IBM object read from file then use scale length as reference
-	nu = (L_IBB_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_SOLID_FROM_FILE
-	// Use object length
-	nu = (L_OBJECT_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined L_BFL_ON
-	// Use bfl body length
-	nu = (L_BFL_REF_LENGTH / dh) * L_UREF / L_RE;
-#elif defined WALLS_ON
-	// If no object then use domain height
-	nu = (L_BY / dh - std::round(L_WALL_THICKNESS_BOTTOM / dh) - std::round(L_WALL_THICKNESS_TOP / dh)) * L_UREF / L_RE;	// Based on actual width of channel
-#else
-	// Use reference length of 1.0
-	nu = (1.0 / dh) * L_UREF / L_RE;
-#endif
+
+	// Use reference length
+	nu = (L_REF_LENGTH / dh) * L_UREF / L_RE;
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity

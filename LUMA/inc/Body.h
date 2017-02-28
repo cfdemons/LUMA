@@ -33,13 +33,18 @@ public:
 
 	Body(void);					// Default Constructor
 	virtual ~Body(void);		// Default destructor
-	Body(GridObj* g, int bodyID, PCpts* _PCpts);									// Custom constructor to build from point cloud data
-	Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point, double radius);
-	Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre_point,
-				std::vector<double> &dimensions, std::vector<double> &angles);
-	Body(GridObj* g, int bodyID, int lev,
-			int reg, std::vector<double> &start_position,
-			double length, std::vector<double> &angles);						// Custom constructor to build filament
+
+	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
+	Body(GridObj* g, int bodyID, PCpts* _PCpts);
+
+	// Custom constructor for building prefab circle or sphere
+	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, double radius);
+
+	// Custom constructor for building prefab square or cuboid
+	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, std::vector<double> &dimensions, std::vector<double> &angles);
+
+	// Custom constructor for building prefab filament
+	Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles);
 
 	// ************************ Members ************************ //
 
@@ -88,11 +93,11 @@ Body<MarkerType>::~Body(void)
 {
 };
 
-/// \brief Custom constructor to call method to build from point cloud.
-///
-/// \param g pointer to grid which owns this body.
-/// \param id indicates unique number of body in array of bodies.
-/// \param _PCpts pointer to point cloud data.
+/*********************************************/
+/// \brief Custom constructor to populate body from array of points.
+/// \param g		hierarchy pointer to grid hierarchy
+/// \param bodyID	ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 {
@@ -115,14 +120,15 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 	this->spacing = _Owner->dh;
 };
 
-/// \brief Custom constructor to call method to build filament.
-///
-/// \param g pointer to grid which owns this body.
-/// \param id indicates unique number of body in array of bodies.
-/// \param _PCpts pointer to point cloud data.
+/*********************************************/
+/// \brief 	Custom constructor for building prefab filament
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param start_position	start position of base of filament
+/// \param length			length of filament
+/// \param angles			angle of filament
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
-		std::vector<double> &start_position, double length, std::vector<double> &angles)
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles)
 {
 
 	// Set the body base class parameters from constructor inputs
@@ -164,14 +170,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 };
 
 
-/// \brief Custom constructor to call method to build filament.
-///
-/// \param g pointer to grid which owns this body.
-/// \param id indicates unique number of body in array of bodies.
-/// \param _PCpts pointer to point cloud data.
+/*********************************************/
+/// \brief 	Custom constructor for building prefab circle/sphere
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre		centre point of circle
+/// \param radius			radius of circle
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
-		std::vector<double> &centre, double radius)
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, double radius)
 {
 
 	// Set the body base class parameters from constructor inputs
@@ -232,14 +238,15 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg,
 };
 
 
-/// \brief Custom constructor to call method to build filament.
-///
-/// \param g pointer to grid which owns this body.
-/// \param id indicates unique number of body in array of bodies.
-/// \param _PCpts pointer to point cloud data.
+/*********************************************/
+/// \brief 	Custom constructor for building square/cuboid
+/// \param g					hierarchy pointer to grid hierarchy
+/// \param bodyID				ID of body in array of bodies.
+/// \param centre				centre point of square
+/// \param width_length_depth	dimensions of square
+/// \param angles				angle of square
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, int bodyID, int lev, int reg, std::vector<double> &centre,
-		std::vector<double> &width_length_depth, std::vector<double> &angles)
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	std::vector<double> &width_length_depth, std::vector<double> &angles)
 {
 
 	// Set the body base class parameters from constructor inputs
@@ -380,6 +387,7 @@ void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 template <typename MarkerType>
 void Body<MarkerType>::deleteRecvLayerMarkers()
 {
+
 	// Loop through markers in body and delete ones which are on receiver layer
 	int a = 0;
 	do {

@@ -352,6 +352,7 @@ void ObjectManager::io_readInGeomConfig() {
 		L_ERROR("Error opening geometry configuration file. Exiting.", GridUtils::logfile);
 	}
 
+
 	// Skip comment lines in config file
 	int fileOffset;
 	std::string line;

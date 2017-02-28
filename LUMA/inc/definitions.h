@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -135,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 100		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.1		///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 2.2		///< End of domain in X (non-dimensional units)
@@ -153,8 +153,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
-#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+//#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
+//#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 0.04			///< Initial/inlet x-velocity
@@ -193,7 +193,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Inlets
 #define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
+//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 

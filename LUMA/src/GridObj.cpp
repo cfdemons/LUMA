@@ -65,7 +65,6 @@ GridObj::GridObj(int level)
 
 	// Call L0 non-MPI initialiser
 	this->LBM_initGrid();
-
 }
 
 // ****************************************************************************

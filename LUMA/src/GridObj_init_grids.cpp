@@ -488,7 +488,6 @@ void GridObj::LBM_initGrid() {
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Initialisation Complete.";
 #endif
-
 }
 	
 
@@ -1147,6 +1146,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Check for potential singularity in BC
 	if (GridUnits::ud2ulbm(L_UX0,this) == 1 || uref == 1) {
+
 		// Singularity so exit
 		L_ERROR("Inlet BC fails with L_UX0 in LBM units = 1, choose something else. Exiting.", GridUtils::logfile);
 	}

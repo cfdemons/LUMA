@@ -10,6 +10,7 @@ General		:	Wholesale changes to coordinate systems and hence changes in the init
 				Extended the error function to create an info function as well for more consistent logging.
 				User input except L_RHOIN is now expected in dimensionless units.
 				Documentation moved to VM @ 130.88.97.222.
+				New GEOMETRY CONFIG runtime infrastructure added for adding multiple bodies of different types into a simulation. Replaces the old compile-time mechanisms.
 
 Issue #125	:	Probe output method now generalised so it will search for a probe position on the finest grid first and then ascend the hierarchy until point is found.
 Issue #111  :   The initial velocitiy field can now be read from a file by defining L_INIT_VELOCITY_FROM_FILE in definitions.h

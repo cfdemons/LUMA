@@ -29,7 +29,6 @@ template <typename MarkerType>
 class Body
 {
 
-
 public:
 
 	Body(void);					// Default Constructor
@@ -153,7 +152,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 #endif
 
 	// Compute spacing
-	int numMarkers = floor(length / g->dh) + 1;
+	int numMarkers = static_cast<int>(std::floor(length / g->dh)) + 1;
 	spacing = length / (numMarkers - 1);							// Physical spacing between markers
 	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
 
@@ -200,7 +199,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 
 	// Following code for point generation on unit sphere actually seeds
 	// using Fibonacci sphere technique. Code is not my own but works.
-	int numMarkers = floor(4.0 * L_PI * pow(radius, 2.0) / pow(g->dh, 2.0));
+	int numMarkers = static_cast<int>(std::floor(4.0 * L_PI * pow(radius, 2.0) / pow(g->dh, 2.0)));
 	double inc = L_PI * (3 - sqrt(5));
 	double off = 2.0 / (float)numMarkers ;
 	for (int k = 0; k < numMarkers; k++) {
@@ -214,7 +213,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 #else
 
 	// Build circle (2D)
-	int numMarkers = floor(2.0 * L_PI * radius / g->dh);
+	int numMarkers = static_cast<int>(std::floor(2.0 * L_PI * radius / g->dh));
 	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
 	for (size_t i = 0; i < theta.size(); i++) {
 
@@ -222,7 +221,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 		addMarker(	centre[0] + radius * cos(theta[i]),
 					centre[1] + radius * sin(theta[i]),
 					centre[2],
-					i );
+					static_cast<int>(i) );
 	}
 #endif
 
@@ -247,7 +246,8 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 /// \param width_length_depth	dimensions of square
 /// \param angles				angle of square
 template <typename MarkerType>
-Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	std::vector<double> &width_length_depth, std::vector<double> &angles)
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	
+	std::vector<double> &width_length_depth, std::vector<double> &angles)
 {
 
 	// Set the body base class parameters from constructor inputs
@@ -268,13 +268,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	std:
 	double depth = width_length_depth[2];
 
 	// Get number of markers in each direction
-	int numMarkersLength = floor(length / g->dh) + 1;
-	int numMarkersHeight = floor(height / g->dh) + 1;
-	int numMarkersDepth = floor(depth / g->dh) + 1;
+	int numMarkersLength = static_cast<int>(std::floor(length / g->dh)) + 1;
+	int numMarkersHeight = static_cast<int>(std::floor(height / g->dh)) + 1;
+	int numMarkersDepth = static_cast<int>(std::floor(depth / g->dh)) + 1;
 
 	// Get total number of markers and check
 #if (L_DIMS == 3)
-	int numMarkers = numMarkersLength * numMarkersHeight * numMarkersDepth - ((numMarkersLength - 2) * (numMarkersHeight - 2) * (numMarkersDepth - 2));
+	int numMarkers = numMarkersLength * numMarkersHeight * numMarkersDepth - 
+		((numMarkersLength - 2) * (numMarkersHeight - 2) * (numMarkersDepth - 2));
 
 	// Check side lengths to make sure we can ensure points on the corners
 	if (numMarkers < 24) {
@@ -320,7 +321,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	std:
 
 					// Transform x y and z based on rotation
 					xdash = (x * cos(angles[0] * L_PI / 180) - y * sin(angles[0] * L_PI / 180)) * cos(angles[1] * L_PI / 180) - z * sin(angles[1] * L_PI / 180);
-					ydash = (y * cos(angles[0] * L_PI / 180) + x * sin(angles[0] * L_PI / 180);
+					ydash = (y * cos(angles[0] * L_PI / 180) + x * sin(angles[0] * L_PI / 180));
 					zdash = (x * cos(angles[0] * L_PI / 180) - y * sin(angles[0] * L_PI / 180)) * sin(angles[1] * L_PI / 180) + z * cos(angles[1] * L_PI / 180);
 					xdash = xdash + centre[0];
 					ydash = ydash + centre[1];

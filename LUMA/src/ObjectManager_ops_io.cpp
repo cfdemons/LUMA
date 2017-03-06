@@ -353,14 +353,14 @@ void ObjectManager::io_readInGeomConfig() {
 	}
 
 
-	// Skip comment lines in config file
+	// Increment offset counter until first valid line is reached
 	int fileOffset;
 	std::string line;
 	file.seekg(std::ios::beg);
 	do {
 
 		// Get the current position within the file
-		fileOffset = file.tellg();
+		fileOffset = static_cast<int>(file.tellg());
 
 		// Get the whole line
 		getline(file, line);
@@ -375,7 +375,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 	// Start reading in config file
 	int bodyID = 0;
-	while(file) {
+	while(!file.eof()) {
 
 		// Get type of body
 		file >> bodyCase;
@@ -409,11 +409,11 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Get direction
 			eCartesianDirection cartDirection;
-			if (direction == "eXDirection")
+			if (direction == "X")
 				cartDirection = eXDirection;
-			else if (direction == "eYDirection")
+			else if (direction == "Y")
 				cartDirection = eYDirection;
-			else if (direction == "eZDirection")
+			else if (direction == "Z")
 				cartDirection = eZDirection;
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
@@ -424,6 +424,8 @@ void ObjectManager::io_readInGeomConfig() {
 				moveProperty = eMovable;
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
+			else
+				moveProperty = eRigid;
 
 			// Get fixed BC
 			bool clamped;
@@ -431,12 +433,22 @@ void ObjectManager::io_readInGeomConfig() {
 				clamped = true;
 			else if (BC == "SUPPORTED")
 				clamped = false;
+			else
+				clamped = false;
+
+			// Packed information into a geometry instance
+			GeomPacked *geom = new GeomPacked(
+				bodyType, bodyID, fileName, lev, reg, 
+				startX, startY, centreZ, length, 
+				cartDirection, moveProperty, clamped
+				);
 
 			// Read in data from point cloud file
 			PCpts* _PCpts = NULL;
 			_PCpts = new PCpts();
-			this->io_readInCloud(_PCpts, bodyType, bodyID, fileName, lev, reg, startX, startY, centreZ, length, cartDirection, moveProperty, clamped);
+			this->io_readInCloud(_PCpts, geom);
 			delete _PCpts;
+			delete geom;
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}
 
@@ -644,9 +656,9 @@ void ObjectManager::io_readInGeomConfig() {
 ///			directory.
 ///
 /// \param	_PCpts	pointer to empty point cloud data container.
-/// \param	objtype	type of object to be read in.
-void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName, int on_grid_lev, int on_grid_reg,
-		double body_start_x, double body_start_y, double body_centre_z, double body_length, eCartesianDirection scale_direction, eMoveableType moveProperty, bool clamped) {
+/// \param	GeomPacked	structure containing object data as parsed from the config file.
+void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
+{
 
 	// Temporary variables
 	double tmp_x, tmp_y, tmp_z;
@@ -657,7 +669,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 
 	// Open input file
 	std::ifstream file;
-	file.open("./input/" + fileName, std::ios::in);
+	file.open("./input/" + geom->fileName, std::ios::in);
 
 	// Handle failure to open
 	if (!file.is_open()) {
@@ -665,7 +677,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 	}
 
 	// Get grid pointer
-	GridUtils::getGrid(_Grids, on_grid_lev, on_grid_reg, g);
+	GridUtils::getGrid(_Grids, geom->on_grid_lev, geom->on_grid_reg, g);
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
@@ -674,10 +686,10 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 	int rank = GridUtils::safeGetRank();
 
 	// Round bounding box dimensions to nearest voxel edge on this grid
-	body_start_x = std::round(body_start_x / g->dh) * g->dh;
-	body_start_y = std::round(body_start_y / g->dh) * g->dh;
-	body_centre_z = std::round(body_centre_z / g->dh) * g->dh + g->dh / 2.0;	// Centre shifted to voxel centre
-	body_length = std::round(body_length / g->dh) * g->dh;
+	double body_start_x = std::round(geom->body_start_x / g->dh) * g->dh;
+	double body_start_y = std::round(geom->body_start_y / g->dh) * g->dh;
+	double body_centre_z = std::round(geom->body_centre_z / g->dh) * g->dh + g->dh / 2.0;	// Centre shifted to voxel centre
+	double body_length = std::round(geom->body_length / g->dh) * g->dh;
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -707,7 +719,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 #endif
 
 		// Insert the ID of the point within this point cloud (needed later for assigning marker IDs)
-		_PCpts->id.push_back(_PCpts->id.size());
+		_PCpts->id.push_back(static_cast<int>(_PCpts->id.size()));
 
 	}
 	file.close();
@@ -728,15 +740,15 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 
 	double scale_factor;
 	// Scale slightly smaller (to voxel centres) to ensure symmetrical distribution of voxels
-	if (scale_direction == eXDirection) {
+	if (geom->scale_direction == eXDirection) {
 		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
-	else if (scale_direction == eYDirection) {
+	else if (geom->scale_direction == eYDirection) {
 		scale_factor = (body_length - g->dh) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
-	else if (scale_direction == eZDirection) {
+	else if (geom->scale_direction == eZDirection) {
 		scale_factor = (body_length - g->dh) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
@@ -762,7 +774,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 	if (!_PCpts->x.empty()) {
 		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;
@@ -779,7 +791,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
-#endif
 	a = 0;
 	do {
 
@@ -799,6 +810,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 		}
 
 	} while (a < static_cast<int>(_PCpts->x.size()));
+#endif
 
 	// Write out the points remaining in for debugging purposes
 #ifdef L_CLOUD_DEBUG
@@ -806,7 +818,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 	*GridUtils::logfile << "Writing to file..." << std::endl;
 	if (!_PCpts->x.empty()) {
 		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(bodyID) + "_Rank" + std::to_string(rank) + ".out",std::ios::out);
+		fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
 		for (size_t i = 0; i < _PCpts->x.size(); i++) {
 			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 			fileout << std::endl;
@@ -820,7 +832,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 
 
 		// Perform a different post-processing action depending on the type of body
-		switch (objtype)
+		switch (geom->objtype)
 		{
 
 		case eBBBCloud:
@@ -850,7 +862,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call constructor to build BFL body
-			pBody.emplace_back(g, bodyID, _PCpts);
+			pBody.emplace_back(g, geom->bodyID, _PCpts);
 			break;
 
 		case eIBBCloud:
@@ -859,7 +871,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyI
 			*GridUtils::logfile << "Building..." << std::endl;
 #endif
 			// Call constructor to build IBM body
-			iBody.emplace_back(g, bodyID, _PCpts, moveProperty, clamped);
+			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->clamped);
 			break;
 
 		}

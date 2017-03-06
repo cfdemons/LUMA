@@ -35,6 +35,41 @@ class ObjectManager
 	// Make Grid a friend so boundary conditions can access the body data
 	friend class GridObj;
 
+	/// \brief	Nested Geometry data structure class.
+	///
+	///			Stores information about a body in a coherent manner but not 
+	///			intended to be instantiated outside the Object Manager.
+	class GeomPacked
+	{
+	public:
+
+		GeomPacked();
+		GeomPacked(
+			eObjectType objtype, int bodyID, std::string fileName, 
+			int on_grid_lev, int on_grid_reg,
+			double body_start_x, double body_start_y, double body_centre_z, 
+			double body_length, eCartesianDirection scale_direction, 
+			eMoveableType moveProperty, bool clamped
+			);
+		~GeomPacked();
+		
+	
+		// Members
+		eObjectType objtype;
+		int bodyID;
+		std::string fileName;
+		int on_grid_lev;
+		int on_grid_reg;
+		double body_start_x;
+		double body_start_y;
+		double body_centre_z;
+		double body_length;
+		eCartesianDirection scale_direction;
+		eMoveableType moveProperty;
+		bool clamped;
+
+	};
+
 	/* Members */
 
 private:
@@ -45,7 +80,6 @@ private:
 	double forceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
 
 	// Objects
-	std::vector<Body<Marker>> bBody;		///< Array of default bodies
 	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
 	std::vector<BFLBody> pBody;				///< Array of BFL bodies
 
@@ -108,11 +142,9 @@ public:
 	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
 	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
-	void io_readInCloud(PCpts* _PCpts, eObjectType objtype, int bodyID, std::string fileName,
-			int on_grid_lev, int on_grid_reg, double body_start_x, double body_start_y,
-			double body_centre_z, double body_length, eCartesianDirection scale_direction, eMoveableType moveProperty, bool clamped);	// Method to read in Point Cloud data
+	void io_readInCloud(PCpts* _PCpts, GeomPacked *geom);	// Method to read in Point Cloud data
 	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
-	void io_readInGeomConfig();		// Read in geometry configuration file
+	void io_readInGeomConfig();						// Read in geometry configuration file
 };
 
 #endif

@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -135,11 +135,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 100		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.0001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.2		///< End of domain in X (non-dimensional units)
-#define L_BY 0.43		///< End of domain in Y (non-dimensional units)
+#define L_BX 1.0		///< End of domain in X (non-dimensional units)
+#define L_BY 1.0		///< End of domain in Y (non-dimensional units)
 #define L_BZ 1.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -163,21 +163,22 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 20			///< Desired Reynolds number
+#define L_RE 100				///< Desired Reynolds number
 
 
 /*
 *******************************************************************************
-****************************** Immersed Boundary ******************************
+****************************** Object Management ******************************
 *******************************************************************************
 */
 
-// Master IBM switches //
-#define L_IBM_ON						///< Turn on IBM
-
+// IBM //
+//#define L_IBM_ON						///< Turn on IBM
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+
+// General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 
 /*
@@ -233,10 +234,9 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 	#define L_BLOCK_MAX_Z 0.7		///< End of object/wall in z-direction
 
 
-// Bounce-back objects from point clouds
-//#define L_SOLID_FROM_FILE			///< Build solid body from point cloud file
+// Bounce-back objects from point clouds // TODO: this needs removing as we need to handle BBB in a coherent way
 
-	#define L_OBJECT_ON_GRID_LEV 2		///< Provide grid level on which object should be added 
+	#define L_OBJECT_ON_GRID_LEV 1		///< Provide grid level on which object should be added 
 	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
 	// Following specified in lattice units (i.e. by index) local to the chosen grid level
 	#define L_START_OBJECT_X 0.7		///< Start of object bounding box in X direction
@@ -260,22 +260,22 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.1 }
+	{ 0.3 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.5 }
+	{ 0.7 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.11 }
+	{ 0.3 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.31 }
+	{ 0.7 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.0 }
+	{ 0.3 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 }
+	{ 0.7 }
 };
 
 #endif

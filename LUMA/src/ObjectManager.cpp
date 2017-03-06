@@ -59,12 +59,11 @@ ObjectManager::~ObjectManager(void) {
 
 /// \brief Constructor with grid hierarchy assignment.
 /// \param	g	pointer to grid hierarchy.
-ObjectManager::ObjectManager(GridObj* g) {
-	this->_Grids = g;
+ObjectManager::ObjectManager(GridObj* g) : _Grids(g)
+{
 };
 
 // ************************************************************************* //
-
 /// \brief	Compute forces on a rigid object.
 ///
 ///			Uses momentum exchange to compute forces on rigid bodies.
@@ -121,4 +120,31 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			}
 		}
 	}
+}
+
+// ************************************************************************* //
+/// Geometry data structure container constructor.
+ObjectManager::GeomPacked::GeomPacked()
+{
+}
+
+/// Geometry data structure container destructor.
+ObjectManager::GeomPacked::~GeomPacked()
+{
+}
+
+/// Geometry data structure container custom constructor.
+ObjectManager::GeomPacked::GeomPacked(
+	eObjectType objtype, int bodyID, std::string fileName,
+	int on_grid_lev, int on_grid_reg,
+	double body_start_x, double body_start_y, double body_centre_z,
+	double body_length, eCartesianDirection scale_direction,
+	eMoveableType moveProperty, bool clamped
+	)
+	: objtype(objtype), bodyID(bodyID), fileName(fileName),
+	on_grid_lev(on_grid_lev), on_grid_reg(on_grid_reg),
+	body_start_x(body_start_x), body_start_y(body_start_y), body_centre_z(body_centre_z), 
+	body_length(body_length), scale_direction(scale_direction),
+	moveProperty(moveProperty), clamped(clamped)
+{
 }

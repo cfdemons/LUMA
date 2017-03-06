@@ -38,8 +38,11 @@ BFLBody::~BFLBody(void)
 /// \param g		hierarchy pointer to grid hierarchy
 /// \param bodyID	ID of body in array of bodies.
 /// \param _PCpts	pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) : Body(g, bodyID, _PCpts)
+BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) 
+	: Body(g, bodyID, _PCpts)
 {
+
+	// Initialiser list ensures the correct super class constructor is called first
 
 #ifdef L_BFL_DEBUG
 	std::ofstream file;

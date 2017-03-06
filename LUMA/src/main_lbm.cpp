@@ -253,14 +253,18 @@ int main( int argc, char* argv[] )
 #ifdef L_GEOMETRY_FILE
 	*GridUtils::logfile << "Reading geometry configuration file..." << endl;
 	objMan->io_readInGeomConfig();
+#endif
+
 
 #if !defined L_RESTARTING
 
-	// Initialise the bodies (compute support etc.) using initial body positions and compute support from supplied grid
+	/* Initialise the bodies (compute support etc.) using initial body positions 
+	 * and compute support from supplied grid. Only attempts to initialise IBM bodies 
+	 * in this way. */
 	objMan->ibm_initialise();
 
 #endif
-#endif
+
 
 	/*
 	****************************************************************************

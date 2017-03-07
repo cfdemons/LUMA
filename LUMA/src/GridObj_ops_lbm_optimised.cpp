@@ -46,6 +46,12 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		objman->bbbForceOnObjectX = 0.0;
 		objman->bbbForceOnObjectY = 0.0;
 		objman->bbbForceOnObjectZ = 0.0;
+
+#ifdef L_MOMEX_DEBUG
+		// Open file for momentum exchange information
+		objman->toggleDebugStream(this);
+#endif
+
 	}
 
 	// Compute Smagorinksy-modified relaxation
@@ -78,8 +84,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 					// Compute lift and drag contribution of this site
 					objman->computeLiftDrag(i, j, k, this);
 				}
-#endif
-				
+#endif				
 
 				// STREAM //
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
@@ -106,6 +111,14 @@ void GridObj::LBM_multi_opt(int subcycle) {
 	// Swap distributions
 	f.swap(fNew);
 
+#ifdef L_MOMEX_DEBUG
+	if (level == objman->bbbOnGridLevel && region_number == objman->bbbOnGridReg)
+	{
+		// Close file for momentum exchange information (call before t increments)
+		objman->toggleDebugStream(this);
+	}
+#endif
+
 	// Increment internal loop counter
 	++t;
 
@@ -121,7 +134,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		// Performance data to logfile
 		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
 	}
-
 
 	// MPI COMMUNICATION //
 #ifdef L_BUILD_FOR_MPI

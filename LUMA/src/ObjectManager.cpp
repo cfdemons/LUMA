@@ -92,6 +92,15 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 #endif
 	{
 
+#ifdef L_MOMEX_DEBUG
+		// Write position of solid site
+		if (debugstream.is_open())
+			debugstream << std::endl << g->XPos[i] << "," << g->YPos[j] << "," << g->ZPos[k];
+
+		// Declare some local stores
+		double contrib_x, contrib_y, contrib_z;
+#endif
+
 		// Loop over directions from solid site
 		for (int n = 0; n < L_NUM_VELS; n++) {
 
@@ -109,15 +118,37 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			// Only apply if streams to a fluid site
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
-
 				bbbForceOnObjectX +=
 					2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				bbbForceOnObjectY += 
+				bbbForceOnObjectY +=
 					2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 				bbbForceOnObjectZ +=
 					2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 
+#ifdef L_MOMEX_DEBUG
+				// Store contribution
+				contrib_x = 2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_y = 2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_z = 2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+
 			}
+			else
+			{
+				// Contributions are zero as do not stream to fluid site
+				contrib_x = 0.0;
+				contrib_y = 0.0;
+				contrib_z = 0.0;
+#endif
+			}
+
+
+#ifdef L_MOMEX_DEBUG
+			// Write contribution to file
+			if (debugstream.is_open())
+				debugstream << "," << std::to_string(contrib_x) << "," << std::to_string(contrib_y) << "," << std::to_string(contrib_z);
+#endif
+
+
 		}
 	}
 }
@@ -159,6 +190,36 @@ void ObjectManager::addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PC
 
 			}
 		}
+	}
+}
+
+// ************************************************************************* //
+/// Private method for opening/closing a debugging file
+///	\param	g	pointer to grid toggling the stream
+void ObjectManager::toggleDebugStream(GridObj *g)
+{
+	// Only do this if on correct time interval
+	if (g->t == 0 || 
+		(g->t + 1) % static_cast<int>(L_OUT_EVERY_FORCES * (1.0 / g->refinement_ratio)) != 0) return;
+
+	// Open file if not open, close if already open
+	if (!debugstream.is_open())
+	{
+		debugstream.open(GridUtils::path_str + "/momex_debug_" + 
+			std::to_string(static_cast<int>((g->t + 1) * g->refinement_ratio)) + 
+			"_Rnk" + std::to_string(GridUtils::safeGetRank()) + ".csv", std::ios::out);
+
+		// Add header for MomEx debug
+		debugstream << "X Position,Y Position,Z Position";
+
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			debugstream << ",F" + std::to_string(v) + "X,F" + std::to_string(v) + "Y,F" + std::to_string(v) + "Z";
+		}
+	}
+	else
+	{
+		debugstream.close();
 	}
 }
 

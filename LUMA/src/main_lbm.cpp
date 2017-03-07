@@ -247,7 +247,6 @@ int main( int argc, char* argv[] )
 	// Create Object Manager
 	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
 	*GridUtils::logfile << "Object Manager Created." << endl;
-	
 
 	// Read in the geometry config file
 #ifdef L_GEOMETRY_FILE

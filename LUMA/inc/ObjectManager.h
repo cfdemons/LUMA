@@ -74,14 +74,17 @@ class ObjectManager
 
 private:
 
+	// Private file stream for debugging momentum exchange
+	std::ofstream debugstream;
+
 	// Bounce-back object fields
 	double bbbForceOnObjectX = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
 	double bbbForceOnObjectY = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
 	double bbbForceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
-	int bbbOnGridLevel;
-	int bbbOnGridReg;
+	int bbbOnGridLevel;						///< Grid level on which the BB body resides
+	int bbbOnGridReg;						///< Grid region on which the BB body resides
 
-	// Objects (could be stored in a singel Body array if used pointers)
+	// Objects (could be stored in a single Body array if we use pointers)
 	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
 	std::vector<BFLBody> pBody;				///< Array of BFL bodies
 
@@ -148,6 +151,9 @@ public:
 	void io_readInCloud(PCpts* _PCpts, GeomPacked *geom);	// Method to read in Point Cloud data
 	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
 	void io_readInGeomConfig();						// Read in geometry configuration file
+
+	// Debug
+	void toggleDebugStream(GridObj *g);		// Method to open/close a debugging file
 };
 
 #endif

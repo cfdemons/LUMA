@@ -51,6 +51,7 @@
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
+#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 
 
 /*
@@ -64,7 +65,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -134,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 100		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 200		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.0001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -163,7 +164,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 100				///< Desired Reynolds number
+#define L_RE 100			///< Desired Reynolds number
 
 
 /*

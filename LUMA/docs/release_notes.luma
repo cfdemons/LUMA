@@ -1,3 +1,7 @@
+version 	=	1.4.1-alpha
+
+General		:	Untracked addition of a momentum exchange debugging option along with a graphical tool.
+
 version		=	1.4.0
 
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.

@@ -656,7 +656,7 @@ void ObjectManager::io_readInGeomConfig() {
 ///			directory.
 ///
 /// \param	_PCpts	pointer to empty point cloud data container.
-/// \param	GeomPacked	structure containing object data as parsed from the config file.
+/// \param	geom	structure containing object data as parsed from the config file.
 void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 {
 

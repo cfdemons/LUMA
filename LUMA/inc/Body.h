@@ -371,12 +371,12 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	deleteOffRankMarkers();
 };
 
-
+/*********************************************/
 /// \brief	Add marker to the body.
 /// \param	x			global X-position of marker.
 /// \param	y			global Y-position of marker.
 /// \param	z 			global Z-position of marker.
-/// \param markerID		ID of marker within body
+/// \param markerID		rank independent ID of marker within body
 template <typename MarkerType>
 void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 {
@@ -385,6 +385,8 @@ void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 	markers.emplace_back(x, y, z, markerID, _Owner);
 
 };
+
+/*********************************************/
 /// \brief	Delete markers which have been built but exist off rank.
 template <typename MarkerType>
 void Body<MarkerType>::deleteRecvLayerMarkers()
@@ -394,7 +396,10 @@ void Body<MarkerType>::deleteRecvLayerMarkers()
 	int a = 0;
 	do {
 		// If on receiver layer then delete that marker
-		if (GridUtils::isOnRecvLayer(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection]))
+		if (GridUtils::isOnRecvLayer(
+			this->markers[a].position[eXDirection],
+			this->markers[a].position[eYDirection],
+			this->markers[a].position[eZDirection]))
 		{
 			this->markers.erase(this->markers.begin() + a);
 		}
@@ -407,7 +412,7 @@ void Body<MarkerType>::deleteRecvLayerMarkers()
 	} while (a < static_cast<int>(this->markers.size()));
 }
 
-
+/*********************************************/
 /// \brief	Delete markers which have been built but exist off rank.
 template <typename MarkerType>
 void Body<MarkerType>::deleteOffRankMarkers()
@@ -418,7 +423,11 @@ void Body<MarkerType>::deleteOffRankMarkers()
 	int a = 0;
 	do {
 		// If not on rank then delete that marker
-		if (!GridUtils::isOnThisRank(this->markers[a].position[eXDirection], this->markers[a].position[eYDirection], this->markers[a].position[eZDirection], &loc, this->_Owner))
+		if (!GridUtils::isOnThisRank(
+			this->markers[a].position[eXDirection],
+			this->markers[a].position[eYDirection],
+			this->markers[a].position[eZDirection],
+			&loc, this->_Owner))
 		{
 			this->markers.erase(this->markers.begin() + a);
 		}
@@ -482,16 +491,17 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 /// \brief	Downsampling voxel-grid filter to take a point and add it to current body.
 ///
 ///			This method attempts to add a marker to body at the global location 
-///			but obeys the rules of a voxel-grid filter to ensure markers are
-///			distributed such that their spacing roughly matches the 
-///			background lattice. It is usually called in side a loop and requires
+///			but obeys the rules of a 1 marker per cell voxel-grid filter to 
+///			ensure markers are distributed such that their spacing roughly matches 
+///			the background lattice. It is usually called inside a loop and requires
 ///			a few extra pieces of information to be tracked throughout.
 ///
-/// \param x desired global X-position of new marker.
-/// \param y desired global Y-position of new marker.
-/// \param z desired global Z-position of new marker.
-/// \param curr_mark is a reference to the ID of last marker added.
-///	\param counter is a reference to the total number of markers in the body.
+/// \param	x			desired global X-position of new marker.
+/// \param	y			desired global Y-position of new marker.
+/// \param	z			desired global Z-position of new marker.
+///	\param	markerID	requested rank independent ID of marker within body.
+/// \param	curr_mark	is a reference to the index of last marker added.
+///	\param	counter		is a reference to the total number of markers in the body.
 template <typename MarkerType>
 void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int markerID, int& curr_mark, std::vector<int>& counter) {
 
@@ -630,7 +640,7 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 
 	// Voxel grid filter //
 
-	*GridUtils::logfile << "ObjectManagerIBB: Applying voxel grid filter..." << std::endl;
+	*GridUtils::logfile << "ObjectManager: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
 	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
@@ -643,7 +653,7 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	// Loop over array of points
 	for (size_t a = 1; a < _PCpts->x.size(); a++)
 	{
-		// Pass to overridden point builder
+		// Pass to point builder
 		passToVoxelFilter(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], _PCpts->id[a], curr_marker, counter);
 	}
 

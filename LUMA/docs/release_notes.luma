@@ -1,4 +1,4 @@
-version		=	1.4.0-alpha
+version		=	1.4.0
 
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.
 				Additional bug fixes in labelling and coarse limit interpretation.

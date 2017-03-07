@@ -110,17 +110,58 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
 
-				forceOnObjectX +=
+				bbbForceOnObjectX +=
 					2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				forceOnObjectY += 
+				bbbForceOnObjectY += 
 					2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				forceOnObjectZ +=
+				bbbForceOnObjectZ +=
 					2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 
 			}
 		}
 	}
 }
+
+// ************************************************************************* //
+/// \brief	Adds a bounce-back body to the grid by labelling sites.
+/// \param	g		pointer to grid on which object resides.
+/// \param	geom	pointer to structure containing object information read from config file.
+/// \param	_PCpts	pointer to point cloud information.
+void ObjectManager::addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts)
+{
+	// Store information about the body in the Object Manager
+	bbbOnGridLevel = geom->on_grid_lev;
+	bbbOnGridReg = geom->on_grid_reg;
+
+	// Declarations
+	std::vector<int> ijk;
+	eLocationOnRank loc = eNone;
+
+	// Label the grid sites
+	for (int a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+
+		// Get indices if on this rank
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
+		{
+			// Update Typing Matrix and correct macroscopic
+			if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
+			{
+				// Change type
+				g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+
+				// Change macro
+				g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+				g->u(ijk[0], ijk[1], ijk[2], 1, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+				g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+#endif
+				g->rho(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = L_RHOIN;
+
+			}
+		}
+	}
+}
+
 
 // ************************************************************************* //
 /// Geometry data structure container constructor.

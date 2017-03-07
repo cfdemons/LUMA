@@ -42,10 +42,10 @@ void GridObj::LBM_multi_opt(int subcycle) {
 	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Reset object forces for momentum exchange force calculation
-	if (level == L_OBJECT_ON_GRID_LEV && region_number == L_OBJECT_ON_GRID_REG) {
-		objman->forceOnObjectX = 0.0;
-		objman->forceOnObjectY = 0.0;
-		objman->forceOnObjectZ = 0.0;
+	if (level == objman->bbbOnGridLevel && region_number == objman->bbbOnGridReg) {
+		objman->bbbForceOnObjectX = 0.0;
+		objman->bbbForceOnObjectY = 0.0;
+		objman->bbbForceOnObjectZ = 0.0;
 	}
 
 	// Compute Smagorinksy-modified relaxation

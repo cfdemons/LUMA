@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.4.0-alpha"
+#define LUMA_VERSION "1.4.0"
 
 
 // Header guard
@@ -64,7 +64,7 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 100			///< How many timesteps before whole grid output
@@ -74,7 +74,7 @@
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -172,14 +172,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
+// General //
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+
 // IBM //
 //#define L_IBM_ON						///< Turn on IBM
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
-
-// General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
-
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 /*
 *******************************************************************************
@@ -204,47 +203,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D							///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
-#define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of front (3D) wall
-#define L_WALL_THICKNESS_BACK (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of back (3D) wall
-
-
-
-/*
-*******************************************************************************
-********************************* Object Data *********************************
-*******************************************************************************
-*/
-
-// Bounce-back solids
-//#define L_SOLID_BLOCK_ON			///< Add solid block to the domain
-
-	#define L_BLOCK_ON_GRID_LEV 2		///< Provide grid level on which block should be added 
-	#define L_BLOCK_ON_GRID_REG 0		///< Provide grid region on which block should be added 
-	// Wall labelling routine implements this
-	// Specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_BLOCK_MIN_X 0.9		///< Start of object/wall in x-direction
-	#define L_BLOCK_MAX_X 1.1		///< End of object/wall in x-direction
-	#define L_BLOCK_MIN_Y 0.4		///< Start of object/wall in y-direction
-	#define L_BLOCK_MAX_Y 0.6		///< End of object/wall in y-direction
-	#define L_BLOCK_MIN_Z 0.3		///< Start of object/wall in z-direction
-	#define L_BLOCK_MAX_Z 0.7		///< End of object/wall in z-direction
-
-
-// Bounce-back objects from point clouds // TODO: this needs removing as we need to handle BBB in a coherent way
-
-	#define L_OBJECT_ON_GRID_LEV 1		///< Provide grid level on which object should be added 
-	#define L_OBJECT_ON_GRID_REG 0		///< Provide grid region on which object should be added
-	// Following specified in lattice units (i.e. by index) local to the chosen grid level
-	#define L_START_OBJECT_X 0.7		///< Start of object bounding box in X direction
-	#define L_START_OBJECT_Y 0.4		///< Start of object bounding box in Y direction
-	#define L_CENTRE_OBJECT_Z 0.5		///< Centre of object bounding box in Z direction
-	#define L_OBJECT_LENGTH 0.2			///< The object input is scaled based on this dimension
-	#define L_OBJECT_SCALE_DIRECTION eXDirection	///< Scale in this direction (specify as enumeration)
-	#define L_OBJECT_REF_LENGTH 0.2		///< Reference length to be used in the definition of Reynolds number
+#define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of front (3D) wall
+#define L_WALL_THICKNESS_BACK (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of back (3D) wall
 
 
 /*
@@ -324,10 +288,6 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 
 	#undef L_BLOCK_MAX_Z
 	#define L_BLOCK_MAX_Z 0.0
-
-	// Set BBB start for 2D
-	#undef L_CENTRE_OBJECT_Z
-	#define L_CENTRE_OBJECT_Z 0.0
 
 	// Set z inlet velocity
 	#undef L_UZ0

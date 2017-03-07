@@ -157,7 +157,7 @@ void GridObj::LBM_initVelocity ( ) {
 			GridUtils::logfile);
 	}
 
-	// Loop over the data and assign the part the corresponds to the current processor. 
+	// Loop over the data and assign the part that corresponds to the current processor. 
 	for (int i = 0; i < gridSize; i++)
 	{
 		eLocationOnRank loc;
@@ -189,18 +189,25 @@ void GridObj::LBM_initVelocity ( ) {
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
 
-#else
-				/* Input velocity is specified by individual vectors for x, y and z which 
-				 * have either been read in from an input file or defined by an expression 
-				 * given in the definitions. */
-				u(i,j,k,0,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UX0,this);
-				u(i,j,k,1,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UY0,this);
+				// Inlet sites are an exception to the no flow setting
+				if (LatTyp(i, j, k, M_lim, K_lim) == eInlet)
+#endif
+
+				{
+
+					/* Input velocity is specified by individual vectors for x, y and z which
+					 * have either been read in from an input file or defined by an expression
+					 * given in the definitions. */
+					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UX0, this);
+					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UY0, this);
 #if (L_DIMS == 3)
-				u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
+				}
 
-#endif
+
+				// Wall sites set to zero
 				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid)
 				{
 					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = 0.0;
@@ -216,7 +223,7 @@ void GridObj::LBM_initVelocity ( ) {
 		}
 	}
 
-#endif
+#endif	// L_INIT_VELOCITY_FROM_FILE
 
 }
 
@@ -1132,9 +1139,6 @@ void GridObj::LBM_initSolidLab() {
 ///			The virtual wind tunnel definitions are implemented by this method.
 void GridObj::LBM_initBoundLab ( ) {
 
-	// Try to add the solid block
-	LBM_initSolidLab();
-
 	// If we need to label the edges...
 #if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL
 
@@ -1426,9 +1430,5 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
         }
     }
 
-	
-	// Try to add the solid block labels
-	LBM_initSolidLab();
 }
-
 // ***************************************************************************************************

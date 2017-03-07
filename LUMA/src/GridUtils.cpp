@@ -474,9 +474,9 @@ bool GridUtils::isOverlapPeriodic(int i, int j, int k, GridObj const & g) {
 /// \param		x		x-position of site.
 /// \param		y		y-position of site.
 /// \param		z		z-position of site.
-/// \param[out]	pos		pointer to the start of a vector in which local indices are returned.
-/// \param		grid	grid being queried.
 /// \param[out]	loc		description of the location of the point.
+/// \param		grid	grid being queried.
+/// \param[out]	pos		pointer to the start of a vector in which local indices are returned.
 /// \return	boolean answer.
 bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc, 
 	GridObj const * const grid, std::vector<int> *pos) {

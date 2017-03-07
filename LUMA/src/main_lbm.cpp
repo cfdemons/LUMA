@@ -340,7 +340,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_VTK_BODY_WRITE
-	*GridUtils::logfile << "Writing out to VTK file..." << endl;
+	*GridUtils::logfile << "Writing out IBB to VTK file..." << endl;
 	objMan->io_vtkIBBWriter(Grids.t);
 #endif
 
@@ -373,6 +373,7 @@ int main( int argc, char* argv[] )
 
 		Grids.LBM_multi_opt();		// Launch LBM kernel on top-level grid
 
+
 		///////////////
 		// Write Out //
 		///////////////
@@ -402,6 +403,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_VTK_BODY_WRITE
+			*GridUtils::logfile << "Writing out IBB to VTK file..." << endl;
 			objMan->io_vtkIBBWriter(Grids.t);
 #endif
 

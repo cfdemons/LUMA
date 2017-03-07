@@ -75,11 +75,13 @@ class ObjectManager
 private:
 
 	// Bounce-back object fields
-	double forceOnObjectX = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
-	double forceOnObjectY = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
-	double forceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
+	double bbbForceOnObjectX = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
+	double bbbForceOnObjectY = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
+	double bbbForceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
+	int bbbOnGridLevel;
+	int bbbOnGridReg;
 
-	// Objects
+	// Objects (could be stored in a singel Body array if used pointers)
 	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
 	std::vector<BFLBody> pBody;				///< Array of BFL bodies
 
@@ -134,7 +136,8 @@ public:
 	void ibm_bandec(double **a, long n, int m1, int m2, double **al,
 		unsigned long indx[], double *d);
 
-	// Force calculation
+	// Bounceback Body Methods
+	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
 	// IO methods //

@@ -11,7 +11,8 @@ General		:	Wholesale changes to coordinate systems and hence changes in the init
 				User input except L_RHOIN is now expected in dimensionless units.
 				Documentation moved to VM @ 130.88.97.222.
 				New GEOMETRY CONFIG runtime infrastructure added for adding multiple bodies of different types into a simulation. Replaces the old compile-time mechanisms.
-
+				
+Issue #127	:	BBB objects are now able to be read from the new goemetry configuration file.
 Issue #125	:	Probe output method now generalised so it will search for a probe position on the finest grid first and then ascend the hierarchy until point is found.
 Issue #111  :   The initial velocitiy field can now be read from a file by defining L_INIT_VELOCITY_FROM_FILE in definitions.h
 Issue #121	:	Fixed bug in 3D serial cases with Grid Manager initialisation that caused the wrong writable region to be set and corrupted HDF5 data.

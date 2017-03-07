@@ -828,8 +828,12 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 #endif
 
 	// If there are points left
-	if (!_PCpts->x.empty())	{
+	if (!_PCpts->x.empty())
+	{
 
+#ifdef L_CLOUD_DEBUG
+		*GridUtils::logfile << "Building..." << std::endl;
+#endif
 
 		// Perform a different post-processing action depending on the type of body
 		switch (geom->objtype)
@@ -837,39 +841,18 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 
 		case eBBBCloud:
 
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Labelling..." << std::endl;
-#endif
-
-			// Label the grid sites
-			for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
-
-				// Get indices if on this rank
-				if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
-				{
-					// Update Typing Matrix
-					if (g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) == eFluid)
-					{
-						g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
-					}
-				}
-			}
+			// Call labeller for BBB
+			addBouncebackObject(g, geom, _PCpts);
 			break;
 
 		case eBFLCloud:
 
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
 			// Call constructor to build BFL body
 			pBody.emplace_back(g, geom->bodyID, _PCpts);
 			break;
 
 		case eIBBCloud:
 
-#ifdef L_CLOUD_DEBUG
-			*GridUtils::logfile << "Building..." << std::endl;
-#endif
 			// Call constructor to build IBM body
 			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->clamped);
 			break;
@@ -889,26 +872,30 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 
 	// Get grid on which object resides
 	GridObj *g = NULL;
-	GridUtils::getGrid(_Grids, L_OBJECT_ON_GRID_LEV, L_OBJECT_ON_GRID_REG, g);
+	GridUtils::getGrid(_Grids, bbbOnGridLevel, bbbOnGridReg, g);
 	// If this grid exists on this process
 	if (g != NULL)
 	{
 		// Create stream
 		std::ofstream fout;
 		fout.precision(L_OUTPUT_PRECISION);
+
 		// Filename
 		std::stringstream fileName;
 		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << rank << ".csv";
+
 		// Open file
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+
 		// Write out the header (first time step only)
 		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
 
+		// Scaled with respect to refinement ratio
 		fout << std::to_string(tval) << ","
-			<< std::to_string(forceOnObjectX / pow(2, L_OBJECT_ON_GRID_LEV)) << ","
-			<< std::to_string(forceOnObjectY / pow(2, L_OBJECT_ON_GRID_LEV)) << ","
+			<< std::to_string(bbbForceOnObjectX * g->refinement_ratio) << ","
+			<< std::to_string(bbbForceOnObjectY * g->refinement_ratio) << ","
 #if (dims == 3)
-			<< std::to_string(forceOnObjectZ / pow(2, L_OBJECT_ON_GRID_LEV))
+			<< std::to_string(bbbForceOnObjectZ * g->refinement_ratio)
 #else
 			<< std::to_string(0.0)
 #endif

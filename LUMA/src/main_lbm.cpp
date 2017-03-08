@@ -182,27 +182,29 @@ int main( int argc, char* argv[] )
 
 
 	// Log file information
-	*GridUtils::logfile << "L0 Grid size = " << L_N << "x" << L_M << "x" << L_K << endl;
+	L_INFO("L0 Grid size = " + std::to_string(L_N) + "x" + std::to_string(L_M) + "x" + std::to_string(L_K), GridUtils::logfile);
 #ifdef L_BUILD_FOR_MPI
-	*GridUtils::logfile << "MPI size = " << L_MPI_XCORES << "x" << L_MPI_YCORES << "x" << L_MPI_ZCORES << endl;
+	L_INFO("MPI size = " + std::to_string(L_MPI_XCORES) + "x" + std::to_string(L_MPI_YCORES) + "x" + std::to_string(L_MPI_ZCORES), GridUtils::logfile);
 	*GridUtils::logfile << "Coordinates on rank " << mpim->my_rank << " are (";
-		for (size_t d = 0; d < L_DIMS; d++) {
-			*GridUtils::logfile << "\t" << mpim->rank_coords[d];
-		}
-		*GridUtils::logfile << "\t)" << std::endl;
+	for (size_t d = 0; d < L_DIMS; d++)
+	{
+		*GridUtils::logfile << "\t" << mpim->rank_coords[d];
+	}
+	*GridUtils::logfile << "\t)" << std::endl;
 #endif
-	*GridUtils::logfile << "Number of time steps = " << std::to_string(L_TOTAL_TIMESTEPS) << endl;
-	*GridUtils::logfile << "Physical grid spacing = " << std::to_string(Grids.dh) << endl;
-	*GridUtils::logfile << "Lattice viscosity = " << std::to_string(Grids.nu) << endl;
-	*GridUtils::logfile << "L0 relaxation time = " << std::to_string(1/Grids.omega) << endl;
-	*GridUtils::logfile << "Lattice reference velocity " << std::to_string(Grids.uref) << std::endl;
+	L_INFO("Number of time steps to run = " + std::to_string(L_TOTAL_TIMESTEPS), GridUtils::logfile);
+	L_INFO("Grid spacing = " + std::to_string(Grids.dh), GridUtils::logfile);
+	L_INFO("Time step = " + std::to_string(Grids.dt), GridUtils::logfile);
+	L_INFO("Lattice viscosity = " + std::to_string(Grids.nu), GridUtils::logfile);
+	L_INFO("L0 relaxation time = " + std::to_string(1.0 / Grids.omega), GridUtils::logfile);
+	L_INFO("Lattice reference velocity " + std::to_string(Grids.uref), GridUtils::logfile);
 	// Reynolds Number
 #ifdef L_NU
 #if L_NU != 0
-	*GridUtils::logfile << "Reynolds Number = " << std::to_string(1/L_NU) << endl;
+	L_INFO("Reynolds Number = " + std::to_string(1.0 / L_NU), GridUtils::logfile);
 #endif
 #else
-	*GridUtils::logfile << "Reynolds Number = " << std::to_string(L_RE) << endl;
+	L_INFO("Reynolds Number = " + std::to_string(L_RE), GridUtils::logfile);
 #endif
 
 

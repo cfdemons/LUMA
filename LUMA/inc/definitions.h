@@ -98,7 +98,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 50000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 60000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 300000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 60000		///< Number of time steps to run simulation for
 
 
 /*
@@ -135,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 40		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 20		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.0001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions

@@ -1,3 +1,8 @@
+version		=	1.4.1-alpha
+
+General		:	Added warning macro and improved some of the documentation in the GridUnits.
+				Added debugging capability for Momentum Exchange as well as associated MATLAB tool.
+
 version		=	1.4.0
 
 General		:	Wholesale changes to coordinate systems and hence changes in the initialisation machinery.

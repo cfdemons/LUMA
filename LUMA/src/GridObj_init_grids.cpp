@@ -278,7 +278,6 @@ void GridObj::LBM_initGrid() {
 
 	//Reference velocity in LBM units
 	uref = GridUnits::ud2ulbm(1, this);
-
 	
 
 
@@ -458,7 +457,7 @@ void GridObj::LBM_initGrid() {
 #ifdef L_NU
 	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
-	nu = GridUnits::nud2nulbm(1/static_cast<double>(L_RE), this);
+	nu = GridUnits::nud2nulbm(1.0 / static_cast<double>(L_RE), this);
 #endif
 
 	// Relaxation frequency on L0
@@ -469,20 +468,25 @@ void GridObj::LBM_initGrid() {
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
 	 */
 
-	//Check that the relaxation frequency is within acceptable values. Suggest a better value for dt to the user if omega is not within acceptable limits. 
-	//Note that the use of BGKSMAG allows for omega >=2
+	/* Check that the relaxation frequency is within acceptable values. 
+	 * Suggest a better value for dt to the user if omega is not within 
+	 * acceptable limits. Note that the use of BGKSMAG allows for omega >=2. */
 #ifndef L_USE_BGKSMAG
 	if (omega >= 2.0) {
 		L_ERROR("LBM relaxation frequency omega too large. Check viscosity value. Exiting.", GridUtils::logfile);
 	}
 #endif
 
-	//Check if there are incompressibility issues, and warn the user if this is the case
+	// Check if there are incompressibility issues and warn the user if so
 	if (uref > (0.17*cs)) {
-		*GridUtils::logfile << "WARNING: Reference velocity in LBM units larger than 17% of the speed of sound. Compressibility effects may impair the quality of the results." << std::endl;
-		*GridUtils::logfile << "Try L_TIMESTEP = " << (dh*dh*(0.7 - 0.5)*cs*cs) / nu << std::endl;
+		L_WARN("Reference velocity in LBM units larger than 17% of the speed of sound. \
+			   			Compressibility effects may impair the quality of the results. \
+												Try L_TIMESTEP = " 
+												+ std::to_string((SQ(dh) * (0.7 - 0.5) * SQ(cs)) / nu),
+												GridUtils::logfile);
 		if (uref >= cs){
-			L_ERROR("Reference velocity in LBM units equal or larger than the speed of sound cs, results of the simulation are not valid. Exiting.", GridUtils::logfile);
+			L_ERROR("Reference velocity in LBM units equal to or larger than the speed of sound cs, \
+					results of the simulation are not valid. Exiting.", GridUtils::logfile);
 		}
 	}
 

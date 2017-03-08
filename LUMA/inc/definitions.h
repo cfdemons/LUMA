@@ -65,11 +65,11 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
+#define L_OUT_EVERY 10000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
@@ -81,7 +81,7 @@
 
 // High frequency output options
 //#define L_PROBE_OUTPUT						///< Turn on probe output
-#define L_PROBE_OUT_FREQ 250					///< Write out frequency of probe output
+#define L_PROBE_OUT_FREQ 200					///< Write out frequency of probe output
 const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
 const static double cProbeLimsX[2] = {0.1, 0.2};	///< Limits of X plane for array of probes
 const static double cProbeLimsY[2] = {0.1, 0.2};	///< Limits of Y plane for array of probes
@@ -95,10 +95,10 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 50000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 60000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 60000		///< Number of time steps to run simulation for
 
 
 /*
@@ -122,7 +122,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
@@ -135,13 +135,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 200		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 20		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.0001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 1.0		///< End of domain in X (non-dimensional units)
-#define L_BY 1.0		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0		///< End of domain in Z (non-dimensional units)
+#define L_BX 10.0		///< End of domain in X (non-dimensional units)
+#define L_BY 10.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -189,7 +189,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Virtual Wind Tunnels
 //#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-//#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
+#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
 
 
 // Inlets
@@ -205,7 +205,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Solids
 //#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
 #define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of front (3D) wall
@@ -218,7 +218,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0

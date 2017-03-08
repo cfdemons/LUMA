@@ -76,19 +76,6 @@
 
 
 /****************************************************/
-// Our headers (include after the ernumerations) //
-/****************************************************/
-
-// Include definitions, singletons and headers to be made available everywhere for convenience.
-#include "definitions.h"
-#include "GridManager.h"
-#include <mpi.h>
-#include "MpiManager.h"
-#include "GridUtils.h"
-#include "GridUnits.h"
-
-
-/****************************************************/
 // Our definitions //
 /****************************************************/
 
@@ -107,16 +94,29 @@
 // Failure coede
 #define LUMA_FAILED 12345
 
-// Global variable references
-extern const int c[3][L_NUM_VELS];				///< Lattice velocities
-extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
-extern const double w[L_NUM_VELS];				///< Quadrature weights
-extern const double cs;							///< Lattice sound speed
+
+/****************************************************/
+// Our headers (include after the enumerations) //
+/****************************************************/
+
+// Include definitions, singletons and headers to be made available everywhere for convenience.
+#include "definitions.h"
+#include "GridManager.h"
+#include <mpi.h>
+#include "MpiManager.h"
+#include "GridUtils.h"
+#include "GridUnits.h"
 
 
 /****************************************************/
 // Our global functions //
 /****************************************************/
+
+// Global variable references
+extern const int c[3][L_NUM_VELS];				///< Lattice velocities
+extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
+extern const double w[L_NUM_VELS];				///< Quadrature weights
+extern const double cs;							///< Lattice sound speed
 
 // Debug stuff -- maybe I should put all these debug statements into some static
 // class and just compile blank functions if not in debugging mode?
@@ -157,7 +157,7 @@ inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 #endif
 
 	std::cout << " Error: See Log File" << std::endl;
-	*logfile << "ERROR: " << msg << std::endl;
+	*logfile << "**ERROR**: " << msg << std::endl;
 	logfile->close();
 
 #ifdef L_BUILD_FOR_MPI
@@ -179,6 +179,21 @@ inline void infofcn(const std::string &msg, std::ofstream *logfile)
 {
 
 	*logfile << "Info: " << msg << std::endl;
+}
+
+/// Regular writer
+#define L_WARN warnfcn	///< Warning function shorthand
+/// \brief Warning function.
+///
+///			Writes string to the supplied logfile.
+///			Inlined since this header is included everywhere.
+///
+///	\param	msg			string to be printed to the log file.
+///	\param	logfile		pointer to the logfile where the message is to be written.
+inline void warnfcn(const std::string &msg, std::ofstream *logfile)
+{
+
+	*logfile << "WARNING: " << msg << std::endl;
 }
 
 #endif

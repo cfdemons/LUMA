@@ -273,10 +273,10 @@ void GridObj::LBM_initGrid() {
 	// Store temporal spacing
 	dt = L_TIMESTEP;
 
-	//Gravity in LBM units
+	// Gravity in LBM units
 	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
 
-	//Reference velocity in LBM units
+	// Reference velocity in LBM units -- always 1 in dimensionless units but varies in LBM units
 	uref = GridUnits::ud2ulbm(1, this);
 	
 

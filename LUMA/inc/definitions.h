@@ -51,7 +51,7 @@
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
-#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
+//#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 
 
 /*
@@ -68,7 +68,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 10000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -122,7 +122,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
@@ -135,8 +135,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 20		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.0001		///< The timestep in non-dimensional units
+#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 10.0		///< End of domain in X (non-dimensional units)
@@ -158,13 +158,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.04			///< Initial/inlet x-velocity
-#define L_UY0 0.0			///< Initial/inlet y-velocity
+#define L_UX0 cos(60 * L_PI / 180)			///< Initial/inlet x-velocity
+#define L_UY0 sin(60 * L_PI / 180)			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 100			///< Desired Reynolds number
+#define L_RE 300			///< Desired Reynolds number
 
 
 /*
@@ -218,29 +218,29 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.3 }
+	{ 3.0 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.7 }
+	{ 7.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.3 }
+	{ 3.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.7 }
+	{ 7.0 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.3 }
+	{ 3.0 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.7 }
+	{ 7.0 }
 };
 
 #endif

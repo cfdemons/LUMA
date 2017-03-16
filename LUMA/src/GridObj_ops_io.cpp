@@ -579,7 +579,7 @@ void GridObj::io_probeOutput() {
 	}
 
 	// Start a new line if first rank
-	if (rank == 0) probefile << std::endl;
+	if (rank == 0 && t != L_PROBE_OUT_FREQ) probefile << std::endl;
 
 	// Declarations
 	eLocationOnRank loc = eNone;

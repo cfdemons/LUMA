@@ -41,6 +41,18 @@
 	#define DEPRECATED
 #endif
 
+// Unused parameter macro
+#ifdef UNUSED
+#elif defined(__GNUC__)
+	#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+	#define UNUSED(x) /*@unused@*/ x
+#elif defined(__cplusplus)
+	#define UNUSED(x)
+#else
+	#define UNUSED(x) x
+#endif
+
 // Frequently used headers (speeds up compilation in VS if put in the pre-compiled header module)
 #include <algorithm>
 #include <cmath>
@@ -87,6 +99,8 @@
 
 // Squared operator
 #define SQ(x) ((x) * (x))
+#define SQRT3 1.7320508075688772935274463415059
+#define SQRT2 1.4142135623730950488016887242097
 
 // Small number for comparing floats to zero
 #define L_SMALL_NUMBER 1e-8

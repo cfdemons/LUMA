@@ -231,109 +231,29 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 
 // ************************************************************************** //
-/// \brief	Write IB body data to VTK file.
-///
-///			Currently can only write out un-closed bodies like filaments.
+/// \brief	Wrapper for writing body position data to VTK file.
 ///
 /// \param	tval	time value at which the write out is being performed.
-void ObjectManager::io_vtkIBBWriter(double tval) {
+void ObjectManager::io_vtkBodyWriter(int tval)
+{
 
 	// Get the rank
 	int rank = GridUtils::safeGetRank();
 
     // Loop through each iBody
-    for (size_t ib = 0; ib < iBody.size(); ib++) {
+	for (IBBody& body : iBody)
+	{
+		// Call the writer
+		body.writeVtkPosition(tval);
 
-        // Create file name then output file stream
-        std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_IBout.Body" << iBody[ib].id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
+	}
 
-        std::ofstream fout;
-        fout.open( fileName.str().c_str() );
-
-        // Add header information
-        fout << "# vtk DataFile Version 3.0f\n";
-        fout << "IB Output for body ID " << iBody[ib].id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
-        fout << "ASCII\n";
-        fout << "DATASET POLYDATA\n";
-
-
-        // Write out the positions of each Lagrange marker
-        fout << "POINTS " << iBody[ib].markers.size() << " float\n";
-        for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-
-        	fout	<< iBody[ib].markers[i].position[0] << " "
-					<< iBody[ib].markers[i].position[1] << " "
-					<< iBody[ib].markers[i].position[2] << std::endl;
-        }
-
-
-        // Write out the connectivity of each Lagrange marker
-        size_t nLines = iBody[ib].markers.size() - 1;
-
-        if (iBody[ib].closed_surface == false)
-            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-        else if (iBody[ib].closed_surface == true)
-            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
-
-        for (size_t i = 0; i < nLines; i++) {
-            fout << 2 << " " << i << " " << i + 1 << std::endl;
-        }
-
-        // If iBody[ib] is a closed surface then join last point to first point
-        if (iBody[ib].closed_surface == true) {
-            fout << 2 << " " << nLines << " " << 0 << std::endl;
-        }
-
-        fout.close();
-    }
-
-    // Loop through each iBody
-    for (size_t pb = 0; pb < pBody.size(); pb++) {
-
-        // Create file name then output file stream
-        std::stringstream fileName;
-        fileName << GridUtils::path_str + "/vtk_BFLout.Body" << pBody[pb].id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
-
-        std::ofstream fout;
-        fout.open( fileName.str().c_str() );
-
-        // Add header information
-        fout << "# vtk DataFile Version 3.0f\n";
-        fout << "BFL Output for body ID " << pBody[pb].id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
-        fout << "ASCII\n";
-        fout << "DATASET POLYDATA\n";
-
-
-        // Write out the positions of each Lagrange marker
-        fout << "POINTS " << pBody[pb].markers.size() << " float\n";
-        for (size_t i = 0; i < pBody[pb].markers.size(); i++) {
-
-        	fout	<< pBody[pb].markers[i].position[0] << " "
-					<< pBody[pb].markers[i].position[1] << " "
-					<< pBody[pb].markers[i].position[2] << std::endl;
-        }
-
-
-        // Write out the connectivity of each Lagrange marker
-        size_t nLines = pBody[pb].markers.size() - 1;
-
-        if (pBody[pb].closed_surface == false)
-            fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-        else if (pBody[pb].closed_surface == true)
-            fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
-
-        for (size_t i = 0; i < nLines; i++) {
-            fout << 2 << " " << i << " " << i + 1 << std::endl;
-        }
-
-        // If iBody[ib] is a closed surface then join last point to first point
-        if (pBody[pb].closed_surface == true) {
-            fout << 2 << " " << nLines << " " << 0 << std::endl;
-        }
-
-        fout.close();
-    }
+    // Loop through each BFL Body
+	for (BFLBody& body : pBody)
+	{
+		// Call the writer
+		body.writeVtkPosition(tval);
+	}
 }
 
 // ************************************************************************** //

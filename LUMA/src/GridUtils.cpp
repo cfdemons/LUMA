@@ -281,6 +281,23 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 }
 
 // *****************************************************************************
+/// \brief	Computes the vector divided by the scalar.
+/// \param	vec1	a vector.
+/// \param	scalar	a scalar.
+/// \return	the vector divide by the scalar.
+std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
+
+	// Declare vector answer as copy of original
+	std::vector<double> answer(vec1);
+
+	// Divide each element
+	for (size_t i = 0; i < answer.size(); ++i) answer[i] /= scalar;
+
+	// Return answer
+	return answer;
+}
+
+// *****************************************************************************
 /// \brief	Gets the indices of the fine site given the coarse site.
 ///
 ///			Maps the indices of a coarse grid site to a corresponding fine 
@@ -384,6 +401,19 @@ int GridUtils::getOpposite(int direction) {
 	}
 
 	return direction_opposite;
+
+}
+
+// *****************************************************************************
+/// \brief	Normalises the supplied value wrt to the lattice link direction.
+///
+/// \param	value	value to be normalised.
+///	\param	v		velocity direction (link direction).
+/// \return	value normalised wrt to lattice link length.
+double GridUtils::normaliseToLink(double value, int v)
+{
+	// Use unit vectors to compute link length
+	return value / GridUtils::vecnorm(c[0][v], c[1][v], c[2][v]);
 
 }
 

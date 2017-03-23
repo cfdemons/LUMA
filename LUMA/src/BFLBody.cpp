@@ -21,19 +21,20 @@
 
 // Implementation of BFL body class //
 
-/*********************************************/
+/******************************************************************************/
 /// Default constructor
 BFLBody::BFLBody(void)
 {
 }
 
+/******************************************************************************/
 /// Default destructor
 BFLBody::~BFLBody(void)
 {
 }
 
 
-/*********************************************/
+/******************************************************************************/
 /// \brief Custom constructor to populate body from array of points.
 /// \param g		hierarchy pointer to grid hierarchy
 /// \param bodyID	ID of body in array of bodies.
@@ -75,8 +76,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores to the "invalid" value
-	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> ( 
-		markers.size(), -1.0 ) );
+	Q.resize(L_NUM_VELS * markers.size(), -1.0);
 
 	// Loop over local grid and inspect the streaming operations
 	for (int i = 0; i < N_lim; i++) {
@@ -115,7 +115,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 }
 
 
-/*********************************************/
+/******************************************************************************/
 /// \brief 	Custom constructor for building prefab filament
 /// \param g				hierarchy pointer to grid hierarchy
 /// \param bodyID			ID of body in array of bodies.
@@ -157,8 +157,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores to the "invalid" value
-	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> (
-		markers.size(), -1.0 ) );
+	Q.resize(L_NUM_VELS * markers.size(), -1.0);
 
 	// Loop over local grid and inspect the streaming operations
 	for (int i = 0; i < N_lim; i++) {
@@ -197,7 +196,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 }
 
 
-/*********************************************/
+/******************************************************************************/
 /// \brief 	Custom constructor for building prefab circle/sphere
 /// \param g				hierarchy pointer to grid hierarchy
 /// \param bodyID			ID of body in array of bodies.
@@ -238,8 +237,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores to the "invalid" value
-	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> (
-		markers.size(), -1.0 ) );
+	Q.resize(L_NUM_VELS * markers.size(), -1.0);
 
 	// Loop over local grid and inspect the streaming operations
 	for (int i = 0; i < N_lim; i++) {
@@ -278,7 +276,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 }
 
 
-/*********************************************/
+/******************************************************************************/
 /// \brief 	Custom constructor for building square/cuboid
 /// \param g				hierarchy pointer to grid hierarchy
 /// \param bodyID			ID of body in array of bodies.
@@ -320,8 +318,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
 	// Initialise Q stores to the "invalid" value
-	Q = std::vector< std::vector<double> > (L_NUM_VELS * 2, std::vector<double> (
-		markers.size(), -1.0 ) );
+	Q.resize(L_NUM_VELS * markers.size(), -1.0);
 
 	// Loop over local grid and inspect the streaming operations
 	for (int i = 0; i < N_lim; i++) {
@@ -359,7 +356,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 #endif
 }
 
-/*********************************************/
+/******************************************************************************/
 /// \brief	Routine to compute wall distance Q.
 ///
 ///			Computes Q values in 3D at a given local voxel for each application of 
@@ -417,7 +414,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 					m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[kk]);
 
 					// If data valid, then store ID
-					if (m_data->ID != -1) V.push_back(m_data->ID);
+					if (m_data->isValid()) V.push_back(m_data->ID);
 				}
 
 			}
@@ -536,15 +533,13 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 				double q = GridUtils::vecnorm( GridUtils::subtract(intersect,src) ) / GridUtils::vecnorm(dir);
 
 				// On first pass, set to valid value
-				if (Q[vel][storeID] == -1) Q[vel][storeID] = std::numeric_limits<double>::max();
+				if (Q[vel + L_NUM_VELS * storeID] == -1) Q[vel + L_NUM_VELS * storeID] = std::numeric_limits<double>::max();
 
-				if (q < Q[vel][storeID]) {
+				if (q < Q[vel + L_NUM_VELS * storeID]) {
 
 					// Set outgoing Q value
-					Q[vel][storeID] = q;
+					Q[vel + L_NUM_VELS * storeID] = q;
 
-					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + L_NUM_VELS][storeID] = 1 - q;
 				}
 			}
 		}
@@ -552,6 +547,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 
 }
 
+/******************************************************************************/
 /// \brief	Routine to compute wall distance Q.
 ///
 ///			Computes Q values in 2D at a given local voxel for each application of 
@@ -566,11 +562,11 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
 	 * stream vector and the constructed line. The distance of intersection
-	 * is the value of q. As with the 3D case, 1-q is assigned to the 
-	 * destination store after we have added q to the source store. */
+	 * is the value of q. */
 
 	// Declarations
 	int dest_i, dest_j;
+	double s, t, s1_x, s1_y, s2_x, s2_y;
 	MarkerData* m_data;
 
 	// Set stencil centre data
@@ -598,7 +594,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 				m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[0]);
 
 				// If data valid, then store ID
-				if (m_data->ID != -1) V.push_back(m_data->ID);
+				if (m_data->isValid()) V.push_back(m_data->ID);
 
 				// Clean-up after getMarkerData call
 				delete m_data;
@@ -644,22 +640,24 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 	// Loop through valid marker combinations
 	for (std::vector<int>& line : combo) {
 
-		// Perform line intersection test //
+		/* Perform line intersection test according to 2nd answer on:
+		 * http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+		 */
 
 		std::vector<double> q;	// Position of adjacent marker
 		q.push_back(markers[line[0]].position[0]);
 		q.push_back(markers[line[0]].position[1]);
 		q.push_back(markers[line[0]].position[2]);
 
-		std::vector<double> s;	// Length of marker-marker vector
-		s.push_back(markers[line[1]].position[0] - q[0]);
-		s.push_back(markers[line[1]].position[1] - q[1]);
-		s.push_back(markers[line[1]].position[2] - q[2]);
+		std::vector<double> qps;	// Position of next marker
+		qps.push_back(markers[line[1]].position[0]);
+		qps.push_back(markers[line[1]].position[1]);
+		qps.push_back(markers[line[1]].position[2]);
 
 		std::vector<double> p;	// Position of source site
 		p.push_back(_Owner->XPos[i]);
-		p.push_back(_Owner->XPos[j]);
-		p.push_back(0.0);
+		p.push_back(_Owner->YPos[j]);
+		p.push_back(markers[line[0]].position[2]);	// In 2D must be in the same plane
 
 		// Loop over velocities (ignore rest distribution)
 		for (int vel = 0; vel < L_NUM_VELS - 1; vel++) {
@@ -671,40 +669,39 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 			// Position of destination site
 			std::vector<double> ppr;
 			ppr.push_back(_Owner->XPos[dest_i]);
-			ppr.push_back(_Owner->XPos[dest_j]);
-			ppr.push_back(0.0);			
+			ppr.push_back(_Owner->YPos[dest_j]);
+			ppr.push_back(markers[line[0]].position[2]);
 
-			std::vector<double> r = GridUtils::subtract(ppr,p);	// Length of streaming vector			
-    
-			// Compute parameters of intersection
-			double rXs = GridUtils::vecnorm(GridUtils::crossprod( r, s ));
-			double qpXr = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), r ));
-			double qpXs = GridUtils::vecnorm(GridUtils::crossprod( GridUtils::subtract(q, p), s ));
-			double t = qpXs / rXs;
-			double u = qpXr / rXs;    
-    
-			// Check for the intersecting case
-			if (rXs != 0 && t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-        
-				// Lines intersect at p + tr = q + us
+			// Compute lengths of lines
+			s1_x = ppr[0] - p[0];     s1_y = ppr[1] - p[1];
+			s2_x = qps[0] - q[0];     s2_y = qps[1] - q[1];
+
+			// Cross products
+			s = (-s1_y * (p[0] - q[0]) + s1_x * (p[1] - q[1])) / (-s2_x * s1_y + s1_x * s2_y);
+			t = (s2_x * (p[1] - q[1]) - s2_y * (p[0] - q[0])) / (-s2_x * s1_y + s1_x * s2_y);
+
+			// Test for intersection
+			if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+			{
+				// Lines intersect at p + ts_1
 				std::vector<double> intersect;
-				intersect.push_back(p[0] + t * r[0]);
-				intersect.push_back(p[1] + t * r[1]);
-				intersect.push_back(0);
+				intersect.push_back(p[0] + t * s1_x);
+				intersect.push_back(p[1] + t * s1_y);
+				intersect.push_back(p[2]);	// Again same plane in 2D
         
-				// Compute Q
-				double q = GridUtils::vecnorm( GridUtils::subtract(intersect, p) ) / GridUtils::vecnorm(r);
+				// Compute Q (normalised)
+				double wall_distance = GridUtils::vecnorm(GridUtils::subtract(intersect, p)) / GridUtils::vecnorm(GridUtils::subtract(ppr, p));
 
 				// On first pass, set to valid value
-				if (Q[vel][storeID] == -1) Q[vel][storeID] = std::numeric_limits<double>::max();
+				if (Q[vel + L_NUM_VELS * storeID] == -1)
+					Q[vel + L_NUM_VELS * storeID] = std::numeric_limits<double>::max();
 				
-				if (q < Q[vel][storeID]) {
+				// Store if lower than previous
+				if (wall_distance < Q[vel + L_NUM_VELS * storeID]) {
 
 					// Set outgoing Q value
-					Q[vel][storeID] = q;
+					Q[vel + L_NUM_VELS * storeID] = wall_distance;
 
-					// Incoming Q value (in destination store at opposite direction) is 1 minus the incoming
-					Q[GridUtils::getOpposite(vel) + L_NUM_VELS][storeID] = 1 - q;
 				}
         
 			}
@@ -713,3 +710,4 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 		}
 	}
 }
+/******************************************************************************/

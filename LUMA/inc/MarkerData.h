@@ -30,18 +30,9 @@ public:
 	/// \param y y-position of marker
 	/// \param z z-position of marker
 	/// \param ID marker number in a given body
-	MarkerData(int i, int j, int k, double x, double y, double z, int ID) {
-
-		// Custom constructor
-		this->i = i;
-		this->j = j;
-		this->k = k;
-		this->x = x;
-		this->y = y;
-		this->z = z;
-		this->ID = ID;
-
-	};
+	MarkerData(int i, int j, int k, double x, double y, double z, int ID)
+		: i(i), j(j), k(k), x(x), y(y), z(z), ID(ID)
+	{ };
 
 	/// \brief	Default Constructor.
 	///
@@ -56,6 +47,13 @@ public:
 
 	/// Default destructor
 	~MarkerData(void) {};
+
+	/// Method to check if marker data structure is valid
+	bool isValid()
+	{
+		if (ID == -1) return false;
+		return true;
+	}
 
 	// Voxel indices
 	int i;	///< i-index of primary support site

@@ -73,6 +73,7 @@ private:
 
 protected:
 	void buildFromCloud(PCpts *_PCpts);										// Method to build body from point cloud
+	virtual void writeVtkPosition(int tval);								// VTK body writer
 
 
 };
@@ -449,7 +450,7 @@ void Body<MarkerType>::deleteOffRankMarkers()
 /// \param x X-position nearest to marker to be retrieved.
 /// \param y Y-position nearest to marker to be retrieved.
 /// \param z Z-position nearest to marker to be retrieved.
-/// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid.
+/// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid by assigning an ID of -1.
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
@@ -614,7 +615,7 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 	MarkerData* m_data = getMarkerData(x, y, z);
 
 	// True if the data store is not empty
-	if (m_data->ID != -1) {
+	if (m_data->isValid()) {
 
 		delete m_data;	// Deallocate the store before leaving scope
 		return true;
@@ -630,7 +631,6 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 /*********************************************/
 /// \brief	Method to build a body from point cloud data.
 /// \param _PCpts	point cloud data from which to build body.
-// Returns boolean as to whether a given point is in an existing marker voxel
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
@@ -659,6 +659,61 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 
 	*GridUtils::logfile << "ObjectManager: Object represented by " << std::to_string(markers.size()) <<
 		" markers using 1 marker / voxel voxelisation." << std::endl;
+};
+
+// ************************************************************************** //
+/// \brief	VTK body writer.
+///
+/// \param	tval	time value at which the write out is being performed.
+template <typename MarkerType>
+void Body<MarkerType>::writeVtkPosition(int tval)
+{
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Create file name then output file stream
+	std::stringstream fileName;
+	fileName << GridUtils::path_str + "/vtk_out.Body" << id << "." << std::to_string(rank) << "." << (int)tval << ".vtk";
+
+	std::ofstream fout;
+	fout.open(fileName.str().c_str());
+
+	// Add header information
+	fout << "# vtk DataFile Version 3.0f\n";
+	fout << "Output for body ID " << id << ", rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
+	fout << "ASCII\n";
+	fout << "DATASET POLYDATA\n";
+
+
+	// Write out the positions of each Lagrange marker
+	fout << "POINTS " << markers.size() << " float\n";
+	for (size_t i = 0; i < markers.size(); i++) {
+
+		fout << markers[i].position[0] << " "
+			<< markers[i].position[1] << " "
+			<< markers[i].position[2] << std::endl;
+	}
+
+
+	// Write out the connectivity of each Lagrange marker
+	size_t nLines = markers.size() - 1;
+
+	if (closed_surface == false)
+		fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+	else if (closed_surface == true)
+		fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
+
+	for (size_t i = 0; i < nLines; i++) {
+		fout << 2 << " " << i << " " << i + 1 << std::endl;
+	}
+
+	// If body is a closed surface then join last point to first point
+	if (closed_surface == true) {
+		fout << 2 << " " << nLines << " " << 0 << std::endl;
+	}
+
+	fout.close();
 };
 
 #endif

@@ -62,10 +62,12 @@ public:
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
 	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);	// Function: crossprod
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
+	static std::vector<double> divide(std::vector<double> vec1, double scalar);					// Divide vector by a scalar
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
-	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);		// Function to get pointer to grid in hierarchy
+	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
+	static double normaliseToLink(double value, int v);									// Normalise value wrt to the lattice link length
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, GridObj const & pGrid);		// Is this halo periodically connected to neighbour

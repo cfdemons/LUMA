@@ -170,6 +170,7 @@ private :
 	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
+	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 
 public :
 	void LBM_multi_opt(int subcycle = 0);

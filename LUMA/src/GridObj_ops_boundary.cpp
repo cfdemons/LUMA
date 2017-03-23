@@ -420,7 +420,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Apply BC in pairs  -- BC 1 */
 
 		// Get value of q (outgoing direction, source store)
-		double q = objMan->pBody[0].Q[v_outgoing][m_data->ID];
+		double q; //= objMan->pBody[0].Q[v_outgoing][m_data->ID];
 
 		// Choose which implementation is appropriate //     
 		
@@ -460,7 +460,7 @@ void GridObj::bc_applyBfl(int i, int j, int k) {
 		/* Apply BC in pairs  -- BC 2 */
 
 		// Get value of q (incoming direction, destination store)
-		q = objMan->pBody[0].Q[v_incoming + L_NUM_VELS][m_data->ID];
+		//q = objMan->pBody[0].Q[v_incoming + L_NUM_VELS][m_data->ID];
 
 		// Half-way Bounce Back
 		if (q == 0) {

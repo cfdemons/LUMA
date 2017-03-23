@@ -65,17 +65,17 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 60000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
 
 
 /*
@@ -135,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 4		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -158,13 +158,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 cos(60 * L_PI / 180)			///< Initial/inlet x-velocity
-#define L_UY0 sin(60 * L_PI / 180)			///< Initial/inlet y-velocity
+#define L_UX0 cos(0 * L_PI / 180)			///< Initial/inlet x-velocity
+#define L_UY0 sin(0 * L_PI / 180)			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 300			///< Desired Reynolds number
+#define L_RE 100			///< Desired Reynolds number
 
 
 /*
@@ -175,11 +175,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
 //#define L_IBM_ON						///< Turn on IBM
 //#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 /*
 *******************************************************************************
@@ -218,7 +218,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0

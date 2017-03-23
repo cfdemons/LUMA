@@ -342,7 +342,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_VTK_BODY_WRITE
 	*GridUtils::logfile << "Writing out IBB to VTK file..." << endl;
-	objMan->io_vtkIBBWriter(Grids.t);
+	objMan->io_vtkBodyWriter(Grids.t);
 #endif
 
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
@@ -405,7 +405,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_VTK_BODY_WRITE
 			*GridUtils::logfile << "Writing out IBB to VTK file..." << endl;
-			objMan->io_vtkIBBWriter(Grids.t);
+			objMan->io_vtkBodyWriter(Grids.t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \

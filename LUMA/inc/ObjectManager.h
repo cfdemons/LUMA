@@ -92,7 +92,7 @@ private:
 	GridObj* _Grids;
 
 	/// Pre-stream distribution functions for applying BFL BCs
-	IVector<double> f_prestream;
+	DEPRECATED IVector<double> f_prestream;
 
 	/// Pointer to self
 	static ObjectManager* me;
@@ -144,7 +144,7 @@ public:
 	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
 
 	// IO methods //
-	void io_vtkIBBWriter(double tval);				// VTK body writer
+	void io_vtkBodyWriter(int tval);				// VTK body writer wrapper
 	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
 	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level

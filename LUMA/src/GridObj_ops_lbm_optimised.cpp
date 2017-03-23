@@ -179,17 +179,26 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		int src_id = src_z + src_y * K_lim + src_x * K_lim * M_lim;
 		src_type_local = LatTyp[src_id];
 
+		// BFL BOUNCEBACK
+		if (type_local == eBFL || src_type_local == eBFL)
+		{
+			// Try to apply BFL BC on streaming link
+			if (_LBM_applyBFL_opt(id, src_id, v, i, j, k, src_x, src_y, src_z)) continue;
+		}
+
 		// BOUNCEBACK
 		if (src_type_local == eSolid) {
 			// F value is its opposite (HWBB)
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
 		}
+
 		// VELOCITY BC
 		else if (src_type_local == eInlet) {
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
 		}
+
 #if (L_NUM_LEVELS > 0)	// Only need to check these options when using refinement
 		// EXPLODE
 		else if (src_type_local == eTransitionToCoarser &&
@@ -197,17 +206,20 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			// Pull value from parent TL site
 			_LBM_explode_opt(id, v, src_x, src_y, src_z);
 		}
+
 		// COALESCE
 		else if (src_type_local == eRefined && type_local == eTransitionToFiner) {
 			// Pull average value from child TL cluster to get value leaving fine grid
 			_LBM_coalesce_opt(i, j, k, id, v);
 		}
 #endif
+
 		// REGULAR STREAM
 		else {
 			// Pull population from source site
 			fNew[v + id * L_NUM_VELS] = f[v + src_id * L_NUM_VELS];
 		}
+
 	}
 
 }
@@ -561,6 +573,119 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 		force_i[v + id * L_NUM_VELS] *= lambda_v;
 
 	}
+
+}
+
+// *****************************************************************************
+/// \brief	Optimised BFL application.
+///
+///			Applies the BFL boundary condition at the present site. BFL site may
+///			be either source or current site and so this method will decide
+///			appropriate action based on each case as well as wall location.
+///			Currently only first BFL body considered.
+///
+/// \param	id		flattened ijk index.
+///	\param	src_id	flatted ijk index of the source site.
+///	\param	v		lattice direction.
+///	\param	i		x-index of current site.
+///	\param	j		y-index of current site.
+///	\param	k		z-index of current site.
+///	\param	src_x	x-index of site where value is pulled from.
+///	\param	src_y	y-index of site where value is pulled from.
+///	\param	src_z	z-index of site where value is pulled from.
+///	\return	boolen a indicator as to whether BFL was applied. If not, regular streaming is continued.
+bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z)
+{
+	/* BFL can be applied easily if only one of the two sites are labelled as BFL.
+	 * If both are labelled BFL, the algorithm here checks to see if there is any 
+	 * intersecting wall assuming only one wall per voxel. If there are two 
+	 * intersecting walls, then the BC favours the nearest. */
+
+	// Initiate marker data store pointer on stack and retrieve Q
+	MarkerData *m_data;
+	double q_link = -1;
+	bool bCurrentSiteBflSite = false;
+	
+	// Get values assuming current site is BFL site
+	m_data = ObjectManager::getInstance()->pBody[0].getMarkerData(XPos[i], YPos[j], ZPos[k]);
+
+	// If this site contains a marker (valid marker data) then get Q value
+	if (m_data->isValid())
+	{
+		q_link = ObjectManager::getInstance()->pBody[0].Q[GridUtils::getOpposite(v) + L_NUM_VELS * m_data->ID];
+	}
+	delete m_data;
+
+	/* If marker found and q value is valid then safe to assume current site is 
+	 * BFL site with link-intersecting wall. If not, then we can check to see if
+	 * the source site is a BFL site and has a link-intersecting wall. */
+	if (!m_data->isValid() || q_link == -1)
+	{
+		m_data = ObjectManager::getInstance()->pBody[0].getMarkerData(XPos[src_x], YPos[src_y], ZPos[src_z]);
+		if (m_data->isValid())
+		{
+			q_link = ObjectManager::getInstance()->pBody[0].Q[v + L_NUM_VELS * m_data->ID];
+		}
+		delete m_data;
+	}
+	else
+	{
+		bCurrentSiteBflSite = true;
+	}
+
+		
+	/* BFL BC must only be applied if the pull link intersects the wall. Wall may
+	 * or may not intersect the pull link hence this method must handle the case 
+	 * where either the source site or the current site is BFL. If 
+	 * q_link == -1, there is no wall intersection between the current
+	 * site and the source site on that link. */
+
+	// No intersection //
+	if (q_link == -1)
+	{
+		// Regular stream as no intersection
+		return false;
+	}
+
+	// Intersection and wall must be nearer current site than source site //
+	else if (bCurrentSiteBflSite)
+	{
+		/* Here, the wall can be considered to be closer to BFL site but we need 
+		 * to perform interpolation on pre-stream values pointing towards the
+		 * wall from the BFL site and one site further away from the wall. This
+		 * stencil site can be found from the pull direction unit vector. */
+		int stencil_i = i + c_opt[v][0];
+		int stencil_j = j + c_opt[v][1];
+		int stencil_k = k + c_opt[v][2];
+		int stencil_id = k + j * K_lim + i * K_lim * M_lim;
+
+		/* Only apply if the stencil is valid on this rank. Otherwise, doesn't 
+		 * matter as it is likely a halo site which will get overwritten anyway. */
+		if (stencil_i >= 0 && stencil_i < N_lim &&
+			stencil_j >= 0 && stencil_j < M_lim &&
+			stencil_k >= 0 && stencil_k < K_lim)
+		{
+			// Interpolate pre-stream value then perform bounceback stream
+			fNew[v + id * L_NUM_VELS] =
+				(1 - 2 * q_link) *
+				(f[GridUtils::getOpposite(v) + stencil_id * L_NUM_VELS] - f[GridUtils::getOpposite(v) + id * L_NUM_VELS])
+				+ f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
+		}
+	}
+
+	// Intersection and wall must be nearer source site than current site //
+	else
+	{
+		/* Wall must be nearer the source site than the current site. We can 
+		 * compute bounced value at current site from post-stream interpolated
+		 * values pointing away from the wall. */
+		fNew[v + id * L_NUM_VELS] =
+			(1 - 2 * q_link) *
+			((f[v + id * L_NUM_VELS] - f[GridUtils::getOpposite(v) + id * L_NUM_VELS]) / (2 - 2 * q_link))
+			+ f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
+	}
+
+	return true;
 
 }
 // *****************************************************************************

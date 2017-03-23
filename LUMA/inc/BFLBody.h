@@ -52,10 +52,10 @@ protected:
 
 	/// \brief	Distance between adjacent lattice site and the surface of the body.
 	///
-	///			There are two stores of values. Store 1 is the distance on one 
-	///			side of the wall and store 2 the distance on the other side. 
-	///			One store is appended to the other in this structure.
-	std::vector< std::vector<double> > Q;
+	///			Q values are stored in a flattened 2D array with the fatest 
+	///			changing index the velocity direction and the second the marker
+	///			ID.
+	std::vector<double>	Q;
 
 
 	/************** Member Methods **************/

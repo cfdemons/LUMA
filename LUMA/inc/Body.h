@@ -101,10 +101,9 @@ Body<MarkerType>::~Body(void)
 /// \param _PCpts	pointer to point cloud data
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
+	: _Owner(g), id(bodyID)
 {
-	// Set the body base class parameters from constructor inputs
-	this->_Owner = g;
-	this->id = bodyID;
+	// Set as unclosed surface by default
 	this->closed_surface = false;
 
 	// Set the rank which owns this body

@@ -386,8 +386,8 @@ void GridObj::_LBM_collide_opt(int id, double omega_s) {
 ///	\param	type_local	type of site under consideration
 void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
-	// Only update fluid sites or TL to finer
-	if (type_local == eFluid ||
+	// Only update fluid sites (includeing BFL) or TL to finer
+	if (type_local == eFluid || type_local == eBFL ||
 		type_local == eTransitionToFiner) {
 
 		// Reset

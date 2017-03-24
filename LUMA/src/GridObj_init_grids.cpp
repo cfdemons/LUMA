@@ -376,7 +376,11 @@ void GridObj::LBM_initGrid() {
 	// When not builiding for MPI positions are straightforward
 	XPos = GridUtils::linspace(dh / 2, L_BX - dh / 2, static_cast<int>(L_N));
 	YPos = GridUtils::linspace(dh / 2, L_BY - dh / 2, static_cast<int>(L_M));
+#if (L_DIMS == 3)
 	ZPos = GridUtils::linspace(dh / 2, L_BZ - dh / 2, static_cast<int>(L_K));
+#else
+	ZPos.push_back(0.0);
+#endif
 
 #endif	// L_BUILD_FOR_MPI
 

@@ -130,7 +130,7 @@ public :
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
-	DEPRECATED void LBM_initSolidLab();					// Initialise labels for solid objects
+	DEPRECATED void LBM_initSolidLab();			// Initialise labels for solid objects
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 

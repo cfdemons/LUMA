@@ -65,10 +65,10 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -98,7 +98,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 60000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
 
 
 /*
@@ -135,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 4		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -164,7 +164,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 100			///< Desired Reynolds number
+#define L_RE 300			///< Desired Reynolds number
 
 
 /*
@@ -218,7 +218,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
@@ -275,7 +275,7 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 
 	// Set Z limits for 2D
 	#undef L_BZ
-	#define L_BZ 2
+	#define L_BZ 0
 
 	#undef L_K
 	#define L_K 1

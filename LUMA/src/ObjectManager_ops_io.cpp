@@ -659,23 +659,23 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 #endif
 
 	double scale_factor;
-	// Scale slightly smaller (to voxel centres) to ensure symmetrical distribution of voxels
+	// Scale slightly smaller as distribution of voxels would be asymmetric if points sit on edge
 	if (geom->scale_direction == eXDirection) {
-		scale_factor = (body_length - g->dh) /
+		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
 	else if (geom->scale_direction == eYDirection) {
-		scale_factor = (body_length - g->dh) /
+		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
 	else if (geom->scale_direction == eZDirection) {
-		scale_factor = (body_length - g->dh) /
+		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
 
-	// Shift to voxel centre not to edge
-	double shift_x = (body_start_x + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
-	double shift_y = (body_start_y + g->dh / 2.0) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	// Shift to a small fraction of the grid spacing in from edge to avoid issues with symmetry
+	double shift_x = (body_start_x + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	double shift_y = (body_start_y + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 
 	// z-shift based on centre of object
 	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
@@ -686,7 +686,9 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
+#if (L_DIMS == 3)
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
+#endif
 	}
 
 	// Write out the points after scaling and shifting
@@ -711,6 +713,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 	// Exclude points which are not on this rank
 #ifdef L_CLOUD_DEBUG
 	*GridUtils::logfile << "Filtering..." << std::endl;
+#endif
 	a = 0;
 	do {
 
@@ -730,7 +733,6 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 		}
 
 	} while (a < static_cast<int>(_PCpts->x.size()));
-#endif
 
 	// Write out the points remaining in for debugging purposes
 #ifdef L_CLOUD_DEBUG

@@ -551,9 +551,7 @@ void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int marke
 
 		// Create new marker as this is a new marker voxel
 		addMarker(x, y, z, markerID);
-
 	}
-
 
 };
 

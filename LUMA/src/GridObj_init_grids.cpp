@@ -559,7 +559,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 #if L_DIMS == 3
 	LBM_initPositionVector(pGrid.ZPos[CoarseLimsZ[eMinimum]] - dh / 2.0, pGrid.ZPos[CoarseLimsZ[eMaximum]] - dh / 2.0, eZDirection);
 #else
-	ZPos.insert( ZPos.begin(), 1 ); // 2D default
+	ZPos.insert( ZPos.begin(), 0.0 ); // 2D default
 #endif
 		
 

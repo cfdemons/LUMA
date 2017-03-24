@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 60000		///< Number of time steps to run simulation for
 
 
 /*

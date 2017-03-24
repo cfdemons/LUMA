@@ -71,6 +71,9 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 	}
 
+	// Close Body //
+	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
+	enforceSurfaceClosure();
 
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
@@ -152,6 +155,9 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 	}
 
+	// Close Body //
+	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
+	enforceSurfaceClosure();
 
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
@@ -232,6 +238,9 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 	}
 
+	// Close Body //
+	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
+	enforceSurfaceClosure();
 
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
@@ -313,6 +322,9 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
 	}
 
+	// Close Body //
+	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
+	enforceSurfaceClosure();
 
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
@@ -710,4 +722,175 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 		}
 	}
 }
+/******************************************************************************/
+///	\brief	Ensures that BFL body is represented by markers such that there are
+///			no holes in the surface caused by the voxel grid filter.
+///
+///			There is a perculiar problem with BFL bodies where if the boundary 
+///			represented by the point cloud passes diagonally between two cells
+///			such that there is no point in any vertical or horizontal cell
+///			connecting them then the wall is not visible in the direction
+///			perpendicular to wall as there is no BFL site to trigger the boundary
+///			condition and artefacts are generated. Increasing the input cloud 
+///			resolution would eventually fix the problem but could require a lot
+///			of computational power to initialise.
+///			We can work round this by checking the immediate neighbourhood of 
+///			every BFL cell to ensure it has a vertical or horizontal connection to
+///			another BFL site. If not, then we can project the line between two 
+///			diagonal neigbours to add a new marker.
+///
+void BFLBody::enforceSurfaceClosure()
+{
+	// Commonly accessed
+	int K_lim = _Owner->K_lim;
+	int M_lim = _Owner->M_lim;
+	int i_neigh, j_neigh, k_neigh, is, js, ks;
+	int av_count;
+	bool bAdjacentConnectionFound = false, bNewMarkerRequired = false;
+	double start_vec[3];
+	double len_vec[3];
+	double px, py, pz, av_pos_x, av_pos_y, av_pos_z;
+	std::vector<int> ijk_point;
+	int num_points_in_projection = 20;
+	double projection_spacing = 1.0 / num_points_in_projection;
+
+	// Loop over every marker in the body
+	for (BFLMarker& current : markers)
+	{
+		// Check diagonals
+		for (int i =  -1; i <= 1; i += 2)
+		{
+			for (int j = -1; j <= 1; j += 2)
+			{
+#if (L_DIMS == 3)
+				for (int k = -1; k <= 1; k += 2)
+#else
+				int k = 0;
+#endif
+				{
+
+					// Get indices of the diagonal site
+					i_neigh = current.supp_i[0] + i;
+					j_neigh = current.supp_j[0] + j;
+					k_neigh = current.supp_k[0] + k;
+
+					// If diagonal BFL site found
+					if (!GridUtils::isOffGrid(i_neigh, j_neigh, k_neigh, _Owner) &&
+						_Owner->LatTyp(i_neigh, j_neigh, k_neigh, M_lim, K_lim) == eBFL)
+					{
+						// Reset flag
+						bAdjacentConnectionFound = false;
+
+						// Check the surrounding values for a connecting site
+						for (int i_count = 0; i_count < 2; i_count++)
+						{
+							for (int j_count = 0; j_count < 2; j_count++)
+							{
+								for (int k_count = 0; k_count < 2; k_count++)
+								{
+									// Compute neighbour indices
+									is = i - i_count * i;
+									js = j - j_count * j;
+									ks = k - k_count * k;
+
+									// Ignore the diagonal itself and centre site
+									if	(	(is == i && js == j && ks == k) ||
+											(is == 0 && js == 0 && ks == 0)
+										) continue;
+
+									// Check site label of adjacent site and early break if found
+									if (!GridUtils::isOffGrid(current.supp_i[0] + is, current.supp_j[0] + js, current.supp_k[0] + ks, _Owner) &&
+										_Owner->LatTyp(current.supp_i[0] + is, current.supp_j[0] + js, current.supp_k[0] + ks, M_lim, K_lim) == eBFL)
+									{
+										bAdjacentConnectionFound = true;
+										break;
+									}
+								}
+								if (bAdjacentConnectionFound) break;
+							}
+							if (bAdjacentConnectionFound) break;
+						}
+
+						// If no site found then need to add new marker
+						if (!bAdjacentConnectionFound)
+						{
+							// Reset flag
+							bNewMarkerRequired = false;
+							av_count = 0;
+
+							// Create vector of points between the current marker and the illegal diagonal
+							start_vec[eXDirection] = current.position[eXDirection];
+							start_vec[eYDirection] = current.position[eYDirection];
+							start_vec[eZDirection] = current.position[eZDirection];
+
+							MarkerData *m_data = getMarkerData(_Owner->XPos[i_neigh], _Owner->YPos[j_neigh], _Owner->ZPos[k_neigh]);
+							len_vec[eXDirection] = markers[m_data->ID].position[eXDirection] - start_vec[eXDirection];
+							len_vec[eYDirection] = markers[m_data->ID].position[eYDirection] - start_vec[eYDirection];
+							len_vec[eZDirection] = markers[m_data->ID].position[eZDirection] - start_vec[eZDirection];
+							delete m_data;
+
+							// Start an iterative projection procedure
+							while (!bNewMarkerRequired)
+							{
+								num_points_in_projection *= 2;
+								projection_spacing = 1.0 / num_points_in_projection;
+
+								// For each point see if it ends up in a non-BFL voxel and flag
+								for (int p = 0; p < num_points_in_projection + 1; p++)
+								{
+									px = start_vec[eXDirection] + p * projection_spacing * len_vec[eXDirection];
+									py = start_vec[eYDirection] + p * projection_spacing * len_vec[eYDirection];
+									pz = start_vec[eZDirection] + p * projection_spacing * len_vec[eZDirection];
+
+									GridUtils::getEnclosingVoxel(px, py, pz, _Owner, &ijk_point);
+
+									// If site not in a BFL voxel then new marker required so average position
+									if (_Owner->LatTyp(ijk_point[eXDirection], ijk_point[eYDirection], ijk_point[eZDirection], M_lim, K_lim) != eBFL)
+									{
+										if (!bNewMarkerRequired)
+										{
+											bNewMarkerRequired = true;
+											av_pos_x = px;
+											av_pos_y = py;
+											av_pos_z = pz;
+										}
+										else
+										{
+											av_pos_x *= av_count;
+											av_pos_x += px;
+											av_pos_x /= av_count + 1;
+
+											av_pos_y *= av_count;
+											av_pos_y += py;
+											av_pos_y /= av_count + 1;
+
+											av_pos_z *= av_count;
+											av_pos_z += pz;
+											av_pos_z /= av_count + 1;
+										}
+										av_count++;
+									}
+								}
+
+								// Add marker to body and label voxel
+								if (bNewMarkerRequired)
+								{
+									addMarker(av_pos_x, av_pos_y, av_pos_z, static_cast<int>(markers.size()));
+									_Owner->LatTyp(markers.back().supp_i[0], markers.back().supp_j[0], markers.back().supp_k[0], M_lim, K_lim) = eBFL;
+								}
+
+
+							}	// Iterative projection
+
+						}	// No adjacent connection found
+
+					}	// Diagonally connected to another BFL site
+
+				}	// k diagonal loop
+			}	// j diagonal loop
+		}	// i diagonal loop
+
+	}	// Loop over markers in the BFL body
+
+} // Method end
 /******************************************************************************/

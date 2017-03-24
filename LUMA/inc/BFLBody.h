@@ -63,6 +63,7 @@ protected:
 	// Compute Q routine + overload
 	void computeQ(int i, int j, int k, GridObj* g);
 	void computeQ(int i, int j, GridObj* g);
+	void enforceSurfaceClosure();
 
 };
 

@@ -59,7 +59,9 @@ protected:
 
 	/************** Member Methods **************/
 
-public:
+private:
+
+	void initialise(eMoveableType moveProperty);		// Initialisation wrapper for setting flags
 
 };
 

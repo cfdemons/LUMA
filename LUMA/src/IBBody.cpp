@@ -30,16 +30,20 @@ IBBody::IBBody()
 	this->id = 0;
 }
 
+/// Default destructor
+IBBody::~IBBody(void)
+{
+}
 
-
-/*********************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param _PCpts			pointer to point cloud data
-/// \param moveProperty		determines if body is moveable, flexible or rigid
-/// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
-IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped) : Body(g, bodyID, _PCpts)
+/******************************************************************************/
+/// \brief	Initialiser for a general IB body.
+///
+///			This initialiser performs debugging IO and sets the property flags. 
+///			It is called immediately after the appropriate constructor by all 
+///			derived constructors.
+///
+///	\param	moveProperty	movable body flag passed on by the constructor.
+void IBBody::initialise(eMoveableType moveProperty)
 {
 
 	// Set movable and flexible parameters
@@ -61,6 +65,21 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
 	deleteRecvLayerMarkers();
 #endif
+
+}
+
+
+/*********************************************/
+/// \brief Custom constructor to populate body from array of points.
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param _PCpts			pointer to point cloud data
+/// \param moveProperty		determines if body is moveable, flexible or rigid
+/// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
+IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped)
+	: Body(g, bodyID, _PCpts)
+{
+	initialise(moveProperty);	
 }
 
 
@@ -74,29 +93,10 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 /// \param moveProperty		determines if body is moveable, flexible or rigid
 /// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped) : Body(g, bodyID, start_position, length, angles)
+		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped)
+		: Body(g, bodyID, start_position, length, angles)
 {
-
-	// Set movable and flexible parameters
-	if (moveProperty == eFlexible) {
-		this->isFlexible = true;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eMovable) {
-		this->isFlexible = false;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eRigid) {
-		this->isFlexible = false;
-		this->isMovable = false;
-	}
-
-	// Delete any markers which are on the receiver layer as not needed for IBM
-#ifdef BUILD_FOR_MPI
-	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	deleteRecvLayerMarkers();
-#endif
-
+	initialise(moveProperty);
 }
 
 
@@ -108,29 +108,10 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 /// \param radius			radius of circle
 /// \param moveProperty		determines if body is moveable, flexible or rigid
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
-		double radius, eMoveableType moveProperty) : Body(g, bodyID, centre_point, radius)
+		double radius, eMoveableType moveProperty)
+		: Body(g, bodyID, centre_point, radius)
 {
-
-	// Set movable and flexible parameters
-	if (moveProperty == eFlexible) {
-		this->isFlexible = true;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eMovable) {
-		this->isFlexible = false;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eRigid) {
-		this->isFlexible = false;
-		this->isMovable = false;
-	}
-
-	// Delete any markers which are on the receiver layer as not needed for IBM
-#ifdef BUILD_FOR_MPI
-	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	deleteRecvLayerMarkers();
-#endif
-
+	initialise(moveProperty);
 }
 
 /*********************************************/
@@ -142,32 +123,8 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 /// \param angles			angle of square
 /// \param moveProperty		determines if body is moveable, flexible or rigid
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
-		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty) : Body(g, bodyID, centre_point, dimensions, angles)
+		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty)
+		: Body(g, bodyID, centre_point, dimensions, angles)
 {
-
-	// Set movable and flexible parameters
-	if (moveProperty == eFlexible) {
-		this->isFlexible = true;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eMovable) {
-		this->isFlexible = false;
-		this->isMovable = true;
-	}
-	else if (moveProperty == eRigid) {
-		this->isFlexible = false;
-		this->isMovable = false;
-	}
-
-	// Delete any markers which are on the receiver layer as not needed for IBM
-#ifdef BUILD_FOR_MPI
-	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	deleteRecvLayerMarkers();
-#endif
-
-}
-
-/// Default destructor
-IBBody::~IBBody(void)
-{
+	initialise(moveProperty);
 }

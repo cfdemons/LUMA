@@ -59,10 +59,16 @@ protected:
 
 
 	/************** Member Methods **************/
+private :
+
+	// Initialiser (wrapper for labeller and Q computation)
+	void initialise();
 
 	// Compute Q routine + overload
 	void computeQ(int i, int j, int k, GridObj* g);
 	void computeQ(int i, int j, GridObj* g);
+
+	// Surface closure
 	void enforceSurfaceClosure();
 
 };

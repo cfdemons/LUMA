@@ -33,27 +33,25 @@ BFLBody::~BFLBody(void)
 {
 }
 
-
 /******************************************************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g		hierarchy pointer to grid hierarchy
-/// \param bodyID	ID of body in array of bodies.
-/// \param _PCpts	pointer to point cloud data
-BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) 
-	: Body(g, bodyID, _PCpts)
+/// \brief	Initialiser for a general BFL body.
+///
+///			This initialiser performs debugging IO and wraps the calling of the
+///			labelling and Q computation. It is called immediately after the 
+///			appropriate constructor by all derived constructors.
+void BFLBody::initialise()
 {
 
-	// Initialiser list ensures the correct super class constructor is called first
-
+	// Write out marker data now body has been built
 #ifdef L_BFL_DEBUG
 	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/BflMarkerData_Rank" + std::to_string(GridUtils::safeGetRank()) + ".out", std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
 	for (size_t n = 0; n < markers.size(); n++) {
-		file << std::to_string(n) << ", " << 
+		file << std::to_string(n) << ", " <<
 			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
 			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
-}
+	}
 	file.close();
 #endif
 
@@ -68,7 +66,7 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 	for (Marker& m : markers) {
 
 		// Label as BFL site
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
+		_Owner->LatTyp(m.supp_i[0], m.supp_j[0], m.supp_k[0], M_lim, K_lim) = eBFL;
 	}
 
 	// Close Body //
@@ -87,13 +85,13 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 			for (int k = 0; k < K_lim; k++) {
 
 				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
+				if (_Owner->LatTyp(i, j, k, M_lim, K_lim) == eBFL) {
 
 					// Compute Q for all stream vectors storing on source voxel BFL marker
 #if (L_DIMS == 3)
-					computeQ(i,j,k,_Owner);
+					computeQ(i, j, k, _Owner);
 #else
-					computeQ(i,j,_Owner);
+					computeQ(i, j, _Owner);
 #endif
 
 				}
@@ -104,17 +102,33 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 	// Computation of Q complete
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
+
+	// Write out Q values for each marker
 #ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
+	file.open(GridUtils::path_str + "/BflMarkerQs_Rank" + std::to_string(GridUtils::safeGetRank()) + ".out", std::ios::out);
 	file.precision(L_OUTPUT_PRECISION);
-	for (std::vector<double> i : Q) {
-		for (size_t n = 0; n < markers.size(); n++) {
-			file << i[n] << '\t';
+	for (size_t n = 0; n < markers.size(); ++n)
+	{
+		for (size_t v = 0; v < L_NUM_LEVELS; ++v)
+		{		
+			file << Q[v + L_NUM_VELS * n] << '\t';
 		}
 		file << std::endl;
 	}
 	file.close();
 #endif
+
+}
+
+/******************************************************************************/
+/// \brief Custom constructor to populate body from array of points.
+/// \param g		hierarchy pointer to grid hierarchy
+/// \param bodyID	ID of body in array of bodies.
+/// \param _PCpts	pointer to point cloud data
+BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts) 
+	: Body(g, bodyID, _PCpts)
+{
+	initialise();
 }
 
 
@@ -126,79 +140,10 @@ BFLBody::BFLBody(GridObj* g, int bodyID, PCpts* _PCpts)
 /// \param length			length of filament
 /// \param angles			angle of filament
 BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, std::vector<double> &angles) : Body(g, bodyID, start_position, length, angles)
+	double length, std::vector<double> &angles)
+	: Body(g, bodyID, start_position, length, angles)
 {
-
-#ifdef L_BFL_DEBUG
-	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (size_t n = 0; n < markers.size(); n++) {
-		file << std::to_string(n) << ", " <<
-			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
-			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
-}
-	file.close();
-#endif
-
-	// Labelling //
-	*GridUtils::logfile << "ObjectManagerBFL: Labelling lattice voxels..." << std::endl;
-
-	int N_lim = _Owner->N_lim;
-	int M_lim = _Owner->M_lim;
-	int K_lim = _Owner->K_lim;
-
-	// Get each marker in turn
-	for (Marker& m : markers) {
-
-		// Label as BFL site
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
-	}
-
-	// Close Body //
-	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
-	enforceSurfaceClosure();
-
-	// Compute Q //
-	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
-
-	// Initialise Q stores to the "invalid" value
-	Q.resize(L_NUM_VELS * markers.size(), -1.0);
-
-	// Loop over local grid and inspect the streaming operations
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-
-				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
-
-					// Compute Q for all stream vectors storing on source voxel BFL marker
-#if (L_DIMS == 3)
-					computeQ(i,j,k,_Owner);
-#else
-					computeQ(i,j,_Owner);
-#endif
-
-				}
-			}
-		}
-	}
-
-	// Computation of Q complete
-	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
-
-#ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (std::vector<double> i : Q) {
-		for (size_t n = 0; n < markers.size(); n++) {
-			file << i[n] << '\t';
-		}
-		file << std::endl;
-	}
-	file.close();
-#endif
+	initialise();
 }
 
 
@@ -209,79 +154,10 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 /// \param centre_point		centre point of circle
 /// \param radius			radius of circle
 BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
-		double radius) : Body(g, bodyID, centre_point, radius)
+	double radius)
+	: Body(g, bodyID, centre_point, radius)
 {
-
-#ifdef L_BFL_DEBUG
-	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (size_t n = 0; n < markers.size(); n++) {
-		file << std::to_string(n) << ", " <<
-			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
-			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
-}
-	file.close();
-#endif
-
-	// Labelling //
-	*GridUtils::logfile << "ObjectManagerBFL: Labelling lattice voxels..." << std::endl;
-
-	int N_lim = _Owner->N_lim;
-	int M_lim = _Owner->M_lim;
-	int K_lim = _Owner->K_lim;
-
-	// Get each marker in turn
-	for (Marker& m : markers) {
-
-		// Label as BFL site
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
-	}
-
-	// Close Body //
-	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
-	enforceSurfaceClosure();
-
-	// Compute Q //
-	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
-
-	// Initialise Q stores to the "invalid" value
-	Q.resize(L_NUM_VELS * markers.size(), -1.0);
-
-	// Loop over local grid and inspect the streaming operations
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-
-				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
-
-					// Compute Q for all stream vectors storing on source voxel BFL marker
-#if (L_DIMS == 3)
-					computeQ(i,j,k,_Owner);
-#else
-					computeQ(i,j,_Owner);
-#endif
-
-				}
-			}
-		}
-	}
-
-	// Computation of Q complete
-	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
-
-#ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (std::vector<double> i : Q) {
-		for (size_t n = 0; n < markers.size(); n++) {
-			file << i[n] << '\t';
-		}
-		file << std::endl;
-	}
-	file.close();
-#endif
+	initialise();
 }
 
 
@@ -293,79 +169,10 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 /// \param dimensions		dimensions of square
 /// \param angles			angle of square
 BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
-		std::vector<double> &dimensions, std::vector<double> &angles) : Body(g, bodyID, centre_point, dimensions, angles)
+	std::vector<double> &dimensions, std::vector<double> &angles)
+	: Body(g, bodyID, centre_point, dimensions, angles)
 {
-
-#ifdef L_BFL_DEBUG
-	std::ofstream file;
-	file.open(GridUtils::path_str + "/marker_data_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (size_t n = 0; n < markers.size(); n++) {
-		file << std::to_string(n) << ", " <<
-			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
-			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
-}
-	file.close();
-#endif
-
-	// Labelling //
-	*GridUtils::logfile << "ObjectManagerBFL: Labelling lattice voxels..." << std::endl;
-
-	int N_lim = _Owner->N_lim;
-	int M_lim = _Owner->M_lim;
-	int K_lim = _Owner->K_lim;
-
-	// Get each marker in turn
-	for (Marker& m : markers) {
-
-		// Label as BFL site
-		_Owner->LatTyp(m.supp_i[0],m.supp_j[0],m.supp_k[0],M_lim,K_lim) = eBFL;
-	}
-
-	// Close Body //
-	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
-	enforceSurfaceClosure();
-
-	// Compute Q //
-	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
-
-	// Initialise Q stores to the "invalid" value
-	Q.resize(L_NUM_VELS * markers.size(), -1.0);
-
-	// Loop over local grid and inspect the streaming operations
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-
-				// If site is a BFL voxel
-				if (_Owner->LatTyp(i,j,k,M_lim,K_lim) == eBFL) {
-
-					// Compute Q for all stream vectors storing on source voxel BFL marker
-#if (L_DIMS == 3)
-					computeQ(i,j,k,_Owner);
-#else
-					computeQ(i,j,_Owner);
-#endif
-
-				}
-			}
-		}
-	}
-
-	// Computation of Q complete
-	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
-
-#ifdef L_BFL_DEBUG
-	file.open(GridUtils::path_str + "/marker_Qs_rank" + std::to_string(rank) + ".out",std::ios::out);
-	file.precision(L_OUTPUT_PRECISION);
-	for (std::vector<double> i : Q) {
-		for (size_t n = 0; n < markers.size(); n++) {
-			file << i[n] << '\t';
-		}
-		file << std::endl;
-	}
-	file.close();
-#endif
+	initialise();
 }
 
 /******************************************************************************/
@@ -380,7 +187,8 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 /// \param j local j-index of BFL voxel
 /// \param k local k-index of BFL voxel
 /// \param g pointer to owner grid
-void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
+void BFLBody::computeQ(int i, int j, int k, GridObj* g)
+{
 
 	// Declarations
 	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
@@ -569,7 +377,8 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g) {
 /// \param i local i-index of BFL voxel
 /// \param j local j-index of BFL voxel
 /// \param g pointer to owner grid
-void BFLBody::computeQ(int i, int j, GridObj* g) {
+void BFLBody::computeQ(int i, int j, GridObj* g)
+{
 
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
@@ -722,6 +531,7 @@ void BFLBody::computeQ(int i, int j, GridObj* g) {
 		}
 	}
 }
+
 /******************************************************************************/
 ///	\brief	Ensures that BFL body is represented by markers such that there are
 ///			no holes in the surface caused by the voxel grid filter.

@@ -73,6 +73,19 @@ void BFLBody::initialise()
 	*GridUtils::logfile << "ObjectManagerBFL: Checking surface integrity..." << std::endl;
 	enforceSurfaceClosure();
 
+	// Write out closed body marker data
+#ifdef L_BFL_DEBUG
+	file;
+	file.open(GridUtils::path_str + "/BflMarkerDataClosed_Rank" + std::to_string(GridUtils::safeGetRank()) + ".out", std::ios::out);
+	file.precision(L_OUTPUT_PRECISION);
+	for (size_t n = 0; n < markers.size(); n++) {
+		file << std::to_string(n) << ", " <<
+			markers[n].position[0] << ", " << markers[n].position[1] << ", " << markers[n].position[2] << ", " <<
+			markers[n].supp_i[0] << ", " << markers[n].supp_j[0] << ", " << markers[n].supp_k[0] << std::endl;
+	}
+	file.close();
+#endif
+
 	// Compute Q //
 	*GridUtils::logfile << "ObjectManagerBFL: Computing Q..." << std::endl;
 
@@ -109,7 +122,7 @@ void BFLBody::initialise()
 	file.precision(L_OUTPUT_PRECISION);
 	for (size_t n = 0; n < markers.size(); ++n)
 	{
-		for (size_t v = 0; v < L_NUM_LEVELS; ++v)
+		for (size_t v = 0; v < L_NUM_VELS; ++v)
 		{		
 			file << Q[v + L_NUM_VELS * n] << '\t';
 		}
@@ -191,7 +204,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g)
 {
 
 	// Declarations
-	int dest_i, dest_j, dest_k, ib, jb, kb, storeID;
+	int dest_i, dest_j, dest_k, storeID;
 	MarkerData* m_data;
 
 	/* Get voxel IDs of self and stencil required to specify planes
@@ -206,10 +219,7 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g)
 	 */
 
 
-	// Set stencil centre data
-	ib = i;
-	jb = j;
-	kb = k;
+	// TODO: Update under the restrictions we have done for 2D //
 
 	// Get marker data associated with this local site
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[k]);
@@ -219,16 +229,16 @@ void BFLBody::computeQ(int i, int j, int k, GridObj* g)
 
 	// Get list of IDs of neighbour vertices for plane construction
 	std::vector<int> V;
-	for (int ii = ib - 1; ii <= ib + 1; ii++) {
-		for (int jj = jb - 1; jj <= jb + 1; jj++) {
-			for (int kk = kb - 1; kk <= kb + 1; kk++) {
+	for (int ii = i - 1; ii <= i + 1; ii++) {
+		for (int jj = j - 1; jj <= j + 1; jj++) {
+			for (int kk = k - 1; kk <= k + 1; kk++) {
 
-				// If indices are valid and not equal to centre voxel
-
-				if (	ib >= 0 && ib < g->N_lim
-					&&	jb >= 0 && jb < g->M_lim
-					&&	kb >= 0 && kb < g->K_lim
-					) {
+				// If indices are valid (include itself in combinations)
+				if (	ii >= 0 && ii < g->N_lim
+					&&	jj >= 0 && jj < g->M_lim
+					&&	kk >= 0 && kk < g->K_lim
+					)
+				{
 
 					// Fetch data if available
 					m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[kk]);
@@ -383,16 +393,13 @@ void BFLBody::computeQ(int i, int j, GridObj* g)
 	/* For each possible line extending from the marker voxel to an 
 	 * immediate neighbour we can check for an intersection between the 
 	 * stream vector and the constructed line. The distance of intersection
-	 * is the value of q. */
+	 * is the value of q. Since the inclusion of the closure model, we can limit
+	 * our selection to just vertical and horizontal adjacent markers. */
 
 	// Declarations
 	int dest_i, dest_j;
 	double s, t, s1_x, s1_y, s2_x, s2_y;
 	MarkerData* m_data;
-
-	// Set stencil centre data
-	int ib = i;
-	int jb = j;
 	
 	// Get marker data associated with this local site
 	m_data = getMarkerData(g->XPos[i], g->YPos[j], g->ZPos[0]);
@@ -401,21 +408,24 @@ void BFLBody::computeQ(int i, int j, GridObj* g)
 	delete m_data;
 
 
-	// Get list of IDs of neighbour vertices for line construction
-	std::vector<int> V;
-	for (int ii = ib - 1; ii <= ib + 1; ii++) {
-		for (int jj = jb - 1; jj <= jb + 1; jj++) {
+	// Get IDs of vertical and horizontal neighbour vertices for line construction
+	std::vector< std::pair<int, int> > combo;
+	for (int ii = i - 1; ii <= i + 1; ii++) {
+		for (int jj = j - 1; jj <= j + 1; jj++) {
 
-			// Check local indices on the grid
-			if (	ib >= 0 && ib < g->N_lim
-				&&	jb >= 0 && jb < g->M_lim
-				) {			
+			// Must be on grid and only consider v/h neighbours (exclude self)
+			if	(	ii >= 0 && ii < g->N_lim &&	
+					jj >= 0 && jj < g->M_lim &&
+					(ii == i || jj == j) &&
+					!(ii == i && jj == j)
+				)
+			{			
 
 				// Fetch data if available
 				m_data = getMarkerData(g->XPos[ii], g->YPos[jj], g->ZPos[0]);
 
 				// If data valid, then store ID
-				if (m_data->isValid()) V.push_back(m_data->ID);
+				if (m_data->isValid()) combo.push_back(std::pair<int,int>(storeID, m_data->ID));
 
 				// Clean-up after getMarkerData call
 				delete m_data;
@@ -425,60 +435,31 @@ void BFLBody::computeQ(int i, int j, GridObj* g)
 		}
 	}
 
-	// Can only continue if we have at least 2 points
-	if (V.size() < 2) return;
+	// Can only continue at least 1 pair
+	if (combo.size() == 0) return;
 
-	// Get unique combinations of vertex IDs
-	std::vector< std::vector<int> > combo;
-
-	// Sort IDs in ascending order
-	std::sort(V.begin(), V.end());
-
-	// Loop over sorted array and store ID combinations
-	std::vector<int> tmp;
-	std::vector<bool> flags(V.size());
-	std::fill(flags.begin(), flags.end() - V.size() + 2, true);
-
-	// Loop over permutations
-	do {
-
-		// Reset tmp array
-		tmp.clear();
-
-		// Loop over permutation and pull corresponding 
-		// values from V into combo array
-		for (size_t i = 0; i < V.size(); ++i) {
-			if (flags[i]) {
-				tmp.push_back(V[i]);
-			}
-		}
-		if (tmp.size() == 2) combo.push_back(tmp);
-
-	} while (std::prev_permutation(flags.begin(), flags.end()));
-
-
+	// Get position of marker in this cell
+	std::vector<double> q;
+	q.push_back(markers[storeID].position[0]);
+	q.push_back(markers[storeID].position[1]);
+	q.push_back(markers[storeID].position[2]);
 
 	// Loop through valid marker combinations
-	for (std::vector<int>& line : combo) {
+	for (std::pair<int,int>& line : combo) {
 
 		/* Perform line intersection test according to 2nd answer on:
 		 * http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 		 */
 
-		std::vector<double> q;	// Position of adjacent marker
-		q.push_back(markers[line[0]].position[0]);
-		q.push_back(markers[line[0]].position[1]);
-		q.push_back(markers[line[0]].position[2]);
-
 		std::vector<double> qps;	// Position of next marker
-		qps.push_back(markers[line[1]].position[0]);
-		qps.push_back(markers[line[1]].position[1]);
-		qps.push_back(markers[line[1]].position[2]);
+		qps.push_back(markers[line.second].position[0]);
+		qps.push_back(markers[line.second].position[1]);
+		qps.push_back(markers[line.second].position[2]);
 
 		std::vector<double> p;	// Position of source site
 		p.push_back(_Owner->XPos[i]);
 		p.push_back(_Owner->YPos[j]);
-		p.push_back(markers[line[0]].position[2]);	// In 2D must be in the same plane
+		p.push_back(markers[line.first].position[2]);	// In 2D must be in the same plane
 
 		// Loop over velocities (ignore rest distribution)
 		for (int vel = 0; vel < L_NUM_VELS - 1; vel++) {
@@ -491,11 +472,13 @@ void BFLBody::computeQ(int i, int j, GridObj* g)
 			std::vector<double> ppr;
 			ppr.push_back(_Owner->XPos[dest_i]);
 			ppr.push_back(_Owner->YPos[dest_j]);
-			ppr.push_back(markers[line[0]].position[2]);
+			ppr.push_back(markers[line.first].position[2]);
 
 			// Compute lengths of lines
-			s1_x = ppr[0] - p[0];     s1_y = ppr[1] - p[1];
-			s2_x = qps[0] - q[0];     s2_y = qps[1] - q[1];
+			s1_x = ppr[0] - p[0];
+			s1_y = ppr[1] - p[1];
+			s2_x = qps[0] - q[0];
+			s2_y = qps[1] - q[1];
 
 			// Cross products
 			s = (-s1_y * (p[0] - q[0]) + s1_x * (p[1] - q[1])) / (-s2_x * s1_y + s1_x * s2_y);
@@ -564,8 +547,9 @@ void BFLBody::enforceSurfaceClosure()
 	int num_points_in_projection = 20;
 	double projection_spacing = 1.0 / num_points_in_projection;
 
-	// Loop over every marker in the body
-	for (BFLMarker& current : markers)
+	/* Loop over every marker in the body (don't use a ranged-for as iterators are 
+	 * invalidated if reallocation is performed when new marker is added. */
+	for (size_t m = 0; m < markers.size(); ++m)
 	{
 		// Check diagonals
 		for (int i =  -1; i <= 1; i += 2)
@@ -580,9 +564,9 @@ void BFLBody::enforceSurfaceClosure()
 				{
 
 					// Get indices of the diagonal site
-					i_neigh = current.supp_i[0] + i;
-					j_neigh = current.supp_j[0] + j;
-					k_neigh = current.supp_k[0] + k;
+					i_neigh = markers[m].supp_i[0] + i;
+					j_neigh = markers[m].supp_j[0] + j;
+					k_neigh = markers[m].supp_k[0] + k;
 
 					// If diagonal BFL site found
 					if (!GridUtils::isOffGrid(i_neigh, j_neigh, k_neigh, _Owner) &&
@@ -609,8 +593,8 @@ void BFLBody::enforceSurfaceClosure()
 										) continue;
 
 									// Check site label of adjacent site and early break if found
-									if (!GridUtils::isOffGrid(current.supp_i[0] + is, current.supp_j[0] + js, current.supp_k[0] + ks, _Owner) &&
-										_Owner->LatTyp(current.supp_i[0] + is, current.supp_j[0] + js, current.supp_k[0] + ks, M_lim, K_lim) == eBFL)
+									if (!GridUtils::isOffGrid(markers[m].supp_i[0] + is, markers[m].supp_j[0] + js, markers[m].supp_k[0] + ks, _Owner) &&
+										_Owner->LatTyp(markers[m].supp_i[0] + is, markers[m].supp_j[0] + js, markers[m].supp_k[0] + ks, M_lim, K_lim) == eBFL)
 									{
 										bAdjacentConnectionFound = true;
 										break;
@@ -629,9 +613,9 @@ void BFLBody::enforceSurfaceClosure()
 							av_count = 0;
 
 							// Create vector of points between the current marker and the illegal diagonal
-							start_vec[eXDirection] = current.position[eXDirection];
-							start_vec[eYDirection] = current.position[eYDirection];
-							start_vec[eZDirection] = current.position[eZDirection];
+							start_vec[eXDirection] = markers[m].position[eXDirection];
+							start_vec[eYDirection] = markers[m].position[eYDirection];
+							start_vec[eZDirection] = markers[m].position[eZDirection];
 
 							MarkerData *m_data = getMarkerData(_Owner->XPos[i_neigh], _Owner->YPos[j_neigh], _Owner->ZPos[k_neigh]);
 							len_vec[eXDirection] = markers[m_data->ID].position[eXDirection] - start_vec[eXDirection];
@@ -685,6 +669,7 @@ void BFLBody::enforceSurfaceClosure()
 								// Add marker to body and label voxel
 								if (bNewMarkerRequired)
 								{
+									// Add new marker to the end of the array
 									addMarker(av_pos_x, av_pos_y, av_pos_z, static_cast<int>(markers.size()));
 									_Owner->LatTyp(markers.back().supp_i[0], markers.back().supp_j[0], markers.back().supp_k[0], M_lim, K_lim) = eBFL;
 								}

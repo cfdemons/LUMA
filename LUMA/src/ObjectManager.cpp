@@ -173,7 +173,7 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 ///			easily be upgraded.
 ///
 ///	\param	v			lattice direction of link being considered.
-///	\param	is			collapsed ijk index for site on which BFL BC is being applied.
+///	\param	id			collapsed ijk index for site on which BFL BC is being applied.
 /// \param	g			pointer to grid on which marker resides.
 /// \param	markerID	id of marker on which force is to be updated.
 void ObjectManager::computeLiftDrag(int v, int id, GridObj *g, int markerID)

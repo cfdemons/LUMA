@@ -64,14 +64,12 @@ ObjectManager::ObjectManager(GridObj* g) : _Grids(g)
 };
 
 // ************************************************************************* //
-/// \brief	Compute forces on a rigid object.
+/// \brief	Compute forces on a BB rigid object.
 ///
 ///			Uses momentum exchange to compute forces on rigid bodies.
 ///			Currently working with bounce-back objects only. There is no 
 ///			bounding box so if we have walls in the domain they will be counted 
-///			as well. Also only possible to differentiate between bodies. Lumps 
-///			all bodies together.identify which body this site relates to so 
-///			we can differentiate.
+///			as well.
 ///
 /// \param	i	local i-index of solid site.
 /// \param	j	local j-index of solid site.
@@ -108,9 +106,9 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			int n_opp = GridUtils::getOpposite(n);
 
 			// Compute destination coordinates
-			int xdest = i + c[0][n];
-			int ydest = j + c[1][n];
-			int zdest = k + c[2][n];
+			int xdest = i + c[eXDirection][n];
+			int ydest = j + c[eYDirection][n];
+			int zdest = k + c[eZDirection][n];
 
 			// Reject site on grid edges (like single-cell walls)
 			if (GridUtils::isOffGrid(xdest, ydest, zdest, g)) return;
@@ -118,18 +116,32 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 			// Only apply if streams to a fluid site
 			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
+				/* For HWBB:
+				 *
+				 *	Force = 
+				 *		(pre-stream population toward wall + 
+				 *		post-stream population away from wall)
+				 *
+				 * since population is simply bounced-back, we can write as:
+				 * 
+				 *	Force = 
+				 *		(2 * pre-stream population toward wall)
+				 *
+				 * Multiplication by c unit vector resolves the result in 
+				 * appropriate direction.
+				 */
 				bbbForceOnObjectX +=
-					2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 				bbbForceOnObjectY +=
-					2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 				bbbForceOnObjectZ +=
-					2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+					2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 
 #ifdef L_MOMEX_DEBUG
 				// Store contribution
-				contrib_x = 2.0 * c[0][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_y = 2.0 * c[1][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_z = 2.0 * c[2][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_x = 2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_y = 2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_z = 2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 
 			}
 			else
@@ -149,6 +161,69 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 #endif
 
 
+		}
+	}
+}
+
+// ************************************************************************* //
+/// \brief	Compute forces on a BFL rigid object.
+///
+///			Uses momentum exchange to compute forces on a marker than makes up
+///			a BFL body. Currently only works with a single BFL body but can 
+///			easily be upgraded.
+///
+///	\param	v			lattice direction of link being considered.
+///	\param	is			collapsed ijk index for site on which BFL BC is being applied.
+/// \param	g			pointer to grid on which marker resides.
+/// \param	markerID	id of marker on which force is to be updated.
+void ObjectManager::computeLiftDrag(int v, int id, GridObj *g, int markerID)
+{
+	// Get opposite once
+	int v_opp = GridUtils::getOpposite(v);
+
+	// Similar to BBB but we cannot assume that bounced-back population is the same anymore
+	pBody[0].markers[markerID].forceX +=
+		c[eXDirection][v_opp] * (g->f[v_opp + id * L_NUM_VELS] + g->fNew[v + id * L_NUM_VELS]);
+	pBody[0].markers[markerID].forceY +=
+		c[eYDirection][v_opp] * (g->f[v_opp + id * L_NUM_VELS] + g->fNew[v + id * L_NUM_VELS]);
+	pBody[0].markers[markerID].forceZ +=
+		c[eZDirection][v_opp] * (g->f[v_opp + id * L_NUM_VELS] + g->fNew[v + id * L_NUM_VELS]);
+}
+
+// ************************************************************************* //
+/// \brief	Resets the body force members prior to a new force calculation
+///			using momentum exchange.
+///
+///	\param	grid	Grid object on which method was called
+void ObjectManager::resetMomexBodyForces(GridObj * grid)
+{
+	if (grid->level == bbbOnGridLevel && grid->region_number == bbbOnGridReg)
+	{
+		bbbForceOnObjectX = 0.0;
+		bbbForceOnObjectY = 0.0;
+		bbbForceOnObjectZ = 0.0;
+
+#ifdef L_MOMEX_DEBUG
+		// Open file for momentum exchange information
+		toggleDebugStream(this);
+#endif
+
+	}
+
+	// Reset the BFL body marker forces
+	for (BFLBody& body : pBody)
+	{
+		// Only reset if body on this grid
+		if (body._Owner->level == grid->level &&
+			body._Owner->region_number == grid->region_number)
+		{
+
+			for (BFLMarker& marker : body.markers)
+			{
+				marker.forceX = 0.0;
+				marker.forceY = 0.0;
+				marker.forceZ = 0.0;
+			}
 		}
 	}
 }

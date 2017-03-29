@@ -788,9 +788,15 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 ///			Writes out the forces on solid objects in the domain computed using
 ///			momentum exchange. Each rank writes its own file. Output is a CSV file.
 /// \param	tval	time value at which write out is taking place.
-void ObjectManager::io_writeForceOnObject(double tval) {
+void ObjectManager::io_writeForcesOnObjects(double tval) {
 	
+	// Declarations
 	int rank = GridUtils::safeGetRank();
+	std::ofstream fout;
+	fout.precision(L_OUTPUT_PRECISION);
+	std::stringstream fileName;
+
+	// BB OBJECTS //
 
 	// Get grid on which object resides
 	GridObj *g = NULL;
@@ -798,19 +804,14 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 	// If this grid exists on this process
 	if (g != NULL)
 	{
-		// Create stream
-		std::ofstream fout;
-		fout.precision(L_OUTPUT_PRECISION);
-
 		// Filename
-		std::stringstream fileName;
-		fileName << GridUtils::path_str + "/LiftDrag" << "Rnk" << rank << ".csv";
+		fileName << GridUtils::path_str + "/LiftDragBBB_Rnk" << rank << ".csv";
 
 		// Open file
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
 
 		// Write out the header (first time step only)
-		if (static_cast<int>(tval) == 0) fout << "Time,Fx,Fy,Fz" << std::endl;
+		if (static_cast<int>(tval) == L_OUT_EVERY_FORCES) fout << "Time,Fx,Fy,Fz" << std::endl;
 
 		// Scaled with respect to refinement ratio
 		fout << std::to_string(tval) << ","
@@ -818,6 +819,49 @@ void ObjectManager::io_writeForceOnObject(double tval) {
 			<< std::to_string(bbbForceOnObjectY * g->refinement_ratio) << ","
 #if (dims == 3)
 			<< std::to_string(bbbForceOnObjectZ * g->refinement_ratio)
+#else
+			<< std::to_string(0.0)
+#endif
+			<< std::endl;
+
+		fout.close();
+	}
+
+	// BFL OBJECTS //
+	ObjectManager *objman = ObjectManager::getInstance();
+	
+	// Search for bodies on this rank
+	for (BFLBody& body : objman->pBody)
+	{
+		// Filename
+		fileName << GridUtils::path_str + "/LiftDragBFL_Rnk" << rank << ".csv";
+
+		// Open file
+		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
+
+		// Write out the header (first time step only)
+		if (static_cast<int>(tval) == L_OUT_EVERY_FORCES) fout << "Time,Fx,Fy,Fz" << std::endl;
+
+		// Summation required
+		double bodyForceX = 0.0;
+		double bodyForceY = 0.0;
+		double bodyForceZ = 0.0;
+
+		for (BFLMarker& marker : body.markers)
+		{
+			// Sum marker contributions
+			bodyForceX += marker.forceX;
+			bodyForceY += marker.forceY;
+			bodyForceZ += marker.forceZ;
+
+		}
+
+		// Scaled with respect to refinement ratio
+		fout << std::to_string(tval) << ","
+			<< std::to_string(bodyForceX * body._Owner->refinement_ratio) << ","
+			<< std::to_string(bodyForceY * body._Owner->refinement_ratio) << ","
+#if (dims == 3)
+			<< std::to_string(bodyForceZ * body._Owner->refinement_ratio)
 #else
 			<< std::to_string(0.0)
 #endif

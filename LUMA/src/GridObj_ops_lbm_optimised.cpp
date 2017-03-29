@@ -41,18 +41,10 @@ void GridObj::LBM_multi_opt(int subcycle) {
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
+#ifdef L_LD_OUT
 	// Reset object forces for momentum exchange force calculation
-	if (level == objman->bbbOnGridLevel && region_number == objman->bbbOnGridReg) {
-		objman->bbbForceOnObjectX = 0.0;
-		objman->bbbForceOnObjectY = 0.0;
-		objman->bbbForceOnObjectZ = 0.0;
-
-#ifdef L_MOMEX_DEBUG
-		// Open file for momentum exchange information
-		objman->toggleDebugStream(this);
+	objman->resetMomexBodyForces(this);
 #endif
-
-	}
 
 	// Compute Smagorinksy-modified relaxation
 #ifdef L_USE_BGKSMAG
@@ -603,36 +595,34 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 
 	// Initiate marker data store pointer on stack and retrieve Q
 	MarkerData *m_data;
-	double q_link = -1;
-	bool bCurrentSiteBflSite = false;
-	
-	// Get values assuming current site is BFL site
-	m_data = ObjectManager::getInstance()->pBody[0].getMarkerData(XPos[i], YPos[j], ZPos[k]);
+	double q_link = -1;		// Set to invalid value by default
+	bool bCurrentSiteBflSite = true;
+	int markerID;
 
-	// If this site contains a marker (valid marker data) then get Q value
-	if (m_data->isValid())
+	// Check whether current site is BFL site and get Q value
+	if (LatTyp(i, j, k, M_lim, K_lim) == eBFL)
 	{
-		q_link = ObjectManager::getInstance()->pBody[0].Q[GridUtils::getOpposite(v) + L_NUM_VELS * m_data->ID];
+		m_data = ObjectManager::getInstance()->pBody[0].getMarkerData(XPos[i], YPos[j], ZPos[k]);
+		markerID = m_data->ID;
+		delete m_data;
+		q_link = ObjectManager::getInstance()->pBody[0].Q[GridUtils::getOpposite(v) + L_NUM_VELS * markerID];
+		
 	}
-	delete m_data;
 
-	/* If marker found and q value is valid then safe to assume current site is 
-	 * BFL site with link-intersecting wall. If not, then we can check to see if
-	 * the source site is a BFL site and has a link-intersecting wall. */
-	if (!m_data->isValid() || q_link == -1)
+	/* If q value is valid then current site is a BFL site with link-intersecting 
+	 * wall. If not, then we can check to see if the source site is a BFL site 
+	 * and has a link-intersecting wall. */
+	if (q_link == -1)
 	{
 		m_data = ObjectManager::getInstance()->pBody[0].getMarkerData(XPos[src_x], YPos[src_y], ZPos[src_z]);
 		if (m_data->isValid())
 		{
-			q_link = ObjectManager::getInstance()->pBody[0].Q[v + L_NUM_VELS * m_data->ID];
+			bCurrentSiteBflSite = false;
+			markerID = m_data->ID;
+			q_link = ObjectManager::getInstance()->pBody[0].Q[v + L_NUM_VELS * markerID];
 		}
 		delete m_data;
 	}
-	else
-	{
-		bCurrentSiteBflSite = true;
-	}
-
 		
 	/* BFL BC must only be applied if the pull link intersects the wall. Wall may
 	 * or may not intersect the pull link hence this method must handle the case 
@@ -670,6 +660,12 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 				(1 - 2 * q_link) *
 				(f[GridUtils::getOpposite(v) + stencil_id * L_NUM_VELS] - f[GridUtils::getOpposite(v) + id * L_NUM_VELS])
 				+ f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
+
+			// Momentum exchange -- don't include forces computed on halo sites to avoid duplicates
+#ifdef L_LD_OUT
+			if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
+				ObjectManager::getInstance()->computeLiftDrag(v, id, this, markerID);
+#endif
 		}
 	}
 
@@ -683,6 +679,12 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 			(1 - 2 * q_link) *
 			((f[v + id * L_NUM_VELS] - f[GridUtils::getOpposite(v) + id * L_NUM_VELS]) / (2 - 2 * q_link))
 			+ f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
+
+		// Momentum exchange -- don't include forces computed on halo sites to avoid duplicates
+#ifdef L_LD_OUT
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
+			ObjectManager::getInstance()->computeLiftDrag(v, id, this, markerID);
+#endif
 	}
 
 	return true;

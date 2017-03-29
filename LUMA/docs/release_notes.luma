@@ -3,7 +3,10 @@ version		=	1.4.1-alpha
 General		:	Added warning macro and improved some of the documentation in the GridUnits.
 				Added debugging capability for Momentum Exchange as well as associated MATLAB tool.
 				
-Issue #129	:	BFL has been added to the optimised kernel; intersection and Q compute algorithms have been rewritten. BFL and IB body classes restructured to reduce duplication.
+Issue #129	:	BFL has been added to the optimised kernel.
+				Intersection and Q compute algorithms have been rewritten.
+				BFL and IB body classes restructured to reduce duplication.
+				Momentum exchange has been upgraded to work with BFL bodies as well as BBB.
 
 version		=	1.4.0
 

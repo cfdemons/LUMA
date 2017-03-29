@@ -36,11 +36,11 @@ public:
 	/// Array of indices indicating on which rank the given support point resides
 	std::vector<int> support_rank;
 
-	// Marker ID within body (needed for building structural matrices)
-	int id;						///< ID of marker within its owning body
+	/// ID of marker within its owning body
+	int id;
 
-	// Marker ID within body (needed for building structural matrices)
-	double ds;						///< Spacing between this marker and neighbours (can't set in constructor)
+	/// Spacing between this marker and neighbours
+	double ds;
 
 
 public:

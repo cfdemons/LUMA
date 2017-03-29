@@ -41,6 +41,12 @@ public:
 	// Custom constructor when positions are passed
 	BFLMarker(double x, double y, double z, int markerID, GridObj const * const body_owner);
 
+protected:
+	// Per marker force storage
+	double forceX = 0.0;	///< Instantaneous X-direction force on marker
+	double forceY = 0.0;	///< Instantaneous Y-direction force on marker
+	double forceZ = 0.0;	///< Instantaneous Z-direction force on marker
+
 };
 
 #endif

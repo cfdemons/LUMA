@@ -81,8 +81,8 @@ private:
 	double bbbForceOnObjectX = 0.0;			///< Instantaneous X-direction force on BB bodies in domain
 	double bbbForceOnObjectY = 0.0;			///< Instantaneous Y-direction force on BB bodies in domain
 	double bbbForceOnObjectZ = 0.0;			///< Instantaneous Z-direction force on BB bodies in domain
-	int bbbOnGridLevel;						///< Grid level on which the BB body resides
-	int bbbOnGridReg;						///< Grid region on which the BB body resides
+	int bbbOnGridLevel = -1;				///< Grid level on which the BB body resides
+	int bbbOnGridReg = -1;					///< Grid region on which the BB body resides
 
 	// Objects (could be stored in a single Body array if we use pointers)
 	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
@@ -141,7 +141,9 @@ public:
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.
-	void computeLiftDrag(int i, int j, int k, GridObj *g);		// Compute force for BBB or BFLB residing on supplied grid.
+	void computeLiftDrag(int i, int j, int k, GridObj *g);			// Compute force using Momentum Exchange for BBB on supplied grid.
+	void computeLiftDrag(int v, int id, GridObj *g, int markerID);	// Compute force using Momentum Exchange for BFL on supplied grid.
+	void resetMomexBodyForces(GridObj * grid);						// Reset the force stores for Momentum Exchange
 
 	// IO methods //
 	void io_vtkBodyWriter(int tval);				// VTK body writer wrapper
@@ -149,7 +151,7 @@ public:
 	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts* _PCpts, GeomPacked *geom);	// Method to read in Point Cloud data
-	void io_writeForceOnObject(double tval);		// Method to write object forces to a csv file
+	void io_writeForcesOnObjects(double tval);		// Method to write object forces to a csv file
 	void io_readInGeomConfig();						// Read in geometry configuration file
 
 	// Debug

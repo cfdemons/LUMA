@@ -421,7 +421,7 @@ int main( int argc, char* argv[] )
 		if (Grids.t % L_OUT_EVERY_FORCES == 0) {
 
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;
-			objMan->io_writeForceOnObject(Grids.t);
+			objMan->io_writeForcesOnObjects(Grids.t);
 
 #ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;

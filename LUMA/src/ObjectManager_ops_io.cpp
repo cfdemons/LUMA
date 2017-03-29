@@ -88,7 +88,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 }
 
 // ************************************************************************** //
-/// \brief	Read/write IB body information to restart file.
+/// \brief	Read/write body information to restart file.
 /// \param	IO_flag	flag indicating write (true) or read (false).
 /// \param	level	level of the grid begin written/read
 void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
@@ -99,6 +99,8 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		// Output stream
 		std::ofstream file;
+
+		// IB BODIES //
 
 		if (level == 0) {
 			// Overwrite as first to write
@@ -151,10 +153,17 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 		file.close();
 
 
+		// BFL BODIES //
+
+		// TODO
+
+
 	} else {
 
 		// Input stream
 		std::ifstream file;
+
+		// IB BODIES //
 
 		// We only enter this routine if on correct level so no need to check
 		file.open("./input/restart_IBBody_Rnk" + std::to_string(rank) + ".out", std::ios::in);
@@ -224,6 +233,11 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 		// Close file
 		file.close();
+
+
+		// BFL BODIES //
+
+		// TODO
 
 	}
 

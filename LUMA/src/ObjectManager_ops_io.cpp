@@ -330,6 +330,16 @@ void ObjectManager::io_readInGeomConfig() {
 			std::string flex_rigid; file >> flex_rigid;
 			std::string BC; file >> BC;
 
+
+			// ****** BEGIN JON ONLY ****** //
+
+			// Overwrite the values from file with parameterisation for inclined 2D plate
+			startX = (L_BX - cos(L_ANGLE * L_PI / 180.0)) / 2.0;
+			startY = (L_BY - sin(L_ANGLE * L_PI / 180.0)) / 2.0;
+			length = cos(L_ANGLE * L_PI / 180);
+
+			// ****** END JON ONLY ****** //
+
 			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
 
 			// Get body type

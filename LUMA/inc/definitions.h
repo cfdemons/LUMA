@@ -158,8 +158,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 cos(30 * L_PI / 180)			///< Initial/inlet x-velocity
-#define L_UY0 sin(30 * L_PI / 180)			///< Initial/inlet y-velocity
+#define L_UX0 1.0			///< Initial/inlet x-velocity
+#define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
@@ -172,6 +172,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 ****************************** Object Management ******************************
 *******************************************************************************
 */
+
+// ****** BEGIN JON ONLY ****** //
+
+#define L_ANGLE 0
+
+// ****** END JON ONLY ****** //
 
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file

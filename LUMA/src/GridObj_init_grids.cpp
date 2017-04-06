@@ -1282,7 +1282,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (k = 0; k < K_lim; k++) {
 
-#ifdef L_WALLS_ON
+#if (defined L_WALLS_ON && !defined L_WALL_FLOOR_ONLY)
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
 #elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream

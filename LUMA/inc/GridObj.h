@@ -44,8 +44,8 @@ public:
 
 private :
 
-	/// 1D subgrid array (size = L_NUM_REGIONS)
-	std::vector<GridObj> subGrid;
+	/// 1D array of sub-grid pointers (size = L_NUM_REGIONS)
+	std::vector<GridObj*> subGrid;
 
 	/// Pointer to parent grid
 	GridObj *parentGrid = nullptr;
@@ -126,7 +126,7 @@ public :
 	void LBM_initVelocity();		// Initialise the velocity field
 	void LBM_initRho();				// Initialise the density field
 	void LBM_initGrid();			// Grid initialiser
-	void LBM_initSubGrid(GridObj& pGrid);		// Initialise subgrid with all quantities
+	void LBM_initSubGrid(GridObj& pGrid);				// Initialise subgrid with all quantities
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls

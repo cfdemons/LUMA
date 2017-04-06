@@ -1,4 +1,9 @@
-version		=	1.4.1-alpha
+version		=	1.4.2-alpha
+
+Issue #132	:	Construction of GridObjs converted to heap allocations. Nested sub-grids are stored as pointers rather than objects.
+				Destructors modified to free memory on parent deletion.
+
+version		=	1.4.1
 
 General		:	Added warning macro and improved some of the documentation in the GridUnits.
 				Added debugging capability for Momentum Exchange as well as associated MATLAB tool.

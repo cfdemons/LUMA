@@ -221,11 +221,6 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
 	}
 
-	// If using custom sizes, user must set the L_MPI_ZCORES to 1
-	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
-		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", GridUtils::logfile);
-	}
-	
 	// Global physical dimensions
 	double Lx = L_BX;
 	double dh = Lx / static_cast<double>(L_N);

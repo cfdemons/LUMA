@@ -31,7 +31,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 	// Two iterations on sub-grid first
 	if (subGrid.size()) {
 		for (int i = 0; i < 2; ++i) {
-			subGrid[0].LBM_multi_opt(i);
+			subGrid[0]->LBM_multi_opt(i);
 		}
 	}
 
@@ -227,7 +227,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 
 	// Get pointer to child grid
-	GridObj *childGrid = &subGrid[0];
+	GridObj *childGrid = subGrid[0];
 
 	// Get sizes
 	int cM_lim = childGrid->M_lim;
@@ -425,7 +425,7 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 	if (type_local == eTransitionToFiner) {
 
 		// Get child grid
-		GridObj *childGrid = &subGrid[0];
+		GridObj *childGrid = subGrid[0];
 
 		// Get indices
 		std::vector<int> cInd =
@@ -455,7 +455,7 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 						] = u[d + id * L_DIMS];
 					}
 
-					subGrid[0].rho[
+					subGrid[0]->rho[
 						(cInd[2] + kk) +
 							(cInd[1] + jj) * cK_lim +
 							(cInd[0] + ii) * cK_lim * cM_lim

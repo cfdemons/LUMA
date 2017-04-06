@@ -75,7 +75,7 @@
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -102,7 +102,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
-//#define L_USE_BGKSMAG
+#define L_USE_BGKSMAG
 #define L_CSMAG 0.07
 
 
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -135,13 +135,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.001		///< The timestep in non-dimensional units
+#define L_RESOLUTION 2		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.001	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 10.0		///< End of domain in X (non-dimensional units)
-#define L_BY 10.0		///< End of domain in Y (non-dimensional units)
-#define L_BZ 10.0		///< End of domain in Z (non-dimensional units)
+#define L_BX 24.0		///< End of domain in X (non-dimensional units)
+#define L_BY 6.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 7.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -158,13 +158,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 cos(30 * L_PI / 180)			///< Initial/inlet x-velocity
-#define L_UY0 sin(30 * L_PI / 180)			///< Initial/inlet y-velocity
+#define L_UX0 1.0			///< Initial/inlet x-velocity
+#define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 300			///< Desired Reynolds number
+#define L_RE 10000			///< Desired Reynolds number
 
 
 /*
@@ -175,7 +175,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
 //#define L_IBM_ON						///< Turn on IBM
@@ -206,6 +206,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Solids
 //#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
+#define L_WALL_FLOOR_ONLY
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
 #define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of front (3D) wall
@@ -218,29 +219,59 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 6		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 }
+	{ 4.4 },
+	{ 4.5 },
+	{ 4.6 },
+	{ 4.7 },
+	{ 4.8 },
+	{ 4.9 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 7.0 }
+	{ 13.5 },
+	{ 13.0 },
+	{ 12.5 },
+	{ 12.0 },
+	{ 11.5 },
+	{ 11.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 }
+	{ 0.0 },
+	{ 0.0 },
+	{ 0.0 },
+	{ 0.0 },
+	{ 0.0 },
+	{ 0.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 7.0 }
+	{ 2.0 },
+	{ 1.9 },
+	{ 1.8 },
+	{ 1.7 },
+	{ 1.6 },
+	{ 1.5 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 }
+	{ 2.1 },
+	{ 2.2 },
+	{ 2.3 },
+	{ 2.4 },
+	{ 2.5 },
+	{ 2.6 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 7.0 }
+	{ 4.9 },
+	{ 4.8 },
+	{ 4.7 },
+	{ 4.6 },
+	{ 4.5 },
+	{ 4.4 }
 };
 
 #endif

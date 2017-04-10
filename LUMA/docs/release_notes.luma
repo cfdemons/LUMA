@@ -2,6 +2,8 @@ version		=	1.4.2-alpha
 
 Issue #132	:	Construction of GridObjs converted to heap allocations. Nested sub-grids are stored as pointers rather than objects.
 				Destructors modified to free memory on parent deletion.
+Issue #123	:	Added auto sub-grid generation capability. User only needs to specify L1 and then padding and the rest is taken care of by the grid manager.
+				Can be disabled in the definitions file, causing the grid manager to use the values specified in the usual way.
 
 version		=	1.4.1
 

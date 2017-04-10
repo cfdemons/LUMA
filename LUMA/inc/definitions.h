@@ -123,7 +123,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
 
@@ -135,7 +135,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 2		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 6		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.001	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -221,6 +221,15 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_NUM_LEVELS 6		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
+
+// If you want coincident edges then set to (-2.0 * dh)
+#define L_PADDING_X_MIN 0.0		///< Padding between X start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.0		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN (-2.0 * dh)		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_Y_MAX 0.0		///< Padding between Y end of each sub-grid and its child edge
+#define L_PADDING_Z_MIN 0.0		///< Padding between Z start of each sub-grid and its child edge
+#define L_PADDING_Z_MAX 0.0		///< Padding between Z end of each sub-grid and its child edge
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
@@ -250,7 +259,7 @@ static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 0.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.0 },
+	{ 3.0 },
 	{ 1.9 },
 	{ 1.8 },
 	{ 1.7 },

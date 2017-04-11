@@ -43,7 +43,7 @@
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+//#define L_MPI_WRITE_LOAD_BALANCE	        ///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
@@ -65,18 +65,18 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
+#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
-#define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
-//#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
+#define L_HDF5_OUTPUT				        ///< HDF5 dump on output
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_IO_FGA                                      ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
@@ -98,7 +98,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 1000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 4000		///< Number of time steps to run simulation for
 
 
 /*

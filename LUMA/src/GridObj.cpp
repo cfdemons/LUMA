@@ -31,6 +31,9 @@ GridObj::GridObj(void)
 /// Default Destructor
 GridObj::~GridObj(void)
 {
+	// Loop over subgrid array and destroy each one
+	for (GridObj *g : subGrid) delete g;
+
 }
 
 // ****************************************************************************
@@ -112,20 +115,20 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 	if ( !GridUtils::intersectsRefinedRegion(*this, RegionNumber) ) return;
 	
 	// Ok to proceed and add the subgrid passing parent grid as a reference for initialisation
-	subGrid.emplace_back( RegionNumber, *this);	
+	subGrid.push_back( new GridObj(RegionNumber, *this) );	
 	
 	// Initialise the subgrid passing position of corner of the refined region on parent grid
-	this->subGrid.back().LBM_initSubGrid(*this);
+	this->subGrid.back()->LBM_initSubGrid(*this);
 
 #ifndef L_BUILD_FOR_MPI
 	// Update the writable data in the grid manager
 	// WHen using MPI this is done when building the communicators.
-	GridManager::getInstance()->createWritableDataStore(&subGrid.back());
+	GridManager::getInstance()->createWritableDataStore(subGrid.back());
 #endif
 
 	// Try to add another subgrid beneath the one just created if necessary
-	if (this->subGrid.back().level < L_NUM_LEVELS) {
-		this->subGrid.back().LBM_addSubGrid(this->subGrid.back().region_number);
+	if (this->subGrid.back()->level < L_NUM_LEVELS) {
+		this->subGrid.back()->LBM_addSubGrid(this->subGrid.back()->region_number);
 	}
 
 }

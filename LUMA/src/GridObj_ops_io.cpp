@@ -87,9 +87,9 @@ void GridObj::io_textout(std::string output_tag) {
 				gridoutput << "Grid is refined." << endl;
 				// Get size of regions
 				for (size_t reg = 0; reg < subGrid.size(); reg++) {
-					int finex = subGrid[reg].CoarseLimsX[eMaximum] - subGrid[reg].CoarseLimsX[eMinimum] + 1;
-					int finey = subGrid[reg].CoarseLimsY[eMaximum] - subGrid[reg].CoarseLimsY[eMinimum] + 1;
-					int finez = subGrid[reg].CoarseLimsZ[eMaximum] - subGrid[reg].CoarseLimsZ[eMinimum] + 1;
+					int finex = subGrid[reg]->CoarseLimsX[eMaximum] - subGrid[reg]->CoarseLimsX[eMinimum] + 1;
+					int finey = subGrid[reg]->CoarseLimsY[eMaximum] - subGrid[reg]->CoarseLimsY[eMinimum] + 1;
+					int finez = subGrid[reg]->CoarseLimsZ[eMaximum] - subGrid[reg]->CoarseLimsZ[eMinimum] + 1;
 					gridoutput << "Local region # " << reg << " refinement = " << (((float)finex)*((float)finey)*((float)finez)*100) / (L_N*L_M*L_K) << "%" << endl;
 				}
 			}
@@ -240,7 +240,7 @@ void GridObj::io_textout(std::string output_tag) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg].io_textout(output_tag);
+				subGrid[reg]->io_textout(output_tag);
 
 			}
 		}
@@ -367,7 +367,7 @@ void GridObj::_io_fgaout(int timeStepL0) {
 		if (regions != 0) {
 			for (size_t reg = 0; reg < regions; reg++) {
 
-				subGrid[reg]._io_fgaout(timeStepL0);
+				subGrid[reg]->_io_fgaout(timeStepL0);
 			}
 		}
 
@@ -470,7 +470,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		// Call write recursively for subgrids
 		if (level < L_NUM_LEVELS && subGrid.size()) {
 			for (size_t g = 0; g < subGrid.size(); g++) {
-				subGrid[g].io_restart(IO_flag);
+				subGrid[g]->io_restart(IO_flag);
 			}
 		}
 
@@ -763,7 +763,7 @@ void GridObj::io_lite(double tval, std::string TAG) {
 	// Now do any sub-grids
 	if (L_NUM_LEVELS > level) {
 		for (size_t reg = 0; reg < subGrid.size(); reg++) {
-			subGrid[reg].io_lite(tval,"");
+			subGrid[reg]->io_lite(tval, "");
 		}
 	}
 
@@ -1230,7 +1230,7 @@ int GridObj::io_hdf5(double tval) {
 #endif	// L_BUILD_FOR_MPI
 
 	// Try call recursively on any present sub-grids
-	for (GridObj& g : subGrid) g.io_hdf5(tval);
+	for (GridObj *g : subGrid) g->io_hdf5(tval);
 
 	return 0;
 

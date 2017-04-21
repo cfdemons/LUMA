@@ -177,8 +177,8 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-	// Create the grid object (level = 0)
-	GridObj Grids(0);
+	// Create the first object in the hierarchy (level = 0)
+	GridObj *Grids = new GridObj(0);
 
 
 	// Log file information
@@ -193,11 +193,11 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "\t)" << std::endl;
 #endif
 	L_INFO("Number of time steps to run = " + std::to_string(L_TOTAL_TIMESTEPS), GridUtils::logfile);
-	L_INFO("Grid spacing = " + std::to_string(Grids.dh), GridUtils::logfile);
-	L_INFO("Time step = " + std::to_string(Grids.dt), GridUtils::logfile);
-	L_INFO("Lattice viscosity = " + std::to_string(Grids.nu), GridUtils::logfile);
-	L_INFO("L0 relaxation time = " + std::to_string(1.0 / Grids.omega), GridUtils::logfile);
-	L_INFO("Lattice reference velocity " + std::to_string(Grids.uref), GridUtils::logfile);
+	L_INFO("Grid spacing = " + std::to_string(Grids->dh), GridUtils::logfile);
+	L_INFO("Time step = " + std::to_string(Grids->dt), GridUtils::logfile);
+	L_INFO("Lattice viscosity = " + std::to_string(Grids->nu), GridUtils::logfile);
+	L_INFO("L0 relaxation time = " + std::to_string(1.0 / Grids->omega), GridUtils::logfile);
+	L_INFO("Lattice reference velocity " + std::to_string(Grids->uref), GridUtils::logfile);
 	// Reynolds Number
 #ifdef L_NU
 #if L_NU != 0
@@ -231,14 +231,14 @@ int main( int argc, char* argv[] )
 		for (int reg = 0; reg < L_NUM_REGIONS; reg++) {
 
 			// Try adding subgrids and let constructor initialise
-			Grids.LBM_addSubGrid(reg);
+			Grids->LBM_addSubGrid(reg);
 
 		}
 
 	}
 
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
-	gm->Grids = &Grids;
+	gm->Grids = Grids;
 
 	/*
 	****************************************************************************
@@ -247,7 +247,7 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create Object Manager
-	ObjectManager* objMan = ObjectManager::getInstance(&Grids);
+	ObjectManager* objMan = ObjectManager::getInstance(Grids);
 	*GridUtils::logfile << "Object Manager Created." << endl;
 
 	// Read in the geometry config file
@@ -280,7 +280,7 @@ int main( int argc, char* argv[] )
 	////////////////////////
 
 	// Read in
-	Grids.io_restart(eRead);
+	Grids->io_restart(eRead);
 
 	// Reinitialise IB bodies based on restart positions
 #ifdef L_IBM_ON
@@ -326,23 +326,23 @@ int main( int argc, char* argv[] )
 
 	// Write out t = 0
 #ifdef L_TEXTOUT
-	*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
-	Grids.io_textout("INITIALISATION");	// Do not change this tag!
+	*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
+	Grids->io_textout("INITIALISATION");	// Do not change this tag!
 #endif
 
 #ifdef L_IO_LITE
 	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-	Grids.io_lite(Grids.t, "INITIALISATION");
+	Grids->io_lite(Grids->t, "INITIALISATION");
 #endif
 
 #ifdef L_HDF5_OUTPUT
 	*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
-	Grids.io_hdf5(Grids.t);
+	Grids->io_hdf5(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE
 	*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
-	objMan->io_vtkBodyWriter(Grids.t);
+	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
@@ -360,19 +360,19 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if ((Grids.t+1) % L_OUT_EVERY == 0
+		if ((Grids->t+1) % L_OUT_EVERY == 0
 #ifdef L_BUILD_FOR_MPI
 			&& mpim->my_rank == 0
 #endif
 			)
-			std::cout << "\n------ Time Step " << Grids.t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------" << endl;
+			std::cout << "\n------ Time Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------" << endl;
 
 
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
 
-		Grids.LBM_multi_opt();		// Launch LBM kernel on top-level grid
+		Grids->LBM_multi_opt();		// Launch LBM kernel on top-level grid
 
 
 		///////////////
@@ -380,59 +380,59 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids.t % L_OUT_EVERY == 0) {
+		if (Grids->t % L_OUT_EVERY == 0) {
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
 #endif
 #ifdef L_TEXTOUT
-			*GridUtils::logfile << "Writing out to <Grids.out>..." << endl;
-			Grids.io_textout("START OF TIMESTEP");
+			*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
+			Grids->io_textout("START OF TIMESTEP");
 #endif
 #ifdef L_IO_FGA
 			*GridUtils::logfile << "Writing out to <.fga>..." << endl;
-			Grids.io_fgaout();
+			Grids->io_fgaout();
 #endif
 
 #ifdef L_IO_LITE
 			*GridUtils::logfile << "Writing out to IOLite file..." << endl;
-			Grids.io_lite(Grids.t,"");
+			Grids->io_lite(Grids->t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT
 			*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
-			Grids.io_hdf5(Grids.t);
+			Grids->io_hdf5(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE
 			*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
-			objMan->io_vtkBodyWriter(Grids.t);
+			objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
 #if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
 	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
 	&& defined L_IBM_ON && defined L_IBBODY_TRACER
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
-			objMan->io_writeBodyPosition(Grids.t);
+			objMan->io_writeBodyPosition(Grids->t);
 #endif
 		}
 
 		// Write out forces of objects
 #ifdef L_LD_OUT
-		if (Grids.t % L_OUT_EVERY_FORCES == 0) {
+		if (Grids->t % L_OUT_EVERY_FORCES == 0) {
 
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;
-			objMan->io_writeForcesOnObjects(Grids.t);
+			objMan->io_writeForcesOnObjects(Grids->t);
 
 #ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
-			objMan->io_writeLiftDrag(Grids.t);
+			objMan->io_writeLiftDrag(Grids->t);
 #endif
 		}
 #endif	
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT
-		if (Grids.t % L_PROBE_OUT_FREQ == 0) {
+		if (Grids->t % L_PROBE_OUT_FREQ == 0) {
 
 #ifdef L_BUILD_FOR_MPI
 			for (int n = 0; n < mpim->num_ranks; n++)
@@ -447,7 +447,7 @@ int main( int argc, char* argv[] )
 				{
 
 					*GridUtils::logfile << "Probe write out..." << endl;
-					Grids.io_probeOutput();
+					Grids->io_probeOutput();
 
 				}
 
@@ -460,14 +460,14 @@ int main( int argc, char* argv[] )
 		/////////////////////////
 		// Restart File Output //
 		/////////////////////////
-		if (Grids.t % L_RESTART_OUT_FREQ == 0) {
+		if (Grids->t % L_RESTART_OUT_FREQ == 0) {
 
 			// Write out
-			Grids.io_restart(eWrite);
+			Grids->io_restart(eWrite);
 		}
 
 	// Loop End
-	} while (Grids.t < L_TOTAL_TIMESTEPS);
+	} while (Grids->t < L_TOTAL_TIMESTEPS);
 
 
 	/*
@@ -517,7 +517,7 @@ int main( int argc, char* argv[] )
 					
 					// Get the grid
 					g = NULL;
-					GridUtils::getGrid(&Grids,lev,reg,g);
+					GridUtils::getGrid(Grids,lev,reg,g);
 
 					// If grid does not exist the put in a zero
 					if (g == NULL) {
@@ -560,6 +560,9 @@ int main( int argc, char* argv[] )
 	ObjectManager::destroyInstance();
 	MpiManager::destroyInstance();
 	GridManager::destroyInstance();
+
+	// Destroy hierarchy
+	delete Grids;
 
 #ifdef L_BUILD_FOR_MPI
 	// Finalise MPI

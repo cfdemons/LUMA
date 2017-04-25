@@ -14,7 +14,7 @@
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.4.2"
+#define LUMA_VERSION "1.4.3-alpha"
 
 
 // Header guard
@@ -112,7 +112,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -123,7 +123,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
 
@@ -134,7 +134,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_DIMS 3			///< Number of dimensions to the problem
 #define L_RESOLUTION 6		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.001	///< The timestep in non-dimensional units
 
@@ -219,7 +219,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 6		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
@@ -235,51 +235,21 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.4 },
-	{ 4.5 },
-	{ 4.6 },
-	{ 4.7 },
-	{ 4.8 },
 	{ 4.9 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 13.5 },
-	{ 13.0 },
-	{ 12.5 },
-	{ 12.0 },
-	{ 11.5 },
 	{ 11.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
 	{ 0.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 },
-	{ 1.9 },
-	{ 1.8 },
-	{ 1.7 },
-	{ 1.6 },
 	{ 1.5 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.1 },
-	{ 2.2 },
-	{ 2.3 },
-	{ 2.4 },
-	{ 2.5 },
 	{ 2.6 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.9 },
-	{ 4.8 },
-	{ 4.7 },
-	{ 4.6 },
-	{ 4.5 },
 	{ 4.4 }
 };
 

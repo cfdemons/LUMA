@@ -334,13 +334,7 @@ int main(int argc, char* argv[])
 				}
 
 				// Ignore list
-				if (
-					Type[c] == eRefined ||
-					Type[c] == eRefinedInlet ||
-					Type[c] == eRefinedSolid ||
-					Type[c] == eRefinedSymmetry ||
-					Type[c] == eTransitionToCoarser
-					) continue;
+				if (isOnIgnoreList(static_cast<eType>(Type[c]))) continue;
 
 				local_point_count++;
 

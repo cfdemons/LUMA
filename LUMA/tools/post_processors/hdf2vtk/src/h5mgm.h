@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2.5"
+#define H5MGM_VERSION "0.2.6"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -120,6 +120,21 @@ void writeInfo(std::string info, eError type) {
 
 }
 
+bool isOnIgnoreList(eType cell_type)
+{
+
+	if (
+		cell_type == eRefined ||
+		cell_type == eRefinedInlet ||
+		cell_type == eRefinedSolid ||
+		cell_type == eRefinedSymmetry ||
+		cell_type == eTransitionToCoarser ||
+		cell_type == eSolid
+		) return true;
+
+	return false;
+}
+
 // Method to read a dataset with a given name into a buffer
 template <typename T>
 herr_t readDataset(std::string VAR, std::string TIME_STRING, hid_t input_fid, hid_t input_sid, hid_t H5Type, T *buffer) {
@@ -204,17 +219,11 @@ herr_t addDataToGrid(std::string VAR, std::string TIME_STRING,
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
 				// If not one of the include sites, ignore
-				if (
-					Type[c] == eRefined ||
-					Type[c] == eRefinedInlet ||
-					Type[c] == eRefinedSolid ||
-					Type[c] == eRefinedSymmetry ||
-					Type[c] == eTransitionToCoarser
-					) continue;
+				if (isOnIgnoreList(static_cast<eType>(Type[c]))) continue;
 
-					// Insert data into array
-					vtkArray->InsertValue(count, data[c]);
-					count++;
+				// Insert data into array
+				vtkArray->InsertValue(count, data[c]);
+				count++;
 			}
 
 			// Close input dataspace

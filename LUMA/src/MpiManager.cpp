@@ -51,11 +51,7 @@ MpiManager::MpiManager()
 	size_t xSize, ySize, zSize;
 	xSize = L_MPI_XCORES;
 	ySize = L_MPI_YCORES;
-#if (L_DIMS == 3)
 	zSize = L_MPI_ZCORES;
-#else
-	zSize = 1;
-#endif
 	cRankSizeX.resize(xSize*ySize*zSize);
 	cRankSizeY.resize(xSize*ySize*zSize);
 	cRankSizeZ.resize(xSize*ySize*zSize);
@@ -98,7 +94,7 @@ void MpiManager::destroyInstance() {
 ///
 ///			Method is responsible for initialising the MPI topolgy and 
 ///			associated data. Must be called immediately after MPI_init().
-///			For serial vuilds this gets called simply to intialise the 
+///			For serial builds this gets called simply to intialise the 
 ///			MPIM with a basic set of grid information used by other methods.
 void MpiManager::mpi_init()
 {
@@ -221,11 +217,8 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
 	}
 
-	// Global physical dimensions
-	double Lx = L_BX;
-	double dh = Lx / static_cast<double>(L_N);
-
 	// Auxiliary variables
+	double dh = L_BX / static_cast<double>(L_N);
 	int numCells[3];
 	int numCores[3];
 	numCells[0] = L_N;
@@ -233,58 +226,14 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	numCells[2] = L_K;
 	numCores[0] = L_MPI_XCORES;
 	numCores[1] = L_MPI_YCORES;
-#if (L_DIMS == 3)
 	numCores[2] = L_MPI_ZCORES;
+
+	// Compute block sizes based on chosen algorithm
+#ifdef L_MPI_SMART_DECOMPOSE
+	mpi_smartDecompose(&numCells[0], &numCores[0]);
 #else
-	numCores[2] = 1;
+	mpi_uniformDecompose(&numCells[0], &numCores[0]);
 #endif
-	int cellsInDomains[3];
-	int cellsLastDomain[3];
-
-	// Set the last position to 0, just in case we are working with L_DIMS = 2
-	cellsInDomains[2] = 0;
-	cellsLastDomain[2] = 0;
-
-	// Compute domain size base don uniform decomposition
-	for (size_t d = 0; d < L_DIMS; d++)
-	{
-
-		// Calculate the size of each domain in dimension d
-		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
-
-		// Calculate the size of the last domain
-		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
-
-		// Throw an error if cellsInLast domain is <=0
-		if (cellsLastDomain[d] <= 0)
-		{
-			L_ERROR("Last core in dir = " + std::to_string(d) + 
-				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
-		}
-	}
-
-	
-	// Fill the cRankSize arrays for each MPI block
-	int ind = 0;
-	for (int i = 0; i < numCores[0]; i++)
-	{
-		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
-
-		for (int j = 0; j < numCores[1]; j++)
-		{
-			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
-
-			for (int k = 0; k < numCores[2]; k++)
-			{
-				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
-				cRankSizeX[ind] = sX;
-				cRankSizeY[ind] = sY;
-				cRankSizeZ[ind] = sZ;
-				ind++;
-			}
-		}
-	}
-
 	
 	// Compute required local grid size to pass to grid manager //
 	std::vector<int> local_size;
@@ -839,7 +788,7 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 				else {
 					// Remove the coarse cells from the count
-					active_cell_count -= grid_cell_count / 2;
+					active_cell_count -= grid_cell_count / static_cast<long>(pow(2, L_DIMS));
 
 					// Add the fine cells
 					active_cell_count += grid_cell_count;
@@ -892,6 +841,117 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 #endif
 
+}
+// ************************************************************************* //
+/// \brief	Populate the rank size arrays based on uniform decomposition logic
+void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
+{
+	// Auxiliary variables
+	int cellsInDomains[3];
+	int cellsLastDomain[3];
+
+	// Set the last position to 0, just in case we are working with L_DIMS = 2
+	cellsInDomains[2] = 0;
+	cellsLastDomain[2] = 0;
+
+	// Compute domain size based on uniform decomposition
+	for (size_t d = 0; d < L_DIMS; d++)
+	{
+
+		// Calculate the size of each domain in dimension d
+		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
+
+		// Calculate the size of the last domain
+		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
+
+		// Throw an error if cellsInLast domain is <=0
+		if (cellsLastDomain[d] <= 0)
+		{
+			L_ERROR("Last core in dir = " + std::to_string(d) +
+				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
+		}
+	}
+
+
+	// Fill the cRankSize arrays for each MPI block
+	int ind = 0;
+	for (int i = 0; i < numCores[0]; i++)
+	{
+		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+
+		for (int j = 0; j < numCores[1]; j++)
+		{
+			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+
+			for (int k = 0; k < numCores[2]; k++)
+			{
+				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+				cRankSizeX[ind] = sX;
+				cRankSizeY[ind] = sY;
+				cRankSizeZ[ind] = sZ;
+				ind++;
+			}
+		}
+	}
+}
+
+// ************************************************************************* //
+/// \brief	Populate the rank size arrays based on an algorithm that seeks to 
+///			load balance.
+void MpiManager::mpi_smartDecompose(int *numCells, int *numCores)
+{
+	// Declarations
+	int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
+	GridManager *gman = GridManager::getInstance();
+
+	// Work out ideal number of cells / core for 100 balance
+	double *blockBounds = new double[6];
+	blockBounds[eXMin] = gman->global_edges[eXMin][0];
+	blockBounds[eXMax] = gman->global_edges[eXMax][0];
+	blockBounds[eYMin] = gman->global_edges[eYMin][0];
+	blockBounds[eYMax] = gman->global_edges[eYMax][0];
+	blockBounds[eZMin] = gman->global_edges[eZMin][0];
+	blockBounds[eZMax] = gman->global_edges[eZMax][0];
+	long idealCellsPerCore = gman->getActiveCellCount(blockBounds) / numProcs;
+
+	/* The variables in this problem are the location of the bloxk boundaries. 
+	 * Since faces of adjacent blocks must be conincident the problem reduces 
+	 * to find the unknowns of which there are (XCORES + YCORES + ZCORES + L_DIMS).
+	 * The left-hand set of block boundaries are aligned with the domain origin so
+	 * in practise we have (XCORES + YCORES + ZCORES) unknowns.
+	 *
+	 * The algorithm is executed as an initial value problem with perturbations. 
+	 * The first block has L_DIMS remaining unknowns to define it size after 
+	 * fixing the left-hand edges. We therefore need to reduce this to a single 
+	 * unknown by supplying (L_DIMS - 1) extra conditions. We do this by fixing 
+	 * the dimensions of the block in the least significant direction.
+	 *
+	 * Solution of the remaining unknowns may then proceed sequentially such 
+	 * that every block only has a single unknown to find. For each block, this 
+	 * single unknown is found by perturbing the variable about a default value 
+	 * within a set range and selecting the value that gives the closest active 
+	 * cell count to the ideal count. */
+
+	// Set up the unknown block edges
+	double X_unknowns[L_MPI_XCORES + 1];
+	double Y_unknowns[L_MPI_YCORES + 1];
+	double Z_unknowns[L_MPI_ZCORES + 1];
+
+	// TODO: Need to implement a general way to work through the unknowns for any size topology
+
+
+
+
+
+
+
+
+	// Populate the rank sizes with balanced solution
+
+
+
+	// Clean up
+	delete[] blockBounds;
 }
 // ************************************************************************** //
 

@@ -88,7 +88,8 @@ int main( int argc, char* argv[] )
 	*/
 
     // Timing variables
-	clock_t t_start, secs; // Wall clock variables
+	clock_t t_start, secs;	// Wall clock variables
+	double outer_loop_time = 0.0; 
 
 	// Start clock to time initialisation
 	t_start = clock();
@@ -360,12 +361,16 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if ((Grids->t+1) % L_OUT_EVERY == 0
+#ifdef L_SHOW_TIME_TO_COMPLETE
+		// Start clock for timing outer loop
+		t_start = clock();
+#endif
+
+		if ((Grids->t + 1) % L_OUT_EVERY == 0
 #ifdef L_BUILD_FOR_MPI
 			&& mpim->my_rank == 0
 #endif
-			)
-			std::cout << "\n------ Time Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------" << endl;
+		) std::cout << "\n------ Time Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------" << endl;
 
 
 		///////////////////////
@@ -380,7 +385,8 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids->t % L_OUT_EVERY == 0) {
+		if (Grids->t % L_OUT_EVERY == 0)
+		{
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
 #endif
@@ -414,6 +420,16 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
 #endif
+
+#ifdef L_SHOW_TIME_TO_COMPLETE
+			if (GridUtils::safeGetRank() == 0)
+			{
+				int hms[3];
+				GridUnits::secs2hms((L_TOTAL_TIMESTEPS - Grids->t) * outer_loop_time / 1000, &hms[0]);
+				std::cout << "Time to complete approx. " << hms[0] << " [h] " << hms[1] << " [m] " << hms[2] << " [s]" << std::endl;
+			}
+#endif
+
 		}
 
 		// Write out forces of objects
@@ -465,6 +481,14 @@ int main( int argc, char* argv[] )
 			// Write out
 			Grids->io_restart(eWrite);
 		}
+
+
+#ifdef L_SHOW_TIME_TO_COMPLETE
+		// Update outer loop time (inc. effects of writing out for accuracy)
+		outer_loop_time *= Grids->t - 1;
+		outer_loop_time += (static_cast<double>(clock() - t_start)) / CLOCKS_PER_SEC * 1000;
+		outer_loop_time /= Grids->t;
+#endif
 
 	// Loop End
 	} while (Grids->t < L_TOTAL_TIMESTEPS);

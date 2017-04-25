@@ -30,10 +30,9 @@ class GridManager
 	friend class GridUtils;
 	friend class GridObj;
 
-private:
-	GridManager(void);		///< Private constructor
-	~GridManager(void);		///< Private destructor
-	static GridManager* me;	///< Pointer to self
+public:
+	/// Pointer to grid hierarchy
+	GridObj* Grids;
 
 protected:
 	// Grid data
@@ -77,16 +76,14 @@ protected:
 	/// Vector of structures containing writable region descriptors for block writing (HDF5)
 	std::vector<HDFstruct> p_data;
 
-public:
-	/// Pointer to grid hierarchy
-	GridObj* Grids;
-
 
 	// METHODS //
 
+public:
 	// Singleton design
 	static GridManager* getInstance();	// Get the pointer to the singleton instance (create it if necessary)
 	static void destroyInstance();
+
 
 protected:
 	// Set the local size (MpiManager can set local size)
@@ -95,6 +92,16 @@ protected:
 	// Allow grid initialisation to store its writable data information
 	void createWritableDataStore(HDFstruct *& datastruct);
 	bool createWritableDataStore(GridObj const * const targetGrid);
+
+	// Get estimated active cell count within the global bounds supplied
+	long getActiveCellCount(double *bounds);
+	long getCellCount(GridObj *target, double *bounds);
+
+
+private:
+	GridManager(void);		///< Private constructor
+	~GridManager(void);		///< Private destructor
+	static GridManager* me;	///< Pointer to self
 
 };
 

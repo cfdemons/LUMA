@@ -163,7 +163,6 @@ int main( int argc, char* argv[] )
 	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
 #endif
 
-
 	// Start clock again for next bit of initialisation
 #ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(mpim->world_comm);
@@ -179,7 +178,7 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create the first object in the hierarchy (level = 0)
-	GridObj *Grids = new GridObj(0);
+	GridObj *const Grids = new GridObj(0);
 
 
 	// Log file information
@@ -239,7 +238,7 @@ int main( int argc, char* argv[] )
 	}
 
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
-	gm->Grids = Grids;
+	gm->setGridHierarchy(Grids);
 
 	/*
 	****************************************************************************
@@ -321,9 +320,6 @@ int main( int argc, char* argv[] )
 	mpim->mpi_updateLoadInfo(gm);
 
 #endif
-
-
-
 
 	// Write out t = 0
 #ifdef L_TEXTOUT

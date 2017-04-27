@@ -30,11 +30,10 @@ class GridManager
 	friend class GridUtils;
 	friend class GridObj;
 
-public:
-	/// Pointer to grid hierarchy
-	GridObj* Grids;
-
 protected:
+	/// Pointer to grid hierarchy
+	GridObj *Grids;
+
 	// Grid data
 	/// \brief	Overall size of each grid (excluding halo of course).
 	///
@@ -83,6 +82,7 @@ public:
 	// Singleton design
 	static GridManager* getInstance();	// Get the pointer to the singleton instance (create it if necessary)
 	static void destroyInstance();
+	void setGridHierarchy(GridObj *const grids);
 
 
 protected:
@@ -95,7 +95,7 @@ protected:
 
 	// Get estimated active cell count within the global bounds supplied
 	long getActiveCellCount(double *bounds);
-	long getCellCount(GridObj *target, double *bounds);
+	long getCellCount(int targetLevel, int targetRegion, double *bounds);
 
 
 private:

@@ -184,6 +184,12 @@ void GridManager::destroyInstance()
 	delete me;			// Delete pointer from static context (destructor will be called automatically)
 }
 
+/// Set grid hierarchy in the manager after grid creation
+void GridManager::setGridHierarchy(GridObj *const grids)
+{
+	Grids = grids;
+}
+
 
 /// \brief	Method to set the local coarse size.
 ///
@@ -502,31 +508,21 @@ long GridManager::getActiveCellCount(double *bounds)
 	unsigned int idx = 0;
 	long cell_count = 0;
 	long cells_on_this_grid = 0;
-	GridObj *target = nullptr;
-	GridUtils::getGrid(Grids, 0, 0, target);
-	if (target)	cell_count = getCellCount(target, bounds);
+	cell_count = getCellCount(0, 0, bounds);
 
 	// Loop over the grids and retrieve cell counts
 	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev)
 	{
 		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 		{
+			// Retrieve cell count in union
+			cells_on_this_grid = getCellCount(lev, reg, bounds);
 
-			target = nullptr;
-			GridUtils::getGrid(Grids, lev, reg, target);
-
-			if (target)
-			{
-				// Retrieve cell count in union
-				cells_on_this_grid = getCellCount(target, bounds);
-
-				// Add the contribution of active cells from this grid
-				cell_count += cells_on_this_grid;
+			// Add the contribution of active cells from this grid
+			cell_count += cells_on_this_grid;
 				
-				// Deduct course cells that are refined
-				cell_count -= cells_on_this_grid / static_cast<long>(pow(2, L_DIMS));
-
-			}
+			// Deduct course cells that are refined
+			cell_count -= cells_on_this_grid / static_cast<long>(pow(2, L_DIMS));
 
 		}
 	}
@@ -542,14 +538,15 @@ long GridManager::getActiveCellCount(double *bounds)
 ///			snap bounds edges to cell edges hence the value returned is only an
 ///			approximation of cell count rather than the actual cell count.
 ///
-///	\param	target	grid on which to check for union.
-///	\param	bounds	pointer to an array containing the bounds of the region to be checked.
-///	\returns		number of cells in the union.
-long GridManager::getCellCount(GridObj *target, double *bounds)
+///	\param	targetLevel		grid level on which to check for union.
+///	\param	targetRegion	grid region on which to check for union.
+///	\param	bounds			pointer to an array containing the bounds of the region to be checked.
+///	\returns				number of cells in the union.
+long GridManager::getCellCount(int targetLevel, int targetRegion, double *bounds)
 {
 	// Access edge array using idx
 	unsigned int idx = 0;
-	if (target->level != 0) idx = target->level + target->region_number * L_NUM_LEVELS;
+	if (targetLevel != 0) idx = targetLevel + targetRegion * L_NUM_LEVELS;
 
 	// If start of bounds outside end of grid, no union
 	if (
@@ -590,9 +587,11 @@ long GridManager::getCellCount(GridObj *target, double *bounds)
 #endif
 
 	// Use knowledge of discretisation to return the number of cells in union
+	double base_cell_size = L_BX / static_cast<double>(L_N);
+	double local_cell_size = base_cell_size / pow(2, targetLevel);
 #if (L_DIMS == 3)
-	return static_cast<long>(volume / (target->dh * target->dh * target->dh));
+	return static_cast<long>(volume / (local_cell_size * local_cell_size * local_cell_size));
 #else
-	return static_cast<long>(volume / (target->dh * target->dh));
+	return static_cast<long>(volume / (local_cell_size * local_cell_size));
 #endif
 }

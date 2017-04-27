@@ -149,4 +149,14 @@ enum eMoveableType {
 	eRigid	///< Immersed boundary body
 };
 
+///	\enum eSDReturnType
+///	\brief	Return types for smart decomposition methods.
+enum eSDReturnType {
+	eSDNoUnknown,
+	eSDSnappedToEdges,
+	eSDShrinkTarget,
+	eSDProceed,
+	eSDEarlyExit
+};
+
 #endif

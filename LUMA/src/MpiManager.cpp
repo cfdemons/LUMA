@@ -230,7 +230,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 
 	// Compute block sizes based on chosen algorithm
 #ifdef L_MPI_SMART_DECOMPOSE
-	mpi_smartDecompose(&numCells[0], &numCores[0]);
+	mpi_smartDecompose(dh);
 #else
 	mpi_uniformDecompose(&numCells[0], &numCores[0]);
 #endif
@@ -896,62 +896,345 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 }
 
 // ************************************************************************* //
+/// \brief	Initialise the block bounds based on the edge to be varied.
+///
+///	\param	blockBounds	reference to the block bounds array for the next compute.
+///	\return				special indicator for returning action required.
+eSDReturnType MpiManager::mpi_SDInitialise(double *blockBounds, int &var, int i, int j, int k)
+{
+	// Locate the unknown parameter to be varied and snap other bounds to voxel edge
+	var = -1;
+	double dh = L_BX / static_cast<double>(L_N);
+	for (int p = 0; p < 6; ++p)
+	{
+		if (blockBounds[p] < 0)
+		{
+			var = p;
+		}
+		else
+		{
+			/* Find number of partial cells between grid origin and position.
+			* Round then convert back to position. */
+			blockBounds[p] = std::round(blockBounds[p] / dh) * dh;
+		}
+
+	}
+	if (var == -1) return eSDNoUnknown;	// No unknown to be found in this block
+
+	// Set boundary to default value or snap to grid edge if last block
+	switch (var)
+	{
+	case eXMin:
+
+		// Set default -- snapped to coarse grid voxel edge
+		blockBounds[var] = std::round((blockBounds[eXMax] - (L_BX / L_MPI_XCORES)) / dh) * dh;
+
+		// If last block then snap to grid edge
+		if (i == 0)
+		{
+			blockBounds[var] = 0.0;
+			return eSDSnappedToEdges;
+		}
+
+		/* If not an edge block and default value is outside
+		* the grid then make grid cell target smaller and
+		* restart. */
+		else if (blockBounds[var] <= 0.0)
+			return eSDShrinkTarget;
+
+		break;
+
+	case eXMax:
+
+		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eXMin] + (L_BX / L_MPI_XCORES)) / dh) * dh;
+
+		if (i == L_MPI_XCORES - 1)
+		{
+			blockBounds[var] = L_BX;
+			return eSDSnappedToEdges;
+		}
+		else if (blockBounds[var] >= L_BX)
+			return eSDShrinkTarget;
+
+		break;
+
+	case eYMin:
+
+		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eYMax] - (L_BY / L_MPI_YCORES)) / dh) * dh;
+
+		if (j == 0)
+		{
+			blockBounds[var] = 0.0;
+			return eSDSnappedToEdges;
+		}
+		else if (blockBounds[var] <= 0.0)
+			return eSDShrinkTarget;
+
+		break;
+
+	case eYMax:
+
+		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eYMin] + (L_BY / L_MPI_YCORES)) / dh) * dh;
+
+		if (j == L_MPI_YCORES - 1)
+		{
+			blockBounds[var] = L_BY;
+			return eSDSnappedToEdges;
+		}
+		else if (blockBounds[var] >= L_BY)
+			return eSDShrinkTarget;
+
+		break;
+
+	case eZMin:
+
+		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eZMax] - (L_BZ / L_MPI_ZCORES)) / dh) * dh;
+
+		if (k == 0)
+		{
+			blockBounds[var] = 0.0;
+			return eSDSnappedToEdges;
+		}
+		else if (blockBounds[var] <= 0.0)
+			return eSDShrinkTarget;
+
+		break;
+
+	case eZMax:
+
+		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eZMin] + (L_BZ / L_MPI_ZCORES)) / dh) * dh;
+
+		if (k == L_MPI_ZCORES - 1)
+		{
+			blockBounds[var] = L_BZ;
+			return eSDSnappedToEdges;
+		}
+		else if (blockBounds[var] >= L_BZ)
+			return eSDShrinkTarget;
+
+		break;
+	}
+
+	return eSDProceed;
+}
+
+// ************************************************************************* //
+/// \brief	Carry out the algorithm to compute the block sizes.
+///
+///	\param	targetCellCount	the number of cells the algorithm should ensure each block has.
+///	\return					special indicator for returning action required.
+eSDReturnType MpiManager::mpi_SDCompute(long targetCellCount)
+{
+	// Declarations
+	double blockBounds[6];
+	double blockBoundsOld[6];
+	unsigned int rank_number = 0;
+	long currentCellCount = 0;
+	long currentDistanceFromIdeal = 0;
+	long previousDistanceFromIdeal = std::numeric_limits<long>::max();
+	int perturbationDirection = 1;
+	int var = -1;
+
+	// Grids not initialised yet so have to compute base resolution from compile time data
+	double dh = L_BX / static_cast<double>(L_N);
+
+	/* The variables in this problem are the location of the block boundaries.
+	* Since faces of adjacent blocks must be conincident the problem reduces
+	* to find the unknowns of which there are (XCORES + YCORES + ZCORES + L_DIMS).
+	* The left-hand set of block boundaries are aligned with the domain origin so
+	* in practise we have (XCORES + YCORES + ZCORES) unknowns.
+	*
+	* The algorithm is executed as an initial value problem with perturbations.
+	* The first block has L_DIMS remaining unknowns to define it size after
+	* fixing the left-hand edges. We therefore need to reduce this to a single
+	* unknown by supplying (L_DIMS - 1) extra conditions. We do this by fixing
+	* the dimensions of the block in the least significant direction.
+	*
+	* Solution of the remaining unknowns may then proceed as a nested loop over
+	* each of the problem dimensions in any order. Each block only has a single
+	* unknown to find. For each block, this single unknown is found by setting
+	* a default value and then perturbing it in one direction. The active cell
+	* count for the new value can then be retrieved. A 2-point gradient
+	* estimation can determine whether the direction of perturbation is correct.
+	* Once the direction is correct, the process proceeds and resorts to
+	* bisection to find the value that achieves the desired active cell count.
+	* Termination conditions can be set based on the limits of the domain size
+	* as the block edges cannot be zero or greater than the domain edges so
+	* the method should naturally exit at these points. */
+	bool bSuggestShrinking = false;
+	bool bBlockSolved = false;
+
+	// Set up the unknown block edges with invalid values
+	std::vector<double> X_unknowns(L_MPI_XCORES + 1, -1.0);
+	std::vector<double> Y_unknowns(L_MPI_YCORES + 1, -1.0);
+	std::vector<double> Z_unknowns(L_MPI_ZCORES + 1, -1.0);
+
+	// Fix unknowns for starting block (default block 0)
+	X_unknowns[0] = 0.0;
+	Y_unknowns[0] = 0.0;
+	Z_unknowns[0] = 0.0;
+
+	// Extra closure conditions
+	Y_unknowns[1] = L_BY / static_cast<double>(L_MPI_YCORES);
+	Z_unknowns[1] = L_BZ / static_cast<double>(L_MPI_ZCORES);
+
+	// Loop and solve for remaining unknowns
+	for (int i = 0; i < L_MPI_XCORES; ++i)
+	{
+		for (int j = 0; j < L_MPI_YCORES; ++j)
+		{
+#if (L_DIMS == 3)
+			for (int k = 0; k < L_MPI_ZCORES; ++k)
+#else
+			int k = 0;
+#endif
+			{
+				// Set perturbation direction to positive and reset perturbation variable
+				perturbationDirection = 1;
+				var = -1;
+				bBlockSolved = false;
+
+				// MPI numbers in Z, then Y, then X
+#if (L_DIMS == 3)
+				rank_number = k + j * L_MPI_ZCORES + i * L_MPI_ZCORES * L_MPI_YCORES;
+#else
+				rank_number = j + i * L_MPI_YCORES;
+#endif
+
+				// Get the bounds for this block from the unknowns
+				blockBounds[eXMin] = X_unknowns[i];
+				blockBounds[eXMax] = X_unknowns[i + 1];
+				blockBounds[eYMin] = Y_unknowns[j];
+				blockBounds[eYMax] = Y_unknowns[j + 1];
+				blockBounds[eZMin] = Z_unknowns[k];
+				blockBounds[eZMax] = Z_unknowns[k + 1];
+
+				// Initialise the block size with default values
+				eSDReturnType status = mpi_SDInitialise(blockBounds, var, i, j, k);
+
+				// Do we need to restart?
+				if (status == eSDShrinkTarget)
+					return eSDShrinkTarget;
+
+				// No unknowns for this block so use current bounds
+				else if (status == eSDNoUnknown)
+					bBlockSolved = true;
+
+				// Snapped to edges so block bounds are solved
+				else if (status == eSDSnappedToEdges)
+					bBlockSolved = true;
+
+
+				// Run perturbation loop on the block if not marked as solved
+				while (!bBlockSolved)
+				{
+
+					// Get active cell count for blocks bounds
+					currentCellCount = GridManager::getInstance()->getActiveCellCount(&blockBounds[0]);
+
+					// Check how far away we are from the target
+					currentDistanceFromIdeal = abs(targetCellCount - currentCellCount);
+
+					// If we have achieved the target cell count then use these block settings
+					if (currentDistanceFromIdeal == 0)
+						bBlockSolved = true;
+
+					// If we are getting further away from the target
+					else if (currentDistanceFromIdeal > previousDistanceFromIdeal)
+					{
+						// Swap direction and iterate again
+						if (perturbationDirection == 1)
+							perturbationDirection = -1;
+
+						// If already swapped, use the previous setting as this was more accurate
+						else
+						{
+							blockBounds[var] = blockBoundsOld[var];
+							bBlockSolved = true;
+						}
+					}
+
+					// If not solved, prepare for next iteration
+					if (!bBlockSolved)
+					{
+						// Copy block bounds to old array
+						memcpy(&blockBoundsOld[0], &blockBounds[0], sizeof(double) * 6);
+
+						// Adjust block boundary position by a single coarse cell
+						blockBounds[var] += (dh * perturbationDirection);
+
+						// Copy cell count for comparison with next iteration
+						previousDistanceFromIdeal = currentDistanceFromIdeal;					
+
+					}
+
+
+				} // End perturbation loop
+
+
+				// Current block bounds are to be used for this block
+				if (bBlockSolved)
+				{
+					// Update unknown vectors with solution for this block
+					X_unknowns[i] = blockBounds[eXMin];
+					X_unknowns[i + 1] = blockBounds[eXMax];
+					Y_unknowns[j] = blockBounds[eYMin];
+					Y_unknowns[j + 1] = blockBounds[eYMax];
+					Z_unknowns[k] = blockBounds[eZMin];
+					Z_unknowns[k + 1] = blockBounds[eZMax];
+
+					// Update arrays of block sizes in the manager taking into account overall size
+					cRankSizeX[rank_number] = static_cast<int>(std::round((blockBounds[eXMax] - blockBounds[eXMin]) / dh));
+					cRankSizeY[rank_number] = static_cast<int>(std::round((blockBounds[eYMax] - blockBounds[eYMin]) / dh));
+					cRankSizeZ[rank_number] = static_cast<int>(std::round((blockBounds[eZMax] - blockBounds[eZMin]) / dh));
+				}				
+
+			}	// End inner block loop
+
+		} // End middle block loop
+
+	}	// End outer block loop
+
+	return eSDProceed;
+
+}
+
+// ************************************************************************* //
 /// \brief	Populate the rank size arrays based on an algorithm that seeks to 
 ///			load balance.
-void MpiManager::mpi_smartDecompose(int *numCells, int *numCores)
+///
+///	\param	dh	size of a voxel on the coarsest grid
+void MpiManager::mpi_smartDecompose(double dh)
 {
 	// Declarations
 	int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
 	GridManager *gman = GridManager::getInstance();
-
+	bool bSolutionFound = false;
+	
 	// Work out ideal number of cells / core for 100 balance
-	double *blockBounds = new double[6];
+	double blockBounds[6];
 	blockBounds[eXMin] = gman->global_edges[eXMin][0];
 	blockBounds[eXMax] = gman->global_edges[eXMax][0];
 	blockBounds[eYMin] = gman->global_edges[eYMin][0];
 	blockBounds[eYMax] = gman->global_edges[eYMax][0];
 	blockBounds[eZMin] = gman->global_edges[eZMin][0];
 	blockBounds[eZMax] = gman->global_edges[eZMax][0];
-	long idealCellsPerCore = gman->getActiveCellCount(blockBounds) / numProcs;
+	long idealCellsPerCore = gman->getActiveCellCount(&blockBounds[0]) / numProcs;
 
-	/* The variables in this problem are the location of the bloxk boundaries. 
-	 * Since faces of adjacent blocks must be conincident the problem reduces 
-	 * to find the unknowns of which there are (XCORES + YCORES + ZCORES + L_DIMS).
-	 * The left-hand set of block boundaries are aligned with the domain origin so
-	 * in practise we have (XCORES + YCORES + ZCORES) unknowns.
-	 *
-	 * The algorithm is executed as an initial value problem with perturbations. 
-	 * The first block has L_DIMS remaining unknowns to define it size after 
-	 * fixing the left-hand edges. We therefore need to reduce this to a single 
-	 * unknown by supplying (L_DIMS - 1) extra conditions. We do this by fixing 
-	 * the dimensions of the block in the least significant direction.
-	 *
-	 * Solution of the remaining unknowns may then proceed sequentially such 
-	 * that every block only has a single unknown to find. For each block, this 
-	 * single unknown is found by perturbing the variable about a default value 
-	 * within a set range and selecting the value that gives the closest active 
-	 * cell count to the ideal count. */
+	// Loop over different target cell counts
+	while (!bSolutionFound)
+	{
+		// Run algorithm with ideal target cells
+		eSDReturnType status = mpi_SDCompute(idealCellsPerCore);
 
-	// Set up the unknown block edges
-	double X_unknowns[L_MPI_XCORES + 1];
-	double Y_unknowns[L_MPI_YCORES + 1];
-	double Z_unknowns[L_MPI_ZCORES + 1];
+		// If required to shrink the target cell count by 10%
+		if (status == eSDShrinkTarget)
+			idealCellsPerCore = static_cast<long>(static_cast<int>(idealCellsPerCore)* 0.9);
 
-	// TODO: Need to implement a general way to work through the unknowns for any size topology
+		// If OK to proceed then the solution has been found
+		else if (status == eSDProceed)
+			bSolutionFound = true;
 
-
-
-
-
-
-
-
-	// Populate the rank sizes with balanced solution
-
-
-
-	// Clean up
-	delete[] blockBounds;
+	}
 }
 // ************************************************************************** //
-

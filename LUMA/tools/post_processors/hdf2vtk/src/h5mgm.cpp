@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 	hid_t output_fid = NULL;
 	hid_t input_fid = NULL;
 	hid_t input_aid = NULL;
-	int dimensions_p, levels, regions, timesteps, out_every;
+	int dimensions_p, levels, regions, timesteps, out_every, mpi_flag;
 	double dx;
 	std::string VAR;
 	int* LatTyp = nullptr;
@@ -191,6 +191,13 @@ int main(int argc, char* argv[])
 	input_aid = H5Aopen(input_fid, "OutputFrequency", H5P_DEFAULT);
 	if (input_aid <= 0) writeInfo("Cannot open attribute!", eHDF);
 	status = H5Aread(input_aid, H5T_NATIVE_INT, &out_every);
+	if (status != 0) writeInfo("Cannot read attribute!", eHDF);
+	status = H5Aclose(input_aid);
+	if (status != 0) writeInfo("Cannot close attribute!", eHDF);
+
+	input_aid = H5Aopen(input_fid, "Mpi", H5P_DEFAULT);
+	if (input_aid == NULL) writeInfo("Cannot open attribute!", eHDF);
+	status = H5Aread(input_aid, H5T_NATIVE_INT, &mpi_flag);
 	if (status != 0) writeInfo("Cannot read attribute!", eHDF);
 	status = H5Aclose(input_aid);
 	if (status != 0) writeInfo("Cannot close attribute!", eHDF);
@@ -239,12 +246,12 @@ int main(int argc, char* argv[])
 	for (int lev = 0; lev < levels; lev++) {
 		for (int reg = 0; reg < regions; reg++) {
 
-			// Debug
-			int local_point_count = 0;
-			std::cout << "Adding cells from L" << lev << " R" << reg << "...";
-
 			// L0 doesn't have different regions
 			if (lev == 0 && reg != 0) continue;
+
+			// Debug
+			int local_point_count = 0;
+			std::cout << "Adding cells from L" << lev << " R" << reg << "...";			
 
 			// Construct input file name
 			std::string IN_FILE_NAME("./hdf_R" + std::to_string(reg) + "N" + std::to_string(lev) + ".h5");
@@ -297,7 +304,7 @@ int main(int argc, char* argv[])
 			hid_t input_sid = H5Screate_simple(1, dims_input, NULL);
 			if (input_sid <= 0) writeInfo("Cannot create input dataspace!", eHDF);
 
-			// Open, read into buffers and close input datasets
+			// Open, read into buffers information required for mesh definition and close input datasets
 			status = readDataset("/LatTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, Type);
 			if (status != 0)
 			{
@@ -400,7 +407,7 @@ int main(int argc, char* argv[])
 	std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
 	// Could also use CleanPolyGrid?
 
-	// Time loop
+	// Time loop and data addition
 	int count = 0; int missed_set_count;
 	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
 
@@ -416,6 +423,16 @@ int main(int argc, char* argv[])
 		LatTyp->SetName("LatTyp");
 		status = addDataToGrid("/LatTyp", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, LatTyp);
 		if (status == DATASET_READ_FAIL) missed_set_count++;
+
+		// MPI block data always read from Time_0
+		if (mpi_flag)
+		{
+			vtkSmartPointer<vtkIntArray> Block = vtkSmartPointer<vtkIntArray>::New();
+			Block->Allocate(unstructuredGrid->GetNumberOfCells());
+			Block->SetName("MpiBlockNumber");
+			status = addDataToGrid("/MpiBlock", "/Time_0", levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, Block);
+			if (status == DATASET_READ_FAIL) missed_set_count++;
+		}
 
 		vtkSmartPointer<vtkDoubleArray> RhoArray = vtkSmartPointer<vtkDoubleArray>::New();
 		RhoArray->Allocate(unstructuredGrid->GetNumberOfCells());

@@ -69,7 +69,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 250				///< How many timesteps before whole grid output
+#define L_OUT_EVERY 100				///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -90,13 +90,13 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 
 // Gravity
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 0.24
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 2500			///< Frequency of write out of restart file
@@ -139,13 +139,13 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 3		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.001	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 5.0		///< End of domain in X (non-dimensional units)
-#define L_BY 1.0		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0		///< End of domain in Z (non-dimensional units)
+#define L_BX 10.0		///< End of domain in X (non-dimensional units)
+#define L_BY 10.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -168,7 +168,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 50				///< Desired Reynolds number
+#define L_RE 10000			///< Desired Reynolds number
 
 
 /*
@@ -192,23 +192,23 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-//#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-//#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
+//#define L_UPSTREAM_TUNNEL		///< Adds an inlet to all faces except exit
+#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
 
 
 // Inlets
-//#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
+#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
 //#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
 //#define L_INLET_NRBC			///< Turn on NRBC at inlet
 
 
 // Outlets
-//#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
+#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
 //#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
 
 
 // Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 //#define L_WALL_FLOOR_ONLY
 #define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
@@ -223,17 +223,17 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 4		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)
-#define L_PADDING_X_MIN 0.0		///< Padding between X start of each sub-grid and its child edge
-#define L_PADDING_X_MAX 0.0		///< Padding between X end of each sub-grid and its child edge
-#define L_PADDING_Y_MIN 0.0		///< Padding between Y start of each sub-grid and its child edge
-#define L_PADDING_Y_MAX 0.0		///< Padding between Y end of each sub-grid and its child edge
-#define L_PADDING_Z_MIN 0.0		///< Padding between Z start of each sub-grid and its child edge
-#define L_PADDING_Z_MAX 0.0		///< Padding between Z end of each sub-grid and its child edge
+#define L_PADDING_X_MIN 0.2		///< Padding between X start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.5		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN 0.2		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_Y_MAX 0.2		///< Padding between Y end of each sub-grid and its child edge
+#define L_PADDING_Z_MIN 0.2		///< Padding between Z start of each sub-grid and its child edge
+#define L_PADDING_Z_MAX 0.2		///< Padding between Z end of each sub-grid and its child edge
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
@@ -242,19 +242,19 @@ static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 2.0 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.0 }
+	{ 6.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.3 }
+	{ 3.0 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.7 }
+	{ 7.0 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.3 }
+	{ 3.0 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.7 }
+	{ 7.0 }
 };
 
 #endif

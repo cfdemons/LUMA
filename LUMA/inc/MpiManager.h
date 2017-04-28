@@ -70,7 +70,7 @@ public :
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)
-	MPI_Comm subGrid_comm[L_NUM_LEVELS*L_NUM_REGIONS];	
+	MPI_Comm subGrid_comm[L_NUM_LEVELS * L_NUM_REGIONS];	
 #else
 	MPI_Comm subGrid_comm[1];	// Default to size = 1
 #endif

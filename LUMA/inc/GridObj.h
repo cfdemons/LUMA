@@ -113,9 +113,9 @@ public :
 	int N_lim;			///< Local size of grid in X-direction
 	int M_lim;			///< Local size of grid in Y-direction
 	int K_lim;			///< Local size of grid in Z-direction
-	double XOrigin;		///< Position of grid left edge
-	double YOrigin;		///< Position of grid bottom edge
-	double ZOrigin;		///< Position of grid front edge
+	DEPRECATED double XOrigin;		///< Position of grid left edge
+	DEPRECATED double YOrigin;		///< Position of grid bottom edge
+	DEPRECATED double ZOrigin;		///< Position of grid front edge
 
 
 	/************** Member Methods **************/

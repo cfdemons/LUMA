@@ -384,15 +384,6 @@ void GridObj::LBM_initGrid() {
 
 #endif	// L_BUILD_FOR_MPI
 
-	// Absolute origins (position of first site on grid)
-	XOrigin = dh / 2.0;
-	YOrigin = dh / 2.0;
-#if (L_DIMS == 3)
-	ZOrigin = dh / 2.0;
-#else
-	ZOrigin = 0.0;
-#endif
-
 	
 
 	// Define TYPING MATRICES
@@ -560,16 +551,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	LBM_initPositionVector(pGrid.ZPos[CoarseLimsZ[eMinimum]] - dh / 2.0, pGrid.ZPos[CoarseLimsZ[eMaximum]] - dh / 2.0, eZDirection);
 #else
 	ZPos.insert( ZPos.begin(), 0.0 ); // 2D default
-#endif
-		
-
-	// Global edge origins (voxel centre position of first cell on grid)
-	XOrigin = gm->global_edges[eXMin][gm_idx] + dh / 2;
-	YOrigin = gm->global_edges[eYMin][gm_idx] + dh / 2;
-#if (L_DIMS == 3)
-	ZOrigin = gm->global_edges[eZMin][gm_idx] + dh / 2;
-#else
-	ZOrigin = 0.0;
 #endif
 
 	

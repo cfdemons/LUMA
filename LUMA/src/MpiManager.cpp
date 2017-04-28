@@ -666,9 +666,9 @@ int MpiManager::mpi_getOpposite(int direction) {
 ///
 ///	\param	grid_man	pointer to non-null grid manager.
 int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
-
-	*GridUtils::logfile << "Creating infrastructure for HDF5...";
-
+	
+	L_INFO("Creating infrastructure for HDF5...", GridUtils::logfile);
+	
 	// Declarations
 	int status = 0;
 	int colour;							// Colour indicates which new communicator this process belongs to
@@ -682,7 +682,8 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 		for (int lev = 1; lev <= L_NUM_LEVELS; lev++) {
 
 #if defined L_HDF_DEBUG
-			*logout << "Looking to add sub-grid L" << lev << " R" << reg << " to writable communicator...";
+			L_INFO("MpiManager: Looking to add sub-grid L" + std::to_string(lev) +
+				" R" + std::to_string(reg) + " to writable communicator...", GridUtils::logfile);
 #endif
 
 			// Try gain access to the sub-grid on this rank
@@ -694,7 +695,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			{
 
 #if defined L_HDF_DEBUG
-				*logout << "Grid Found." << std::endl;
+				L_INFO("Grid Found.", GridUtils::logfile);
 #endif
 
 				if (grid_man->createWritableDataStore(targetGrid))
@@ -718,7 +719,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 				colour = MPI_UNDEFINED;
 
 #if defined L_HDF_DEBUG
-				*logout << "Grid not found." << std::endl;
+				L_INFO("Grid NOT found.", GridUtils::logfile);
 #endif
 			}
 
@@ -732,11 +733,16 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			// Only write out communicator info if this rank was added to the communicator
 			if (colour != MPI_UNDEFINED)
 			{
-				*logout << "Grid has writable data of size " << grid_man->p_data.back().writable_data_count <<
-					": Region " << reg << ", Level " << lev <<
-					" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] <<
-					" and colour " << colour << std::endl;
+				L_INFO("Grid has writable data of size " + std::to_string(grid_man->p_data.back().writable_data_count)
+					+ ": Region " + std::to_string(reg) + ", Level " + std::to_string(lev)
+					+ " has communicator value: " + std::to_string(subGrid_comm[lev + reg * L_NUM_LEVELS])
+					+ " and colour " + std::to_string(colour), GridUtils::logfile);
 			}
+			else
+			{
+				L_INFO("Grid has no writable data", GridUtils::logfile);
+			}
+
 #endif
 
 		}
@@ -1211,7 +1217,7 @@ void MpiManager::mpi_smartDecompose(double dh)
 	GridManager *gman = GridManager::getInstance();
 	bool bSolutionFound = false;
 	
-	// Work out ideal number of cells / core for 100 balance
+	// Work out ideal number of cells / core for 100% balance
 	double blockBounds[6];
 	blockBounds[eXMin] = gman->global_edges[eXMin][0];
 	blockBounds[eXMax] = gman->global_edges[eXMax][0];
@@ -1227,9 +1233,22 @@ void MpiManager::mpi_smartDecompose(double dh)
 		// Run algorithm with ideal target cells
 		eSDReturnType status = mpi_SDCompute(idealCellsPerCore);
 
-		// If required to shrink the target cell count by 10%
+		// If required to shrink the target cell count by 1%
 		if (status == eSDShrinkTarget)
-			idealCellsPerCore = static_cast<long>(static_cast<int>(idealCellsPerCore)* 0.9);
+		{
+			long newCellsPerCore = static_cast<long>(static_cast<double>(idealCellsPerCore)* 0.99);
+
+			// If resolution so coarse that a 1% shrink doesn't do anything then just deduct 1 cell
+			if (newCellsPerCore == idealCellsPerCore)
+				newCellsPerCore = idealCellsPerCore - 1;
+
+			// Cannot be zero
+			if (newCellsPerCore == 0)
+				L_ERROR("Smart decomposition failed -- no compatible target cell count available!", GridUtils::logfile);
+
+			// Update target cells per core for next iteration
+			idealCellsPerCore = newCellsPerCore;
+		}
 
 		// If OK to proceed then the solution has been found
 		else if (status == eSDProceed)

@@ -312,10 +312,10 @@ int main( int argc, char* argv[] )
 	
 	// Compute buffer sizes
 	mpim->mpi_buffer_size();
-
+	
 	//  Build writable data for all grids and sub-grid communicators
 	mpim->mpi_buildCommunicators(gm);
-
+	
 	// Compute load balance information
 	mpim->mpi_updateLoadInfo(gm);
 
@@ -342,7 +342,15 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
+#ifdef L_BUILD_FOR_MPI
+	// Barrier before recording completion of initialisation
+	MPI_Barrier(mpim->world_comm);
+#endif
+
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
+
+	if (rank == 0)
+		std::cout << "Initialisation complete. Starting LBM time-stepping..." << std::endl;
 
 
 	/*

@@ -1,5 +1,8 @@
 version		=	1.4.3-alpha
 
+General		:	Updated the HDF5 output and the merge tool to include MPI block labels to make decomposition more apparent.
+				Fixed an untracked bug in the HDF5 writer which would cause a hang on certain MPI/sub-grid combos.
+
 Issue #131	:	More intelligent algorithm implemented for constructing MPI block sizes. Not a perfect solution but certainly improves the imbalance.
 				Only a first pass for now -- any scenario which breaks the algorithm should be added to the tracker.
 

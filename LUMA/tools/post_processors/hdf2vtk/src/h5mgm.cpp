@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
 
 			// Debug
 			int local_point_count = 0;
-			std::cout << "Adding cells from L" << lev << " R" << reg << "...";			
+			std::cout << "Adding cells from L" << lev << " R" << reg << "..." << std::endl;			
 
 			// Construct input file name
 			std::string IN_FILE_NAME("./hdf_R" + std::to_string(reg) + "N" + std::to_string(lev) + ".h5");

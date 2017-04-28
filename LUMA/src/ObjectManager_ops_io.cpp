@@ -692,9 +692,10 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	double shift_y = (body_start_y + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 
 	// z-shift based on centre of object
-	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-	double z_start_position = body_centre_z - (scaled_body_length / 2);
-	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
+	double scaled_body_length = scale_factor * std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
+	scaled_body_length = std::round(scaled_body_length / g->dh) * g->dh;	// Round to nearest voxels
+	double z_start_position = body_centre_z - (scaled_body_length / 2.0);
+	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());	
 
 	// Declare local indices
 	std::vector<int> ijk;

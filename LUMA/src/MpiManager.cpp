@@ -1107,6 +1107,10 @@ eSDReturnType MpiManager::mpi_SDCompute(long targetCellCount)
 				rank_number = j + i * L_MPI_YCORES;
 #endif
 
+				// Log progress
+				L_INFO("Smart Decomposition: Solving block " + std::to_string(rank_number) + 
+					" / " + std::to_string((L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES) - 1), GridUtils::logfile);
+
 				// Get the bounds for this block from the unknowns
 				blockBounds[eXMin] = X_unknowns[i];
 				blockBounds[eXMax] = X_unknowns[i + 1];
@@ -1146,7 +1150,7 @@ eSDReturnType MpiManager::mpi_SDCompute(long targetCellCount)
 						bBlockSolved = true;
 
 					// If we are getting further away from the target
-					else if (currentDistanceFromIdeal > previousDistanceFromIdeal)
+					else if (currentDistanceFromIdeal >= previousDistanceFromIdeal)
 					{
 						// Swap direction and iterate again
 						if (perturbationDirection == 1)
@@ -1227,6 +1231,9 @@ void MpiManager::mpi_smartDecompose(double dh)
 	blockBounds[eZMax] = gman->global_edges[eZMax][0];
 	long idealCellsPerCore = gman->getActiveCellCount(&blockBounds[0]) / numProcs;
 
+	// Log use of SD
+	L_INFO("Using Smart Decomposition...", GridUtils::logfile);
+
 	// Loop over different target cell counts
 	while (!bSolutionFound)
 	{
@@ -1236,6 +1243,8 @@ void MpiManager::mpi_smartDecompose(double dh)
 		// If required to shrink the target cell count by 1%
 		if (status == eSDShrinkTarget)
 		{
+			L_WARN("Smart Decomposition failed. Shrinking target cell count. Retrying... ", GridUtils::logfile);
+
 			long newCellsPerCore = static_cast<long>(static_cast<double>(idealCellsPerCore)* 0.99);
 
 			// If resolution so coarse that a 1% shrink doesn't do anything then just deduct 1 cell
@@ -1243,7 +1252,7 @@ void MpiManager::mpi_smartDecompose(double dh)
 				newCellsPerCore = idealCellsPerCore - 1;
 
 			// Cannot be zero
-			if (newCellsPerCore == 0)
+			if (newCellsPerCore <= 0)
 				L_ERROR("Smart decomposition failed -- no compatible target cell count available!", GridUtils::logfile);
 
 			// Update target cells per core for next iteration

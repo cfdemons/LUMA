@@ -346,13 +346,13 @@ int main( int argc, char* argv[] )
 	// Barrier before recording completion of initialisation
 	MPI_Barrier(mpim->world_comm);
 #endif
-
+	
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 
 	if (rank == 0)
 		std::cout << "Initialisation complete. Starting LBM time-stepping..." << std::endl;
 
-
+	
 	/*
 	****************************************************************************
 	***************************** IB-LBM PROCEDURE *****************************

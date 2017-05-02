@@ -113,7 +113,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
 
 
 /*
@@ -124,12 +124,13 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 6		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
 
 // Balanced decomposition
 #define L_MPI_SMART_DECOMPOSE
+#define L_MPI_SD_MAX_ITER 5000
 
 /*
 *******************************************************************************
@@ -138,7 +139,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 7		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 
@@ -178,7 +179,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //

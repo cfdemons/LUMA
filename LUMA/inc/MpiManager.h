@@ -18,6 +18,7 @@
 
 #include "stdafx.h"
 #include "HDFstruct.h"
+#include <random>
 class GridObj;
 class GridManager;
 
@@ -139,9 +140,12 @@ public :
 	int mpi_buildCommunicators(GridManager* const grid_man);	// Create a new communicator for each sub-grid and region combo
 	void mpi_updateLoadInfo(GridManager* const grid_man);		// Method to compute the number of active cells on the rank and pass to master
 	void mpi_uniformDecompose(int *numCells, int *numCores);	// Method to perform uniform decomposition into MPI blocks
-	void mpi_smartDecompose(double dh);							// Method to perform load-balanced decomposition into MPI blocks
-	eSDReturnType mpi_SDCompute(long targetCellCount);
-	eSDReturnType mpi_SDInitialise(double *blockBounds, int &var, int i, int j, int k);
+	void mpi_smartDecompose(double dh, int *numCores);			// Method to perform load-balanced decomposition into MPI blocks
+	void mpi_SDReconstructSolution(std::vector<double>& theta,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
+	bool mpi_SDCheckTheta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
+	float mpi_SDComputeImbalance(std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

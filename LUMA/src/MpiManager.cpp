@@ -230,7 +230,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 
 	// Compute block sizes based on chosen algorithm
 #ifdef L_MPI_SMART_DECOMPOSE
-	mpi_smartDecompose(dh);
+	mpi_smartDecompose(dh, &numCores[0]);
 #else
 	mpi_uniformDecompose(&numCells[0], &numCores[0]);
 #endif
@@ -902,310 +902,125 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 }
 
 // ************************************************************************* //
-/// \brief	Initialise the block bounds based on the edge to be varied.
+/// \brief	Checks whether the perturbation vector is valid.
 ///
-///	\param	blockBounds	reference to the block bounds array for the next compute.
-///	\return				special indicator for returning action required.
-eSDReturnType MpiManager::mpi_SDInitialise(double *blockBounds, int &var, int i, int j, int k)
+///			Also reconstructs the solution vector at the same time.
+///
+///	\param	theta			vector of variable block edges.
+///	\param	delta			perturbation vector.
+///	\param[out]	thetaNew	perturbed vector of variable block edges.
+///	\param[out]	XSol		X solution vector.
+///	\param[out]	YSol		Y solution vector.
+///	\param[out]	ZSol		Z solution vector.
+///	\returns				inidication whether the perturbation is valid or not.
+bool MpiManager::mpi_SDCheckTheta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
 {
-	// Locate the unknown parameter to be varied and snap other bounds to voxel edge
-	var = -1;
-	double dh = L_BX / static_cast<double>(L_N);
-	for (int p = 0; p < 6; ++p)
-	{
-		if (blockBounds[p] < 0)
-		{
-			var = p;
-		}
-		else
-		{
-			/* Find number of partial cells between grid origin and position.
-			* Round then convert back to position. */
-			blockBounds[p] = std::round(blockBounds[p] / dh) * dh;
-		}
+	// Create perturbed variable vector
+	for (size_t p = 0; p < theta.size(); ++p)
+		thetaNew[p] = theta[p] + delta[p];
 
+	// Reconstruct the solution vector
+	mpi_SDReconstructSolution(thetaNew, XSol, YSol, ZSol);
+
+	// Check validity of edges
+	bool bIsValid = true;
+	int i = 0;
+	for (i = 1; i < L_MPI_XCORES; ++i)
+	{
+		if (XSol[i] <= XSol[i - 1])
+			bIsValid = false;
+		if (XSol[i] >= XSol[i + 1])
+			bIsValid = false;
 	}
-	if (var == -1) return eSDNoUnknown;	// No unknown to be found in this block
-
-	// Set boundary to default value or snap to grid edge if last block
-	switch (var)
+	for (i = 1; i < L_MPI_YCORES; ++i)
 	{
-	case eXMin:
-
-		// Set default -- snapped to coarse grid voxel edge
-		blockBounds[var] = std::round((blockBounds[eXMax] - (L_BX / L_MPI_XCORES)) / dh) * dh;
-
-		// If last block then snap to grid edge
-		if (i == 0)
-		{
-			blockBounds[var] = 0.0;
-			return eSDSnappedToEdges;
-		}
-
-		/* If not an edge block and default value is outside
-		* the grid then make grid cell target smaller and
-		* restart. */
-		else if (blockBounds[var] <= 0.0)
-			return eSDShrinkTarget;
-
-		break;
-
-	case eXMax:
-
-		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eXMin] + (L_BX / L_MPI_XCORES)) / dh) * dh;
-
-		if (i == L_MPI_XCORES - 1)
-		{
-			blockBounds[var] = L_BX;
-			return eSDSnappedToEdges;
-		}
-		else if (blockBounds[var] >= L_BX)
-			return eSDShrinkTarget;
-
-		break;
-
-	case eYMin:
-
-		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eYMax] - (L_BY / L_MPI_YCORES)) / dh) * dh;
-
-		if (j == 0)
-		{
-			blockBounds[var] = 0.0;
-			return eSDSnappedToEdges;
-		}
-		else if (blockBounds[var] <= 0.0)
-			return eSDShrinkTarget;
-
-		break;
-
-	case eYMax:
-
-		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eYMin] + (L_BY / L_MPI_YCORES)) / dh) * dh;
-
-		if (j == L_MPI_YCORES - 1)
-		{
-			blockBounds[var] = L_BY;
-			return eSDSnappedToEdges;
-		}
-		else if (blockBounds[var] >= L_BY)
-			return eSDShrinkTarget;
-
-		break;
-
-	case eZMin:
-
-		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eZMax] - (L_BZ / L_MPI_ZCORES)) / dh) * dh;
-
-		if (k == 0)
-		{
-			blockBounds[var] = 0.0;
-			return eSDSnappedToEdges;
-		}
-		else if (blockBounds[var] <= 0.0)
-			return eSDShrinkTarget;
-
-		break;
-
-	case eZMax:
-
-		blockBounds[var] = std::round((blockBounds[var] = blockBounds[eZMin] + (L_BZ / L_MPI_ZCORES)) / dh) * dh;
-
-		if (k == L_MPI_ZCORES - 1)
-		{
-			blockBounds[var] = L_BZ;
-			return eSDSnappedToEdges;
-		}
-		else if (blockBounds[var] >= L_BZ)
-			return eSDShrinkTarget;
-
-		break;
+		if (YSol[i] <= YSol[i - 1])
+			bIsValid = false;
+		if (YSol[i] >= YSol[i + 1])
+			bIsValid = false;
+	}
+	for (i = 1; i < L_MPI_ZCORES; ++i)
+	{
+		if (ZSol[i] <= ZSol[i - 1])
+			bIsValid = false;
+		if (ZSol[i] >= ZSol[i + 1])
+			bIsValid = false;
 	}
 
-	return eSDProceed;
+	return bIsValid;
 }
 
 // ************************************************************************* //
-/// \brief	Carry out the algorithm to compute the block sizes.
+/// \brief	Reassembles the solutions vectors given the vector of variable block edges.
 ///
-///	\param	targetCellCount	the number of cells the algorithm should ensure each block has.
-///	\return					special indicator for returning action required.
-eSDReturnType MpiManager::mpi_SDCompute(long targetCellCount)
+///	\param	theta		vector of variable block edges.
+///	\param	XSol		X solution vector.
+///	\param	YSol		Y solution vector.
+///	\param	ZSol		Z solution vector.
+void MpiManager::mpi_SDReconstructSolution(std::vector<double>& theta,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
 {
-	// Declarations
-	double blockBounds[6];
-	double blockBoundsOld[6];
-	unsigned int rank_number = 0;
-	long currentCellCount = 0;
-	long currentDistanceFromIdeal = 0;
-	long previousDistanceFromIdeal = std::numeric_limits<long>::max();
-	int perturbationDirection = 1;
-	int var = -1;
+	// 1D index for theta
+	int c = 0;
+	int i = 0;
+	for (i = 1; i < L_MPI_XCORES; ++i)
+	{
+		XSol[i] = theta[c];
+		c++;
+	}
+	for (i = 1; i < L_MPI_YCORES; ++i)
+	{
+		YSol[i] = theta[c];
+		c++;
+	}
+	for (i = 1; i < L_MPI_ZCORES; ++i)
+	{
+		ZSol[i] = theta[c];
+		c++;
+	}
 
-	// Grids not initialised yet so have to compute base resolution from compile time data
-	double dh = L_BX / static_cast<double>(L_N);
+}
 
-	/* The variables in this problem are the location of the block boundaries.
-	* Since faces of adjacent blocks must be conincident the problem reduces
-	* to find the unknowns of which there are (XCORES + YCORES + ZCORES + L_DIMS).
-	* The left-hand set of block boundaries are aligned with the domain origin so
-	* in practise we have (XCORES + YCORES + ZCORES) unknowns.
-	*
-	* The algorithm is executed as an initial value problem with perturbations.
-	* The first block has L_DIMS remaining unknowns to define it size after
-	* fixing the left-hand edges. We therefore need to reduce this to a single
-	* unknown by supplying (L_DIMS - 1) extra conditions. We do this by fixing
-	* the dimensions of the block in the least significant direction.
-	*
-	* Solution of the remaining unknowns may then proceed as a nested loop over
-	* each of the problem dimensions in any order. Each block only has a single
-	* unknown to find. For each block, this single unknown is found by setting
-	* a default value and then perturbing it in one direction. The active cell
-	* count for the new value can then be retrieved. A 2-point gradient
-	* estimation can determine whether the direction of perturbation is correct.
-	* Once the direction is correct, the process proceeds and resorts to
-	* bisection to find the value that achieves the desired active cell count.
-	* Termination conditions can be set based on the limits of the domain size
-	* as the block edges cannot be zero or greater than the domain edges so
-	* the method should naturally exit at these points. */
-	bool bSuggestShrinking = false;
-	bool bBlockSolved = false;
+// ************************************************************************* //
+/// \brief	Populate the active cell counts for the given block configuration.
+///
+///	\param	XSol		X solution vector.
+///	\param	YSol		Y solution vector.
+///	\param	ZSol		Z solution vector.
+///	\returns			imbalance measure as the difference between the heaviest 
+///						and lightest block as a percentage of the heaviest.
+float MpiManager::mpi_SDComputeImbalance(std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+{
+	size_t count = 0;
+	size_t countMax = 0;
+	size_t countMin = std::numeric_limits<size_t>::max();
 
-	// Set up the unknown block edges with invalid values
-	std::vector<double> X_unknowns(L_MPI_XCORES + 1, -1.0);
-	std::vector<double> Y_unknowns(L_MPI_YCORES + 1, -1.0);
-	std::vector<double> Z_unknowns(L_MPI_ZCORES + 1, -1.0);
-
-	// Fix unknowns for starting block (default block 0)
-	X_unknowns[0] = 0.0;
-	Y_unknowns[0] = 0.0;
-	Z_unknowns[0] = 0.0;
-
-	// Extra closure conditions
-	Y_unknowns[1] = L_BY / static_cast<double>(L_MPI_YCORES);
-	Z_unknowns[1] = L_BZ / static_cast<double>(L_MPI_ZCORES);
-
-	// Loop and solve for remaining unknowns
+	// Construct bounds for each block and then find active cell count from grid manager
+	double bounds[6];
 	for (int i = 0; i < L_MPI_XCORES; ++i)
 	{
 		for (int j = 0; j < L_MPI_YCORES; ++j)
 		{
-#if (L_DIMS == 3)
 			for (int k = 0; k < L_MPI_ZCORES; ++k)
-#else
-			int k = 0;
-#endif
 			{
-				// Set perturbation direction to positive and reset perturbation variable
-				perturbationDirection = 1;
-				var = -1;
-				bBlockSolved = false;
+				bounds[eXMin] = XSol[i];
+				bounds[eXMax] = XSol[i + 1];
+				bounds[eYMin] = YSol[j];
+				bounds[eYMax] = YSol[j + 1];
+				bounds[eZMin] = ZSol[k];
+				bounds[eZMax] = ZSol[k + 1];
+				count = GridManager::getInstance()->getActiveCellCount(&bounds[0]);
 
-				// MPI numbers in Z, then Y, then X
-#if (L_DIMS == 3)
-				rank_number = k + j * L_MPI_ZCORES + i * L_MPI_ZCORES * L_MPI_YCORES;
-#else
-				rank_number = j + i * L_MPI_YCORES;
-#endif
+				// Update the extremes
+				if (count > countMax) countMax = count;
+				if (count < countMin) countMin = count;
 
-				// Log progress
-				L_INFO("Smart Decomposition: Solving block " + std::to_string(rank_number) + 
-					" / " + std::to_string((L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES) - 1), GridUtils::logfile);
+			}
+		}
+	}
 
-				// Get the bounds for this block from the unknowns
-				blockBounds[eXMin] = X_unknowns[i];
-				blockBounds[eXMax] = X_unknowns[i + 1];
-				blockBounds[eYMin] = Y_unknowns[j];
-				blockBounds[eYMax] = Y_unknowns[j + 1];
-				blockBounds[eZMin] = Z_unknowns[k];
-				blockBounds[eZMax] = Z_unknowns[k + 1];
-
-				// Initialise the block size with default values
-				eSDReturnType status = mpi_SDInitialise(blockBounds, var, i, j, k);
-
-				// Do we need to restart?
-				if (status == eSDShrinkTarget)
-					return eSDShrinkTarget;
-
-				// No unknowns for this block so use current bounds
-				else if (status == eSDNoUnknown)
-					bBlockSolved = true;
-
-				// Snapped to edges so block bounds are solved
-				else if (status == eSDSnappedToEdges)
-					bBlockSolved = true;
-
-
-				// Run perturbation loop on the block if not marked as solved
-				while (!bBlockSolved)
-				{
-
-					// Get active cell count for blocks bounds
-					currentCellCount = GridManager::getInstance()->getActiveCellCount(&blockBounds[0]);
-
-					// Check how far away we are from the target
-					currentDistanceFromIdeal = abs(targetCellCount - currentCellCount);
-
-					// If we have achieved the target cell count then use these block settings
-					if (currentDistanceFromIdeal == 0)
-						bBlockSolved = true;
-
-					// If we are getting further away from the target
-					else if (currentDistanceFromIdeal >= previousDistanceFromIdeal)
-					{
-						// Swap direction and iterate again
-						if (perturbationDirection == 1)
-							perturbationDirection = -1;
-
-						// If already swapped, use the previous setting as this was more accurate
-						else
-						{
-							blockBounds[var] = blockBoundsOld[var];
-							bBlockSolved = true;
-						}
-					}
-
-					// If not solved, prepare for next iteration
-					if (!bBlockSolved)
-					{
-						// Copy block bounds to old array
-						memcpy(&blockBoundsOld[0], &blockBounds[0], sizeof(double) * 6);
-
-						// Adjust block boundary position by a single coarse cell
-						blockBounds[var] += (dh * perturbationDirection);
-
-						// Copy cell count for comparison with next iteration
-						previousDistanceFromIdeal = currentDistanceFromIdeal;					
-
-					}
-
-
-				} // End perturbation loop
-
-
-				// Current block bounds are to be used for this block
-				if (bBlockSolved)
-				{
-					// Update unknown vectors with solution for this block
-					X_unknowns[i] = blockBounds[eXMin];
-					X_unknowns[i + 1] = blockBounds[eXMax];
-					Y_unknowns[j] = blockBounds[eYMin];
-					Y_unknowns[j + 1] = blockBounds[eYMax];
-					Z_unknowns[k] = blockBounds[eZMin];
-					Z_unknowns[k + 1] = blockBounds[eZMax];
-
-					// Update arrays of block sizes in the manager taking into account overall size
-					cRankSizeX[rank_number] = static_cast<int>(std::round((blockBounds[eXMax] - blockBounds[eXMin]) / dh));
-					cRankSizeY[rank_number] = static_cast<int>(std::round((blockBounds[eYMax] - blockBounds[eYMin]) / dh));
-					cRankSizeZ[rank_number] = static_cast<int>(std::round((blockBounds[eZMax] - blockBounds[eZMin]) / dh));
-				}				
-
-			}	// End inner block loop
-
-		} // End middle block loop
-
-	}	// End outer block loop
-
-	return eSDProceed;
+	return (std::fabs(static_cast<float>(countMax)-static_cast<float>(countMin)) * 100.0f / static_cast<float>(countMax));
 
 }
 
@@ -1213,56 +1028,178 @@ eSDReturnType MpiManager::mpi_SDCompute(long targetCellCount)
 /// \brief	Populate the rank size arrays based on an algorithm that seeks to 
 ///			load balance.
 ///
-///	\param	dh	size of a voxel on the coarsest grid
-void MpiManager::mpi_smartDecompose(double dh)
+///	\param	dh			size of a voxel on the coarsest grid
+///	\param	numCores	pointer to an array holding the MPI core dimenions.
+void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 {
-	// Declarations
-	int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
-	GridManager *gman = GridManager::getInstance();
-	bool bSolutionFound = false;
-	
-	// Work out ideal number of cells / core for 100% balance
-	double blockBounds[6];
-	blockBounds[eXMin] = gman->global_edges[eXMin][0];
-	blockBounds[eXMax] = gman->global_edges[eXMax][0];
-	blockBounds[eYMin] = gman->global_edges[eYMin][0];
-	blockBounds[eYMax] = gman->global_edges[eYMax][0];
-	blockBounds[eZMin] = gman->global_edges[eZMin][0];
-	blockBounds[eZMax] = gman->global_edges[eZMax][0];
-	long idealCellsPerCore = gman->getActiveCellCount(&blockBounds[0]) / numProcs;
-
 	// Log use of SD
 	L_INFO("Using Smart Decomposition...", GridUtils::logfile);
 
-	// Loop over different target cell counts
-	while (!bSolutionFound)
+	// Data
+	int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
+	int p = (L_MPI_XCORES + L_MPI_YCORES + L_MPI_ZCORES) - 3;	// Number of unknowns
+	int rate = 10;						// Size of perturbation in coarse lattice sites
+	int max_sub_it = rate * p;			// Maximum number of perturbations to try per iteration
+	int i = 0;
+	int c = 0;
+	int *domainSize = new int[3];
+	domainSize[eXDirection] = L_N;
+	domainSize[eYDirection] = L_M;
+	domainSize[eZDirection] = L_K;
+
+	// Set up solution vector for variables	
+	std::vector<double> XSolution(L_MPI_XCORES + 1, -1 * dh);
+	std::vector<double> YSolution(L_MPI_YCORES + 1, -1 * dh);
+	std::vector<double> ZSolution(L_MPI_YCORES + 1, -1 * dh);
+
+	// Fix the edges as we know where they are
+	XSolution[0] = 0.0;
+	YSolution[0] = 0.0;
+	ZSolution[0] = 0.0;
+	XSolution.back() = L_BX;
+	YSolution.back() = L_BY;
+	ZSolution.back() = L_BZ;
+
+	// Create imbalance variable
+	double loadImbalance = 100.0;
+	
+	// Create theta vector with initial guesses (uniform decomposition)
+	std::vector<double> theta(p, 0.0);
+	std::vector<double> thetaNew(theta);
+	for (int d = 0; d < 3; ++d)
 	{
-		// Run algorithm with ideal target cells
-		eSDReturnType status = mpi_SDCompute(idealCellsPerCore);
+		// Coarse sites in a block if decomposed uniformly
+		int uniSpace = static_cast<int>(std::round(domainSize[d] / numCores[d]));
 
-		// If required to shrink the target cell count by 1%
-		if (status == eSDShrinkTarget)
+		// Upper edge of block is a variable
+		for (i = 0; i < numCores[d] - 1; ++i)
 		{
-			L_WARN("Smart Decomposition failed. Shrinking target cell count. Retrying... ", GridUtils::logfile);
+			theta[c] = (i + 1) * uniSpace * dh;
+			c++;
+		}
+	}
 
-			long newCellsPerCore = static_cast<long>(static_cast<double>(idealCellsPerCore)* 0.99);
+	// Create temporary arrays for intermediate solutions
+	std::vector<double> tmpX(XSolution);
+	std::vector<double> tmpY(YSolution);
+	std::vector<double> tmpZ(ZSolution);
+	double tmpImbalance;
 
-			// If resolution so coarse that a 1% shrink doesn't do anything then just deduct 1 cell
-			if (newCellsPerCore == idealCellsPerCore)
-				newCellsPerCore = idealCellsPerCore - 1;
+	// Perturbation vector and random integer generator
+	std::vector<double> delta(p, 0);
+	std::default_random_engine generator;
+	std::uniform_int_distribution<int> distribution(-1 * rate, 1 * rate);
 
-			// Cannot be zero
-			if (newCellsPerCore <= 0)
-				L_ERROR("Smart decomposition failed -- no compatible target cell count available!", GridUtils::logfile);
+	// Get initial count array and store in solution vectors
+	mpi_SDCheckTheta(theta, delta, thetaNew, XSolution, YSolution, ZSolution);
+	loadImbalance = mpi_SDComputeImbalance(XSolution, YSolution, ZSolution);
+	L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+	
+	// Start iteration
+	int k = 0;
+	while (k < L_MPI_SD_MAX_ITER)
+	{
 
-			// Update target cells per core for next iteration
-			idealCellsPerCore = newCellsPerCore;
+		// Reset counters and flags
+		c = 0;
+		bool bFoundDelta = false;
+		bool bIsImproving = true;
+
+		// Start sub-iterations of deltas
+		for (int sub = 0; sub < max_sub_it; ++sub)
+		{
+
+			// Set perturbation vector in range [-1 0 1] scaled by rate
+			for (int r = 0; r < p; ++r)
+				delta[r] = distribution(generator) * dh;
+
+			// See if theta is valid, if not try another sub-iteration
+			if (!mpi_SDCheckTheta(theta, delta, thetaNew, tmpX, tmpY, tmpZ))
+				continue;
+
+			// Increment valid perturbation counter
+			c++;
+
+			// Obtain new imbalance under the valid delta
+			tmpImbalance = mpi_SDComputeImbalance(tmpX, tmpY, tmpZ);
+
+			// If this perturbation decreases the overall imbalance then use it
+			if (tmpImbalance < loadImbalance)
+			{
+				bFoundDelta = true;
+				break;
+			}
 		}
 
-		// If OK to proceed then the solution has been found
-		else if (status == eSDProceed)
-			bSolutionFound = true;
+		// If no valid delta found then reduce rate (also max_sub_it might be too low)
+		if (!bFoundDelta)
+		{
+			rate--;
+			if (rate == 0) rate = 1;
+			//max_sub_it = rate * p;
+			distribution.param(std::uniform_int_distribution<int>::param_type(-1 * rate, 1 * rate));
+			k++;
+			continue;
+		}
 
+		// Update the solution with the solution computed using the new theta
+		XSolution = tmpX;
+		YSolution = tmpY;
+		ZSolution = tmpZ;
+		theta = thetaNew;
+		loadImbalance = tmpImbalance;
+
+		// Use new theta to drive solution in this direction until no longer improving
+		while (bIsImproving)
+		{
+
+			// Compute new theta
+			bIsImproving = mpi_SDCheckTheta(theta, delta, thetaNew, tmpX, tmpY, tmpZ);
+
+			// If next theta is valid update solution
+			if (bIsImproving)
+			{
+				// Get latest imbalance
+				tmpImbalance = mpi_SDComputeImbalance(tmpX, tmpY, tmpZ);
+
+				// If imbalance gets worse stop the loop
+				if (tmpImbalance - loadImbalance > 0)
+				{
+					bIsImproving = false;
+				}
+				// If not, update the solution
+				else
+				{
+					XSolution = tmpX;
+					YSolution = tmpY;
+					ZSolution = tmpZ;
+					theta = thetaNew;
+					loadImbalance = tmpImbalance;
+				}
+			}
+		}
+
+		// Increment k
+		k++;
+	}
+
+	L_INFO("Smart decomposition finished. Imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+
+	// Update ranks sizes from solution
+	int blockIdx = 0;
+	for (int i = 0; i < numCores[eXDirection]; i++)
+	{
+		for (int j = 0; j < numCores[eYDirection]; j++)
+		{
+			for (int k = 0; k < numCores[eZDirection]; k++)
+			{
+				// Update vectors
+				cRankSizeX[blockIdx] = static_cast<int>((XSolution[i + 1] - XSolution[i]) / dh);
+				cRankSizeY[blockIdx] = static_cast<int>((YSolution[j + 1] - YSolution[j]) / dh);
+				cRankSizeZ[blockIdx] = static_cast<int>((ZSolution[k + 1] - ZSolution[k]) / dh);
+				blockIdx++;
+			}
+		}
 	}
 }
 // ************************************************************************** //

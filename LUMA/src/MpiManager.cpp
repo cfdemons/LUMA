@@ -902,7 +902,8 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 }
 
 // ************************************************************************* //
-/// \brief	Checks whether the perturbation vector is valid.
+/// \brief	Checks whether the perturbation vector is valid and adjusts delta 
+///			if necessary.
 ///
 ///			Also reconstructs the solution vector at the same time.
 ///
@@ -912,43 +913,81 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 ///	\param[out]	XSol		X solution vector.
 ///	\param[out]	YSol		Y solution vector.
 ///	\param[out]	ZSol		Z solution vector.
-///	\returns				inidication whether the perturbation is valid or not.
-bool MpiManager::mpi_SDCheckTheta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
-	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+///	\param		dh			coarsest cell width.
+///	\returns				indication whether the perturbation was valid or not.
+bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh)
 {
-	// Create perturbed variable vector
+
+	// Declarations
+	bool bAdjustComplete = false;
+	bool bAdjusted = false;
+	unsigned int c = 0;
+
+	// Create perturbed variable vector using current delta
 	for (size_t p = 0; p < theta.size(); ++p)
 		thetaNew[p] = theta[p] + delta[p];
 
 	// Reconstruct the solution vector
 	mpi_SDReconstructSolution(thetaNew, XSol, YSol, ZSol);
 
-	// Check validity of edges
-	bool bIsValid = true;
-	int i = 0;
-	for (i = 1; i < L_MPI_XCORES; ++i)
+	// Loop
+	while (!bAdjustComplete)
 	{
-		if (XSol[i] <= XSol[i - 1])
-			bIsValid = false;
-		if (XSol[i] >= XSol[i + 1])
-			bIsValid = false;
-	}
-	for (i = 1; i < L_MPI_YCORES; ++i)
-	{
-		if (YSol[i] <= YSol[i - 1])
-			bIsValid = false;
-		if (YSol[i] >= YSol[i + 1])
-			bIsValid = false;
-	}
-	for (i = 1; i < L_MPI_ZCORES; ++i)
-	{
-		if (ZSol[i] <= ZSol[i - 1])
-			bIsValid = false;
-		if (ZSol[i] >= ZSol[i + 1])
-			bIsValid = false;
+		// Reset the adjusted flag
+		bAdjusted = false;		
+
+		// Check validity of edges and reset the delta if causes a problem
+		for (int i = 0; i < L_MPI_XCORES; ++i)
+		{
+			for (int j = 0; j < L_MPI_YCORES; ++j)
+			{
+				for (int k = 0; k < L_MPI_ZCORES; ++k)
+				{
+					// Nothing to change if on the last block
+					if (
+						i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+#if (L_DIMS == 3)
+						|| k == L_MPI_ZCORES - 1
+#endif
+						) continue;
+
+					// Perturbation cannot cause a block to have a zero size
+					if ((XSol[i + 1] - XSol[i]) < dh)
+					{
+						// Adjust delta such that size is equal to dh
+						c = i;
+						delta[c] = XSol[i] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						XSol[i + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+					if ((YSol[j + 1] - YSol[j]) < dh)
+					{
+						c = L_MPI_XCORES - 1 + j;
+						delta[c] = YSol[j] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						YSol[j + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+#if (L_DIMS == 3)
+					if ((ZSol[k + 1] - ZSol[k]) < dh)
+					{
+						c = L_MPI_XCORES + L_MPI_YCORES - 2 + k;
+						delta[c] = ZSol[k] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						ZSol[k + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+#endif
+				}
+			}
+		}
+		bAdjustComplete = true;
 	}
 
-	return bIsValid;
+	return !bAdjusted;
+
 }
 
 // ************************************************************************* //
@@ -985,12 +1024,15 @@ void MpiManager::mpi_SDReconstructSolution(std::vector<double>& theta,
 // ************************************************************************* //
 /// \brief	Populate the active cell counts for the given block configuration.
 ///
-///	\param	XSol		X solution vector.
-///	\param	YSol		Y solution vector.
-///	\param	ZSol		Z solution vector.
-///	\returns			imbalance measure as the difference between the heaviest 
-///						and lightest block as a percentage of the heaviest.
-float MpiManager::mpi_SDComputeImbalance(std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+///	\param[out]	heaviestBlock	vector of block indices in MPI topology number 
+///								that has the heaviest load.
+///	\param		XSol			X solution vector.
+///	\param		YSol			Y solution vector.
+///	\param		ZSol			Z solution vector.
+///	\returns					imbalance measure as the difference between the heaviest 
+///								and lightest block as a percentage of the heaviest.
+float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
 {
 	size_t count = 0;
 	size_t countMax = 0;
@@ -1013,7 +1055,13 @@ float MpiManager::mpi_SDComputeImbalance(std::vector<double>& XSol, std::vector<
 				count = GridManager::getInstance()->getActiveCellCount(&bounds[0]);
 
 				// Update the extremes
-				if (count > countMax) countMax = count;
+				if (count > countMax)
+				{
+					countMax = count;
+					heaviestBlock[eXDirection] = i;
+					heaviestBlock[eYDirection] = j;
+					heaviestBlock[eZDirection] = k;
+				}
 				if (count < countMin) countMin = count;
 
 			}
@@ -1051,6 +1099,7 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 	std::vector<double> XSolution(L_MPI_XCORES + 1, -1 * dh);
 	std::vector<double> YSolution(L_MPI_YCORES + 1, -1 * dh);
 	std::vector<double> ZSolution(L_MPI_YCORES + 1, -1 * dh);
+	std::vector<unsigned int> heaviestBlock(3);
 
 	// Fix the edges as we know where they are
 	XSolution[0] = 0.0;
@@ -1079,105 +1128,97 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 		}
 	}
 
-	// Create temporary arrays for intermediate solutions
+	// Perturbation vector
+	std::vector<double> delta(p, 0);
+
+	// Populate initial solution vectors
+	mpi_SDCheckDelta(theta, delta, thetaNew, XSolution, YSolution, ZSolution, dh);
+	loadImbalance = mpi_SDComputeImbalance(heaviestBlock, XSolution, YSolution, ZSolution);
+	L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+
+	// Temporaries
 	std::vector<double> tmpX(XSolution);
 	std::vector<double> tmpY(YSolution);
 	std::vector<double> tmpZ(ZSolution);
-	double tmpImbalance;
-
-	// Perturbation vector and random integer generator
-	std::vector<double> delta(p, 0);
-	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(-1 * rate, 1 * rate);
-
-	// Get initial count array and store in solution vectors
-	mpi_SDCheckTheta(theta, delta, thetaNew, XSolution, YSolution, ZSolution);
-	loadImbalance = mpi_SDComputeImbalance(XSolution, YSolution, ZSolution);
-	L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+	float tmpImbalance;
 	
 	// Start iteration
 	int k = 0;
+	double midHeavyBlockX, midHeavyBlockY, midHeavyBlockZ;
+	double midCurrentBlockX, midCurrentBlockY, midCurrentBlockZ;
+	double dirX, dirY, dirZ;
 	while (k < L_MPI_SD_MAX_ITER)
 	{
 
-		// Reset counters and flags
-		c = 0;
-		bool bFoundDelta = false;
-		bool bIsImproving = true;
+		// Set perturbation directions by driving towards heaviest block
+		midHeavyBlockX =
+			(tmpX[heaviestBlock[eXDirection] + 1] + tmpX[heaviestBlock[eXDirection]]) / 2.0;
+		midHeavyBlockY =
+			(tmpY[heaviestBlock[eYDirection] + 1] + tmpY[heaviestBlock[eYDirection]]) / 2.0;
+		midHeavyBlockZ =
+			(tmpZ[heaviestBlock[eZDirection] + 1] + tmpZ[heaviestBlock[eZDirection]]) / 2.0;
 
-		// Start sub-iterations of deltas
-		for (int sub = 0; sub < max_sub_it; ++sub)
+		for (int i = 0; i < numCores[eXDirection]; i++)
 		{
-
-			// Set perturbation vector in range [-1 0 1] scaled by rate
-			for (int r = 0; r < p; ++r)
-				delta[r] = distribution(generator) * dh;
-
-			// See if theta is valid, if not try another sub-iteration
-			if (!mpi_SDCheckTheta(theta, delta, thetaNew, tmpX, tmpY, tmpZ))
-				continue;
-
-			// Increment valid perturbation counter
-			c++;
-
-			// Obtain new imbalance under the valid delta
-			tmpImbalance = mpi_SDComputeImbalance(tmpX, tmpY, tmpZ);
-
-			// If this perturbation decreases the overall imbalance then use it
-			if (tmpImbalance < loadImbalance)
+			for (int j = 0; j < numCores[eYDirection]; j++)
 			{
-				bFoundDelta = true;
-				break;
+				for (int k = 0; k < numCores[eZDirection]; k++)
+				{
+					if	(
+						i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+#if (L_DIMS == 3)
+						|| k == L_MPI_ZCORES - 1
+#endif
+						) continue;
+
+					// Compute middle of current block
+					midCurrentBlockX = (tmpX[i + 1] + tmpX[i]) / 2.0;
+					midCurrentBlockY = (tmpY[j + 1] + tmpY[j]) / 2.0;
+					midCurrentBlockZ = (tmpZ[k + 1] + tmpZ[k]) / 2.0;
+
+					// Compute direction to heaviest block
+					dirX = midHeavyBlockX - midCurrentBlockX;
+					dirY = midHeavyBlockY - midCurrentBlockY;
+					dirZ = midHeavyBlockZ - midCurrentBlockZ;
+
+					// Set deltas					
+					if (dirX == 0)
+						delta[i] = -dh;
+					else
+						delta[i] = (dirX / std::fabs(dirX)) * dh;
+
+					if (dirY == 0)
+						delta[L_MPI_XCORES - 1 + j] = -dh;
+					else
+						delta[L_MPI_XCORES - 1 + j] = (dirY / std::fabs(dirY)) * dh;
+
+#if (L_DIMS == 3)
+					if (dirZ == 0)
+						delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = -dh;
+					else
+						delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = (dirZ / std::fabs(dirZ)) * dh;
+#endif
+				}
 			}
 		}
 
-		// If no valid delta found then reduce rate (also max_sub_it might be too low)
-		if (!bFoundDelta)
+		// Check and adjust delta if necessary
+		mpi_SDCheckDelta(theta, delta, thetaNew, tmpX, tmpY, tmpZ, dh);
+
+		// Obtain new imbalance under the adjusted delta
+		tmpImbalance = mpi_SDComputeImbalance(heaviestBlock, tmpX, tmpY, tmpZ);
+
+		// If better than current solution, update
+		if (tmpImbalance <= loadImbalance)
 		{
-			rate--;
-			if (rate == 0) rate = 1;
-			//max_sub_it = rate * p;
-			distribution.param(std::uniform_int_distribution<int>::param_type(-1 * rate, 1 * rate));
-			k++;
-			continue;
+			loadImbalance = tmpImbalance;
+			XSolution = tmpX;
+			YSolution = tmpY;
+			ZSolution = tmpZ;
 		}
 
-		// Update the solution with the solution computed using the new theta
-		XSolution = tmpX;
-		YSolution = tmpY;
-		ZSolution = tmpZ;
+		// Update theta
 		theta = thetaNew;
-		loadImbalance = tmpImbalance;
-
-		// Use new theta to drive solution in this direction until no longer improving
-		while (bIsImproving)
-		{
-
-			// Compute new theta
-			bIsImproving = mpi_SDCheckTheta(theta, delta, thetaNew, tmpX, tmpY, tmpZ);
-
-			// If next theta is valid update solution
-			if (bIsImproving)
-			{
-				// Get latest imbalance
-				tmpImbalance = mpi_SDComputeImbalance(tmpX, tmpY, tmpZ);
-
-				// If imbalance gets worse stop the loop
-				if (tmpImbalance - loadImbalance > 0)
-				{
-					bIsImproving = false;
-				}
-				// If not, update the solution
-				else
-				{
-					XSolution = tmpX;
-					YSolution = tmpY;
-					ZSolution = tmpZ;
-					theta = thetaNew;
-					loadImbalance = tmpImbalance;
-				}
-			}
-		}
 
 		// Increment k
 		k++;

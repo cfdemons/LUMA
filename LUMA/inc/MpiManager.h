@@ -18,7 +18,6 @@
 
 #include "stdafx.h"
 #include "HDFstruct.h"
-#include <random>
 class GridObj;
 class GridManager;
 
@@ -143,9 +142,10 @@ public :
 	void mpi_smartDecompose(double dh, int *numCores);			// Method to perform load-balanced decomposition into MPI blocks
 	void mpi_SDReconstructSolution(std::vector<double>& theta,
 		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
-	bool mpi_SDCheckTheta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+	float mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
 		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
-	float mpi_SDComputeImbalance(std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
+	bool mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh);
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

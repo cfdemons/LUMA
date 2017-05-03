@@ -41,9 +41,9 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
@@ -52,7 +52,7 @@
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
-#define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
+//#define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
 
 
 /*
@@ -126,7 +126,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_MPI_XCORES 6		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-#define L_MPI_ZCORES 2
+#define L_MPI_ZCORES 4
 
 // Balanced decomposition
 #define L_MPI_SMART_DECOMPOSE
@@ -179,7 +179,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //

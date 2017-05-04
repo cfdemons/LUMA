@@ -151,7 +151,7 @@ int main( int argc, char* argv[] )
 
 	// Create the Grid Manager
 	GridManager *gm = GridManager::getInstance();
-	
+
 #ifdef L_BUILD_FOR_MPI
 	// Decompose the domain
 	mpim->mpi_gridbuild(gm);

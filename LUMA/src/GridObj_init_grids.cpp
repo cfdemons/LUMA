@@ -1032,6 +1032,14 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Complete." << std::endl;
+
+	// Write out the position vectors
+	if (dir == eXDirection) *GridUtils::logfile << "XPos: ";
+	else if (dir == eYDirection) *GridUtils::logfile << "YPos: ";
+	else if (dir == eZDirection) *GridUtils::logfile << "ZPos: ";
+	for (size_t i = 0; i < arr->size(); ++i)
+		*GridUtils::logfile << std::to_string((*arr)[i]) << " ";
+	*GridUtils::logfile << "...Complete." << std::endl;
 #endif
 }
 
@@ -1146,7 +1154,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] == dh / 2) {		// Wall found
+		if (XPos[i] <= dh / 2.0) {		// Wall found
 
 			// Label inlet
 			for (j = 0; j < M_lim; j++) {
@@ -1168,7 +1176,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] == L_BX - dh / 2) {		// Wall found
+		if (XPos[i] >= L_BX - dh / 2.0) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {

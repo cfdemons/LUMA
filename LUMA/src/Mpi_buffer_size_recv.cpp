@@ -75,7 +75,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj* const g) {
 		{
 
 		case 0:
-			// Right
+			// Right (but receiving from rank on left)
 		
 			// Examine possible inner and outer buffer locations
 			for (range_i_left) {
@@ -103,7 +103,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj* const g) {
 			break;
 
 		case 1:
-			// Left
+			// Left (but receiving from rank on right)
 		
 
 			for (range_i_right) {
@@ -760,7 +760,7 @@ void MpiManager::mpi_buffer_size_recv(GridObj* const g) {
 		}
 
 		// Store the count of sites in the MpiManager buffer_info structure
-		buffer_recv_info.back().size[dir] = count;	
+		buffer_recv_info.back().size[dir] = count;
 	}
 
 }

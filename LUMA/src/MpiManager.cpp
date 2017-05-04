@@ -497,17 +497,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			// Use a blocking receive call if required
 			MPI_Recv( &f_buffer_recv[dir].front(), static_cast<int>(f_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
 				TAG, world_comm, &recv_stat );
-		
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Direction " << dir << " --> Received." << std::endl;
-
-			// Write out buffers
-			*logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
-								<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir] 
-								<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
-			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(my_rank) + "_Dir" + std::to_string(dir) + ".out";
-			mpi_writeout_buf(filename, dir);
 #endif
 
 			///////////////////////////
@@ -519,10 +511,23 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		}
 
+#ifdef L_MPI_VERBOSE
+
+		*logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir
+			<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir]
+			<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
+
+		// Write out buffers
+		std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(my_rank) + "_Dir" + std::to_string(dir) + ".out";
+		mpi_writeout_buf(filename, dir);
+#endif
+
 	}
 
 #ifdef L_MPI_VERBOSE
-	*logout << " *********************** Waiting for Send Completion  *********************** " << std::endl;
+	*logout << " *********************** Waiting for Sends to be Received on L" + 
+		std::to_string(lev) + "R" + std::to_string(reg) + 
+		" *********************** " << std::endl;
 #endif
 
 	/* Wait until other processes have handled all the sends from this rank
@@ -549,7 +554,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	if (Grid->t % L_OUT_EVERY == 0) {
 		// Performance Data
-		*GridUtils::logfile << "MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
+		L_INFO("MPI overhead taking an average of " + 
+			std::to_string(Grid->timeav_mpi_overhead * 1000) + "ms", GridUtils::logfile);
 	}
 
 
@@ -584,47 +590,38 @@ void MpiManager::mpi_buffer_size() {
 			GridUtils::getGrid(GridManager::getInstance()->Grids, l, r, g);
 
 			// If the pointer is not updated then it doesn't exist on this rank
-			if (g == NULL) {
+			if (g == NULL)
+			{
 				continue;	// Try find next grid in loop
 			}
 
 			// Expand buffer info arrays by one and add grid ID info
-			buffer_send_info.emplace_back();		buffer_recv_info.emplace_back();
-			buffer_send_info.back().level = l;		buffer_recv_info.back().level = l;
-			buffer_send_info.back().region = r;		buffer_recv_info.back().region = r;
+			buffer_send_info.emplace_back(l, r);
+			buffer_recv_info.emplace_back(l, r);
 
-			/* To allow for the fact that not every edge needs to be communicated,
-			 * we must account for 4 states in each Cartesian direction:
-			 *
-			 * 1. The x_min edge of the lattice needs communicating;
-			 * 2. The x_max edge of the lattice needs communicating;
-			 * 3. Both the x_min and the x_max edges of the lattice need communicating;
-			 * 4. Neither the x_min nor the x_max edges of the lattice need communicating;
-			 * 
-			 * Therefore in 2D there are 4^2 = 16 permutations and in 3D there are 4^3 = 64 permutations.
-			 *
-			 * We can do this by looping over the appropriate region of the grid and checking whether 
-			 * a site lies in the associated sender layer.
-			 * If so increment the buffer size counter. */
+			/* Not every edge of a sub-grid needs to be communicated.
+			 * We therefore loop over the appropriate region of the grid and 
+			 * check whether a site lies in the associated sender / receiver 
+			 * layer. If so increment the buffer size counter. */
 
 			// Call send and recv size finding routines
 			mpi_buffer_size_send(g);
 			mpi_buffer_size_recv(g);
 
 
-			// Write out buffer sizes
 #ifdef L_MPI_VERBOSE
-		*logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_DIRS; i++) {
-			*logout << buffer_send_info.back().size[i] << '\t';
-		}
-		*logout << std::endl;
+			// Write out buffer sizes for reference
+			*logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
+			for (int i = 0; i < L_MPI_DIRS; i++) {
+				*logout << buffer_send_info.back().size[i] << '\t';
+			}
+			*logout << std::endl;
 
-		*logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_DIRS; i++) {
-			*logout << buffer_recv_info.back().size[i] << '\t';
-		}
-		*logout << std::endl;
+			*logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
+			for (int i = 0; i < L_MPI_DIRS; i++) {
+				*logout << buffer_recv_info.back().size[i] << '\t';
+			}
+			*logout << std::endl;
 #endif
 
 
@@ -632,6 +629,114 @@ void MpiManager::mpi_buffer_size() {
 	}
 
 	*GridUtils::logfile << "Complete." << std::endl;
+
+#ifdef L_MPI_VERBOSE
+	/* Historically, there have been cases of MPI hangs due to buffer
+	* size inconsistencies between ranks. These are difficult to debug
+	* as it involves going through the log files and cross checking
+	* each send and receive by hand. To speed up the process we
+	* implement a debugging activity here to check the send and receive
+	* buffer sizes tally up across the topology. */
+	int * const bufSendSizesOut = new int[L_NUM_LEVELS * L_NUM_REGIONS + 1];
+	int * const bufSendSizesIn = new int[L_NUM_LEVELS * L_NUM_REGIONS + 1];
+	bool bInfoFound = false;
+
+	// Loop over the MPI directions
+	for (int i = 0; i < L_MPI_DIRS; i++)
+	{
+		int counter = 0;
+
+		// Loop over grids and sub-grids and pack buffer one at a time
+		for (int l = 0; l <= L_NUM_LEVELS; l++)
+		{
+			for (int r = 0; r < L_NUM_REGIONS; r++)
+			{
+				bInfoFound = false;
+				if (l == 0 && r != 0) continue;		// L0 can only be R0
+
+				// Try retireve the buffer size info
+				for (MpiManager::buffer_struct bufs : buffer_send_info)
+				{
+					if (bufs.level == l && bufs.region == r)
+					{
+						bufSendSizesOut[counter] = bufs.size[i];
+						bInfoFound = true;
+					}
+				}
+
+				// If no info found then grid doesn't exist on this rank so mark as zero
+				if (!bInfoFound) bufSendSizesOut[counter] = 0;
+
+				// Increment counter
+				counter++;
+			}
+		}
+
+		L_INFO("Send sizes packed for direction " + std::to_string(i) + ". Sending to rank " + std::to_string(neighbour_rank[i]) + "...", logout);
+
+		// Once buffer complete, post send
+		MPI_Isend(bufSendSizesOut, L_NUM_LEVELS * L_NUM_REGIONS + 1, MPI_INT, neighbour_rank[i],
+			my_rank, world_comm, &send_requests[i]);
+
+		L_INFO("Sent.", logout);
+
+		// Get opposite direction
+		int opp_i = mpi_getOpposite(i);
+		L_INFO("Receiving send sizes from rank " + std::to_string(neighbour_rank[opp_i]) + " in direction " + std::to_string(opp_i) + "...", logout);
+
+		// Receive the send sizes from opposite direction
+		MPI_Recv(bufSendSizesIn, L_NUM_LEVELS * L_NUM_REGIONS + 1, MPI_INT, neighbour_rank[opp_i],
+			neighbour_rank[opp_i], world_comm, &recv_stat);
+
+		L_INFO("Received.", logout);
+
+		// Cross check that the send sizes match the receive sizes
+		counter = 0;
+		// Loop over grids and sub-grids and unpack buffer one at a time
+		for (int l = 0; l <= L_NUM_LEVELS; l++)
+		{
+			for (int r = 0; r < L_NUM_REGIONS; r++)
+			{
+				bInfoFound = false;
+				if (l == 0 && r != 0) continue;		// L0 can only be R0
+
+				// Try retireve the buffer size info
+				for (MpiManager::buffer_struct bufr : buffer_recv_info)
+				{
+					if (bufr.level == l && bufr.region == r)
+					{
+						bInfoFound = true;
+						if (bufSendSizesIn[counter] != bufr.size[i])
+						{
+							L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
+								" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
+								" is sending " + std::to_string(bufSendSizesIn[counter]) + 
+								". Expected to receive " + std::to_string(bufr.size[i]), logout);
+						}						
+					}
+				}
+
+				// If no info found then grid doesn't exist on this rank -- make sure buffer size is zero
+				if (!bInfoFound)
+				{
+					if (bufSendSizesIn[counter] != 0)
+					{
+						L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
+							" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
+							" is sending " + std::to_string(bufSendSizesIn[counter]) +
+							". Expected to receive 0 as no grid of this L+R on this rank.", logout);
+					}
+				}
+
+				// Increment counter
+				counter++;
+			}
+		}		
+	}
+	delete[] bufSendSizesOut;
+	delete[] bufSendSizesIn;
+
+#endif
 
 }
 
@@ -1241,10 +1346,10 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 			{
 				for (int k = 0; k < numCores[eZDirection]; k++)
 				{
-					*bufRankSize++ = static_cast<int>((XSolution[i + 1] - XSolution[i]) / dh);
-					*bufRankSize++ = static_cast<int>((YSolution[j + 1] - YSolution[j]) / dh);
+					*bufRankSize++ = static_cast<int>(std::round((XSolution[i + 1] - XSolution[i]) / dh));
+					*bufRankSize++ = static_cast<int>(std::round((YSolution[j + 1] - YSolution[j]) / dh));
 #if (L_DIMS == 3)
-					*bufRankSize++ = static_cast<int>((ZSolution[k + 1] - ZSolution[k]) / dh);
+					*bufRankSize++ = static_cast<int>(std::round((ZSolution[k + 1] - ZSolution[k]) / dh));
 #endif
 				}
 			}

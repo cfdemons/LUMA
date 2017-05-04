@@ -41,8 +41,8 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
@@ -123,10 +123,10 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 6		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 8		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-#define L_MPI_ZCORES 4
+#define L_MPI_ZCORES 2
 
 // Balanced decomposition
 #define L_MPI_SMART_DECOMPOSE
@@ -139,7 +139,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_DIMS 3			///< Number of dimensions to the problem
 #define L_RESOLUTION 7		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 

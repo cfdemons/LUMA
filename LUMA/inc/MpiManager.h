@@ -110,14 +110,18 @@ public :
 	std::vector< std::vector<double>> f_buffer_recv;	///< Array of resizeable incoming buffers used for data transfer
 	MPI_Status recv_stat;					///< Status structure for Receive return information
 	MPI_Request send_requests[L_MPI_DIRS];	///< Array of request structures for handles to posted ISends
-	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each Isend
+	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each ISend
 
 	/// \struct buffer_struct
 	/// \brief	Structure storing buffers sizes in each direction for particular grid.
-	struct buffer_struct {
+	struct buffer_struct
+	{
 		int size[L_MPI_DIRS];	///< Buffer sizes for each direction
 		int level;				///< Grid level
 		int region;				///< Region number
+
+		buffer_struct(int l, int r) 
+			: level(l), region(r){};
 	};
 	std::vector<buffer_struct> buffer_send_info;	///< Vectors of buffer_info structures holding sender layer size info.
 	std::vector<buffer_struct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.

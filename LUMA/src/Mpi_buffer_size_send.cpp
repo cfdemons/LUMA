@@ -92,6 +92,7 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 								(!GridUtils::isOnRecvLayer(g->ZPos[k],eZMax) && !GridUtils::isOnRecvLayer(g->ZPos[k],eZMin))
 #endif
 							) {
+
 								// Must be a site to pass in MPI so increment counter
 								count++;
 							}

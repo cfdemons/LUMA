@@ -156,8 +156,14 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 	// Loop over velocities
 	for (int v = 0; v < L_NUM_VELS; ++v) {
 
-		// Do nothing inlets and solid sites are simply reset to equilibrium
-		if (type_local == eInlet || type_local == eSolid) {
+		// Forced equilibirum inlets and solid sites are simply reset to equilibrium
+		if	(
+			type_local == eSolid
+#ifndef L_VELOCITY_REGULARISED
+			|| type_local == eInlet
+#endif
+			)
+		{
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
 			continue;
 		}
@@ -186,7 +192,8 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		}
 
 		// VELOCITY BC
-		else if (src_type_local == eInlet) {
+		else if (src_type_local == eInlet)
+		{
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
 		}

@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -1136,7 +1136,7 @@ void GridObj::LBM_initSolidLab() {
 void GridObj::LBM_initBoundLab ( ) {
 
 	// If we need to label the edges...
-#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL
+#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL
 
 	int i, j, k;
 
@@ -1206,7 +1206,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1226,7 +1226,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1251,7 +1251,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
@@ -1272,7 +1272,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #if (defined L_WALLS_ON && !defined L_WALL_FLOOR_ONLY)
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
 #endif
 

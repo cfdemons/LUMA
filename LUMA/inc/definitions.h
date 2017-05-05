@@ -5,16 +5,16 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.4.3-alpha"
+#define LUMA_VERSION "1.5.0-alpha"
 
 
 // Header guard
@@ -140,7 +140,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 4		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 3		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -193,20 +193,16 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-//#define L_UPSTREAM_TUNNEL		///< Adds an inlet to all faces except exit
-#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
+#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
+// Type of Inlet/Outlet BC (default Forced Equilibrium)
+//#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
-// Inlets
-#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-//#define L_INLET_NRBC			///< Turn on NRBC at inlet
+// Inlet (left-hand wall)
+#define L_INLET_ON				///< Turn on inlet boundary
 
-
-// Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
-//#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
-
+// Outlet (right-hand wall)
+#define L_OUTLET_ON				///< Turn on outlet boundary
 
 // Solids
 //#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
@@ -240,22 +236,22 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.5 }
+	{ 3.4 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 }
+	{ 6.6 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.6 }
+	{ 3.7 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.5 }
+	{ 6.3 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 }
+	{ 2.8 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 7.0 }
+	{ 7.2 }
 };
 
 #endif

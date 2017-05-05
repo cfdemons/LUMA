@@ -1,10 +1,17 @@
-version		=	1.4.3-alpha
+version		=	1.5.0-alpha
 
 General		:	Updated the HDF5 output and the merge tool to include MPI block labels to make decomposition more apparent.
 				Fixed an untracked bug in the HDF5 writer which would cause a hang on certain MPI/sub-grid combos.
+				Added some colourmaps for paraview.
+				Added script for creating symmetric aerofoil point clouds in 2D and 3D with ends.
+				Added MPI buffer size debugging and cross-checking to prevent hidden hangs in future.
+				Added ability of LUMA to predict completion time of simulation.
+				Merge tool now cuts out solid sites to save memory.
 
-Issue #131	:	More intelligent algorithm implemented for constructing MPI block sizes. Not a perfect solution but certainly improves the imbalance.
-				Only a first pass for now -- any scenario which breaks the algorithm should be added to the tracker.
+Issue #135	:	Reinstated RBC for a fixed velocity.
+Issue #137	:	Upgraded geometry file and PC reader so obejcts can easily be centred in the domain if required through keywords in the config.
+Issue #122	:	Changed dt suggest code so it gives the upper limit for dt instead.
+Issue #131	:	More intelligent algorithm implemented for constructing MPI block sizes by driving variable boundaries towards most loaded process.
 
 version		=	1.4.2
 

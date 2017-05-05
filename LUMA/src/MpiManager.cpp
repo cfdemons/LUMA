@@ -205,18 +205,6 @@ void MpiManager::mpi_init()
 ///	\param	grid_man	Pointer to an initialised grid manager.
 void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 {
-	
-	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
-	if (
-		L_MPI_XCORES < 2 || L_MPI_YCORES < 2
-#if (L_DIMS == 3)
-		|| L_MPI_ZCORES < 2
-#endif
-		)
-	{
-		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
-	}
-
 	// Auxiliary variables
 	double dh = L_BX / static_cast<double>(L_N);
 	int numCells[3];

@@ -124,7 +124,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 3
 

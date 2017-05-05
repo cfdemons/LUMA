@@ -236,8 +236,8 @@ void ObjectManager::resetMomexBodyForces(GridObj * grid)
 void ObjectManager::addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts)
 {
 	// Store information about the body in the Object Manager
-	bbbOnGridLevel = geom->on_grid_lev;
-	bbbOnGridReg = geom->on_grid_reg;
+	bbbOnGridLevel = geom->onGridLev;
+	bbbOnGridReg = geom->onGridReg;
 
 	// Declarations
 	std::vector<int> ijk;
@@ -313,15 +313,30 @@ ObjectManager::GeomPacked::~GeomPacked()
 /// Geometry data structure container custom constructor.
 ObjectManager::GeomPacked::GeomPacked(
 	eObjectType objtype, int bodyID, std::string fileName,
-	int on_grid_lev, int on_grid_reg,
-	double body_start_x, double body_start_y, double body_centre_z,
-	double body_length, eCartesianDirection scale_direction,
-	eMoveableType moveProperty, bool clamped
+	int onGridLev, int onGridReg,
+	bool isCentreX, double refX,
+	bool isCentreY, double refY,
+	bool isCentreZ, double refZ,
+	double bodyLength, eCartesianDirection scaleDirection,
+	eMoveableType moveProperty, bool isClamped
 	)
 	: objtype(objtype), bodyID(bodyID), fileName(fileName),
-	on_grid_lev(on_grid_lev), on_grid_reg(on_grid_reg),
-	body_start_x(body_start_x), body_start_y(body_start_y), body_centre_z(body_centre_z), 
-	body_length(body_length), scale_direction(scale_direction),
-	moveProperty(moveProperty), clamped(clamped)
+	onGridLev(onGridLev), onGridReg(onGridReg),
+	isRefXCentre(isCentreX), bodyRefX(refX),
+	isRefYCentre(isCentreY), bodyRefY(refY),
+	isRefZCentre(isCentreZ), bodyRefZ(refZ),
+	bodyLength(bodyLength), scaleDirection(scaleDirection),
+	moveProperty(moveProperty), isClamped(isClamped)
 {
+}
+
+/// Method to interpret the reference type read in from the gerometry file
+bool ObjectManager::GeomPacked::interpretRef(std::string refType)
+{
+	if (refType == "CENTRE")
+		return true;
+	else if (refType != "START")
+		L_ERROR("Unknown reference type in geometry file. Exiting.", GridUtils::logfile);
+
+	return false;
 }

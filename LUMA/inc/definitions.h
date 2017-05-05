@@ -124,9 +124,9 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 8		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 3		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-#define L_MPI_ZCORES 2
+#define L_MPI_ZCORES 3
 
 // Balanced decomposition
 #define L_MPI_SMART_DECOMPOSE
@@ -140,13 +140,13 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 3			///< Number of dimensions to the problem
-#define L_RESOLUTION 7		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 4		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 20.0		///< End of domain in X (non-dimensional units)
-#define L_BY 6.0		///< End of domain in Y (non-dimensional units)
-#define L_BZ 7.0		///< End of domain in Z (non-dimensional units)
+#define L_BX 10.0		///< End of domain in X (non-dimensional units)
+#define L_BY 10.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -230,8 +230,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // If you want coincident edges then set to (-2.0 * dh)
 #define L_PADDING_X_MIN 0.1		///< Padding between X start of each sub-grid and its child edge
-#define L_PADDING_X_MAX 0.5		///< Padding between X end of each sub-grid and its child edge
-#define L_PADDING_Y_MIN (-2.0 * dh)		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.1		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN 0.1		///< Padding between Y start of each sub-grid and its child edge
 #define L_PADDING_Y_MAX 0.1		///< Padding between Y end of each sub-grid and its child edge
 #define L_PADDING_Z_MIN 0.1		///< Padding between Z start of each sub-grid and its child edge
 #define L_PADDING_Z_MAX 0.1		///< Padding between Z end of each sub-grid and its child edge
@@ -240,22 +240,22 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.7 }
+	{ 3.5 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 8.9 }
+	{ 6.5 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.0 }
+	{ 3.6 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 1.2 }
+	{ 6.5 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.5 }
+	{ 3.0 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.4 }
+	{ 7.0 }
 };
 
 #endif

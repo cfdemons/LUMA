@@ -473,14 +473,19 @@ void GridObj::LBM_initGrid() {
 #endif
 
 	// Check if there are incompressibility issues and warn the user if so
-	if (uref > (0.17 * cs)) {
-		L_WARN("Reference velocity in LBM units larger than 17% of the speed of sound. \
-			   Compressibility effects may impair the quality of the results. \
-			   Try L_TIMESTEP = " 
-			   + std::to_string(0.17 * dh * cs) + " or smaller.", GridUtils::logfile);
-		if (uref >= cs){
-			L_ERROR("Reference velocity in LBM units equal to or larger than the speed of sound cs, \
-					results of the simulation are not valid. Exiting.", GridUtils::logfile);
+	if (uref > (0.17 * cs))
+	{
+		std::string msg;
+		msg += "Reference velocity in LBM units larger than 17% of the speed of sound. ";
+		msg += "Compressibility effects may impair the quality of the results. ";
+		msg += "Try L_TIMESTEP = " + std::to_string(0.17 * dh * cs) + " or smaller.";
+		L_WARN(msg, GridUtils::logfile);
+		if (uref >= cs)
+		{
+			msg.clear();
+			msg += "Reference velocity in LBM units equal to or larger than the speed of sound cs. ";
+			msg += "Results of the simulation are not valid. Exiting.";
+			L_ERROR(msg, GridUtils::logfile);
 		}
 	}
 

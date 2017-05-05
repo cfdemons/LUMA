@@ -337,10 +337,14 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 		int k2 = k1 + normalVector[eZDirection];
 
 #ifdef L_BUILD_FOR_MPI
-		if (GridUtils::isOffGrid(i1, j1, k1, this) || GridUtils::isOffGrid(i2, j2, k2, this))
-			L_ERROR("Regularised BC edges/corners perform quadratic extrapolation. \
-					The inlets on this block do not have enough points next to the \
-					inlet sites to perform this procedure. Exiting.", GridUtils::logfile);
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]) &&
+			(GridUtils::isOffGrid(i1, j1, k1, this) || GridUtils::isOffGrid(i2, j2, k2, this)))
+		{
+			std::string msg;
+			msg += "Regularised BC edges/corners perform quadratic extrapolation.";
+			msg += "The inlets on this block do not have enough points next to the inlet sites to perform this procedure. Exiting.";
+			L_ERROR(msg, GridUtils::logfile);
+		}
 #endif
 		rho[id] = 2.0 * rho(i1, j1, k1, M_lim, K_lim) - rho(i2, j2, k2, M_lim, K_lim);
 
@@ -357,13 +361,13 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 			if (c_opt[v][normalDirection] == -normalVector[normalDirection])
 			{
 				// Add to known momentum leaving the domain
-				f_plus += f[v + id * L_NUM_VELS];
+				f_plus += fNew[v + id * L_NUM_VELS];
 
 			}
 			// If it is perpendicular to wall part of f_zero
 			else if (c_opt[v][normalDirection] == 0)
 			{
-				f_zero += f[v + id * L_NUM_VELS];
+				f_zero += fNew[v + id * L_NUM_VELS];
 			}
 
 		}
@@ -388,8 +392,8 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 		// Unknowns for a normal case share the normal vector components
 		if (edgeCount == 1 && c_opt[v][normalDirection] == normalVector[normalDirection])
 		{
-			f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
-				(f[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+				(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
 		}
 
 		// Unknown in edge cases are ones who share at least one of the normal components
@@ -402,12 +406,12 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 			)
 			)
 		{
-			f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
-				(f[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+				(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
 		}
 
 		// Store off-equilibrium and update stress components
-		fneq = f[v + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
+		fneq = fNew[v + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
 
 		// Compute off-equilibrium stress components
 		Sxx += c_opt[v][eXDirection] * c_opt[v][eXDirection] * fneq;
@@ -424,7 +428,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Compute regularised non-equilibrium components and add to feq to get new populations
 	for (int v = 0; v < L_NUM_VELS; v++)
 	{
-		f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+		fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
 			(w[v] / (2.0 * SQ(cs) * SQ(cs))) *
 			(
 			((c_opt[v][eXDirection] * c_opt[v][eXDirection] - SQ(cs)) * Sxx) +

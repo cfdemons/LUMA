@@ -66,10 +66,10 @@
 #define L_PI 3.14159265358979323846		///< PI definition
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI			///< Enable MPI features in build
+#define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1				///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -99,7 +99,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 5000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 10000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -113,7 +113,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -124,7 +124,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 3		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 3
 
@@ -196,7 +196,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
-#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
+//#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // Inlet (left-hand wall)
 #define L_INLET_ON				///< Turn on inlet boundary

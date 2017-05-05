@@ -130,22 +130,13 @@ public :
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
-	DEPRECATED void LBM_initSolidLab();			// Initialise labels for solid objects
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_macro(int i, int j, int k);
-	void LBM_resetForces();							// Resets the force vectors on the grid
-
-	// Boundary operations
-	DEPRECATED void bc_applyBounceBack(int label, int i, int j, int k);		// Application of HWBB BC
-	DEPRECATED void bc_applySpecReflect(int label, int i, int j, int k);	// Application of HWSR BC
-	DEPRECATED void bc_applyRegularised(int label, int i, int j, int k);	// Application of Regaulrised BC
-	DEPRECATED void bc_applyExtrapolation(int label, int i, int j, int k);	// Application of Extrapolation BC
-	DEPRECATED void bc_applyBfl(int i, int j, int k);						// Application of BFL BC
-	DEPRECATED void bc_applyNrbc(int i, int j, int k);						// Application of characteristic NRBC
+	void LBM_resetForces();								// Resets the force vectors on the grid
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
@@ -159,6 +150,7 @@ public :
 	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
 
 private :
+
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
@@ -171,6 +163,7 @@ private :
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
+	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
 
 public :
 	void LBM_multi_opt(int subcycle = 0);

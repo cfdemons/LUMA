@@ -84,9 +84,17 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
 
+				// REGULARISED BCs //
+#ifdef L_VELOCITY_REGULARISED
+				if (type_local == eInlet)
+					_LBM_regularised_velocity_opt(i, j, k, id);
+#endif
+
 				// FORCING //
 #if (defined L_IBM_ON || defined L_GRAVITY_ON)
-				if (type_local != eSolid) {	// Do not force solid sites
+				// Do not force solid sites
+				if (type_local != eSolid)
+				{
 					_LBM_forceGrid_opt(id);
 				}
 				L_DACTION_WRITE_OUT_FORCES
@@ -148,13 +156,15 @@ void GridObj::LBM_multi_opt(int subcycle) {
 ///	\param	id	flattened ijk index.
 ///	\param	type_local	type of current site.
 ///	\param	subcycle	number of sub-cycle being performed.
-void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle) {
+void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle)
+{
 
 	// Local value to save multiple loads
 	eType src_type_local;
 
 	// Loop over velocities
-	for (int v = 0; v < L_NUM_VELS; ++v) {
+	for (int v = 0; v < L_NUM_VELS; ++v)
+	{
 
 		// Forced equilibirum inlets and solid sites are simply reset to equilibrium
 		if	(
@@ -185,41 +195,248 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		}
 
 		// BOUNCEBACK
-		if (src_type_local == eSolid) {
+		if (src_type_local == eSolid)
+		{
 			// F value is its opposite (HWBB)
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
 		}
 
-		// VELOCITY BC
+		// VELOCITY BC (forced equilbirium)
+#ifndef L_VELOCITY_REGULARISED
 		else if (src_type_local == eInlet)
 		{
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
 		}
+#endif
 
 #if (L_NUM_LEVELS > 0)	// Only need to check these options when using refinement
 		// EXPLODE
-		else if (src_type_local == eTransitionToCoarser &&
-			subcycle == 0) {
+		else if (src_type_local == eTransitionToCoarser && subcycle == 0)
+		{
 			// Pull value from parent TL site
 			_LBM_explode_opt(id, v, src_x, src_y, src_z);
 		}
 
 		// COALESCE
-		else if (src_type_local == eRefined && type_local == eTransitionToFiner) {
+		else if (src_type_local == eRefined && type_local == eTransitionToFiner)
+		{
 			// Pull average value from child TL cluster to get value leaving fine grid
 			_LBM_coalesce_opt(i, j, k, id, v);
 		}
 #endif
 
 		// REGULAR STREAM
-		else {
+		else
+		{
 			// Pull population from source site
 			fNew[v + id * L_NUM_VELS] = f[v + src_id * L_NUM_VELS];
 		}
 
 	}
+
+}
+
+// *****************************************************************************
+/// \brief	Optimised application of regularised velocity BC
+///
+///			This implementation assumes the velocity is normal to the wall as is
+///			the case in the Latt et al. 2008 paper on which the conditions are
+///			based. https://doi.org/10.1103/PhysRevE.77.056703
+///
+/// \param	i			x-index of current site.
+/// \param	j			y-index of current site.
+/// \param	k			z-index of current site.
+///	\param	id			flattened ijk index.
+void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
+{
+	// Declarations
+	double normalVelocity;
+	int normalVector[3] = { 0, 0, 0 };
+	eCartesianDirection normalDirection;
+	double f_plus = 0.0, f_zero = 0.0;
+	double Sxx = 0, Syy = 0, Sxy = 0;	// 2D & 3D
+	double fneq;
+	double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
+	unsigned int edgeCount = 0;
+
+	// Find which wall we are on and proceed to assign key variables //
+
+	// Left wall
+	if (XPos[i] > 0.0 && XPos[i] < dh)
+	{
+		// Assign wall velocity
+		normalVelocity = GridUnits::ud2ulbm(L_UX0, this);
+
+		// Select the wall normal velocity direction
+		normalDirection = eXDirection;
+		normalVector[normalDirection] = 1;
+		edgeCount++;
+	}
+
+	// Right wall
+	if (XPos[i] < L_BX && XPos[i] > L_BX - dh)
+	{
+		normalVelocity = -GridUnits::ud2ulbm(L_UX0, this);
+		normalDirection = eXDirection;
+		normalVector[normalDirection] = -1;
+		edgeCount++;
+	}
+
+	// Bottom wall
+	else if (YPos[j] > 0.0 && YPos[j] < dh)
+	{
+		normalVelocity = GridUnits::ud2ulbm(L_UY0, this);
+		normalDirection = eYDirection;
+		normalVector[normalDirection] = 1;
+		edgeCount++;
+	}
+	
+	// Top wall
+	else if (YPos[j] < L_BY && YPos[j] > L_BY - dh)
+	{
+		normalVelocity = -GridUnits::ud2ulbm(L_UY0, this);
+		normalDirection = eYDirection;
+		normalVector[normalDirection] = -1;
+		edgeCount++;
+	}
+
+#if (L_DIMS == 3)
+
+	// Front wall
+	else if (ZPos[k] > 0.0 && ZPos[k] < dh)
+	{
+		normalVelocity = GridUnits::ud2ulbm(L_UZ0, this);
+		normalDirection = eZDirection;
+		normalVector[normalDirection] = 1;
+		edgeCount++;
+	}
+	
+	// Back wall
+	else if (ZPos[k] < L_BZ && ZPos[k] > L_BZ - dh)
+	{
+		normalVelocity = -GridUnits::ud2ulbm(L_UZ0, this);
+		normalDirection = eZDirection;
+		normalVector[normalDirection] = -1;
+		edgeCount++;
+	}
+#endif
+
+	/* If it is a corner or an edge then get wall density by extrapolating in 
+	 * the direction of the normal. Since this is non-local, when using MPI
+	 * cannot be performed correctly if site on receiver layer */
+	if (edgeCount > 1)
+	{
+		// Quadratic extrapolation (non-local)
+		int i1 = i + normalVector[eXDirection];
+		int i2 = i1 + normalVector[eXDirection];
+		int j1 = j + normalVector[eYDirection];
+		int j2 = j1 + normalVector[eYDirection];
+		int k1 = k + normalVector[eZDirection];
+		int k2 = k1 + normalVector[eZDirection];
+
+#ifdef L_BUILD_FOR_MPI
+		if (GridUtils::isOffGrid(i1, j1, k1, this) || GridUtils::isOffGrid(i2, j2, k2, this))
+			L_ERROR("Regularised BC edges/corners perform quadratic extrapolation. \
+					The inlets on this block do not have enough points next to the \
+					inlet sites to perform this procedure. Exiting.", GridUtils::logfile);
+#endif
+		rho[id] = 2.0 * rho(i1, j1, k1, M_lim, K_lim) - rho(i2, j2, k2, M_lim, K_lim);
+
+	}
+
+	// Only in one edge region so not a corner or an edge
+	else
+	{
+
+		// Compute f_plus and f_0
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			// If has opposite normal direction component then part of f_plus
+			if (c_opt[v][normalDirection] == -normalVector[normalDirection])
+			{
+				// Add to known momentum leaving the domain
+				f_plus += f[v + id * L_NUM_VELS];
+
+			}
+			// If it is perpendicular to wall part of f_zero
+			else if (c_opt[v][normalDirection] == 0)
+			{
+				f_zero += f[v + id * L_NUM_VELS];
+			}
+
+		}
+
+		// Update density
+		rho[id] = (1.0 / (1.0 - normalVelocity)) * (2.0 * f_plus + f_zero);
+	}
+
+	// Update velocity
+	u[eXDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this);
+	u[eYDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this);
+#if (L_DIMS == 3)
+	u[eZDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this);
+#endif
+
+	// Loop over directions now macroscopic are up-to-date
+	for (int v = 0; v < L_NUM_VELS; ++v)
+	{
+
+		// Apply off-equilibrium BB to unknown components //
+
+		// Unknowns for a normal case share the normal vector components
+		if (edgeCount == 1 && c_opt[v][normalDirection] == normalVector[normalDirection])
+		{
+			f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+				(f[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+		}
+
+		// Unknown in edge cases are ones who share at least one of the normal components
+		else if (edgeCount > 1 && (
+			c_opt[v][eXDirection] == normalVector[eXDirection] ||
+			c_opt[v][eYDirection] == normalVector[eYDirection]
+#if (L_DIMS == 3)
+			|| c_opt[v][eZDirection] == normalVector[eZDirection]
+#endif
+			)
+			)
+		{
+			f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+				(f[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+		}
+
+		// Store off-equilibrium and update stress components
+		fneq = f[v + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
+
+		// Compute off-equilibrium stress components
+		Sxx += c_opt[v][eXDirection] * c_opt[v][eXDirection] * fneq;
+		Syy += c_opt[v][eYDirection] * c_opt[v][eYDirection] * fneq;
+		Sxy += c_opt[v][eXDirection] * c_opt[v][eYDirection] * fneq;
+#if (L_DIMS == 3)
+		Szz += c_opt[v][eZDirection] * c_opt[v][eZDirection] * fneq;
+		Sxz += c_opt[v][eXDirection] * c_opt[v][eZDirection] * fneq;
+		Syz += c_opt[v][eYDirection] * c_opt[v][eZDirection] * fneq;
+#endif
+
+	}
+
+	// Compute regularised non-equilibrium components and add to feq to get new populations
+	for (int v = 0; v < L_NUM_VELS; v++)
+	{
+		f[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+			(w[v] / (2.0 * SQ(cs) * SQ(cs))) *
+			(
+			((c_opt[v][eXDirection] * c_opt[v][eXDirection] - SQ(cs)) * Sxx) +
+			((c_opt[v][eYDirection] * c_opt[v][eYDirection] - SQ(cs)) * Syy) +
+			((c_opt[v][eZDirection] * c_opt[v][eZDirection] - SQ(cs)) * Szz) +
+			(2.0 * c_opt[v][eXDirection] * c_opt[v][eYDirection] * Sxy) +
+			(2.0 * c_opt[v][eXDirection] * c_opt[v][eZDirection] * Sxz) +
+			(2.0 * c_opt[v][eYDirection] * c_opt[v][eZDirection] * Syz)
+			);
+	}
+
+
 
 }
 

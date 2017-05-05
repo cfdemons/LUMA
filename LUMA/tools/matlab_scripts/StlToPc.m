@@ -3,12 +3,13 @@
 % and vertex positions respectively. Resolution is how many points
 % per length the surface should be discretised into using the object
 % bounding box dimension in the x-direction as the length.
+% Requires stlread from The Mathworks to work.
 %
 % Copyright Adrian Harwood, The University of Manchester, UK
-function PC = StlToPc(filename, resolution)
+function PC = StlToPc(infile, outfile, resolution)
 
 % Use STL read first
-[faces, vertices] = stlread(filename);
+[faces, vertices] = stlread(infile);
 
 % Start counters
 count = 0;
@@ -168,10 +169,17 @@ disp(['Number of faces discretised = ' num2str(count_discrete)]);
 disp(['Number of faces not discretised = ' num2str(count_notdiscrete)]);
 disp(['Total number of points = ' num2str(count)]);
 
+% Swap columns
+tmp = PC(:,2);
+PC(:,2) = PC(:,3);
+PC(:,3) = tmp;
+
 figure
-plot3(PC(:,1),PC(:,3),PC(:,2),'.','MarkerSize',1);
+plot3(PC(:,1),PC(:,2),PC(:,3),'.','MarkerSize',1);
 axis equal
 axis tight
 grid on
+
+dlmwrite(outfile,PC,'Delimiter','\t');
 
 end

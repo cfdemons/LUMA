@@ -30,12 +30,17 @@
 #ifndef vtkCleanUnstructuredGrid_h
 #define vtkCleanUnstructuredGrid_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
+
+#if (__cplusplus >= 201103L) || ( defined(_MSC_VER) && _MSC_VER >= 1800 )
+# define VTK_DELETE_FUNCTION =delete
+#else
+# define VTK_DELETE_FUNCTION
+#endif
 
 class vtkPointLocator;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGrid
+class vtkCleanUnstructuredGrid
   : public vtkUnstructuredGridAlgorithm
 {
 public:

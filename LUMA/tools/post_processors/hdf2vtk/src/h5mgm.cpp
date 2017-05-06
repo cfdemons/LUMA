@@ -13,7 +13,8 @@
 *
 */
 
-#include "h5mgm.h"
+#include "VelocitySorter.h"
+#include "ThirdParty/vtkCleanUnstructuredGrid.h"
 
 // Method to construct a 3D polyhedron out of faces and add to an unstructured grid
 size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
@@ -114,7 +115,12 @@ int main(int argc, char* argv[])
 		{
 			bLegacy = true;
 		}
-		else {
+		else if (arg_str == "sorter")
+		{
+			bSorter = true;
+		}
+		else
+		{
 			case_num = std::string(argv[a]);
 		}
 	}
@@ -137,7 +143,7 @@ int main(int argc, char* argv[])
 	if (bQuiet == false)
 	{
 		std::string logpath = H5MGM_OUTPUT_PATH;
-		logpath += "/log.out";
+		logpath += "/h5mgm.log";
 		logfile.open(logpath, std::ios::out | std::ios::app);
 		logfile << "---------------------------------------" << std::endl;
 	}
@@ -147,6 +153,18 @@ int main(int argc, char* argv[])
 
 	// Turn auto error printing off
 	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
+
+
+	// If using the sorter use the standalone class then return
+	if (bSorter)
+	{
+		VelocitySorter<double> *vs = new VelocitySorter<double>();
+		vs->readAndSort();
+		delete vs;
+		return 0;
+	}
+
+
 
 	// Construct L0 filename
 	std::string IN_FILE_NAME("./hdf_R0N0.h5");
@@ -243,7 +261,8 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkPoints>::New();
 
 	// Create point ID list
-	std::vector<vtkIdType> pointIds;
+	std::vector<vtkIdType> *pointIds = 
+		new std::vector<vtkIdType>();
 
 	// Total point count
 	int point_count = 0;
@@ -378,7 +397,7 @@ int main(int argc, char* argv[])
 				}
 
 				// Build cell from points and add to mesh
-				res = addCell(points, unstructuredGrid, pointIds, cell_points, &point_count, dimensions_p);
+				res = addCell(points, unstructuredGrid, *pointIds, cell_points, &point_count, dimensions_p);
 
 			}
 			std::cout << "\r" << "Examining cell " << std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << "/" <<
@@ -405,18 +424,22 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	// Delete pointIds as we are finished with them
+	delete pointIds;
+
 	// Debug
 	std::cout << "Total number of cells retained for merged mesh = " << unstructuredGrid->GetNumberOfCells() << std::endl;
 	std::cout << "Adding data for each time step to mesh..." << std::endl;
 
-	// Clean mesh to remove duplicates (Paraview not VTK)
-	/*vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
-	vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
+	// Clean mesh to remove duplicate points (Paraview not VTK)
+	vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
+		vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
 	cleaner->SetInputData(unstructuredGrid);
 	cleaner->Update();
-	cleaner->GetOutput();
-	std::cout << "Cleaned Point Count  = " << unstructuredGrid->GetPointData() << std::endl;*/
-	// Could also use CleanPolyGrid?
+
+	// Replace the unstructured grid with the cleaned version
+	unstructuredGrid->Reset();
+	unstructuredGrid = cleaner->GetOutput();
 
 	// Time loop and data addition
 	int count = 0; int missed_set_count;

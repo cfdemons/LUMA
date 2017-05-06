@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2.8"
+#define H5MGM_VERSION "0.3.0"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #ifdef _WIN32
 	#include <Windows.h>
@@ -46,15 +47,15 @@
 #define EARLY_EXIT 998
 #define NUM_DATASETS_3D (15 + mpi_flag)
 #define NUM_DATASETS_2D (10 + mpi_flag)
-#define H5MGM_OUTPUT_PATH "./vtk_output"
+#define H5MGM_OUTPUT_PATH "./postprocessedoutput"
 
 // Static variables
 static bool bQuiet = false;
 static bool bLoud = false;
 static ofstream logfile;
 static bool bCutSolid = false;
-static bool bSorter = false;
 static bool bLegacy = false;
+static bool bSorter = false;
 
 // Unit vectors for node positions on each cell
 const int e[3][8] =
@@ -137,6 +138,27 @@ bool isOnIgnoreList(eType cell_type)
 		) return true;
 
 	return false;
+}
+
+// Method to convert seconds to hours minutes and seconds
+template <typename T>
+static void secs2hms(T total_seconds, int *hms)
+{
+	// Round to the nearest second
+	total_seconds = std::round(total_seconds);
+
+	// Compute number of hours and minutes represented
+	double hours = static_cast<double>(total_seconds) / (60.0 * 60.0);
+	double minutes = static_cast<double>(total_seconds) / 60.0;
+
+	// Compute components
+	hms[0] = static_cast<int>(std::floor(hours));
+	hms[1] = static_cast<int>(std::floor(minutes - (static_cast<double>(hms[0]) * 60.0)));
+	hms[2] = static_cast<int>(std::floor(
+		static_cast<double>(total_seconds)-
+		static_cast<double>(hms[1]) * 60.0 -
+		static_cast<double>(hms[0]) * 60.0 * 60.0
+		));
 }
 
 // Method to read a dataset with a given name into a buffer

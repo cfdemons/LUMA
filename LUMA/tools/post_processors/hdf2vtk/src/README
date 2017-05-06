@@ -5,8 +5,10 @@ Parameters are passed as space separated command line argument as follows:
 Valid options for the argument are:
 
 	cut			Excludes solid sites from the reconstruction.
+	legacy		Writes VTKs instead of VTUs.
 	loud		Prints out information to the screen as well as to the log file.
 	quiet		Will not write the log file.
+	sorter		Writes out a sorted velocity list from the HDF5 files.
 	version		Prints the version number of the tool compiled on your system.
 	XXX			Where XXX are three numbers to be appended to the VTK filename to differntiate cases. 
-				e.g. h5mgm 123 will produce files named something like "luma.123.<t>.vtk"
+				e.g. h5mgm 123 will produce files named something like "luma.123.<t>.<ext>"

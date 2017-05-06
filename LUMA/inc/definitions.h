@@ -69,7 +69,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -123,10 +123,10 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 8		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
-#define L_MPI_ZCORES 3
+#define L_MPI_ZCORES 2
 
 // Balanced decomposition
 #define L_MPI_SMART_DECOMPOSE
@@ -139,8 +139,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
+#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_RESOLUTION 5		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -179,7 +179,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
@@ -220,7 +220,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 

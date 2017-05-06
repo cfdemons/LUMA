@@ -1,0 +1,12 @@
+h5mgm is a tool to convert the HDF5 files written by LUMA into a set of VTK files to be read by Paraview.
+Parameters are passed as space separated command line argument as follows:
+	h5mgm <arg1> <arg2> ...
+
+Valid options for the argument are:
+
+	cut			Excludes solid sites from the reconstruction.
+	loud		Prints out information to the screen as well as to the log file.
+	quiet		Will not write the log file.
+	version		Prints the version number of the tool compiled on your system.
+	XXX			Where XXX are three numbers to be appended to the VTK filename to differntiate cases. 
+				e.g. h5mgm 123 will produce files named something like "luma.123.<t>.vtk"

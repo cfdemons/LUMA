@@ -89,22 +89,33 @@ int main(int argc, char* argv[])
 
 	// Parse arguments and handle
 	std::string case_num("000");
-	if (argc == 2)
+	for (int a = 1; a < argc; ++a)
 	{
-		std::string arg_str = std::string(argv[1]);
+		std::string arg_str = std::string(argv[a]);
 
-		if (arg_str == "version") {
+		if (arg_str == "version")
+		{
 			std::cout << "H5MultiGridMerge (h5mgm) Version " << H5MGM_VERSION << std::endl;
 			return 0;
 		}
-		else if (arg_str == "quiet") {
+		else if (arg_str == "quiet")
+		{
 			bQuiet = true;
 		}
-		else if (arg_str == "loud") {
+		else if (arg_str == "loud")
+		{
 			bLoud = true;
 		}
+		else if (arg_str == "cut")
+		{
+			bCutSolid = true;
+		}
+		else if (arg_str == "legacy")
+		{
+			bLegacy = true;
+		}
 		else {
-			case_num = std::string(argv[1]);
+			case_num = std::string(argv[a]);
 		}
 	}
 
@@ -336,7 +347,7 @@ int main(int argc, char* argv[])
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
 				if (bLoud || c % 100000 == 0) {
-					std::cout << "\r" << "Examining cell " << std::to_string(c + 1) << "/" <<
+					std::cout << "\r" << "Examining cell " << std::to_string(c) << "/" <<
 						std::to_string(gridsize[0] * gridsize[1] * gridsize[2]) << std::flush;
 				}
 
@@ -414,8 +425,12 @@ int main(int argc, char* argv[])
 		// Reset counter
 		missed_set_count = 0;
 
-		// Create VTK filename
-		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t) + ".vtk";
+		// Create filename
+		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t);
+		if (bLegacy)
+			vtkFilename += ".vtk";
+		else
+			vtkFilename += ".vtu";
 
 		// Add data
 		vtkSmartPointer<vtkIntArray> LatTyp = vtkSmartPointer<vtkIntArray>::New();
@@ -541,16 +556,33 @@ int main(int argc, char* argv[])
 			(float)(timesteps + out_every)) * 100.0f)) << "% complete." << std::flush;
 
 		// Write grid to file
-		vtkSmartPointer<vtkUnstructuredGridWriter> writer =
-			vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-		writer->SetFileName(vtkFilename.c_str());
-		writer->SetFileTypeToBinary();
+		void *writer = nullptr;
+		if (bLegacy)
+		{
+			vtkSmartPointer<vtkUnstructuredGridWriter> writer =
+				vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+			writer->SetFileName(vtkFilename.c_str());
+			writer->SetFileTypeToBinary();
+			writer->SetFileName(vtkFilename.c_str());
 #if VTK_MAJOR_VERSION <= 5
-		writer->SetInput(unstructuredGrid);
+			writer->SetInput(unstructuredGrid);
 #else
-		writer->SetInputData(unstructuredGrid);
+			writer->SetInputData(unstructuredGrid);
 #endif
-		writer->Write();
+			writer->Write();
+		}
+		else
+		{
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =
+				vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			writer->SetFileName(vtkFilename.c_str());
+#if VTK_MAJOR_VERSION <= 5
+			writer->SetInput(unstructuredGrid);
+#else
+			writer->SetInputData(unstructuredGrid);
+#endif
+			writer->Write();
+		}
 
 		// Free the memory used (forces destructor call)
 		LatTyp = NULL;
@@ -563,8 +595,6 @@ int main(int argc, char* argv[])
 		UxUx_TimeAv = NULL;
 		UxUy_TimeAv = NULL;
 		UyUy_TimeAv = NULL;
-
-
 	}
 
 	return 0;

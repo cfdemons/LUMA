@@ -123,7 +123,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 8		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 3
@@ -140,7 +140,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 5		///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.01		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -169,7 +169,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 100			///< Desired Reynolds number
+#define L_RE 1000			///< Desired Reynolds number
 
 
 /*
@@ -220,7 +220,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 

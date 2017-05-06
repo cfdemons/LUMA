@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.2.7"
+#define H5MGM_VERSION "0.2.8"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -39,6 +39,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkPointData.h"
 
 #define DATASET_READ_FAIL -321
@@ -51,6 +52,9 @@
 static bool bQuiet = false;
 static bool bLoud = false;
 static ofstream logfile;
+static bool bCutSolid = false;
+static bool bSorter = false;
+static bool bLegacy = false;
 
 // Unit vectors for node positions on each cell
 const int e[3][8] =
@@ -129,7 +133,7 @@ bool isOnIgnoreList(eType cell_type)
 		cell_type == eRefinedSolid ||
 		cell_type == eRefinedSymmetry ||
 		cell_type == eTransitionToCoarser ||
-		cell_type == eSolid
+		(bCutSolid = true && cell_type == eSolid)
 		) return true;
 
 	return false;

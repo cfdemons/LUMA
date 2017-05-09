@@ -492,7 +492,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		}
 		// Counters, sizes and indices
 		int i,j,k,v;
-		int x, y, z;
+		double x, y, z;
 		int in_level, in_regnum;
 		std::vector<int> ind;
 

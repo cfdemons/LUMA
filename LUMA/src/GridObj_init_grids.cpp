@@ -457,7 +457,7 @@ void GridObj::LBM_initGrid() {
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
-	omega = 1 / ( (nu / pow(cs,2)) + .5 );
+	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
 
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );

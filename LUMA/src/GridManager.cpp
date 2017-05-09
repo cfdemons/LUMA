@@ -56,13 +56,51 @@ GridManager::GridManager()
 
 			idx = lev + reg * L_NUM_LEVELS;
 
-			// Round definitions file values to voxel resolution on parent level
-			global_edges[eXMin][idx] = std::round(cRefStartX[lev - 1][reg] / dh) * dh;
-			global_edges[eXMax][idx] = std::round(cRefEndX[lev - 1][reg] / dh) * dh;
-			global_edges[eYMin][idx] = std::round(cRefStartY[lev - 1][reg] / dh) * dh;
-			global_edges[eYMax][idx] = std::round(cRefEndY[lev - 1][reg] / dh) * dh;
-			global_edges[eZMin][idx] = std::round(cRefStartZ[lev - 1][reg] / dh) * dh;
-			global_edges[eZMax][idx] = std::round(cRefEndZ[lev - 1][reg] / dh) * dh;
+			/* If using auto sub-grid generation, the padding from the definitions 
+			 * file will be used to define the grid edges. */
+#ifdef L_AUTO_SUBGRIDS
+			if (lev > 1)
+			{
+				// Use padding parameters to specify relative to TL of parent
+				global_edges[eXMin][idx] = global_edges[eXMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_X_MIN / dh) * dh;
+				global_edges[eXMax][idx] = global_edges[eXMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_X_MAX / dh) * dh;
+				global_edges[eYMin][idx] = global_edges[eYMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_Y_MIN / dh) * dh;
+				global_edges[eYMax][idx] = global_edges[eYMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_Y_MAX / dh) * dh;
+				global_edges[eZMin][idx] = global_edges[eZMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_Z_MIN / dh) * dh;
+				global_edges[eZMax][idx] = global_edges[eZMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_Z_MAX / dh) * dh;
+
+			}
+			else
+				// Level 1 must be placed based on the user-defined value //
+#endif
+			{
+				// Round definitions file values to voxel resolution on parent level
+				global_edges[eXMin][idx] = std::round(cRefStartX[lev - 1][reg] / dh) * dh;
+				global_edges[eXMax][idx] = std::round(cRefEndX[lev - 1][reg] / dh) * dh;
+				global_edges[eYMin][idx] = std::round(cRefStartY[lev - 1][reg] / dh) * dh;
+				global_edges[eYMax][idx] = std::round(cRefEndY[lev - 1][reg] / dh) * dh;
+				global_edges[eZMin][idx] = std::round(cRefStartZ[lev - 1][reg] / dh) * dh;
+				global_edges[eZMax][idx] = std::round(cRefEndZ[lev - 1][reg] / dh) * dh;
+
+			}
+
+			// Print warnings for grids sizes that extend beyond parent grid
+			if (lev > 1)
+			{
+				if (global_edges[eXMin][idx] <= global_edges[eXMin][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is coincident with or outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eXMax][idx] >= global_edges[eXMax][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is coincident with or outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eYMin][idx] <= global_edges[eYMin][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is coincident with or outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eYMax][idx] >= global_edges[eYMax][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is coincident with or outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eZMin][idx] <= global_edges[eZMin][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is coincident with or outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eZMax][idx] >= global_edges[eZMax][idx - 1])
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is coincident with or outside its parent grid!", GridUtils::logfile);
+			}
+
 
 			// Populate sizes
 			global_size[eXDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eXMax][idx] - global_edges[eXMin][idx]) / dh));
@@ -73,8 +111,14 @@ GridManager::GridManager()
 			global_size[eZDirection][idx] = 1;
 #endif
 
-			/* If the start and end edges are the same, assume the user is trying to make the sub-grid periodic
-			* so size of sub-grid is just double the parent grid size in that direction */
+			// Error if grid sizes are negative or zero
+			if (global_size[eXDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in X-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+			if (global_size[eYDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in Y-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+			if (global_size[eZDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in Z-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+
+			/* If the start and end edges are the same, assume the user is trying to 
+			 * make the sub-grid periodic so size of sub-grid is just double the 
+			 * parent grid size in that direction. */
 			if (global_edges[eXMin][idx] == global_edges[eXMax][idx]) global_size[eXDirection][idx] = global_size[eXDirection][idx - 1] * 2;
 			if (global_edges[eYMin][idx] == global_edges[eYMax][idx]) global_size[eYDirection][idx] = global_size[eYDirection][idx - 1] * 2;
 			if (global_edges[eZMin][idx] == global_edges[eZMax][idx]) global_size[eZDirection][idx] = global_size[eZDirection][idx - 1] * 2;

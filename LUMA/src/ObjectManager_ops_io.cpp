@@ -599,9 +599,9 @@ void ObjectManager::io_readInGeomConfig() {
 ///			Input data must be in tab separated, 3-column format in the input 
 ///			directory.
 ///
-/// \param	_PCpts	pointer to empty point cloud data container.
+/// \param	_PCpts	reference to pointer to empty point cloud data container.
 /// \param	geom	structure containing object data as parsed from the config file.
-void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
+void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 {
 
 	// Temporary variables
@@ -706,21 +706,43 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 	double z_start_position = body_centre_z - (scaled_body_length / 2);
 	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 
-	// Apply to each point to convert to global positions
-	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+	// Declare local indices
+	std::vector<int> ijk;
+	eLocationOnRank loc = eNone;
+
+	// Filter: erase is O(n^2) so propose creating a copy instead
+	PCpts *_filtered = new PCpts();
+
+	// Apply shift and scale to each point to convert to global positions
+	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++)
+	{
 		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
 		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
 #if (L_DIMS == 3)
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
 #endif
+
+		// Apply a rnak filter at the same time
+		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
+		{
+			_filtered->x.push_back(_PCpts->x[a]);
+			_filtered->y.push_back(_PCpts->y[a]);
+			_filtered->z.push_back(_PCpts->z[a]);
+			_filtered->id.push_back(_PCpts->id[a]);
+		}
+
 	}
 
-	// Write out the points after scaling and shifting
+	// Free old array and assign new array to pointer which will be passed back out
+	delete _PCpts;
+	_PCpts = _filtered;
+
+	// Write out the points after scaling, shifting and filtering
 #ifdef L_CLOUD_DEBUG
 	if (!_PCpts->x.empty()) {
 		if (rank == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPtsPreFilter_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;
@@ -728,50 +750,7 @@ void ObjectManager::io_readInCloud(PCpts* _PCpts, GeomPacked *geom)
 			fileout.close();
 		}
 	}
-#endif
-
-	// Declare local indices
-	std::vector<int> ijk;
-	eLocationOnRank loc = eNone;
-
-	// Exclude points which are not on this rank
-#ifdef L_CLOUD_DEBUG
-	*GridUtils::logfile << "Filtering..." << std::endl;
-#endif
-	a = 0;
-	do {
-
-		// If on this rank get its indices
-		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
-		{
-			// Increment counter
-			a++;
-		}
-		// If not, erase
-		else {
-			_PCpts->x.erase(_PCpts->x.begin() + a);
-			_PCpts->y.erase(_PCpts->y.begin() + a);
-			_PCpts->z.erase(_PCpts->z.begin() + a);
-			_PCpts->id.erase(_PCpts->id.begin() + a);
-
-		}
-
-	} while (a < static_cast<int>(_PCpts->x.size()));
-
-	// Write out the points remaining in for debugging purposes
-#ifdef L_CLOUD_DEBUG
-	*GridUtils::logfile << "There are " << std::to_string(_PCpts->x.size()) << " points on this rank." << std::endl;
-	*GridUtils::logfile << "Writing to file..." << std::endl;
-	if (!_PCpts->x.empty()) {
-		std::ofstream fileout;
-		fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
-		for (size_t i = 0; i < _PCpts->x.size(); i++) {
-			fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
-			fileout << std::endl;
-		}
-		fileout.close();
-	}
-#endif
+#endif	
 
 	// If there are points left
 	if (!_PCpts->x.empty())

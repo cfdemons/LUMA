@@ -204,7 +204,7 @@ void MpiManager::mpi_init()
 ///			Method to decompose the domain and identify local grid sizes.
 ///			Parameters defined here are used in GridObj construction.
 ///			Grid manager must have been initialised before calleing this hence the
-///			requirement o have it as a non-null input parameter.
+///			requirement to have it as a non-null input parameter.
 ///
 ///	\param	grid_man	Pointer to an initialised grid manager.
 void MpiManager::mpi_gridbuild(GridManager* const grid_man)
@@ -221,16 +221,10 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
 	}
 
-	// If using custom sizes, user must set the L_MPI_ZCORES to 1
-	if (L_DIMS == 2 && L_MPI_ZCORES != 1) {
-		L_ERROR("L_MPI_ZCORES must be set to 1 when using custom MPI sizes in 2D. Exiting.", GridUtils::logfile);
-	}
-	
 	// Global physical dimensions
 	double Lx = L_BX;
 	double dh = Lx / static_cast<double>(L_N);
 
-	// Fill up the cRankSize arrays with the coordinates of each mpi region. 
 	// Auxiliary variables
 	int numCells[3];
 	int numCores[3];
@@ -244,7 +238,6 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 #else
 	numCores[2] = 1;
 #endif
-
 	int cellsInDomains[3];
 	int cellsLastDomain[3];
 
@@ -252,15 +245,15 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	cellsInDomains[2] = 0;
 	cellsLastDomain[2] = 0;
 
-	// Loop over dimensions
+	// Compute domain size base don uniform decomposition
 	for (size_t d = 0; d < L_DIMS; d++)
 	{
 
-		// Calculate the size of each domain
+		// Calculate the size of each domain in dimension d
 		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
 
 		// Calculate the size of the last domain
-		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d]*numCores[d] - numCells[d]);
+		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
 
 		// Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
@@ -271,7 +264,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	}
 
 	
-	// Fill the cRankSize arrays
+	// Fill the cRankSize arrays for each MPI block
 	int ind = 0;
 	for (int i = 0; i < numCores[0]; i++)
 	{
@@ -305,7 +298,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 
 		} else {
 
-			// Else, get grids sizes from the arrays
+			// Else, get grids sizes from the arrays and add halo
 			switch (d)
 			{
 			case 0:

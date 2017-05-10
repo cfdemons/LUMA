@@ -43,7 +43,7 @@ public:
 	Matrix2D<T>& operator=(const Matrix2D<T>& other)
 	{
 		//WHAT HAPPENS IF THE SIZES OF THE ARRAYS ARE NTO THE SAME? WILL THE EQUAL FROM VALARRAY THROW AN EXCEPTION? OR DO THIS FUNCTION HAS TO THROW IT?
-		for (int i = 0; i < rows; ++i)
+		for (int i = 0; i < m_rows; ++i)
 			m_values[i] = other[i];
 		return *this;
 	}

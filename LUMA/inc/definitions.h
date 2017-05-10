@@ -61,11 +61,6 @@
 *******************************************************************************
 */
 
-
-// Numbers
-#define L_PI 3.14159265358979323846		///< PI definition
-#define L_SQRT2 1.4142135623731         ///< Square root of 2 definition
-
 // Using MPI?
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 

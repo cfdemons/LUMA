@@ -611,7 +611,7 @@ double GridObj::_LBM_smag(int id, double omega)
 	double Q = sqrt(2.0*(nonEquiStress%nonEquiStress));
 
 	double tau = 1.0 / omega;
-	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)* L_RHOIN* SQ(cs)*SQ(cs) *Q ) - tau);  
+	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * L_SQRT2 * (L_CSMAG * L_CSMAG) * L_RHOIN * SQ(cs) * SQ(cs) * Q ) - tau);  
 	return ( 1.0 / (tau + tau_t) );
 }
 

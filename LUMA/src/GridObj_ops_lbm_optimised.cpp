@@ -326,35 +326,40 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 // *****************************************************************************
 /// \brief	Compute Smagorinksy-modified relaxation
 /// 
-/// Model taken from "DNS and LES of decaying isotropic turbulence with and without frame rotation using lattice Boltzmann method"
-/// by Yu, Huidan Girimaji, Sharath S. Luo, Li Shi  [2005]
+///			Model taken from "DNS and LES of decaying isotropic turbulence with 
+///			and without frame rotation using lattice Boltzmann method" by Yu, 
+///			Huidan Girimaji, Sharath S. Luo, Li Shi  [2005]
 ///
-///	\param	id flattened ijk index. 
-/// \param omega Relaxation frequency. 
-/// \return Smagorinsky-modified omega value
+///	\param	id 		flattened ijk index. 
+/// \param 	omega 	Relaxation frequency. 
+/// \return 		Smagorinsky-modified omega value
 double GridObj::_LBM_smag(int id, double omega)
 {
-	//Calculate the non equilibrium stress tensor
+	// Calculate the non equilibrium stress tensor
 	Matrix2D<double> nonEquiStress(3,3);
 	double fneq[L_NUM_VELS];
  
-	for (int v = 0; v < L_NUM_VELS; ++v) {
+	for (int v = 0; v < L_NUM_VELS; ++v)
 		fneq[v] = fNew[v + id*L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
-	}
 
-	//Calculate diagonal and upper diagonal of the non equilibrium stress tensor
-	for (int i = 0; i < L_DIMS; ++i){
-		for (int j = i; j < L_DIMS; ++j){
+	// Calculate diagonal and upper diagonal of the non equilibrium stress tensor
+	for (int i = 0; i < L_DIMS; ++i)
+	{
+		for (int j = i; j < L_DIMS; ++j)
+		{
 			nonEquiStress[i][j] = 0.0;
-			for (int v = 0; v < L_NUM_VELS; ++v){
+			for (int v = 0; v < L_NUM_VELS; ++v)
+			{
 				nonEquiStress[i][j] += c_opt[v][i] * c_opt[v][j] * fneq[v];
 			}
 		}
 	}
 
-	//Fill in the lower diagonal of the non equilibrium stress tensor (since this tensor is symmetric)
-	for (int i = 1; i < L_DIMS; ++i){
-		for (int j = 0; j < i; ++j){
+	// Fill in the lower diagonal of the non equilibrium stress tensor (since this tensor is symmetric)
+	for (int i = 1; i < L_DIMS; ++i)
+	{
+		for (int j = 0; j < i; ++j)
+		{
 			nonEquiStress[i][j] = nonEquiStress[j][i];
 		}
 	}
@@ -363,7 +368,7 @@ double GridObj::_LBM_smag(int id, double omega)
 
 	double tau = 1.0 / omega;
 	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)* L_RHOIN* SQ(cs)*SQ(cs) *Q ) - tau);  
-	return ( 1 / (tau + tau_t) );
+	return ( 1.0 / (tau + tau_t) );
 }
 
 // *****************************************************************************

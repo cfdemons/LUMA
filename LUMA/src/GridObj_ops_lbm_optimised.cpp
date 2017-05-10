@@ -17,6 +17,8 @@
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
 
+#include "../inc/Matrix.h"
+
 // *****************************************************************************
 /// \brief	Optimised LBM multi-grid kernel.
 ///
@@ -44,16 +46,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #ifdef L_LD_OUT
 	// Reset object forces for momentum exchange force calculation
 	objman->resetMomexBodyForces(this);
-#endif
-
-	// Compute Smagorinksy-modified relaxation
-#ifdef L_USE_BGKSMAG
-	// Smagorinsky
-	double tau = 1.0 / omega;
-	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * 1.4142 * (L_CSMAG * L_CSMAG)) - tau);
-	double omega_s = 1 / (tau + tau_t);
-#else
-	double omega_s = omega;
 #endif
 
 	// Loop over grid
@@ -101,6 +93,12 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #endif
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
+#ifdef L_USE_BGKSMAG
+					// Compute Smagorinksy-modified relaxation
+					double omega_s = _LBM_smag(id, omega);
+#else
+					double omega_s = omega;
+#endif
 					_LBM_collide_opt(id, omega_s);
 				}
 
@@ -146,6 +144,8 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #endif
 
 }
+
+
 
 // *****************************************************************************
 /// \brief	Optimised stream operation.
@@ -565,6 +565,54 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 	// Compute f^eq
 	return rho[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
 
+}
+
+// *****************************************************************************
+/// \brief	Compute Smagorinksy-modified relaxation
+/// 
+///			Model taken from "DNS and LES of decaying isotropic turbulence with 
+///			and without frame rotation using lattice Boltzmann method" by Yu, 
+///			Huidan Girimaji, Sharath S. Luo, Li Shi  [2005]
+///
+///	\param	id 		flattened ijk index. 
+/// \param 	omega 	Relaxation frequency. 
+/// \return 		Smagorinsky-modified omega value
+double GridObj::_LBM_smag(int id, double omega)
+{
+	// Calculate the non equilibrium stress tensor
+	Matrix2D<double> nonEquiStress(3,3);
+	double fneq[L_NUM_VELS];
+ 
+	for (int v = 0; v < L_NUM_VELS; ++v)
+		fneq[v] = fNew[v + id*L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
+
+	// Calculate diagonal and upper diagonal of the non equilibrium stress tensor
+	for (int i = 0; i < L_DIMS; ++i)
+	{
+		for (int j = i; j < L_DIMS; ++j)
+		{
+			nonEquiStress[i][j] = 0.0;
+			for (int v = 0; v < L_NUM_VELS; ++v)
+			{
+				nonEquiStress[i][j] += c_opt[v][i] * c_opt[v][j] * fneq[v];
+			}
+		}
+	}
+
+	// Fill in the lower diagonal of the non equilibrium stress tensor (since this tensor is symmetric)
+	for (int i = 1; i < L_DIMS; ++i)
+	{
+		for (int j = 0; j < i; ++j)
+		{
+			nonEquiStress[i][j] = nonEquiStress[j][i];
+		}
+	}
+
+	double Q = sqrt(2.0*(nonEquiStress%nonEquiStress));
+
+	double tau = 1.0 / omega;
+	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * L_SQRT2 * (L_CSMAG * L_CSMAG)* L_RHOIN* SQ(cs)*SQ(cs) *Q ) - tau);  
+	return ( 1.0 / (tau + tau_t) );
 }
 
 // *****************************************************************************

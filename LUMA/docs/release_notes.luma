@@ -1,3 +1,21 @@
+version		=	1.5.0-alpha
+
+General		:	Updated the HDF5 output and the merge tool to include MPI block labels to make decomposition more apparent.
+				Fixed an untracked bug in the HDF5 writer which would cause a hang on certain MPI/sub-grid combos.
+				Added some colourmaps for paraview.
+				Added script for creating symmetric aerofoil point clouds in 2D and 3D with ends.
+				Added MPI buffer size debugging and cross-checking to prevent hidden hangs in future.
+				Added ability of LUMA to predict completion time of simulation.
+				Merge tool now cuts out solid sites to save memory. Also now uses the CleanToGrid filter from paraview -- extra files supplied with the merge tool.
+				VTU XMLs are written instead of the legacy VTK too. Merge tool incremented to v0.3.0
+
+Issue #46	:	BGK implemented. Set constant in definitions file. 
+Issue #136	:	Upgraded the merge tool to also perform the task of writing out a sorted velocity field from the HDF5 files. Use CLA <sorter>.
+Issue #135	:	Reinstated RBC for a fixed velocity.
+Issue #137	:	Upgraded geometry file and PC reader so obejcts can easily be centred in the domain if required through keywords in the config.
+Issue #122	:	Changed dt suggest code so it gives the upper limit for dt instead.
+Issue #131	:	More intelligent algorithm implemented for constructing MPI block sizes by driving variable boundaries towards most loaded process.
+
 version		=	1.4.2
 
 General		:	Optimisation of PCpts reader so it scales as O(n) rather than O(n^2).

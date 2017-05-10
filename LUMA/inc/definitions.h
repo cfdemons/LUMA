@@ -5,16 +5,16 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
 /// LUMA version
-#define LUMA_VERSION "1.4.2"
+#define LUMA_VERSION "1.5.0-alpha"
 
 
 // Header guard
@@ -42,7 +42,7 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 #define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
@@ -52,6 +52,7 @@
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
+#define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
 
 
 /*
@@ -60,15 +61,11 @@
 *******************************************************************************
 */
 
-
-// Numbers
-#define L_PI 3.14159265358979323846		///< PI definition
-
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 10000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 640000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 100		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
 
@@ -80,22 +77,22 @@
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
-//#define L_PROBE_OUTPUT						///< Turn on probe output
-#define L_PROBE_OUT_FREQ 200					///< Write out frequency of probe output
-const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
-const static double cProbeLimsX[2] = {0.1, 0.2};	///< Limits of X plane for array of probes
-const static double cProbeLimsY[2] = {0.1, 0.2};	///< Limits of Y plane for array of probes
-const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for array of probes
+#define L_PROBE_OUTPUT							///< Turn on probe output
+#define L_PROBE_OUT_FREQ (L_OUT_EVERY / 10)		///< Write out frequency of probe output
+const static int cNumProbes[3] = {1, 5, 1};		///< Number of probes in each direction (x, y, z)
+const static double cProbeLimsX[2] = {0.5, 0.5};	///< Limits of X plane for array of probes
+const static double cProbeLimsY[2] = {0.2, 0.8};	///< Limits of Y plane for array of probes
+const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for array of probes
 
 
 // Gravity
-//#define L_GRAVITY_ON						///< Turn on gravity force
-/// Expression for the gravity force
-#define L_GRAVITY_FORCE 0.0001
+#define L_GRAVITY_ON						///< Turn on gravity force
+/// Expression for the gravity force in dimensionless units
+#define L_GRAVITY_FORCE (12.0 / L_RE)
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 1000			///< Frequency of write out of restart file
@@ -122,10 +119,14 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
+
+// Balanced decomposition
+#define L_MPI_SMART_DECOMPOSE
+#define L_MPI_SD_MAX_ITER 5000
 
 /*
 *******************************************************************************
@@ -134,14 +135,14 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 6		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.001	///< The timestep in non-dimensional units
+#define L_DIMS 2				///< Number of dimensions to the problem
+#define L_RESOLUTION 64		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 1.0e-4	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 24.0		///< End of domain in X (non-dimensional units)
-#define L_BY 6.0		///< End of domain in Y (non-dimensional units)
-#define L_BZ 7.0		///< End of domain in Z (non-dimensional units)
+#define L_BX 2.0		///< End of domain in X (non-dimensional units)
+#define L_BY 1.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -164,7 +165,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 10000			///< Desired Reynolds number
+#define L_RE 50			///< Desired Reynolds number
 
 
 /*
@@ -180,7 +181,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // ****** END JON ONLY ****** //
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
@@ -194,29 +195,25 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-//#define L_UPSTREAM_TUNNEL			///< Adds an inlet to all faces except exit
-#define L_FREESTREAM_TUNNEL		///< Adds a inlet to all faces
+//#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
+// Type of Inlet/Outlet BC (default Forced Equilibrium)
+//#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
-// Inlets
-#define L_INLET_ON				///< Turn on inlet boundary (assumed left-hand wall - default Do Nothing)
-//#define L_INLET_REGULARISED	///< Specify the inlet to be a regularised inlet condition (Latt & Chopard)
-//#define L_INLET_NRBC			///< Turn on NRBC at inlet
+// Inlet (left-hand wall)
+//#define L_INLET_ON				///< Turn on inlet boundary
 
-
-// Outlets
-#define L_OUTLET_ON				///< Turn on outlet boundary (assumed right-hand wall -- default Do Nothing)
-//#define L_OUTLET_NRBC			///< Turn on NRBC at outlet
-
+// Outlet (right-hand wall)
+//#define L_OUTLET_ON				///< Turn on outlet boundary
 
 // Solids
-//#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_FLOOR_ONLY
-#define L_WALL_THICKNESS_BOTTOM (static_cast<double>(L_BX)/static_cast<double>(L_N))		///< Thickness of wall
-#define L_WALL_THICKNESS_TOP (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of top wall
-#define L_WALL_THICKNESS_FRONT (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of front (3D) wall
-#define L_WALL_THICKNESS_BACK (static_cast<double>(L_BX)/static_cast<double>(L_N))			///< Thickness of back (3D) wall
+#define L_WALL_THICKNESS_BOTTOM L_COARSE_SITE_THICKNESS			///< Thickness of wall
+#define L_WALL_THICKNESS_TOP L_COARSE_SITE_THICKNESS			///< Thickness of top wall
+#define L_WALL_THICKNESS_FRONT L_COARSE_SITE_THICKNESS			///< Thickness of front (3D) wall
+#define L_WALL_THICKNESS_BACK L_COARSE_SITE_THICKNESS			///< Thickness of back (3D) wall
 
 
 /*
@@ -225,68 +222,38 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 6		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)
-#define L_PADDING_X_MIN 0.0		///< Padding between X start of each sub-grid and its child edge
-#define L_PADDING_X_MAX 0.0		///< Padding between X end of each sub-grid and its child edge
-#define L_PADDING_Y_MIN (-2.0 * dh)		///< Padding between Y start of each sub-grid and its child edge
-#define L_PADDING_Y_MAX 0.0		///< Padding between Y end of each sub-grid and its child edge
-#define L_PADDING_Z_MIN 0.0		///< Padding between Z start of each sub-grid and its child edge
-#define L_PADDING_Z_MAX 0.0		///< Padding between Z end of each sub-grid and its child edge
+#define L_PADDING_X_MIN 0.01		///< Padding between X start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.01		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN 0.01		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_Y_MAX 0.01		///< Padding between Y end of each sub-grid and its child edge
+#define L_PADDING_Z_MIN 0.01		///< Padding between Z start of each sub-grid and its child edge
+#define L_PADDING_Z_MAX 0.01		///< Padding between Z end of each sub-grid and its child edge
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.4 },
-	{ 4.5 },
-	{ 4.6 },
-	{ 4.7 },
-	{ 4.8 },
-	{ 4.9 }
+	{ 0.8 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 13.5 },
-	{ 13.0 },
-	{ 12.5 },
-	{ 12.0 },
-	{ 11.5 },
-	{ 11.0 }
+	{ 1.2 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 },
-	{ 0.0 }
+	{ 0.4 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.0 },
-	{ 1.9 },
-	{ 1.8 },
-	{ 1.7 },
-	{ 1.6 },
-	{ 1.5 }
+	{ 0.6 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.1 },
-	{ 2.2 },
-	{ 2.3 },
-	{ 2.4 },
-	{ 2.5 },
-	{ 2.6 }
+	{ 2.8 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 4.9 },
-	{ 4.8 },
-	{ 4.7 },
-	{ 4.6 },
-	{ 4.5 },
-	{ 4.4 }
+	{ 7.2 }
 };
 
 #endif
@@ -301,6 +268,7 @@ static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 #define L_N static_cast<int>(L_BX * L_RESOLUTION)
 #define L_M static_cast<int>(L_BY * L_RESOLUTION)
 #define L_K static_cast<int>(L_BZ * L_RESOLUTION)
+#define L_COARSE_SITE_THICKNESS (static_cast<double>(L_BX)/static_cast<double>(L_N))
 
 // Set dependent options
 #if (L_DIMS == 3)

@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -384,15 +384,6 @@ void GridObj::LBM_initGrid() {
 
 #endif	// L_BUILD_FOR_MPI
 
-	// Absolute origins (position of first site on grid)
-	XOrigin = dh / 2.0;
-	YOrigin = dh / 2.0;
-#if (L_DIMS == 3)
-	ZOrigin = dh / 2.0;
-#else
-	ZOrigin = 0.0;
-#endif
-
 	
 
 	// Define TYPING MATRICES
@@ -466,7 +457,7 @@ void GridObj::LBM_initGrid() {
 
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
-	omega = 1 / ( (nu / pow(cs,2)) + .5 );
+	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
 
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
@@ -482,15 +473,19 @@ void GridObj::LBM_initGrid() {
 #endif
 
 	// Check if there are incompressibility issues and warn the user if so
-	if (uref > (0.17*cs)) {
-		L_WARN("Reference velocity in LBM units larger than 17% of the speed of sound. \
-			   			Compressibility effects may impair the quality of the results. \
-												Try L_TIMESTEP = " 
-												+ std::to_string((SQ(dh) * (0.7 - 0.5) * SQ(cs)) / nu),
-												GridUtils::logfile);
-		if (uref >= cs){
-			L_ERROR("Reference velocity in LBM units equal to or larger than the speed of sound cs, \
-					results of the simulation are not valid. Exiting.", GridUtils::logfile);
+	if (uref > (0.17 * cs))
+	{
+		std::string msg;
+		msg += "Reference velocity in LBM units larger than 17% of the speed of sound. ";
+		msg += "Compressibility effects may impair the quality of the results. ";
+		msg += "Try L_TIMESTEP = " + std::to_string(0.17 * dh * cs) + " or smaller.";
+		L_WARN(msg, GridUtils::logfile);
+		if (uref >= cs)
+		{
+			msg.clear();
+			msg += "Reference velocity in LBM units equal to or larger than the speed of sound cs. ";
+			msg += "Results of the simulation are not valid. Exiting.";
+			L_ERROR(msg, GridUtils::logfile);
 		}
 	}
 
@@ -560,16 +555,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	LBM_initPositionVector(pGrid.ZPos[CoarseLimsZ[eMinimum]] - dh / 2.0, pGrid.ZPos[CoarseLimsZ[eMaximum]] - dh / 2.0, eZDirection);
 #else
 	ZPos.insert( ZPos.begin(), 0.0 ); // 2D default
-#endif
-		
-
-	// Global edge origins (voxel centre position of first cell on grid)
-	XOrigin = gm->global_edges[eXMin][gm_idx] + dh / 2;
-	YOrigin = gm->global_edges[eYMin][gm_idx] + dh / 2;
-#if (L_DIMS == 3)
-	ZOrigin = gm->global_edges[eZMin][gm_idx] + dh / 2;
-#else
-	ZOrigin = 0.0;
 #endif
 
 	
@@ -1051,93 +1036,15 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Complete." << std::endl;
+
+	// Write out the position vectors
+	if (dir == eXDirection) *GridUtils::logfile << "XPos: ";
+	else if (dir == eYDirection) *GridUtils::logfile << "YPos: ";
+	else if (dir == eZDirection) *GridUtils::logfile << "ZPos: ";
+	for (size_t i = 0; i < arr->size(); ++i)
+		*GridUtils::logfile << std::to_string((*arr)[i]) << " ";
+	*GridUtils::logfile << "...Complete." << std::endl;
 #endif
-}
-
-// ****************************************************************************
-/// \brief	Method to initialise label-based solids
-void GridObj::LBM_initSolidLab() {
-
-#ifdef L_SOLID_BLOCK_ON
-	// Return if not to be put on the current grid
-	if (L_BLOCK_ON_GRID_LEV != level || L_BLOCK_ON_GRID_REG != region_number) return;
-
-	// Declarations
-	int i, j, k;
-	int idx = level + region_number * L_NUM_LEVELS;
-	GridManager *gm = GridManager::getInstance();
-
-	/* Check solid block contained on the grid specified in the definitions file.
-	 * If not then exit as user has specifed block outside the grid on which they want it 
-	 * placed. */
-
-	// Check block placement -- must not be on TL if on a level other than 0
-	if	(
-		(
-
-		(level == 0) && 
-
-		(L_BLOCK_MAX_X > L_BX || L_BLOCK_MIN_X < 0.0 || L_BLOCK_MAX_Y > L_BY || L_BLOCK_MIN_Y < 0.0 
-#if (L_DIMS == 3)
-		|| L_BLOCK_MAX_Z > L_BZ || L_BLOCK_MIN_Z < 0.0
-#endif
-		)
-
-		) || (
-
-		(level != 0) && 
-
-		(
-		(
-		L_BLOCK_MAX_X > gm->global_edges[eXMax][idx] || 
-		L_BLOCK_MIN_X < gm->global_edges[eXMin][idx] || 
-		L_BLOCK_MAX_Y > gm->global_edges[eYMax][idx] || 
-		L_BLOCK_MIN_Y < gm->global_edges[eYMin][idx] 
-#if (L_DIMS == 3)
-		||
-		L_BLOCK_MAX_Z > gm->global_edges[eZMax][idx] || 
-		L_BLOCK_MIN_Z < gm->global_edges[eZMin][idx]
-#endif
-		)
-		||
-		(
-		GridUtils::isOnTransitionLayer(L_BLOCK_MIN_X, L_BLOCK_MIN_Y, L_BLOCK_MIN_Z, this) ||
-		GridUtils::isOnTransitionLayer(L_BLOCK_MAX_X, L_BLOCK_MAX_Y, L_BLOCK_MAX_Z, this)
-		)
-		)
-	
-		)
-		) {
-
-		// Block outside grid
-		L_ERROR("Block is placed outside or on the TL of the selected grid. Exiting.", GridUtils::logfile);
-	}
-
-
-	// Loop over grid
-	for (i = 0; i < N_lim; ++i)
-	{
-		for (j = 0; j < M_lim; ++j)
-		{
-			for (k = 0; k < K_lim; ++k)
-			{
-
-				if (
-					XPos[i] <= L_BLOCK_MAX_X && XPos[i] > L_BLOCK_MIN_X &&
-					YPos[j] <= L_BLOCK_MAX_Y && YPos[j] > L_BLOCK_MIN_Y
-#if (L_DIMS == 3)
-					&& ZPos[k] <= L_BLOCK_MAX_Z && ZPos[k] > L_BLOCK_MIN_Z
-#endif
-					)
-				{
-					LatTyp(i, j, k, M_lim, K_lim) = eSolid;
-				}
-
-			}
-		}
-	}
-
-#endif	// L_SOLID_BLOCK_ON
 
 }
 
@@ -1148,7 +1055,7 @@ void GridObj::LBM_initSolidLab() {
 void GridObj::LBM_initBoundLab ( ) {
 
 	// If we need to label the edges...
-#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL || defined L_UPSTREAM_TUNNEL
+#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL
 
 	int i, j, k;
 
@@ -1165,7 +1072,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] == dh / 2) {		// Wall found
+		if (XPos[i] <= dh / 2.0) {		// Wall found
 
 			// Label inlet
 			for (j = 0; j < M_lim; j++) {
@@ -1187,7 +1094,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] == L_BX - dh / 2) {		// Wall found
+		if (XPos[i] >= L_BX - dh / 2.0) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {
@@ -1218,7 +1125,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1238,7 +1145,7 @@ void GridObj::LBM_initBoundLab ( ) {
 			for (i = 0; i < N_lim; i++) {
 				for (j = 0; j < M_lim; j++) {
 
-#if (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#if (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
 #else
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
@@ -1263,7 +1170,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #ifdef L_WALLS_ON
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
 #endif
 
@@ -1284,7 +1191,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 #if (defined L_WALLS_ON && !defined L_WALL_FLOOR_ONLY)
 					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_UPSTREAM_TUNNEL || defined L_FREESTREAM_TUNNEL)
+#elif (defined L_FREESTREAM_TUNNEL)
 					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
 #endif
 

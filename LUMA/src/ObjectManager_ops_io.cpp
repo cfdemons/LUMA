@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -315,32 +315,36 @@ void ObjectManager::io_readInGeomConfig() {
 		file >> bodyCase;
 
 		// ** READ FROM FILE ** //
-		if (bodyCase == "FROM_FILE") {
+		if (bodyCase == "FROM_FILE")
+		{
 
 			// Read in the rest of the data for this case
 			std::string boundaryType; file >> boundaryType;
 			std::string fileName; file >> fileName;
 			int lev; file >> lev;
 			int reg; file >> reg;
-			double startX; file >> startX;
-			double startY; file >> startY;
-			double centreZ; file >> centreZ;
+			std::string xRefType; file >> xRefType;
+			double xRef; file >> xRef;
+			std::string yRefType; file >> yRefType;
+			double yRef; file >> yRef;
+			std::string zRefType; file >> zRefType;
+			double zRef; file >> zRef;
 			double length; file >> length;
 			std::string direction; file >> direction;
 			std::string flex_rigid; file >> flex_rigid;
 			std::string BC; file >> BC;
 
+			bool xRefCen = GeomPacked::interpretRef(xRefType);
+			bool yRefCen = GeomPacked::interpretRef(yRefType);
+			bool zRefCen = GeomPacked::interpretRef(zRefType);
 
-			// ****** BEGIN JON ONLY ****** //
-
-			// Overwrite the values from file with parameterisation for inclined 2D plate
-			startX = (L_BX - cos(L_ANGLE * L_PI / 180.0)) / 2.0;
-			startY = (L_BY - sin(L_ANGLE * L_PI / 180.0)) / 2.0;
+			L_INFO("Initialising Body " + std::to_string(bodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
+			
+			// ****** START JON ONLY ***** //
 			length = cos(L_ANGLE * L_PI / 180);
 
 			// ****** END JON ONLY ****** //
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") from file..." << std::endl;
 
 			// Get body type
 			eObjectType bodyType;
@@ -352,13 +356,13 @@ void ObjectManager::io_readInGeomConfig() {
 				bodyType = eIBBCloud;
 
 			// Get direction
-			eCartesianDirection cartDirection;
+			eCartesianDirection scaleDirection;
 			if (direction == "X")
-				cartDirection = eXDirection;
+				scaleDirection = eXDirection;
 			else if (direction == "Y")
-				cartDirection = eYDirection;
+				scaleDirection = eYDirection;
 			else if (direction == "Z")
-				cartDirection = eZDirection;
+				scaleDirection = eZDirection;
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
@@ -383,8 +387,8 @@ void ObjectManager::io_readInGeomConfig() {
 			// Packed information into a geometry instance
 			GeomPacked *geom = new GeomPacked(
 				bodyType, bodyID, fileName, lev, reg, 
-				startX, startY, centreZ, length, 
-				cartDirection, moveProperty, clamped
+				xRefCen, xRef, yRefCen, yRef, zRefCen, zRef,
+				length, scaleDirection, moveProperty, clamped
 				);
 
 			// Read in data from point cloud file
@@ -397,7 +401,8 @@ void ObjectManager::io_readInGeomConfig() {
 		}
 
 		// ** INSERT FILAMENT ** //
-		else if (bodyCase == "FILAMENT") {
+		else if (bodyCase == "FILAMENT")
+		{
 
 			// Read in the rest of the data for this case
 			std::string boundaryType; file >> boundaryType;
@@ -465,7 +470,8 @@ void ObjectManager::io_readInGeomConfig() {
 		}
 
 		// ** INSERT CIRCLE/SPHERE ** //
-		else if (bodyCase == "CIRCLE_SPHERE") {
+		else if (bodyCase == "CIRCLE_SPHERE")
+		{
 
 			// Read in the rest of the data for this case
 			std::string boundaryType; file >> boundaryType;
@@ -521,7 +527,8 @@ void ObjectManager::io_readInGeomConfig() {
 		}
 
 		// ** INSERT SQUARE/CUBE ** //
-		else if (bodyCase == "SQUARE_CUBE") {
+		else if (bodyCase == "SQUARE_CUBE")
+		{
 
 			// Read in the rest of the data for this case
 			std::string boundaryType; file >> boundaryType;
@@ -621,7 +628,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	}
 
 	// Get grid pointer
-	GridUtils::getGrid(_Grids, geom->on_grid_lev, geom->on_grid_reg, g);
+	GridUtils::getGrid(_Grids, geom->onGridLev, geom->onGridReg, g);
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
@@ -629,11 +636,11 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	// Get rank for debugging
 	int rank = GridUtils::safeGetRank();
 
-	// Round bounding box dimensions to nearest voxel edge on this grid
-	double body_start_x = std::round(geom->body_start_x / g->dh) * g->dh;
-	double body_start_y = std::round(geom->body_start_y / g->dh) * g->dh;
-	double body_centre_z = std::round(geom->body_centre_z / g->dh) * g->dh + g->dh / 2.0;	// Centre shifted to voxel centre
-	double body_length = std::round(geom->body_length / g->dh) * g->dh;
+	// Round reference values to voxel centres
+	double bodyRefX = std::round(geom->bodyRefX / g->dh) * g->dh;
+	double bodyRefY = std::round(geom->bodyRefY / g->dh) * g->dh;
+	double bodyRefZ = std::round(geom->bodyRefZ / g->dh) * g->dh;
+	double bodyLength = std::round(geom->bodyLength / g->dh) * g->dh;
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -684,27 +691,65 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 
 	double scale_factor;
 	// Scale slightly smaller as distribution of voxels would be asymmetric if points sit on edge
-	if (geom->scale_direction == eXDirection) {
-		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
+	if (geom->scaleDirection == eXDirection)
+	{
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
-	else if (geom->scale_direction == eYDirection) {
-		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
+	else if (geom->scaleDirection == eYDirection)
+	{
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
-	else if (geom->scale_direction == eZDirection) {
-		scale_factor = (body_length - 2 * L_SMALL_NUMBER * g->dh) /
+	else if (geom->scaleDirection == eZDirection)
+	{
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
 
-	// Shift to a small fraction of the grid spacing in from edge to avoid issues with symmetry
-	double shift_x = (body_start_x + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
-	double shift_y = (body_start_y + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	// If reference is a centre, shift to centre of voxel
+	double shiftX, shiftY, shiftZ, scaledDistance, startPos;
+	if (geom->isRefXCentre)
+	{
+		bodyRefX += (g->dh / 2.0);
+		scaledDistance = scale_factor * 
+			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
+		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;	// Round to nearest voxel multiple
+		startPos = bodyRefX - (scaledDistance / 2.0);
+		shiftX = startPos - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	}
+	else
+	{
+		shiftX = (bodyRefX + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+	}
 
-	// z-shift based on centre of object
-	double scaled_body_length = scale_factor * (*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-	double z_start_position = body_centre_z - (scaled_body_length / 2);
-	double shift_z = z_start_position - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
+	if (geom->isRefYCentre)
+	{
+		bodyRefY += (g->dh / 2.0);
+		scaledDistance = scale_factor *
+			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
+		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;
+		startPos = bodyRefY - (scaledDistance / 2.0);
+		shiftY = startPos - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	}
+	else
+	{
+		shiftY = (bodyRefY + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+	}
+
+	if (geom->isRefZCentre)
+	{
+		bodyRefZ += (g->dh / 2.0);
+		scaledDistance = scale_factor *
+			std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
+		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;
+		startPos = bodyRefZ - (scaledDistance / 2.0);
+		shiftZ = startPos - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
+	}
+	else
+	{
+		shiftZ = (bodyRefZ + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
+	}
 
 	// Declare local indices
 	std::vector<int> ijk;
@@ -716,10 +761,10 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	// Apply shift and scale to each point to convert to global positions
 	for (a = 0; a < static_cast<int>(_PCpts->x.size()); a++)
 	{
-		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shift_x;
-		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shift_y;
+		_PCpts->x[a] *= scale_factor; _PCpts->x[a] += shiftX;
+		_PCpts->y[a] *= scale_factor; _PCpts->y[a] += shiftY;
 #if (L_DIMS == 3)
-		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shift_z;
+		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shiftZ;
 #endif
 
 		// Apply a rnak filter at the same time
@@ -779,7 +824,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		case eIBBCloud:
 
 			// Call constructor to build IBM body
-			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->clamped);
+			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->isClamped);
 			break;
 
 		}

@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -88,7 +88,8 @@ int main( int argc, char* argv[] )
 	*/
 
     // Timing variables
-	clock_t t_start, secs; // Wall clock variables
+	clock_t t_start, secs;	// Wall clock variables
+	double outer_loop_time = 0.0; 
 
 	// Start clock to time initialisation
 	t_start = clock();
@@ -150,7 +151,7 @@ int main( int argc, char* argv[] )
 
 	// Create the Grid Manager
 	GridManager *gm = GridManager::getInstance();
-	
+
 #ifdef L_BUILD_FOR_MPI
 	// Decompose the domain
 	mpim->mpi_gridbuild(gm);
@@ -161,7 +162,6 @@ int main( int argc, char* argv[] )
 	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
 	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
 #endif
-
 
 	// Start clock again for next bit of initialisation
 #ifdef L_BUILD_FOR_MPI
@@ -178,7 +178,7 @@ int main( int argc, char* argv[] )
 	*/
 
 	// Create the first object in the hierarchy (level = 0)
-	GridObj *Grids = new GridObj(0);
+	GridObj *const Grids = new GridObj(0);
 
 
 	// Log file information
@@ -238,7 +238,7 @@ int main( int argc, char* argv[] )
 	}
 
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
-	gm->Grids = Grids;
+	gm->setGridHierarchy(Grids);
 
 	/*
 	****************************************************************************
@@ -312,17 +312,14 @@ int main( int argc, char* argv[] )
 	
 	// Compute buffer sizes
 	mpim->mpi_buffer_size();
-
+	
 	//  Build writable data for all grids and sub-grid communicators
 	mpim->mpi_buildCommunicators(gm);
-
+	
 	// Compute load balance information
 	mpim->mpi_updateLoadInfo(gm);
 
 #endif
-
-
-
 
 	// Write out t = 0
 #ifdef L_TEXTOUT
@@ -345,9 +342,17 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
+#ifdef L_BUILD_FOR_MPI
+	// Barrier before recording completion of initialisation
+	MPI_Barrier(mpim->world_comm);
+#endif
+	
 	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
 
+	if (rank == 0)
+		std::cout << "Initialisation complete. Starting LBM time-stepping..." << std::endl;
 
+	
 	/*
 	****************************************************************************
 	***************************** IB-LBM PROCEDURE *****************************
@@ -360,12 +365,12 @@ int main( int argc, char* argv[] )
 		MPI_Barrier(mpim->world_comm);
 #endif
 
-		if ((Grids->t+1) % L_OUT_EVERY == 0
-#ifdef L_BUILD_FOR_MPI
-			&& mpim->my_rank == 0
+#ifdef L_SHOW_TIME_TO_COMPLETE
+		// Start clock for timing outer loop
+		t_start = clock();
 #endif
-			)
-			std::cout << "\n------ Time Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------" << endl;
+		if ((Grids->t + 1) % L_OUT_EVERY == 0 && rank == 0)
+			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
 
 
 		///////////////////////
@@ -380,10 +385,14 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids->t % L_OUT_EVERY == 0) {
+		if (Grids->t % L_OUT_EVERY == 0)
+		{
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
 #endif
+			// Write out the time an outer loop is taking to the log file
+			L_INFO("Outer loop taking " + std::to_string(outer_loop_time) + "ms", GridUtils::logfile);
+
 #ifdef L_TEXTOUT
 			*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
 			Grids->io_textout("START OF TIMESTEP");
@@ -414,7 +423,19 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
 #endif
+
 		}
+
+		// Completion time
+#ifdef L_SHOW_TIME_TO_COMPLETE
+		if (rank == 0 && (Grids->t % L_OUT_EVERY == 0 || Grids->t < 10))
+		{
+			int hms[3];
+			GridUnits::secs2hms((L_TOTAL_TIMESTEPS - Grids->t) * outer_loop_time / 1000, &hms[0]);
+			if (Grids->t % L_OUT_EVERY != 0) std::cout << "\r";
+			std::cout << " Time to complete approx. " << hms[0] << " [h] " << hms[1] << " [m] " << hms[2] << " [s]     " << std::flush;
+		}
+#endif
 
 		// Write out forces of objects
 #ifdef L_LD_OUT
@@ -465,6 +486,14 @@ int main( int argc, char* argv[] )
 			// Write out
 			Grids->io_restart(eWrite);
 		}
+
+
+#ifdef L_SHOW_TIME_TO_COMPLETE
+		// Update outer loop time (inc. effects of writing out for accuracy)
+		outer_loop_time *= Grids->t - 1;
+		outer_loop_time += (static_cast<double>(clock() - t_start)) / CLOCKS_PER_SEC * 1000;
+		outer_loop_time /= Grids->t;
+#endif
 
 	// Loop End
 	} while (Grids->t < L_TOTAL_TIMESTEPS);

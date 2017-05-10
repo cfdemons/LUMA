@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -61,6 +61,7 @@
 #include <fstream>
 #include <sstream>
 #include <numeric>
+#include <valarray>
 #include <assert.h>
 
 // Check OS is Windows or not
@@ -99,8 +100,9 @@
 
 // Squared operator
 #define SQ(x) ((x) * (x))
-#define SQRT3 1.7320508075688772935274463415059
-#define SQRT2 1.4142135623730950488016887242097
+#define L_SQRT3 1.7320508075688772935274463415059
+#define L_SQRT2 1.4142135623730950488016887242097
+#define L_PI 3.14159265358979323846
 
 // Small number for comparing floats to zero
 #define L_SMALL_NUMBER 1e-8

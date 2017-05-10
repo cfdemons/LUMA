@@ -18,7 +18,10 @@
 // Static declarations
 GridManager* GridManager::me;
 
-/// Default constructor
+/// \brief	Default constructor
+///
+///			Uses compile-time parameters to populate global grid information.
+///			Also executes the auto-sub-grid generation if requested.
 GridManager::GridManager()
 {
 
@@ -169,18 +172,22 @@ GridManager::~GridManager()
 }
 
 /// Instance creator
-GridManager* GridManager::getInstance() {
-
+GridManager* GridManager::getInstance()
+{
 	if (!me) me = new GridManager();	// Private construction
 	return me;							// Return pointer to new object
-
 }
 
 /// Instance destroyer
-void GridManager::destroyInstance() {
-
+void GridManager::destroyInstance()
+{
 	delete me;			// Delete pointer from static context (destructor will be called automatically)
+}
 
+/// Set grid hierarchy in the manager after grid creation
+void GridManager::setGridHierarchy(GridObj *const grids)
+{
+	Grids = grids;
 }
 
 
@@ -482,4 +489,109 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 	}
 
 	return true;
+}
+
+/// \brief	Returns the number of active cells in the union between the domain 
+///			and the bounds.
+///
+///			This method wraps the getCellCount() method. Grid hierarchy is 
+///			traversed with active cells from each grid being added to the total 
+///			in turn. Does not taken into account the halo cells at present 
+///			although could be modified to do so in the future.
+///
+///	\param	bounds	pointer to an array containing the bounds of the region to be checked.
+///	\returns		number of active cells in the union.
+long GridManager::getActiveCellCount(double *bounds)
+{
+
+	// Get count on course grid
+	unsigned int idx = 0;
+	long cell_count = 0;
+	long cells_on_this_grid = 0;
+	cell_count = getCellCount(0, 0, bounds);
+
+	// Loop over the grids and retrieve cell counts
+	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev)
+	{
+		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
+		{
+			// Retrieve cell count in union
+			cells_on_this_grid = getCellCount(lev, reg, bounds);
+
+			// Add the contribution of active cells from this grid
+			cell_count += cells_on_this_grid;
+				
+			// Deduct course cells that are refined
+			cell_count -= cells_on_this_grid / static_cast<long>(pow(2, L_DIMS));
+
+		}
+	}
+
+	return cell_count;
+}
+
+/// \brief	Returns the number of cells in the union between the target 
+///			grid and the bounds.
+///
+///			This method does not taken into account the halo cells at present
+///			although could be modified to do so in the future. It also does not 
+///			snap bounds edges to cell edges hence the value returned is only an
+///			approximation of cell count rather than the actual cell count.
+///
+///	\param	targetLevel		grid level on which to check for union.
+///	\param	targetRegion	grid region on which to check for union.
+///	\param	bounds			pointer to an array containing the bounds of the region to be checked.
+///	\returns				number of cells in the union.
+long GridManager::getCellCount(int targetLevel, int targetRegion, double *bounds)
+{
+	// Access edge array using idx
+	unsigned int idx = 0;
+	if (targetLevel != 0) idx = targetLevel + targetRegion * L_NUM_LEVELS;
+
+	// If start of bounds outside end of grid, no union
+	if (
+		bounds[eXMin] > global_edges[eXMax][idx] ||
+		bounds[eYMin] > global_edges[eYMax][idx]
+#if (L_DIMS == 3)
+		|| bounds[eZMin] > global_edges[eZMax][idx]
+#endif
+		) return 0;
+
+	// If end of bounds is before the start of the grid, no union
+	if (
+		bounds[eXMax] < global_edges[eXMin][idx] ||
+		bounds[eYMax] < global_edges[eYMin][idx]
+#if (L_DIMS == 3)
+		|| bounds[eZMax] < global_edges[eZMin][idx]
+#endif
+		) return 0;
+
+	// All other scenarios can produce a union //
+
+	// Create store for the union edges
+	double union_bounds[6];
+	union_bounds[eXMin] = (bounds[eXMin] > global_edges[eXMin][idx]) ? bounds[eXMin] : global_edges[eXMin][idx];
+	union_bounds[eXMax] = (bounds[eXMax] < global_edges[eXMax][idx]) ? bounds[eXMax] : global_edges[eXMax][idx];
+	union_bounds[eYMin] = (bounds[eYMin] > global_edges[eYMin][idx]) ? bounds[eYMin] : global_edges[eYMin][idx];
+	union_bounds[eYMax] = (bounds[eYMax] < global_edges[eYMax][idx]) ? bounds[eYMax] : global_edges[eYMax][idx];
+#if (L_DIMS == 3)
+	union_bounds[eZMin] = (bounds[eZMin] > global_edges[eZMin][idx]) ? bounds[eZMin] : global_edges[eZMin][idx];
+	union_bounds[eZMax] = (bounds[eZMax] < global_edges[eZMax][idx]) ? bounds[eZMax] : global_edges[eZMax][idx];
+#endif
+
+
+	// Determine area / volume of the union
+	double volume = (union_bounds[eXMax] - union_bounds[eXMin]) * (union_bounds[eYMax] - union_bounds[eYMin]);
+#if (L_DIMS == 3)
+	volume *= (union_bounds[eZMax] - union_bounds[eZMin]);
+#endif
+
+	// Use knowledge of discretisation to return the number of cells in union
+	double base_cell_size = L_BX / static_cast<double>(L_N);
+	double local_cell_size = base_cell_size / pow(2, targetLevel);
+#if (L_DIMS == 3)
+	return static_cast<long>(volume / (local_cell_size * local_cell_size * local_cell_size));
+#else
+	return static_cast<long>(volume / (local_cell_size * local_cell_size));
+#endif
 }

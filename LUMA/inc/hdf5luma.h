@@ -33,25 +33,23 @@
 ///
 ///			Automatically selects the correct slab arrangement and buffers the 
 ///			data accordingly before writing to structured file.
-/// \param memspace		memory dataspace id.
-/// \param filespace	file dataspace id.
-/// \param dataset_id	dataset id.
-/// \param slab_type	slab type enum.
-/// \param N_lim		number of X-direction sites on the local grid.
-/// \param M_lim		number of Y-direction sites on the local grid.
-/// \param K_lim		number of Z-direction sites on the local grid.
-/// \param g			pointer to grid which we are writing out.
-/// \param data			pointer to the start of the array to be written.
-/// \param hdf_datatype HDF5 datatype being written.
-///	\param TL_present	pointer to array of flags indicating whether a lower TL is 
-///						present on this grid in given direction so offset in file can be computed.
-/// \param TL_thickness the thickness of the TL on this grid level in local lattice units.
-/// \param hdf_data		the data structure containing information about local halos.
+/// \param	memspace		memory dataspace id.
+/// \param	filespace		file dataspace id.
+/// \param	dataset_id		dataset id.
+/// \param	slab_type		slab type enum.
+/// \param	g				pointer to grid which we are writing out.
+/// \param	data			pointer to the start of the array to be written.
+/// \param	hdf_datatype	HDF5 datatype being written.
+///	\param	TL_present		pointer to array of flags indicating whether a lower TL is 
+///							present on this grid in given direction so offset in 
+///							file can be computed.
+/// \param	TL_thickness	the thickness of the TL on this grid level in local lattice units.
+///	\param	minEdges		pointer to double array containing position of grid edge (from GM).
+/// \param	hdf_data		the data structure containing information about local halos.
 template <typename T>
 void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
-	eHdf5SlabType slab_type, int N_lim, int M_lim, int K_lim,
-	GridObj *g, T *data, hid_t hdf_datatype,
-	bool *TL_present, int TL_thickness,
+	eHdf5SlabType slab_type, GridObj *g, T *data, hid_t hdf_datatype,
+	bool *TL_present, int TL_thickness, double *minEdges,
 	HDFstruct hdf_data) {
 
 
@@ -63,12 +61,17 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	int k_start = hdf_data.k_start;
 	int k_end = hdf_data.k_end;
 
+	// Index for grid manager quantities
+	int idx;
+	if (g->level == 0) idx = 0;
+	else idx = g->level + g->region_number * L_NUM_LEVELS;
+
 	// Create buffer (block of data we aim to write from this process)
 	T *buffer = (T*)malloc(hdf_data.writable_data_count * sizeof(T));
 
 	// DEBUG //
 #ifdef L_HDF_DEBUG
-	*GridUtils::logfile << "Writable data size = " 
+	*GridUtils::logfile << "Writing...Writable data size = " 
 		<< (i_end - i_start + 1) << "," 
 		<< (j_end - j_start + 1) << 
 #if (L_DIMS == 3)
@@ -126,10 +129,13 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 	/* Get global offsets for start of file space from the number of cells 
 	 * between the origin and the first writable cell.
 	 * Correct the offset due to TL presence as TL is not written out. */
-	f_offset[0] = static_cast<size_t>(std::round((g->XPos[i_start] - g->XOrigin) / g->dh)) - TL_present[eXDirection] * TL_thickness;
-	f_offset[1] = static_cast<size_t>(std::round((g->YPos[j_start] - g->YOrigin) / g->dh)) - TL_present[eYDirection] * TL_thickness;
+	f_offset[0] = static_cast<int>(std::round((g->XPos[i_start] - minEdges[eXDirection] - (g->dh / 2.0)) / g->dh)) 
+		- TL_present[eXDirection] * TL_thickness;
+	f_offset[1] = static_cast<int>(std::round((g->YPos[j_start] - minEdges[eYDirection] - (g->dh / 2.0)) / g->dh))
+		- TL_present[eYDirection] * TL_thickness;
 #if (L_DIMS == 3)
-	f_offset[2] = static_cast<size_t>(std::round((g->ZPos[k_start] - g->ZOrigin) / g->dh)) - TL_present[eZDirection] * TL_thickness;
+	f_offset[2] = static_cast<int>(std::round((g->ZPos[k_start] - minEdges[eZDirection] - (g->dh / 2.0)) / g->dh))
+		- TL_present[eZDirection] * TL_thickness;
 #endif
 
 #else
@@ -190,15 +196,15 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 			// Get memory space slab parameters
 #if (L_DIMS == 3)
-			m_offset = k_start + j_start * K_lim + i * M_lim * K_lim;
+			m_offset = k_start + j_start * g->K_lim + i * g->M_lim * g->K_lim;
 			m_block = k_end - k_start + 1;
 			m_count = j_end - j_start + 1;
-			m_stride = K_lim;
+			m_stride = g->K_lim;
 #else
-			m_offset = j_start + i_start * M_lim;	// 1D starting index
+			m_offset = j_start + i_start * g->M_lim;	// 1D starting index
 			m_block = j_end - j_start + 1;			// Size of block in 1D pattern
 			m_count = i_end - i_start + 1;			// Number of blocks in pattern
-			m_stride = M_lim;						// Number of elements between start of two blocks
+			m_stride = g->M_lim;					// Number of elements between start of two blocks
 
 #endif
 			// Copy slab of memory to buffer
@@ -240,12 +246,12 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 				// Get memory space slab parameters
 #if (L_DIMS == 3)
 				m_offset = 0 + k_start * L_DIMS + 
-					j * L_DIMS * K_lim + i * L_DIMS * M_lim * K_lim;
+					j * L_DIMS * g->K_lim + i * L_DIMS * g->M_lim * g->K_lim;
 				m_block = 1;
 				m_count = k_end - k_start + 1;
 				m_stride = L_DIMS;
 #else
-				m_offset = 0 + j_start * L_DIMS + i * L_DIMS * M_lim;	// Memory offset handled by incoming pointer
+				m_offset = 0 + j_start * L_DIMS + i * L_DIMS * g->M_lim;	// Memory offset handled by incoming pointer
 				m_block = 1;
 				m_count = j_end - j_start + 1;
 				m_stride = L_DIMS;
@@ -291,12 +297,12 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 				// Get memory space slab parameters
 #if (L_DIMS == 3)
 				m_offset = 0 + k_start * (3 * L_DIMS - 3) + 
-					j * (3 * L_DIMS - 3) * K_lim + i * (3 * L_DIMS - 3) * M_lim * K_lim;
+					j * (3 * L_DIMS - 3) * g->K_lim + i * (3 * L_DIMS - 3) * g->M_lim * g->K_lim;
 				m_block = 1;
 				m_count = k_end - k_start + 1;
 				m_stride = 3 * L_DIMS - 3;
 #else
-				m_offset = 0 + j_start * (3 * L_DIMS - 3) + i * (3 * L_DIMS - 3) * M_lim;
+				m_offset = 0 + j_start * (3 * L_DIMS - 3) + i * (3 * L_DIMS - 3) * g->M_lim;
 				m_block = 1;
 				m_count = j_end - j_start + 1;
 				m_stride = 3 * L_DIMS - 3;
@@ -392,7 +398,7 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 
 	// DEBUG //
 #ifdef L_HDF_DEBUG
-	*GridUtils::logfile << "Lev " << g->level << " WRITING slab type " << std::to_string(slab_type) << std::endl;
+	*GridUtils::logfile << "Lev " << g->level << " writing slab type = " << std::to_string(slab_type) << "...";
 #endif
 
 	// Write data
@@ -401,11 +407,13 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 		*GridUtils::logfile << "HDF5 ERROR: Write data failed: " << status << std::endl;
 		H5Eprint(H5E_DEFAULT, stderr);
 	}
+	else
+#ifdef L_HDF_DEBUG
+		*GridUtils::logfile << "Write Successful." << std::endl;
+#endif
 	H5Sselect_none(filespace);
 
-#ifdef L_HDF_DEBUG
-	*GridUtils::logfile << "Write Complete." << std::endl;
-#endif
+
 
 	// Close property list
 	status = H5Pclose(plist_id);

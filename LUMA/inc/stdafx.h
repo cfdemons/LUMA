@@ -61,6 +61,7 @@
 #include <fstream>
 #include <sstream>
 #include <numeric>
+#include <valarray>
 #include <assert.h>
 
 // Check OS is Windows or not

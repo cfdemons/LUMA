@@ -42,8 +42,8 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
-//#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
@@ -113,7 +113,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 6400000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 64000		///< Number of time steps to run simulation for
 
 
 /*
@@ -129,7 +129,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_MPI_ZCORES 2
 
 // Balanced decomposition
-//#define L_MPI_SMART_DECOMPOSE
+#define L_MPI_SMART_DECOMPOSE
 #define L_MPI_SD_MAX_ITER 5000
 
 /*
@@ -140,8 +140,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
-#define L_RESOLUTION 384		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 7.813e-6	///< The timestep in non-dimensional units
+#define L_RESOLUTION 64		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 1.0e-4	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 2.0		///< End of domain in X (non-dimensional units)
@@ -220,32 +220,32 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)
-#define L_PADDING_X_MIN 0.1		///< Padding between X start of each sub-grid and its child edge
-#define L_PADDING_X_MAX 0.1		///< Padding between X end of each sub-grid and its child edge
-#define L_PADDING_Y_MIN 0.1		///< Padding between Y start of each sub-grid and its child edge
-#define L_PADDING_Y_MAX 0.1		///< Padding between Y end of each sub-grid and its child edge
-#define L_PADDING_Z_MIN 0.1		///< Padding between Z start of each sub-grid and its child edge
-#define L_PADDING_Z_MAX 0.1		///< Padding between Z end of each sub-grid and its child edge
+#define L_PADDING_X_MIN 0.01		///< Padding between X start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.01		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN 0.01		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_Y_MAX 0.01		///< Padding between Y end of each sub-grid and its child edge
+#define L_PADDING_Z_MIN 0.01		///< Padding between Z start of each sub-grid and its child edge
+#define L_PADDING_Z_MAX 0.01		///< Padding between Z end of each sub-grid and its child edge
 
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.4 }
+	{ 0.8 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.6 }
+	{ 1.2 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 3.7 }
+	{ 0.4 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 6.3 }
+	{ 0.6 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 2.8 }

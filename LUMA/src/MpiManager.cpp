@@ -848,27 +848,36 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 // ************************************************************************* //
 /// \brief	Update the load balancing information stored in the MpiManager
 ///
-///			This method is executed by all processes. Counts the ACTIVE cells on
-///			the current rank and pushes the information to the master (rank 0)
+///			This method is executed by all processes. Counts the ACTIVE cell 
+///			operations on the current rank and pushes the to the master (rank 0)
 ///			which writes this information to an output file if required. Must be 
 ///			called after the grids have been built or will return zero.
+///			Active cell count takes into account the number of operations 
+///			each cell requires per timestep by scaling the count by the 
+///			refinement ratio. i.e. in 2D a coarse site refined to level 1 is 
+///			represented	by 2^2 cells which each do 2^1 operations per coarse 
+///			time step. Operation count is therefore 2^3 = 8 operations.
 ///
 ///	\param	grid_man	pointer to non-null grid manager.
 void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 	/* Loop over the grids and compute the number of ACTIVE cells on the rank.
 	 * In other words exclude the cells covered by a sub-grid. However, does 
-	 * include halo cells as these are part of the calculation. */
-	long active_cell_count = 0;
+	 * include halo cells as these are part of the calculation. Count up ops
+	 * per coarse time step. */
+	long ops_count = 0;
 
-	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev) {
-		for (int reg = 0; reg < L_NUM_REGIONS; ++reg) {
+	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev)
+	{
+		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
+		{
 
 			// Get pointer to grid if available on this process
-			GridObj *g = NULL;
-			GridUtils::getGrid(grid_man->Grids, lev, reg, g);
+			GridObj *g = nullptr;
+			GridUtils::getGrid(lev, reg, g);
 
-			if (g != NULL) {
+			if (g)
+			{
 
 				// Get size (includes halo)
 				long grid_cell_count = g->N_lim * g->M_lim * g->K_lim;
@@ -878,46 +887,49 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 				*logout << "Local Size = " << g->N_lim << "x" << g->M_lim << "x" << g->K_lim << std::endl;
 #endif
 
-				// Update total
-				if (lev == 0) {
+				// Update total operations
+				if (lev == 0)
+				{
 
 					// Add cells to counter
-					active_cell_count += grid_cell_count;
+					ops_count += grid_cell_count;
 				}
 
-				else {
-					// Remove the coarse cells from the count
-					active_cell_count -= grid_cell_count / static_cast<long>(pow(2, L_DIMS));
+				else
+				{
+					// Remove the coarse ops from the count
+					ops_count -= grid_cell_count * static_cast<long>(pow(2, (lev - 1) * (1 + L_DIMS)));
 
-					// Add the fine cells
-					active_cell_count += grid_cell_count;
+					// Add the fine ops to the count
+					ops_count += grid_cell_count * static_cast<long>(pow(2, lev * (1 + L_DIMS)));
 				}
 
 			}
 		}
 	}
 
-	// Pass active cell count to master
-	long *cell_counts;
-	if (my_rank == 0) {
-
+	// Pass ops count to master
+	long *ops_count_buffer = nullptr;
+	if (my_rank == 0)
+	{
 		// Allocate space for receive buffer
-		cell_counts = (long*)malloc(num_ranks * sizeof(long));
+		ops_count_buffer = new long[num_ranks];
 	}
 
 	// Gather data (into root process)
-	MPI_Gather(&active_cell_count, 1, MPI_LONG, cell_counts, 1, MPI_LONG, 0, world_comm);
+	MPI_Gather(&ops_count, 1, MPI_LONG, ops_count_buffer, 1, MPI_LONG, 0, world_comm);
 
 
 	// Write information
 #ifdef L_MPI_VERBOSE
-	*logout << "Active Cell Count (this rank) = " << active_cell_count << std::endl;
+	*logout << "Lattice updates (this rank) = " << ops_count << std::endl;
 #endif
 
 	// If master, write special log file
 #ifdef L_MPI_WRITE_LOAD_BALANCE
 	
-	if (my_rank == 0) {
+	if (my_rank == 0)
+	{
 
 		std::ofstream counts_out;
 		counts_out.open(GridUtils::path_str + "/loadbalancing.out", std::ios::out);
@@ -925,20 +937,21 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 		// Get max load
 		double max_load = 0;
 		for (int process = 0; process < num_ranks; ++process)
-			if (cell_counts[process] > max_load) max_load = static_cast<double>(cell_counts[process]);
+			if (ops_count_buffer[process] > max_load) max_load = static_cast<double>(ops_count_buffer[process]);
 
-		for (int process = 0; process < num_ranks; ++process) {
-
+		for (int process = 0; process < num_ranks; ++process)
+		{
 			// Write process number, active count, load (as percentage of maximum)
-			counts_out << process << "\t" << cell_counts[process] << "\t" << 
-				(static_cast<double>(cell_counts[process]) * 100.0 / max_load) << std::endl;
-
+			counts_out << process << "\t" << ops_count_buffer[process] << "\t" << 
+				(static_cast<double>(ops_count_buffer[process]) * 100.0 / max_load) << std::endl;
 		}
 
 		counts_out.close();
 	}
 
 #endif
+
+	if (ops_count_buffer) delete[] ops_count_buffer;
 
 }
 // ************************************************************************* //

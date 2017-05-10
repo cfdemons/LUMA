@@ -19,7 +19,6 @@
 #include "../inc/GridObj.h"
 #include "../inc/ObjectManager.h"
 #include "../inc/hdf5luma.h"
-//#include "../inc/GridUnits.h"
 
 using namespace std;
 
@@ -778,7 +777,8 @@ void GridObj::io_lite(double tval, std::string TAG) {
 ///			conver to sructured VTK output readable in paraview.
 ///
 /// \param tval	time value being written out.
-int GridObj::io_hdf5(double tval) {
+int GridObj::io_hdf5(double tval)
+{
 
 	// Get GM and lower edge information
 	GridManager *gm = GridManager::getInstance();
@@ -797,7 +797,7 @@ int GridObj::io_hdf5(double tval) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 #ifdef L_MPI_VERBOSE
-	*mpim->logout << "Writing out Level " << level << ", Region " << region_number << std::endl;
+	*mpim->logout << "Writing out Level " << std::to_string(level) << ", Region " << std::to_string(region_number) << std::endl;
 #endif
 
 #endif
@@ -1250,7 +1250,9 @@ int GridObj::io_hdf5(double tval) {
 	// No writable data
 	else
 	{
-		*GridUtils::logfile << "Skipping HDF5 write as no writable data on L" << level << " R" << region_number << "..." << std::endl;
+#ifdef L_MPI_VERBOSE
+		L_INFO("Skipping HDF5 write as no writable data on L" + std::to_string(level) + " R" + std::to_string(region_number) + "...", mpim->logout);
+#endif
 
 #ifdef L_HDF_DEBUG
 		// Check that the communicator was setup properly
@@ -1266,7 +1268,7 @@ int GridObj::io_hdf5(double tval) {
 #endif	// L_BUILD_FOR_MPI
 
 	// Try call recursively on any present sub-grids
-	for (GridObj *g : subGrid) g->io_hdf5(tval);
+	for (GridObj *g : subGrid) g->io_hdf5(tval);	
 
 	return 0;
 

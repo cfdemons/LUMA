@@ -32,7 +32,7 @@ GridObj::GridObj(void)
 GridObj::~GridObj(void)
 {
 	// Loop over subgrid array and destroy each one
-	for (GridObj *g : subGrid) delete g;
+	for (GridObj *g : subGrid) if (g) delete g;
 
 }
 
@@ -104,8 +104,9 @@ GridObj::GridObj(int RegionNumber, GridObj& pGrid)
 // ****************************************************************************
 /// \brief Wrapper method to add sub-grid to this grid.
 /// \param RegionNumber ID indicating the region of nested refinement to which 
-///			this sub-grid belongs.
-void GridObj::LBM_addSubGrid(int RegionNumber) {
+///						this sub-grid belongs.
+void GridObj::LBM_addSubGrid(int RegionNumber)
+{
 
 	/* We check here to see if the extent of this rank covers any part of the 
 	 * extent of the sub-grid (once user-specified extent in definitions file
@@ -127,9 +128,8 @@ void GridObj::LBM_addSubGrid(int RegionNumber) {
 #endif
 
 	// Try to add another subgrid beneath the one just created if necessary
-	if (this->subGrid.back()->level < L_NUM_LEVELS) {
+	if (this->subGrid.back()->level < L_NUM_LEVELS)
 		this->subGrid.back()->LBM_addSubGrid(this->subGrid.back()->region_number);
-	}
 
 }
 

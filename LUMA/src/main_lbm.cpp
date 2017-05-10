@@ -390,6 +390,9 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
 #endif
+			// Write out the time an outer loop is taking to the log file
+			L_INFO("Outer loop taking " + std::to_string(outer_loop_time) + "ms", GridUtils::logfile);
+
 #ifdef L_TEXTOUT
 			*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
 			Grids->io_textout("START OF TIMESTEP");

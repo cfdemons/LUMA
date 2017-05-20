@@ -392,24 +392,26 @@ template <typename MarkerType>
 void Body<MarkerType>::deleteRecvLayerMarkers()
 {
 
-	// Loop through markers in body and delete ones which are on receiver layer
-	int a = 0;
-	do {
-		// If on receiver layer then delete that marker
-		if (GridUtils::isOnRecvLayer(
-			this->markers[a].position[eXDirection],
-			this->markers[a].position[eYDirection],
-			this->markers[a].position[eZDirection]))
-		{
-			this->markers.erase(this->markers.begin() + a);
-		}
-		// If not, keep and move onto next one
-		else {
+	// Loop through markers in body (if any) and delete ones which are on receiver layer
+	if (this->markers.size() > 0) {
+		int a = 0;
+		do {
+			// If on receiver layer then delete that marker
+			if (GridUtils::isOnRecvLayer(
+				this->markers[a].position[eXDirection],
+				this->markers[a].position[eYDirection],
+				this->markers[a].position[eZDirection]))
+			{
+				this->markers.erase(this->markers.begin() + a);
+			}
+			// If not, keep and move onto next one
+			else {
 
-			// Increment counter
-			a++;
-		}
-	} while (a < static_cast<int>(this->markers.size()));
+				// Increment counter
+				a++;
+			}
+		} while (a < static_cast<int>(this->markers.size()));
+	}
 }
 
 /*********************************************/

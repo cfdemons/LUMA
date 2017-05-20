@@ -61,7 +61,7 @@ void IBBody::initialise(eMoveableType moveProperty)
 	}
 
 	// Delete any markers which are on the receiver layer as not needed for IBM
-#ifdef BUILD_FOR_MPI
+#ifdef L_BUILD_FOR_MPI
 	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
 	deleteRecvLayerMarkers();
 #endif

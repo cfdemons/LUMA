@@ -65,6 +65,7 @@ protected:
 		int& curr_mark, std::vector<int>& counter);							// Voxelising marker adder
 	void deleteRecvLayerMarkers();											// Delete any markers which are on receiver layer
 	void deleteOffRankMarkers();											// Delete any markers which don't exist on this rank
+	void sortMarkerIDs();													// Sorts marker IDs after point cloud reader
 
 private:
 	bool isInVoxel(double x, double y, double z, int curr_mark);			// Check a point is inside an existing marker voxel
@@ -642,7 +643,8 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	*GridUtils::logfile << "ObjectManager: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
+	if (!_PCpts->x.empty())
+		addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
 
 	// Increment counters
 	int curr_marker = 0;
@@ -713,6 +715,102 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	}
 
 	fout.close();
+};
+
+
+/*********************************************/
+/// \brief	Sorts marker IDs as point cloud reader does not assign consecutive IDs.
+///
+template <typename MarkerType>
+void Body<MarkerType>::sortMarkerIDs()
+{
+
+	// If serial build then sorting is trivial
+#ifndef L_BUILD_FOR_MPI
+
+	// Loop through markers and assign value
+	for (int i = 0; i < markers.size(); i++)
+		markers[i].id = i;
+
+#else
+
+	// Parallel build is more tricky as owning rank needs to gather all markers, sort then scatter to other ranks
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Get number of markers to be sent
+	int nMarkers = markers.size();
+
+	// Create receive buffer
+	std::vector<int> recvSizeBuffer;
+
+	// Only resize if owning rank
+	if (mpim->my_rank == owningRank)
+		recvSizeBuffer.resize(mpim->num_ranks, 0);
+
+	// Perform gather so that owning rank knows how many markers to receive
+	MPI_Gather(&nMarkers, 1, MPI_INT, &recvSizeBuffer.front(), 1, MPI_INT, owningRank, mpim->world_comm);
+
+	// Now pack current marker IDs into send buffer
+	std::vector<int> sendIDBuffer(nMarkers,0);
+	for (int i = 0; i < nMarkers; i++) {
+		sendIDBuffer[i] = markers[i].id;
+	}
+
+	// Create the receive buffer and also set receive displacements
+	std::vector<int> recvIDBuffer;
+	std::vector<int> recvDisps;
+	if (mpim->my_rank == owningRank) {
+
+		// Resize vectors
+		recvIDBuffer.resize(std::accumulate(recvSizeBuffer.begin(), recvSizeBuffer.end(), 0), 0);
+		recvDisps.resize(mpim->num_ranks, 0);
+
+		// Set the displacements for receive buffer
+		for (int i = 1; i < recvDisps.size(); i++)
+			recvDisps[i] = std::accumulate(recvSizeBuffer.begin(), recvSizeBuffer.begin()+i, 0);
+	}
+
+	// Gather in marker IDs
+	MPI_Gatherv(&sendIDBuffer.front(), nMarkers, MPI_INT, &recvIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, owningRank, mpim->world_comm);
+
+	// Now do the sorting
+	std::vector<int> sendNewIDBuffer;
+	if (mpim->my_rank == owningRank) {
+
+		// Create vector for each marker which contains rank ID and an index array
+		std::vector<int> rankIDs(recvIDBuffer.size(), 0);
+		std::vector<int> indexIDs(recvIDBuffer.size(), 0);
+		int count = 0;
+		for (int i = 0; i < recvSizeBuffer.size(); i++) {
+			for (int j = 0; j < recvSizeBuffer[i]; j++) {
+				rankIDs[count] = i;
+				indexIDs[count] = count;
+				count++;
+			}
+		}
+
+		// Sort the IDs according to the current ID values and return the indices
+		std::sort(indexIDs.begin(), indexIDs.end(), [&](int a, int b) {return recvIDBuffer[a] < recvIDBuffer[b];});
+
+		// Pack into send buffer
+		sendNewIDBuffer.resize(indexIDs.size(), 0);
+		for (int i = 0; i < indexIDs.size(); i++) {
+			sendNewIDBuffer[indexIDs[i]] = i;
+		}
+	}
+
+	// Create receive buffers
+	std::vector<int> recvNewIDBuffer(nMarkers, 0);
+
+	// Scatter to all ranks
+	MPI_Scatterv(&sendNewIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvNewIDBuffer.front(), nMarkers, MPI_INT, owningRank, mpim->world_comm);
+
+	// Unpack into correct place
+	for (int i = 0; i < nMarkers; i++) {
+		markers[i].id = recvNewIDBuffer[i];
+	}
+#endif
+
 };
 
 #endif

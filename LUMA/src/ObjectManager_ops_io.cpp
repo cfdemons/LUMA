@@ -258,7 +258,8 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	for (IBBody& body : iBody)
 	{
 		// Call the writer
-		body.writeVtkPosition(tval);
+		if (body.markers.size() > 0)
+			body.writeVtkPosition(tval);
 
 	}
 
@@ -266,7 +267,8 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	for (BFLBody& body : pBody)
 	{
 		// Call the writer
-		body.writeVtkPosition(tval);
+		if (body.markers.size() > 0)
+			body.writeVtkPosition(tval);
 	}
 }
 
@@ -742,37 +744,35 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	}
 #endif	
 
-	// If there are points left
-	if (!_PCpts->x.empty())
-	{
 
 #ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
+	*GridUtils::logfile << "Building..." << std::endl;
 #endif
 
-		// Perform a different post-processing action depending on the type of body
-		switch (geom->objtype)
-		{
+	// Perform a different post-processing action depending on the type of body
+	switch (geom->objtype)
+	{
 
-		case eBBBCloud:
+	case eBBBCloud:
 
-			// Call labeller for BBB
-			addBouncebackObject(g, geom, _PCpts);
-			break;
+		// Call labeller for BBB
+		addBouncebackObject(g, geom, _PCpts);
+		break;
 
-		case eBFLCloud:
+	case eBFLCloud:
 
-			// Call constructor to build BFL body
-			pBody.emplace_back(g, geom->bodyID, _PCpts);
-			break;
+		// Call constructor to build BFL body
+		pBody.emplace_back(g, geom->bodyID, _PCpts);
+		pBody.back().sortMarkerIDs();
+		break;
 
-		case eIBBCloud:
+	case eIBBCloud:
 
-			// Call constructor to build IBM body
-			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->clamped);
-			break;
+		// Call constructor to build IBM body
+		iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->clamped);
+		iBody.back().sortMarkerIDs();
+		break;
 
-		}
 	}
 }
 // *****************************************************************************

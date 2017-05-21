@@ -146,14 +146,17 @@ void ObjectManager::ibm_initialise() {
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
 #ifdef L_IBM_DEBUG
-		// DEBUG -- write out marker coordinates
-		std::ofstream bodyout;
-		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
-		bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
-		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << "\t" << iBody[ib].markers[i].id << std::endl;
+		if (iBody[ib].markers.size() > 0) {
+
+			// DEBUG -- write out marker coordinates
+			std::ofstream bodyout;
+			bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
+			bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
+			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+				bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << "\t" << iBody[ib].markers[i].id << std::endl;
+			}
+			bodyout.close();
 		}
-		bodyout.close();
 #endif
 
 		// Compute extended support for each marker in the body (or body portion)
@@ -163,10 +166,9 @@ void ObjectManager::ibm_initialise() {
 		}
 
 		// Find epsilon for the body
-		ibm_findEpsilon(ib);
+//		ibm_findEpsilon(ib);
 
 	}
-
 }
 
 // *****************************************************************************

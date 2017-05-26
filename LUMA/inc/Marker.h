@@ -33,14 +33,15 @@ public:
 	std::vector<int> supp_j;	///< Y-indices of lattice sites in support of this marker
 	std::vector<int> supp_k;	///< Z-indices of lattice sites in support of this marker
 
+	std::vector<double> supp_x;	///< X-indices of lattice sites in support of this marker
+	std::vector<double> supp_y;	///< Y-indices of lattice sites in support of this marker
+	std::vector<double> supp_z;	///< Z-indices of lattice sites in support of this marker
+
 	/// Array of indices indicating on which rank the given support point resides
 	std::vector<int> support_rank;
 
 	/// ID of marker within its owning body
 	int id;
-
-	/// Spacing between this marker and neighbours
-	double ds;
 
 
 public:
@@ -57,10 +58,14 @@ public:
 		supp_j.push_back(0);
 		supp_k.push_back(0);
 
+		// Set the i, j, and k for the closest voxel to zero
+		supp_x.push_back(0.0);
+		supp_y.push_back(0.0);
+		supp_z.push_back(0.0);
+
 		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
 		id = 0;
-		ds = 0.0;
 	};
 
 	/// Default destructor
@@ -94,10 +99,14 @@ public:
 		supp_j.push_back(ijk[1]);
 		supp_k.push_back(ijk[2]);
 
+		// Get the x-position of the support marker
+		supp_x.push_back(body_owner->XPos[ijk[eXDirection]]);
+		supp_y.push_back(body_owner->YPos[ijk[eYDirection]]);
+		supp_z.push_back(body_owner->ZPos[ijk[eZDirection]]);
+
 		// Set rank of first support marker and marker ID in body
 		support_rank.push_back(GridUtils::safeGetRank());
 		id = markerID;
-		ds = 0.0;
 	}
 };
 

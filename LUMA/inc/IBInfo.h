@@ -17,32 +17,34 @@
 
 #include "stdafx.h"
 
-// Forward declare
-class IBBody;
 
-///	\brief	Structure for passing IB information between MPI processes.
+
+///	\brief	Class for arranging data before epsilon calculation.
 ///
-///			This structure has a series of different constructors depending on 
-///			what information should be passed.
 ///
-class IBInfo
+class epsCalcMarkerClass
 {
 
 public:
 	// Default Constructor
-	IBInfo();
-	IBInfo(IBBody *iBody, eIBInfoType type);
+	epsCalcMarkerClass();
 
-	// Methods
-	int mapToMpiStruct(eIBInfoType type);
+	// Custom constructor for creating eps calc marker
+	epsCalcMarkerClass(int bodyID, std::vector<double> position, double area, double dilation, std::vector<std::vector<double>> supp_position, std::vector<double> deltaval);
 
-private:
-	// Possible member data
-	std::vector<double> voxel_centre_X;
-	std::vector<double> voxel_centre_Y;
-	std::vector<double> voxel_centre_Z;
-	std::vector<double> delta_sum;
+public:
 
+	// Marker data
+	int bodyID;
+	std::vector<double> position;
+	double local_area;
+	double dilation;
+
+	// Support data
+	std::vector<double> deltaval;
+	std::vector<double> x;
+	std::vector<double> y;
+	std::vector<double> z;
 };
 
 #endif	// L_IBINFO_H

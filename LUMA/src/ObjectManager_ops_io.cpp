@@ -438,20 +438,11 @@ void ObjectManager::io_readInGeomConfig() {
 			if (g != NULL) {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
-				if (boundaryType == "IBM") {
+				if (boundaryType == "IBM")
 					iBody.emplace_back(g, bodyID, start_position, length, angles, moveProperty, clamped);
 
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
-				}
-				else if (boundaryType == "BFL") {
+				else if (boundaryType == "BFL")
 					pBody.emplace_back(g, bodyID, start_position, length, angles);
-
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
-				}
 			}
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}
@@ -494,20 +485,11 @@ void ObjectManager::io_readInGeomConfig() {
 			if (g != NULL) {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
-				if (boundaryType == "IBM") {
+				if (boundaryType == "IBM")
 					iBody.emplace_back(g, bodyID, centre_point, radius, moveProperty);
-
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
-				}
-				else if (boundaryType == "BFL") {
+				else if (boundaryType == "BFL")
 					pBody.emplace_back(g, bodyID, centre_point, radius);
 
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
-				}
 			}
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}
@@ -559,20 +541,11 @@ void ObjectManager::io_readInGeomConfig() {
 			if (g != NULL) {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
-				if (boundaryType == "IBM") {
+				if (boundaryType == "IBM")
 					iBody.emplace_back(g, bodyID, centre_point, dimensions, angles, moveProperty);
-
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
-				}
-				else if (boundaryType == "BFL") {
+				else if (boundaryType == "BFL")
 					pBody.emplace_back(g, bodyID, centre_point, dimensions, angles);
 
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
-				}
 			}
 			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
 		}

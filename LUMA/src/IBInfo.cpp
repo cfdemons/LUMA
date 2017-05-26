@@ -15,60 +15,44 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBInfo.h"
-#include "../inc/IBBody.h"
-#include "../inc/IBMarker.h"
 
-IBInfo::IBInfo()
-{
-	// Default constructor
+// Default constructor
+epsCalcMarkerClass::epsCalcMarkerClass() {
+
+	// Default values
+	bodyID = 0;
+	local_area = 0.0;
+	dilation = 0.0;
 }
 
-/// \brief Custom constructor for different types of message containers.
-///	\param	iBody	pointer to the iBody being packed.
-///	\param	type	the type fo container to be created.
-IBInfo::IBInfo(IBBody *iBody, eIBInfoType type)
-{
 
-	switch (type)
-	{
+/// \brief Custom constructor for epsilon calculation class.
+///	\param	ib				id of current body.
+///	\param	positionIn		position of IB marker.
+///	\param	areaIn			local area of IB marker.
+///	\param	dilationIn		dilation parameter for IB marker.
+///	\param	supp_position	positions of all support points for that IB marker.
+///	\param	deltavalIn		delta value for all support points for that IB marker.
+epsCalcMarkerClass::epsCalcMarkerClass(int bodyIDIn, std::vector<double> positionIn, double areaIn, double dilationIn, std::vector<std::vector<double>> supp_position, std::vector<double> deltavalIn) {
 
-	case eIBDeltaSum:
-		// Pack voxel_centres for each marker and sum of delta functions
-		for (size_t m = 0; m < iBody->markers.size(); ++m)
-		{
-			// First support point should be the closest
-			voxel_centre_X.push_back(iBody->_Owner->XPos[iBody->markers[m].supp_i[0]]);
-			voxel_centre_Y.push_back(iBody->_Owner->YPos[iBody->markers[m].supp_j[0]]);
-			voxel_centre_Z.push_back(iBody->_Owner->ZPos[iBody->markers[m].supp_k[0]]);
+	// Assign values
+	bodyID = bodyIDIn;
+	local_area = areaIn;
+	dilation = dilationIn;
 
-			// Sum of deltas
-			delta_sum.push_back(
-				std::accumulate(iBody->markers[m].deltaval.begin(), iBody->markers[m].deltaval.end(), 0.0)
-				);
-		}
-		break;
+	// Resize vectors and assign
+	position.resize(positionIn.size());
+	deltaval.resize(deltavalIn.size());
+	position = positionIn;
+	deltaval = deltavalIn;
 
-		// Add other cases here
+	// Assign position of support points
+	for (int i = 0; i < deltaval.size(); i++) {
+		x.push_back(supp_position[i][eXDirection]);
+		y.push_back(supp_position[i][eYDirection]);
 
+#if (L_DIMS == 3)
+		z.push_back(supp_position[i][eZDirection]);
+#endif
 	}
-}
-
-///	\brief Maps a version of the IBInfo structure to an MPI_Struct datatype.
-///	\param	type	type of container you want to map.
-///	\return	handle to the MPI struct data.
-int IBInfo::mapToMpiStruct(eIBInfoType type)
-{
-
-	switch (type)
-	{
-
-	case eIBDeltaSum:
-
-		// TODO: Map to a sturcture
-		//return MPI_Type_struct();
-
-		break;
-	}
-
-	return 0;
 }

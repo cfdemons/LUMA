@@ -114,7 +114,7 @@ void ObjectManager::ibm_moveBodies() {
 
 #ifndef L_STOP_EPSILON_RECOMPUTE
 			// Recompute epsilon
-			ibm_findEpsilon(ib);
+			ibm_findEpsilon();
 #endif
 
 		}
@@ -164,11 +164,10 @@ void ObjectManager::ibm_initialise() {
 		{
 			ibm_findSupport(ib, m);		// Pass body ID and marker ID
 		}
-
-		// Find epsilon for the body
-//		ibm_findEpsilon(ib);
-
 	}
+
+	// Find epsilon for the body
+	ibm_findEpsilon();
 }
 
 // *****************************************************************************
@@ -333,6 +332,10 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 						iBody[ib].markers[m].supp_i.push_back(i);
 						iBody[ib].markers[m].supp_j.push_back(j);
 						iBody[ib].markers[m].supp_k.push_back(k);
+
+						iBody[ib].markers[m].supp_x.push_back(estimated_position[eXDirection]);
+						iBody[ib].markers[m].supp_y.push_back(estimated_position[eYDirection]);
+						iBody[ib].markers[m].supp_z.push_back(estimated_position[eZDirection]);
 
 						// Add owning rank as this one for now
 						iBody[ib].markers[m].support_rank.push_back(rank);
@@ -584,158 +587,122 @@ void ObjectManager::ibm_spread(int ib) {
 // *****************************************************************************
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
-double ObjectManager::ibm_findEpsilon(int ib) {
+double ObjectManager::ibm_findEpsilon() {
 
+	// Root rank which collects all data and performs epsilon calculation
+	int rootRank = 0;
+
+	// Vector containing all data needed for epsilon calculation
+	std::vector<epsCalcMarkerClass> markerData;
+
+	// Gather and pack the data into one set containing all markers
+	int nMarkersOnThisRank = 0;
+	std::vector<int> nMarkersOnAllRanks;
+	std::vector<int> markerDisps;
+	ibm_gatherForEpsCalc(rootRank, nMarkersOnThisRank, nMarkersOnAllRanks, markerDisps, markerData);
+
+	// Get rank
 	int rank = GridUtils::safeGetRank();
 
-	/***** TODO: In order to compute epsilon using this linear system a single process needs 
-	to know all the delta values of all the support points in the body to build the whole system. 
-	We could simply nominate a rank to do this based on the body ID but we will have to think about
-	how to gather the data -- this is one of the problems of not using the other approach I guess. *****/
+	// Only rank 0 does the epsilon calculation
+	double minimum_residual_achieved = 100.0;
+	std::vector<double> epsilon;
+	if (rank == rootRank) {
 
-#ifdef L_BUILD_FOR_MPI
+		/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
+		to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
+		We can use built-in libraries to solve the ensuing linear system in future. */
 
-	// Create message object
-	IBInfo *msg_deltas = new IBInfo(&iBody[ib], eIBDeltaSum);
+		// Declarations
+		double Delta_I, Delta_J;
 
-	// TODO: The following sections of implementation
+		//////////////////////////////////
+		//	Build coefficient matrix A	//
+		//		with a_ij values.		//
+		//////////////////////////////////
 
-	// Map the IBInfo to an MPI_Type_struct object
-
-
-	// Send to managing rank
-
-
-	// If managing rank then unpack data and build A matrix
-
-
-	// Solve for epsilon
+		// Initialise 2D std vector with zeros
+		std::vector< std::vector<double> > A(markerData.size(), std::vector<double>(markerData.size(), 0.0));
 
 
-	// Create new message with all epsilon values for every point
-	IBInfo *msg_epsilon = new IBInfo();
+		// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
+		for (size_t I = 0; I < markerData.size(); I++) {
 
-	// Send messages to all ranks
+			// Loop over markers J
+			for (size_t J = 0; J < markerData.size(); J++) {
 
+				// Sum delta values evaluated for each support of I
+				for (size_t s = 0; s < markerData[I].deltaval.size(); s++) {
 
-	// Each rank receive return message and copy epsilon value to matching markers
-
-
-	// Destroy objects once we have finished
-	delete msg_deltas;
-	delete msg_epsilon;
-
-#endif
-
-
-	/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
-	to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
-	We can use built-in libraries to solve the ensuing linear system in future. */
-
-	// Declarations
-	double Delta_I, Delta_J;
-
-	//////////////////////////////////
-	//	Build coefficient matrix A	//
-	//		with a_ij values.		//
-	//////////////////////////////////
-
-	// Initialise 2D std vector with zeros
-	std::vector< std::vector<double> > A (iBody[ib].markers.size(), std::vector<double>(iBody[ib].markers.size(), 0.0) );
-
-
-	// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
-	for (size_t I = 0; I < iBody[ib].markers.size(); I++) {
-
-		// Loop over markers J
-		for (size_t J = 0; J < iBody[ib].markers.size(); J++) {
-
-			// Sum delta values evaluated for each support of I
-			for (size_t s = 0; s < iBody[ib].markers[I].supp_i.size(); s++) {
-
-				Delta_I = iBody[ib].markers[I].deltaval[s];
+					Delta_I = markerData[I].deltaval[s];
 #if (L_DIMS == 3)
-				Delta_J =
-					ibm_deltaKernel(
-					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dh, 
-					iBody[ib].markers[J].dilation
-					) *
-					ibm_deltaKernel(
-					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dh,
-					iBody[ib].markers[J].dilation
-					) *
-					ibm_deltaKernel(
-					(iBody[ib].markers[J].position[2] - iBody[ib]._Owner->ZPos[iBody[ib].markers[I].supp_k[s]]) / iBody[ib]._Owner->dh,
-					iBody[ib].markers[J].dilation
-					);
+					Delta_J =
+						ibm_deltaKernel(
+						(markerData[J].position[eXDirection] - markerData[I].x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						markerData[J].dilation
+						) *
+						ibm_deltaKernel(
+						(markerData[J].position[eYDirection] - markerData[I].y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						markerData[J].dilation
+						) *
+						ibm_deltaKernel(
+						(markerData[J].position[eZDirection] - markerData[I].z[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						markerData[J].dilation
+						);
 #else
-				Delta_J =
-					ibm_deltaKernel(
-					(iBody[ib].markers[J].position[0] - iBody[ib]._Owner->XPos[iBody[ib].markers[I].supp_i[s]]) / iBody[ib]._Owner->dh,
-					iBody[ib].markers[J].dilation
-					) *
-					ibm_deltaKernel(
-					(iBody[ib].markers[J].position[1] - iBody[ib]._Owner->YPos[iBody[ib].markers[I].supp_j[s]]) / iBody[ib]._Owner->dh,
-					iBody[ib].markers[J].dilation
-					);
+					Delta_J =
+						ibm_deltaKernel(
+						(markerData[J].position[eXDirection] - markerData[I].x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						markerData[J].dilation
+						) *
+						ibm_deltaKernel(
+						(markerData[J].position[eYDirection] - markerData[I].y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						markerData[J].dilation
+						);
 #endif
-				// Multiply by local area (or volume in 3D)
-				A[I][J] += Delta_I * Delta_J * iBody[ib].markers[I].local_area;
+					// Multiply by local area (or volume in 3D)
+					A[I][J] += Delta_I * Delta_J * markerData[I].local_area;
+				}
+
+				// Multiply by arc length between markers in lattice units
+				A[I][J] = A[I][J] * (iBody[markerData[I].bodyID].spacing / iBody[markerData[I].bodyID]._Owner->dh);
 			}
-
-			// Multiply by arc length between markers in lattice units
-			A[I][J] = A[I][J] * (iBody[ib].spacing / iBody[ib]._Owner->dh);
-
 		}
 
-	}
-
-
+		// DEBUG -- write out A
 #ifdef L_IBM_DEBUG
-
-#ifdef L_BUILD_FOR_MPI
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
-#endif
-
-	// DEBUG -- write out A
-	std::ofstream Aout;
-	Aout.open(GridUtils::path_str + "/Amatrix_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
-	for (size_t i = 0; i < A.size(); i++) {
-		Aout << "\n";
-		for (size_t j = 0; j < A.size(); j++) {
-			Aout << A[i][j] << "\t";
+		std::ofstream Aout;
+		Aout.open(GridUtils::path_str + "/Amatrix_rank" + std::to_string(rank) + ".out");
+		for (size_t i = 0; i < A.size(); i++) {
+			Aout << "\n";
+			for (size_t j = 0; j < A.size(); j++) {
+				Aout << A[i][j] << "\t";
+			}
 		}
-	}
-	Aout.close();
+		Aout.close();
 #endif
 
+		// Create vectors
+		epsilon.resize(markerData.size(), 0.0);
+		std::vector<double> bVector (markerData.size(), 1.0);
 
-	// Create vectors
-	std::vector<double> epsilon (iBody[ib].markers.size(), 0.0);
-	std::vector<double> bVector (iBody[ib].markers.size(), 1.0);
+		//////////////////
+		// Solve system //
+		//////////////////
 
+		// Settings
+		double tolerance = 1.0e-5;
+		int maxiterations = 2500;
 
-	//////////////////
-	// Solve system //
-	//////////////////
-
-	// Settings
-    double tolerance = 1.0e-5;
-	int maxiterations = 2500;
-	double minimum_residual_achieved;
-
-    // Biconjugate gradient stabilised method for solving asymmetric linear systems
-    minimum_residual_achieved = ibm_bicgstab(A, bVector, epsilon, tolerance, maxiterations);
-
-	// Now assign epsilon to the markers
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-
-		iBody[ib].markers[m].epsilon = epsilon[m];
+		// Biconjugate gradient stabilised method for solving asymmetric linear systems
+		minimum_residual_achieved = ibm_bicgstab(A, bVector, epsilon, tolerance, maxiterations);
 	}
 
-	return minimum_residual_achieved;
+	// Distribute the epsilon values back to the body
+	ibm_scatterAfterEpsCalc(rootRank, nMarkersOnThisRank, nMarkersOnAllRanks, markerDisps, epsilon);
 
+	// Return the residual
+	return minimum_residual_achieved;
 }
 
 // *****************************************************************************

@@ -394,6 +394,8 @@ void ObjectManager::io_readInGeomConfig() {
 			// Read in data from point cloud file
 			PCpts* _PCpts = NULL;
 			_PCpts = new PCpts();
+			
+			L_INFO("Reading in point cloud...", GridUtils::logfile); 
 			this->io_readInCloud(_PCpts, geom);
 			delete _PCpts;
 			delete geom;
@@ -680,7 +682,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile);
 	}
 	else {
-		*GridUtils::logfile << "Successfully acquired object data from cloud input file." << std::endl;
+		L_INFO("Successfully acquired object data from cloud input file.", GridUtils::logfile);
 	}
 
 

@@ -887,37 +887,32 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 				*logout << "Local Size = " << g->N_lim << "x" << g->M_lim << "x" << g->K_lim << std::endl;
 #endif
 
-				// Update total operations
-				if (lev == 0)
-				{
+				// Update total operations (cells * sub-cycles)
+				ops_count += grid_cell_count * static_cast<long>(pow(2, lev));
 
-					// Add cells to counter
-					ops_count += grid_cell_count;
-				}
-
-				else
+				if (lev != 0)
 				{
 					// Remove the coarse ops from the count
-					ops_count -= grid_cell_count * static_cast<long>(pow(2, (lev - 1) * (1 + L_DIMS)));
-
-					// Add the fine ops to the count
-					ops_count += grid_cell_count * static_cast<long>(pow(2, lev * (1 + L_DIMS)));
+					ops_count -= grid_cell_count * static_cast<long>(pow(2, lev - 1 - L_DIMS));
 				}
 
 			}
 		}
 	}
 
-	// Pass ops count to master
+	// Gather ops count (into root process)
 	long *ops_count_buffer = nullptr;
 	if (my_rank == 0)
 	{
 		// Allocate space for receive buffer
 		ops_count_buffer = new long[num_ranks];
+		MPI_Gather(&ops_count, 1, MPI_LONG, ops_count_buffer, 1, MPI_LONG, 0, world_comm);
 	}
-
-	// Gather data (into root process)
-	MPI_Gather(&ops_count, 1, MPI_LONG, ops_count_buffer, 1, MPI_LONG, 0, world_comm);
+	else
+	{
+		// No buffer need for non-root processes
+		MPI_Gather(&ops_count, 1, MPI_LONG, NULL, 1, MPI_LONG, 0, world_comm);
+	}
 
 
 	// Write information
@@ -1200,8 +1195,6 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 		// Data
 		int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
 		int p = (L_MPI_XCORES + L_MPI_YCORES + L_MPI_ZCORES) - 3;	// Number of unknowns
-		int rate = 10;						// Size of perturbation in coarse lattice sites
-		int max_sub_it = rate * p;			// Maximum number of perturbations to try per iteration
 		int i = 0;
 		int c = 0;
 		int *domainSize = new int[3];
@@ -1212,7 +1205,7 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 		// Set up solution vector for variables	
 		std::vector<double> XSolution(L_MPI_XCORES + 1, -1 * dh);
 		std::vector<double> YSolution(L_MPI_YCORES + 1, -1 * dh);
-		std::vector<double> ZSolution(L_MPI_YCORES + 1, -1 * dh);
+		std::vector<double> ZSolution(L_MPI_ZCORES + 1, -1 * dh);
 		std::vector<unsigned int> heaviestBlock(3);
 
 		// Fix the edges as we know where they are

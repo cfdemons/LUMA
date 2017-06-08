@@ -155,7 +155,6 @@ private:
 	size_t totalSites;
 
 	// Method to read a dataset with a given name into a buffer (taken from h5mgm)
-	template <typename T>
 	void readDataset(std::string VAR, std::string TIME_STRING, hid_t input_fid, hid_t input_sid, hid_t H5Type, T *buffer)
 	{
 		std::string variable_string = TIME_STRING + VAR;
@@ -165,7 +164,6 @@ private:
 	};
 
 	// Method to perform a vector sort favouring value in column col
-	template <typename T>
 	void sortrows(std::vector<std::vector<T>>& matrix, int col)
 	{
 		std::stable_sort(

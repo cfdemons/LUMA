@@ -38,6 +38,10 @@
 # define VTK_DELETE_FUNCTION
 #endif
 
+#ifndef VTK_OVERRIDE
+#define VTK_OVERRIDE override
+#endif
+
 class vtkPointLocator;
 
 class vtkCleanUnstructuredGrid

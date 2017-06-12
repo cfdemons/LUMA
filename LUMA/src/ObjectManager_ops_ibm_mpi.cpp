@@ -20,6 +20,12 @@
 #include "../inc/IBInfo.h"
 
 
+/// \brief	Builds MPI comm class for MPI comminocation in IBM.
+void ObjectManager::ibm_buildMPIComms() {
+
+
+}
+
 /// \brief	Gathers data required for epsilon calculation and arranges.
 /// \param	rootRank			root rank which holds epsilon values.
 /// \param	nMarkersOnThisRank	number of markers on current rank.

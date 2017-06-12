@@ -31,12 +31,12 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->dilation = 0.0;
 
 	// Stationary point
-	this->desired_vel.push_back(0.0);
-	this->desired_vel.push_back(0.0);
-	this->desired_vel.push_back(0.0);
+	this->markerVel.push_back(0.0);
+	this->markerVel.push_back(0.0);
+	this->markerVel.push_back(0.0);
 
 	// Resize vectors
-	this->fluid_vel.resize(L_DIMS);
+	this->interpVel.resize(L_DIMS);
 	this->force_xyz.resize(L_DIMS);
 
 	// Set old position to initial position

@@ -370,7 +370,7 @@ int main( int argc, char* argv[] )
 		t_start = clock();
 #endif
 		if ((Grids->t + 1) % L_OUT_EVERY == 0 && rank == 0)
-			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
+			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>\n" << std::flush;
 
 
 		///////////////////////

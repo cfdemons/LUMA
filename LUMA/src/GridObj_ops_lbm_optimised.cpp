@@ -106,6 +106,11 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		}
 	}
 
+	// Perform IBM step
+#ifdef L_IBM_ON
+	objman->ibm_apply2();
+#endif
+
 	// Swap distributions
 	f.swap(fNew);
 

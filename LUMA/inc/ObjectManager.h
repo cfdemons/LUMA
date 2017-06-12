@@ -101,6 +101,9 @@ private:
 	/// Pointer to self
 	static ObjectManager* me;
 
+	// Flag for if there are any flexible bodies in the simulation
+	bool hasMovingBodies = false;
+
 
 	/* Methods */
 
@@ -118,6 +121,7 @@ public:
 
 	// IBM methods //
 	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_apply2();						// Apply interpolate, compute and spread operations for all bodies.
 	void ibm_initialise();					// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
 	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
@@ -133,7 +137,18 @@ public:
 						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
 																	// linear system required by finding epsilon
 
+	// IBM Debug methods //
+	void ibm_debug_epsilon(int ib);
+	void ibm_debug_interpVel(int ib);
+	void ibm_debug_markerForce(int ib);
+	void ibm_debug_markerPosition(int ib);
+	void ibm_debug_supportInfo(int ib, int m, int s);
+	void ibm_debug_supportVel(int ib);
+	void ibm_debug_supportForce(int ib);
+
+
 	// IBM-MPI methods
+	void ibm_buildMPIComms();
 	void ibm_gatherForEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<epsCalcMarkerClass> &markerData);
 	void ibm_scatterAfterEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<double> &epsilon);
 

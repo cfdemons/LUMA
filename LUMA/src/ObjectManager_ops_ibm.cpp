@@ -18,80 +18,161 @@
 #include "../inc/ObjectManager.h"
 
 
+
+// *****************************************************************************
+/// Perform IBM procedure.
+void ObjectManager::ibm_apply2() {
+
+	MpiManager *mpim = MpiManager::getInstance();
+
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
+
+	// Loop through all bodies and find support
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// If a flexible body recalculate support and delta values
+		if (iBody[ib].isFlexible) {
+
+			// Recompute support for new marker positions
+			for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
+
+				// Erase support vectors
+				iBody[ib].markers[m].supp_i.clear();
+				iBody[ib].markers[m].supp_j.clear();
+				iBody[ib].markers[m].supp_k.clear();
+				iBody[ib].markers[m].supp_x.clear();
+				iBody[ib].markers[m].supp_y.clear();
+				iBody[ib].markers[m].supp_z.clear();
+				iBody[ib].markers[m].deltaval.clear();
+				iBody[ib].markers[m].support_rank.clear();
+
+				// Get the i, j, and k for the closest voxel to markers
+				std::vector<int> ijk;
+				double x = iBody[ib].markers[m].position[eXDirection], y = iBody[ib].markers[m].position[eYDirection], z = iBody[ib].markers[m].position[eZDirection];
+				GridUtils::getEnclosingVoxel(x, y, z, iBody[ib]._Owner, &ijk);
+				iBody[ib].markers[m].supp_i.push_back(ijk[0]);
+				iBody[ib].markers[m].supp_j.push_back(ijk[1]);
+				iBody[ib].markers[m].supp_k.push_back(ijk[2]);
+
+				// Get the x-position of the support marker
+				iBody[ib].markers[m].supp_x.push_back(iBody[ib]._Owner->XPos[ijk[eXDirection]]);
+				iBody[ib].markers[m].supp_y.push_back(iBody[ib]._Owner->YPos[ijk[eYDirection]]);
+				iBody[ib].markers[m].supp_z.push_back(iBody[ib]._Owner->ZPos[ijk[eZDirection]]);
+
+				// Set rank of first support marker and marker ID in body
+				iBody[ib].markers[m].support_rank.push_back(GridUtils::safeGetRank());
+
+				// Recompute support
+				ibm_findSupport(ib, m);
+			}
+		}
+	}
+
+	// Calculate epsilon
+	if (hasMovingBodies)
+		ibm_findEpsilon();
+
+	// Interpolate the velocity onto the markers
+
+
+
+
+	for (int ib = 0; ib < iBody.size(); ib++) {
+		for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			std::cout << "Rank " << mpim->my_rank << ", marker " << iBody[ib].markers[m].id << ", eps = " << iBody[ib].markers[m].epsilon << std::endl;
+		}
+	}
+
+//	if (mpim->my_rank == 1) {
+//		std::cout << std::endl;
+//		int ib = 0;
+//		int m = 0;
+//		for (int i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
+//			std::cout << std::fixed << i << " " << iBody[ib].markers[m].supp_x[i] << " " << iBody[ib].markers[m].supp_y[i] << " " << iBody[ib].markers[m].deltaval[i] << " " << iBody[ib].markers[m].support_rank[i] << std::endl;
+//		}
+//	}
+
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
+
+}
+
+
 // *****************************************************************************
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply() {
 
-#ifdef L_BUILD_FOR_MPI
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
-#endif
-	int rank = GridUtils::safeGetRank();
-
-	// Loop over array of IB_bodies and perform IB operations
-	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
-
-#ifdef L_IBM_DEBUG
-		// DEBUG -- write out support coordinates
-		std::ofstream suppout;
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(iBody[ib].id) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-			suppout << "\nNEW TIME STEP" << std::endl;
-			suppout << "x\ty\tz" << std::endl;
-			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
-				if (L_DIMS == 3) {
-					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
-				} else {
-					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
-				}
-			}
-			suppout.close();
-		}
-#endif
-
-#ifdef L_IBM_DEBUG
-		// DEBUG -- write out epsilon values
-		std::ofstream epout;
-		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-		epout << "\nNEW TIME STEP" << std::endl;
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			epout << iBody[ib].markers[m].epsilon << std::endl;
-		}
-		epout.close();
-#endif
-
-			// Interpolate velocity
-			ibm_interpol(ib);
-
-#ifdef L_IBM_DEBUG
-		// DEBUG -- write out interpolate velocity values
-		std::ofstream predout;
-		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-		predout << "\nNEW TIME STEP" << std::endl;
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			predout << iBody[ib].markers[m].fluid_vel[0] << "\t" << iBody[ib].markers[m].fluid_vel[1] << std::endl;
-		}
-		predout.close();
-#endif
-
-			// Compute restorative force
-			ibm_computeForce(ib);
-
-#ifdef L_IBM_DEBUG
-		// DEBUG -- write out Lagrange force values
-		std::ofstream forceout;
-		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-		forceout << "\nNEW TIME STEP" << std::endl;
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
-		}
-		forceout.close();
-#endif
-
-			// Spread force back to lattice (Cartesian vector)
-			ibm_spread(ib);
-
-		}
+//#ifdef L_BUILD_FOR_MPI
+//	// Get MPI Manager Instance
+//	MpiManager *mpim = MpiManager::getInstance();
+//#endif
+//	int rank = GridUtils::safeGetRank();
+//
+//	// Loop over array of IB_bodies and perform IB operations
+//	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
+//
+//#ifdef L_IBM_DEBUG
+//		// DEBUG -- write out support coordinates
+//		std::ofstream suppout;
+//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(iBody[ib].id) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+//			suppout << "\nNEW TIME STEP" << std::endl;
+//			suppout << "x\ty\tz" << std::endl;
+//			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
+//				if (L_DIMS == 3) {
+//					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
+//				} else {
+//					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
+//				}
+//			}
+//			suppout.close();
+//		}
+//#endif
+//
+//#ifdef L_IBM_DEBUG
+//		// DEBUG -- write out epsilon values
+//		std::ofstream epout;
+//		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+//		epout << "\nNEW TIME STEP" << std::endl;
+//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//			epout << iBody[ib].markers[m].epsilon << std::endl;
+//		}
+//		epout.close();
+//#endif
+//
+//			// Interpolate velocity
+//			ibm_interpol(ib);
+//
+//#ifdef L_IBM_DEBUG
+//		// DEBUG -- write out interpolate velocity values
+//		std::ofstream predout;
+//		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+//		predout << "\nNEW TIME STEP" << std::endl;
+//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//			predout << iBody[ib].markers[m].interpVel[0] << "\t" << iBody[ib].markers[m].interpVel[1] << std::endl;
+//		}
+//		predout.close();
+//#endif
+//
+//			// Compute restorative force
+//			ibm_computeForce(ib);
+//
+//#ifdef L_IBM_DEBUG
+//		// DEBUG -- write out Lagrange force values
+//		std::ofstream forceout;
+//		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+//		forceout << "\nNEW TIME STEP" << std::endl;
+//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
+//		}
+//		forceout.close();
+//#endif
+//
+//			// Spread force back to lattice (Cartesian vector)
+//			ibm_spread(ib);
+//
+//		}
 }
 
 // *****************************************************************************
@@ -102,29 +183,29 @@ void ObjectManager::ibm_apply() {
 ///
 void ObjectManager::ibm_moveBodies() {
 
-	// Loop over bodies launching positional update if movable to compute new locations of markers
-	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
-	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
-
-		// If body is movable it needs a positional update
-		if (iBody[ib].isMovable) {
-
-			// Call structural or forced positional update and recompute support
-			ibm_positionUpdate(ib);
-
-#ifndef L_STOP_EPSILON_RECOMPUTE
-			// Recompute epsilon
-			ibm_findEpsilon();
-#endif
-
-		}
-	}
-
-#if defined L_INSERT_FILARRAY
-	// Special bit for filament-based plates where flexible centreline is used to update position of others in group
-	*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
-	ibm_positionUpdateGroup(999);
-#endif
+//	// Loop over bodies launching positional update if movable to compute new locations of markers
+//	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
+//	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
+//
+//		// If body is movable it needs a positional update
+//		if (iBody[ib].isMovable) {
+//
+//			// Call structural or forced positional update and recompute support
+//			ibm_positionUpdate(ib);
+//
+//#ifndef L_STOP_EPSILON_RECOMPUTE
+//			// Recompute epsilon
+//			ibm_findEpsilon();
+//#endif
+//
+//		}
+//	}
+//
+//#if defined L_INSERT_FILARRAY
+//	// Special bit for filament-based plates where flexible centreline is used to update position of others in group
+//	*GridUtils::logfile << "Filament-based plate positional update..." << std::endl;
+//	ibm_positionUpdateGroup(999);
+//#endif
 
 }
 
@@ -136,38 +217,35 @@ void ObjectManager::ibm_moveBodies() {
 ///
 void ObjectManager::ibm_initialise() {
 
-#ifdef L_BUILD_FOR_MPI
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
-#endif
+	// Get rank safely
 	int rank = GridUtils::safeGetRank();
 
 	// Loop over the number of bodies in the iBody array
 	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
 
+		// Write out marker positions for debugging
 #ifdef L_IBM_DEBUG
-		if (iBody[ib].markers.size() > 0) {
-
-			// DEBUG -- write out marker coordinates
-			std::ofstream bodyout;
-			bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
-			bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
-			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-				bodyout << iBody[ib].markers[i].position[0] << "\t" << iBody[ib].markers[i].position[1] << "\t" << iBody[ib].markers[i].position[2] << "\t" << iBody[ib].markers[i].id << std::endl;
-			}
-			bodyout.close();
-		}
+		ibm_debug_markerPosition(ib);
 #endif
 
 		// Compute extended support for each marker in the body (or body portion)
 		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++)
-		{
-			ibm_findSupport(ib, m);		// Pass body ID and marker ID
-		}
+			ibm_findSupport(ib, m);
 	}
+
+	// Get MPI Manager Instance
+#ifdef L_BUILD_FOR_MPI
+	ibm_buildMPIComms();
+#endif
 
 	// Find epsilon for the body
 	ibm_findEpsilon();
+
+	// Write out epsilon
+#ifdef L_IBM_DEBUG
+	for (int ib = 0; ib < iBody.size(); ib++)
+		ibm_debug_epsilon(ib);
+#endif
 }
 
 // *****************************************************************************
@@ -258,26 +336,9 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	// Get the deltaval for the first support point
 	ibm_initialiseSupport(ib, m, s, estimated_position);
 
+	// Write out info for support site
 #ifdef L_IBM_DEBUG
-
-	// DEBUG -- Write out support as they are found
-	std::ofstream supportout;
-	supportout.open(GridUtils::path_str
-		+ "/IBsupport_" + std::to_string(iBody[ib].id)
-		+ "_rank" + std::to_string(rank)
-		+ ".out", std::ios::app);
-
-		// Write out the first (nearest) support marker
-	if (m == 0)
-		supportout << "Marker\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
-
-	supportout
-		<< m << "\t"
-		<< iBody[ib].markers[m].support_rank.back() << "\t"
-		<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
-		<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
-		<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << "\t"
-		<< iBody[ib].markers[m].deltaval.back() << std::endl;
+	ibm_debug_supportInfo(ib, m, s);
 #endif
 
 
@@ -379,26 +440,15 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 							 * including those not on this rank using estimated positions. */
 						ibm_initialiseSupport(ib, m, s, estimated_position);
 
+						// Write out info for support site
 #ifdef L_IBM_DEBUG
-						// DEBUG -- add this support point to the list
-						supportout
-							<< m << "\t"
-							<< iBody[ib].markers[m].support_rank.back() << "\t"
-							<< estimated_position[eXDirection] << "\t"
-							<< estimated_position[eYDirection] << "\t"
-							<< estimated_position[eZDirection] << "\t"
-							<< iBody[ib].markers[m].deltaval.back() << std::endl;
-
+						ibm_debug_supportInfo(ib, m, s);
 #endif
 					}
 				}
 			}
 		}
 	}
-
-#ifdef L_IBM_DEBUG
-	supportout.close();
-#endif
 }
 
 // *****************************************************************************
@@ -444,71 +494,71 @@ void ObjectManager::ibm_initialiseSupport(int ib, int m, int s, double estimated
 /// \brief	Interpolate velocity field onto markers
 /// \param	ib	iBody being operated on.
 void ObjectManager::ibm_interpol(int ib) {
-
-	// Get grid sizes
-	size_t M_lim = iBody[ib]._Owner->M_lim;
-#if (L_DIMS == 3)
-	size_t K_lim = iBody[ib]._Owner->K_lim;
-#endif
-	int rank = GridUtils::safeGetRank();
-
-	// For each marker
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-
-		// Reset the values of interpolated velocity
-		std::fill(iBody[ib].markers[m].fluid_vel.begin(), iBody[ib].markers[m].fluid_vel.end(), 0.0);
-
-		// Loop over support nodes
-		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-
-			// Loop over directions x y z
-			for (int dir = 0; dir < L_DIMS; dir++) {
-
-				// Read given velocity component from support node, multiply by delta function
-				// for that support node and sum to get interpolated velocity.
-
-#if (L_DIMS == 3)
-			iBody[ib].markers[m].fluid_vel[dir] += 
-				iBody[ib]._Owner->u(
-				iBody[ib].markers[m].supp_i[i],
-				iBody[ib].markers[m].supp_j[i],
-				iBody[ib].markers[m].supp_k[i],
-				dir,
-				M_lim, K_lim, L_DIMS
-				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
-#else
-			iBody[ib].markers[m].fluid_vel[dir] += 
-				iBody[ib]._Owner->u(
-				iBody[ib].markers[m].supp_i[i],
-				iBody[ib].markers[m].supp_j[i],
-				dir,
-				M_lim, L_DIMS
-				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
-#endif
-			}
-		}
-	}
-
-#ifdef L_IBM_DEBUG
-
-#ifdef L_BUILD_FOR_MPI
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
-#endif
-
-	// DEBUG -- write out res vector
-	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
-	testout << "\nNEW TIME STEP" << std::endl;
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-			testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_DIMS) << "\t"
-					<< iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_DIMS) << std::endl;
-		}
-		testout << std::endl;
-	}
-	testout.close();
-#endif
+//
+//	// Get grid sizes
+//	size_t M_lim = iBody[ib]._Owner->M_lim;
+//#if (L_DIMS == 3)
+//	size_t K_lim = iBody[ib]._Owner->K_lim;
+//#endif
+//	int rank = GridUtils::safeGetRank();
+//
+//	// For each marker
+//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//
+//		// Reset the values of interpolated velocity
+//		std::fill(iBody[ib].markers[m].fluid_vel.begin(), iBody[ib].markers[m].fluid_vel.end(), 0.0);
+//
+//		// Loop over support nodes
+//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+//
+//			// Loop over directions x y z
+//			for (int dir = 0; dir < L_DIMS; dir++) {
+//
+//				// Read given velocity component from support node, multiply by delta function
+//				// for that support node and sum to get interpolated velocity.
+//
+//#if (L_DIMS == 3)
+//			iBody[ib].markers[m].fluid_vel[dir] +=
+//				iBody[ib]._Owner->u(
+//				iBody[ib].markers[m].supp_i[i],
+//				iBody[ib].markers[m].supp_j[i],
+//				iBody[ib].markers[m].supp_k[i],
+//				dir,
+//				M_lim, K_lim, L_DIMS
+//				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+//#else
+//			iBody[ib].markers[m].fluid_vel[dir] +=
+//				iBody[ib]._Owner->u(
+//				iBody[ib].markers[m].supp_i[i],
+//				iBody[ib].markers[m].supp_j[i],
+//				dir,
+//				M_lim, L_DIMS
+//				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+//#endif
+//			}
+//		}
+//	}
+//
+//#ifdef L_IBM_DEBUG
+//
+//#ifdef L_BUILD_FOR_MPI
+//	// Get MPI Manager Instance
+//	MpiManager *mpim = MpiManager::getInstance();
+//#endif
+//
+//	// DEBUG -- write out res vector
+//	std::ofstream testout;
+//	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+//	testout << "\nNEW TIME STEP" << std::endl;
+//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+//			testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_DIMS) << "\t"
+//					<< iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_DIMS) << std::endl;
+//		}
+//		testout << std::endl;
+//	}
+//	testout.close();
+//#endif
 
 }
 
@@ -517,70 +567,70 @@ void ObjectManager::ibm_interpol(int ib) {
 /// \param	ib	iBody being operated on.
 void ObjectManager::ibm_computeForce(int ib) {
 
-	// Loop over markers
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		for (int dir = 0; dir < L_DIMS; dir++) {
-			// Compute restorative force (in lattice units)
-			iBody[ib].markers[m].force_xyz[dir] = 
-				(iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /	1.0;	// Time step in grid-normalised lattice units
-		}
-	}
+//	// Loop over markers
+//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//		for (int dir = 0; dir < L_DIMS; dir++) {
+//			// Compute restorative force (in lattice units)
+//			iBody[ib].markers[m].force_xyz[dir] =
+//				(iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /	1.0;	// Time step in grid-normalised lattice units
+//		}
+//	}
 }
 
 // *****************************************************************************
 /// \brief	Spread restorative force back onto marker support.
 /// \param	ib	iBody being operated on.
 void ObjectManager::ibm_spread(int ib) {
-
-	int rank = GridUtils::safeGetRank();
-
-	// For each marker
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		// Loop over support nodes
-		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-
-			// Get size of grid
-			size_t M_lim = iBody[ib]._Owner->M_lim;
-			size_t K_lim = iBody[ib]._Owner->K_lim;
-
-			for (size_t dir = 0; dir < L_DIMS; dir++) {
-				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
-				iBody[ib]._Owner->force_xyz(
-					iBody[ib].markers[m].supp_i[i],
-					iBody[ib].markers[m].supp_j[i],
-					iBody[ib].markers[m].supp_k[i],
-					dir, M_lim, K_lim, L_DIMS) +=
-					iBody[ib].markers[m].deltaval[i] * 
-					iBody[ib].markers[m].force_xyz[dir] * 
-					iBody[ib].markers[m].epsilon * 
-					iBody[ib].spacing/iBody[ib]._Owner->dh;
-			}
-		}
-	}
-
-#ifdef L_IBM_DEBUG
-
-#ifdef L_BUILD_FOR_MPI
-	// Get MPI Manager Instance
-	MpiManager *mpim = MpiManager::getInstance();
-#endif
-
-	// DEBUG -- write out res vector
-	std::ofstream testout;
-	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
-	testout << "\nNEW TIME STEP" << std::endl;
-	// Get size of grid
-	size_t M_lim = iBody[ib]._Owner->M_lim;
-	size_t K_lim = iBody[ib]._Owner->K_lim;
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-			testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_DIMS) << "\t"
-					<< iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_DIMS) << std::endl;
-		}
-		testout << std::endl;
-	}
-	testout.close();
-#endif
+//
+//	int rank = GridUtils::safeGetRank();
+//
+//	// For each marker
+//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//		// Loop over support nodes
+//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+//
+//			// Get size of grid
+//			size_t M_lim = iBody[ib]._Owner->M_lim;
+//			size_t K_lim = iBody[ib]._Owner->K_lim;
+//
+//			for (size_t dir = 0; dir < L_DIMS; dir++) {
+//				// Add contribution of current marker force to support node Cartesian force vector using delta values computed when support was computed
+//				iBody[ib]._Owner->force_xyz(
+//					iBody[ib].markers[m].supp_i[i],
+//					iBody[ib].markers[m].supp_j[i],
+//					iBody[ib].markers[m].supp_k[i],
+//					dir, M_lim, K_lim, L_DIMS) +=
+//					iBody[ib].markers[m].deltaval[i] *
+//					iBody[ib].markers[m].force_xyz[dir] *
+//					iBody[ib].markers[m].epsilon *
+//					iBody[ib].spacing/iBody[ib]._Owner->dh;
+//			}
+//		}
+//	}
+//
+//#ifdef L_IBM_DEBUG
+//
+//#ifdef L_BUILD_FOR_MPI
+//	// Get MPI Manager Instance
+//	MpiManager *mpim = MpiManager::getInstance();
+//#endif
+//
+//	// DEBUG -- write out res vector
+//	std::ofstream testout;
+//	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+//	testout << "\nNEW TIME STEP" << std::endl;
+//	// Get size of grid
+//	size_t M_lim = iBody[ib]._Owner->M_lim;
+//	size_t K_lim = iBody[ib]._Owner->K_lim;
+//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+//			testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_DIMS) << "\t"
+//					<< iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_DIMS) << std::endl;
+//		}
+//		testout << std::endl;
+//	}
+//	testout.close();
+//#endif
 
 }
 
@@ -668,19 +718,6 @@ double ObjectManager::ibm_findEpsilon() {
 				A[I][J] = A[I][J] * (iBody[markerData[I].bodyID].spacing / iBody[markerData[I].bodyID]._Owner->dh);
 			}
 		}
-
-		// DEBUG -- write out A
-#ifdef L_IBM_DEBUG
-		std::ofstream Aout;
-		Aout.open(GridUtils::path_str + "/Amatrix_rank" + std::to_string(rank) + ".out");
-		for (size_t i = 0; i < A.size(); i++) {
-			Aout << "\n";
-			for (size_t j = 0; j < A.size(); j++) {
-				Aout << A[i][j] << "\t";
-			}
-		}
-		Aout.close();
-#endif
 
 		// Create vectors
 		epsilon.resize(markerData.size(), 0.0);
@@ -831,6 +868,210 @@ double ObjectManager::ibm_bicgstab(
 		epsilon[j] = epsilon_best[j];
 	}
 	return res_min;
+}
+
+
+// *****************************************************************************
+/// \brief	Write out marker positions for debugging.
+///
+///			Writes out the marker positions for debugging
+///
+/// \param	ib			id of body being written out.
+///
+void ObjectManager::ibm_debug_markerPosition(int ib) {
+
+	// Only do if there is data to write
+	if (iBody[ib].markers.size() > 0) {
+
+		// Get rank safely
+		int rank = GridUtils::safeGetRank();
+
+		// Open file and write header
+		std::ofstream bodyout;
+		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
+		bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
+
+		// Loop through markers
+		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+			bodyout << iBody[ib].markers[i].position[eXDirection] << "\t" << iBody[ib].markers[i].position[eYDirection] << "\t" << iBody[ib].markers[i].position[eZDirection] << "\t" << iBody[ib].markers[i].id << std::endl;
+		}
+		bodyout.close();
+	}
+}
+
+// *****************************************************************************
+/// \brief	Write out support site information for debugging.
+///
+///			Writes out support site information for debugging
+///
+/// \param	ib			id of body being written out.
+/// \param	m			id of marker being written out.
+void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
+
+	// Only do if there is data to write
+	if (iBody[ib].markers.size() > 0) {
+
+		// Get rank safely
+		int rank = GridUtils::safeGetRank();
+
+		// Open file and write header
+		std::ofstream supportout;
+		supportout.open(GridUtils::path_str + "/IBsupport_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+
+		// Write out the first (nearest) support marker
+		if (m == 0 && s == 0)
+			supportout << "Marker\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
+
+		// Write out info
+		supportout
+			<< m << "\t"
+			<< iBody[ib].markers[m].support_rank.back() << "\t"
+			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
+			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
+			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << "\t"
+			<< iBody[ib].markers[m].deltaval.back() << std::endl;
+
+		supportout.close();
+	}
+}
+
+// *****************************************************************************
+/// \brief	Write out epsilon for debugging.
+///
+///			Writes out the epsilon values for debugging
+///
+/// \param	ib			id of body being written out.
+///
+void ObjectManager::ibm_debug_epsilon(int ib) {
+
+	// Get rank safely
+	int rank = GridUtils::safeGetRank();
+
+	// Open file and write header
+	std::ofstream epout;
+	epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+	epout << "\nNEW TIME STEP" << std::endl;
+	epout << "ID Epsilon" << std::endl;
+
+	// Loop through markers
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		epout << iBody[ib].markers[m].id << " " << iBody[ib].markers[m].epsilon << std::endl;
+	}
+	epout.close();
+}
+
+
+
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_debug_interpVel(int ib) {
+
+	// Get rank safely
+	int rank = GridUtils::safeGetRank();
+
+	// Open file and write header
+	std::ofstream predout;
+	predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+	predout << "\nNEW TIME STEP" << std::endl;
+
+	// Loop through markers
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		predout << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << std::endl;
+	}
+	predout.close();
+}
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_debug_markerForce(int ib) {
+
+	// Get rank safely
+	int rank = GridUtils::safeGetRank();
+
+	// Open file and write header
+	std::ofstream forceout;
+	forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+	forceout << "\nNEW TIME STEP" << std::endl;
+
+	// Loop through markers
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		forceout << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << std::endl;
+	}
+	forceout.close();
+}
+
+
+
+
+
+
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_debug_supportVel(int ib) {
+
+	// Get rank safely
+	int rank = GridUtils::safeGetRank();
+
+	// Open file and write header
+	std::ofstream testout;
+	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+	testout << "\nNEW TIME STEP" << std::endl;
+
+	// Loop through markers and support sites
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+			testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, iBody[ib]._Owner->M_lim, L_DIMS) << "\t"
+					<< iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, iBody[ib]._Owner->M_lim, L_DIMS) << std::endl;
+		}
+		testout << std::endl;
+	}
+	testout.close();
+}
+
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_debug_supportForce(int ib) {
+
+	// Get rank safely
+	int rank = GridUtils::safeGetRank();
+
+	// Open file and write header
+	std::ofstream testout;
+	testout.open(GridUtils::path_str + "/force_xyz_supp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
+	testout << "\nNEW TIME STEP" << std::endl;
+
+	// Get size of grid
+	size_t M_lim = iBody[ib]._Owner->M_lim;
+	size_t K_lim = iBody[ib]._Owner->K_lim;
+
+	// Loop through markers and support sites
+	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+			testout << iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 0, M_lim, K_lim, L_DIMS) << "\t"
+					<< iBody[ib]._Owner->force_xyz(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], iBody[ib].markers[m].supp_k[i], 1, M_lim, K_lim, L_DIMS) << std::endl;
+		}
+		testout << std::endl;
+	}
+	testout.close();
 }
 
 // ****************************************************************************

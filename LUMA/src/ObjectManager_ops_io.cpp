@@ -366,10 +366,14 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
-			if (flex_rigid == "FLEXIBLE")
+			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-			else if (flex_rigid == "MOVABLE")
+				hasMovingBodies = true;
+			}
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+				hasMovingBodies = true;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 			else
@@ -431,10 +435,14 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
-			if (flex_rigid == "FLEXIBLE")
+			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-			else if (flex_rigid == "MOVABLE")
+				hasMovingBodies = true;
+			}
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+				hasMovingBodies = true;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 
@@ -497,8 +505,10 @@ void ObjectManager::io_readInGeomConfig() {
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE")
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
-			else if (flex_rigid == "MOVABLE")
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+				hasMovingBodies = true;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 
@@ -563,8 +573,10 @@ void ObjectManager::io_readInGeomConfig() {
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE")
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
-			else if (flex_rigid == "MOVABLE")
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+				hasMovingBodies = true;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 

@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -70,7 +70,7 @@ public :
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)
-	MPI_Comm subGrid_comm[L_NUM_LEVELS*L_NUM_REGIONS];	
+	MPI_Comm subGrid_comm[L_NUM_LEVELS * L_NUM_REGIONS];	
 #else
 	MPI_Comm subGrid_comm[1];	// Default to size = 1
 #endif
@@ -110,14 +110,18 @@ public :
 	std::vector< std::vector<double>> f_buffer_recv;	///< Array of resizeable incoming buffers used for data transfer
 	MPI_Status recv_stat;					///< Status structure for Receive return information
 	MPI_Request send_requests[L_MPI_DIRS];	///< Array of request structures for handles to posted ISends
-	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each Isend
+	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each ISend
 
 	/// \struct buffer_struct
 	/// \brief	Structure storing buffers sizes in each direction for particular grid.
-	struct buffer_struct {
+	struct buffer_struct
+	{
 		int size[L_MPI_DIRS];	///< Buffer sizes for each direction
 		int level;				///< Grid level
 		int region;				///< Region number
+
+		buffer_struct(int l, int r) 
+			: level(l), region(r){};
 	};
 	std::vector<buffer_struct> buffer_send_info;	///< Vectors of buffer_info structures holding sender layer size info.
 	std::vector<buffer_struct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.
@@ -138,6 +142,14 @@ public :
 	void mpi_gridbuild(GridManager* const grid_man);			// Do domain decomposition to build local grid dimensions
 	int mpi_buildCommunicators(GridManager* const grid_man);	// Create a new communicator for each sub-grid and region combo
 	void mpi_updateLoadInfo(GridManager* const grid_man);		// Method to compute the number of active cells on the rank and pass to master
+	void mpi_uniformDecompose(int *numCells, int *numCores);	// Method to perform uniform decomposition into MPI blocks
+	void mpi_smartDecompose(double dh, int *numCores);			// Method to perform load-balanced decomposition into MPI blocks
+	void mpi_SDReconstructSolution(std::vector<double>& theta,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
+	float mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
+	bool mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh);
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

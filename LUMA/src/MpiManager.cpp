@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -51,11 +51,7 @@ MpiManager::MpiManager()
 	size_t xSize, ySize, zSize;
 	xSize = L_MPI_XCORES;
 	ySize = L_MPI_YCORES;
-#if (L_DIMS == 3)
 	zSize = L_MPI_ZCORES;
-#else
-	zSize = 1;
-#endif
 	cRankSizeX.resize(xSize*ySize*zSize);
 	cRankSizeY.resize(xSize*ySize*zSize);
 	cRankSizeZ.resize(xSize*ySize*zSize);
@@ -98,7 +94,7 @@ void MpiManager::destroyInstance() {
 ///
 ///			Method is responsible for initialising the MPI topolgy and 
 ///			associated data. Must be called immediately after MPI_init().
-///			For serial vuilds this gets called simply to intialise the 
+///			For serial builds this gets called simply to intialise the 
 ///			MPIM with a basic set of grid information used by other methods.
 void MpiManager::mpi_init()
 {
@@ -209,23 +205,8 @@ void MpiManager::mpi_init()
 ///	\param	grid_man	Pointer to an initialised grid manager.
 void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 {
-	
-	// Check that when using MPI at least 2 cores have been specified as have assumed so in implementation
-	if (
-		L_MPI_XCORES < 2 || L_MPI_YCORES < 2
-#if (L_DIMS == 3)
-		|| L_MPI_ZCORES < 2
-#endif
-		)
-	{
-		L_ERROR("When using MPI must use at least 2 cores in each direction. Exiting.", GridUtils::logfile);
-	}
-
-	// Global physical dimensions
-	double Lx = L_BX;
-	double dh = Lx / static_cast<double>(L_N);
-
 	// Auxiliary variables
+	double dh = L_BX / static_cast<double>(L_N);
 	int numCells[3];
 	int numCores[3];
 	numCells[0] = L_N;
@@ -233,58 +214,14 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	numCells[2] = L_K;
 	numCores[0] = L_MPI_XCORES;
 	numCores[1] = L_MPI_YCORES;
-#if (L_DIMS == 3)
 	numCores[2] = L_MPI_ZCORES;
+
+	// Compute block sizes based on chosen algorithm
+#ifdef L_MPI_SMART_DECOMPOSE
+	mpi_smartDecompose(dh, &numCores[0]);
 #else
-	numCores[2] = 1;
+	mpi_uniformDecompose(&numCells[0], &numCores[0]);
 #endif
-	int cellsInDomains[3];
-	int cellsLastDomain[3];
-
-	// Set the last position to 0, just in case we are working with L_DIMS = 2
-	cellsInDomains[2] = 0;
-	cellsLastDomain[2] = 0;
-
-	// Compute domain size base don uniform decomposition
-	for (size_t d = 0; d < L_DIMS; d++)
-	{
-
-		// Calculate the size of each domain in dimension d
-		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
-
-		// Calculate the size of the last domain
-		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
-
-		// Throw an error if cellsInLast domain is <=0
-		if (cellsLastDomain[d] <= 0)
-		{
-			L_ERROR("Last core in dir = " + std::to_string(d) + 
-				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
-		}
-	}
-
-	
-	// Fill the cRankSize arrays for each MPI block
-	int ind = 0;
-	for (int i = 0; i < numCores[0]; i++)
-	{
-		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
-
-		for (int j = 0; j < numCores[1]; j++)
-		{
-			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
-
-			for (int k = 0; k < numCores[2]; k++)
-			{
-				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
-				cRankSizeX[ind] = sX;
-				cRankSizeY[ind] = sY;
-				cRankSizeZ[ind] = sZ;
-				ind++;
-			}
-		}
-	}
-
 	
 	// Compute required local grid size to pass to grid manager //
 	std::vector<int> local_size;
@@ -293,8 +230,8 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	for (size_t d = 0; d < L_DIMS; d++) {
 
 		if (dimensions[d] == 1) {
-			// If only 1 rank in this direction local grid is same size a global grid
-			local_size.push_back( grid_man->global_size[d][0] );
+			// If only 1 rank in this direction local grid is same size a global grid and add halo
+			local_size.push_back(grid_man->global_size[d][0] + 2);
 
 		} else {
 
@@ -548,17 +485,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			// Use a blocking receive call if required
 			MPI_Recv( &f_buffer_recv[dir].front(), static_cast<int>(f_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
 				TAG, world_comm, &recv_stat );
-		
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Direction " << dir << " --> Received." << std::endl;
-
-			// Write out buffers
-			*logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
-								<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir] 
-								<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
-			std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(my_rank) + "_Dir" + std::to_string(dir) + ".out";
-			mpi_writeout_buf(filename, dir);
 #endif
 
 			///////////////////////////
@@ -570,10 +499,23 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 		}
 
+#ifdef L_MPI_VERBOSE
+
+		*logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir
+			<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir]
+			<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
+
+		// Write out buffers
+		std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(my_rank) + "_Dir" + std::to_string(dir) + ".out";
+		mpi_writeout_buf(filename, dir);
+#endif
+
 	}
 
 #ifdef L_MPI_VERBOSE
-	*logout << " *********************** Waiting for Send Completion  *********************** " << std::endl;
+	*logout << " *********************** Waiting for Sends to be Received on L" + 
+		std::to_string(lev) + "R" + std::to_string(reg) + 
+		" *********************** " << std::endl;
 #endif
 
 	/* Wait until other processes have handled all the sends from this rank
@@ -600,7 +542,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 	if (Grid->t % L_OUT_EVERY == 0) {
 		// Performance Data
-		*GridUtils::logfile << "MPI overhead taking an average of " << Grid->timeav_mpi_overhead*1000 << "ms" << std::endl;
+		L_INFO("MPI overhead taking an average of " + 
+			std::to_string(Grid->timeav_mpi_overhead * 1000) + "ms", GridUtils::logfile);
 	}
 
 
@@ -635,47 +578,38 @@ void MpiManager::mpi_buffer_size() {
 			GridUtils::getGrid(GridManager::getInstance()->Grids, l, r, g);
 
 			// If the pointer is not updated then it doesn't exist on this rank
-			if (g == NULL) {
+			if (g == NULL)
+			{
 				continue;	// Try find next grid in loop
 			}
 
 			// Expand buffer info arrays by one and add grid ID info
-			buffer_send_info.emplace_back();		buffer_recv_info.emplace_back();
-			buffer_send_info.back().level = l;		buffer_recv_info.back().level = l;
-			buffer_send_info.back().region = r;		buffer_recv_info.back().region = r;
+			buffer_send_info.emplace_back(l, r);
+			buffer_recv_info.emplace_back(l, r);
 
-			/* To allow for the fact that not every edge needs to be communicated,
-			 * we must account for 4 states in each Cartesian direction:
-			 *
-			 * 1. The x_min edge of the lattice needs communicating;
-			 * 2. The x_max edge of the lattice needs communicating;
-			 * 3. Both the x_min and the x_max edges of the lattice need communicating;
-			 * 4. Neither the x_min nor the x_max edges of the lattice need communicating;
-			 * 
-			 * Therefore in 2D there are 4^2 = 16 permutations and in 3D there are 4^3 = 64 permutations.
-			 *
-			 * We can do this by looping over the appropriate region of the grid and checking whether 
-			 * a site lies in the associated sender layer.
-			 * If so increment the buffer size counter. */
+			/* Not every edge of a sub-grid needs to be communicated.
+			 * We therefore loop over the appropriate region of the grid and 
+			 * check whether a site lies in the associated sender / receiver 
+			 * layer. If so increment the buffer size counter. */
 
 			// Call send and recv size finding routines
 			mpi_buffer_size_send(g);
 			mpi_buffer_size_recv(g);
 
 
-			// Write out buffer sizes
 #ifdef L_MPI_VERBOSE
-		*logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_DIRS; i++) {
-			*logout << buffer_send_info.back().size[i] << '\t';
-		}
-		*logout << std::endl;
+			// Write out buffer sizes for reference
+			*logout << "Send buffer sizes are [L" << buffer_send_info.back().level << ",R" << buffer_send_info.back().region << "]" << '\t';
+			for (int i = 0; i < L_MPI_DIRS; i++) {
+				*logout << buffer_send_info.back().size[i] << '\t';
+			}
+			*logout << std::endl;
 
-		*logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
-		for (int i = 0; i < L_MPI_DIRS; i++) {
-			*logout << buffer_recv_info.back().size[i] << '\t';
-		}
-		*logout << std::endl;
+			*logout << "Recv buffer sizes are [L" << buffer_recv_info.back().level << ",R" << buffer_recv_info.back().region << "]" << '\t';
+			for (int i = 0; i < L_MPI_DIRS; i++) {
+				*logout << buffer_recv_info.back().size[i] << '\t';
+			}
+			*logout << std::endl;
 #endif
 
 
@@ -683,6 +617,114 @@ void MpiManager::mpi_buffer_size() {
 	}
 
 	*GridUtils::logfile << "Complete." << std::endl;
+
+#ifdef L_MPI_VERBOSE
+	/* Historically, there have been cases of MPI hangs due to buffer
+	* size inconsistencies between ranks. These are difficult to debug
+	* as it involves going through the log files and cross checking
+	* each send and receive by hand. To speed up the process we
+	* implement a debugging activity here to check the send and receive
+	* buffer sizes tally up across the topology. */
+	int * const bufSendSizesOut = new int[L_NUM_LEVELS * L_NUM_REGIONS + 1];
+	int * const bufSendSizesIn = new int[L_NUM_LEVELS * L_NUM_REGIONS + 1];
+	bool bInfoFound = false;
+
+	// Loop over the MPI directions
+	for (int i = 0; i < L_MPI_DIRS; i++)
+	{
+		int counter = 0;
+
+		// Loop over grids and sub-grids and pack buffer one at a time
+		for (int l = 0; l <= L_NUM_LEVELS; l++)
+		{
+			for (int r = 0; r < L_NUM_REGIONS; r++)
+			{
+				bInfoFound = false;
+				if (l == 0 && r != 0) continue;		// L0 can only be R0
+
+				// Try retireve the buffer size info
+				for (MpiManager::buffer_struct bufs : buffer_send_info)
+				{
+					if (bufs.level == l && bufs.region == r)
+					{
+						bufSendSizesOut[counter] = bufs.size[i];
+						bInfoFound = true;
+					}
+				}
+
+				// If no info found then grid doesn't exist on this rank so mark as zero
+				if (!bInfoFound) bufSendSizesOut[counter] = 0;
+
+				// Increment counter
+				counter++;
+			}
+		}
+
+		L_INFO("Send sizes packed for direction " + std::to_string(i) + ". Sending to rank " + std::to_string(neighbour_rank[i]) + "...", logout);
+
+		// Once buffer complete, post send
+		MPI_Isend(bufSendSizesOut, L_NUM_LEVELS * L_NUM_REGIONS + 1, MPI_INT, neighbour_rank[i],
+			my_rank, world_comm, &send_requests[i]);
+
+		L_INFO("Sent.", logout);
+
+		// Get opposite direction
+		int opp_i = mpi_getOpposite(i);
+		L_INFO("Receiving send sizes from rank " + std::to_string(neighbour_rank[opp_i]) + " in direction " + std::to_string(opp_i) + "...", logout);
+
+		// Receive the send sizes from opposite direction
+		MPI_Recv(bufSendSizesIn, L_NUM_LEVELS * L_NUM_REGIONS + 1, MPI_INT, neighbour_rank[opp_i],
+			neighbour_rank[opp_i], world_comm, &recv_stat);
+
+		L_INFO("Received.", logout);
+
+		// Cross check that the send sizes match the receive sizes
+		counter = 0;
+		// Loop over grids and sub-grids and unpack buffer one at a time
+		for (int l = 0; l <= L_NUM_LEVELS; l++)
+		{
+			for (int r = 0; r < L_NUM_REGIONS; r++)
+			{
+				bInfoFound = false;
+				if (l == 0 && r != 0) continue;		// L0 can only be R0
+
+				// Try retireve the buffer size info
+				for (MpiManager::buffer_struct bufr : buffer_recv_info)
+				{
+					if (bufr.level == l && bufr.region == r)
+					{
+						bInfoFound = true;
+						if (bufSendSizesIn[counter] != bufr.size[i])
+						{
+							L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
+								" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
+								" is sending " + std::to_string(bufSendSizesIn[counter]) + 
+								". Expected to receive " + std::to_string(bufr.size[i]), logout);
+						}						
+					}
+				}
+
+				// If no info found then grid doesn't exist on this rank -- make sure buffer size is zero
+				if (!bInfoFound)
+				{
+					if (bufSendSizesIn[counter] != 0)
+					{
+						L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
+							" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
+							" is sending " + std::to_string(bufSendSizesIn[counter]) +
+							". Expected to receive 0 as no grid of this L+R on this rank.", logout);
+					}
+				}
+
+				// Increment counter
+				counter++;
+			}
+		}		
+	}
+	delete[] bufSendSizesOut;
+	delete[] bufSendSizesIn;
+
+#endif
 
 }
 
@@ -717,9 +759,9 @@ int MpiManager::mpi_getOpposite(int direction) {
 ///
 ///	\param	grid_man	pointer to non-null grid manager.
 int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
-
-	*GridUtils::logfile << "Creating infrastructure for HDF5...";
-
+	
+	L_INFO("Creating infrastructure for HDF5...", GridUtils::logfile);
+	
 	// Declarations
 	int status = 0;
 	int colour;							// Colour indicates which new communicator this process belongs to
@@ -733,7 +775,8 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 		for (int lev = 1; lev <= L_NUM_LEVELS; lev++) {
 
 #if defined L_HDF_DEBUG
-			*logout << "Looking to add sub-grid L" << lev << " R" << reg << " to writable communicator...";
+			L_INFO("MpiManager: Looking to add sub-grid L" + std::to_string(lev) +
+				" R" + std::to_string(reg) + " to writable communicator...", GridUtils::logfile);
 #endif
 
 			// Try gain access to the sub-grid on this rank
@@ -745,7 +788,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			{
 
 #if defined L_HDF_DEBUG
-				*logout << "Grid Found." << std::endl;
+				L_INFO("Grid Found.", GridUtils::logfile);
 #endif
 
 				if (grid_man->createWritableDataStore(targetGrid))
@@ -769,7 +812,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 				colour = MPI_UNDEFINED;
 
 #if defined L_HDF_DEBUG
-				*logout << "Grid not found." << std::endl;
+				L_INFO("Grid NOT found.", GridUtils::logfile);
 #endif
 			}
 
@@ -783,11 +826,16 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			// Only write out communicator info if this rank was added to the communicator
 			if (colour != MPI_UNDEFINED)
 			{
-				*logout << "Grid has writable data of size " << grid_man->p_data.back().writable_data_count <<
-					": Region " << reg << ", Level " << lev <<
-					" has communicator value: " << subGrid_comm[lev + reg * L_NUM_LEVELS] <<
-					" and colour " << colour << std::endl;
+				L_INFO("Grid has writable data of size " + std::to_string(grid_man->p_data.back().writable_data_count)
+					+ ": Region " + std::to_string(reg) + ", Level " + std::to_string(lev)
+					+ " has communicator value: " + std::to_string(subGrid_comm[lev + reg * L_NUM_LEVELS])
+					+ " and colour " + std::to_string(colour), GridUtils::logfile);
 			}
+			else
+			{
+				L_INFO("Grid has no writable data", GridUtils::logfile);
+			}
+
 #endif
 
 		}
@@ -800,27 +848,36 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 // ************************************************************************* //
 /// \brief	Update the load balancing information stored in the MpiManager
 ///
-///			This method is executed by all processes. Counts the ACTIVE cells on
-///			the current rank and pushes the information to the master (rank 0)
+///			This method is executed by all processes. Counts the ACTIVE cell 
+///			operations on the current rank and pushes the to the master (rank 0)
 ///			which writes this information to an output file if required. Must be 
 ///			called after the grids have been built or will return zero.
+///			Active cell count takes into account the number of operations 
+///			each cell requires per timestep by scaling the count by the 
+///			refinement ratio. i.e. in 2D a coarse site refined to level 1 is 
+///			represented	by 2^2 cells which each do 2^1 operations per coarse 
+///			time step. Operation count is therefore 2^3 = 8 operations.
 ///
 ///	\param	grid_man	pointer to non-null grid manager.
 void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 	/* Loop over the grids and compute the number of ACTIVE cells on the rank.
 	 * In other words exclude the cells covered by a sub-grid. However, does 
-	 * include halo cells as these are part of the calculation. */
-	long active_cell_count = 0;
+	 * include halo cells as these are part of the calculation. Count up ops
+	 * per coarse time step. */
+	long ops_count = 0;
 
-	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev) {
-		for (int reg = 0; reg < L_NUM_REGIONS; ++reg) {
+	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev)
+	{
+		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
+		{
 
 			// Get pointer to grid if available on this process
-			GridObj *g = NULL;
-			GridUtils::getGrid(grid_man->Grids, lev, reg, g);
+			GridObj *g = nullptr;
+			GridUtils::getGrid(lev, reg, g);
 
-			if (g != NULL) {
+			if (g)
+			{
 
 				// Get size (includes halo)
 				long grid_cell_count = g->N_lim * g->M_lim * g->K_lim;
@@ -830,46 +887,44 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 				*logout << "Local Size = " << g->N_lim << "x" << g->M_lim << "x" << g->K_lim << std::endl;
 #endif
 
-				// Update total
-				if (lev == 0) {
+				// Update total operations (cells * sub-cycles)
+				ops_count += grid_cell_count * static_cast<long>(pow(2, lev));
 
-					// Add cells to counter
-					active_cell_count += grid_cell_count;
-				}
-
-				else {
-					// Remove the coarse cells from the count
-					active_cell_count -= grid_cell_count / 2;
-
-					// Add the fine cells
-					active_cell_count += grid_cell_count;
+				if (lev != 0)
+				{
+					// Remove the coarse ops from the count
+					ops_count -= grid_cell_count * static_cast<long>(pow(2, lev - 1 - L_DIMS));
 				}
 
 			}
 		}
 	}
 
-	// Pass active cell count to master
-	long *cell_counts;
-	if (my_rank == 0) {
-
+	// Gather ops count (into root process)
+	long *ops_count_buffer = nullptr;
+	if (my_rank == 0)
+	{
 		// Allocate space for receive buffer
-		cell_counts = (long*)malloc(num_ranks * sizeof(long));
+		ops_count_buffer = new long[num_ranks];
+		MPI_Gather(&ops_count, 1, MPI_LONG, ops_count_buffer, 1, MPI_LONG, 0, world_comm);
 	}
-
-	// Gather data (into root process)
-	MPI_Gather(&active_cell_count, 1, MPI_LONG, cell_counts, 1, MPI_LONG, 0, world_comm);
+	else
+	{
+		// No buffer need for non-root processes
+		MPI_Gather(&ops_count, 1, MPI_LONG, NULL, 1, MPI_LONG, 0, world_comm);
+	}
 
 
 	// Write information
 #ifdef L_MPI_VERBOSE
-	*logout << "Active Cell Count (this rank) = " << active_cell_count << std::endl;
+	*logout << "Lattice updates (this rank) = " << ops_count << std::endl;
 #endif
 
 	// If master, write special log file
 #ifdef L_MPI_WRITE_LOAD_BALANCE
 	
-	if (my_rank == 0) {
+	if (my_rank == 0)
+	{
 
 		std::ofstream counts_out;
 		counts_out.open(GridUtils::path_str + "/loadbalancing.out", std::ios::out);
@@ -877,14 +932,13 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 		// Get max load
 		double max_load = 0;
 		for (int process = 0; process < num_ranks; ++process)
-			if (cell_counts[process] > max_load) max_load = static_cast<double>(cell_counts[process]);
+			if (ops_count_buffer[process] > max_load) max_load = static_cast<double>(ops_count_buffer[process]);
 
-		for (int process = 0; process < num_ranks; ++process) {
-
+		for (int process = 0; process < num_ranks; ++process)
+		{
 			// Write process number, active count, load (as percentage of maximum)
-			counts_out << process << "\t" << cell_counts[process] << "\t" << 
-				(static_cast<double>(cell_counts[process]) * 100.0 / max_load) << std::endl;
-
+			counts_out << process << "\t" << ops_count_buffer[process] << "\t" << 
+				(static_cast<double>(ops_count_buffer[process]) * 100.0 / max_load) << std::endl;
 		}
 
 		counts_out.close();
@@ -892,6 +946,433 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 #endif
 
+	if (ops_count_buffer) delete[] ops_count_buffer;
+
+}
+// ************************************************************************* //
+/// \brief	Populate the rank size arrays based on uniform decomposition logic
+void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
+{
+	// Auxiliary variables
+	int cellsInDomains[3];
+	int cellsLastDomain[3];
+
+	// Set the last position to 0, just in case we are working with L_DIMS = 2
+	cellsInDomains[2] = 0;
+	cellsLastDomain[2] = 0;
+
+	// Compute domain size based on uniform decomposition
+	for (size_t d = 0; d < L_DIMS; d++)
+	{
+
+		// Calculate the size of each domain in dimension d
+		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
+
+		// Calculate the size of the last domain
+		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
+
+		// Throw an error if cellsInLast domain is <=0
+		if (cellsLastDomain[d] <= 0)
+		{
+			L_ERROR("Last core in dir = " + std::to_string(d) +
+				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
+		}
+	}
+
+
+	// Fill the cRankSize arrays for each MPI block
+	int ind = 0;
+	for (int i = 0; i < numCores[0]; i++)
+	{
+		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+
+		for (int j = 0; j < numCores[1]; j++)
+		{
+			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+
+			for (int k = 0; k < numCores[2]; k++)
+			{
+				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+				cRankSizeX[ind] = sX;
+				cRankSizeY[ind] = sY;
+				cRankSizeZ[ind] = sZ;
+				ind++;
+			}
+		}
+	}
+}
+
+// ************************************************************************* //
+/// \brief	Checks whether the perturbation vector is valid and adjusts delta 
+///			if necessary.
+///
+///			Also reconstructs the solution vector at the same time.
+///
+///	\param	theta			vector of variable block edges.
+///	\param	delta			perturbation vector.
+///	\param[out]	thetaNew	perturbed vector of variable block edges.
+///	\param[out]	XSol		X solution vector.
+///	\param[out]	YSol		Y solution vector.
+///	\param[out]	ZSol		Z solution vector.
+///	\param		dh			coarsest cell width.
+///	\returns				indication whether the perturbation was valid or not.
+bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh)
+{
+
+	// Declarations
+	bool bAdjustComplete = false;
+	bool bAdjusted = false;
+	unsigned int c = 0;
+
+	// Create perturbed variable vector using current delta
+	for (size_t p = 0; p < theta.size(); ++p)
+		thetaNew[p] = theta[p] + delta[p];
+
+	// Reconstruct the solution vector
+	mpi_SDReconstructSolution(thetaNew, XSol, YSol, ZSol);
+
+	// Loop
+	while (!bAdjustComplete)
+	{
+		// Reset the adjusted flag
+		bAdjusted = false;		
+
+		// Check validity of edges and reset the delta if causes a problem
+		for (int i = 0; i < L_MPI_XCORES; ++i)
+		{
+			for (int j = 0; j < L_MPI_YCORES; ++j)
+			{
+				for (int k = 0; k < L_MPI_ZCORES; ++k)
+				{
+					// Nothing to change if on the last block
+					if (
+						i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+#if (L_DIMS == 3)
+						|| k == L_MPI_ZCORES - 1
+#endif
+						) continue;
+
+					// Perturbation cannot cause a block to have a zero size
+					if ((XSol[i + 1] - XSol[i]) < dh)
+					{
+						// Adjust delta such that size is equal to dh
+						c = i;
+						delta[c] = XSol[i] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						XSol[i + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+					if ((YSol[j + 1] - YSol[j]) < dh)
+					{
+						c = L_MPI_XCORES - 1 + j;
+						delta[c] = YSol[j] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						YSol[j + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+#if (L_DIMS == 3)
+					if ((ZSol[k + 1] - ZSol[k]) < dh)
+					{
+						c = L_MPI_XCORES + L_MPI_YCORES - 2 + k;
+						delta[c] = ZSol[k] - theta[c] + dh;
+						thetaNew[c] = theta[c] + delta[c];
+						ZSol[k + 1] = thetaNew[c];
+						bAdjusted = true;
+					}
+#endif
+				}
+			}
+		}
+		bAdjustComplete = true;
+	}
+
+	return !bAdjusted;
+
+}
+
+// ************************************************************************* //
+/// \brief	Reassembles the solutions vectors given the vector of variable block edges.
+///
+///	\param	theta		vector of variable block edges.
+///	\param	XSol		X solution vector.
+///	\param	YSol		Y solution vector.
+///	\param	ZSol		Z solution vector.
+void MpiManager::mpi_SDReconstructSolution(std::vector<double>& theta,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+{
+	// 1D index for theta
+	int c = 0;
+	int i = 0;
+	for (i = 1; i < L_MPI_XCORES; ++i)
+	{
+		XSol[i] = theta[c];
+		c++;
+	}
+	for (i = 1; i < L_MPI_YCORES; ++i)
+	{
+		YSol[i] = theta[c];
+		c++;
+	}
+	for (i = 1; i < L_MPI_ZCORES; ++i)
+	{
+		ZSol[i] = theta[c];
+		c++;
+	}
+
+}
+
+// ************************************************************************* //
+/// \brief	Populate the active cell counts for the given block configuration.
+///
+///	\param[out]	heaviestBlock	vector of block indices in MPI topology number 
+///								that has the heaviest load.
+///	\param		XSol			X solution vector.
+///	\param		YSol			Y solution vector.
+///	\param		ZSol			Z solution vector.
+///	\returns					imbalance measure as the difference between the heaviest 
+///								and lightest block as a percentage of the heaviest.
+float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
+	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+{
+	size_t count = 0;
+	size_t countMax = 0;
+	size_t countMin = std::numeric_limits<size_t>::max();
+
+	// Construct bounds for each block and then find active cell count from grid manager
+	double bounds[6];
+	for (int i = 0; i < L_MPI_XCORES; ++i)
+	{
+		for (int j = 0; j < L_MPI_YCORES; ++j)
+		{
+			for (int k = 0; k < L_MPI_ZCORES; ++k)
+			{
+				bounds[eXMin] = XSol[i];
+				bounds[eXMax] = XSol[i + 1];
+				bounds[eYMin] = YSol[j];
+				bounds[eYMax] = YSol[j + 1];
+				bounds[eZMin] = ZSol[k];
+				bounds[eZMax] = ZSol[k + 1];
+				count = GridManager::getInstance()->getActiveCellCount(&bounds[0]);
+
+				// Update the extremes
+				if (count > countMax)
+				{
+					countMax = count;
+					heaviestBlock[eXDirection] = i;
+					heaviestBlock[eYDirection] = j;
+					heaviestBlock[eZDirection] = k;
+				}
+				if (count < countMin) countMin = count;
+
+			}
+		}
+	}
+
+	return (std::fabs(static_cast<float>(countMax)-static_cast<float>(countMin)) * 100.0f / static_cast<float>(countMax));
+
+}
+
+// ************************************************************************* //
+/// \brief	Populate the rank size arrays based on an algorithm that seeks to 
+///			load balance.
+///
+///	\param	dh			size of a voxel on the coarsest grid
+///	\param	numCores	pointer to an array holding the MPI core dimenions.
+void MpiManager::mpi_smartDecompose(double dh, int *numCores)
+{
+	// Only rank 0 needs to do the calculation but all create buffer
+	int *bufRankSize = new int[L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES * L_DIMS];
+
+	// Stash constant pointer to start of buffer
+	int * const bufRankSizeStart = bufRankSize;
+
+	if (my_rank == 0)
+	{
+		// Log use of SD
+		L_INFO("Using Smart Decomposition...", GridUtils::logfile);
+
+		// Data
+		int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
+		int p = (L_MPI_XCORES + L_MPI_YCORES + L_MPI_ZCORES) - 3;	// Number of unknowns
+		int i = 0;
+		int c = 0;
+		int *domainSize = new int[3];
+		domainSize[eXDirection] = L_N;
+		domainSize[eYDirection] = L_M;
+		domainSize[eZDirection] = L_K;
+
+		// Set up solution vector for variables	
+		std::vector<double> XSolution(L_MPI_XCORES + 1, -1 * dh);
+		std::vector<double> YSolution(L_MPI_YCORES + 1, -1 * dh);
+		std::vector<double> ZSolution(L_MPI_ZCORES + 1, -1 * dh);
+		std::vector<unsigned int> heaviestBlock(3);
+
+		// Fix the edges as we know where they are
+		XSolution[0] = 0.0;
+		YSolution[0] = 0.0;
+		ZSolution[0] = 0.0;
+		XSolution.back() = L_BX;
+		YSolution.back() = L_BY;
+		ZSolution.back() = L_BZ;
+
+		// Create imbalance variable
+		double loadImbalance = 100.0;
+
+		// Create theta vector with initial guesses (uniform decomposition)
+		std::vector<double> theta(p, 0.0);
+		std::vector<double> thetaNew(theta);
+		for (int d = 0; d < 3; ++d)
+		{
+			// Coarse sites in a block if decomposed uniformly
+			int uniSpace = static_cast<int>(std::round(domainSize[d] / numCores[d]));
+
+			// Upper edge of block is a variable
+			for (i = 0; i < numCores[d] - 1; ++i)
+			{
+				theta[c] = (i + 1) * uniSpace * dh;
+				c++;
+			}
+		}
+
+		// Perturbation vector
+		std::vector<double> delta(p, 0);
+
+		// Populate initial solution vectors
+		mpi_SDCheckDelta(theta, delta, thetaNew, XSolution, YSolution, ZSolution, dh);
+		loadImbalance = mpi_SDComputeImbalance(heaviestBlock, XSolution, YSolution, ZSolution);
+		L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+
+		// Temporaries
+		std::vector<double> tmpX(XSolution);
+		std::vector<double> tmpY(YSolution);
+		std::vector<double> tmpZ(ZSolution);
+		float tmpImbalance;
+
+		// Start iteration
+		int k = 0;
+		double midHeavyBlockX, midHeavyBlockY, midHeavyBlockZ;
+		double midCurrentBlockX, midCurrentBlockY, midCurrentBlockZ;
+		double dirX, dirY, dirZ;
+		while (k < L_MPI_SD_MAX_ITER)
+		{
+
+			// Set perturbation directions by driving towards heaviest block
+			midHeavyBlockX =
+				(tmpX[heaviestBlock[eXDirection] + 1] + tmpX[heaviestBlock[eXDirection]]) / 2.0;
+			midHeavyBlockY =
+				(tmpY[heaviestBlock[eYDirection] + 1] + tmpY[heaviestBlock[eYDirection]]) / 2.0;
+			midHeavyBlockZ =
+				(tmpZ[heaviestBlock[eZDirection] + 1] + tmpZ[heaviestBlock[eZDirection]]) / 2.0;
+
+			for (int i = 0; i < numCores[eXDirection]; i++)
+			{
+				for (int j = 0; j < numCores[eYDirection]; j++)
+				{
+					for (int k = 0; k < numCores[eZDirection]; k++)
+					{
+						if (
+							i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+#if (L_DIMS == 3)
+							|| k == L_MPI_ZCORES - 1
+#endif
+							) continue;
+
+						// Compute middle of current block
+						midCurrentBlockX = (tmpX[i + 1] + tmpX[i]) / 2.0;
+						midCurrentBlockY = (tmpY[j + 1] + tmpY[j]) / 2.0;
+						midCurrentBlockZ = (tmpZ[k + 1] + tmpZ[k]) / 2.0;
+
+						// Compute direction to heaviest block
+						dirX = midHeavyBlockX - midCurrentBlockX;
+						dirY = midHeavyBlockY - midCurrentBlockY;
+						dirZ = midHeavyBlockZ - midCurrentBlockZ;
+
+						// Set deltas					
+						if (dirX == 0)
+							delta[i] = -dh;
+						else
+							delta[i] = (dirX / std::fabs(dirX)) * dh;
+
+						if (dirY == 0)
+							delta[L_MPI_XCORES - 1 + j] = -dh;
+						else
+							delta[L_MPI_XCORES - 1 + j] = (dirY / std::fabs(dirY)) * dh;
+
+#if (L_DIMS == 3)
+						if (dirZ == 0)
+							delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = -dh;
+						else
+							delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = (dirZ / std::fabs(dirZ)) * dh;
+#endif
+					}
+				}
+			}
+
+			// Check and adjust delta if necessary
+			mpi_SDCheckDelta(theta, delta, thetaNew, tmpX, tmpY, tmpZ, dh);
+
+			// Obtain new imbalance under the adjusted delta
+			tmpImbalance = mpi_SDComputeImbalance(heaviestBlock, tmpX, tmpY, tmpZ);
+
+			// If better than current solution, update
+			if (tmpImbalance <= loadImbalance)
+			{
+				loadImbalance = tmpImbalance;
+				XSolution = tmpX;
+				YSolution = tmpY;
+				ZSolution = tmpZ;
+			}
+
+			// Update theta
+			theta = thetaNew;
+
+			// Increment k
+			k++;
+		}
+
+		L_INFO("Smart decomposition finished. Imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+
+		// Pack information
+		for (int i = 0; i < numCores[eXDirection]; i++)
+		{
+			for (int j = 0; j < numCores[eYDirection]; j++)
+			{
+				for (int k = 0; k < numCores[eZDirection]; k++)
+				{
+					*bufRankSize++ = static_cast<int>(std::round((XSolution[i + 1] - XSolution[i]) / dh));
+					*bufRankSize++ = static_cast<int>(std::round((YSolution[j + 1] - YSolution[j]) / dh));
+#if (L_DIMS == 3)
+					*bufRankSize++ = static_cast<int>(std::round((ZSolution[k + 1] - ZSolution[k]) / dh));
+#endif
+				}
+			}
+		}
+
+	}
+
+	// Update ranks sizes from solution
+	MPI_Bcast(bufRankSizeStart, L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES * L_DIMS, MPI_INT, 0, world_comm);
+	int blockIdx = 0;
+	bufRankSize = bufRankSizeStart;
+	for (int i = 0; i < numCores[eXDirection]; i++)
+	{
+		for (int j = 0; j < numCores[eYDirection]; j++)
+		{
+			for (int k = 0; k < numCores[eZDirection]; k++)
+			{
+				// Update vectors
+				cRankSizeX[blockIdx] = *bufRankSize++;
+				cRankSizeY[blockIdx] = *bufRankSize++;
+#if (L_DIMS == 3)
+				cRankSizeZ[blockIdx] = *bufRankSize++;
+#endif
+				blockIdx++;
+			}
+		}
+	}
+
+	delete[] bufRankSizeStart;
+
 }
 // ************************************************************************** //
-

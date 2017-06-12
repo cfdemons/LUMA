@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -753,7 +753,25 @@ bool GridUtils::intersectsRefinedRegion(GridObj const & pGrid, int RegNum) {
 }
 
 // ****************************************************************************
-/// \brief	Get a pointer to a given grid in the hierarchy.
+/// \brief	Get a pointer to a given grid in the default hierarchy.
+///
+///			Takes a NULL pointer by reference and updates it when matching grid 
+///			is found in hierarchy on this rank. If grid not found, pointer is 
+///			returned without change and stays NULL. Can be used to test for the 
+///			existence of a grid on a rank by passing in a NULL pointer and 
+///			checking if a NULL pointer is returned.
+///
+/// \param		level	level desired.
+/// \param		region	region desried.
+/// \param[out] ptr		reference to pointer where address of grid matching in hierarchy will be assigned.
+void GridUtils::getGrid(int level, int region, GridObj*& ptr)
+{
+	// Get default grid hierarchy
+	getGrid(GridManager::getInstance()->Grids, level, region, ptr);
+}
+
+// ****************************************************************************
+/// \brief	Get a pointer to a given grid in the supplied hierarchy.
 ///
 ///			Takes a NULL pointer by reference and updates it when matching grid 
 ///			is found in hierarchy on this rank. If grid not found, pointer is 
@@ -765,7 +783,8 @@ bool GridUtils::intersectsRefinedRegion(GridObj const & pGrid, int RegNum) {
 /// \param		level	level desired.
 /// \param		region	region desried.
 /// \param[out] ptr		reference to pointer where address of grid matching in hierarchy will be assigned.
-void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr) {
+void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr)
+{
 
 	// Check supplied grid for a match
 	if (Grids->level == level && Grids->region_number == region) {
@@ -1369,7 +1388,7 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 		);
 
 	/* Compute offset from global edge i.e. number of voxels between grid edge and 
-	 * rank egde. We round it as although they are exact (as they are MPIM quantities
+	 * rank edge. We round it as although they are exact (as they are MPIM quantities
 	 * there may be round-off errors which might give an non-zero answer when zero 
 	 * was expected) */
 	offset = static_cast<int>(

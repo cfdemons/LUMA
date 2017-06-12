@@ -98,6 +98,31 @@ public:
 		return (a_dimensionless * SQ(currentGrid->dt)) / currentGrid->dh;
 	}
 
+	// *****************************************************************************
+	/// \brief	Converts seconds into hours, minutes and seconds.
+	///
+	/// \param total_seconds	number of seconds to be converted.
+	/// \param[out] hms			pointer to an integer array of size 3 contianing 
+	///							hours minutes and seconds.
+	template <typename T>
+	static void secs2hms(T total_seconds, int *hms)
+	{
+		// Round to the nearest second
+		total_seconds = std::round(total_seconds);
+
+		// Compute number of hours and minutes represented
+		double hours = static_cast<double>(total_seconds) / (60.0 * 60.0);
+		double minutes = static_cast<double>(total_seconds) / 60.0;
+
+		// Compute components
+		hms[0] = static_cast<int>(std::floor(hours));
+		hms[1] = static_cast<int>(std::floor(minutes - (static_cast<double>(hms[0]) * 60.0)));
+		hms[2] = static_cast<int>(std::floor(
+			static_cast<double>(total_seconds) - 
+			static_cast<double>(hms[1]) * 60.0 - 
+			static_cast<double>(hms[0]) * 60.0 * 60.0
+			));
+	}
 	
 };
 

@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 #ifndef OBJMAN_H
@@ -46,27 +46,34 @@ class ObjectManager
 		GeomPacked();
 		GeomPacked(
 			eObjectType objtype, int bodyID, std::string fileName, 
-			int on_grid_lev, int on_grid_reg,
-			double body_start_x, double body_start_y, double body_centre_z, 
-			double body_length, eCartesianDirection scale_direction, 
-			eMoveableType moveProperty, bool clamped
+			int onGridLev, int onGridReg,
+			bool isCentreX, double refX,
+			bool isCentreY, double refY, 
+			bool isCentreZ, double refZ, 
+			double bodyLength, eCartesianDirection scaleDirection, 
+			eMoveableType moveProperty, bool isClamped
 			);
 		~GeomPacked();
+
+		static bool interpretRef(std::string refType);
 		
 	
 		// Members
 		eObjectType objtype;
 		int bodyID;
 		std::string fileName;
-		int on_grid_lev;
-		int on_grid_reg;
-		double body_start_x;
-		double body_start_y;
-		double body_centre_z;
-		double body_length;
-		eCartesianDirection scale_direction;
+		int onGridLev;
+		int onGridReg;
+		bool isRefXCentre;
+		bool isRefYCentre;
+		bool isRefZCentre;
+		double bodyRefX;
+		double bodyRefY;
+		double bodyRefZ;
+		double bodyLength;
+		eCartesianDirection scaleDirection;
 		eMoveableType moveProperty;
-		bool clamped;
+		bool isClamped;
 
 	};
 
@@ -90,9 +97,6 @@ private:
 
 	/// Pointer to grid hierarchy
 	GridObj* _Grids;
-
-	/// Pre-stream distribution functions for applying BFL BCs
-	DEPRECATED IVector<double> f_prestream;
 
 	/// Pointer to self
 	static ObjectManager* me;

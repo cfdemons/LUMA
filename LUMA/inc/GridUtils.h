@@ -5,11 +5,11 @@
  *
  * -------------------------- L-U-M-A ---------------------------
  *
- *  Copyright (C) 2015, 2016
+ *  Copyright (C) The University of Manchester 2017
  *  E-mail contact: info@luma.manchester.ac.uk
  *
  * This software is for academic use only and not available for
- * distribution without written consent.
+ * further distribution commericially or otherwise without written consent.
  *
  */
 
@@ -66,6 +66,7 @@ public:
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
+	static void getGrid(int level, int region, GridObj*& ptr);							// Wrapper using default hierarchy to get grid pointer
 	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
 	static double normaliseToLink(double value, int v);									// Normalise value wrt to the lattice link length
 

@@ -104,6 +104,9 @@ private:
 	// Flag for if there are any flexible bodies in the simulation
 	bool hasMovingBodies = false;
 
+	// IBM-MPI members
+	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
+
 
 	/* Methods */
 
@@ -124,7 +127,7 @@ public:
 	void ibm_apply2();						// Apply interpolate, compute and spread operations for all bodies.
 	void ibm_initialise();					// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
-	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
+	void ibm_interpolate();				// Interpolation of velocity field onto markers of ib-th body.
 	void ibm_spread(int ib);				// Spreading of restoring force from ib-th body.
 	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
 	void ibm_initialiseSupport(int ib, int m, 

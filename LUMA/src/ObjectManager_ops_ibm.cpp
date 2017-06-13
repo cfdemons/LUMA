@@ -23,11 +23,6 @@
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply2() {
 
-	MpiManager *mpim = MpiManager::getInstance();
-
-	MPI_Barrier(mpim->world_comm);
-	exit(0);
-
 	// Loop through all bodies and find support
 	for (int ib = 0; ib < iBody.size(); ib++) {
 
@@ -74,28 +69,7 @@ void ObjectManager::ibm_apply2() {
 		ibm_findEpsilon();
 
 	// Interpolate the velocity onto the markers
-
-
-
-
-	for (int ib = 0; ib < iBody.size(); ib++) {
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
-			std::cout << "Rank " << mpim->my_rank << ", marker " << iBody[ib].markers[m].id << ", eps = " << iBody[ib].markers[m].epsilon << std::endl;
-		}
-	}
-
-//	if (mpim->my_rank == 1) {
-//		std::cout << std::endl;
-//		int ib = 0;
-//		int m = 0;
-//		for (int i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
-//			std::cout << std::fixed << i << " " << iBody[ib].markers[m].supp_x[i] << " " << iBody[ib].markers[m].supp_y[i] << " " << iBody[ib].markers[m].deltaval[i] << " " << iBody[ib].markers[m].support_rank[i] << std::endl;
-//		}
-//	}
-
-	MPI_Barrier(mpim->world_comm);
-	exit(0);
-
+	ibm_interpolate();
 }
 
 
@@ -492,73 +466,60 @@ void ObjectManager::ibm_initialiseSupport(int ib, int m, int s, double estimated
 
 // *****************************************************************************
 /// \brief	Interpolate velocity field onto markers
-/// \param	ib	iBody being operated on.
-void ObjectManager::ibm_interpol(int ib) {
-//
-//	// Get grid sizes
-//	size_t M_lim = iBody[ib]._Owner->M_lim;
-//#if (L_DIMS == 3)
-//	size_t K_lim = iBody[ib]._Owner->K_lim;
-//#endif
-//	int rank = GridUtils::safeGetRank();
-//
-//	// For each marker
-//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//
-//		// Reset the values of interpolated velocity
-//		std::fill(iBody[ib].markers[m].fluid_vel.begin(), iBody[ib].markers[m].fluid_vel.end(), 0.0);
-//
-//		// Loop over support nodes
-//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-//
-//			// Loop over directions x y z
-//			for (int dir = 0; dir < L_DIMS; dir++) {
-//
-//				// Read given velocity component from support node, multiply by delta function
-//				// for that support node and sum to get interpolated velocity.
-//
-//#if (L_DIMS == 3)
-//			iBody[ib].markers[m].fluid_vel[dir] +=
-//				iBody[ib]._Owner->u(
-//				iBody[ib].markers[m].supp_i[i],
-//				iBody[ib].markers[m].supp_j[i],
-//				iBody[ib].markers[m].supp_k[i],
-//				dir,
-//				M_lim, K_lim, L_DIMS
-//				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
-//#else
-//			iBody[ib].markers[m].fluid_vel[dir] +=
-//				iBody[ib]._Owner->u(
-//				iBody[ib].markers[m].supp_i[i],
-//				iBody[ib].markers[m].supp_j[i],
-//				dir,
-//				M_lim, L_DIMS
-//				) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
-//#endif
-//			}
-//		}
-//	}
-//
-//#ifdef L_IBM_DEBUG
-//
-//#ifdef L_BUILD_FOR_MPI
-//	// Get MPI Manager Instance
-//	MpiManager *mpim = MpiManager::getInstance();
-//#endif
-//
-//	// DEBUG -- write out res vector
-//	std::ofstream testout;
-//	testout.open(GridUtils::path_str + "/velSupp" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out", std::ios::app);
-//	testout << "\nNEW TIME STEP" << std::endl;
-//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//		for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
-//			testout << iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 0, M_lim, L_DIMS) << "\t"
-//					<< iBody[ib]._Owner->u(iBody[ib].markers[m].supp_i[i], iBody[ib].markers[m].supp_j[i], 1, M_lim, L_DIMS) << std::endl;
-//		}
-//		testout << std::endl;
-//	}
-//	testout.close();
-//#endif
+void ObjectManager::ibm_interpolate() {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Loop through all bodies
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Get grid sizes
+		size_t M_lim = iBody[ib]._Owner->M_lim;
+#if (L_DIMS == 3)
+		size_t K_lim = iBody[ib]._Owner->K_lim;
+#endif
+
+		// For each marker
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+
+			// Reset the values of interpolated velocity
+			std::fill(iBody[ib].markers[m].interpVel.begin(), iBody[ib].markers[m].interpVel.end(), 0.0);
+
+			// Loop over support nodes
+			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+
+				// Only interpolate over data this rank actually owns at the moment
+				if (rank == iBody[ib].markers[m].support_rank[i]) {
+
+					// Loop over directions x y z
+					for (int dir = 0; dir < L_DIMS; dir++) {
+
+						// Read given velocity component from support node, multiply by delta function
+						// for that support node and sum to get interpolated velocity.
+#if (L_DIMS == 3)
+						iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
+								iBody[ib].markers[m].supp_i[i],
+								iBody[ib].markers[m].supp_j[i],
+								iBody[ib].markers[m].supp_k[i],
+								dir, M_lim, K_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+#else
+						iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
+								iBody[ib].markers[m].supp_i[i],
+								iBody[ib].markers[m].supp_j[i],
+								dir, M_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+#endif
+					}
+				}
+			}
+		}
+	}
+
+	// Write out interpolate velocity
+#ifdef L_IBM_DEBUG
+	for (int ib = 0; ib < iBody.size(); ib++)
+		ibm_debug_interpVel(ib);
+#endif
 
 }
 
@@ -889,11 +850,11 @@ void ObjectManager::ibm_debug_markerPosition(int ib) {
 		// Open file and write header
 		std::ofstream bodyout;
 		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
-		bodyout << "x\ty\tz\tFirst Marker ID" << std::endl;
+		bodyout << "Marker ID\tx\ty\tz" << std::endl;
 
 		// Loop through markers
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-			bodyout << iBody[ib].markers[i].position[eXDirection] << "\t" << iBody[ib].markers[i].position[eYDirection] << "\t" << iBody[ib].markers[i].position[eZDirection] << "\t" << iBody[ib].markers[i].id << std::endl;
+			bodyout << iBody[ib].markers[i].id << "\t" << iBody[ib].markers[i].position[eXDirection] << "\t" << iBody[ib].markers[i].position[eYDirection] << "\t" << iBody[ib].markers[i].position[eZDirection] << std::endl;
 		}
 		bodyout.close();
 	}
@@ -920,11 +881,11 @@ void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
 
 		// Write out the first (nearest) support marker
 		if (m == 0 && s == 0)
-			supportout << "Marker\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
+			supportout << "Marker ID\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
 
 		// Write out info
 		supportout
-			<< m << "\t"
+			<< iBody[ib].markers[m].id << "\t"
 			<< iBody[ib].markers[m].support_rank.back() << "\t"
 			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
 			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
@@ -950,13 +911,14 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 	// Open file and write header
 	std::ofstream epout;
 	epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-	epout << "\nNEW TIME STEP" << std::endl;
-	epout << "ID Epsilon" << std::endl;
+	epout << "NEW TIME STEP" << std::endl;
+	epout << "Marker ID\tEpsilon" << std::endl;
 
 	// Loop through markers
 	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		epout << iBody[ib].markers[m].id << " " << iBody[ib].markers[m].epsilon << std::endl;
+		epout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].epsilon << std::endl;
 	}
+	epout << std::endl;
 	epout.close();
 }
 
@@ -964,26 +926,32 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 
 
 // *****************************************************************************
-/// \brief	Moves iBodies after applying IBM.
+/// \brief	Write out interpolated velocity for debugging.
 ///
-///			Wrapper for relocating markers of an iBody be calling appropriate
-///			positional update routine.
+///			Writes out the interpolated velocity values for debugging
+///
+/// \param	ib			id of body being written out.
 ///
 void ObjectManager::ibm_debug_interpVel(int ib) {
 
-	// Get rank safely
-	int rank = GridUtils::safeGetRank();
+	// Only do if there is data to write
+	if (iBody[ib].markers.size() > 0) {
 
-	// Open file and write header
-	std::ofstream predout;
-	predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-	predout << "\nNEW TIME STEP" << std::endl;
+		// Get rank safely
+		int rank = GridUtils::safeGetRank();
 
-	// Loop through markers
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		predout << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << std::endl;
+		// Open file and write header
+		std::ofstream predout;
+		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+		predout << "NEW TIME STEP" << std::endl;
+
+		// Loop through markers
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << std::endl;
+		}
+		predout << std::endl;
+		predout.close();
 	}
-	predout.close();
 }
 
 // *****************************************************************************

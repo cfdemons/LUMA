@@ -20,9 +20,96 @@
 #include "../inc/IBInfo.h"
 
 
-/// \brief	Builds MPI comm class for MPI comminocation in IBM.
+/// \brief	Builds MPI comm class for MPI communication in IBM.
 void ObjectManager::ibm_buildMPIComms() {
 
+	// Get the mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Also clear comm vector
+	supportCommMarkerSide.clear();
+
+	// Loop through all bodies, markers and support sites and get places where communication is necessary
+	for (int ib = 0; ib < iBody.size(); ib++) {
+		for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
+
+				// If this rank does not own support site then add new element in comm vector
+				if (mpim->my_rank != iBody[ib].markers[m].support_rank[s])
+					supportCommMarkerSide.emplace_back(ib, m, s, iBody[ib].markers[m].support_rank[s]);
+			}
+		}
+	}
+
+	// Get how many supports site that need to be received from each rank
+	std::vector<int> nSupportRecv(mpim->num_ranks, 0);
+	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+		nSupportRecv[supportCommMarkerSide[i].rank]++;
+	}
+
+	// Do global comm so that each rank knows how many support sites to send and where
+	std::vector<int> nSupportSend(mpim->num_ranks, 0);
+	MPI_Alltoall(&nSupportRecv.front(), 1, MPI_INT, &nSupportSend.front(), 1, MPI_INT, mpim->world_comm);
+
+	// Pack the positions of the support sites that need to be received into buffer
+	int ib, m, s, rank;
+	std::vector<std::vector<double>> supportPositions;
+	std::vector<std::vector<int>> bodyIDSend;
+	supportPositions.resize(mpim->num_ranks);
+	bodyIDSend.resize(mpim->num_ranks);
+	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+
+		// Get IDs of support site
+		ib = supportCommMarkerSide[i].bodyID;
+		m = supportCommMarkerSide[i].markerID;
+		s = supportCommMarkerSide[i].supportID;
+		rank = supportCommMarkerSide[i].rank;
+
+		// Body ID
+		bodyIDSend[rank].push_back(ib);
+
+		// Add to send buffer
+		supportPositions[rank].push_back(iBody[ib].markers[m].supp_x[s]);
+		supportPositions[rank].push_back(iBody[ib].markers[m].supp_y[s]);
+#if (L_DIMS == 3)
+		supportPositions[rank].push_back(iBody[ib].markers[m].supp_z[s]);
+#endif
+	}
+
+	// Set MPI request for asynchronous send
+	MPI_Request send_requestsPositions[mpim->num_ranks] = {MPI_REQUEST_NULL};
+	MPI_Request send_requestsIDs[mpim->num_ranks] = {MPI_REQUEST_NULL};
+
+	// Loop through all sends that are required
+	for (int i = 0; i < mpim->num_ranks; i++) {
+
+		// Check if it has stuff to send to rank i
+		if (nSupportRecv[i] > 0) {
+			MPI_Isend(&supportPositions[i].front(), nSupportRecv[i]*L_DIMS, MPI_DOUBLE, i, mpim->my_rank, mpim->world_comm, &send_requestsPositions[i]);
+			MPI_Isend(&bodyIDSend[i].front(), nSupportRecv[i], MPI_INT, i, mpim->my_rank, mpim->world_comm, &send_requestsIDs[i]);
+		}
+	}
+
+	// Loop through all receives that are required
+	std::vector<std::vector<double>> supportPositionsRecv;
+	std::vector<std::vector<int>> bodyIDRecv;
+	supportPositionsRecv.resize(mpim->num_ranks);
+	bodyIDRecv.resize(mpim->num_ranks);
+	for (int i = 0; i < mpim->num_ranks; i++) {
+
+		// Resize the buffer
+		supportPositionsRecv[i].resize(nSupportSend[i]*L_DIMS);
+		bodyIDRecv[i].resize(nSupportSend[i]);
+
+		// Check if it has stuff to receive from rank i
+		if (nSupportSend[i] > 0) {
+			MPI_Recv(&supportPositionsRecv[i].front(), nSupportSend[i]*L_DIMS, MPI_DOUBLE, i, i, mpim->world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&bodyIDRecv[i].front(), nSupportSend[i], MPI_INT, i, i, mpim->world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
 
 }
 

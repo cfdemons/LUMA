@@ -16,6 +16,31 @@
 #include "../inc/stdafx.h"
 #include "../inc/IBInfo.h"
 
+
+// Default constructor
+supportCommMarkerSideClass::supportCommMarkerSideClass() {
+
+	// Default values
+	bodyID = 0;
+	markerID = 0;
+	supportID = 0;
+	rank = 0;
+}
+
+/// \brief Custom constructor for support receiver communication class.
+///	\param	body				index of body.
+///	\param	marker				index of marker.
+///	\param	support				index of support.
+supportCommMarkerSideClass::supportCommMarkerSideClass(int body, int marker, int support, int rankID) {
+
+	// Default values
+	bodyID = body;
+	markerID = marker;
+	supportID = support;
+	rank = rankID;
+}
+
+
 // Default constructor
 epsCalcMarkerClass::epsCalcMarkerClass() {
 

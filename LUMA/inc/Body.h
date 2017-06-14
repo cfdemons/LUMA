@@ -52,9 +52,11 @@ protected:
 	GridObj* _Owner;					///< Pointer to owning grid
 	int id;								///< Unique ID of the body
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
+	double spacing;						///< Reference spacing of the markers
+
+public:
 	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
-	double spacing;						///< Reference spacing of the markers
 
 
 	// ************************ Methods ************************ //

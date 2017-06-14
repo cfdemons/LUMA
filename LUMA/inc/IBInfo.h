@@ -18,17 +18,17 @@
 #include "stdafx.h"
 
 
-///	\brief	Class for arranging data for support-marker communcation.
+///	\brief	Class for arranging data for support-marker communication on support side.
 ///
 ///
-class supportCommSupportSideClass
-{
+class supportCommSupportSideClass {
 
 public:
+
 	// Default Constructor
 	supportCommSupportSideClass();
 
-	// Custom constructor for creating eps calc marker
+	// Custom constructor for creating supportCommSupportSide object
 	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &position);
 
 public:
@@ -42,17 +42,17 @@ public:
 };
 
 
-///	\brief	Class for arranging data for support-marker communcation.
+///	\brief	Class for arranging data for support-marker communication on marker side.
 ///
 ///
-class supportCommMarkerSideClass
-{
+class supportCommMarkerSideClass {
 
 public:
+
 	// Default Constructor
 	supportCommMarkerSideClass();
 
-	// Custom constructor for creating eps calc marker
+	// Custom constructor for creating supportCommMarkerSide object
 	supportCommMarkerSideClass(int body, int marker, int support, int rankID);
 
 public:
@@ -65,6 +65,8 @@ public:
 };
 
 
+
+// ***** USE IBODY INSTEAD WITH A CUSTOM CONSTRUCTOR FOR CREATING THE BODIES **** //
 ///	\brief	Class for arranging data before epsilon calculation.
 ///
 ///
@@ -88,9 +90,9 @@ public:
 
 	// Support data
 	std::vector<double> deltaval;
-	std::vector<double> x;
-	std::vector<double> y;
-	std::vector<double> z;
+	std::vector<double> supp_x;
+	std::vector<double> supp_y;
+	std::vector<double> supp_z;
 };
 
 #endif	// L_IBINFO_H

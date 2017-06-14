@@ -212,6 +212,11 @@ void ObjectManager::ibm_initialise() {
 	ibm_buildMPIComms();
 #endif
 
+	MpiManager *mpim = MpiManager::getInstance();
+	MPI_Barrier(mpim->world_comm);
+	exit(0);
+
+
 	// Find epsilon for the body
 	ibm_findEpsilon();
 
@@ -655,25 +660,25 @@ double ObjectManager::ibm_findEpsilon() {
 #if (L_DIMS == 3)
 					Delta_J =
 						ibm_deltaKernel(
-						(markerData[J].position[eXDirection] - markerData[I].x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						(markerData[J].position[eXDirection] - markerData[I].supp_x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
 						markerData[J].dilation
 						) *
 						ibm_deltaKernel(
-						(markerData[J].position[eYDirection] - markerData[I].y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						(markerData[J].position[eYDirection] - markerData[I].supp_y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
 						markerData[J].dilation
 						) *
 						ibm_deltaKernel(
-						(markerData[J].position[eZDirection] - markerData[I].z[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						(markerData[J].position[eZDirection] - markerData[I].supp_z[s]) / iBody[markerData[I].bodyID]._Owner->dh,
 						markerData[J].dilation
 						);
 #else
 					Delta_J =
 						ibm_deltaKernel(
-						(markerData[J].position[eXDirection] - markerData[I].x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						(markerData[J].position[eXDirection] - markerData[I].supp_x[s]) / iBody[markerData[I].bodyID]._Owner->dh,
 						markerData[J].dilation
 						) *
 						ibm_deltaKernel(
-						(markerData[J].position[eYDirection] - markerData[I].y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
+						(markerData[J].position[eYDirection] - markerData[I].supp_y[s]) / iBody[markerData[I].bodyID]._Owner->dh,
 						markerData[J].dilation
 						);
 #endif

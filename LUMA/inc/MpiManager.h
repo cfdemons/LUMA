@@ -166,6 +166,10 @@ public :
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 
+	// IBM
+	void mpi_getIBMarkers();							// Collect all IBM markers for each body
+	void mpi_buildEpsComms();							// Build comms required for epsilon calculation
+
 };
 
 #endif

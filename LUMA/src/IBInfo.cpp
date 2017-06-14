@@ -96,11 +96,11 @@ epsCalcMarkerClass::epsCalcMarkerClass(int bodyIDIn, std::vector<double> positio
 
 	// Assign position of support points
 	for (int i = 0; i < deltaval.size(); i++) {
-		x.push_back(supp_position[i][eXDirection]);
-		y.push_back(supp_position[i][eYDirection]);
+		supp_x.push_back(supp_position[i][eXDirection]);
+		supp_y.push_back(supp_position[i][eYDirection]);
 
 #if (L_DIMS == 3)
-		z.push_back(supp_position[i][eZDirection]);
+		supp_z.push_back(supp_position[i][eZDirection]);
 #endif
 	}
 }

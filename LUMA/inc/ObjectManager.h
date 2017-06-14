@@ -91,10 +91,6 @@ private:
 	int bbbOnGridLevel = -1;				///< Grid level on which the BB body resides
 	int bbbOnGridReg = -1;					///< Grid region on which the BB body resides
 
-	// Objects (could be stored in a single Body array if we use pointers)
-	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
-	std::vector<BFLBody> pBody;				///< Array of BFL bodies
-
 	/// Pointer to grid hierarchy
 	GridObj* _Grids;
 
@@ -107,6 +103,12 @@ private:
 	// IBM-MPI members
 	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
 	std::vector<supportCommSupportSideClass> supportCommSupportSide;
+
+public:
+
+	// Objects (could be stored in a single Body array if we use pointers)
+	std::vector<IBBody> iBody;				///< Array of immersed boundary bodies
+	std::vector<BFLBody> pBody;				///< Array of BFL bodies
 
 
 

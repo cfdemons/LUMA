@@ -62,12 +62,12 @@
 */
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
+#define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -136,21 +136,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
-#define L_RESOLUTION 1		                ///< Number of coarse lattice sites per unit length
-
-/*
-*******************************************************************************/
-
-
-#define L_lattViscosity  0.0010                            ///Lattice Viscosity John's definitions
-#define dx_square        1.0/(L_RESOLUTION*L_RESOLUTION)  /// dx^2             John's definitions
-
-
-/*******************************************************************************
-*/
-
-#define L_TIMESTEP L_lattViscosity*dx_square*L_RE       ///< The timestep in non-dimensional units
-
+#define L_RESOLUTION 1		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.1	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 20.0		///< End of domain in X (non-dimensional units)
@@ -186,12 +173,6 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 ****************************** Object Management ******************************
 *******************************************************************************
 */
-
-// ****** BEGIN JON ONLY ****** //
-
-#define L_ANGLE 60
-
-// ****** END JON ONLY ****** //
 
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
@@ -247,112 +228,27 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_PADDING_Z_MIN 0.1		///< Padding between Z start of each sub-grid and its child edge
 #define L_PADDING_Z_MAX 0.1		///< Padding between Z end of each sub-grid and its child edge
 
-/*
-*******************************************************************************
-************************ John Definition **************************************
-*******************************************************************************
-*/
-
-#define StartX  4                                    //John's definitions Position 1 level X
-#define LengthX 5                                    //John's definitions Size 1 level X 
-#define StartY  3.5                                  //John's definitions Position 1 level Y
-#define LengthY 3                                    //John's definitions Size 1 level Y
-#define StartZ   3                                   //John's definitions Position 1 level Z
-#define LengthZ  4                                   //John's definitions Position 1 level Z
-
-#define NumCellsLevOneFrontX   1
-#define NumCellsLevOneBackX    L_RESOLUTION*0.5       //John's definition
-#define NumCellsLevOneBottomY  L_RESOLUTION*0.2       //John's definition
-#define NumCellsLevOneTopY     L_RESOLUTION*0.2       //John's definition
-#define NumCellsLevOneLowZ     L_RESOLUTION*0.2       //John's definition
-#define NumCellsLevOneHighZ    L_RESOLUTION*0.2       //John's definition
-
-#define StartX1   StartX+(NumCellsLevOneFrontX*(1.0/L_RESOLUTION))           //John's definition                                  
-#define EndX1     (StartX+LengthX)-(NumCellsLevOneBackX*(1.0/L_RESOLUTION))  //John's definition                                 
-#define StartY1   StartY+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))          //John's definition                       
-#define EndY1     (StartY+LengthY)-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))   //John's definition
-#define StartZ1   StartZ+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))             //John's definition                       
-#define EndZ1     (StartZ+LengthZ)-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))  //John's definition
-
-#define StartX2   StartX1+((NumCellsLevOneFrontX/2.0)*(1.0/L_RESOLUTION))       //John's definition                           
-#define EndX2     EndX1-(NumCellsLevOneBackX*(1.0/L_RESOLUTION))                //John's definition                      
-#define StartY2   StartY1+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
-#define EndY2     EndY1-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
-#define StartZ2   StartZ1+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
-#define EndZ2     EndZ1-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))    //John's definition
-
-#define StartX3   StartX2+((NumCellsLevOneFrontX/4.0)*(1.0/L_RESOLUTION))       //John's definition                          
-#define EndX3     EndX2-((NumCellsLevOneBackX)*(1.0/L_RESOLUTION))                //John's definition                      
-#define StartY3   StartY2+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
-#define EndY3     EndY2-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
-#define StartZ3   StartZ2+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
-#define EndZ3     EndZ2-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))    //John's definition
-
-#define StartX4   StartX3+((NumCellsLevOneFrontX/8.0)*(1.0/L_RESOLUTION))       //John's definition                          
-#define EndX4     EndX3-((NumCellsLevOneBackX*3)*(1.0/L_RESOLUTION))                //John's definition                      
-#define StartY4   StartY3+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
-#define EndY4     EndY3-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
-#define StartZ4   StartZ3+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
-#define EndZ4     EndZ3-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))    //John's definition
-
-
-
-
-
-
-
-/*
-*******************************************************************************
-*******************************************************************************
-*******************************************************************************
-*/
-
-
-
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
-
-//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartX)}};
-//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartX+LengthX)}};
-//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartY)}};
-//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartY+LengthY)}};
-//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartZ)}};
-//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartZ+LengthZ) }};
-
-
-//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1}};
-//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1}};
-//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1}};
-//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1}};
-//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1}};
-//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1}};
-
-
-//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2}};
-//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2}};
-//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2}};
-//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2}};
-//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2}};
-//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2}};
-
-//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2},{StartX3}};
-//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2},{EndX3}};
-//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2},{StartY3}};
-//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2},{EndY3}};
-//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2},{StartZ3}};
-//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2},{EndZ3}};
-
-
-static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2},{StartX3},{StartX4}};
-static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2},{EndX3},{EndX4}};
-static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2},{StartY3},{StartY4}};
-static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2},{EndY3},{EndY4}};
-static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2},{StartZ3},{StartZ4}};
-static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2},{EndZ3},{EndZ4}};
-
-
-
+static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 4.7 }
+};
+static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 8.9 }
+};
+static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 0.0 }
+};
+static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 1.2 }
+};
+static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 2.5 }
+};
+static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
+	{ 4.4 }
+};
 
 #endif
 

@@ -339,11 +339,6 @@ void ObjectManager::io_readInGeomConfig() {
 			bool zRefCen = GeomPacked::interpretRef(zRefType);
 
 			L_INFO("Initialising Body " + std::to_string(bodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
-			
-			// ****** START JON ONLY ***** //
-			length = cos(L_ANGLE * L_PI / 180);
-
-			// ****** END JON ONLY ****** //
 
 
 			// Get body type

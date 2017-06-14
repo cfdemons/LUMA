@@ -106,6 +106,8 @@ private:
 
 	// IBM-MPI members
 	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
+	std::vector<supportCommSupportSideClass> supportCommSupportSide;
+
 
 
 	/* Methods */
@@ -152,6 +154,7 @@ public:
 
 	// IBM-MPI methods
 	void ibm_buildMPIComms();
+	void ibm_interpolate_comm();
 	void ibm_gatherForEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<epsCalcMarkerClass> &markerData);
 	void ibm_scatterAfterEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<double> &epsilon);
 

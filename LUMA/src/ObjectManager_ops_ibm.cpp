@@ -515,6 +515,12 @@ void ObjectManager::ibm_interpolate() {
 		}
 	}
 
+	// Pass the necessary values between ranks
+#ifdef L_BUILD_FOR_MPI
+	ibm_interpolate_comm();
+#endif
+
+
 	// Write out interpolate velocity
 #ifdef L_IBM_DEBUG
 	for (int ib = 0; ib < iBody.size(); ib++)

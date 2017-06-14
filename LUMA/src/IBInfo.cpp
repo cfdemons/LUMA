@@ -18,6 +18,29 @@
 
 
 // Default constructor
+supportCommSupportSideClass::supportCommSupportSideClass() {
+
+	// Default values
+	rank = 0;
+	bodyID = 0;
+}
+
+/// \brief Custom constructor for support side communication class.
+///	\param	rank to send to		index of body.
+///	\param	marker				index of marker.
+///	\param	support				index of support.
+supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, std::vector<int> &position) {
+
+	// Default values
+	rank = rankID;
+	bodyID = body;
+	supportIdx.push_back(position[eXDirection]);
+	supportIdx.push_back(position[eYDirection]);
+	supportIdx.push_back(position[eZDirection]);
+}
+
+
+// Default constructor
 supportCommMarkerSideClass::supportCommMarkerSideClass() {
 
 	// Default values

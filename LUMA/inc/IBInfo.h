@@ -18,7 +18,7 @@
 #include "stdafx.h"
 
 
-///	\brief	Class for arranging data before epsilon calculation.
+///	\brief	Class for arranging data for support-marker communcation.
 ///
 ///
 class supportCommSupportSideClass
@@ -29,22 +29,20 @@ public:
 	supportCommSupportSideClass();
 
 	// Custom constructor for creating eps calc marker
-//	supportCommSupportSideClass(int body, int marker, int support, int rankID);
+	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &position);
 
 public:
 
 	// ID data
 	int rank;
+	int bodyID;
 
 	// Force data
-	std::vector<double> supportPosition;
-
-	// Force data
-	std::vector<double> markerForce;
+	std::vector<int> supportIdx;
 };
 
 
-///	\brief	Class for arranging data before epsilon calculation.
+///	\brief	Class for arranging data for support-marker communcation.
 ///
 ///
 class supportCommMarkerSideClass
@@ -60,13 +58,10 @@ public:
 public:
 
 	// ID data
+	int rank;
 	int bodyID;
 	int markerID;
 	int supportID;
-	int rank;
-
-	// Velocity data
-	std::vector<double> supportVel;
 };
 
 

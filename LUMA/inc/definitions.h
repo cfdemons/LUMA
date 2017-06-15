@@ -65,9 +65,9 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1222			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 312991			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 5		///< Precision of output (for text writers)
+#define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -78,9 +78,9 @@
 
 // High frequency output options
 #define L_PROBE_OUTPUT							///< Turn on probe output
-#define L_PROBE_OUT_FREQ 122		///< Write out frequency of probe output
+#define L_PROBE_OUT_FREQ 31299		///< Write out frequency of probe output
 const static int cNumProbes[3] = {1, 5, 1};		///< Number of probes in each direction (x, y, z)
-const static double cProbeLimsX[2] = {0.5, 0.5};	///< Limits of X plane for array of probes
+const static double cProbeLimsX[2] = {1.0, 1.0};	///< Limits of X plane for array of probes
 const static double cProbeLimsY[2] = {0.2, 0.8};	///< Limits of Y plane for array of probes
 const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for array of probes
 
@@ -109,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 12226		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 3129917		///< Number of time steps to run simulation for
 
 
 /*
@@ -136,8 +136,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
-#define L_RESOLUTION 24		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 4.1e-3	///< The timestep in non-dimensional units
+#define L_RESOLUTION 384		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 1.597e-5	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 2.0		///< End of domain in X (non-dimensional units)
@@ -201,9 +201,9 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 //#define L_OUTLET_ON				///< Turn on outlet boundary
 
 // Solids
-#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_WALL_FLOOR_ONLY
+//#define L_WALL_FLOOR_ONLY
 #define L_WALL_THICKNESS_BOTTOM L_COARSE_SITE_THICKNESS			///< Thickness of wall
 #define L_WALL_THICKNESS_TOP L_COARSE_SITE_THICKNESS			///< Thickness of top wall
 #define L_WALL_THICKNESS_FRONT L_COARSE_SITE_THICKNESS			///< Thickness of front (3D) wall

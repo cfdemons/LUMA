@@ -569,16 +569,17 @@ void GridObj::io_probeOutput() {
 	int i, j, d;
 	double x, y, z;
 
-	if (t == L_PROBE_OUT_FREQ && rank == 0) {
+	if (t == 0 && rank == 0) {
 		// Overwrite existing first time through
 		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out);
 	} else {
 		// Append to existing
 		probefile.open(GridUtils::path_str + "/probe.out", std::ios::out | std::ios::app);
 	}
+	probefile.precision(L_OUTPUT_PRECISION);
 
 	// Start a new line if first rank
-	if (rank == 0 && t != L_PROBE_OUT_FREQ) probefile << std::endl;
+	if (rank == 0 && t != 0) probefile << std::endl;
 
 	// Declarations
 	eLocationOnRank loc = eNone;
@@ -636,6 +637,12 @@ void GridObj::io_probeOutput() {
 						{
 							probefile << g->u(ijk[0], ijk[1], ijk[2], d, g->M_lim, g->K_lim, L_DIMS) << "\t";
 						}
+#if (L_DIMS != 3)
+						probefile << 0 << "\t";
+#endif
+
+						// Write out density
+						probefile << g->rho(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) << "\t";
 
 						bProbeWritten = true;
 						break;

@@ -342,6 +342,24 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
+#ifdef L_PROBE_OUTPUT
+
+#ifdef L_BUILD_FOR_MPI
+	for (int n = 0; n < mpim->num_ranks; n++)
+#endif
+	{
+		// Wait for rank accessing the file and only access if this rank's turn
+#ifdef L_BUILD_FOR_MPI
+		MPI_Barrier(mpim->world_comm);
+		if (mpim->my_rank == n)
+#endif
+		{
+			L_INFO("Initial probe write out...", GridUtils::logfile);
+			Grids->io_probeOutput();
+		}
+	}
+#endif
+
 #ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation
 	MPI_Barrier(mpim->world_comm);

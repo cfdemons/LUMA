@@ -811,9 +811,10 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	double lambda_v, beta_v;
 
 #ifdef L_GRAVITY_ON
-	// Add gravity
+	// Add gravity and reset the lattice forces
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
 		rho[id] * gravity * refinement_ratio;
+	memset(&force_i[id * L_NUM_VELS], 0, sizeof(double) * L_NUM_VELS);
 #endif
 
 	// Now compute force_i components from Cartesian force vector

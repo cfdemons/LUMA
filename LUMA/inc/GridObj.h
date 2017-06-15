@@ -136,7 +136,7 @@ public :
 	// LBM operations
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_macro(int i, int j, int k);
-	void LBM_resetForces();								// Resets the force vectors on the grid
+	DEPRECATED void LBM_resetForces();								// Resets the force vectors on the grid
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number

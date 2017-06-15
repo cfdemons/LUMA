@@ -25,6 +25,7 @@ class epsCommOwnerSideClass {
 
 	// Make MPIManager a friend so it can access body data
 	friend class MpiManager;
+	friend class IBBody;
 
 public:
 
@@ -37,7 +38,7 @@ public:
 private:
 
 	// Member data
-	int fromRank;
+	int rankComm;
 	int bodyID;
 	int markerID;
 	int nSupportSites;
@@ -63,7 +64,7 @@ public:
 private:
 
 	// Member data
-	int toRank;
+	int rankComm;
 	int bodyID;
 	int markerIdx;
 };

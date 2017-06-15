@@ -136,7 +136,7 @@ public:
 	void ibm_initialiseSupport(int ib, int m, 
 		int s, double estimated_position[]);		// Initialises data associated with the support points.
 	void ibm_computeForce(int ib);			// Compute restorative force at each marker in ib-th body.
-	double ibm_findEpsilon();			// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_findEpsilon();					// Method to find epsilon weighting parameter for ib-th body.
 	void ibm_moveBodies();					// Update all IBBody positions and support.
 	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
 		std::vector<double>& bVector, std::vector<double>& epsilon,

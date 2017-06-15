@@ -49,6 +49,10 @@ public:
 	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
 
+	// Custom constructor for building dummy iBody for epsilon calculation
+	IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer);
+
+
 protected:
 
 	/************** Member Data **************/

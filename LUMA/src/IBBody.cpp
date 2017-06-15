@@ -128,3 +128,109 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 {
 	initialise(moveProperty);
 }
+
+
+/*********************************************/
+/// \brief 		Custom constructor for building dummy iBody for epsilon calculation
+/// \param iBody				original iBody that this rank owns
+/// \param recvBuffer			all additional information required for epsilon calculation
+IBBody::IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer) {
+
+	// Get MPI manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Set body ID
+	id = iBody.id;
+
+	// First size markers from original body
+	int nMarkers = iBody.markers.size();
+
+	// Now get extra markers that have been received from other ranks
+	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
+		if (mpim->epsCommOwnerSide[i].bodyID == iBody.id)
+			nMarkers++;
+	}
+
+	// Now resize the markers
+	markers.resize(nMarkers);
+
+	// Now assign values from the original body first
+	int markerID;
+	for (int m = 0; m < iBody.markers.size(); m++) {
+
+		// Get markerID
+		markerID = iBody.markers[m].id;
+
+		// Assign the position of the marker and first support site
+		markers[markerID].position[eXDirection] = iBody.markers[m].position[eXDirection];
+		markers[markerID].position[eYDirection] = iBody.markers[m].position[eYDirection];
+		markers[markerID].supp_x[0] = iBody.markers[m].supp_x[0];
+		markers[markerID].supp_y[0] = iBody.markers[m].supp_y[0];
+		markers[markerID].deltaval.push_back(iBody.markers[m].deltaval[0]);
+#if (L_DIMS == 3)
+		markers[markerID].position[eZDirection] = iBody.markers[m].position[eZDirection];
+		markers[markerID].supp_z[0] = iBody.markers[m].supp_z[0];
+#endif
+		markers[markerID].local_area = iBody.markers[m].local_area;
+		markers[markerID].dilation = iBody.markers[m].dilation;
+
+		// Assign rest of the support sites
+		for (int s = 1; s < iBody.markers[m].deltaval.size(); s++) {
+			markers[markerID].supp_x.push_back(iBody.markers[m].supp_x[s]);
+			markers[markerID].supp_y.push_back(iBody.markers[m].supp_y[s]);
+#if (L_DIMS == 3)
+			markers[markerID].supp_z.push_back(iBody.markers[m].supp_z[s]);
+#endif
+			markers[markerID].deltaval.push_back(iBody.markers[m].deltaval[s]);
+		}
+	}
+
+	// Index vector for looping through recvBuffer
+	std::vector<int> idx(mpim->num_ranks, 0);
+
+	// Get starting indices
+	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
+		if (mpim->epsCommOwnerSide[i].bodyID < iBody.id)
+			idx[mpim->epsCommOwnerSide[i].rankComm] += L_DIMS + 2 + mpim->epsCommOwnerSide[i].nSupportSites * (L_DIMS + 1);
+	}
+
+	// Rank to collect data from
+	int fromRank;
+
+	// Now fill in the rest of the values from other ranks
+	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
+		if (mpim->epsCommOwnerSide[i].bodyID == iBody.id) {
+
+			// Get ID info
+			fromRank = mpim->epsCommOwnerSide[i].rankComm;
+			markerID = mpim->epsCommOwnerSide[i].markerID;
+
+			// Assign the position of the marker
+			markers[markerID].position[eXDirection] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+			markers[markerID].position[eYDirection] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+#if (L_DIMS == 3)
+			markers[markerID].position[eZDirection] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+#endif
+			markers[markerID].local_area = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+			markers[markerID].dilation = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+
+			// Assign first support site
+			markers[markerID].supp_x[0] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+			markers[markerID].supp_y[0] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+#if (L_DIMS == 3)
+			markers[markerID].supp_z[0] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
+#endif
+			markers[markerID].deltaval.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
+
+			// Loop through rest of support sites
+			for (int s = 1; s < mpim->epsCommOwnerSide[i].nSupportSites; s++) {
+				markers[markerID].supp_x.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
+				markers[markerID].supp_y.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
+	#if (L_DIMS == 3)
+				markers[markerID].supp_z.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
+	#endif
+				markers[markerID].deltaval.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
+			}
+		}
+	}
+}

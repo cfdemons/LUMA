@@ -20,7 +20,7 @@
 epsCommOwnerSideClass::epsCommOwnerSideClass() {
 
 	// Set default values
-	fromRank = 0;
+	rankComm = 0;
 	bodyID = 0;
 	markerID = 0;
 	nSupportSites = 0;
@@ -33,7 +33,7 @@ epsCommOwnerSideClass::epsCommOwnerSideClass() {
 epsCommOwnerSideClass::epsCommOwnerSideClass(int rank, int body, int marker) {
 
 	// Set values
-	fromRank = rank;
+	rankComm = rank;
 	bodyID = body;
 	markerID = marker;
 	nSupportSites = 0;
@@ -44,7 +44,7 @@ epsCommOwnerSideClass::epsCommOwnerSideClass(int rank, int body, int marker) {
 epsCommMarkerSideClass::epsCommMarkerSideClass() {
 
 	// Set default values
-	toRank = 0;
+	rankComm = 0;
 	bodyID = 0;
 	markerIdx = 0;
 }
@@ -56,7 +56,7 @@ epsCommMarkerSideClass::epsCommMarkerSideClass() {
 epsCommMarkerSideClass::epsCommMarkerSideClass(int rank, int body, int idx) {
 
 	// Set values
-	toRank = rank;
+	rankComm = rank;
 	bodyID = body;
 	markerIdx = idx;
 }

@@ -173,8 +173,11 @@ public :
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 
 	// IBM
-	void mpi_getIBMarkers();							// Collect all IBM markers for each body
-	void mpi_buildEpsComms();							// Build comms required for epsilon calculation
+	void mpi_getIBMarkers();														// Collect all IBM markers for each body
+	void mpi_buildEpsComms();														// Build comms required for epsilon calculation
+	void mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer);		// Do communication required for epsilon calculation
+	void mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon);			// Do communication required for epsilon calculation
+
 
 };
 

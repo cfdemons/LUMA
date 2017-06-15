@@ -343,6 +343,11 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_BUILD_FOR_MPI
+	MPI_Barrier(mpim->world_comm);
+#endif
+	exit(0);
+
+#ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation
 	MPI_Barrier(mpim->world_comm);
 #endif

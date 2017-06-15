@@ -33,10 +33,12 @@ void MpiManager::mpi_getIBMarkers() {
 		// Get number of markers for this body which exist on this rank
 		int nMarkers = objman->iBody[ib].markers.size();
 
-		// Create and size buffer for receiving
+		// Create and size buffer for receiving (also nMarkers to zero as it will not be sending)
 		std::vector<int> nMarkersAll;
-		if (my_rank == objman->iBody[ib].owningRank)
+		if (my_rank == objman->iBody[ib].owningRank) {
+			nMarkers = 0;
 			nMarkersAll.resize(num_ranks);
+		}
 
 		// Gather the number of markers which exist on each rank
 		MPI_Gather(&nMarkers, 1, MPI_INT, &nMarkersAll.front(), 1, MPI_INT, objman->iBody[ib].owningRank, world_comm);
@@ -54,6 +56,7 @@ void MpiManager::mpi_getIBMarkers() {
 			MPI_Isend(&markerIDs.front(), markerIDs.size(), MPI_INT, objman->iBody[ib].owningRank, my_rank, world_comm, &requestStatus);
 		}
 
+
 		// Receive marker IDs
 		if (my_rank == objman->iBody[ib].owningRank) {
 
@@ -62,19 +65,26 @@ void MpiManager::mpi_getIBMarkers() {
 
 			// Loop through all ranks to receive from
 			for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-				if (my_rank != fromRank && nMarkersAll[fromRank] > 0) {
+				if (nMarkersAll[fromRank] > 0) {
 
 					// Resize buffer and receive
 					markerIDsAll[fromRank].resize(nMarkersAll[fromRank]);
 					MPI_Recv(&markerIDsAll[fromRank].front(), nMarkersAll[fromRank], MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 				}
 			}
+
+			// Now build the eps-comm class on owner side
+			for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
+				for (int m = 0; m < nMarkersAll[fromRank]; m++) {
+					epsCommOwnerSide.emplace_back(fromRank, ib, markerIDsAll[fromRank][m]);
+				}
+			}
 		}
+
+		// Now build eps-comm class on marker side
+		for (int m = 0; m < nMarkers; m++)
+			epsCommMarkerSide.emplace_back(objman->iBody[ib].owningRank, ib, m);
 	}
-
-	MPI_Barrier(world_comm);
-	exit(0);
-
 }
 
 
@@ -88,8 +98,51 @@ void MpiManager::mpi_getIBMarkers() {
 ///
 void MpiManager::mpi_buildEpsComms() {
 
-	//
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
 
+	// Send buffer which will hold nSupportSites
+	std::vector<std::vector<int>> nSupportSitesSend(num_ranks, std::vector<int>(0));
+
+	// Loop through eps-comm class on marker side and pack nSupportSites for sending to owner
+	int toRank, ib, m;
+	for (int i = 0; i < epsCommMarkerSide.size(); i++) {
+
+		// Get marker info
+		toRank = epsCommMarkerSide[i].toRank;
+		ib = epsCommMarkerSide[i].bodyID;
+		m = epsCommMarkerSide[i].markerIdx;
+
+		// Pack into send buffer
+		nSupportSitesSend[toRank].push_back(objman->iBody[ib].markers[m].deltaval.size());
+	}
+
+	// Now loop through and send to required ranks
+	for (int toRank = 0; toRank < num_ranks; toRank++) {
+		if (nSupportSitesSend[toRank].size() > 0) {
+			MPI_Request requestStatus;
+			MPI_Isend(&nSupportSitesSend[toRank].front(), nSupportSitesSend[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &requestStatus);
+		}
+	}
+
+	// Now create and size the receive buffer
+	std::vector<std::vector<int>> nSupportSitesRecv(num_ranks, std::vector<int>(0));
+	for (int i = 0; i < epsCommOwnerSide.size(); i++)
+		nSupportSitesRecv[epsCommOwnerSide[i].fromRank].push_back(0);
+
+	// Now loop through and receive
+	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
+		if (nSupportSitesRecv[fromRank].size() > 0) {
+			MPI_Recv(&nSupportSitesRecv[fromRank].front(), nSupportSitesRecv[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+
+	// Now unpack
+	std::vector<int> idx(num_ranks, 0);
+	for (int i = 0; i < epsCommOwnerSide.size(); i++) {
+		epsCommOwnerSide[i].nSupportSites = nSupportSitesRecv[epsCommOwnerSide[i].fromRank][idx[epsCommOwnerSide[i].fromRank]];
+		idx[epsCommOwnerSide[i].fromRank]++;
+	}
 }
 
 // ************************************************************************** //

@@ -16,6 +16,57 @@
 #include "../inc/stdafx.h"
 #include "../inc/IBInfo.h"
 
+// Default constructor
+epsCommOwnerSideClass::epsCommOwnerSideClass() {
+
+	// Set default values
+	fromRank = 0;
+	bodyID = 0;
+	markerID = 0;
+	nSupportSites = 0;
+}
+
+/// \brief 	Custom constructor for creating epsCommOwnerSideClass object
+///	\param	rank				rank receiving from.
+///	\param	body				body ID to receive.
+///	\param	marker				marker ID to receive.
+epsCommOwnerSideClass::epsCommOwnerSideClass(int rank, int body, int marker) {
+
+	// Set values
+	fromRank = rank;
+	bodyID = body;
+	markerID = marker;
+	nSupportSites = 0;
+}
+
+
+// Default constructor
+epsCommMarkerSideClass::epsCommMarkerSideClass() {
+
+	// Set default values
+	toRank = 0;
+	bodyID = 0;
+	markerIdx = 0;
+}
+
+/// \brief 	Custom constructor for creating epsCommMarkerSideClass object
+///	\param	rank				rank sending to.
+///	\param	body				body ID to receive.
+///	\param	marker				marker ID to receive.
+epsCommMarkerSideClass::epsCommMarkerSideClass(int rank, int body, int idx) {
+
+	// Set values
+	toRank = rank;
+	bodyID = body;
+	markerIdx = idx;
+}
+
+
+
+
+/// ******************** ///
+
+
 
 // Default constructor
 supportCommSupportSideClass::supportCommSupportSideClass() {

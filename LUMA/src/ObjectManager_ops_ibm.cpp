@@ -287,6 +287,7 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 		&nearijk
 		);
 
+	// Indices of closest support
 	inear = nearijk[eXDirection];
 	jnear = nearijk[eYDirection];
 	knear = nearijk[eZDirection];
@@ -402,8 +403,8 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 
 						// Get MPI direction of the neighbour that owns this point
 						int owner_direction = GridUtils::getMpiDirection(estimated_rank_offset);
-						if (owner_direction != -1)
-						{
+						if (owner_direction != -1) {
+
 							// Owned by a neighbour so correct the support rank
 							iBody[ib].markers[m].support_rank.back() = mpim->neighbour_rank[owner_direction];
 						}
@@ -892,7 +893,7 @@ void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
 
 		// Write out the first (nearest) support marker
 		if (m == 0 && s == 0)
-			supportout << "Marker ID\tRank\tX\tY\tZ\tdeltaVal" << std::endl;
+			supportout << "Marker ID\tRank\ti\tj\tk\tX\tY\tZ\tdeltaVal" << std::endl;
 
 		// Write out info
 		supportout
@@ -901,6 +902,9 @@ void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
 			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
 			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
 			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << "\t"
+			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_x.back()] << "\t"
+			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_y.back()] << "\t"
+			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_z.back()] << "\t"
 			<< iBody[ib].markers[m].deltaval.back() << std::endl;
 
 		supportout.close();

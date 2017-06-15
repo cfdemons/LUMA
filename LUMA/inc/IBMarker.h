@@ -27,6 +27,9 @@ class IBMarker : public Marker {
 	// Make ObjectManager a friend class so it can access the protected data of IBMarker objects
 	friend class ObjectManager;
 
+	// Make MPIManager a friend so it can access body data
+	friend class MpiManager;
+
 	// Same for IBBody
 	friend class IBBody;
 	friend class IBInfo;

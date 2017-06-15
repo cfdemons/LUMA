@@ -18,6 +18,7 @@
 
 #include "stdafx.h"
 #include "HDFstruct.h"
+#include "IBInfo.h"
 class GridObj;
 class GridManager;
 
@@ -128,6 +129,11 @@ public :
 
 	/// Logfile handle
 	std::ofstream* logout;
+
+
+	// MPI-IBM specific members
+	std::vector<epsCommOwnerSideClass> epsCommOwnerSide;
+	std::vector<epsCommMarkerSideClass> epsCommMarkerSide;
 
 
 

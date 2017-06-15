@@ -18,6 +18,56 @@
 #include "stdafx.h"
 
 
+/// \brief Class for arranging data for epsilon communication on owner side.
+///
+///
+class epsCommOwnerSideClass {
+
+	// Make MPIManager a friend so it can access body data
+	friend class MpiManager;
+
+public:
+
+	// Default Constructor
+	epsCommOwnerSideClass();
+
+	// Custom constructor for creating epsCommOwnerSideClass object
+	epsCommOwnerSideClass(int rank, int body, int marker);
+
+private:
+
+	// Member data
+	int fromRank;
+	int bodyID;
+	int markerID;
+	int nSupportSites;
+};
+
+
+/// \brief Class for arranging data for epsilon communication on marker side.
+///
+///
+class epsCommMarkerSideClass {
+
+	// Make MPIManager a friend so it can access body data
+	friend class MpiManager;
+
+public:
+
+	// Default Constructor
+	epsCommMarkerSideClass();
+
+	// Custom constructor for creating epsCommMarkerSideClass object
+	epsCommMarkerSideClass(int rank, int body, int idx);
+
+private:
+
+	// Member data
+	int toRank;
+	int bodyID;
+	int markerIdx;
+};
+
 ///	\brief	Class for arranging data for support-marker communication on support side.
 ///
 ///
@@ -37,7 +87,7 @@ public:
 	int rank;
 	int bodyID;
 
-	// Force data
+	// Support index
 	std::vector<int> supportIdx;
 };
 

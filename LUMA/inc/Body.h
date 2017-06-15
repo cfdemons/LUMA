@@ -672,7 +672,6 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 template <typename MarkerType>
 void Body<MarkerType>::writeVtkPosition(int tval)
 {
-
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
@@ -689,7 +688,6 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	fout << "ASCII\n";
 	fout << "DATASET POLYDATA\n";
 
-
 	// Write out the positions of each Lagrange marker
 	fout << "POINTS " << markers.size() << " float\n";
 	for (size_t i = 0; i < markers.size(); i++) {
@@ -698,7 +696,6 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 			<< markers[i].position[1] << " "
 			<< markers[i].position[2] << std::endl;
 	}
-
 
 	// Write out the connectivity of each Lagrange marker
 	size_t nLines = markers.size() - 1;

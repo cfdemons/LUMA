@@ -337,6 +337,8 @@ int main( int argc, char* argv[] )
 	Grids->io_hdf5(Grids->t);
 #endif
 
+
+
 #ifdef L_VTK_BODY_WRITE
 	*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
 	objMan->io_vtkBodyWriter(Grids->t);

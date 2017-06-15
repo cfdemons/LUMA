@@ -255,18 +255,19 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	int rank = GridUtils::safeGetRank();
 
     // Loop through each iBody
-	for (IBBody& body : iBody)
-	{
-		// Call the writer
-		body.writeVtkPosition(tval);
+	for (IBBody& body : iBody) {
 
+		// Call the writer
+		if (body.markers.size() > 0)
+			body.writeVtkPosition(tval);
 	}
 
     // Loop through each BFL Body
-	for (BFLBody& body : pBody)
-	{
+	for (BFLBody& body : pBody) {
+
 		// Call the writer
-		body.writeVtkPosition(tval);
+		if (body.markers.size() > 0)
+			body.writeVtkPosition(tval);
 	}
 }
 

@@ -316,7 +316,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	ibm_debug_supportInfo(ib, m, s);
 #endif
 
-
 	// Loop over surrounding 5 lattice sites and check if within support region
 	for (int i = inear - 5; i <= inear + 5; i++) {
 		for (int j = jnear - 5; j <= jnear + 5; j++) {
@@ -731,7 +730,6 @@ void ObjectManager::ibm_findEpsilon() {
 
 	// Perform MPI communication and insert correct epsilon values
 	mpim->mpi_epsilonCommScatter(epsilon);
-
 #endif
 }
 
@@ -882,7 +880,7 @@ void ObjectManager::ibm_debug_markerPosition(int ib) {
 		// Open file and write header
 		std::ofstream bodyout;
 		bodyout.open(GridUtils::path_str + "/IBbody_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out");
-		bodyout << "Marker ID\tx\ty\tz" << std::endl;
+		bodyout << "Marker\tx\ty\tz" << std::endl;
 
 		// Loop through markers
 		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
@@ -913,18 +911,18 @@ void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
 
 		// Write out the first (nearest) support marker
 		if (m == 0 && s == 0)
-			supportout << "Marker ID\tRank\ti\tj\tk\tX\tY\tZ\tdeltaVal" << std::endl;
+			supportout << "Marker\tRank\ti\tj\tk\tX\tY\tZ\tdeltaVal" << std::endl;
 
 		// Write out info
 		supportout
 			<< iBody[ib].markers[m].id << "\t"
 			<< iBody[ib].markers[m].support_rank.back() << "\t"
-			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i.back()] << "\t"
-			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j.back()] << "\t"
-			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k.back()] << "\t"
-			<< iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_x.back()] << "\t"
-			<< iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_y.back()] << "\t"
-			<< iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_z.back()] << "\t"
+			<< iBody[ib].markers[m].supp_i.back() << "\t"
+			<< iBody[ib].markers[m].supp_j.back() << "\t"
+			<< iBody[ib].markers[m].supp_k.back() << "\t"
+			<< iBody[ib].markers[m].supp_x.back() << "\t"
+			<< iBody[ib].markers[m].supp_y.back() << "\t"
+			<< iBody[ib].markers[m].supp_z.back() << "\t"
 			<< iBody[ib].markers[m].deltaval.back() << std::endl;
 
 		supportout.close();
@@ -950,7 +948,7 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 		std::ofstream epout;
 		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		epout << "NEW TIME STEP" << std::endl;
-		epout << "Marker ID\tEpsilon" << std::endl;
+		epout << "Marker\tEpsilon" << std::endl;
 
 		// Loop through markers
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {

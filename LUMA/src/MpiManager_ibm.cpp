@@ -64,8 +64,8 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 	std::vector<int> bufferSize(num_ranks, 0);
 
 	// Size the receive buffer
-	for (int i = 0; i < epsCommOwnerSide.size(); i++)
-		bufferSize[epsCommOwnerSide[i].rankComm]++;
+	for (int i = 0; i < epsCommMarkerSide.size(); i++)
+		bufferSize[epsCommMarkerSide[i].rankComm]++;
 
 	// Declare receive buffer
 	std::vector<std::vector<double>> recvBuffer(num_ranks, std::vector<double>(0));

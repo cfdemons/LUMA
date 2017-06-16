@@ -130,10 +130,11 @@ public :
 	/// Logfile handle
 	std::ofstream* logout;
 
-
 	// MPI-IBM specific members
 	std::vector<epsCommOwnerSideClass> epsCommOwnerSide;
 	std::vector<epsCommMarkerSideClass> epsCommMarkerSide;
+	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
+	std::vector<supportCommSupportSideClass> supportCommSupportSide;
 
 
 
@@ -175,6 +176,7 @@ public :
 	// IBM
 	void mpi_getIBMarkers();														// Collect all IBM markers for each body
 	void mpi_buildEpsComms();														// Build comms required for epsilon calculation
+	void mpi_buildSupportComms();													// Build comms required for support communication
 	void mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer);		// Do communication required for epsilon calculation
 	void mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon);			// Do communication required for epsilon calculation
 

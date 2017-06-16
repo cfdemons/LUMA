@@ -23,50 +23,54 @@
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply2() {
 
-	// Loop through all bodies and find support
-	for (int ib = 0; ib < iBody.size(); ib++) {
-
-		// If a flexible body recalculate support and delta values
-		if (iBody[ib].isFlexible) {
-
-			// Recompute support for new marker positions
-			for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
-
-				// Erase support vectors
-				iBody[ib].markers[m].supp_i.clear();
-				iBody[ib].markers[m].supp_j.clear();
-				iBody[ib].markers[m].supp_k.clear();
-				iBody[ib].markers[m].supp_x.clear();
-				iBody[ib].markers[m].supp_y.clear();
-				iBody[ib].markers[m].supp_z.clear();
-				iBody[ib].markers[m].deltaval.clear();
-				iBody[ib].markers[m].support_rank.clear();
-
-				// Get the i, j, and k for the closest voxel to markers
-				std::vector<int> ijk;
-				double x = iBody[ib].markers[m].position[eXDirection], y = iBody[ib].markers[m].position[eYDirection], z = iBody[ib].markers[m].position[eZDirection];
-				GridUtils::getEnclosingVoxel(x, y, z, iBody[ib]._Owner, &ijk);
-				iBody[ib].markers[m].supp_i.push_back(ijk[0]);
-				iBody[ib].markers[m].supp_j.push_back(ijk[1]);
-				iBody[ib].markers[m].supp_k.push_back(ijk[2]);
-
-				// Get the x-position of the support marker
-				iBody[ib].markers[m].supp_x.push_back(iBody[ib]._Owner->XPos[ijk[eXDirection]]);
-				iBody[ib].markers[m].supp_y.push_back(iBody[ib]._Owner->YPos[ijk[eYDirection]]);
-				iBody[ib].markers[m].supp_z.push_back(iBody[ib]._Owner->ZPos[ijk[eZDirection]]);
-
-				// Set rank of first support marker and marker ID in body
-				iBody[ib].markers[m].support_rank.push_back(GridUtils::safeGetRank());
-
-				// Recompute support
-				ibm_findSupport(ib, m);
-			}
-		}
-	}
-
-	// Calculate epsilon
-	if (hasMovingBodies)
-		ibm_findEpsilon();
+//	// Loop through all bodies and find support
+//	for (int ib = 0; ib < iBody.size(); ib++) {
+//
+//		// If a flexible body recalculate support and delta values
+//		if (iBody[ib].isFlexible) {
+//
+//			// Recompute support for new marker positions
+//			for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++) {
+//
+//				// Erase support vectors
+//				iBody[ib].markers[m].supp_i.clear();
+//				iBody[ib].markers[m].supp_j.clear();
+//				iBody[ib].markers[m].supp_k.clear();
+//				iBody[ib].markers[m].supp_x.clear();
+//				iBody[ib].markers[m].supp_y.clear();
+//				iBody[ib].markers[m].supp_z.clear();
+//				iBody[ib].markers[m].deltaval.clear();
+//				iBody[ib].markers[m].support_rank.clear();
+//
+//				// Get the marker position
+//				double x = iBody[ib].markers[m].position[eXDirection];
+//				double y = iBody[ib].markers[m].position[eYDirection];
+//				double z = iBody[ib].markers[m].position[eZDirection];
+//
+//				// Get ijk of enclosing voxel
+//				std::vector<int> ijk;
+//				GridUtils::getEnclosingVoxel(x, y, z, iBody[ib]._Owner, &ijk);
+//				iBody[ib].markers[m].supp_i.push_back(ijk[eXDirection]);
+//				iBody[ib].markers[m].supp_j.push_back(ijk[eYDirection]);
+//				iBody[ib].markers[m].supp_k.push_back(ijk[eZDirection]);
+//
+//				// Get the x-position of the support marker
+//				iBody[ib].markers[m].supp_x.push_back(iBody[ib]._Owner->XPos[ijk[eXDirection]]);
+//				iBody[ib].markers[m].supp_y.push_back(iBody[ib]._Owner->YPos[ijk[eYDirection]]);
+//				iBody[ib].markers[m].supp_z.push_back(iBody[ib]._Owner->ZPos[ijk[eZDirection]]);
+//
+//				// Set rank of first support marker and marker ID in body
+//				iBody[ib].markers[m].support_rank.push_back(GridUtils::safeGetRank());
+//
+//				// Recompute support
+//				ibm_findSupport(ib, m);
+//			}
+//		}
+//	}
+//
+//	// Calculate epsilon
+//	if (hasMovingBodies)
+//		ibm_findEpsilon();
 
 	// Interpolate the velocity onto the markers
 	ibm_interpolate();
@@ -520,12 +524,17 @@ void ObjectManager::ibm_interpolate() {
 	ibm_interpolate_comm();
 #endif
 
-
 	// Write out interpolate velocity
 #ifdef L_IBM_DEBUG
 	for (int ib = 0; ib < iBody.size(); ib++)
 		ibm_debug_interpVel(ib);
 #endif
+
+#ifdef L_BUILD_FOR_MPI
+	MpiManager *mpim = MpiManager::getInstance();
+	MPI_Barrier(mpim->world_comm);
+#endif
+	exit(0);
 
 }
 

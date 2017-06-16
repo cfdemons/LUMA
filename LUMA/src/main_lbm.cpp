@@ -337,17 +337,10 @@ int main( int argc, char* argv[] )
 	Grids->io_hdf5(Grids->t);
 #endif
 
-
-
 #ifdef L_VTK_BODY_WRITE
 	*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
-
-#ifdef L_BUILD_FOR_MPI
-	MPI_Barrier(mpim->world_comm);
-#endif
-	exit(0);
 
 #ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation

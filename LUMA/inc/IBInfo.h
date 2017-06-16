@@ -69,6 +69,8 @@ private:
 	int markerIdx;
 };
 
+
+
 ///	\brief	Class for arranging data for support-marker communication on support side.
 ///
 ///
@@ -80,12 +82,12 @@ public:
 	supportCommSupportSideClass();
 
 	// Custom constructor for creating supportCommSupportSide object
-	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &position);
+	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &idx);
 
 public:
 
 	// ID data
-	int rank;
+	int rankComm;
 	int bodyID;
 
 	// Support index
@@ -109,41 +111,9 @@ public:
 public:
 
 	// ID data
-	int rank;
+	int rankComm;
 	int bodyID;
 	int markerID;
 	int supportID;
 };
-
-
-
-// ***** USE IBODY INSTEAD WITH A CUSTOM CONSTRUCTOR FOR CREATING THE BODIES **** //
-///	\brief	Class for arranging data before epsilon calculation.
-///
-///
-class epsCalcMarkerClass
-{
-
-public:
-	// Default Constructor
-	epsCalcMarkerClass();
-
-	// Custom constructor for creating eps calc marker
-	epsCalcMarkerClass(int bodyID, std::vector<double> position, double area, double dilation, std::vector<std::vector<double>> supp_position, std::vector<double> deltaval);
-
-public:
-
-	// Marker data
-	int bodyID;
-	std::vector<double> position;
-	double local_area;
-	double dilation;
-
-	// Support data
-	std::vector<double> deltaval;
-	std::vector<double> supp_x;
-	std::vector<double> supp_y;
-	std::vector<double> supp_z;
-};
-
 #endif	// L_IBINFO_H

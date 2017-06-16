@@ -105,12 +105,6 @@ private:
 	// Flag for if there are any flexible bodies in the simulation
 	bool hasMovingBodies = false;
 
-	// IBM-MPI members
-	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
-	std::vector<supportCommSupportSideClass> supportCommSupportSide;
-
-
-
 	/* Methods */
 
 private:
@@ -156,8 +150,6 @@ public:
 	// IBM-MPI methods
 	void ibm_buildMPIComms();
 	void ibm_interpolate_comm();
-	void ibm_gatherForEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<epsCalcMarkerClass> &markerData);
-	void ibm_scatterAfterEpsCalc(int rootRank, int &nMarkersOnThisRank, std::vector<int> &nMarkersOnAllRanks, std::vector<int> &markerDisps, std::vector<double> &epsilon);
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.

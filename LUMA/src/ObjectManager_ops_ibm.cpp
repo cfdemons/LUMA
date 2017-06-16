@@ -74,6 +74,15 @@ void ObjectManager::ibm_apply2() {
 
 	// Interpolate the velocity onto the markers
 	ibm_interpolate();
+
+	// Compute force
+	ibm_computeForce();
+
+#ifdef L_BUILD_FOR_MPI
+	MpiManager *mpim = MpiManager::getInstance();
+	MPI_Barrier(mpim->world_comm);
+#endif
+	exit(0);
 }
 
 
@@ -519,7 +528,6 @@ void ObjectManager::ibm_interpolate() {
 		}
 	}
 
-
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
 	ibm_gatherOffRankVels();
@@ -530,27 +538,28 @@ void ObjectManager::ibm_interpolate() {
 	for (int ib = 0; ib < iBody.size(); ib++)
 		ibm_debug_interpVel(ib);
 #endif
-
-#ifdef L_BUILD_FOR_MPI
-	MpiManager *mpim = MpiManager::getInstance();
-	MPI_Barrier(mpim->world_comm);
-#endif
-	exit(0);
 }
 
 // *****************************************************************************
 /// \brief	Compute restorative force at each marker in a body.
 /// \param	ib	iBody being operated on.
-void ObjectManager::ibm_computeForce(int ib) {
+void ObjectManager::ibm_computeForce() {
 
-//	// Loop over markers
-//	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//		for (int dir = 0; dir < L_DIMS; dir++) {
-//			// Compute restorative force (in lattice units)
-//			iBody[ib].markers[m].force_xyz[dir] =
-//				(iBody[ib].markers[m].desired_vel[dir] - iBody[ib].markers[m].fluid_vel[dir]) /	1.0;	// Time step in grid-normalised lattice units
-//		}
-//	}
+	// Loop over markers
+	for (int ib = 0; ib < iBody.size(); ib++) {
+		for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (int dir = 0; dir < L_DIMS; dir++) {
+
+				// Compute restorative force (in lattice units)
+				iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
+			}
+		}
+
+		// Write out force on markers
+#ifdef L_IBM_DEBUG
+		ibm_debug_markerForce(ib);
+#endif
+	}
 }
 
 // *****************************************************************************
@@ -990,10 +999,11 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 		std::ofstream predout;
 		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		predout << "NEW TIME STEP" << std::endl;
+		predout << "Marker\tVelX\tVelY\tVelZ" << std::endl;
 
 		// Loop through markers
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << std::endl;
+			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << "\t" << iBody[ib].markers[m].interpVel[eZDirection] << std::endl;
 		}
 		predout << std::endl;
 		predout.close();
@@ -1001,26 +1011,33 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 }
 
 // *****************************************************************************
-/// \brief	Moves iBodies after applying IBM.
+/// \brief	Write out force on markers for debugging.
 ///
-///			Wrapper for relocating markers of an iBody be calling appropriate
-///			positional update routine.
+///			Writes out force on markers for debugging
+///
+/// \param	ib			id of body being written out.
 ///
 void ObjectManager::ibm_debug_markerForce(int ib) {
 
-	// Get rank safely
-	int rank = GridUtils::safeGetRank();
+	// Only do if there is data to write
+	if (iBody[ib].markers.size() > 0) {
 
-	// Open file and write header
-	std::ofstream forceout;
-	forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-	forceout << "\nNEW TIME STEP" << std::endl;
+		// Get rank safely
+		int rank = GridUtils::safeGetRank();
 
-	// Loop through markers
-	for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-		forceout << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << std::endl;
+		// Open file and write header
+		std::ofstream forceout;
+		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
+		forceout << "NEW TIME STEP" << std::endl;
+		forceout << "Marker\tFx\tFy\tFz" << std::endl;
+
+		// Loop through markers
+		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			forceout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << "\t" << iBody[ib].markers[m].force_xyz[eZDirection] << std::endl;
+		}
+		forceout << std::endl;
+		forceout.close();
 	}
-	forceout.close();
 }
 
 

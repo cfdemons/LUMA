@@ -519,6 +519,7 @@ void ObjectManager::ibm_interpolate() {
 		}
 	}
 
+
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
 	ibm_gatherOffRankVels();
@@ -535,7 +536,6 @@ void ObjectManager::ibm_interpolate() {
 	MPI_Barrier(mpim->world_comm);
 #endif
 	exit(0);
-
 }
 
 // *****************************************************************************

@@ -130,7 +130,7 @@ int main( int argc, char* argv[] )
 		std::cout << version_string << std::endl;
 
 	}
-	
+
 	// Create application log file
 	std::ofstream logfile;
 	logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".out", std::ios::out);
@@ -259,8 +259,8 @@ int main( int argc, char* argv[] )
 
 #if !defined L_RESTARTING
 
-	/* Initialise the bodies (compute support etc.) using initial body positions 
-	 * and compute support from supplied grid. Only attempts to initialise IBM bodies 
+	/* Initialise the bodies (compute support etc.) using initial body positions
+	 * and compute support from supplied grid. Only attempts to initialise IBM bodies
 	 * in this way. */
 	objMan->ibm_initialise();
 

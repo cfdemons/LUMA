@@ -123,7 +123,7 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 
 	// Loop through and post send if there is data
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
-		if (sendBuffer.size() > 0) {
+		if (sendBuffer[toRank].size() > 0) {
 			MPI_Request requestStatus;
 			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &requestStatus);
 		}

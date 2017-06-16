@@ -521,7 +521,7 @@ void ObjectManager::ibm_interpolate() {
 
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
-	ibm_interpolate_comm();
+	ibm_gatherOffRankVels();
 #endif
 
 	// Write out interpolate velocity

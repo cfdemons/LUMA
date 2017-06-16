@@ -179,6 +179,7 @@ public :
 	void mpi_buildSupportComms();													// Build comms required for support communication
 	void mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer);		// Do communication required for epsilon calculation
 	void mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon);			// Do communication required for epsilon calculation
+	void mpi_interpolateComm(std::vector<std::vector<double>> &interpVels);			// Do communication required for velocity interpolation
 
 
 };

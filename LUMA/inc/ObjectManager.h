@@ -146,10 +146,9 @@ public:
 	void ibm_debug_supportVel(int ib);
 	void ibm_debug_supportForce(int ib);
 
-
 	// IBM-MPI methods
 	void ibm_buildMPIComms();
-	void ibm_interpolate_comm();
+	void ibm_gatherOffRankVels();
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.

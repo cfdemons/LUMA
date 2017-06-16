@@ -19,6 +19,75 @@
 
 
 // ************************************************************************* //
+/// \brief	Do communication required for velocity interpolation
+///
+///
+void MpiManager::mpi_interpolateComm(std::vector<std::vector<double>> &recvVel) {
+
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
+
+	// Declare values
+	int toRank, ib;
+	std::vector<int> idx(3, 0);
+	std::vector<std::vector<double>> sendVel(num_ranks, std::vector<double>(0));
+
+	// Pack and send data first
+	for (int i = 0; i < supportCommSupportSide.size(); i++) {
+
+		// Get rank to send to
+		toRank = supportCommSupportSide[i].rankComm;
+		ib = supportCommSupportSide[i].bodyID;
+
+		// Get grid sizes
+		size_t M_lim = objman->iBody[ib]._Owner->M_lim;
+#if (L_DIMS == 3)
+		size_t K_lim = objman->iBody[ib]._Owner->K_lim;
+#endif
+
+		// Get indices
+		idx = supportCommSupportSide[i].supportIdx;
+
+		// Pack velocity into buffer
+#if (L_DIMS == 2)
+		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eXDirection, M_lim, L_DIMS));
+		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eYDirection, M_lim, L_DIMS));
+#elif (L_DIMS == 3)
+		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eXDirection, M_lim, K_lim, L_DIMS));
+		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eYDirection, M_lim, K_lim, L_DIMS));
+		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eZDirection, M_lim, K_lim, L_DIMS));
+#endif
+	}
+
+	// Now send the values
+	for (int toRank = 0; toRank < num_ranks; toRank++) {
+
+		// Check if current rank needs to send stuff to rank toRank
+		if (sendVel[toRank].size() > 0) {
+			MPI_Request send_requests;
+			MPI_Isend(&sendVel[toRank].front(), sendVel[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &send_requests);
+		}
+	}
+
+	// Get receive sizes from each rank
+	std::vector<int> bufferSize(num_ranks, 0);
+	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+		bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS;
+	}
+
+	// Now receive the velocity values
+	recvVel.resize(num_ranks, std::vector<double>(0));
+	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
+
+		// If there is data to receive from rank fromRank
+		if (bufferSize[fromRank] > 0) {
+			recvVel[fromRank].resize(bufferSize[fromRank]);
+			MPI_Recv(&recvVel[fromRank].front(), recvVel[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+}
+
+// ************************************************************************* //
 /// \brief	Do communication required for epsilon calculation
 ///
 ///
@@ -348,7 +417,7 @@ void MpiManager::mpi_buildSupportComms() {
 
 		// Get IDs of support site
 		ib = supportCommMarkerSide[i].bodyID;
-		m = supportCommMarkerSide[i].markerID;
+		m = supportCommMarkerSide[i].markerIdx;
 		s = supportCommMarkerSide[i].supportID;
 		toRank = supportCommMarkerSide[i].rankComm;
 

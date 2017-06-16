@@ -113,7 +113,7 @@ public:
 	// ID data
 	int rankComm;
 	int bodyID;
-	int markerID;
+	int markerIdx;
 	int supportID;
 };
 #endif	// L_IBINFO_H

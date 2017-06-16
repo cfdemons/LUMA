@@ -96,7 +96,7 @@ supportCommMarkerSideClass::supportCommMarkerSideClass() {
 
 	// Default values
 	bodyID = 0;
-	markerID = 0;
+	markerIdx = 0;
 	supportID = 0;
 	rankComm = 0;
 }
@@ -109,7 +109,7 @@ supportCommMarkerSideClass::supportCommMarkerSideClass(int body, int marker, int
 
 	// Default values
 	bodyID = body;
-	markerID = marker;
+	markerIdx = marker;
 	supportID = support;
 	rankComm = rankID;
 }

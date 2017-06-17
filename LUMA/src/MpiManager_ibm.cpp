@@ -22,7 +22,7 @@
 /// \brief	Do communication required for velocity interpolation
 ///
 ///
-void MpiManager::mpi_interpolateComm(std::vector<std::vector<double>> &recvVel) {
+void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>> &recvVel) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
@@ -35,28 +35,34 @@ void MpiManager::mpi_interpolateComm(std::vector<std::vector<double>> &recvVel) 
 	// Pack and send data first
 	for (int i = 0; i < supportCommSupportSide.size(); i++) {
 
-		// Get rank to send to
-		toRank = supportCommSupportSide[i].rankComm;
-		ib = supportCommSupportSide[i].bodyID;
+		// Get body ID
+		ib = objman->bodyIDToIdx[supportCommSupportSide[i].bodyID];
 
-		// Get grid sizes
-		size_t M_lim = objman->iBody[ib]._Owner->M_lim;
+		// Only pack if body belongs to current grid level
+		if (objman->iBody[ib]._Owner->level == level) {
+
+			// Get rank to send to
+			toRank = supportCommSupportSide[i].rankComm;
+
+			// Get grid sizes
+			size_t M_lim = objman->iBody[ib]._Owner->M_lim;
 #if (L_DIMS == 3)
-		size_t K_lim = objman->iBody[ib]._Owner->K_lim;
+			size_t K_lim = objman->iBody[ib]._Owner->K_lim;
 #endif
 
-		// Get indices
-		idx = supportCommSupportSide[i].supportIdx;
+			// Get indices
+			idx = supportCommSupportSide[i].supportIdx;
 
-		// Pack velocity into buffer
+			// Pack velocity into buffer
 #if (L_DIMS == 2)
-		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eXDirection, M_lim, L_DIMS));
-		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eYDirection, M_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eXDirection, M_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eYDirection, M_lim, L_DIMS));
 #elif (L_DIMS == 3)
-		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eXDirection, M_lim, K_lim, L_DIMS));
-		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eYDirection, M_lim, K_lim, L_DIMS));
-		sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eZDirection, M_lim, K_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eXDirection, M_lim, K_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eYDirection, M_lim, K_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eZDirection, M_lim, K_lim, L_DIMS));
 #endif
+		}
 	}
 
 	// Now send the values
@@ -72,7 +78,8 @@ void MpiManager::mpi_interpolateComm(std::vector<std::vector<double>> &recvVel) 
 	// Get receive sizes from each rank
 	std::vector<int> bufferSize(num_ranks, 0);
 	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
-		bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS;
+		if (objman->iBody[objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID]]._Owner->level == level)
+			bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS;
 	}
 
 	// Now receive the velocity values
@@ -100,7 +107,7 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
 		if (my_rank == objman->iBody[ib].owningRank) {
 			for (int m = 0; m < objman->iBody[ib].markers.size(); m++) {
-				objman->iBody[ib].markers[m].epsilon = epsilon[ib][objman->iBody[ib].markers[m].id];
+				objman->iBody[ib].markers[m].epsilon = epsilon[objman->iBody[ib].id][objman->iBody[ib].markers[m].id];
 			}
 		}
 	}
@@ -153,16 +160,16 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 	std::vector<int> idx(num_ranks, 0);
 
 	// Now unpack into epsilon values
-	int fromRank, markerIdx;
+	int fromRank, ib, markerIdx;
 	for (int i = 0; i < epsCommMarkerSide.size(); i++) {
 
 		// Get ID info
 		fromRank = epsCommMarkerSide[i].rankComm;
-		bodyID = epsCommMarkerSide[i].bodyID;
+		ib = objman->bodyIDToIdx[epsCommMarkerSide[i].bodyID];
 		markerIdx = epsCommMarkerSide[i].markerIdx;
 
 		// Put into epsilon
-		objman->iBody[bodyID].markers[markerIdx].epsilon = recvBuffer[fromRank][idx[fromRank]];
+		objman->iBody[ib].markers[markerIdx].epsilon = recvBuffer[fromRank][idx[fromRank]];
 		idx[fromRank]++;
 	}
 }
@@ -186,7 +193,7 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 
 		// Get ID info
 		toRank = epsCommMarkerSide[i].rankComm;
-		ib = epsCommMarkerSide[i].bodyID;
+		ib = objman->bodyIDToIdx[epsCommMarkerSide[i].bodyID];
 		m = epsCommMarkerSide[i].markerIdx;
 
 		// Pack marker data
@@ -249,7 +256,7 @@ void MpiManager::mpi_getIBMarkers() {
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
 		if (my_rank != objman->iBody[ib].owningRank) {
 			for (int m = 0; m < objman->iBody[ib].markers.size(); m++)
-				epsCommMarkerSide.emplace_back(objman->iBody[ib].owningRank, ib, m);
+				epsCommMarkerSide.emplace_back(objman->iBody[ib].owningRank, objman->iBody[ib].id, m);
 		}
 	}
 
@@ -272,11 +279,11 @@ void MpiManager::mpi_getIBMarkers() {
 
 		// Body and marker ID
 		toRank = epsCommMarkerSide[i].rankComm;
-		ib = epsCommMarkerSide[i].bodyID;
+		ib = objman->bodyIDToIdx[epsCommMarkerSide[i].bodyID];
 		m = epsCommMarkerSide[i].markerIdx;
 
 		// Fill send buffer
-		sendBuffer[toRank].push_back(ib);
+		sendBuffer[toRank].push_back(epsCommMarkerSide[i].bodyID);
 		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].id);
 	}
 
@@ -294,12 +301,11 @@ void MpiManager::mpi_getIBMarkers() {
 	// Loop through all receives that are required
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
 
-		// Resize the buffer
-		recvBuffer[fromRank].resize(2 * nMarkersToRecv[fromRank]);
-
 		// Check if it has stuff to receive from rank i
-		if (recvBuffer[fromRank].size() > 0)
+		if (nMarkersToRecv[fromRank] > 0) {
+			recvBuffer[fromRank].resize(2 * nMarkersToRecv[fromRank]);
 			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
 	}
 
 	// Now unpack and build comm class
@@ -339,7 +345,7 @@ void MpiManager::mpi_buildEpsComms() {
 
 		// Get marker info
 		toRank = epsCommMarkerSide[i].rankComm;
-		ib = epsCommMarkerSide[i].bodyID;
+		ib = objman->bodyIDToIdx[epsCommMarkerSide[i].bodyID];
 		m = epsCommMarkerSide[i].markerIdx;
 
 		// Pack into send buffer
@@ -392,7 +398,7 @@ void MpiManager::mpi_buildSupportComms() {
 
 				// If this rank does not own support site then add new element in comm vector
 				if (my_rank != objman->iBody[ib].markers[m].support_rank[s])
-					supportCommMarkerSide.emplace_back(ib, m, s, objman->iBody[ib].markers[m].support_rank[s]);
+					supportCommMarkerSide.emplace_back(objman->iBody[ib].id, m, s, objman->iBody[ib].markers[m].support_rank[s]);
 			}
 		}
 	}
@@ -416,13 +422,13 @@ void MpiManager::mpi_buildSupportComms() {
 	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
 
 		// Get IDs of support site
-		ib = supportCommMarkerSide[i].bodyID;
+		ib = objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID];
 		m = supportCommMarkerSide[i].markerIdx;
 		s = supportCommMarkerSide[i].supportID;
 		toRank = supportCommMarkerSide[i].rankComm;
 
 		// Body ID
-		bodyIDs[toRank].push_back(ib);
+		bodyIDs[toRank].push_back(supportCommMarkerSide[i].bodyID);
 
 		// Add to send buffer
 		supportPositions[toRank].push_back(objman->iBody[ib].markers[m].supp_x[s]);
@@ -468,7 +474,7 @@ void MpiManager::mpi_buildSupportComms() {
 		for (int i = 0; i < nSupportsToSend[fromRank]; i++) {
 
 			// Unpack positions and body ID
-			ib = bodyIDsRecv[fromRank][i];
+			ib = objman->bodyIDToIdx[bodyIDsRecv[fromRank][i]];
 			x = supportPositionsRecv[fromRank][i * L_DIMS];
 			y = supportPositionsRecv[fromRank][i * L_DIMS + 1];
 			z = 0.0;
@@ -480,7 +486,7 @@ void MpiManager::mpi_buildSupportComms() {
 			GridUtils::getEnclosingVoxel(x, y, z, objman->iBody[ib]._Owner, &nearijk);
 
 			// Place in sending vector
-			supportCommSupportSide.emplace_back(fromRank, ib, nearijk);
+			supportCommSupportSide.emplace_back(fromRank, bodyIDsRecv[fromRank][i], nearijk);
 		}
 	}
 }

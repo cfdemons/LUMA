@@ -309,7 +309,7 @@ void ObjectManager::io_readInGeomConfig() {
 	std::string bodyCase;
 
 	// Start reading in config file
-	int bodyID = 0;
+	int iBodyID = 0, pBodyID = 0;
 	while(!file.eof()) {
 
 		// Get type of body
@@ -339,7 +339,7 @@ void ObjectManager::io_readInGeomConfig() {
 			bool yRefCen = GeomPacked::interpretRef(yRefType);
 			bool zRefCen = GeomPacked::interpretRef(zRefType);
 
-			L_INFO("Initialising Body " + std::to_string(bodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
+			L_INFO("Initialising Body " + std::to_string(iBodyID+pBodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
 			
 			// Get body type
 			eObjectType bodyType;
@@ -385,7 +385,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Packed information into a geometry instance
 			GeomPacked *geom = new GeomPacked(
-				bodyType, bodyID, fileName, lev, reg, 
+				bodyType, iBodyID+pBodyID, fileName, lev, reg,
 				xRefCen, xRef, yRefCen, yRef, zRefCen, zRef,
 				length, scaleDirection, moveProperty, clamped
 				);
@@ -398,7 +398,13 @@ void ObjectManager::io_readInGeomConfig() {
 			this->io_readInCloud(_PCpts, geom);
 			delete _PCpts;
 			delete geom;
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (bodyType == eBFLCloud)
+				pBodyID++;
+			else if (bodyType == eIBBCloud)
+				iBodyID++;
 		}
 
 		// ** INSERT FILAMENT ** //
@@ -418,7 +424,7 @@ void ObjectManager::io_readInGeomConfig() {
 			std::string flex_rigid; file >> flex_rigid;
 			std::string BC; file >> BC;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
 			// Sort data
 			std::vector<double> start_position, angles;
@@ -457,13 +463,19 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, start_position, length, angles, moveProperty, clamped);
+					iBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles, moveProperty, clamped);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, start_position, length, angles);
+					pBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// ** INSERT CIRCLE/SPHERE ** //
@@ -480,7 +492,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double radius; file >> radius;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
 
 			// Sort data
 			std::vector<double> centre_point, angles;
@@ -508,13 +520,19 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, centre_point, radius, moveProperty);
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, centre_point, radius);
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// ** INSERT SQUARE/CUBE ** //
@@ -535,7 +553,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double angleHorz; file >> angleHorz;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
 
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
@@ -568,20 +586,30 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, centre_point, dimensions, angles, moveProperty);
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, centre_point, dimensions, angles);
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// Increment body ID and set case to none
-		bodyID++;
 		bodyCase = "NONE";
 	}
 	file.close();
+
+	// Create the vector containing the mapping from global body ID to local index in iBody vector
+	bodyIDToIdx.resize(iBodyID, -1);
+	for (int ib = 0; ib < iBody.size(); ib++)
+		bodyIDToIdx[iBody[ib].id] = ib;
 }
 
 

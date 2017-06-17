@@ -139,8 +139,14 @@ IBBody::IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer) {
 	// Get MPI manager instance
 	MpiManager *mpim = MpiManager::getInstance();
 
+	// Set grid pointer
+	_Owner = iBody._Owner;
+
 	// Set body ID
 	id = iBody.id;
+
+	// Set spacing
+	spacing = iBody.spacing;
 
 	// First size markers from original body
 	int nMarkers = iBody.markers.size();

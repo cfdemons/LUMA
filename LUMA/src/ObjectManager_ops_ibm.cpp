@@ -21,7 +21,7 @@
 
 // *****************************************************************************
 /// Perform IBM procedure.
-void ObjectManager::ibm_apply2() {
+void ObjectManager::ibm_apply2(int level) {
 
 //	// Loop through all bodies and find support
 //	for (int ib = 0; ib < iBody.size(); ib++) {
@@ -73,10 +73,11 @@ void ObjectManager::ibm_apply2() {
 //		ibm_findEpsilon();
 
 	// Interpolate the velocity onto the markers
-	ibm_interpolate();
+	ibm_interpolate(level);
 
 	// Compute force
-	ibm_computeForce();
+	ibm_computeForce(level);
+
 
 #ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
@@ -479,7 +480,7 @@ void ObjectManager::ibm_initialiseSupport(int ib, int m, int s, double estimated
 
 // *****************************************************************************
 /// \brief	Interpolate velocity field onto markers
-void ObjectManager::ibm_interpolate() {
+void ObjectManager::ibm_interpolate(int level) {
 
 	// Get rank
 	int rank = GridUtils::safeGetRank();
@@ -487,78 +488,90 @@ void ObjectManager::ibm_interpolate() {
 	// Loop through all bodies
 	for (int ib = 0; ib < iBody.size(); ib++) {
 
-		// Get grid sizes
-		size_t M_lim = iBody[ib]._Owner->M_lim;
+		// Only interpolate the bodies that exist on this grid level
+		if (iBody[ib]._Owner->level == level) {
+
+			// Get grid sizes
+			size_t M_lim = iBody[ib]._Owner->M_lim;
 #if (L_DIMS == 3)
-		size_t K_lim = iBody[ib]._Owner->K_lim;
+			size_t K_lim = iBody[ib]._Owner->K_lim;
 #endif
 
-		// For each marker
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			// For each marker
+			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 
-			// Reset the values of interpolated velocity
-			std::fill(iBody[ib].markers[m].interpVel.begin(), iBody[ib].markers[m].interpVel.end(), 0.0);
+				// Reset the values of interpolated velocity
+				std::fill(iBody[ib].markers[m].interpVel.begin(), iBody[ib].markers[m].interpVel.end(), 0.0);
 
-			// Loop over support nodes
-			for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
+				// Loop over support nodes
+				for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
 
-				// Only interpolate over data this rank actually owns at the moment
-				if (rank == iBody[ib].markers[m].support_rank[i]) {
+					// Only interpolate over data this rank actually owns at the moment
+					if (rank == iBody[ib].markers[m].support_rank[i]) {
 
-					// Loop over directions x y z
-					for (int dir = 0; dir < L_DIMS; dir++) {
+						// Loop over directions x y z
+						for (int dir = 0; dir < L_DIMS; dir++) {
 
-						// Read given velocity component from support node, multiply by delta function
-						// for that support node and sum to get interpolated velocity.
+							// Read given velocity component from support node, multiply by delta function
+							// for that support node and sum to get interpolated velocity.
 #if (L_DIMS == 3)
-						iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
-								iBody[ib].markers[m].supp_i[i],
-								iBody[ib].markers[m].supp_j[i],
-								iBody[ib].markers[m].supp_k[i],
-								dir, M_lim, K_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+							iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
+									iBody[ib].markers[m].supp_i[i],
+									iBody[ib].markers[m].supp_j[i],
+									iBody[ib].markers[m].supp_k[i],
+									dir, M_lim, K_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #else
-						iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
-								iBody[ib].markers[m].supp_i[i],
-								iBody[ib].markers[m].supp_j[i],
-								dir, M_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+							iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
+									iBody[ib].markers[m].supp_i[i],
+									iBody[ib].markers[m].supp_j[i],
+									dir, M_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #endif
+						}
 					}
 				}
 			}
 		}
 	}
 
+
+
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
-	ibm_gatherOffRankVels();
+	ibm_gatherOffRankVels(level);
 #endif
 
 	// Write out interpolate velocity
 #ifdef L_IBM_DEBUG
-	for (int ib = 0; ib < iBody.size(); ib++)
-		ibm_debug_interpVel(ib);
+	for (int ib = 0; ib < iBody.size(); ib++) {
+		if (iBody[ib]._Owner->level == level)
+			ibm_debug_interpVel(ib);
+	}
 #endif
 }
 
 // *****************************************************************************
 /// \brief	Compute restorative force at each marker in a body.
 /// \param	ib	iBody being operated on.
-void ObjectManager::ibm_computeForce() {
+void ObjectManager::ibm_computeForce(int level) {
 
 	// Loop over markers
 	for (int ib = 0; ib < iBody.size(); ib++) {
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
-			for (int dir = 0; dir < L_DIMS; dir++) {
 
-				// Compute restorative force (in lattice units)
-				iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
+		// Only do if this body is on this grid level
+		if (iBody[ib]._Owner->level == level) {
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				for (int dir = 0; dir < L_DIMS; dir++) {
+
+					// Compute restorative force (in lattice units)
+					iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
+				}
 			}
-		}
 
 		// Write out force on markers
 #ifdef L_IBM_DEBUG
 		ibm_debug_markerForce(ib);
 #endif
+		}
 	}
 }
 
@@ -649,11 +662,10 @@ void ObjectManager::ibm_findEpsilon() {
 		if (mpim->my_rank == iBody[ib].owningRank)
 			iBodyTemp.emplace_back(iBody[ib], recvBuffer);
 	}
-
 #endif
 
 	// Size epsilon values
-	std::vector<std::vector<double>> epsilon(iBody.size(), std::vector<double>(0));
+	std::vector<std::vector<double>> epsilon(bodyIDToIdx.size(), std::vector<double>(0));
 
 	// Loop through all iBodys this rank owns
 	for (int ib = 0; ib < iBodyTemp.size(); ib++) {
@@ -687,25 +699,25 @@ void ObjectManager::ibm_findEpsilon() {
 #if (L_DIMS == 3)
 					Delta_J =
 						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBody[iBodyTemp[ib].id]._Owner->dh,
+						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
 						iBodyTemp[ib].markers[J].dilation
 						) *
 						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBody[iBodyTemp[ib].id]._Owner->dh,
+						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
 						iBodyTemp[ib].markers[J].dilation
 						) *
 						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eZDirection] - iBodyTemp[ib].markers[I].supp_z[s]) / iBody[iBodyTemp[ib].id]._Owner->dh,
+						(iBodyTemp[ib].markers[J].position[eZDirection] - iBodyTemp[ib].markers[I].supp_z[s]) / iBodyTemp[ib]._Owner->dh,
 						iBodyTemp[ib].markers[J].dilation
 						);
 #else
 					Delta_J =
 						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBody[iBodyTemp[ib].id]._Owner->dh,
+						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
 						iBodyTemp[ib].markers[J].dilation
 						) *
 						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBody[iBodyTemp[ib].id]._Owner->dh,
+						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
 						iBodyTemp[ib].markers[J].dilation
 						);
 #endif
@@ -714,7 +726,7 @@ void ObjectManager::ibm_findEpsilon() {
 				}
 
 				// Multiply by arc length between markers in lattice units
-				A[I][J] = A[I][J] * (iBody[iBodyTemp[ib].id].spacing / iBody[iBodyTemp[ib].id]._Owner->dh);
+				A[I][J] = A[I][J] * (iBodyTemp[ib].spacing / iBodyTemp[ib]._Owner->dh);
 			}
 		}
 

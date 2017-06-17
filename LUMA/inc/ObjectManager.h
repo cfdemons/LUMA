@@ -128,7 +128,7 @@ public:
 	void ibm_initialise();					// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
 	void ibm_interpolate(int level);		// Interpolation of velocity field onto markers of ib-th body.
-	void ibm_spread(int ib);				// Spreading of restoring force from ib-th body.
+	void ibm_spread(int level);				// Spreading of restoring force from ib-th body.
 	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
 	void ibm_initialiseSupport(int ib, int m, 
 		int s, double estimated_position[]);		// Initialises data associated with the support points.
@@ -151,7 +151,8 @@ public:
 
 	// IBM-MPI methods
 	void ibm_buildMPIComms();
-	void ibm_gatherOffRankVels(int level);
+	void ibm_interpolateOffRankVels(int level);
+	void ibm_spreadOffRankForces(int level);
 
 	// Flexible body methods
 	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.

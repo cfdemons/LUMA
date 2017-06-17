@@ -18,6 +18,72 @@
 #include "../inc/ObjectManager.h"
 
 
+
+// ************************************************************************* //
+/// \brief	Do communication required for force spreading
+///
+///
+void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces) {
+
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
+
+	// Declare values
+	int toRank, ib , m, s;
+	std::vector<std::vector<double>> sendForce(num_ranks, std::vector<double>(0));
+
+	// Pack and send data first
+	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+
+		// Get body index
+		ib = objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID];
+
+		// Only pack if body belongs to current grid level
+		if (objman->iBody[ib]._Owner->level == level) {
+
+			// Get rank to send to and support ID info
+			toRank = supportCommMarkerSide[i].rankComm;
+			m = supportCommMarkerSide[i].markerIdx;
+			s = supportCommMarkerSide[i].supportID;
+
+			// Pack into buffer
+			for (int dir = 0; dir < L_DIMS; dir++) {
+				sendForce[toRank].push_back(objman->iBody[ib].markers[m].deltaval[s] * objman->iBody[ib].markers[m].force_xyz[dir] *
+						objman->iBody[ib].markers[m].epsilon * objman->iBody[ib].spacing / objman->iBody[ib]._Owner->dh);
+			}
+		}
+	}
+
+	// Now send the values
+	for (int toRank = 0; toRank < num_ranks; toRank++) {
+
+		// Check if current rank needs to send stuff to rank toRank
+		if (sendForce[toRank].size() > 0) {
+			MPI_Request send_requests;
+			MPI_Isend(&sendForce[toRank].front(), sendForce[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &send_requests);
+		}
+	}
+
+	// Get receive sizes from each rank
+	std::vector<int> bufferSize(num_ranks, 0);
+	for (int i = 0; i < supportCommSupportSide.size(); i++) {
+		if (objman->iBody[objman->bodyIDToIdx[supportCommSupportSide[i].bodyID]]._Owner->level == level)
+			bufferSize[supportCommSupportSide[i].rankComm] += L_DIMS;
+	}
+
+	// Now receive the velocity values
+	spreadForces.resize(num_ranks, std::vector<double>(0));
+	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
+
+		// If there is data to receive from rank fromRank
+		if (bufferSize[fromRank] > 0) {
+			spreadForces[fromRank].resize(bufferSize[fromRank]);
+			MPI_Recv(&spreadForces[fromRank].front(), spreadForces[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+}
+
+
 // ************************************************************************* //
 /// \brief	Do communication required for velocity interpolation
 ///

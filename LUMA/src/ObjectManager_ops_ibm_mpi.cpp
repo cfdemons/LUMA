@@ -38,7 +38,7 @@ void ObjectManager::ibm_buildMPIComms() {
 
 
 /// \brief	Pass velocity values from support site which exist off-rank.
-void ObjectManager::ibm_gatherOffRankVels(int level) {
+void ObjectManager::ibm_interpolateOffRankVels(int level) {
 
 	// Get the mpi manager instance
 	MpiManager *mpim = MpiManager::getInstance();
@@ -68,6 +68,49 @@ void ObjectManager::ibm_gatherOffRankVels(int level) {
 			// Interpolate these values
 			for (int dir = 0; dir < L_DIMS; dir++)
 				iBody[ib].markers[m].interpVel[dir] += interpVels[fromRank][dir+idx[fromRank]] * iBody[ib].markers[m].deltaval[s] * iBody[ib].markers[m].local_area;
+
+			// Shift index
+			idx[fromRank] += L_DIMS;
+		}
+	}
+}
+
+/// \brief	Pass velocity values from support site which exist off-rank.
+void ObjectManager::ibm_spreadOffRankForces(int level) {
+
+	// Get the mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Perform interpolation communication
+	std::vector<std::vector<double>> spreadForces;
+	mpim->mpi_spreadComm(level, spreadForces);
+
+	// Create idx vector
+	std::vector<int> idx(mpim->num_ranks, 0);
+	std::vector<int> suppIdx(3, 0);
+
+	// Now interpolate these remaining values onto the marker
+	int ib, fromRank;
+	for (int i = 0; i < mpim->supportCommSupportSide.size(); i++) {
+
+		// Get body idx
+		ib = bodyIDToIdx[mpim->supportCommSupportSide[i].bodyID];
+
+		// Only do if body is on this grid level
+		if (iBody[ib]._Owner->level == level) {
+
+			// Get grid sizes
+			size_t M_lim = iBody[ib]._Owner->M_lim;
+			size_t K_lim = iBody[ib]._Owner->K_lim;
+
+			// Get IDs of support site
+			fromRank = mpim->supportCommSupportSide[i].rankComm;
+			suppIdx = mpim->supportCommSupportSide[i].supportIdx;
+
+			// Interpolate these values
+			for (int dir = 0; dir < L_DIMS; dir++)
+				iBody[ib]._Owner->force_xyz(suppIdx[eXDirection], suppIdx[eYDirection], suppIdx[eZDirection], dir, M_lim, K_lim, L_DIMS) -=
+						spreadForces[fromRank][idx[fromRank] + dir];
 
 			// Shift index
 			idx[fromRank] += L_DIMS;

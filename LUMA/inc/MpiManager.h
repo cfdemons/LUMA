@@ -180,6 +180,8 @@ public :
 	void mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer);			// Do communication required for epsilon calculation
 	void mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon);				// Do communication required for epsilon calculation
 	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation
+	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
+
 
 
 };

@@ -86,7 +86,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Gravity
-//#define L_GRAVITY_ON						///< Turn on gravity force
+#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE (12.0 / L_RE)
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)

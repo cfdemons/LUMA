@@ -37,6 +37,11 @@ void GridObj::LBM_multi_opt(int subcycle) {
 		}
 	}
 
+	// If IBM is on then reset the forces
+#ifdef L_IBM_ON
+	_LBM_resetForces();
+#endif
+
 	// Start the clock to time this kernel
 	clock_t secs, t_start = clock();
 
@@ -89,7 +94,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				{
 					_LBM_forceGrid_opt(id);
 				}
-				L_DACTION_WRITE_OUT_FORCES
+//				L_DACTION_WRITE_OUT_FORCES
 #endif
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
@@ -815,14 +820,11 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	// Declarations
 	double lambda_v, beta_v;
 
-#ifdef L_GRAVITY_ON
-	// Add gravity
-	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
-#endif
-
 	// Now compute force_i components from Cartesian force vector
 	for (size_t v = 0; v < L_NUM_VELS; v++) {
+
+		// Reset to zero
+		force_i[v + id * L_NUM_VELS] = 0.0;
 
 		// Reset beta_v
 		beta_v = 0.0;
@@ -838,15 +840,12 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 
 		// Compute force using shorthand sum described above
 		for (int d = 0; d < L_DIMS; d++) {
-			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] *
-				(c_opt[v][d] * (1 + beta_v) - u[d + id * L_DIMS]);
+			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] * (c_opt[v][d] * (1 + beta_v) - u[d + id * L_DIMS]);
 		}
 
 		// Multiply by lambda_v
 		force_i[v + id * L_NUM_VELS] *= lambda_v;
-
 	}
-
 }
 
 // *****************************************************************************
@@ -970,5 +969,20 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 
 	return true;
 
+}
+
+// *****************************************************************************
+/// \brief	Method to reset body forces.
+///
+///			Resets Cartesian force vector to zero.
+void GridObj::_LBM_resetForces() {
+
+	// Reset Cartesian force vector on every grid site
+#ifdef L_GRAVITY_ON
+	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
+#else
+	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
+#endif
 }
 // *****************************************************************************

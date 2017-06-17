@@ -416,10 +416,9 @@ void GridObj::LBM_initGrid() {
 	// Cartesian force vector
 	force_xyz.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
 
-#if (defined L_IBM_ON || defined L_GRAVITY_ON)
+#if (defined L_GRAVITY_ON)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
-	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Lattice force vector
@@ -596,10 +595,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
-#if (defined L_IBM_ON || defined L_GRAVITY_ON)
+#if (defined L_GRAVITY_ON)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
-		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Lattice force vector

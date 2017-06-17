@@ -136,7 +136,6 @@ public :
 	// LBM operations
 	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_macro(int i, int j, int k);
-	void LBM_resetForces();								// Resets the force vectors on the grid
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
@@ -164,6 +163,8 @@ private :
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
+	void _LBM_resetForces();
+
 
 	double _LBM_smag(int id, double omega); 
 public :

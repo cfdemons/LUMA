@@ -567,7 +567,7 @@ void ObjectManager::ibm_computeForce(int level) {
 				for (int dir = 0; dir < L_DIMS; dir++) {
 
 					// Compute restorative force (in lattice units)
-					iBody[ib].markers[m].force_xyz[dir] = (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
+					iBody[ib].markers[m].force_xyz[dir] = 2.0 * (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
 				}
 			}
 		}

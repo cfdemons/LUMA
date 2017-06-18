@@ -86,13 +86,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 
 // Gravity
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE (12.0 / L_RE)
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
@@ -136,8 +136,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
-#define L_RESOLUTION 1		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.1	///< The timestep in non-dimensional units
+#define L_RESOLUTION 1.0			///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.1			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 20.0		///< End of domain in X (non-dimensional units)
@@ -145,7 +145,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_BZ 1.0		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 0.02		///< Reference velocity of the real fluid to model [m/s]
 
 
 /*
@@ -155,17 +155,17 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
-//#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+//#define L_USE_INLET_PROFILE	   	///< Use an inlet profile
+//#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.0			///< Initial/inlet x-velocity
+#define L_UX0 0.02			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 150			///< Desired Reynolds number
+#define L_RE 10			///< Desired Reynolds number
 
 
 /*
@@ -180,7 +180,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // IBM //
 #define L_IBM_ON						///< Turn on IBM
-#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+//#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 /*
 *******************************************************************************
@@ -189,16 +189,16 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
+//#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
 //#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // Inlet (left-hand wall)
-#define L_INLET_ON				///< Turn on inlet boundary
+//#define L_INLET_ON				///< Turn on inlet boundary
 
 // Outlet (right-hand wall)
-#define L_OUTLET_ON				///< Turn on outlet boundary
+//#define L_OUTLET_ON				///< Turn on outlet boundary
 
 // Solids
 //#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)

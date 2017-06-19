@@ -123,12 +123,12 @@ public:
 	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
-	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
-	void ibm_apply2(int level);				// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_apply(int level);						// Apply interpolate, compute and spread operations for all bodies.
 	void ibm_initialise();					// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
 	void ibm_interpolate(int level);		// Interpolation of velocity field onto markers of ib-th body.
 	void ibm_spread(int level);				// Spreading of restoring force from ib-th body.
+	void ibm_updateMacroscopic(int level);	// Update the macroscopic values with the IBM force
 	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
 	void ibm_initialiseSupport(int ib, int m, 
 		int s, double estimated_position[]);		// Initialises data associated with the support points.

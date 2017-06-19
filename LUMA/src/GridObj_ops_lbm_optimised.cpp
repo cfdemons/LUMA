@@ -81,6 +81,27 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
 
+				// If IBM is on then split loop and perform IBM step
+#ifdef L_IBM_ON
+			}
+		}
+	}
+
+	// Perform IBM steps (interpolate, force calc, spread and update macro)
+	objman->ibm_apply(this->level);
+
+
+	// Loop over grid
+	for (int i = 0; i < N_lim; ++i) {
+		for (int j = 0; j < M_lim; ++j) {
+			for (int k = 0; k < K_lim; ++k) {
+
+				// Local index and type
+				int id = k + j * K_lim + i * K_lim * M_lim;
+				eType type_local = LatTyp[id];
+
+#endif
+
 				// REGULARISED BCs //
 #ifdef L_VELOCITY_REGULARISED
 				if (type_local == eInlet)
@@ -110,11 +131,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 			}
 		}
 	}
-
-	// Perform IBM step
-#ifdef L_IBM_ON
-	objman->ibm_apply2(this->level);
-#endif
 
 	// Swap distributions
 	f.swap(fNew);

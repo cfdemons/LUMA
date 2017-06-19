@@ -21,7 +21,7 @@
 
 // *****************************************************************************
 /// Perform IBM procedure.
-void ObjectManager::ibm_apply2(int level) {
+void ObjectManager::ibm_apply(int level) {
 
 //	// Loop through all bodies and find support
 //	for (int ib = 0; ib < iBody.size(); ib++) {
@@ -81,89 +81,12 @@ void ObjectManager::ibm_apply2(int level) {
 	// Spread force
 	ibm_spread(level);
 
-#ifdef L_BUILD_FOR_MPI
-	MpiManager *mpim = MpiManager::getInstance();
-	MPI_Barrier(mpim->world_comm);
-#endif
-	exit(0);
+	// Update the macroscopic values
+	ibm_updateMacroscopic(level);
 }
 
 
-// *****************************************************************************
-/// Perform IBM procedure.
-void ObjectManager::ibm_apply() {
 
-//#ifdef L_BUILD_FOR_MPI
-//	// Get MPI Manager Instance
-//	MpiManager *mpim = MpiManager::getInstance();
-//#endif
-//	int rank = GridUtils::safeGetRank();
-//
-//	// Loop over array of IB_bodies and perform IB operations
-//	for (int ib = 0; ib < static_cast<int>(iBody.size()); ib++) {
-//
-//#ifdef L_IBM_DEBUG
-//		// DEBUG -- write out support coordinates
-//		std::ofstream suppout;
-//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//			suppout.open(GridUtils::path_str + "/Supp_" + std::to_string(iBody[ib].id) + "_" + std::to_string(m) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-//			suppout << "\nNEW TIME STEP" << std::endl;
-//			suppout << "x\ty\tz" << std::endl;
-//			for (size_t i = 0; i < iBody[ib].markers[m].supp_i.size(); i++) {
-//				if (L_DIMS == 3) {
-//					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << iBody[ib]._Owner->ZPos[iBody[ib].markers[m].supp_k[i]] << std::endl;
-//				} else {
-//					suppout << iBody[ib]._Owner->XPos[iBody[ib].markers[m].supp_i[i]] << "\t" << iBody[ib]._Owner->YPos[iBody[ib].markers[m].supp_j[i]] << "\t" << 0.0 << std::endl;
-//				}
-//			}
-//			suppout.close();
-//		}
-//#endif
-//
-//#ifdef L_IBM_DEBUG
-//		// DEBUG -- write out epsilon values
-//		std::ofstream epout;
-//		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-//		epout << "\nNEW TIME STEP" << std::endl;
-//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//			epout << iBody[ib].markers[m].epsilon << std::endl;
-//		}
-//		epout.close();
-//#endif
-//
-//			// Interpolate velocity
-//			ibm_interpol(ib);
-//
-//#ifdef L_IBM_DEBUG
-//		// DEBUG -- write out interpolate velocity values
-//		std::ofstream predout;
-//		predout.open(GridUtils::path_str + "/interpVel_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-//		predout << "\nNEW TIME STEP" << std::endl;
-//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//			predout << iBody[ib].markers[m].interpVel[0] << "\t" << iBody[ib].markers[m].interpVel[1] << std::endl;
-//		}
-//		predout.close();
-//#endif
-//
-//			// Compute restorative force
-//			ibm_computeForce(ib);
-//
-//#ifdef L_IBM_DEBUG
-//		// DEBUG -- write out Lagrange force values
-//		std::ofstream forceout;
-//		forceout.open(GridUtils::path_str + "/force_xyz_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
-//		forceout << "\nNEW TIME STEP" << std::endl;
-//		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-//			forceout << iBody[ib].markers[m].force_xyz[0] << "\t" << iBody[ib].markers[m].force_xyz[1] << std::endl;
-//		}
-//		forceout.close();
-//#endif
-//
-//			// Spread force back to lattice (Cartesian vector)
-//			ibm_spread(ib);
-//
-//		}
-}
 
 // *****************************************************************************
 /// \brief	Moves iBodies after applying IBM.
@@ -482,6 +405,7 @@ void ObjectManager::ibm_initialiseSupport(int ib, int m, int s, double estimated
 
 // *****************************************************************************
 /// \brief	Interpolate velocity field onto markers
+/// \param	level	Current grid level.
 void ObjectManager::ibm_interpolate(int level) {
 
 	// Get rank
@@ -555,7 +479,7 @@ void ObjectManager::ibm_interpolate(int level) {
 
 // *****************************************************************************
 /// \brief	Compute restorative force at each marker in a body.
-/// \param	ib	iBody being operated on.
+/// \param	level	Current grid level.
 void ObjectManager::ibm_computeForce(int level) {
 
 	// Loop over markers
@@ -576,7 +500,7 @@ void ObjectManager::ibm_computeForce(int level) {
 
 // *****************************************************************************
 /// \brief	Spread restorative force back onto marker support.
-/// \param	ib	iBody being operated on.
+/// \param	level	Current grid level.
 void ObjectManager::ibm_spread(int level) {
 
 	// Get rank
@@ -632,6 +556,81 @@ void ObjectManager::ibm_spread(int level) {
 		if (iBody[ib]._Owner->level == level) {
 			ibm_debug_markerForce(ib);
 			ibm_debug_supportForce(ib);
+		}
+	}
+#endif
+}
+
+
+// *****************************************************************************
+/// \brief	Update the macroscopic values at the support points.
+/// \param	level	Current grid level.
+void ObjectManager::ibm_updateMacroscopic(int level) {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Grid indices and type
+	int ib, idx, jdx, kdx, id;
+	eType type_local;
+
+	// First do all support points that belong to markers that this rank owns
+	// Loop through all IBM bodies
+	for (ib = 0; ib < iBody.size(); ib++) {
+
+		// Only do if body belongs to this grid level
+		if (iBody[ib]._Owner->level == level) {
+
+			// Loop through all markers
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
+
+					// Only do if this rank actually owns this support site
+					if (iBody[ib].markers[m].support_rank[s] == rank) {
+
+						// Get indices
+						idx = iBody[ib].markers[m].supp_i[s];
+						jdx = iBody[ib].markers[m].supp_j[s];
+						kdx = iBody[ib].markers[m].supp_k[s];
+
+						// Grid site index and type
+						id = kdx + jdx * iBody[ib]._Owner->K_lim + idx * iBody[ib]._Owner->K_lim * iBody[ib]._Owner->M_lim;
+						type_local = iBody[ib]._Owner->LatTyp[id];
+
+						// Update macroscopic value at this site
+						iBody[ib]._Owner->_LBM_macro_opt(idx, jdx, kdx, id, type_local);
+					}
+				}
+			}
+		}
+	}
+
+	// Now loop through any support sites this rank owns which belong to markers off-rank
+#ifdef L_BUILD_FOR_MPI
+
+	// Get MPI manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Loop through any support sites this rank owns which belong to markers off-rank
+	for (int i = 0; i < mpim->supportCommSupportSide.size(); i++) {
+
+		// Get body idx
+		ib = bodyIDToIdx[mpim->supportCommSupportSide[i].bodyID];
+
+		// Only do if body is on this grid level
+		if (iBody[ib]._Owner->level == level) {
+
+			// Get indices
+			idx = mpim->supportCommSupportSide[i].supportIdx[eXDirection];
+			jdx = mpim->supportCommSupportSide[i].supportIdx[eYDirection];
+			kdx = mpim->supportCommSupportSide[i].supportIdx[eZDirection];
+
+			// Grid site index and type
+			id = kdx + jdx * iBody[ib]._Owner->K_lim + idx * iBody[ib]._Owner->K_lim * iBody[ib]._Owner->M_lim;
+			type_local = iBody[ib]._Owner->LatTyp[id];
+
+			// Update macroscopic value at this site
+			iBody[ib]._Owner->_LBM_macro_opt(idx, jdx, kdx, id, type_local);
 		}
 	}
 #endif

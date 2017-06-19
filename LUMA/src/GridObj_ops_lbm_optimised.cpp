@@ -289,11 +289,24 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 
 	// Find which wall we are on and proceed to assign key variables //
 
+	// Set velocities (may be modified later on depending on BC)
+	double ux = L_UX0;
+	double uy = L_UY0;
+#if (L_DIMS == 3)
+	double uz = L_UZ0;
+#endif
+
 	// Left wall
 	if (XPos[i] > 0.0 && XPos[i] < dh)
 	{
+
+		// If using parabolic inlet
+#ifdef L_PARABOLIC_INLET
+		ux = 1.5 * L_UX0 * (1 - pow((YPos[j] - dh - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+#endif
+
 		// Assign wall velocity
-		normalVelocity = GridUnits::ud2ulbm(L_UX0, this);
+		normalVelocity = GridUnits::ud2ulbm(ux, this);
 
 		// Select the wall normal velocity direction
 		normalDirection = eXDirection;
@@ -304,7 +317,24 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Right wall
 	if (XPos[i] < L_BX && XPos[i] > L_BX - dh)
 	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UX0, this);
+
+		// Extrapolate from previous lattice site (don't do on receiver layers)
+#ifdef EXTRAPOLATED_OUTLET
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
+
+			// Get index of previous lattice site
+			int idBack = id - K_lim * M_lim;
+
+			// Set velocity
+			ux = GridUnits::ulat2uphys(u[eXDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+			uy = GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+#if (L_DIMS == 3)
+			uz = GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+#endif
+		}
+#endif
+
+		normalVelocity = -GridUnits::ud2ulbm(ux, this);
 		normalDirection = eXDirection;
 		normalVector[normalDirection] = -1;
 		edgeCount++;
@@ -313,7 +343,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Bottom wall
 	else if (YPos[j] > 0.0 && YPos[j] < dh)
 	{
-		normalVelocity = GridUnits::ud2ulbm(L_UY0, this);
+		normalVelocity = GridUnits::ud2ulbm(uy, this);
 		normalDirection = eYDirection;
 		normalVector[normalDirection] = 1;
 		edgeCount++;
@@ -322,7 +352,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Top wall
 	else if (YPos[j] < L_BY && YPos[j] > L_BY - dh)
 	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UY0, this);
+		normalVelocity = -GridUnits::ud2ulbm(uy, this);
 		normalDirection = eYDirection;
 		normalVector[normalDirection] = -1;
 		edgeCount++;
@@ -333,7 +363,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Front wall
 	else if (ZPos[k] > 0.0 && ZPos[k] < dh)
 	{
-		normalVelocity = GridUnits::ud2ulbm(L_UZ0, this);
+		normalVelocity = GridUnits::ud2ulbm(uz, this);
 		normalDirection = eZDirection;
 		normalVector[normalDirection] = 1;
 		edgeCount++;
@@ -342,7 +372,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Back wall
 	else if (ZPos[k] < L_BZ && ZPos[k] > L_BZ - dh)
 	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UZ0, this);
+		normalVelocity = -GridUnits::ud2ulbm(uz, this);
 		normalDirection = eZDirection;
 		normalVector[normalDirection] = -1;
 		edgeCount++;
@@ -403,10 +433,10 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 
 	// Update velocity
-	u[eXDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this);
-	u[eYDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this);
+	u[eXDirection + id * L_DIMS] = GridUnits::ud2ulbm(ux, this);
+	u[eYDirection + id * L_DIMS] = GridUnits::ud2ulbm(uy, this);
 #if (L_DIMS == 3)
-	u[eZDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this);
+	u[eZDirection + id * L_DIMS] = GridUnits::ud2ulbm(uz, this);
 #endif
 
 	// Loop over directions now macroscopic are up-to-date

@@ -943,6 +943,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
+#ifdef L_BUILD_FOR_MPI
 	if (
 		GridUtils::isOnRecvLayer(pos_x,eXMin) || GridUtils::isOnRecvLayer(pos_x,eXMax) ||
 		GridUtils::isOnRecvLayer(pos_y,eYMin) || GridUtils::isOnRecvLayer(pos_y,eYMax)
@@ -953,6 +954,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 		) {
 			return true;
 	}
+#endif
 
 	return false;
 

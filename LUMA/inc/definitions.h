@@ -199,6 +199,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Outlet (right-hand wall)
 #define L_OUTLET_ON				///< Turn on outlet boundary
+#define EXTRAPOLATED_OUTLET		///< Extrapolate the velocity from the outlet
 
 // Solids
 #define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)

@@ -273,6 +273,9 @@ void GridObj::LBM_initGrid() {
 	// Store temporal spacing
 	dt = L_TIMESTEP;
 
+	// Store mass conversion
+	dm = (L_RHO_REF / L_RHOIN) * dh * dh * dh;
+
 	// Gravity in LBM units
 	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
 
@@ -522,6 +525,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Define scales
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
+	dm = pGrid.dm / 8.0;
 	gravity = pGrid.gravity;
 	uref = pGrid.uref;
 	

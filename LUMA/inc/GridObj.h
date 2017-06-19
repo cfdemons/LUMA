@@ -99,6 +99,7 @@ public :
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size
+	double dm;
 	int t;							///< Number of completed iterations on this level
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency

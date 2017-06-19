@@ -58,33 +58,71 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 /// \param	timestep	timestep at which the write out is being performed.
 void ObjectManager::io_writeLiftDrag(int timestep) {
 
+	// Force conversion
+	double forceScaling, volWidth, volDepth;
+
+	// Write out lift and drag
 	int rank = GridUtils::safeGetRank();
 
-	for (size_t ib = 0; ib < iBody.size(); ib++) {
+	// Loop through all bodies
+	for (int ib = 0; ib < iBody.size(); ib++) {
 
+		// Only write out if this rank owns some markers
+		if (iBody[ib].markers.size() > 0) {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(rank) + ".out", std::ios::out);
-			jout << "L" + std::to_string(timestep) + ", D" + std::to_string(timestep) << std::endl;
+			jout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_LD_rank" + std::to_string(rank) + ".out", std::ios::app);
 
-			// Sum variables
-			double Lsum = 0.0, Dsum = 0.0;
+			// If first time step ten write out initial values
+			if (_Grids->t == L_OUT_EVERY) {
 
-			// Compute lift and drag
-			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-				jout	<< iBody[ib].markers[i].force_xyz[0] << ", " 
-						<< iBody[ib].markers[i].force_xyz[1] << std::endl;
-				Lsum += iBody[ib].markers[i].force_xyz[0];
-				Dsum += iBody[ib].markers[i].force_xyz[1];
+				// Header
+				jout << "Timestep\tTime (s)\tLift (N)\tDrag (N)" << std::endl;
+
+				// Write out timestep data
+				jout << 0 << "\t" << 0.0;
+
+				// Compute lift and drag
+				for (int m = 0; m < iBody[ib].markers.size(); m++) {
+
+					// Write out force on markers
+					for (int dir = 0; dir < L_DIMS; dir++)
+						jout << "\t" << 0.0;
+				}
 			}
 
-			jout << "Totals = " << std::endl;
-			jout << Lsum << ", " << Dsum << std::endl;
+			// Convert force per volume to force
+#if (L_DIMS == 2)
+			forceScaling = iBody[ib]._Owner->dm * iBody[ib]._Owner->dh / SQ(iBody[ib]._Owner->dt) * 1.0 / iBody[ib]._Owner->dh;
+#elif (L_DIMS == 3)
+			forceScaling = iBody[ib]._Owner->dm * iBody[ib]._Owner->dh / SQ(iBody[ib]._Owner->dt);
+#endif
+
+			// Write out timestep data
+			jout << _Grids->t << "\t" << _Grids->t * _Grids->dt;
+
+			// Compute lift and drag
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+
+				// Get volume scaling
+				volWidth = iBody[ib].markers[m].epsilon;
+#if (L_DIMS == 2)
+				volDepth = 1.0;
+#elif (L_DIMS == 3)
+				volDepth = iBody[ib].markers[m].epsilon;
+#endif
+
+				// Write out force on markers
+				for (int dir = 0; dir < L_DIMS; dir++)
+					jout << "\t" << iBody[ib].markers[m].force_xyz[dir] * volWidth * volDepth * (iBody[ib].spacing / iBody[ib]._Owner->dh) * forceScaling;
+			}
+
+			// Next line and close file
+			jout << std::endl;
 			jout.close();
-
+		}
 	}
-
 }
 
 // ************************************************************************** //

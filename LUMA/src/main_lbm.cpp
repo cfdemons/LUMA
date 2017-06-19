@@ -417,9 +417,7 @@ int main( int argc, char* argv[] )
 			objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
-#if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
-	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
-	&& defined L_IBM_ON && defined L_IBBODY_TRACER
+#if (defined L_IBM_ON && defined L_IBBODY_TRACER)
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
 #endif

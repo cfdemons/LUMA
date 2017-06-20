@@ -75,7 +75,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 			jout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_LD_rank" + std::to_string(rank) + ".out", std::ios::app);
 
 			// If first time step ten write out initial values
-			if (_Grids->t == L_OUT_EVERY) {
+			if (_Grids->t == L_OUT_EVERY_FORCES) {
 
 				// Header
 				jout << "Timestep\tTime (s)\tLift (N)\tDrag (N)" << std::endl;
@@ -467,7 +467,7 @@ void ObjectManager::io_readInGeomConfig() {
 			// Sort data
 			std::vector<double> start_position, angles;
 			start_position.push_back(startX);
-			start_position.push_back(startY);
+			start_position.push_back(startY + _Grids->dh);
 			start_position.push_back(startZ);
 			angles.push_back(angleVert);
 			angles.push_back(angleHorz);
@@ -535,7 +535,7 @@ void ObjectManager::io_readInGeomConfig() {
 			// Sort data
 			std::vector<double> centre_point, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY);
+			centre_point.push_back(centreY + _Grids->dh);
 			centre_point.push_back(centreZ);
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
@@ -596,7 +596,7 @@ void ObjectManager::io_readInGeomConfig() {
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY);
+			centre_point.push_back(centreY + _Grids->dh);
 			centre_point.push_back(centreZ);
 			dimensions.push_back(length);
 			dimensions.push_back(height);

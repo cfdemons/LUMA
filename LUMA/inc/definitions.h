@@ -61,12 +61,14 @@
 *******************************************************************************
 */
 
+const int resFactor = 1;
+
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 20		///< Specific output frequency of body forces
+#define L_OUT_EVERY (resFactor*resFactor*200)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES (resFactor*resFactor*20)		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
 // Types of output
@@ -95,7 +97,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 100000			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 1000000000000			///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -109,7 +111,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 60000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS (resFactor*resFactor*60000)		///< Number of time steps to run simulation for
 
 
 /*
@@ -136,8 +138,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
-#define L_RESOLUTION 200			///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.000462963			///< The timestep in non-dimensional units
+#define L_RESOLUTION (resFactor*200)			///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP (0.000462963/(resFactor*resFactor))			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 2.2								///< End of domain in X (non-dimensional units)
@@ -178,11 +180,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 //#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 /*
@@ -238,16 +240,16 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Position of each refined region
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 2.0 }
+	{ 0.05 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 7.0 }
+	{ 0.35 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 1.0 }
+	{ 0.055 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {
-	{ 9.0 }
+	{ 0.365 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {
 	{ 2.5 }

@@ -57,7 +57,8 @@ protected:
 	/************** Member Data **************/
 	
 	// General vectors
-	std::vector<double> interpVel;		///< Fluid velocity interpolated from lattice nodes
+	std::vector<double> interpMom;		///< Fluid velocity interpolated from lattice nodes
+	double interpRho;					///< Fluid density interpolate from lattice nodes
 	std::vector<double> markerVel;		///< Desired velocity at marker
 	std::vector<double> force_xyz;		///< Restorative force vector on marker
 	std::vector<double> position_old;	///< Vector containing the physical coordinates (x,y,z) of the marker at t-1. Used for moving bodies.

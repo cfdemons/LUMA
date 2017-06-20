@@ -29,6 +29,7 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->epsilon = 0.0;
 	this->local_area = 0.0;
 	this->dilation = 0.0;
+	this->interpRho = 0.0;
 
 	// Stationary point
 	this->markerVel.push_back(0.0);
@@ -36,7 +37,7 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->markerVel.push_back(0.0);
 
 	// Resize vectors
-	this->interpVel.resize(L_DIMS);
+	this->interpMom.resize(L_DIMS);
 	this->force_xyz.resize(L_DIMS);
 
 	// Set old position to initial position

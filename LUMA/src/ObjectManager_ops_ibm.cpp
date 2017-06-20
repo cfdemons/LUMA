@@ -426,8 +426,9 @@ void ObjectManager::ibm_interpolate(int level) {
 			// For each marker
 			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 
-				// Reset the values of interpolated velocity
-				std::fill(iBody[ib].markers[m].interpVel.begin(), iBody[ib].markers[m].interpVel.end(), 0.0);
+				// Reset the values of interpolated velocity and density
+				std::fill(iBody[ib].markers[m].interpMom.begin(), iBody[ib].markers[m].interpMom.end(), 0.0);
+				iBody[ib].markers[m].interpRho = 0.0;
 
 				// Loop over support nodes
 				for (size_t i = 0; i < iBody[ib].markers[m].deltaval.size(); i++) {
@@ -435,22 +436,47 @@ void ObjectManager::ibm_interpolate(int level) {
 					// Only interpolate over data this rank actually owns at the moment
 					if (rank == iBody[ib].markers[m].support_rank[i]) {
 
+
+						// Interpolate density
+#if (L_DIMS == 2)
+						iBody[ib].markers[m].interpRho += iBody[ib]._Owner->rho(
+								iBody[ib].markers[m].supp_i[i],
+								iBody[ib].markers[m].supp_j[i], M_lim) *
+								iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+#else
+						iBody[ib].markers[m].interpRho += iBody[ib]._Owner->rho(
+								iBody[ib].markers[m].supp_i[i],
+								iBody[ib].markers[m].supp_j[i],
+								iBody[ib].markers[m].supp_k[i],
+								M_lim, K_lim) *
+								iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+#endif
+
 						// Loop over directions x y z
 						for (int dir = 0; dir < L_DIMS; dir++) {
 
 							// Read given velocity component from support node, multiply by delta function
 							// for that support node and sum to get interpolated velocity.
-#if (L_DIMS == 3)
-							iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
+#if (L_DIMS == 2)
+
+							iBody[ib].markers[m].interpMom[dir] += iBody[ib]._Owner->rho(
+									iBody[ib].markers[m].supp_i[i],
+									iBody[ib].markers[m].supp_j[i], M_lim) *
+									iBody[ib]._Owner->u(
+									iBody[ib].markers[m].supp_i[i],
+									iBody[ib].markers[m].supp_j[i],
+									dir, M_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
+#else
+							iBody[ib].markers[m].interpMom[dir] += iBody[ib]._Owner->rho(
+									iBody[ib].markers[m].supp_i[i],
+									iBody[ib].markers[m].supp_j[i],
+									iBody[ib].markers[m].supp_k[i],
+									M_lim, K_lim) *
+									iBody[ib]._Owner->u(
 									iBody[ib].markers[m].supp_i[i],
 									iBody[ib].markers[m].supp_j[i],
 									iBody[ib].markers[m].supp_k[i],
 									dir, M_lim, K_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
-#else
-							iBody[ib].markers[m].interpVel[dir] += iBody[ib]._Owner->u(
-									iBody[ib].markers[m].supp_i[i],
-									iBody[ib].markers[m].supp_j[i],
-									dir, M_lim, L_DIMS) * iBody[ib].markers[m].deltaval[i] * iBody[ib].markers[m].local_area;
 #endif
 						}
 					}
@@ -491,7 +517,7 @@ void ObjectManager::ibm_computeForce(int level) {
 				for (int dir = 0; dir < L_DIMS; dir++) {
 
 					// Compute restorative force (in lattice units)
-					iBody[ib].markers[m].force_xyz[dir] = 2.0 * (iBody[ib].markers[m].interpVel[dir] - iBody[ib].markers[m].markerVel[dir]) / 1.0;
+					iBody[ib].markers[m].force_xyz[dir] = 2.0 * (iBody[ib].markers[m].interpMom[dir] - iBody[ib].markers[m].interpRho * iBody[ib].markers[m].markerVel[dir]) / 1.0;
 				}
 			}
 		}
@@ -512,6 +538,9 @@ void ObjectManager::ibm_spread(int level) {
 		// Only spread the bodies that exist on this grid level
 		if (iBody[ib]._Owner->level == level) {
 
+			// Get volume scaling
+			double volWidth, volDepth;
+
 			// Get grid sizes
 			size_t M_lim = iBody[ib]._Owner->M_lim;
 			size_t K_lim = iBody[ib]._Owner->K_lim;
@@ -525,6 +554,13 @@ void ObjectManager::ibm_spread(int level) {
 					// Only interpolate over data this rank actually owns at the moment
 					if (rank == iBody[ib].markers[m].support_rank[s]) {
 
+						// Set volume scaling
+						volWidth = iBody[ib].markers[m].epsilon;
+						volDepth = 1.0;
+#if (L_DIMS == 3)
+						volDepth = iBody[ib].markers[m].epsilon;
+#endif
+
 						// Loop over directions x y z
 						for (size_t dir = 0; dir < L_DIMS; dir++) {
 
@@ -536,7 +572,7 @@ void ObjectManager::ibm_spread(int level) {
 									dir, M_lim, K_lim, L_DIMS) -=
 									iBody[ib].markers[m].deltaval[s] *
 									iBody[ib].markers[m].force_xyz[dir] *
-									iBody[ib].markers[m].epsilon *
+									volWidth * volDepth *
 									iBody[ib].spacing / iBody[ib]._Owner->dh;
 						}
 					}
@@ -1019,7 +1055,9 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 
 		// Loop through markers
 		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpVel[eXDirection] << "\t" << iBody[ib].markers[m].interpVel[eYDirection] << "\t" << iBody[ib].markers[m].interpVel[eZDirection] << std::endl;
+			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpMom[eXDirection] / iBody[ib].markers[m].interpRho << "\t" <<
+														  iBody[ib].markers[m].interpMom[eYDirection] / iBody[ib].markers[m].interpRho << "\t" <<
+														  iBody[ib].markers[m].interpMom[eZDirection] / iBody[ib].markers[m].interpRho << std::endl;
 		}
 		predout << std::endl;
 		predout.close();

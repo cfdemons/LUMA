@@ -65,9 +65,15 @@ void ObjectManager::ibm_interpolateOffRankVels(int level) {
 			s = mpim->supportCommMarkerSide[i].supportID;
 			fromRank = mpim->supportCommMarkerSide[i].rankComm;
 
+			// Interpolate density
+			iBody[ib].markers[m].interpRho += interpVels[fromRank][idx[fromRank]] * iBody[ib].markers[m].deltaval[s] * iBody[ib].markers[m].local_area;
+
+			// Shift index
+			idx[fromRank]++;
+
 			// Interpolate these values
 			for (int dir = 0; dir < L_DIMS; dir++)
-				iBody[ib].markers[m].interpVel[dir] += interpVels[fromRank][dir+idx[fromRank]] * iBody[ib].markers[m].deltaval[s] * iBody[ib].markers[m].local_area;
+				iBody[ib].markers[m].interpMom[dir] += interpVels[fromRank][dir+idx[fromRank]] * iBody[ib].markers[m].deltaval[s] * iBody[ib].markers[m].local_area;
 
 			// Shift index
 			idx[fromRank] += L_DIMS;

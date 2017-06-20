@@ -46,10 +46,17 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 			m = supportCommMarkerSide[i].markerIdx;
 			s = supportCommMarkerSide[i].supportID;
 
+			// Get volume scaling
+			double volWidth = objman->iBody[ib].markers[m].epsilon;
+			double volDepth = 1.0;
+#if (L_DIMS == 3)
+			volDepth = objman->iBody[ib].markers[m].epsilon;
+#endif
+
 			// Pack into buffer
 			for (int dir = 0; dir < L_DIMS; dir++) {
 				sendForce[toRank].push_back(objman->iBody[ib].markers[m].deltaval[s] * objman->iBody[ib].markers[m].force_xyz[dir] *
-						objman->iBody[ib].markers[m].epsilon * objman->iBody[ib].spacing / objman->iBody[ib]._Owner->dh);
+						volWidth * volDepth * objman->iBody[ib].spacing / objman->iBody[ib]._Owner->dh);
 			}
 		}
 	}
@@ -119,14 +126,26 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 			// Get indices
 			idx = supportCommSupportSide[i].supportIdx;
 
-			// Pack velocity into buffer
+			// Pack density and momentum into buffer
 #if (L_DIMS == 2)
-			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eXDirection, M_lim, L_DIMS));
-			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eYDirection, M_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], M_lim));
+
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], M_lim) *
+									  objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eXDirection, M_lim, L_DIMS));
+
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], M_lim) *
+									  objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], eYDirection, M_lim, L_DIMS));
 #elif (L_DIMS == 3)
-			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eXDirection, M_lim, K_lim, L_DIMS));
-			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eYDirection, M_lim, K_lim, L_DIMS));
-			sendVel[toRank].push_back(objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eZDirection, M_lim, K_lim, L_DIMS));
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], idx[eZDirection], M_lim, K_lim));
+
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], idx[eZDirection], M_lim, K_lim) *
+									  objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eXDirection, M_lim, K_lim, L_DIMS));
+
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], idx[eZDirection], M_lim, K_lim) *
+									  objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eYDirection, M_lim, K_lim, L_DIMS));
+
+			sendVel[toRank].push_back(objman->iBody[ib]._Owner->rho(idx[eXDirection], idx[eYDirection], idx[eZDirection], M_lim, K_lim) *
+									  objman->iBody[ib]._Owner->u(idx[eXDirection], idx[eYDirection], idx[eZDirection], eZDirection, M_lim, K_lim, L_DIMS));
 #endif
 		}
 	}
@@ -145,7 +164,7 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 	std::vector<int> bufferSize(num_ranks, 0);
 	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
 		if (objman->iBody[objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID]]._Owner->level == level)
-			bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS;
+			bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS + 1;
 	}
 
 	// Now receive the velocity values

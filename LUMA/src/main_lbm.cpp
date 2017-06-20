@@ -436,7 +436,7 @@ int main( int argc, char* argv[] )
 #endif
 
 		// Write out forces of objects
-#ifdef L_LD_OUT
+#if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
 		if (Grids->t % L_OUT_EVERY_FORCES == 0) {
 
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;

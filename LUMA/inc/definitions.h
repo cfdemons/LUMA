@@ -61,10 +61,10 @@
 *******************************************************************************
 */
 
-const int resFactor = 1;
+const int resFactor = 4;
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY (resFactor*resFactor*200)			///< How many timesteps before whole grid output
@@ -121,7 +121,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
@@ -180,11 +180,11 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 //#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 /*

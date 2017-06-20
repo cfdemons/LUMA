@@ -1065,6 +1065,7 @@ void GridObj::LBM_initBoundLab ( ) {
 #if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL
 
 	int i, j, k;
+	double delta = dh / 1000.0;
 
 
 #ifdef L_INLET_ON
@@ -1079,7 +1080,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] <= dh / 2.0) {		// Wall found
+		if (XPos[i] <= dh / 2.0 + delta) {		// Wall found
 
 			// Label inlet
 			for (j = 0; j < M_lim; j++) {
@@ -1101,7 +1102,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] >= L_BX - dh / 2.0) {		// Wall found
+		if (XPos[i] >= L_BX - dh / 2.0 - delta) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {

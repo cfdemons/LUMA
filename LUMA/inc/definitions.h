@@ -199,10 +199,12 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Inlet (left-hand wall)
 #define L_INLET_ON				///< Turn on inlet boundary
+#define L_INLET_RAMP 2.0		///< Ramp up the inlet velocity (this value is the time over which to ramp)
 
 // Outlet (right-hand wall)
-#define L_OUTLET_ON				///< Turn on outlet boundary
-#define EXTRAPOLATED_OUTLET		///< Extrapolate the velocity from the outlet
+#define L_OUTLET_ON					///< Turn on outlet boundary
+//#define L_EXTRAPOLATED_OUTLET		///< Extrapolate the velocity from the outlet
+#define L_PRESSURE_OUTLET 0.0		///< Fixed pressure outlet (this value is the delta)
 
 // Solids
 #define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)

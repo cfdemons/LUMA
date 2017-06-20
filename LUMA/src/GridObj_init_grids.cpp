@@ -189,11 +189,7 @@ void GridObj::LBM_initVelocity ( ) {
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
 
-				// Inlet sites are an exception to the no flow setting
-				if (LatTyp(i, j, k, M_lim, K_lim) == eInlet)
-#endif
-
-				{
+#else
 
 					/* Input velocity is specified by individual vectors for x, y and z which
 					 * have either been read in from an input file or defined by an expression
@@ -204,8 +200,7 @@ void GridObj::LBM_initVelocity ( ) {
 					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
-				}
-
+#endif
 
 				// Wall sites set to zero
 				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid)
@@ -217,8 +212,6 @@ void GridObj::LBM_initVelocity ( ) {
 #endif
 
 				}
-
-
 			}
 		}
 	}

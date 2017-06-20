@@ -90,6 +90,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 					for (int dir = 0; dir < L_DIMS; dir++)
 						jout << "\t" << 0.0;
 				}
+				jout << std::endl;
 			}
 
 			// Convert force per volume to force

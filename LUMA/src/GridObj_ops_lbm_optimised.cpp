@@ -300,26 +300,39 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	if (XPos[i] > 0.0 && XPos[i] < dh)
 	{
 
-		// If using parabolic inlet
-#ifdef L_PARABOLIC_INLET
-		ux = 1.5 * L_UX0 * (1 - pow((YPos[j] - dh - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
-#endif
-
-		// Assign wall velocity
-		normalVelocity = GridUnits::ud2ulbm(ux, this);
-
 		// Select the wall normal velocity direction
 		normalDirection = eXDirection;
 		normalVector[normalDirection] = 1;
 		edgeCount++;
+
+		// Inlet ramp
+		double rampCoefficient = 1.0;
+#ifdef L_INLET_RAMP
+		if(t * dt <= L_INLET_RAMP) {
+			rampCoefficient = (1.0 - cos(L_PI * t * dt / L_INLET_RAMP)) / 2.0;;
+		}
+		ux = rampCoefficient * L_UX0;
+#endif
+
+		// If using parabolic inlet
+#ifdef L_PARABOLIC_INLET
+		ux = rampCoefficient * 1.5 * L_UX0 * (1 - pow((YPos[j] - dh - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+#endif
+
+		// Set boundary normal velocity
+		normalVelocity = GridUnits::ud2ulbm(ux, this);
 	}
 
 	// Right wall
 	if (XPos[i] < L_BX && XPos[i] > L_BX - dh)
 	{
+		// Set normal directions
+		normalDirection = eXDirection;
+		normalVector[normalDirection] = -1;
+		edgeCount++;
 
 		// Extrapolate from previous lattice site (don't do on receiver layers)
-#ifdef EXTRAPOLATED_OUTLET
+#ifdef L_EXTRAPOLATED_OUTLET
 		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
 
 			// Get index of previous lattice site
@@ -332,12 +345,49 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 			uz = GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
 #endif
 		}
+
+		// Fixed pressure outlet (don't do on receiver layer
+#elif (defined L_PRESSURE_OUTLET)
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
+
+			// Get index of previous lattice site
+			int idBack = id - K_lim * M_lim;
+			int idBack2 = id - 2 * K_lim * M_lim;
+
+			// Get values at outlet
+			double rhoOutlet = L_RHOIN + (L_PRESSURE_OUTLET * (dh * SQ(dt)) / dm) / SQ(cs);
+			uy = (2.0 * GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eYDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
+#if (L_DIMS == 3)
+			uz = (2.0 * GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eZDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
 #endif
 
+			// Compute f_plus and f_0
+			for (int v = 0; v < L_NUM_VELS; ++v) {
+
+				// If has opposite normal direction component then part of f_plus
+				if (c_opt[v][normalDirection] == -normalVector[normalDirection])
+				{
+					// Add to known momentum leaving the domain
+					f_plus += fNew[v + id * L_NUM_VELS];
+
+				}
+				// If it is perpendicular to wall part of f_zero
+				else if (c_opt[v][normalDirection] == 0)
+				{
+					f_zero += fNew[v + id * L_NUM_VELS];
+				}
+			}
+
+			// Update density
+			ux = GridUnits::ulat2uphys(-1.0 + (2.0 * f_plus + f_zero) / rhoOutlet, this) / L_PHYSICAL_U;
+
+			// Reset to zero
+			f_plus = 0.0, f_zero = 0.0;
+		}
+#endif
+
+		// Set boundary normal velocity
 		normalVelocity = -GridUnits::ud2ulbm(ux, this);
-		normalDirection = eXDirection;
-		normalVector[normalDirection] = -1;
-		edgeCount++;
 	}
 
 	// Bottom wall

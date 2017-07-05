@@ -62,12 +62,13 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 	}
 
 	// Now send the values
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 
 		// Check if current rank needs to send stuff to rank toRank
 		if (sendForce[toRank].size() > 0) {
-			MPI_Request send_requests;
-			MPI_Isend(&sendForce[toRank].front(), sendForce[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &send_requests);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&sendForce[toRank].front(), sendForce[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -88,6 +89,9 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 			MPI_Recv(&spreadForces[fromRank].front(), spreadForces[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -151,12 +155,13 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 	}
 
 	// Now send the values
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 
 		// Check if current rank needs to send stuff to rank toRank
 		if (sendVel[toRank].size() > 0) {
-			MPI_Request send_requests;
-			MPI_Isend(&sendVel[toRank].front(), sendVel[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &send_requests);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&sendVel[toRank].front(), sendVel[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -177,6 +182,9 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 			MPI_Recv(&recvVel[fromRank].front(), recvVel[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 // ************************************************************************* //
@@ -214,10 +222,11 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 	}
 
 	// Loop through and post send if there is data
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
-			MPI_Request requestStatus;
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &requestStatus);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -257,6 +266,9 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 		objman->iBody[ib].markers[markerIdx].epsilon = recvBuffer[fromRank][idx[fromRank]];
 		idx[fromRank]++;
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -302,10 +314,11 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 	}
 
 	// Now loop through send buffer and send to appropriate ranks
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
-			MPI_Request requestStatus;
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &requestStatus);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -326,6 +339,9 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 // ************************************************************************* //
@@ -373,10 +389,11 @@ void MpiManager::mpi_getIBMarkers() {
 	}
 
 	// Loop through and send
+	std::vector<MPI_Request> sendRequests;
 	for (toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
-			MPI_Request requestStatus;
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &requestStatus);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -405,6 +422,9 @@ void MpiManager::mpi_getIBMarkers() {
 			epsCommOwnerSide.emplace_back(fromRank, ib, m);
 		}
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -438,10 +458,11 @@ void MpiManager::mpi_buildEpsComms() {
 	}
 
 	// Now loop through and send to required ranks
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (nSupportSitesSend[toRank].size() > 0) {
-			MPI_Request requestStatus;
-			MPI_Isend(&nSupportSitesSend[toRank].front(), nSupportSitesSend[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &requestStatus);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&nSupportSitesSend[toRank].front(), nSupportSitesSend[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -463,6 +484,9 @@ void MpiManager::mpi_buildEpsComms() {
 		epsCommOwnerSide[i].nSupportSites = nSupportSitesRecv[epsCommOwnerSide[i].rankComm][idx[epsCommOwnerSide[i].rankComm]];
 		idx[epsCommOwnerSide[i].rankComm]++;
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 // ************************************************************************* //
@@ -524,13 +548,15 @@ void MpiManager::mpi_buildSupportComms() {
 	}
 
 	// Loop through all sends that are required
+	std::vector<MPI_Request> sendRequests;
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 
 		// Check if it has stuff to send to rank toRank
 		if (nSupportsToRecv[toRank] > 0) {
-			MPI_Request requestStatusPos, requestStatusIDs;
-			MPI_Isend(&supportPositions[toRank].front(), supportPositions[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &requestStatusPos);
-			MPI_Isend(&bodyIDs[toRank].front(), bodyIDs[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &requestStatusIDs);
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&supportPositions[toRank].front(), supportPositions[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			sendRequests.push_back(MPI_REQUEST_NULL);
+			MPI_Isend(&bodyIDs[toRank].front(), bodyIDs[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -574,6 +600,9 @@ void MpiManager::mpi_buildSupportComms() {
 			supportCommSupportSide.emplace_back(fromRank, bodyIDsRecv[fromRank][i], nearijk);
 		}
 	}
+
+	// If sending any messages then wait for request status
+	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 // ************************************************************************** //

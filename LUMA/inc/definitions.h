@@ -64,17 +64,17 @@
 const int resFactor = 1;
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*50)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY (resFactor*resFactor*1)			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES (resFactor*resFactor*1)		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -111,7 +111,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (resFactor*resFactor*500)		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS (resFactor*resFactor*10)		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,13 +137,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 3				///< Number of dimensions to the problem
-#define L_RESOLUTION (resFactor*5)			///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP (0.01/(resFactor*resFactor))			///< The timestep in non-dimensional units
+#define L_DIMS 2									///< Number of dimensions to the problem
+#define L_RESOLUTION (resFactor*1)					///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP (0.001/(resFactor*resFactor))	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 25.0								///< End of domain in X (non-dimensional units)
-#define L_BY 20.0		///< End of domain in Y (non-dimensional units)
+#define L_BX 20.0								///< End of domain in X (non-dimensional units)
+#define L_BY 20.0								///< End of domain in Y (non-dimensional units)
 #define L_BZ 20.0								///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -224,8 +224,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
-#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 0		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)

@@ -465,11 +465,23 @@ void ObjectManager::io_readInGeomConfig() {
 
 			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
+
+
 			// Sort data
 			std::vector<double> start_position, angles;
 			start_position.push_back(startX);
-			start_position.push_back(startY + _Grids->dh);
-			start_position.push_back(startZ);
+			start_position.push_back(startY + shiftY);
+			start_position.push_back(startZ + shiftZ);
 			angles.push_back(angleVert);
 			angles.push_back(angleHorz);
 
@@ -533,11 +545,22 @@ void ObjectManager::io_readInGeomConfig() {
 
 			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
 
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
+
 			// Sort data
 			std::vector<double> centre_point, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY + _Grids->dh);
-			centre_point.push_back(centreZ);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
@@ -594,11 +617,22 @@ void ObjectManager::io_readInGeomConfig() {
 
 			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
 
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
+
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY + _Grids->dh);
-			centre_point.push_back(centreZ);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
 			dimensions.push_back(length);
 			dimensions.push_back(height);
 			dimensions.push_back(depth);

@@ -182,6 +182,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
 #define L_IBM_ON						///< Turn on IBM

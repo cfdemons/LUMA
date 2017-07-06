@@ -18,10 +18,12 @@
 #include "stdafx.h"
 
 // Forward declarations
-#include "Body.h"	// This is a templated class so include the whole file
+#include "Body.h"		// This is a templated class so include the whole file
+#include "FEMBody.h"
 class IBMarker;
 class PCpts;
 class GridObj;
+class FEMBody;
 
 /// \brief	Immersed boundary body.
 class IBBody : public Body<IBMarker> {
@@ -29,6 +31,7 @@ class IBBody : public Body<IBMarker> {
 	// Add friend classes so they can access the protected data of IBBody objects
 	friend class ObjectManager;
 	friend class IBInfo;
+	friend class FEMBody;
 
 public:
 	// Constructor and destructor
@@ -47,7 +50,7 @@ public:
 
 	// Custom constructor for building prefab filament
 	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
+		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElement, bool clamped, double density, double E);
 
 	// Custom constructor for building dummy iBody for epsilon calculation
 	IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer);
@@ -59,6 +62,8 @@ protected:
 
 	bool isFlexible;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool isMovable;						///< Flag to indicate if body is movable or not.
+
+	FEMBody *fBody;						///< Pointer to FEM body object
 
 
 	/************** Member Methods **************/

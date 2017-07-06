@@ -172,6 +172,7 @@ public:
 
 	// IO methods //
 	void io_vtkBodyWriter(int tval);				// VTK body writer wrapper
+	void io_vtkFEMWriter(int tval);					// VTK FEM writer
 	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
 	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
 	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level

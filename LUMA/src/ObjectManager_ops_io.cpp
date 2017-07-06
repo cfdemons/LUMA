@@ -458,10 +458,15 @@ void ObjectManager::io_readInGeomConfig() {
 			double startY; file >> startY;
 			double startZ; file >> startZ;
 			double length; file >> length;
+			double height; file >> height;
+			double depth; file >> depth;
 			double angleVert; file >> angleVert;
 			double angleHorz; file >> angleHorz;
+			std::string nElementsString; file >> nElementsString;
 			std::string flex_rigid; file >> flex_rigid;
 			std::string BC; file >> BC;
+			double density; file >> density;
+			double YoungMod; file >> YoungMod;
 
 			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
@@ -476,7 +481,6 @@ void ObjectManager::io_readInGeomConfig() {
 #endif
 #endif
 
-
 			// Sort data
 			std::vector<double> start_position, angles;
 			start_position.push_back(startX);
@@ -484,6 +488,7 @@ void ObjectManager::io_readInGeomConfig() {
 			start_position.push_back(startZ + shiftZ);
 			angles.push_back(angleVert);
 			angles.push_back(angleHorz);
+
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
@@ -512,9 +517,18 @@ void ObjectManager::io_readInGeomConfig() {
 			// If rank has grid
 			if (g != NULL) {
 
+				// Get number of elements to use in FEM
+				double nElements;
+				if (nElementsString == "CONFORMING") {
+					nElements = floor(length / g->dh);
+				}
+				else {
+					nElements = stod(nElementsString);
+				}
+
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles, moveProperty, clamped);
+					iBody.emplace_back(g, iBodyID+pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
 				}
 				else if (boundaryType == "BFL") {
 					pBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles);
@@ -679,10 +693,20 @@ void ObjectManager::io_readInGeomConfig() {
 	}
 	file.close();
 
-	// Create the vector containing the mapping from global body ID to local index in iBody vector
+	// Some sorting out to do after building everything
 	bodyIDToIdx.resize(iBodyID, -1);
-	for (int ib = 0; ib < iBody.size(); ib++)
+	int rank = GridUtils::safeGetRank();
+
+	// Set index mapping and reset FEM to IBM pointers
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Create vector which maps the bodyID to it's index in the iBody vector
 		bodyIDToIdx[iBody[ib].id] = ib;
+
+		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
+		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank)
+			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
+	}
 }
 
 
@@ -1005,4 +1029,90 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 	}
 
 }
+
+
+// ************************************************************************** //
+/// \brief	Wrapper for writing body position data to VTK file.
+///
+/// \param	tval	time value at which the write out is being performed.
+void ObjectManager::io_vtkFEMWriter(int tval)
+{
+
+	// Get the rank
+	int rank = GridUtils::safeGetRank();
+
+	// Create string and file streams
+	std::stringstream fileName;
+	std::ofstream fout;
+
+	// Switch flag for opening file
+	bool switchFlag = false;
+
+	// Number of nodes and lines
+	int nNodes = 0, nLines = 0;
+	std::vector<int> nLinesBody;
+
+    // Loop through all bodies
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Check if body is flexible and if this rank owns it
+		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
+
+			// Increment number of nodes and lines
+			nNodes += iBody[ib].fBody->node.size();
+			nLines += iBody[ib].fBody->node.size() - 1;
+			nLinesBody.push_back(iBody[ib].fBody->node.size() - 1);
+
+			// If first body that is found then open file
+			if (switchFlag == false) {
+				fileName << GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
+				fout.open(fileName.str().c_str());
+				switchFlag = true;
+			}
+		}
+		else if (ib == iBody.size()-1 && switchFlag == false)
+			return;
+	}
+
+	// Add header information
+	fout << "# vtk DataFile Version 3.0f\n";
+	fout << "Output for rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
+	fout << "ASCII\n";
+	fout << "DATASET POLYDATA\n";
+
+	// Write out the positions of each Lagrange marker
+	fout << "POINTS " << nNodes << " float\n";
+
+    // Loop through all bodies
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Check if body is flexible and if this rank owns it
+		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
+			for (int m = 0; m < iBody[ib].fBody->node.size(); m++) {
+
+				// Write out positions
+				fout << iBody[ib].fBody->node[m].position[eXDirection] << " "
+					 << iBody[ib].fBody->node[m].position[eYDirection] << " "
+					 << iBody[ib].fBody->node[m].position[eZDirection] << std::endl;
+			}
+		}
+	}
+
+	// Write out the connectivity of each Lagrange marker
+	fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+
+	// Loop through number of lines
+	int count = 0;
+	for (int i = 0; i < nLinesBody.size(); i++) {
+		for (int j = 0; j < nLinesBody[i]; j++) {
+			fout << 2 << " " << count << " " << count + 1 << std::endl;
+			count++;
+		}
+		count++;
+	}
+
+	// Close file
+	fout.close();
+}
+
 // *****************************************************************************

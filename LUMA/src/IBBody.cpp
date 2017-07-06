@@ -46,6 +46,9 @@ IBBody::~IBBody(void)
 void IBBody::initialise(eMoveableType moveProperty)
 {
 
+	// Set FEM body pointer to NULL (if required it will be set properly later)
+	fBody = NULL;
+
 	// Set movable and flexible parameters
 	if (moveProperty == eFlexible) {
 		this->isFlexible = true;
@@ -93,10 +96,19 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 /// \param moveProperty		determines if body is moveable, flexible or rigid
 /// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped)
+		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElements, bool clamped, double density, double E)
 		: Body(g, bodyID, start_position, length, angles)
 {
+
+	// Set some additional IBM parameters
 	initialise(moveProperty);
+
+	// Get current rank
+	int rank = GridUtils::safeGetRank();
+
+	// If body is flexible then create an FEM body
+	if (isFlexible == true && owningRank == rank)
+		fBody = new FEMBody(this, start_position, length, height, depth, angles, nElements, clamped, density, E);
 }
 
 

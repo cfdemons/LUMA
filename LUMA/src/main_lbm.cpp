@@ -342,6 +342,11 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
+#ifdef L_VTK_FEM_WRITE
+	*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+	objMan->io_vtkFEMWriter(Grids->t);
+#endif
+
 #ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation
 	MPI_Barrier(mpim->world_comm);
@@ -415,6 +420,11 @@ int main( int argc, char* argv[] )
 #ifdef L_VTK_BODY_WRITE
 			*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
 			objMan->io_vtkBodyWriter(Grids->t);
+#endif
+
+#ifdef L_VTK_FEM_WRITE
+			*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+			objMan->io_vtkFEMWriter(Grids->t);
 #endif
 
 #if (defined L_IBM_ON && defined L_IBBODY_TRACER)

@@ -64,7 +64,7 @@
 const int resFactor = 1;
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY (resFactor*resFactor*1)			///< How many timesteps before whole grid output
@@ -182,7 +182,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
-#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
+//#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
 #define L_IBM_ON						///< Turn on IBM

@@ -99,8 +99,6 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElements, bool clamped, double density, double E)
 		: Body(g, bodyID, start_position, length, angles)
 {
-
-	// Set some additional IBM parameters
 	initialise(moveProperty);
 
 	// Get current rank

@@ -68,3 +68,26 @@ FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 	// Initialise internal forces to zero
 	F.resize(DOFs, 0.0);
 }
+
+
+// \brief Constructor for parent element class.
+FEMElement::FEMChildNodes::FEMChildNodes() {
+
+	// Set default values
+	nodeID = 0;
+	zeta1 = 0.0;
+	zeta2 = 0.0;
+}
+
+// \brief Destructor for parent element class.
+FEMElement::FEMChildNodes::~FEMChildNodes() {
+}
+
+// \brief Constructor for parent element class.
+FEMElement::FEMChildNodes::FEMChildNodes(int node, double zetaA, double zetaB) {
+
+	// Set default values
+	nodeID = node;
+	zeta1 = zetaA;
+	zeta2 = zetaB;
+}

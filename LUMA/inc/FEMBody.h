@@ -30,6 +30,28 @@ class FEMBody {
 	friend class ObjectManager;
 
 
+	/************** Nested classes **************/
+	/// \brief	Nested parent element class for each IBM node.
+	///
+	///			Stores which element and where along it each IBM
+	///			node sits.
+	class IBMParentElements {
+
+		// Set friend class
+		friend class FEMBody;
+
+		// Constructor and destructor
+	public:
+		IBMParentElements();
+		~IBMParentElements();
+
+		// Members
+	private:
+		int elementID;
+		double zeta;
+	};
+
+
 	/************** Constructors **************/
 	FEMBody();
 	~FEMBody();
@@ -51,8 +73,8 @@ class FEMBody {
 	double NRResidual;			///< Residual Newton-Raphson solver reached
 
 	// Nodes and elements
-	std::vector<FEMNode> node;				///< Vector of FEM nodes
-	std::vector<FEMElement> element;		///< Vector of FEM elements
+	std::vector<FEMNode> nodes;				///< Vector of FEM nodes
+	std::vector<FEMElement> elements;		///< Vector of FEM elements
 
 	// System matrices
 	std::vector<std::vector<double>> M;			///< Mass matrix
@@ -65,8 +87,12 @@ class FEMBody {
 	std::vector<double> Udot;					///< Vector velocities
 	std::vector<double> Udotdot;				///< Vector of accelerations
 
+	// Vector of parent elements for each IBM node
+	std::vector<IBMParentElements> IBNodeParents;
+
 
 	/************** Member Methods **************/
+	void computeNodeMapping(int nIBMNodes, int nFEMNodes);		// Compute mapping between FEM and IBM nodes
 
 };
 

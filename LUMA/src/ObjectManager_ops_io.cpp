@@ -1059,9 +1059,9 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
 
 			// Increment number of nodes and lines
-			nNodes += iBody[ib].fBody->node.size();
-			nLines += iBody[ib].fBody->node.size() - 1;
-			nLinesBody.push_back(iBody[ib].fBody->node.size() - 1);
+			nNodes += iBody[ib].fBody->nodes.size();
+			nLines += iBody[ib].fBody->nodes.size() - 1;
+			nLinesBody.push_back(iBody[ib].fBody->nodes.size() - 1);
 
 			// If first body that is found then open file
 			if (switchFlag == false) {
@@ -1088,12 +1088,12 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 
 		// Check if body is flexible and if this rank owns it
 		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-			for (int m = 0; m < iBody[ib].fBody->node.size(); m++) {
+			for (int m = 0; m < iBody[ib].fBody->nodes.size(); m++) {
 
 				// Write out positions
-				fout << iBody[ib].fBody->node[m].position[eXDirection] << " "
-					 << iBody[ib].fBody->node[m].position[eYDirection] << " "
-					 << iBody[ib].fBody->node[m].position[eZDirection] << std::endl;
+				fout << iBody[ib].fBody->nodes[m].position[eXDirection] << " "
+					 << iBody[ib].fBody->nodes[m].position[eYDirection] << " "
+					 << iBody[ib].fBody->nodes[m].position[eZDirection] << std::endl;
 			}
 		}
 	}

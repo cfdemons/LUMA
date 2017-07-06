@@ -24,6 +24,31 @@ class FEMElement {
 	friend class FEMBody;
 
 
+	/************** Nested classes **************/
+	/// \brief	Nested child IBM node class for FEM elements.
+	///
+	///			Stores which nodes and where along itself each IBM
+	///			node sits.
+	class FEMChildNodes {
+
+		// Set friend class
+		friend class FEMBody;
+
+		// Constructor and destructor
+	public:
+		FEMChildNodes();
+		~FEMChildNodes();
+
+		// Custom constructor for initialising vector element
+		FEMChildNodes(int node, double zetaA, double zetaB);
+
+		// Members
+	private:
+		int nodeID;
+		double zeta1;
+		double zeta2;
+	};
+
 	/************** Constructors **************/
 public:
 	FEMElement();
@@ -52,6 +77,9 @@ private:
 
 	// Internal forces
 	std::vector<double> F;				///< Vector of internal forces
+
+	// Vector of child IBM nodes which exist along this element
+	std::vector<FEMChildNodes> IBChildNodes;		///< Vector of child IBM nodes which exist along this element
 
 
 	/************** Member Methods **************/

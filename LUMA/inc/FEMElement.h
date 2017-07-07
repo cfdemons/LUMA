@@ -62,21 +62,24 @@ public:
 private:
 
 	// Element ID
-	int ID;								///< Element ID in FEM body
+	int ID;											///< Element ID in FEM body
 
 	// Geometry properties
-	double length0;						///< Initial length of element
-	double length;						///< Current length of element
-	double angles;			///< Current orientation of element
-	double area;						///< Cross-sectional area of element
-	double I;				///< Second moment areas
+	double length0;									///< Initial length of element
+	double length;									///< Current length of element
+	double angles;									///< Current orientation of element
+	double area;									///< Cross-sectional area of element
+	double I;										///< Second moment areas
 
 	// Structural properties
-	double E;							///< Youngs modulus
-	double density;						///< Material density
+	double E;										///< Youngs modulus
+	double density;									///< Material density
+
+	// Transformation matrix
+	std::vector<std::vector<double>> T;				///< Local transformation matrix
 
 	// Internal forces
-	std::vector<double> F;				///< Vector of internal forces
+	std::vector<double> F;							///< Vector of internal forces
 
 	// Vector of child IBM nodes which exist along this element
 	std::vector<FEMChildNodes> IBChildNodes;		///< Vector of child IBM nodes which exist along this element

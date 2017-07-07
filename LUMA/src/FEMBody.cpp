@@ -173,7 +173,7 @@ void FEMBody::newtonRaphsonIterator () {
 	setNewmark(M_hat, K_hat, RmF_hat);
 
 	// Solve linear system using LAPACK library
-	GridUtils::solveLinearSystem(K_hat, RmF_hat, delU_hat);
+	delU_hat = GridUtils::solveLinearSystem(K_hat, RmF_hat);
 
 	// Assign displacement to delU
 	for (int i = 0; i < systemDOFs - BC_DOFs; i++) {
@@ -235,6 +235,58 @@ void FEMBody::updateVelocityAndAcceleration () {
 //
 void FEMBody::constructMassMat () {
 
+	// Initialise arrays and matrices for calculating mass matrix
+	std::vector<std::vector<double>> Mglobal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+	std::vector<std::vector<double>> Mlocal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+
+	// Reset mass matrix to zero
+	for (int i = 0; i < M.size(); i++) {
+		fill(M[i].begin(), M[i].end(), 0.0);
+	}
+
+	// Coefficients
+	double A, rho, I, L0, L, C1, C2;
+
+	// Loop through each element and create stiffness matrix
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Coefficients
+		A = elements[el].area;
+		rho = elements[el].density;
+		I = elements[el].I;
+		L0 = elements[el].length0;
+		L = elements[el].length;
+		C1 = rho * A * L0 / 420.0;
+		C2 = rho * I / (30.0 * L0);
+
+		// Construct part 1 of mass matrix (axial and transverse)
+		Mlocal[0][0] = C1 * 140.0;
+		Mlocal[0][3] = C1 * 70.0;
+		Mlocal[1][1] = C1 * 156.0;
+		Mlocal[1][2] = C1 * 22.0 * L0;
+		Mlocal[1][4] = C1 * 54;
+		Mlocal[1][5] = C1 * (-13.0 * L0);
+		Mlocal[2][2] = C1 * 4.0 * SQ(L0);
+		Mlocal[2][4] = C1 * 13.0 * L0;
+		Mlocal[2][5] = C1 * (-3.0 * SQ(L0));
+		Mlocal[3][3] = C1 * 140.0;
+		Mlocal[4][4] = C1 * 156.0;
+		Mlocal[4][5] = C1 * (-22.0 * L0);
+		Mlocal[5][5] = C1 * 4.0 * SQ(L0);
+
+		// Copy to the lower half (symmetrical matrix)
+		for (int i = 1; i < DOFsPerElement; i++) {
+			for (int j = 0; j < i; j++) {
+				Mlocal[i][j] = Mlocal[j][i];
+			}
+		}
+
+		// Multiply by transformation matrices to get global matrix for single element
+		Mglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Mlocal), elements[el].T);
+
+		// Add to global matrix
+		GridUtils::assembleGlobalMat(el, DOFsPerNode, Mglobal, M);
+	}
 }
 
 

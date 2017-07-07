@@ -808,7 +808,7 @@ void ObjectManager::ibm_findEpsilon() {
 		//////////////////
 
 		// Solve linear system
-		GridUtils::solveLinearSystem(A, bVector, epsilon[iBodyTemp[ib].id]);
+		epsilon[iBodyTemp[ib].id] = GridUtils::solveLinearSystem(A, bVector);
 	}
 
 	// Distribute the epsilon values back to the iBody

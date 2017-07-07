@@ -62,6 +62,15 @@ FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 	E = inputE;
 	density = inputDensity;
 
+	// Resize transformation matrix
+	T.resize(DOFs, std::vector<double>(DOFs, 0.0));
+
+	// Set to correct values
+	T[0][0] = T[1][1] =  T[3][3] = T[4][4] = cos(angles);
+	T[0][1] = T[3][4] = sin(angles);
+	T[1][0] = T[4][3] = -sin(angles);
+	T[2][2] = T[5][5] =  1.0;
+
 	// Initialise internal forces to zero
 	F.resize(DOFs, 0.0);
 }

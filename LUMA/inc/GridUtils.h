@@ -66,8 +66,11 @@ public:
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
 	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);	// Function: crossprod
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
+	static std::vector<std::vector<double>> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B); // Function: matrix_multiply
 	static std::vector<double> divide(std::vector<double> vec1, double scalar);					// Divide vector by a scalar
-	static void solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> &b, std::vector<double> &x);	// Solve A.x = b
+	static std::vector<std::vector<double>> matrix_transpose(std::vector<std::vector<double>> &origMat);			// Transpose a matrix
+	static void assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat);		// Assemble global matrix
+	static std::vector<double> solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b);		// Solve A.x = b
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite

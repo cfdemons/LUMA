@@ -280,6 +280,37 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 	return product;
 }
 
+
+// *****************************************************************************
+/// \brief	Multiplies matrix A by matrix B.
+/// \param	A	a matrix represented as a vector or vectors.
+/// \param	B	a matrix represented as a vector or vectors.
+/// \return	a matrx which is A * B.
+std::vector<std::vector<double>> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B) {
+
+	// Check to makes sure dimensions are correct
+	if (A[0].size() != B.size()) {
+		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile);
+	}
+
+	// Initialise answer
+	std::vector<std::vector<double>> product(A.size(), std::vector<double>(B[0].size(), 0.0));
+
+	// Do multiplication
+    for (size_t row = 0; row < A.size(); row++) {
+        for (size_t col = 0; col < B[0].size(); col++) {
+        	for (size_t k = 0; k < A[0].size(); k++) {
+
+        		// Multiply the row of A by the column of B to get the row, column of product.
+        		product[row][col] += A[row][k] * B[k][col];
+        	}
+		}
+	}
+
+    // Return
+	return product;
+}
+
 // *****************************************************************************
 /// \brief	Computes the vector divided by the scalar.
 /// \param	vec1	a vector.
@@ -298,8 +329,49 @@ std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
 }
 
 
-// Solve the system A.x = b using LAPACK
-void GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> &b, std::vector<double> &x) {
+// *****************************************************************************
+/// \brief	Tranpose a matrix.
+/// \param	origMat		original matrix.
+/// \return	transMat	transposed matrix.
+std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::vector<double>> &origMat) {
+
+	// Intialise tranpose
+	std::vector<std::vector<double>> transMat(origMat[0].size(), std::vector<double>(origMat.size(), 0.0));
+
+	// Loop over matrix and swap i and j values
+	for (int i = 0; i < origMat.size(); i++) {
+		for (int j = 0; j < origMat[0].size(); j++) {
+			transMat[j][i] = origMat[i][j];
+		}
+	}
+
+	// Return
+	return transMat;
+}
+
+
+
+// *****************************************************************************
+/// \brief	Tranpose a matrix.
+/// \param	origMat		original matrix.
+/// \return	transMat	transposed matrix.
+void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (int i = 0; i < localMat.size(); i++) {
+		for (int j = 0; j < localMat[i].size(); j++) {
+			globalMat[i+el*offset][j+el*offset] += localMat[i][j];
+		}
+	}
+}
+
+
+// *****************************************************************************
+/// \brief	Solve the linear system A.x = b
+/// \param	A	A.
+/// \param	b	b.
+/// \return	x	x.
+std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b) {
 
 	// Set up the correct values
 	char trans = 'T';
@@ -310,7 +382,7 @@ void GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vect
     int info;
     int ipiv[dim];
 
-    // Put A into 1D array
+    // Put A into 1D array	// TODO Sort out how this is done so no need to tranpose it
     std::vector<double> a(dim * dim, 0.0);
     for (int i = 0; i < dim; i++) {
     	for (int j = 0; j < dim; j++) {
@@ -318,16 +390,12 @@ void GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vect
     	}
     }
 
-    // Create right hand side so b doesn't get overwritten
-    std::vector<double> rhs(dim, 0.0);
-    rhs = b;
-
     // Factorise and solve
 	dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
-	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *rhs.begin(), &LDB, &info);
+	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
 
-	// Set to x
-	x = rhs;
+	// Return
+	return b;
 }
 
 // *****************************************************************************

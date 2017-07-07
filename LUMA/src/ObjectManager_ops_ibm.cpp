@@ -23,6 +23,47 @@
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply(int level) {
 
+	// Interpolate the velocity onto the markers
+	ibm_interpolate(level);
+
+	// Compute force
+	ibm_computeForce(level);
+
+	// Spread force
+	ibm_spread(level);
+
+	// Update the macroscopic values
+	ibm_updateMacroscopic(level);
+
+	// Perform FEM
+	ibm_moveBodies(level);
+}
+
+
+
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_moveBodies(int level) {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Loop through bodies and apply FEM
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Only do if on this grid level and this rank owns it and it is flexible
+		if (iBody[ib].owningRank == rank && iBody[ib].isFlexible == true && iBody[ib]._Owner->level == level) {
+			iBody[ib].fBody->dynamicFEM();
+		}
+	}
+
+
+
 //	// Loop through all bodies and find support
 //	for (int ib = 0; ib < iBody.size(); ib++) {
 //
@@ -72,29 +113,7 @@ void ObjectManager::ibm_apply(int level) {
 //	if (hasMovingBodies)
 //		ibm_findEpsilon();
 
-	// Interpolate the velocity onto the markers
-	ibm_interpolate(level);
 
-	// Compute force
-	ibm_computeForce(level);
-
-	// Spread force
-	ibm_spread(level);
-
-	// Update the macroscopic values
-	ibm_updateMacroscopic(level);
-}
-
-
-
-
-// *****************************************************************************
-/// \brief	Moves iBodies after applying IBM.
-///
-///			Wrapper for relocating markers of an iBody be calling appropriate
-///			positional update routine.
-///
-void ObjectManager::ibm_moveBodies() {
 
 //	// Loop over bodies launching positional update if movable to compute new locations of markers
 //	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
@@ -778,12 +797,8 @@ void ObjectManager::ibm_findEpsilon() {
 		// Solve system //
 		//////////////////
 
-		// Settings
-		double tolerance = 1.0e-5;
-		int maxiterations = 2500;
-
-		// Biconjugate gradient stabilised method for solving asymmetric linear systems
-		double minimum_residual_achieved = ibm_bicgstab(A, bVector, epsilon[iBodyTemp[ib].id], tolerance, maxiterations);
+		// Solve linear system
+		GridUtils::solveLinearSystem(A, bVector, epsilon[iBodyTemp[ib].id]);
 	}
 
 	// Distribute the epsilon values back to the iBody

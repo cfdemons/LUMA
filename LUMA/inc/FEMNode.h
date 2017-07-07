@@ -40,8 +40,8 @@ private:
 	int ID;								///< Node ID in FEM body
 	std::vector<double> position0;		///< Initial position of FEM node
 	std::vector<double> position;		///< Current position of FEM node
-	std::vector<double> angles0;		///< Initial angles of FEM node
-	std::vector<double> angles;			///< Current angles of FEM node
+	double angles0;						///< Initial angles of FEM node
+	double angles;						///< Current angles of FEM node
 
 
 	/************** Member Methods **************/

@@ -92,6 +92,11 @@ class FEMBody {
 
 
 	/************** Member Methods **************/
+
+	// Main FEM solver methods
+	void dynamicFEM();											// Main outer routine for solving FEM
+
+	// Helper methods
 	void computeNodeMapping(int nIBMNodes, int nFEMNodes);		// Compute mapping between FEM and IBM nodes
 
 };

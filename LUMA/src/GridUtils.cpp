@@ -297,6 +297,39 @@ std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
 	return answer;
 }
 
+
+// Solve the system A.x = b using LAPACK
+void GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> &b, std::vector<double> &x) {
+
+	// Set up the correct values
+	char trans = 'T';
+	int dim = A.size();
+    int nrhs = 1;
+    int LDA = dim;
+    int LDB = dim;
+    int info;
+    int ipiv[dim];
+
+    // Put A into 1D array
+    std::vector<double> a(dim * dim, 0.0);
+    for (int i = 0; i < dim; i++) {
+    	for (int j = 0; j < dim; j++) {
+    		a[j + i * dim] = A[i][j];
+    	}
+    }
+
+    // Create right hand side so b doesn't get overwritten
+    std::vector<double> rhs(dim, 0.0);
+    rhs = b;
+
+    // Factorise and solve
+	dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
+	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *rhs.begin(), &LDB, &info);
+
+	// Set to x
+	x = rhs;
+}
+
 // *****************************************************************************
 /// \brief	Gets the indices of the fine site given the coarse site.
 ///

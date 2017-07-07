@@ -19,6 +19,10 @@
 #include "stdafx.h"
 #include "GridObj.h"
 
+// LAPACK interfaces
+extern "C" void dgetrf_(int* dim1, int* dim2, double* a, int* lda, int* ipiv, int* info);
+extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO );
+
 /// \brief	Grid utility class.
 ///
 ///			Class provides grid utilities including commonly used logical tests. 
@@ -63,6 +67,7 @@ public:
 	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);	// Function: crossprod
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
 	static std::vector<double> divide(std::vector<double> vec1, double scalar);					// Divide vector by a scalar
+	static void solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> &b, std::vector<double> &x);	// Solve A.x = b
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite

@@ -107,6 +107,17 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	Udotdot.resize(systemDOFs, 0.0);
 }
 
+// \brief Main outer routine for solving FEM.
+//
+void FEMBody::dynamicFEM () {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	std::cout << "FEM TEST = " << rank << std::endl;
+}
+
+
 // \brief Compute the mapping parameters for FEM-IBM nodes.
 //
 ///	\param	nIBMNodes	number of IBM nodes in body.

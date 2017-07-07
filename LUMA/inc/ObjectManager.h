@@ -123,22 +123,17 @@ public:
 	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
-	void ibm_apply(int level);						// Apply interpolate, compute and spread operations for all bodies.
-	void ibm_initialise();					// Initialise a built immersed body with support.
-	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
-	void ibm_interpolate(int level);		// Interpolation of velocity field onto markers of ib-th body.
-	void ibm_spread(int level);				// Spreading of restoring force from ib-th body.
-	void ibm_updateMacroscopic(int level);	// Update the macroscopic values with the IBM force
-	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
-	void ibm_initialiseSupport(int ib, int m, 
-		int s, double estimated_position[]);		// Initialises data associated with the support points.
-	void ibm_computeForce(int level);		// Compute restorative force at each marker in ib-th body.
-	void ibm_findEpsilon();					// Method to find epsilon weighting parameter for ib-th body.
-	void ibm_moveBodies();					// Update all IBBody positions and support.
-	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
-		std::vector<double>& bVector, std::vector<double>& epsilon,
-						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
-																	// linear system required by finding epsilon
+	void ibm_apply(int level);														// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_initialise();															// Initialise a built immersed body with support.
+	double ibm_deltaKernel(double rad, double dilation);							// Evaluate kernel (delta function approximation).
+	void ibm_interpolate(int level);												// Interpolation of velocity field onto markers of ib-th body.
+	void ibm_spread(int level);														// Spreading of restoring force from ib-th body.
+	void ibm_updateMacroscopic(int level);											// Update the macroscopic values with the IBM force
+	void ibm_findSupport(int ib, int m);											// Populates support information for the m-th marker of ib-th body.
+	void ibm_initialiseSupport(int ib, int m, int s, double estimated_position[]);	// Initialises data associated with the support points.
+	void ibm_computeForce(int level);												// Compute restorative force at each marker in ib-th body.
+	void ibm_findEpsilon();															// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
 
 	// IBM Debug methods //
 	void ibm_debug_epsilon(int ib);
@@ -153,16 +148,6 @@ public:
 	void ibm_buildMPIComms();
 	void ibm_interpolateOffRankVels(int level);
 	void ibm_spreadOffRankForces(int level);
-
-	// Flexible body methods
-	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
-	void ibm_positionUpdate(int ib);			// Updates the position of movable body markers.
-	void ibm_positionUpdateGroup(int group);	// Updates the positions of movable bodies in a group.
-	// Methods to solve the Jacobian system associated with Jacowire
-	void ibm_banbks(double **a, long n, int m1, int m2, double **al,
-		unsigned long indx[], double b[]);
-	void ibm_bandec(double **a, long n, int m1, int m2, double **al,
-		unsigned long indx[], double *d);
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.

@@ -25,6 +25,8 @@ FEMNode::FEMNode () {
 
 	// Set members to default values
 	ID = 0;
+	angles0 = 0.0;
+	angles = 0.0;
 }
 
 
@@ -41,18 +43,16 @@ FEMNode::FEMNode (int idx, double x, double y, double z, std::vector<double> &in
 	// Set values
 	ID = idx;
 
-	// Resize vectors
-	position.resize(3);
-	angles0.resize(2);
-	angles.resize(2);
-
 	// Set positions
 	position0.push_back(x);
 	position0.push_back(y);
 	position0.push_back(z);
 
+	// Resize vectors
+	position.resize(3);
+
 	// Set values
 	position = position0;
-	angles0 = inputAngles;
+	angles0 = inputAngles[0];
 	angles = angles0;
 }

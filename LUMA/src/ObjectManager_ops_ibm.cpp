@@ -23,6 +23,47 @@
 /// Perform IBM procedure.
 void ObjectManager::ibm_apply(int level) {
 
+	// Interpolate the velocity onto the markers
+	ibm_interpolate(level);
+
+	// Compute force
+	ibm_computeForce(level);
+
+	// Spread force
+	ibm_spread(level);
+
+	// Update the macroscopic values
+	ibm_updateMacroscopic(level);
+
+	// Perform FEM
+	ibm_moveBodies(level);
+}
+
+
+
+
+// *****************************************************************************
+/// \brief	Moves iBodies after applying IBM.
+///
+///			Wrapper for relocating markers of an iBody be calling appropriate
+///			positional update routine.
+///
+void ObjectManager::ibm_moveBodies(int level) {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Loop through bodies and apply FEM
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Only do if on this grid level and this rank owns it and it is flexible
+		if (iBody[ib].owningRank == rank && iBody[ib].isFlexible == true && iBody[ib]._Owner->level == level) {
+			iBody[ib].fBody->dynamicFEM();
+		}
+	}
+
+
+
 //	// Loop through all bodies and find support
 //	for (int ib = 0; ib < iBody.size(); ib++) {
 //
@@ -72,29 +113,7 @@ void ObjectManager::ibm_apply(int level) {
 //	if (hasMovingBodies)
 //		ibm_findEpsilon();
 
-	// Interpolate the velocity onto the markers
-	ibm_interpolate(level);
 
-	// Compute force
-	ibm_computeForce(level);
-
-	// Spread force
-	ibm_spread(level);
-
-	// Update the macroscopic values
-	ibm_updateMacroscopic(level);
-}
-
-
-
-
-// *****************************************************************************
-/// \brief	Moves iBodies after applying IBM.
-///
-///			Wrapper for relocating markers of an iBody be calling appropriate
-///			positional update routine.
-///
-void ObjectManager::ibm_moveBodies() {
 
 //	// Loop over bodies launching positional update if movable to compute new locations of markers
 //	*GridUtils::logfile << "Relocating markers as required..." << std::endl;
@@ -778,12 +797,8 @@ void ObjectManager::ibm_findEpsilon() {
 		// Solve system //
 		//////////////////
 
-		// Settings
-		double tolerance = 1.0e-5;
-		int maxiterations = 2500;
-
-		// Biconjugate gradient stabilised method for solving asymmetric linear systems
-		double minimum_residual_achieved = ibm_bicgstab(A, bVector, epsilon[iBodyTemp[ib].id], tolerance, maxiterations);
+		// Solve linear system
+		GridUtils::solveLinearSystem(A, bVector, epsilon[iBodyTemp[ib].id]);
 	}
 
 	// Distribute the epsilon values back to the iBody
@@ -801,134 +816,6 @@ void ObjectManager::ibm_findEpsilon() {
 	// Perform MPI communication and insert correct epsilon values
 	mpim->mpi_epsilonCommScatter(epsilon);
 #endif
-}
-
-// *****************************************************************************
-/// \brief	Biconjugate gradient method.
-///
-///			Biconjugate gradient stabilised method of solving a linear system 
-///			Ax = b. Solution is performed iteratively.
-///
-/// \param	Amatrix			the A matrix in the linear system.
-/// \param	bVector			the b vector in the linear system.
-/// \param	epsilon			epsilon paramters for each marker.
-/// \param	tolerance		tolerance of solution.
-/// \param	maxiterations	maximum number of iterations.
-/// \returns the minimum residual achieved by the solver.
-double ObjectManager::ibm_bicgstab(
-	std::vector< std::vector<double> >& Amatrix, std::vector<double>& bVector,
-	std::vector<double>& epsilon,
-	double tolerance, int maxiterations) {
-
-	// Declarations //
-
-	// Scalars
-    double bic_alpha, bic_omega, bic_beta, res_current;
-	double res_min = 100.0;		// Arbitrary selection of initial minimum residual -- deliberately big so that first loop is going to generate a epsilon vector with residual better than this.
-	// Number of markers
-    size_t nls = epsilon.size();
-	// Vectors
-    std::vector<double> bic_rho (2, 0.0); // Need both i and i-1 instances at same time so need to declare as a 2x1 vector
-	std::vector<double> bic_s (nls, 0.0);
-	std::vector<double> bic_t (nls, 0.0);
-	std::vector<double> epsilon_best (nls, 0.0);
-	std::vector<double> bic_r, bic_v, bic_p, bic_rhat;
-
-	// Step 1: Use initial guess to compute r vector
-	std::vector<double> bic_Ax = GridUtils::matrix_multiply(Amatrix,epsilon);
-	for (size_t i = 0; i < nls; i++) {
-		bic_r.push_back(bVector[i] - bic_Ax[i]);
-	}
-
-	// Step 2: Choose arbitrary vector r_hat
-	bic_rhat = bic_r;
-
-	// Step 3: rho0 = alpha = omega0 = 1
-	bic_alpha = 1.0;
-	bic_omega = bic_alpha;
-    bic_rho[0] = bic_alpha;
-
-	// Step 4: v0 = p0 = 0
-	for (size_t i = 0; i < nls; i++) {
-        bic_v.push_back(0.0);
-		bic_p.push_back(0.0);
-    }
-
-	// Step 5: Iterate
-	for (int i = 1; i < maxiterations; i++) {
-
-		// Step 5a: Compute new rho
-		bic_rho[1] = GridUtils::dotprod(bic_rhat, bic_r);
-
-		// Step 5b: Compute beta
-		bic_beta = (bic_rho[1] / bic_rho[0]) * (bic_alpha / bic_omega);
-
-		// Step 5c: Compute new p vector
-		for (size_t j = 0; j < nls; j++) {
-			bic_p[j] = bic_r[j] + bic_beta * ( bic_p[j] - bic_omega * bic_v[j] );
-		}
-
-		// Step 5d: Compute new v vector
-		bic_v = GridUtils::matrix_multiply(Amatrix,bic_p);
-
-		// Step 5e: Compute alpha
-		bic_alpha = bic_rho[1] / GridUtils::dotprod(bic_rhat, bic_v);
-		// bic_rho is not used again so copy last element back ready for next iteration
-		bic_rho[0] = bic_rho[1];
-
-		// Step 5f: Compute new s vector
-		for (size_t j = 0; j < nls; j++) {
-			bic_s[j] = bic_r[j] - (bic_alpha * bic_v[j]);
-		}
-
-		// Step 5g: Compute t vector
-		bic_t = GridUtils::matrix_multiply(Amatrix,bic_s);
-
-		// Step 5h: Compute new omega
-		bic_omega = GridUtils::dotprod(bic_t, bic_s) / GridUtils::dotprod(bic_t, bic_t);
-
-		// Step 5i: Update epsilon
-		for (size_t j = 0; j < nls; j++) {
-			epsilon[j] += bic_alpha * bic_p[j] + bic_omega * bic_s[j];
-		}
-
-		// Step 5j: Compute residual
-		for (size_t j = 0; j < nls; j++) {
-			bic_r[j] = bic_s[j] - bic_omega * bic_t[j];
-		}
-
-		// Step 5k: Check residual and store epsilon if best so far
-		res_current = sqrt(GridUtils::dotprod(bic_r, bic_r));
-		if ( res_current < res_min) {
-			res_min = res_current;	// Note best residual
-			for (size_t j = 0; j < nls; j++) {
-				epsilon_best[j] = epsilon[j];
-			}
-			// Check tolerance of best residual
-			if ( res_min <= tolerance ) {
-				// Before exiting, update epsilon to best epsilon
-				for (size_t j = 0; j < nls; j++) {
-					epsilon[j] = epsilon_best[j];
-				}
-				return res_min;
-			}
-		}
-
-		if (i == maxiterations-1) {
-			// Warn that max iterations hit
-			*GridUtils::logfile << "Max iterations hit -- values of epsilon might not be converged. Try adjusting the number of Lagrange markers or the grid resolution to adjust support overlap. Setting Epsilon to 2." << std::endl;
-			for (size_t j = 0; j < nls; j++) {
-				epsilon[j] = 2;
-			}
-		}
-	}
-
-
-	// Before exiting, update epsilon to best epsilon
-	for (size_t j = 0; j < nls; j++) {
-		epsilon[j] = epsilon_best[j];
-	}
-	return res_min;
 }
 
 

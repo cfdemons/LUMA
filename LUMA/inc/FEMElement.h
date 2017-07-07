@@ -67,9 +67,9 @@ private:
 	// Geometry properties
 	double length0;						///< Initial length of element
 	double length;						///< Current length of element
-	std::vector<double> angles;			///< Current orientation of element
+	double angles;			///< Current orientation of element
 	double area;						///< Cross-sectional area of element
-	std::vector<double> I;				///< Second moment areas
+	double I;				///< Second moment areas
 
 	// Structural properties
 	double E;							///< Youngs modulus

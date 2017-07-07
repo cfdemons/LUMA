@@ -30,6 +30,8 @@ FEMElement::FEMElement () {
 	area = 0;
 	E = 0;
 	density = 0;
+	angles = 0.0;
+	I = 0.0;
 }
 
 // ***************************************************************************************************
@@ -51,15 +53,10 @@ FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 	area = height * depth;
 
 	// Set angles
-	angles.resize(2);
-	angles = inputAngles;
+	angles = inputAngles[0];
 
 	// Get the second moment areas
-	I.resize(L_DIMS-1);
-	I[0] = depth * height * height * height / 12.0;
-#if (L_DIMS == 3)
-	I[1] = height * depth * depth * depth / 12.0;
-#endif
+	I = depth * height * height * height / 12.0;
 
 	// Material properties
 	E = inputE;

@@ -81,6 +81,10 @@ FEMElement::FEMChildNodes::~FEMChildNodes() {
 }
 
 // \brief Constructor for parent element class.
+//
+///	\param	node	node ID
+///	\param	zetaA	start of integration range
+///	\param	zetaB	end of integration range
 FEMElement::FEMChildNodes::FEMChildNodes(int node, double zetaA, double zetaB) {
 
 	// Set default values

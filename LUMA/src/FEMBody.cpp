@@ -102,6 +102,7 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	R.resize(systemDOFs, 0.0);
 	F.resize(systemDOFs, 0.0);
 	U.resize(systemDOFs, 0.0);
+	U_n.resize(systemDOFs, 0.0);
 	delU.resize(systemDOFs, 0.0);
 	Udot.resize(systemDOFs, 0.0);
 	Udotdot.resize(systemDOFs, 0.0);
@@ -147,19 +148,140 @@ void FEMBody::dynamicFEM () {
 //
 void FEMBody::newtonRaphsonIterator () {
 
+	// Construct mass matrix
+	constructMassMat();
+
+	// Construct stiffness matrix
+	constructStiffMat();
+
+	// Construct the internal force vector
+	constructFVector();
+
+	// Construct the full non-linear stiffness matrix
+	constructNLStiffMat();
+
+	// Declare reduced matrices with BCs applied
+	std::vector<std::vector<double>> M_hat(systemDOFs - BC_DOFs, std::vector<double>(systemDOFs - BC_DOFs, 0.0));
+	std::vector<std::vector<double>> K_hat(systemDOFs - BC_DOFs, std::vector<double>(systemDOFs - BC_DOFs, 0.0));
+	std::vector<double> RmF_hat(systemDOFs - BC_DOFs, 0.0);
+	std::vector<double> delU_hat(systemDOFs - BC_DOFs, 0.0);
+
+	// Apply the boundary conditions
+	bcFEM(M_hat, K_hat, RmF_hat);
+
+	// Apply Newmark scheme (using Newmark coefficients)
+	setNewmark(M_hat, K_hat, RmF_hat);
+
+	// Solve linear system using LAPACK library
+	GridUtils::solveLinearSystem(K_hat, RmF_hat, delU_hat);
+
+	// Assign displacement to delU
+	for (int i = 0; i < systemDOFs - BC_DOFs; i++) {
+		delU[i+BC_DOFs] = delU_hat[i];
+	}
+
+	// Add deltaU to U
+	for (int i = 0; i < systemDOFs; i++) {
+		U[i] = U[i] + delU[i];
+	}
+
+	// Update FEM positions
+	updateFEMNodes();
 }
 
 
 // \brief Check convergence of the Newton-Raphson scheme
 //
-void FEMBody::checkNRConvergence () {
+double FEMBody::checkNRConvergence () {
 
+	// Get original length of body
+	double L = elements[0].length0 * elements.size();
+
+	// Normalise the displacement
+	std::vector<double> delUStar(delU.size(), 0.0);
+	for (int i = 0; i < delUStar.size(); i++)
+		delUStar[i] = delU[i] / L;
+
+	// Get the norm but divide by length so it is resolution independent and return
+	return sqrt(GridUtils::dotprod(delUStar, delUStar) / delUStar.size());
 }
 
 
 // \brief Newmark-Beta scheme for getting FEM velocities and accelerations
 //
 void FEMBody::updateVelocityAndAcceleration () {
+
+	// Get velocity and acceleration using Newmark-Beta scheme
+	double Dt = iBodyPtr->_Owner->dt;
+	double UdotdotStar;
+
+	// Newmark coefficients
+	double a6 = 1.0 / (L_NB_ALPHA * SQ(Dt));
+	double a7 = -1.0 / (L_NB_ALPHA * Dt);
+	double a8 = -(1.0 / (2.0 * L_NB_ALPHA) - 1.0);
+	double a9 = Dt * (1.0 - L_NB_DELTA);
+	double a10 = L_NB_DELTA * Dt;
+
+	// Update velocities and accelerations
+	for (int i = 0; i < systemDOFs; i++) {
+		UdotdotStar = a6 * (U[i] - U_n[i]) + a7 * Udot[i] + a8 * Udotdot[i];
+		Udot[i] = Udot[i] + a9 * Udotdot[i] + a10 * UdotdotStar;
+		Udotdot[i] = UdotdotStar;
+	}
+}
+
+
+// \brief Construct mass matrix
+//
+void FEMBody::constructMassMat () {
+
+}
+
+
+// \brief Construct linear stiffness matrix
+//
+void FEMBody::constructStiffMat () {
+
+}
+
+
+// \brief Construct internal force vector
+//
+void FEMBody::constructFVector () {
+
+}
+
+
+// \brief Construct non-linear stiffness matrix
+//
+void FEMBody::constructNLStiffMat () {
+
+}
+
+
+// \brief Apply BCs by removing elements in global matrices
+//
+///	\param	M_hat	mass matrix with BCs about to be applied
+///	\param	K_hat	stiffness matrix with BCs about to be applied
+///	\param	RmF_hat	balanced load vector with BCs about to be applied
+void FEMBody::bcFEM (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
+
+}
+
+
+// \brief First step in Newmar-Beta time integration
+//
+///	\param	M_hat	mass matrix with BCs applied
+///	\param	K_hat	stiffness matrix with BCs applied
+///	\param	RmF_hat	balanced load vector with BCs applied
+void FEMBody::setNewmark (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
+
+}
+
+
+// \brief Update the FEM node data using the new displacements
+//
+void FEMBody::updateFEMNodes () {
 
 }
 

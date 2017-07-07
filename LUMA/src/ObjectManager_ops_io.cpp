@@ -1048,7 +1048,8 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	int rank = GridUtils::safeGetRank();
 
 	// Create string and file streams
-	std::stringstream fileName = GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
+	std::stringstream fileName;
+	fileName << GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
 	std::ofstream fout;
 	fout.open(fileName.str().c_str());
 

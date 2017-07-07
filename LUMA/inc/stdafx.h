@@ -100,6 +100,7 @@
 
 // Squared operator
 #define SQ(x) ((x) * (x))
+#define TH(x) ((x) * (x) * (x))
 #define L_SQRT3 1.7320508075688772935274463415059
 #define L_SQRT2 1.4142135623730950488016887242097
 #define L_PI 3.14159265358979323846

@@ -53,6 +53,6 @@ FEMNode::FEMNode (int idx, double x, double y, double z, std::vector<double> &in
 
 	// Set values
 	position = position0;
-	angles0 = inputAngles[0];
+	angles0 = inputAngles[0] * L_PI / 180.0;
 	angles = angles0;
 }

@@ -53,10 +53,10 @@ FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 	area = height * depth;
 
 	// Set angles
-	angles = inputAngles[0];
+	angles = inputAngles[0] * L_PI / 180.0;
 
 	// Get the second moment areas
-	I = depth * height * height * height / 12.0;
+	I = depth * TH(height) / 12.0;
 
 	// Material properties
 	E = inputE;

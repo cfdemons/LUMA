@@ -294,6 +294,57 @@ void FEMBody::constructMassMat () {
 //
 void FEMBody::constructStiffMat () {
 
+	// Initialise arrays and matrices for calculating linear stiffness matrix
+	std::vector<std::vector<double>> Kglobal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+	std::vector<std::vector<double>> Klocal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+
+
+	// Reset linear stiffness matrix to zero
+	for (int i = 0; i < K_L.size(); i++) {
+		fill(K_L[i].begin(), K_L[i].end(), 0.0);
+	}
+
+	// Coefficients
+	double A, E, I, L0, L;
+
+	// Loop through each element and create stiffness matrix
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Coefficients
+		A = elements[el].area;
+		E = elements[el].E;
+		I = elements[el].I;
+		L0 = elements[el].length0;
+		L = elements[el].length;
+
+		// Construct upper half of local stiffness matrix for single element
+		Klocal[0][0] = E * A / L0;
+		Klocal[0][3] = -E * A / L0;
+		Klocal[1][1] = 12.0 * E * I / TH(L0);
+		Klocal[1][2] = 6.0 * E * I / SQ(L0);
+		Klocal[1][4] = -12.0 * E * I / TH(L0);
+		Klocal[1][5] = 6.0 * E * I / SQ(L0);
+		Klocal[2][2] = 4.0 * E * I / L0;
+		Klocal[2][4] = -6.0 * E * I / SQ(L0);
+		Klocal[2][5] = 2.0 * E * I / L0;
+		Klocal[3][3] = E * A / L0;
+		Klocal[4][4] = 12.0 * E * I / TH(L0);
+		Klocal[4][5] = -6.0 * E * I / SQ(L0);
+		Klocal[5][5] = 4.0 * E * I / L0;
+
+		// Copy to the lower half (symmetrical matrix)
+		for (int i = 1; i < DOFsPerElement; i++) {
+			for (int j = 0; j < i; j++) {
+				Klocal[i][j] = Klocal[j][i];
+			}
+		}
+
+		// Multiply by transformation matrices to get global matrix for single element
+		Kglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Klocal), elements[el].T);
+
+		// Add to global matrix
+		GridUtils::assembleGlobalMat(el, DOFsPerNode, Kglobal, K_L);
+	}
 }
 
 
@@ -301,6 +352,55 @@ void FEMBody::constructStiffMat () {
 //
 void FEMBody::constructFVector () {
 
+	// Element internal forces in global coordinates
+	std::vector<double> FGlobal(DOFsPerElement, 0.0);
+
+	// Declare values
+	double E, I, A, L0, L;
+	double angleElement, angleNode1, angleNode2;
+	double u, theta1, theta2;
+	double F0, M1, M2;
+
+	// Reset force vector
+	fill(F.begin(), F.end(), 0.0);
+
+	// Loop through each element
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Set various values for element
+		E = elements[el].E;
+		I = elements[el].I;
+		A = elements[el].area;
+		L0 = elements[el].length0;
+		L = elements[el].length;
+		angleElement = elements[el].angles;
+		angleNode1 = nodes[el].angles;
+		angleNode2 = nodes[el+1].angles;
+
+		// Calculate the local displacements
+		u = (SQ(L) - SQ(L0)) / (L + L0);
+		theta1 = atan2(cos(angleElement) * sin(angleNode1) - sin(angleElement) * cos(angleNode1), cos(angleElement) * cos(angleNode1) + sin(angleElement) * sin(angleNode1));
+		theta2 = atan2(cos(angleElement) * sin(angleNode2) - sin(angleElement) * cos(angleNode2), cos(angleElement) * cos(angleNode2) + sin(angleElement) * sin(angleNode2));
+
+		// Calculate internal forces for beam
+		F0 = (E * A / L0) * u;
+		M1 = (2 * E * I / L0) * (2.0 * theta1 + theta2);
+		M2 = (2 * E * I / L0) * (theta1 + 2.0 * theta2);
+
+		// Set the internal local nodal forces
+		elements[el].F[0] = -F0;
+		elements[el].F[1] = (1.0 / L0) * (M1 + M2);
+		elements[el].F[2] = M1;
+		elements[el].F[3] = F0;
+		elements[el].F[4] = -(1.0 / L0) * (M1 + M2);
+		elements[el].F[5] = M2;
+
+		// Get element internal forces
+		FGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), elements[el].F);
+
+		// Add to global vector
+		GridUtils::assembleGlobalVec(el, DOFsPerNode, FGlobal, F);
+	}
 }
 
 
@@ -308,6 +408,48 @@ void FEMBody::constructFVector () {
 //
 void FEMBody::constructNLStiffMat () {
 
+	// Initialise arrays and matrices for calculating non-linear stiffness matrix
+	std::vector<std::vector<double>> Kglobal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+	std::vector<std::vector<double>> Klocal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
+
+	// Reset non-linear stiffness matrix to zero
+	for (int i = 0; i < K_NL.size(); i++) {
+		fill(K_NL[i].begin(), K_NL[i].end(), 0.0);
+	}
+
+	// Coefficients
+	double L0, L, F0, V0;
+
+	// Loop through each element and create stiffness matrix
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Calculate length of element
+		L0 = elements[el].length0;
+		L = elements[el].length;
+
+		// Internal forces
+		F0 = -elements[el].F[0];
+		V0 = elements[el].F[4];
+
+		// Construct upper half of local stiffness matrix for single element
+		Klocal[0][1] = -V0 / L0;
+		Klocal[0][4] = -(F0 / L0) + V0 / L0;
+		Klocal[1][0] = -V0 / L0;
+		Klocal[1][1] = F0 / L0;
+		Klocal[1][3] = V0 / L0;
+		Klocal[3][1] = V0 / L0;
+		Klocal[3][4] = -V0 / L0;
+		Klocal[4][0] = V0 / L0;
+		Klocal[4][1] = -F0 / L0;
+		Klocal[4][3] = -V0 / L0;
+		Klocal[4][4] = F0 / L0;
+
+		// Multiply by transformation matrices to get global matrix for single element
+		Kglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Klocal), elements[el].T);
+
+		// Add to global matrix
+		GridUtils::assembleGlobalMat(el, DOFsPerNode, Kglobal, K_NL);
+	}
 }
 
 
@@ -318,16 +460,56 @@ void FEMBody::constructNLStiffMat () {
 ///	\param	RmF_hat	balanced load vector with BCs about to be applied
 void FEMBody::bcFEM (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
 
+	// Loop through reduced size
+	for (int i = 0; i < systemDOFs - BC_DOFs; i++) {
+
+		// Unbalanced load vector
+		RmF_hat[i] = R[i+BC_DOFs] - F[i+BC_DOFs];
+
+		// Now loop through mass and stiffness matrices
+		for (int j = 0; j < systemDOFs - BC_DOFs; j++) {
+			M_hat[i][j] = M[i+BC_DOFs][j+BC_DOFs];
+			K_hat[i][j] = K_L[i+BC_DOFs][j+BC_DOFs] + K_NL[i+BC_DOFs][j+BC_DOFs];
+		}
+	}
 }
 
 
-// \brief First step in Newmar-Beta time integration
+// \brief First step in Newmark-Beta time integration
 //
 ///	\param	M_hat	mass matrix with BCs applied
 ///	\param	K_hat	stiffness matrix with BCs applied
 ///	\param	RmF_hat	balanced load vector with BCs applied
 void FEMBody::setNewmark (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
 
+	// Newmark-beta method for time integration
+	double Dt = iBodyPtr->_Owner->dt;
+	double a0, a2, a3;
+	a0 = 1.0 / (L_NB_ALPHA * SQ(Dt));
+	a2 = 1.0 / (L_NB_ALPHA * Dt);
+	a3 = 1.0 / (2.0 * L_NB_ALPHA) - 1.0;
+
+	// Calculate effective load vector
+	std::vector<double> Meff_hat(systemDOFs - BC_DOFs, 0.0);
+	for (int i = 0; i < systemDOFs - BC_DOFs; i++) {
+		Meff_hat[i] = a0 * (U_n[i+BC_DOFs] - U[i+BC_DOFs]) + a2 * Udot[i+BC_DOFs] + a3 * Udotdot[i+BC_DOFs];
+	}
+
+	// Multiply with mass matrix to get inertia forces
+	std::vector<double> MF_hat(systemDOFs - BC_DOFs, 0.0);
+	MF_hat = GridUtils::matrix_multiply(M_hat, Meff_hat);
+
+	// Calculate effective load vector and stiffness matrix
+	for (int i = 0; i < systemDOFs - BC_DOFs; i++) {
+
+		// Effective load
+		RmF_hat[i] += MF_hat[i];
+
+		// Effective stiffness
+		for (int j = 0; j < systemDOFs - BC_DOFs; j++) {
+			K_hat[i][j] += a0 * M_hat[i][j];
+		}
+	}
 }
 
 
@@ -335,6 +517,32 @@ void FEMBody::setNewmark (std::vector<std::vector<double>> &M_hat, std::vector<s
 //
 void FEMBody::updateFEMNodes () {
 
+	// Set the new positions in the particle_struct
+	for (int n = 0; n < nodes.size(); n++) {
+
+		// Positions
+		for (int d = 0; d < L_DIMS; d++)
+			nodes[n].position[d] = nodes[n].position0[d] + U[n*DOFsPerNode+d];
+
+		// Set angle
+		nodes[n].angles = nodes[n].angles + U[n*DOFsPerNode+L_DIMS];
+	}
+
+	// Set the new angles and lengths of the elements
+	std::vector<double> elVector;
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Set the new angles and lengths of the elements
+		elVector = GridUtils::subtract(nodes[el+1].position, nodes[el].position);
+		elements[el].angles = atan2(elVector[eYDirection], elVector[eXDirection]);
+		elements[el].length = GridUtils::vecnorm(elVector);
+
+		// Set new transformation matrix
+		elements[el].T[0][0] = elements[el].T[1][1] =  elements[el].T[3][3] = elements[el].T[4][4] = cos(elements[el].angles);
+		elements[el].T[0][1] = elements[el].T[3][4] = sin(elements[el].angles);
+		elements[el].T[1][0] = elements[el].T[4][3] = -sin(elements[el].angles);
+		elements[el].T[2][2] = elements[el].T[5][5] =  1.0;
+	}
 }
 
 

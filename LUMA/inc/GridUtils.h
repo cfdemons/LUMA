@@ -70,6 +70,7 @@ public:
 	static std::vector<double> divide(std::vector<double> vec1, double scalar);					// Divide vector by a scalar
 	static std::vector<std::vector<double>> matrix_transpose(std::vector<std::vector<double>> &origMat);			// Transpose a matrix
 	static void assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat);		// Assemble global matrix
+	static void assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat);		// Assemble global vector
 	static std::vector<double> solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b);		// Solve A.x = b
 
 	// LBM-specific utilities

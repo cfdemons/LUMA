@@ -352,9 +352,11 @@ std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::ve
 
 
 // *****************************************************************************
-/// \brief	Tranpose a matrix.
-/// \param	origMat		original matrix.
-/// \return	transMat	transposed matrix.
+/// \brief	Assemble global matrix from local matrix.
+/// \param	el			element number.
+/// \param	offset		offset between elements.
+/// \param	localMat	local matrix.
+/// \param	globalMat	global matrix.
 void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat) {
 
 	// Add the values of the single element matrix to the full system matrix
@@ -362,6 +364,21 @@ void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<do
 		for (int j = 0; j < localMat[i].size(); j++) {
 			globalMat[i+el*offset][j+el*offset] += localMat[i][j];
 		}
+	}
+}
+
+
+// *****************************************************************************
+/// \brief	Assemble global vector from local vector.
+/// \param	el			element number.
+/// \param	offset		offset between elements.
+/// \param	localMat	local vector.
+/// \param	globalMat	global vector.
+void GridUtils::assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (int i = 0; i < localMat.size(); i++) {
+		globalMat[i+el*offset] += localMat[i];
 	}
 }
 

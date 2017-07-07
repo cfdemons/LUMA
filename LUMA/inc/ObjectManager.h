@@ -108,6 +108,9 @@ private:
 	// Map global body ID to an index in the iBody vector
 	std::vector<int> bodyIDToIdx;
 
+	// Vector of indices for iBody vector for which this rank owns and is flexible
+	std::vector<int> IdxFEM;
+
 	/* Methods */
 
 private:

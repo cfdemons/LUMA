@@ -53,14 +53,24 @@ void ObjectManager::ibm_moveBodies(int level) {
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
-	// Loop through bodies and apply FEM
-	for (int ib = 0; ib < iBody.size(); ib++) {
+//	// Set R vector (is invariant during iterations)
+//	constructRVector();
 
-		// Only do if on this grid level and this rank owns it and it is flexible
-		if (iBody[ib].owningRank == rank && iBody[ib].isFlexible == true && iBody[ib]._Owner->level == level) {
-			iBody[ib].fBody->dynamicFEM();
+	// Loop through bodies and apply FEM
+	for (int ib = 0; ib < IdxFEM.size(); ib++) {
+
+		// Only do if on this grid level
+		if (iBody[IdxFEM[ib]]._Owner->level == level) {
+			iBody[IdxFEM[ib]].fBody->dynamicFEM();
 		}
 	}
+
+
+//	// Update IB positions
+//	updateIBPositions();
+//
+//	// Update IB velocities
+//	updateIBVelocities(relaxParam);
 
 
 

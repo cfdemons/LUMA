@@ -704,8 +704,10 @@ void ObjectManager::io_readInGeomConfig() {
 		bodyIDToIdx[iBody[ib].id] = ib;
 
 		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
-		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank)
+		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
+			IdxFEM.push_back(ib);
 			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
+		}
 	}
 }
 
@@ -1038,40 +1040,28 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 void ObjectManager::io_vtkFEMWriter(int tval)
 {
 
+	// If there are no flexible bodies on this rank then exit
+	if (IdxFEM.size() == 0)
+		return;
+
 	// Get the rank
 	int rank = GridUtils::safeGetRank();
 
 	// Create string and file streams
-	std::stringstream fileName;
+	std::stringstream fileName = GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
 	std::ofstream fout;
-
-	// Switch flag for opening file
-	bool switchFlag = false;
+	fout.open(fileName.str().c_str());
 
 	// Number of nodes and lines
-	int nNodes = 0, nLines = 0;
+	int nNodes = 0;
 	std::vector<int> nLinesBody;
 
     // Loop through all bodies
-	for (int ib = 0; ib < iBody.size(); ib++) {
+	for (int ib = 0; ib < IdxFEM.size(); ib++) {
 
-		// Check if body is flexible and if this rank owns it
-		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-
-			// Increment number of nodes and lines
-			nNodes += iBody[ib].fBody->nodes.size();
-			nLines += iBody[ib].fBody->nodes.size() - 1;
-			nLinesBody.push_back(iBody[ib].fBody->nodes.size() - 1);
-
-			// If first body that is found then open file
-			if (switchFlag == false) {
-				fileName << GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
-				fout.open(fileName.str().c_str());
-				switchFlag = true;
-			}
-		}
-		else if (ib == iBody.size()-1 && switchFlag == false)
-			return;
+		// Increment number of nodes and lines
+		nNodes += iBody[IdxFEM[ib]].fBody->nodes.size();
+		nLinesBody.push_back(iBody[IdxFEM[ib]].fBody->nodes.size() - 1);
 	}
 
 	// Add header information
@@ -1083,23 +1073,19 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	// Write out the positions of each Lagrange marker
 	fout << "POINTS " << nNodes << " float\n";
 
-    // Loop through all bodies
-	for (int ib = 0; ib < iBody.size(); ib++) {
+    // Loop through all bodies and there nodes
+	for (int ib = 0; ib < IdxFEM.size(); ib++) {
+		for (int m = 0; m < iBody[IdxFEM[ib]].fBody->nodes.size(); m++) {
 
-		// Check if body is flexible and if this rank owns it
-		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-			for (int m = 0; m < iBody[ib].fBody->nodes.size(); m++) {
-
-				// Write out positions
-				fout << iBody[ib].fBody->nodes[m].position[eXDirection] << " "
-					 << iBody[ib].fBody->nodes[m].position[eYDirection] << " "
-					 << iBody[ib].fBody->nodes[m].position[eZDirection] << std::endl;
-			}
+			// Write out positions
+			fout << iBody[IdxFEM[ib]].fBody->nodes[m].position[eXDirection] << " "
+				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eYDirection] << " "
+				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eZDirection] << std::endl;
 		}
 	}
 
 	// Write out the connectivity of each Lagrange marker
-	fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
+	fout << "LINES " << std::accumulate(nLinesBody.begin(), nLinesBody.end(), 0) << " " << 3 * std::accumulate(nLinesBody.begin(), nLinesBody.end(), 0) << std::endl;
 
 	// Loop through number of lines
 	int count = 0;

@@ -111,10 +111,56 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 //
 void FEMBody::dynamicFEM () {
 
-	// Get rank
-	int rank = GridUtils::safeGetRank();
+	// While loop parameters
+	double res;
+	int it;
+	double TOL = 1e-10;
+	double MAXIT = 20;
 
-	std::cout << "FEM TEST = " << rank << std::endl;
+	// Set while counter to zero
+	it = 0;
+
+	// While loop for FEM solver
+	do {
+
+		// Solve and iterate over the system
+		newtonRaphsonIterator();
+
+		// Check residual
+		res = checkNRConvergence();
+
+		// Increment counter
+		it++;
+
+	} while (res > TOL && it < MAXIT);
+
+	// Store the number of iterations
+	NRIterations = it;
+	NRResidual = res;
+
+	// Calculate velocities and accelerations
+	updateVelocityAndAcceleration();
+}
+
+
+// \brief Newton-Raphson routine for solve non-linear FEM
+//
+void FEMBody::newtonRaphsonIterator () {
+
+}
+
+
+// \brief Check convergence of the Newton-Raphson scheme
+//
+void FEMBody::checkNRConvergence () {
+
+}
+
+
+// \brief Newmark-Beta scheme for getting FEM velocities and accelerations
+//
+void FEMBody::updateVelocityAndAcceleration () {
+
 }
 
 

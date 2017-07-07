@@ -95,6 +95,9 @@ class FEMBody {
 
 	// Main FEM solver methods
 	void dynamicFEM();											// Main outer routine for solving FEM
+	void newtonRaphsonIterator();								// Newton-Raphson routine for solve non-linear FEM
+	void checkNRConvergence();									// Check convergence of the Newton-Raphson scheme
+	void updateVelocityAndAcceleration();						// Newmark-Beta scheme for getting FEM velocities and accelerations
 
 	// Helper methods
 	void computeNodeMapping(int nIBMNodes, int nFEMNodes);		// Compute mapping between FEM and IBM nodes

@@ -138,6 +138,9 @@ public:
 	void ibm_findEpsilon();															// Method to find epsilon weighting parameter for ib-th body.
 	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
 
+	// FEM methods //
+	void fem_constructRVector(int level);											// Construct the R vector for all bodies on current level
+
 	// IBM Debug methods //
 	void ibm_debug_epsilon(int ib);
 	void ibm_debug_interpVel(int ib);
@@ -151,6 +154,9 @@ public:
 	void ibm_buildMPIComms();
 	void ibm_interpolateOffRankVels(int level);
 	void ibm_spreadOffRankForces(int level);
+
+	// FEM-MPI methods
+	void fem_getOffRankForces(int level, std::vector<std::vector<int>> &markerIdx, std::vector<std::vector<std::vector<double>>> &forceBuffer);
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.

@@ -26,6 +26,7 @@ class epsCommOwnerSideClass {
 	// Make MPIManager a friend so it can access body data
 	friend class MpiManager;
 	friend class IBBody;
+	friend class ObjectManager;
 
 public:
 

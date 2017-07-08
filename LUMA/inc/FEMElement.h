@@ -22,7 +22,7 @@ class FEMElement {
 
 	/************** Friends **************/
 	friend class FEMBody;
-
+	friend class ObjectManager;
 
 	/************** Nested classes **************/
 	/// \brief	Nested child IBM node class for FEM elements.
@@ -33,6 +33,7 @@ class FEMElement {
 
 		// Set friend class
 		friend class FEMBody;
+		friend class ObjectManager;
 
 		// Constructor and destructor
 	public:

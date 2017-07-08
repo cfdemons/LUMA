@@ -182,6 +182,9 @@ public :
 	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation
 	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
 
+	// FEM
+	void mpi_offRankForcesComm(int level, std::vector<std::vector<double>> &recvBuffer);
+
 
 
 };

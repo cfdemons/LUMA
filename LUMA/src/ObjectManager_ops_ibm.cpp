@@ -48,13 +48,14 @@ void ObjectManager::ibm_apply(int level) {
 ///			Wrapper for relocating markers of an iBody be calling appropriate
 ///			positional update routine.
 ///
+/// \param level current grid level
 void ObjectManager::ibm_moveBodies(int level) {
 
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
-//	// Set R vector (is invariant during iterations)
-//	constructRVector();
+	// Set R vector (is invariant during Newton-Raphson iterations)
+	fem_constructRVector(level);
 
 	// Loop through bodies and apply FEM
 	for (int ib = 0; ib < IdxFEM.size(); ib++) {

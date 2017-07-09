@@ -37,8 +37,10 @@ void ObjectManager::fem_constructRVector(int level) {
 	std::vector<std::vector<double>> IBMforce_xyz;
 
 	// Required parameters
-	double forceScale, angle, length, a, b;
-	double N, V, N1, V1, M1, N2, V2, M2;
+	double forceScale, length, a, b;
+	std::vector<double> Rlocal, RGlobal;
+	std::vector<double> F(L_DIMS, 0.0);
+	std::vector<std::vector<double>> T(L_DIMS, std::vector<double>(L_DIMS, 0.0));
 	int IBnode;
 
 	// Loop through all bodies that this rank owns
@@ -49,6 +51,9 @@ void ObjectManager::fem_constructRVector(int level) {
 
 			// Set R vector to zero
 			fill(iBody[IdxFEM[ib]].fBody->R.begin(), iBody[IdxFEM[ib]].fBody->R.end(), 0.0);
+
+			// Resize vector
+			Rlocal.resize(iBody[IdxFEM[ib]].fBody->DOFsPerElement, 0.0);
 
 			// Get force scaling parameter
 			forceScale = iBody[IdxFEM[ib]]._Owner->dm / SQ(iBody[IdxFEM[ib]]._Owner->dt);
@@ -94,10 +99,9 @@ void ObjectManager::fem_constructRVector(int level) {
 			for (int el = 0; el < iBody[IdxFEM[ib]].fBody->elements.size(); el++) {
 
 				// Get element parameters
-				angle = iBody[IdxFEM[ib]].fBody->elements[el].angles;
 				length = iBody[IdxFEM[ib]].fBody->elements[el].length;
 
-				// Now loop through all child IB nodes this element has	// TODO Vectorise this
+				// Now loop through all child IB nodes this element has
 				for (int node = 0; node < iBody[IdxFEM[ib]].fBody->elements[el].IBChildNodes.size(); node++) {
 
 					// Get IB node and integration ranges
@@ -105,29 +109,74 @@ void ObjectManager::fem_constructRVector(int level) {
 					a = iBody[IdxFEM[ib]].fBody->elements[el].IBChildNodes[node].zeta1;
 					b = iBody[IdxFEM[ib]].fBody->elements[el].IBChildNodes[node].zeta2;
 
+					// Get subset of transpose matrix
+					T = {{iBody[IdxFEM[ib]].fBody->elements[el].T[0][0], iBody[IdxFEM[ib]].fBody->elements[el].T[0][1]},
+						 {iBody[IdxFEM[ib]].fBody->elements[el].T[1][0], iBody[IdxFEM[ib]].fBody->elements[el].T[1][1]}};
+
 					// Convert force to local coordinates
-					N = IBMforce_xyz[IBnode][eXDirection] * cos(angle) + IBMforce_xyz[IBnode][eYDirection] * sin(angle);
-					V = -IBMforce_xyz[IBnode][eXDirection] * sin(angle) + IBMforce_xyz[IBnode][eYDirection] * cos(angle);
+					F = GridUtils::matrix_multiply(T, IBMforce_xyz[IBnode]);
 
 					// Get the nodal values by integrating over range of IB point
-					N1 = 0.5 * N * length * (0.5 * b - 0.5 * a + 0.25 * SQ(a) - 0.25 * SQ(b));
-					N2 = 0.5 * N * length * (-0.25 * SQ(a) + 0.25 * SQ(b) + 0.5 * b - 0.5 * a);
-					V1 = 0.5 * V * length * (0.5 * b - 0.5 * a - SQ(a) * SQ(a) / 16.0 + SQ(b) * SQ(b) / 16.0 + 3.0 * SQ(a) / 8.0 - 3.0 * SQ(b) / 8.0);
-					V2 = 0.5 * V * length * (0.5 * b - 0.5 * a + SQ(a) * SQ(a) / 16.0 - SQ(b) * SQ(b) / 16.0 - 3.0 * SQ(a) / 8.0 + 3.0 * SQ(b) / 8.0);
-					M1 = 0.5 * V * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 - length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 + length * (b - a) / 8.0);
-					M2 = 0.5 * V * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 + length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 - length * (b - a) / 8.0);
+					Rlocal[0] = F[0] * 0.5 * length * (0.5 * b - 0.5 * a + 0.25 * SQ(a) - 0.25 * SQ(b));
+					Rlocal[1] = F[1] * 0.5 * length * (0.5 * b - 0.5 * a - SQ(a) * SQ(a) / 16.0 + SQ(b) * SQ(b) / 16.0 + 3.0 * SQ(a) / 8.0 - 3.0 * SQ(b) / 8.0);
+					Rlocal[2] = F[1] * 0.5 * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 - length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 + length * (b - a) / 8.0);
+					Rlocal[3] = F[0] * 0.5 * length * (-0.25 * SQ(a) + 0.25 * SQ(b) + 0.5 * b - 0.5 * a);
+					Rlocal[4] = F[1] * 0.5 * length * (0.5 * b - 0.5 * a + SQ(a) * SQ(a) / 16.0 - SQ(b) * SQ(b) / 16.0 - 3.0 * SQ(a) / 8.0 + 3.0 * SQ(b) / 8.0);
+					Rlocal[5] = F[1] * 0.5 * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 + length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 - length * (b - a) / 8.0);
 
-					// Add to load vector (and convert back to global coordinates)
-					iBody[IdxFEM[ib]].fBody->R[el*iBody[IdxFEM[ib]].fBody->DOFsPerNode] += N1 * cos(angle) - V1 * sin(angle);
-					iBody[IdxFEM[ib]].fBody->R[el*iBody[IdxFEM[ib]].fBody->DOFsPerNode+1] += N1 * sin(angle) + V1 * cos(angle);
-					iBody[IdxFEM[ib]].fBody->R[el*iBody[IdxFEM[ib]].fBody->DOFsPerNode+2] += M1;
-					iBody[IdxFEM[ib]].fBody->R[(el+1)*iBody[IdxFEM[ib]].fBody->DOFsPerNode] += N2 * cos(angle) - V2 * sin(angle);
-					iBody[IdxFEM[ib]].fBody->R[(el+1)*iBody[IdxFEM[ib]].fBody->DOFsPerNode+1] += N2 * sin(angle) + V2 * cos(angle);
-					iBody[IdxFEM[ib]].fBody->R[(el+1)*iBody[IdxFEM[ib]].fBody->DOFsPerNode+2] += M2;
+					// Get element internal forces
+					RGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(iBody[IdxFEM[ib]].fBody->elements[el].T), Rlocal);
+
+					// Add to global vector
+					GridUtils::assembleGlobalVec(el, iBody[IdxFEM[ib]].fBody->DOFsPerNode, RGlobal, iBody[IdxFEM[ib]].fBody->R);
 				}
 			}
 		}
 	}
+}
+
+/// \brief	Update the IBM markers using new FEM node vales
+///
+///
+/// \param level current grid level
+void ObjectManager::fem_updateIBMarkers(int level) {
+
+
+//	// Get the positions
+//	std::vector<double> uVec(DOFsPerElement, 0.0);
+//	std::vector<double> uRes(L_DIMS, 0.0);
+//	double Ux1, Uy1, Ux2, Uy2;
+//	double Ux, Uy;
+//	double angle;
+//	int elID;
+//
+//	// Loop through all IBM nodes
+//	for (int node = 0; node < IBPointer->IBnode.size(); node++) {
+//
+//		// Get owning element and angle
+//		elID = IBPointer->IBnode[node].FEMparent.elementID;
+//		angle = FEMelement[elID].angle;
+//
+//		// The displacements in global coordinates
+//		Ux1 = U[nodeDOFs*elID];
+//		Uy1 = U[nodeDOFs*elID+1];
+//		Ux2 = U[nodeDOFs*(elID+1)];
+//		Uy2 = U[nodeDOFs*(elID+1)+1];
+//
+//		// Convert to local coordinates
+//		uVec[0] = Ux1 * cos(angle) + Uy1 * sin(angle);
+//		uVec[1] = -Ux1 * sin(angle) + Uy1 * cos(angle);
+//		uVec[2] = U[nodeDOFs*elID+2];
+//		uVec[3] = Ux2 * cos(angle) + Uy2 * sin(angle);
+//		uVec[4] = -Ux2 * sin(angle) + Uy2 * cos(angle);
+//		uVec[5] = U[nodeDOFs*(elID+1)+2];
+//
+//		// Get velocities in local coordinates
+//		shapeFunctions(uVec, IBPointer->IBnode[node].FEMparent.zeta, FEMelement[elID].length, uRes);
+//
+//		// Convert back to global
+//		Ux = uRes[0] * cos(angle) - uRes[1] * sin(angle);
+//		Uy = uRes[0] * sin(angle) + uRes[1] * cos(angle);
 }
 
 // ****************************************************************************

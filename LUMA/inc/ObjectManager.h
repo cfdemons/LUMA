@@ -140,6 +140,7 @@ public:
 
 	// FEM methods //
 	void fem_constructRVector(int level);											// Construct the R vector for all bodies on current level
+	void fem_updateIBMarkers(int level);											// Update the IBM markers using new FEM node vales
 
 	// IBM Debug methods //
 	void ibm_debug_epsilon(int ib);

@@ -66,6 +66,8 @@ void ObjectManager::ibm_moveBodies(int level) {
 		}
 	}
 
+	// Update IBM values
+	fem_updateIBMarkers(level);
 
 //	// Update IB positions
 //	updateIBPositions();

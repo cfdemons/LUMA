@@ -545,6 +545,29 @@ void FEMBody::updateFEMNodes () {
 	}
 }
 
+// \brief Update the FEM node data using the new displacements
+//
+std::vector<double> FEMBody::shapeFunctions (std::vector<double> &DOFVec, double zeta, double length) {
+
+	// Results vector
+	std::vector<double> resVec(L_DIMS, 0.0);
+
+	// Use shape functions to calculate values
+	double N0 = 1.0 - (zeta + 1.0) / 2.0;
+	double N1 = 1.0 - 3.0 * SQ((zeta + 1.0) / 2.0) + 2.0 * TH((zeta + 1.0) / 2.0);
+	double N2 = ((zeta + 1.0) / 2.0 - 2.0 * SQ((zeta + 1.0) / 2.0) + TH((zeta + 1.0) / 2.0)) * length;
+	double N3 = (zeta + 1.0) / 2.0;
+	double N4 = 3.0 * SQ((zeta + 1.0) / 2.0) - 2.0 * TH((zeta + 1.0) / 2.0);
+	double N5 = (-SQ((zeta + 1.0) / 2.0) + TH((zeta + 1.0) / 2.0)) * length;
+
+	// Calculate values using shape functions
+	resVec[eXDirection] = DOFVec[0] * N0 + DOFVec[3] * N3;
+	resVec[eYDirection] = DOFVec[1] * N1 + DOFVec[2] * N2 + DOFVec[4] * N4 + DOFVec[5] * N5;
+
+	// Return
+	return resVec;
+}
+
 
 // \brief Compute the mapping parameters for FEM-IBM nodes.
 //

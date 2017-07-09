@@ -41,10 +41,10 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->force_xyz.resize(L_DIMS);
 
 	// Set old position to initial position
-	this->position_old.resize(this->position.size());
-	this->position_old[eXDirection] = this->position[eXDirection];
-	this->position_old[eYDirection] = this->position[eYDirection];
-	this->position_old[eZDirection] = this->position[eZDirection];
+	this->position0.resize(this->position.size());
+	this->position0[eXDirection] = this->position[eXDirection];
+	this->position0[eYDirection] = this->position[eYDirection];
+	this->position0[eZDirection] = this->position[eZDirection];
 }
 
 

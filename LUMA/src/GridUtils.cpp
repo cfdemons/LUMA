@@ -384,6 +384,21 @@ void GridUtils::assembleGlobalVec(int el, int offset, std::vector<double> &local
 
 
 // *****************************************************************************
+/// \brief	Extract local vector from global vector.
+/// \param	el			element number.
+/// \param	offset		offset between elements.
+/// \param	localMat	local vector.
+/// \param	globalMat	global vector.
+void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &globalMat, std::vector<double> &localMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (int i = 0; i < localMat.size(); i++) {
+		localMat[i] = globalMat[i+el*offset];
+	}
+}
+
+
+// *****************************************************************************
 /// \brief	Solve the linear system A.x = b
 /// \param	A	A.
 /// \param	b	b.

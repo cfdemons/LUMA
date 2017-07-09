@@ -39,6 +39,7 @@ class FEMBody {
 
 		// Set friend class
 		friend class FEMBody;
+		friend class ObjectManager;
 
 		// Constructor and destructor
 	public:
@@ -105,6 +106,7 @@ class FEMBody {
 	void updateFEMNodes();										// Update the FEM node data using the new displacements
 	void bcFEM(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);			// Apply BCs by removing elements in global matrices
 	void setNewmark(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);	// First step in Newmar-Beta time integration
+	std::vector<double> shapeFunctions(std::vector<double> &vec, double zeta, double length);		// Sum the shape functions to get displacement/velocity
 
 	// Helper methods
 	double checkNRConvergence();								// Check convergence of the Newton-Raphson scheme

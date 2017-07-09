@@ -179,9 +179,9 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
-					file << iBody[b].markers[m].position_old[0] << "\t"
-						<< iBody[b].markers[m].position_old[1] << "\t"
-						<< iBody[b].markers[m].position_old[2] << "\t";
+					file << iBody[b].markers[m].position0[0] << "\t"
+						<< iBody[b].markers[m].position0[1] << "\t"
+						<< iBody[b].markers[m].position0[2] << "\t";
 				}
 
 			}
@@ -262,9 +262,9 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
-					iss		>> iBody[b].markers[m].position_old[0]
-							>> iBody[b].markers[m].position_old[1]
-							>> iBody[b].markers[m].position_old[2];
+					iss		>> iBody[b].markers[m].position0[0]
+							>> iBody[b].markers[m].position0[1]
+							>> iBody[b].markers[m].position0[2];
 				}
 			}
 

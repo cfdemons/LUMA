@@ -141,42 +141,57 @@ void ObjectManager::fem_constructRVector(int level) {
 /// \param level current grid level
 void ObjectManager::fem_updateIBMarkers(int level) {
 
+	// Parameters
+	int el, zeta, length;
+	std::vector<double> ULocal, UGlobal, UnodeLocal, UnodeGlobal;
+	std::vector<double> UDotLocal, UDotGlobal, UDotNodeLocal, UDotNodeGlobal;
+	std::vector<std::vector<double>> T(L_DIMS, std::vector<double>(L_DIMS, 0.0));
 
-//	// Get the positions
-//	std::vector<double> uVec(DOFsPerElement, 0.0);
-//	std::vector<double> uRes(L_DIMS, 0.0);
-//	double Ux1, Uy1, Ux2, Uy2;
-//	double Ux, Uy;
-//	double angle;
-//	int elID;
-//
-//	// Loop through all IBM nodes
-//	for (int node = 0; node < IBPointer->IBnode.size(); node++) {
-//
-//		// Get owning element and angle
-//		elID = IBPointer->IBnode[node].FEMparent.elementID;
-//		angle = FEMelement[elID].angle;
-//
-//		// The displacements in global coordinates
-//		Ux1 = U[nodeDOFs*elID];
-//		Uy1 = U[nodeDOFs*elID+1];
-//		Ux2 = U[nodeDOFs*(elID+1)];
-//		Uy2 = U[nodeDOFs*(elID+1)+1];
-//
-//		// Convert to local coordinates
-//		uVec[0] = Ux1 * cos(angle) + Uy1 * sin(angle);
-//		uVec[1] = -Ux1 * sin(angle) + Uy1 * cos(angle);
-//		uVec[2] = U[nodeDOFs*elID+2];
-//		uVec[3] = Ux2 * cos(angle) + Uy2 * sin(angle);
-//		uVec[4] = -Ux2 * sin(angle) + Uy2 * cos(angle);
-//		uVec[5] = U[nodeDOFs*(elID+1)+2];
-//
-//		// Get velocities in local coordinates
-//		shapeFunctions(uVec, IBPointer->IBnode[node].FEMparent.zeta, FEMelement[elID].length, uRes);
-//
-//		// Convert back to global
-//		Ux = uRes[0] * cos(angle) - uRes[1] * sin(angle);
-//		Uy = uRes[0] * sin(angle) + uRes[1] * cos(angle);
+	// Loop through all bodies that this rank owns
+	for (int ib = 0; ib < IdxFEM.size(); ib++) {
+
+		// Check if body is on this level
+		if (iBody[IdxFEM[ib]]._Owner->level == level) {
+
+			// Loop through all IBM nodes
+			for (int node = 0; node < iBody[IdxFEM[ib]].fBody->IBNodeParents.size(); node++) {
+
+				// Get element this IB node exists within
+				el = iBody[IdxFEM[ib]].fBody->IBNodeParents[node].elementID;
+				zeta = iBody[IdxFEM[ib]].fBody->IBNodeParents[node].zeta;
+				length = iBody[IdxFEM[ib]].fBody->elements[el].length;
+
+				// Resize global element vector
+				UGlobal.resize(iBody[IdxFEM[ib]].fBody->DOFsPerElement);
+				UDotGlobal.resize(iBody[IdxFEM[ib]].fBody->DOFsPerElement);
+
+				// Get the element values
+				GridUtils::disassembleGlobalVec(el, iBody[IdxFEM[ib]].fBody->DOFsPerNode, iBody[IdxFEM[ib]].fBody->U, UGlobal);
+				GridUtils::disassembleGlobalVec(el, iBody[IdxFEM[ib]].fBody->DOFsPerNode, iBody[IdxFEM[ib]].fBody->Udot, UDotGlobal);
+
+				// Get element values in local coordinates
+				ULocal = GridUtils::matrix_multiply(iBody[IdxFEM[ib]].fBody->elements[el].T, UGlobal);
+				UDotLocal = GridUtils::matrix_multiply(iBody[IdxFEM[ib]].fBody->elements[el].T, UDotGlobal);
+
+				// Get the local displacement of the IB node
+				UnodeLocal = iBody[IdxFEM[ib]].fBody->shapeFunctions(ULocal, zeta, length);
+				UDotNodeLocal = iBody[IdxFEM[ib]].fBody->shapeFunctions(UDotLocal, zeta, length);
+
+				// Get subset of transformation matrix
+				T = {{iBody[IdxFEM[ib]].fBody->elements[el].T[0][0], iBody[IdxFEM[ib]].fBody->elements[el].T[0][1]},
+					 {iBody[IdxFEM[ib]].fBody->elements[el].T[1][0], iBody[IdxFEM[ib]].fBody->elements[el].T[1][1]}};
+
+				// Get the IB node displacements in global coordinates
+				UnodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UnodeLocal);
+				UDotNodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UDotNodeLocal);
+
+				// Set the IBM node
+				for (int d = 0; d < L_DIMS; d++) {
+					iBody[IdxFEM[ib]].markers[node].position[d] = iBody[IdxFEM[ib]].markers[node].position0[d] + UnodeGlobal[d];
+					iBody[IdxFEM[ib]].markers[node].markerVel[d] = UnodeGlobal[d] * iBody[IdxFEM[ib]]._Owner->dt / iBody[IdxFEM[ib]]._Owner->dh;
+				}
+			}
+		}
+	}
 }
-
 // ****************************************************************************

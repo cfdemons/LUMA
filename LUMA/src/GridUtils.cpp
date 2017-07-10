@@ -816,6 +816,55 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 }
 
 // *****************************************************************************
+/// \brief	Get rank where this position is
+///
+/// \param	position		position (x, y or z)
+int GridUtils::getRankfromPosition(std::vector<double> &position) {
+
+	// TODO Search through the ranks using a self-organised list as more often than not the markers are going back to their original rank
+
+	// Get grid manager
+	GridManager *gm = GridManager::getInstance();
+
+	// Check with coarsest grid limits
+	if (position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
+	 || position[eYDirection] < gm->global_edges[eYMin][0] || position[eYDirection] > gm->global_edges[eYMax][0]
+#if (L_DIMS == 3)
+	 ||	position[eZDirection] < gm->global_edges[eZMin][0] || position[eZDirection] > gm->global_edges[eZMax][0]
+#endif
+		) {
+
+		// Position is not witihn global grid limits
+		L_ERROR("Position is off entire grid hierarchy. Exiting.", GridUtils::logfile);
+	}
+
+	// It is makes it here and serial build then definitely rank 0
+#ifndef L_BUILD_FOR_MPI
+	return 0;
+#else
+
+	// Get MPI Manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Loop through all ranks
+	for (int rank = 0; rank < mpim->num_ranks; rank++) {
+
+		// Check if within the grid
+		if (position[eXDirection] >= mpim->rank_core_edge[eXMin][rank] && position[eXDirection] < mpim->rank_core_edge[eXMax][rank]
+		 && position[eYDirection] >= mpim->rank_core_edge[eYMin][rank] && position[eYDirection] < mpim->rank_core_edge[eYMax][rank]
+#if (L_DIMS == 3)
+		 && position[eZDirection] >= mpim->rank_core_edge[eZMin][rank] && position[eZDirection] < mpim->rank_core_edge[eZMax][rank]
+#endif
+			) {
+
+			// Return rank number
+			return rank;
+		}
+	}
+#endif
+}
+
+// *****************************************************************************
 /// \brief	Finds out whether all or part of specified refined region intersects
 ///			with the space occupied by the grid provided.
 ///

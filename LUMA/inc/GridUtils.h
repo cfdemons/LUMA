@@ -87,6 +87,7 @@ public:
 		std::vector<int> *pos = nullptr);											// Is a site on this MPI rank nad if so, where is it?
 	static bool isOnThisRank(double xyz, eCartesianDirection dir, 
 		eLocationOnRank *loc = nullptr, GridObj const * const grid = nullptr, int *pos = nullptr);
+	static int getRankfromPosition(std::vector<double> &position);					// Get rank where this position is
 	static bool intersectsRefinedRegion(GridObj const & pGrid, int RegNum);	// Does the refined region interesect the current rank.
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);			// Is site on any sender layer

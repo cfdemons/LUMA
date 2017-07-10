@@ -147,6 +147,7 @@ public :
 	// Initialisation
 	void mpi_init();											// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild(GridManager* const grid_man);			// Do domain decomposition to build local grid dimensions
+	void mpi_getAllRankLimits();								// Get the positional limits of all ranks
 	int mpi_buildCommunicators(GridManager* const grid_man);	// Create a new communicator for each sub-grid and region combo
 	void mpi_updateLoadInfo(GridManager* const grid_man);		// Method to compute the number of active cells on the rank and pass to master
 	void mpi_uniformDecompose(int *numCells, int *numCores);	// Method to perform uniform decomposition into MPI blocks

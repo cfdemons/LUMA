@@ -310,6 +310,10 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	rank_core_edge[eZMin][my_rank] = 0.0;
 #endif
 	
+	// Pass MPI grid positional limits to all ranks
+	mpi_getAllRankLimits();
+
+	// Wait for all ranks
 	MPI_Barrier(world_comm);
 
 #ifdef L_MPI_VERBOSE
@@ -327,6 +331,34 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		")" << std:: endl;
 #endif
 
+}
+
+
+// ************************************************************************* //
+/// \brief	Get the positional limits of all ranks
+///
+///			After this all ranks will have positional limits of all ranks
+void MpiManager::mpi_getAllRankLimits() {
+
+	// Declare send buffer
+	std::vector<double> sendBuffer(rank_core_edge.size(), 0.0);
+
+	// Create send buffer
+	for (int i = 0; i < rank_core_edge.size(); i++)
+		sendBuffer[i] = rank_core_edge[i][my_rank];
+
+	// Create receive buffer
+	std::vector<double> recvBuffer(rank_core_edge.size() * num_ranks, 0.0);
+
+	// Do and all-gather so each rank has all information
+	MPI_Allgather(&sendBuffer.front(), sendBuffer.size(), MPI_DOUBLE, &recvBuffer.front(), sendBuffer.size(), MPI_DOUBLE, world_comm);
+
+	// Now loop through and unpack buffer
+	for (int rank = 0; rank < num_ranks; rank++) {
+		for (int i = 0; i < sendBuffer.size(); i++) {
+			rank_core_edge[i][rank] = recvBuffer[i + rank * sendBuffer.size()];
+		}
+	}
 }
 
 // ************************************************************************* //

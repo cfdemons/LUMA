@@ -65,10 +65,65 @@ void IBBody::initialise(eMoveableType moveProperty)
 
 	// Delete any markers which are on the receiver layer as not needed for IBM
 #ifdef L_BUILD_FOR_MPI
-	*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
-	deleteRecvLayerMarkers();
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Delete markers which exist off rank
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
+		deleteRecvLayerMarkers();
+	}
 #endif
 
+
+}
+
+
+/*********************************************/
+/// \brief 		Get the indexes of the valid markers (only relevant for owning ranks in parallel)
+void IBBody::getValidMarkers() {
+
+	// Clear the vector
+	validMarkers.clear();
+
+	// Sort out the markers which do actually exist on this rank
+#ifdef L_BUILD_FOR_MPI
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// If owning rank then not all markers are valid
+	if (rank == owningRank) {
+
+		// Declare values
+		double x, y, z;
+		eLocationOnRank loc;
+
+		// Loop through all markers
+		for (int m = 0; m < markers.size(); m++) {
+
+			// Get positions
+			x = markers[m].position[eXDirection];
+			y = markers[m].position[eYDirection];
+			z = markers[m].position[eZDirection];
+			loc = eNone;
+
+			// Check if on rank and not a receiver layer
+			if (GridUtils::isOnThisRank(x, y, z, &loc, _Owner) && !GridUtils::isOnRecvLayer(x, y, z))
+				validMarkers.push_back(m);
+		}
+	}
+	else {
+
+		// If not owning rank then all markers on this rank are valid
+		validMarkers = GridUtils::onespace(0, markers.size()-1);
+	}
+
+#else
+	// For serial all markers are valid
+	validMarkers = GridUtils::onespace(0, markers.size()-1);
+#endif
 }
 
 

@@ -168,9 +168,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 					i);
 	}
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
 
@@ -236,9 +241,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	}
 	spacing = GridUtils::vecnorm( diff );
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
 
@@ -370,9 +380,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	}
 #endif
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
 /*********************************************/

@@ -21,7 +21,7 @@
 /// \brief Class for arranging data for epsilon communication on owner side.
 ///
 ///
-class epsCommOwnerSideClass {
+class markerCommOwnerSideClass {
 
 	// Make MPIManager a friend so it can access body data
 	friend class MpiManager;
@@ -31,10 +31,10 @@ class epsCommOwnerSideClass {
 public:
 
 	// Default Constructor
-	epsCommOwnerSideClass();
+	markerCommOwnerSideClass();
 
 	// Custom constructor for creating epsCommOwnerSideClass object
-	epsCommOwnerSideClass(int rank, int body, int marker);
+	markerCommOwnerSideClass(int rank, int body, int marker);
 
 private:
 
@@ -49,7 +49,7 @@ private:
 /// \brief Class for arranging data for epsilon communication on marker side.
 ///
 ///
-class epsCommMarkerSideClass {
+class markerCommMarkerSideClass {
 
 	// Make MPIManager a friend so it can access body data
 	friend class MpiManager;
@@ -57,10 +57,10 @@ class epsCommMarkerSideClass {
 public:
 
 	// Default Constructor
-	epsCommMarkerSideClass();
+	markerCommMarkerSideClass();
 
 	// Custom constructor for creating epsCommMarkerSideClass object
-	epsCommMarkerSideClass(int rank, int body, int idx);
+	markerCommMarkerSideClass(int rank, int body, int idx);
 
 private:
 

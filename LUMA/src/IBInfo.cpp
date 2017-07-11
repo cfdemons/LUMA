@@ -17,7 +17,7 @@
 #include "../inc/IBInfo.h"
 
 // Default constructor
-epsCommOwnerSideClass::epsCommOwnerSideClass() {
+markerCommOwnerSideClass::markerCommOwnerSideClass() {
 
 	// Set default values
 	rankComm = 0;
@@ -30,7 +30,7 @@ epsCommOwnerSideClass::epsCommOwnerSideClass() {
 ///	\param	rank				rank receiving from.
 ///	\param	body				body ID to receive.
 ///	\param	marker				marker ID to receive.
-epsCommOwnerSideClass::epsCommOwnerSideClass(int rank, int body, int marker) {
+markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marker) {
 
 	// Set values
 	rankComm = rank;
@@ -41,7 +41,7 @@ epsCommOwnerSideClass::epsCommOwnerSideClass(int rank, int body, int marker) {
 
 
 // Default constructor
-epsCommMarkerSideClass::epsCommMarkerSideClass() {
+markerCommMarkerSideClass::markerCommMarkerSideClass() {
 
 	// Set default values
 	rankComm = 0;
@@ -53,7 +53,7 @@ epsCommMarkerSideClass::epsCommMarkerSideClass() {
 ///	\param	rank				rank sending to.
 ///	\param	body				body ID to receive.
 ///	\param	marker				marker ID to receive.
-epsCommMarkerSideClass::epsCommMarkerSideClass(int rank, int body, int idx) {
+markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx) {
 
 	// Set values
 	rankComm = rank;

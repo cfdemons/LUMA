@@ -30,17 +30,17 @@ void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double
 
 	// Pack the data to send
 	int toRank, ib, m;
-	for (int i = 0; i < epsCommMarkerSide.size(); i++) {
+	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
 
 		// Get body ID
-		ib = objman->bodyIDToIdx[epsCommMarkerSide[i].bodyID];
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
 
 		// Only pack if body belongs to current grid level
 		if (objman->iBody[ib]._Owner->level == level) {
 
 			// Get ID info
-			toRank = epsCommMarkerSide[i].rankComm;
-			m = epsCommMarkerSide[i].markerIdx;
+			toRank = markerCommMarkerSide[i].rankComm;
+			m = markerCommMarkerSide[i].markerIdx;
 
 			// Pack marker data
 			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eXDirection] * objman->iBody[ib].markers[m].epsilon);
@@ -62,8 +62,8 @@ void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double
 
 	// Get buffer sizes
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < epsCommOwnerSide.size(); i++)
-		bufferSize[epsCommOwnerSide[i].rankComm] += L_DIMS;
+	for (int i = 0; i < markerCommOwnerSide.size(); i++)
+		bufferSize[markerCommOwnerSide[i].rankComm] += L_DIMS;
 
 	// Now create receive buffer
 	recvBuffer.resize(num_ranks);

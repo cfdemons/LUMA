@@ -131,8 +131,8 @@ public :
 	std::ofstream* logout;
 
 	// MPI-IBM specific members
-	std::vector<epsCommOwnerSideClass> epsCommOwnerSide;
-	std::vector<epsCommMarkerSideClass> epsCommMarkerSide;
+	std::vector<markerCommOwnerSideClass> markerCommOwnerSide;
+	std::vector<markerCommMarkerSideClass> markerCommMarkerSide;
 	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
 	std::vector<supportCommSupportSideClass> supportCommSupportSide;
 

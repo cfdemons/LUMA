@@ -162,8 +162,8 @@ IBBody::IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer) {
 	int nMarkers = iBody.markers.size();
 
 	// Now get extra markers that have been received from other ranks
-	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
-		if (mpim->epsCommOwnerSide[i].bodyID == iBody.id)
+	for (int i = 0; i < mpim->markerCommOwnerSide.size(); i++) {
+		if (mpim->markerCommOwnerSide[i].bodyID == iBody.id)
 			nMarkers++;
 	}
 
@@ -205,21 +205,21 @@ IBBody::IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer) {
 	std::vector<int> idx(mpim->num_ranks, 0);
 
 	// Get starting indices
-	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
-		if (mpim->epsCommOwnerSide[i].bodyID < iBody.id)
-			idx[mpim->epsCommOwnerSide[i].rankComm] += L_DIMS + 2 + mpim->epsCommOwnerSide[i].nSupportSites * (L_DIMS + 1);
+	for (int i = 0; i < mpim->markerCommOwnerSide.size(); i++) {
+		if (mpim->markerCommOwnerSide[i].bodyID < iBody.id)
+			idx[mpim->markerCommOwnerSide[i].rankComm] += L_DIMS + 2 + mpim->markerCommOwnerSide[i].nSupportSites * (L_DIMS + 1);
 	}
 
 	// Rank to collect data from
 	int fromRank;
 
 	// Now fill in the rest of the values from other ranks
-	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
-		if (mpim->epsCommOwnerSide[i].bodyID == iBody.id) {
+	for (int i = 0; i < mpim->markerCommOwnerSide.size(); i++) {
+		if (mpim->markerCommOwnerSide[i].bodyID == iBody.id) {
 
 			// Get ID info
-			fromRank = mpim->epsCommOwnerSide[i].rankComm;
-			markerID = mpim->epsCommOwnerSide[i].markerID;
+			fromRank = mpim->markerCommOwnerSide[i].rankComm;
+			markerID = mpim->markerCommOwnerSide[i].markerID;
 
 			// Assign the position of the marker
 			markers[markerID].position[eXDirection] = recvBuffer[fromRank][idx[fromRank]]; idx[fromRank]++;
@@ -239,7 +239,7 @@ IBBody::IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer) {
 			markers[markerID].deltaval.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
 
 			// Loop through rest of support sites
-			for (int s = 1; s < mpim->epsCommOwnerSide[i].nSupportSites; s++) {
+			for (int s = 1; s < mpim->markerCommOwnerSide[i].nSupportSites; s++) {
 				markers[markerID].supp_x.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
 				markers[markerID].supp_y.push_back(recvBuffer[fromRank][idx[fromRank]]); idx[fromRank]++;
 	#if (L_DIMS == 3)

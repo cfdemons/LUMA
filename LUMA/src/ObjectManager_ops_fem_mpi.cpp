@@ -43,17 +43,17 @@ void ObjectManager::fem_getOffRankForces(int level, std::vector<std::vector<int>
 	std::vector<double> vals(L_DIMS, 0.0);
 
 	// Now loop through all received data
-	for (int i = 0; i < mpim->epsCommOwnerSide.size(); i++) {
+	for (int i = 0; i < mpim->markerCommOwnerSide.size(); i++) {
 
 		// Get body ID
-		ib = bodyIDToIdx[mpim->epsCommOwnerSide[i].bodyID];
+		ib = bodyIDToIdx[mpim->markerCommOwnerSide[i].bodyID];
 
 		// Only pack if body belongs to current grid level
 		if (iBody[ib]._Owner->level == level) {
 
 			// Get ID info
-			fromRank = mpim->epsCommOwnerSide[i].rankComm;
-			markerID = mpim->epsCommOwnerSide[i].markerID;
+			fromRank = mpim->markerCommOwnerSide[i].rankComm;
+			markerID = mpim->markerCommOwnerSide[i].markerID;
 
 			// Loop through dimensions
 			for (int d = 0; d < L_DIMS; d++)

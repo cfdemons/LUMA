@@ -63,9 +63,6 @@ void IBBody::initialise(eMoveableType moveProperty)
 		this->isMovable = false;
 	}
 
-	// Delete any markers which are on the receiver layer as not needed for IBM
-#ifdef L_BUILD_FOR_MPI
-
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
@@ -74,9 +71,9 @@ void IBBody::initialise(eMoveableType moveProperty)
 		*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
 		deleteRecvLayerMarkers();
 	}
-#endif
 
-
+	// Get indices of valid markers
+	getValidMarkers();
 }
 
 
@@ -138,6 +135,7 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 	: Body(g, bodyID, _PCpts)
 {
 
+	// IBM-specific initialisation
 	initialise(moveProperty);
 
 	// Sort the marker IDs as the point cloud reader does not build them consecutively
@@ -158,6 +156,8 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElements, bool clamped, double density, double E)
 		: Body(g, bodyID, start_position, length, angles)
 {
+
+	// IBM-specific initialisation
 	initialise(moveProperty);
 
 	// Get current rank
@@ -180,6 +180,7 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		double radius, eMoveableType moveProperty)
 		: Body(g, bodyID, centre_point, radius)
 {
+	// IBM-specific initialisation
 	initialise(moveProperty);
 }
 
@@ -195,6 +196,7 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty)
 		: Body(g, bodyID, centre_point, dimensions, angles)
 {
+	// IBM-specific initialisation
 	initialise(moveProperty);
 }
 

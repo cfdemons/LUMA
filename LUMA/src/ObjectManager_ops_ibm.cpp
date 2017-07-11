@@ -174,7 +174,7 @@ void ObjectManager::ibm_initialise() {
 #endif
 
 		// Compute extended support for each marker in the body (or body portion)
-		for (int m = 0; m < static_cast<int>(iBody[ib].markers.size()); m++)
+		for (auto m : iBody[ib].validMarkers)
 			ibm_findSupport(ib, m);
 	}
 
@@ -833,6 +833,32 @@ void ObjectManager::ibm_findEpsilon() {
 
 
 // *****************************************************************************
+/// \brief	Some final setup required for IBM
+/// \param	iBodyID	total number of IBM bodies in whole simulation
+void ObjectManager::ibm_finaliseReadIn(int iBodyID) {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Resize mapping vector
+	bodyIDToIdx.resize(iBodyID, -1);
+
+	// Set index mapping and reset FEM to IBM pointers
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Create vector which maps the bodyID to it's index in the iBody vector
+		bodyIDToIdx[iBody[ib].id] = ib;
+
+		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
+		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
+			IdxFEM.push_back(ib);
+			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
+		}
+	}
+}
+
+
+// *****************************************************************************
 /// \brief	Write out marker positions for debugging.
 ///
 ///			Writes out the marker positions for debugging
@@ -842,7 +868,7 @@ void ObjectManager::ibm_findEpsilon() {
 void ObjectManager::ibm_debug_markerPosition(int ib) {
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -853,7 +879,7 @@ void ObjectManager::ibm_debug_markerPosition(int ib) {
 		bodyout << "Marker\tx\ty\tz" << std::endl;
 
 		// Loop through markers
-		for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
+		for (auto i : iBody[ib].validMarkers) {
 			bodyout << iBody[ib].markers[i].id << "\t" << iBody[ib].markers[i].position[eXDirection] << "\t" << iBody[ib].markers[i].position[eYDirection] << "\t" << iBody[ib].markers[i].position[eZDirection] << std::endl;
 		}
 		bodyout.close();

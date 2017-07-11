@@ -137,6 +137,7 @@ public:
 	void ibm_computeForce(int level);												// Compute restorative force at each marker in ib-th body.
 	void ibm_findEpsilon();															// Method to find epsilon weighting parameter for ib-th body.
 	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
+	void ibm_finaliseReadIn(int iBodyID);
 
 	// FEM methods //
 	void fem_constructRVector(int level);											// Construct the R vector for all bodies on current level

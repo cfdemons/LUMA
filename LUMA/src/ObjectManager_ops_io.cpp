@@ -693,22 +693,8 @@ void ObjectManager::io_readInGeomConfig() {
 	}
 	file.close();
 
-	// Some sorting out to do after building everything
-	bodyIDToIdx.resize(iBodyID, -1);
-	int rank = GridUtils::safeGetRank();
-
-	// Set index mapping and reset FEM to IBM pointers
-	for (int ib = 0; ib < iBody.size(); ib++) {
-
-		// Create vector which maps the bodyID to it's index in the iBody vector
-		bodyIDToIdx[iBody[ib].id] = ib;
-
-		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
-		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-			IdxFEM.push_back(ib);
-			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
-		}
-	}
+	// Do some more IBM setup required after reading all bodies
+	ibm_finaliseReadIn(iBodyID);
 }
 
 

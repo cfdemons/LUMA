@@ -98,6 +98,7 @@ Body<MarkerType>::~Body(void)
 {
 };
 
+// TODO Point cloud reader needs sorting for MPI-IBM
 /*********************************************/
 /// \brief Custom constructor to populate body from array of points.
 /// \param g		hierarchy pointer to grid hierarchy

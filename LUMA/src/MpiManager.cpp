@@ -58,6 +58,12 @@ MpiManager::MpiManager()
 
 	// Initialise the manager, grid information and topology
 	mpi_init();
+
+	// Resize the IBM-MPI helper classes for each grid level
+	markerCommOwnerSide.resize(L_NUM_LEVELS+1);
+	markerCommMarkerSide.resize(L_NUM_LEVELS+1);
+	supportCommMarkerSide.resize(L_NUM_LEVELS+1);
+	supportCommSupportSide.resize(L_NUM_LEVELS+1);
 }
 
 /// \brief	Default destructor.

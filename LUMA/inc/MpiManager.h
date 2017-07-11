@@ -131,10 +131,10 @@ public :
 	std::ofstream* logout;
 
 	// MPI-IBM specific members
-	std::vector<markerCommOwnerSideClass> markerCommOwnerSide;
-	std::vector<markerCommMarkerSideClass> markerCommMarkerSide;
-	std::vector<supportCommMarkerSideClass> supportCommMarkerSide;
-	std::vector<supportCommSupportSideClass> supportCommSupportSide;
+	std::vector<std::vector<markerCommOwnerSideClass>> markerCommOwnerSide;
+	std::vector<std::vector<markerCommMarkerSideClass>> markerCommMarkerSide;
+	std::vector<std::vector<supportCommMarkerSideClass>> supportCommMarkerSide;
+	std::vector<std::vector<supportCommSupportSideClass>> supportCommSupportSide;
 
 
 
@@ -175,9 +175,8 @@ public :
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 
 	// IBM
-	void mpi_getIBMarkers();															// Collect all IBM markers for each body
-	void mpi_buildEpsComms();															// Build comms required for epsilon calculation
-	void mpi_buildSupportComms();														// Build comms required for support communication
+	void mpi_buildMarkerComms(int level);												// Build comms required for epsilon calculation
+	void mpi_buildSupportComms(int level);													// Build comms required for support communication
 	void mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer);			// Do communication required for epsilon calculation
 	void mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon);				// Do communication required for epsilon calculation
 	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation

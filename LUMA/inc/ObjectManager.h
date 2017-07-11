@@ -153,7 +153,7 @@ public:
 	void ibm_debug_supportForce(int ib);
 
 	// IBM-MPI methods
-	void ibm_buildMPIComms();
+	void ibm_updateMPIComms(int level);
 	void ibm_interpolateOffRankVels(int level);
 	void ibm_spreadOffRankForces(int level);
 

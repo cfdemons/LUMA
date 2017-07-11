@@ -178,9 +178,10 @@ void ObjectManager::ibm_initialise() {
 			ibm_findSupport(ib, m);
 	}
 
-	// Get MPI Manager Instance
+	// Build helper classes for MPI comms
 #ifdef L_BUILD_FOR_MPI
-	ibm_buildMPIComms();
+	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+		ibm_updateMPIComms(lev);
 #endif
 
 	// Find epsilon for the body

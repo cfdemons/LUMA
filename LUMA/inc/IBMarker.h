@@ -70,6 +70,8 @@ protected:
 	double epsilon;			///< Scaling parameter
 	double local_area;		///< Area associated with support node in lattice units (same for all points if from same grid and regularly spaced like LBM)
 	double dilation;		///< Dilation parameter in lattice units (same in all directions for uniform Eulerian grid)
+
+	int owningRank;			///< Rank which owns the region where this marker exists
 };
 
 #endif

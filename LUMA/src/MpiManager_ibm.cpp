@@ -345,144 +345,78 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 }
 
 // ************************************************************************* //
-/// \brief	Owning rank gets how many IBM markers are where for each body
+/// \brief	Build helper classes for bodyOwner-marker communication
 ///
 ///
-void MpiManager::mpi_getIBMarkers() {
+void MpiManager::mpi_buildMarkerComms(int level) {
+
+	// Clear the vector
+	markerCommOwnerSide[level].clear();
+	markerCommMarkerSide[level].clear();
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
-	// Build marker side class (only for markers which belong to bodies this rank does not own)
+	// Build owner side for marker comms
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
-		if (my_rank != objman->iBody[ib].owningRank) {
-			for (int m = 0; m < objman->iBody[ib].markers.size(); m++)
-				markerCommMarkerSide.emplace_back(objman->iBody[ib].owningRank, objman->iBody[ib].id, m);
+		if (my_rank == objman->iBody[ib].owningRank && level == objman->iBody[ib]._Owner->level) {
+			for (int m = 0; m < objman->iBody[ib].markers.size(); m++) {
+				if (my_rank != objman->iBody[ib].markers[m].owningRank)
+					markerCommOwnerSide[level].emplace_back(objman->iBody[ib].markers[m].owningRank, objman->iBody[ib].id, objman->iBody[ib].markers[m].id);
+			}
 		}
 	}
 
-	// Get how many supports site that need to be received from each rank
-	std::vector<int> nMarkersToSend(num_ranks, 0);
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
-		nMarkersToSend[markerCommMarkerSide[i].rankComm]++;
+	// Build marker side for marker comms
+	for (int ib = 0; ib < objman->iBody.size(); ib++) {
+		if (my_rank != objman->iBody[ib].owningRank && level == objman->iBody[ib]._Owner->level) {
+			for (auto m : objman->iBody[ib].validMarkers)
+				markerCommMarkerSide[level].emplace_back(objman->iBody[ib].owningRank, objman->iBody[ib].id, m);
+		}
 	}
 
-	// Do global comm so that each rank knows how many support sites to send and where
-	std::vector<int> nMarkersToRecv(num_ranks, 0);
-	MPI_Alltoall(&nMarkersToSend.front(), 1, MPI_INT, &nMarkersToRecv.front(), 1, MPI_INT, world_comm);
-
-	// Create send buffer
+	// Send number of support sites
 	std::vector<std::vector<int>> sendBuffer(num_ranks, std::vector<int>(0));
 
-	// Pack body and marker IDs for sending
+	// Pack data
 	int toRank, ib, m;
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
-		// Body and marker ID
-		toRank = markerCommMarkerSide[i].rankComm;
-		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
-		m = markerCommMarkerSide[i].markerIdx;
+		// Get marker info
+		toRank = markerCommMarkerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
+		m = markerCommMarkerSide[level][i].markerIdx;
 
-		// Fill send buffer
-		sendBuffer[toRank].push_back(markerCommMarkerSide[i].bodyID);
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].id);
+		// Pack into send buffer
+		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].deltaval.size());
 	}
 
-	// Loop through and send
+	// Now loop through and send to required ranks
 	std::vector<MPI_Request> sendRequests;
-	for (toRank = 0; toRank < num_ranks; toRank++) {
+	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
 			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
-	// Declare receive buffer
-	std::vector<std::vector<int>> recvBuffer(num_ranks, std::vector<int>(0));
-
-	// Loop through all receives that are required
-	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-
-		// Check if it has stuff to receive from rank i
-		if (nMarkersToRecv[fromRank] > 0) {
-			recvBuffer[fromRank].resize(2 * nMarkersToRecv[fromRank]);
-			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
-		}
-	}
-
-	// Now unpack and build comm class
-	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-		for (int i = 0; i < nMarkersToRecv[fromRank]; i++) {
-
-			// Get ID
-			ib = recvBuffer[fromRank][2 * i];
-			m = recvBuffer[fromRank][2 * i + 1];
-
-			// Build class
-			markerCommOwnerSide.emplace_back(fromRank, ib, m);
-		}
-	}
-
-	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
-}
-
-
-// ************************************************************************* //
-/// \brief	Build communication information required for epsilon calculation.
-///
-///			The owning rank of each body needs to know how many markers it is
-///			receiving and from where. It also needs to know how many support
-///			points exist for that marker too. Also, the ranks sending this info
-///			need to know this too. This data will be stored in the epsComm class
-///
-void MpiManager::mpi_buildEpsComms() {
-
-	// Get object manager instance
-	ObjectManager *objman = ObjectManager::getInstance();
-
-	// Send buffer which will hold nSupportSites
-	std::vector<std::vector<int>> nSupportSitesSend(num_ranks, std::vector<int>(0));
-
-	// Loop through eps-comm class on marker side and pack nSupportSites for sending to owner
-	int toRank, ib, m;
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
-
-		// Get marker info
-		toRank = markerCommMarkerSide[i].rankComm;
-		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
-		m = markerCommMarkerSide[i].markerIdx;
-
-		// Pack into send buffer
-		nSupportSitesSend[toRank].push_back(objman->iBody[ib].markers[m].deltaval.size());
-	}
-
-	// Now loop through and send to required ranks
-	std::vector<MPI_Request> sendRequests;
-	for (int toRank = 0; toRank < num_ranks; toRank++) {
-		if (nSupportSitesSend[toRank].size() > 0) {
-			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&nSupportSitesSend[toRank].front(), nSupportSitesSend[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
-		}
-	}
-
 	// Now create and size the receive buffer
-	std::vector<std::vector<int>> nSupportSitesRecv(num_ranks, std::vector<int>(0));
-	for (int i = 0; i < markerCommOwnerSide.size(); i++)
-		nSupportSitesRecv[markerCommOwnerSide[i].rankComm].push_back(0);
+	std::vector<std::vector<int>> recvBuffer(num_ranks, std::vector<int>(0));
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++)
+		recvBuffer[markerCommOwnerSide[level][i].rankComm].push_back(0);
 
 	// Now loop through and receive
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-		if (nSupportSitesRecv[fromRank].size() > 0) {
-			MPI_Recv(&nSupportSitesRecv[fromRank].front(), nSupportSitesRecv[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		if (recvBuffer[fromRank].size() > 0) {
+			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
 	// Now unpack
 	std::vector<int> idx(num_ranks, 0);
-	for (int i = 0; i < markerCommOwnerSide.size(); i++) {
-		markerCommOwnerSide[i].nSupportSites = nSupportSitesRecv[markerCommOwnerSide[i].rankComm][idx[markerCommOwnerSide[i].rankComm]];
-		idx[markerCommOwnerSide[i].rankComm]++;
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+		markerCommOwnerSide[level][i].nSupportSites = recvBuffer[markerCommOwnerSide[level][i].rankComm][idx[markerCommOwnerSide[level][i].rankComm]];
+		idx[markerCommOwnerSide[level][i].rankComm]++;
 	}
 
 	// If sending any messages then wait for request status
@@ -495,7 +429,7 @@ void MpiManager::mpi_buildEpsComms() {
 ///			The owning rank of each marker needs to know where to get support
 ///			information from.
 ///
-void MpiManager::mpi_buildSupportComms() {
+void MpiManager::mpi_buildSupportComms(int level) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();

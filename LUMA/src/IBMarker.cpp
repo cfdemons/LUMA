@@ -45,6 +45,9 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->position0[eXDirection] = this->position[eXDirection];
 	this->position0[eYDirection] = this->position[eYDirection];
 	this->position0[eZDirection] = this->position[eZDirection];
+
+	// Get rank which owns area where this marker is
+	this->owningRank = GridUtils::getRankfromPosition(position);
 }
 
 

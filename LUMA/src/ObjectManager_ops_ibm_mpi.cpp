@@ -21,19 +21,16 @@
 
 
 /// \brief	Builds MPI comm class for MPI communication in IBM.
-void ObjectManager::ibm_buildMPIComms() {
+void ObjectManager::ibm_updateMPIComms(int level) {
 
 	// Get MPI manager instance
 	MpiManager *mpim = MpiManager::getInstance();
 
-	// Build MPI comm classes for markers
-	mpim->mpi_getIBMarkers();
-
 	// Build MPI comm classes for epsilon calculation
-	mpim->mpi_buildEpsComms();
+	mpim->mpi_buildMarkerComms(level);
 
 	// Build MPI comm class for support communication
-	mpim->mpi_buildSupportComms();
+	mpim->mpi_buildSupportComms(level);
 }
 
 

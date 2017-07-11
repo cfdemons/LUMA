@@ -910,7 +910,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 #endif	
 
 	// If there are points left
-	if (!_PCpts->x.empty())
+	if (!_PCpts->x.empty() && geom->objtype != eIBBCloud)
 	{
 
 #ifdef L_CLOUD_DEBUG
@@ -932,14 +932,12 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 			// Call constructor to build BFL body
 			pBody.emplace_back(g, geom->bodyID, _PCpts);
 			break;
-
-		case eIBBCloud:
-
-			// Call constructor to build IBM body
-			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->isClamped);
-			break;
-
 		}
+	}
+	else if (geom->objtype == eIBBCloud) {
+
+		// Call constructor to build IBM body
+		iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->isClamped);
 	}
 }
 // *****************************************************************************

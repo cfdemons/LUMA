@@ -82,7 +82,11 @@ void IBBody::initialise(eMoveableType moveProperty)
 IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped)
 	: Body(g, bodyID, _PCpts)
 {
-	initialise(moveProperty);	
+
+	initialise(moveProperty);
+
+	// Sort the marker IDs as the point cloud reader does not build them consecutively
+	sortMarkerIDs();
 }
 
 

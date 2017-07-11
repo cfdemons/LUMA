@@ -774,7 +774,7 @@ void Body<MarkerType>::sortMarkerIDs()
 	MPI_Gatherv(&sendIDBuffer.front(), nMarkers, MPI_INT, &recvIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, owningRank, mpim->world_comm);
 
 	// Now do the sorting
-	std::vector<int> sendNewIDBuffer;
+	std::vector<int> sendSortedIDBuffer;
 	if (mpim->my_rank == owningRank) {
 
 		// Create vector for each marker which contains rank ID and an index array
@@ -793,21 +793,21 @@ void Body<MarkerType>::sortMarkerIDs()
 		std::sort(indexIDs.begin(), indexIDs.end(), [&](int a, int b) {return recvIDBuffer[a] < recvIDBuffer[b];});
 
 		// Pack into send buffer
-		sendNewIDBuffer.resize(indexIDs.size(), 0);
+		sendSortedIDBuffer.resize(indexIDs.size(), 0);
 		for (int i = 0; i < indexIDs.size(); i++) {
-			sendNewIDBuffer[indexIDs[i]] = i;
+			sendSortedIDBuffer[indexIDs[i]] = i;
 		}
 	}
 
 	// Create receive buffers
-	std::vector<int> recvNewIDBuffer(nMarkers, 0);
+	std::vector<int> recvSortedIDBuffer(nMarkers, 0);
 
 	// Scatter to all ranks
-	MPI_Scatterv(&sendNewIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvNewIDBuffer.front(), nMarkers, MPI_INT, owningRank, mpim->world_comm);
+	MPI_Scatterv(&sendSortedIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvSortedIDBuffer.front(), nMarkers, MPI_INT, owningRank, mpim->world_comm);
 
 	// Unpack into correct place
 	for (int i = 0; i < nMarkers; i++) {
-		markers[i].id = recvNewIDBuffer[i];
+		markers[i].id = recvSortedIDBuffer[i];
 	}
 #endif
 

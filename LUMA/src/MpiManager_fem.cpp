@@ -20,7 +20,7 @@
 ///
 ///
 /// \param current grid level
-void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double>> &recvBuffer) {
+void MpiManager::mpi_forceCommGather(int level) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
@@ -30,23 +30,23 @@ void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double
 
 	// Pack the data to send
 	int toRank, ib, m;
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
 		// Get body ID
-		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
 
-		// Only pack if body belongs to current grid level
-		if (objman->iBody[ib]._Owner->level == level) {
+		// Only pack if body belongs to current grid level and is flexible
+		if (objman->iBody[ib]._Owner->level == level && objman->iBody[ib].isFlexible) {
 
 			// Get ID info
-			toRank = markerCommMarkerSide[i].rankComm;
-			m = markerCommMarkerSide[i].markerIdx;
+			toRank = markerCommMarkerSide[level][i].rankComm;
+			m = markerCommMarkerSide[level][i].markerIdx;
 
 			// Pack marker data
-			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eXDirection] * objman->iBody[ib].markers[m].epsilon);
-			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eYDirection] * objman->iBody[ib].markers[m].epsilon);
+			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eXDirection]);
+			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eYDirection]);
 #if (L_DIMS == 3)
-			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eZDirection] * objman->iBody[ib].markers[m].epsilon);
+			sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].force_xyz[eZDirection]);
 #endif
 		}
 	}
@@ -62,11 +62,13 @@ void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double
 
 	// Get buffer sizes
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < markerCommOwnerSide.size(); i++)
-		bufferSize[markerCommOwnerSide[i].rankComm] += L_DIMS;
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+		if (objman->iBody[objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID]].isFlexible)
+			bufferSize[markerCommOwnerSide[level][i].rankComm] += L_DIMS;
+	}
 
 	// Now create receive buffer
-	recvBuffer.resize(num_ranks);
+	std::vector<std::vector<double>> recvBuffer(num_ranks, std::vector<double>(0));
 
 	// Now loop through and receive the buffer
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
@@ -75,6 +77,32 @@ void MpiManager::mpi_offRankForcesComm(int level, std::vector<std::vector<double
 		if (bufferSize[fromRank] > 0) {
 			recvBuffer[fromRank].resize(bufferSize[fromRank]);
 			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+
+	// Index vector for looping through recvBuffer
+	std::vector<int> idx(num_ranks, 0);
+
+	// Now unpack
+	int fromRank;
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+
+		// Get body idx
+		ib = objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID];
+
+		// Only unpack if body is flexible
+		if (objman->iBody[ib].isFlexible) {
+
+			// Get ID info
+			fromRank = markerCommOwnerSide[level][i].rankComm;
+			m = markerCommOwnerSide[level][i].markerID;
+
+			// Loop through and set force
+			for (int d = 0; d < L_DIMS; d++)
+				objman->iBody[ib].markers[m].force_xyz[d] = recvBuffer[fromRank][idx[fromRank]+d];
+
+			// Increment
+			idx[fromRank] += L_DIMS;
 		}
 	}
 

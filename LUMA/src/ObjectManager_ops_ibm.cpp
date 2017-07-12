@@ -51,30 +51,24 @@ void ObjectManager::ibm_apply(int level) {
 /// \param level current grid level
 void ObjectManager::ibm_moveBodies(int level) {
 
-	// Get rank
-	int rank = GridUtils::safeGetRank();
 
-	// Set R vector (is invariant during Newton-Raphson iterations)
-	fem_constructRVector(level);
+#ifdef L_BUILD_FOR_MPI
+
+	// Get MPI manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Pass delta values
+	mpim->mpi_forceCommGather(level);
+#endif
 
 	// Loop through bodies and apply FEM
-	for (int ib = 0; ib < IdxFEM.size(); ib++) {
+	for (auto ib : IdxFEM) {
 
 		// Only do if on this grid level
-		if (iBody[IdxFEM[ib]]._Owner->level == level) {
-			iBody[IdxFEM[ib]].fBody->dynamicFEM();
+		if (iBody[ib]._Owner->level == level) {
+			iBody[ib].fBody->dynamicFEM();
 		}
 	}
-
-	// Update IBM values
-	fem_updateIBMarkers(level);
-
-//	// Update IB positions
-//	updateIBPositions();
-//
-//	// Update IB velocities
-//	updateIBVelocities(relaxParam);
-
 
 
 //	// Loop through all bodies and find support
@@ -265,12 +259,6 @@ void ObjectManager::ibm_findSupport(int ib, int m) {
 	nearpos.push_back(iBody[ib]._Owner->YPos[jnear]);
 	nearpos.push_back(iBody[ib]._Owner->ZPos[knear]);
 
-	// Side length of support region defined as 3 x dilation parameter
-	iBody[ib].markers[m].dilation = 1.0;
-
-	// Store normalised area of support region
-	iBody[ib].markers[m].local_area = 1.0;
-
 	// Vector to store estimated positions of the possible support points
 	double estimated_position[3] = { 0, 0, 0 };
 
@@ -458,7 +446,7 @@ void ObjectManager::ibm_interpolate(int level) {
 #endif
 
 			// For each marker
-			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+			for (auto m : iBody[ib].validMarkers) {
 
 				// Reset the values of interpolated velocity and density
 				std::fill(iBody[ib].markers[m].interpMom.begin(), iBody[ib].markers[m].interpMom.end(), 0.0);
@@ -547,7 +535,7 @@ void ObjectManager::ibm_computeForce(int level) {
 
 		// Only do if this body is on this grid level
 		if (iBody[ib]._Owner->level == level) {
-			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (auto m : iBody[ib].validMarkers) {
 				for (int dir = 0; dir < L_DIMS; dir++) {
 
 					// Compute restorative force (in lattice units)
@@ -580,12 +568,12 @@ void ObjectManager::ibm_spread(int level) {
 			size_t K_lim = iBody[ib]._Owner->K_lim;
 
 			// Loop through markers
-			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (auto m : iBody[ib].validMarkers) {
 
 				// Loop through support sites
 				for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
 
-					// Only interpolate over data this rank actually owns at the moment
+					// Only spread over data this rank actually owns at the moment
 					if (rank == iBody[ib].markers[m].support_rank[s]) {
 
 						// Set volume scaling
@@ -652,7 +640,7 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 		if (iBody[ib]._Owner->level == level) {
 
 			// Loop through all markers
-			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (auto m : iBody[ib].validMarkers) {
 				for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
 
 					// Only do if this rank actually owns this support site
@@ -682,18 +670,18 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 	// Loop through any support sites this rank owns which belong to markers off-rank
-	for (int i = 0; i < mpim->supportCommSupportSide.size(); i++) {
+	for (int i = 0; i < mpim->supportCommSupportSide[level].size(); i++) {
 
 		// Get body idx
-		ib = bodyIDToIdx[mpim->supportCommSupportSide[i].bodyID];
+		ib = bodyIDToIdx[mpim->supportCommSupportSide[level][i].bodyID];
 
 		// Only do if body is on this grid level
 		if (iBody[ib]._Owner->level == level) {
 
 			// Get indices
-			idx = mpim->supportCommSupportSide[i].supportIdx[eXDirection];
-			jdx = mpim->supportCommSupportSide[i].supportIdx[eYDirection];
-			kdx = mpim->supportCommSupportSide[i].supportIdx[eZDirection];
+			idx = mpim->supportCommSupportSide[level][i].supportIdx[eXDirection];
+			jdx = mpim->supportCommSupportSide[level][i].supportIdx[eYDirection];
+			kdx = mpim->supportCommSupportSide[level][i].supportIdx[eZDirection];
 
 			// Grid site index and type
 			id = kdx + jdx * iBody[ib]._Owner->K_lim + idx * iBody[ib]._Owner->K_lim * iBody[ib]._Owner->M_lim;
@@ -756,16 +744,16 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #if (L_DIMS == 3)
 						Delta_J =
 							ibm_deltaKernel(
-							(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
-							iBodyTemp[ib].markers[J].dilation
+							(iBody[ib].markers[J].position[eXDirection] - iBody[ib].markers[I].supp_x[s]) / iBody[ib]._Owner->dh,
+							iBody[ib].markers[J].dilation
 							) *
 							ibm_deltaKernel(
-							(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
-							iBodyTemp[ib].markers[J].dilation
+							(iBody[ib].markers[J].position[eYDirection] - iBody[ib].markers[I].supp_y[s]) / iBody[ib]._Owner->dh,
+							iBody[ib].markers[J].dilation
 							) *
 							ibm_deltaKernel(
-							(iBodyTemp[ib].markers[J].position[eZDirection] - iBodyTemp[ib].markers[I].supp_z[s]) / iBodyTemp[ib]._Owner->dh,
-							iBodyTemp[ib].markers[J].dilation
+							(iBody[ib].markers[J].position[eZDirection] - iBody[ib].markers[I].supp_z[s]) / iBody[ib]._Owner->dh,
+							iBody[ib].markers[J].dilation
 							);
 #else
 						Delta_J =
@@ -949,7 +937,7 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 void ObjectManager::ibm_debug_interpVel(int ib) {
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -961,7 +949,7 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 		predout << "Marker\tVelX\tVelY\tVelZ" << std::endl;
 
 		// Loop through markers
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (auto m : iBody[ib].validMarkers) {
 			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpMom[eXDirection] / iBody[ib].markers[m].interpRho << "\t" <<
 														  iBody[ib].markers[m].interpMom[eYDirection] / iBody[ib].markers[m].interpRho << "\t" <<
 														  iBody[ib].markers[m].interpMom[eZDirection] / iBody[ib].markers[m].interpRho << std::endl;
@@ -981,7 +969,7 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 void ObjectManager::ibm_debug_markerForce(int ib) {
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -993,7 +981,7 @@ void ObjectManager::ibm_debug_markerForce(int ib) {
 		forceout << "Marker\tFx\tFy\tFz" << std::endl;
 
 		// Loop through markers
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (auto m : iBody[ib].validMarkers) {
 			forceout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << "\t" << iBody[ib].markers[m].force_xyz[eZDirection] << std::endl;
 		}
 		forceout << std::endl;
@@ -1011,7 +999,7 @@ void ObjectManager::ibm_debug_markerForce(int ib) {
 void ObjectManager::ibm_debug_supportVel(int ib) {
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -1028,7 +1016,7 @@ void ObjectManager::ibm_debug_supportVel(int ib) {
 #endif
 
 		// Loop through markers and support sites
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
+		for (auto m : iBody[ib].validMarkers) {
 			for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
 
 				// Write out the first (nearest) support marker
@@ -1066,7 +1054,7 @@ void ObjectManager::ibm_debug_supportForce(int ib) {
 
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -1081,7 +1069,7 @@ void ObjectManager::ibm_debug_supportForce(int ib) {
 		size_t K_lim = iBody[ib]._Owner->K_lim;
 
 		// Loop through markers and support sites
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
+		for (auto m : iBody[ib].validMarkers) {
 			for (int s = 0; s < iBody[ib].markers[m].deltaval.size(); s++) {
 
 				// Write out the first (nearest) support marker

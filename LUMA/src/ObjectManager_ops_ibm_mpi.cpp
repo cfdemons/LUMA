@@ -49,18 +49,18 @@ void ObjectManager::ibm_interpolateOffRankVels(int level) {
 
 	// Now interpolate these remaining values onto the marker
 	int ib, m, s, fromRank;
-	for (int i = 0; i < mpim->supportCommMarkerSide.size(); i++) {
+	for (int i = 0; i < mpim->supportCommMarkerSide[level].size(); i++) {
 
 		// Get body idx
-		ib = bodyIDToIdx[mpim->supportCommMarkerSide[i].bodyID];
+		ib = bodyIDToIdx[mpim->supportCommMarkerSide[level][i].bodyID];
 
 		// Only do if body is on this grid level
 		if (iBody[ib]._Owner->level == level) {
 
 			// Get IDs of support site
-			m = mpim->supportCommMarkerSide[i].markerIdx;
-			s = mpim->supportCommMarkerSide[i].supportID;
-			fromRank = mpim->supportCommMarkerSide[i].rankComm;
+			m = mpim->supportCommMarkerSide[level][i].markerIdx;
+			s = mpim->supportCommMarkerSide[level][i].supportID;
+			fromRank = mpim->supportCommMarkerSide[level][i].rankComm;
 
 			// Interpolate density
 			iBody[ib].markers[m].interpRho += interpVels[fromRank][idx[fromRank]] * iBody[ib].markers[m].deltaval[s] * iBody[ib].markers[m].local_area;
@@ -94,10 +94,10 @@ void ObjectManager::ibm_spreadOffRankForces(int level) {
 
 	// Now interpolate these remaining values onto the marker
 	int ib, fromRank;
-	for (int i = 0; i < mpim->supportCommSupportSide.size(); i++) {
+	for (int i = 0; i < mpim->supportCommSupportSide[level].size(); i++) {
 
 		// Get body idx
-		ib = bodyIDToIdx[mpim->supportCommSupportSide[i].bodyID];
+		ib = bodyIDToIdx[mpim->supportCommSupportSide[level][i].bodyID];
 
 		// Only do if body is on this grid level
 		if (iBody[ib]._Owner->level == level) {
@@ -107,8 +107,8 @@ void ObjectManager::ibm_spreadOffRankForces(int level) {
 			size_t K_lim = iBody[ib]._Owner->K_lim;
 
 			// Get IDs of support site
-			fromRank = mpim->supportCommSupportSide[i].rankComm;
-			suppIdx = mpim->supportCommSupportSide[i].supportIdx;
+			fromRank = mpim->supportCommSupportSide[level][i].rankComm;
+			suppIdx = mpim->supportCommSupportSide[level][i].supportIdx;
 
 			// Interpolate these values
 			for (int dir = 0; dir < L_DIMS; dir++)

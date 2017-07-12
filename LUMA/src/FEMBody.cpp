@@ -18,6 +18,7 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/FEMBody.h"
+#include "../inc/IBMarker.h"
 
 // ***************************************************************************************************
 /// \brief Default constructor for FEM body.
@@ -112,6 +113,9 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 //
 void FEMBody::dynamicFEM () {
 
+	// Construct load vector as invariant during Newton-Raphson iterations
+	constructRVector();
+
 	// While loop parameters
 	double res;
 	int it;
@@ -141,6 +145,9 @@ void FEMBody::dynamicFEM () {
 
 	// Calculate velocities and accelerations
 	updateVelocityAndAcceleration();
+
+	// Update IBM markers
+	updateIBMarkers();
 }
 
 
@@ -227,6 +234,67 @@ void FEMBody::updateVelocityAndAcceleration () {
 		UdotdotStar = a6 * (U[i] - U_n[i]) + a7 * Udot[i] + a8 * Udotdot[i];
 		Udot[i] = Udot[i] + a9 * Udotdot[i] + a10 * UdotdotStar;
 		Udotdot[i] = UdotdotStar;
+	}
+}
+
+
+// *****************************************************************************
+/// \brief	Construct load vector.
+///
+///
+void FEMBody::constructRVector() {
+
+	// Initialise arrays and matrices for calculating load vector
+	std::vector<std::vector<double>> T(L_DIMS, std::vector<double>(L_DIMS, 0.0));
+	std::vector<double> Rlocal(DOFsPerElement, 0.0);
+	std::vector<double> RGlobal(DOFsPerElement, 0.0);
+	std::vector<double> F(L_DIMS, 0.0);
+
+	// Required parameters
+	double forceScale, length, a, b;
+	int IBnode;
+
+	// Set R vector to zero
+	fill(R.begin(), R.end(), 0.0);
+
+	// Get force scaling parameter
+	forceScale = iBodyPtr->_Owner->dm / SQ(iBodyPtr->_Owner->dt);
+
+	// Loop through all FEM elements
+	for (int el = 0; el < elements.size(); el++) {
+
+		// Get element parameters
+		length = elements[el].length;
+
+		// Now loop through all child IB nodes this element has
+		for (int node = 0; node < elements[el].IBChildNodes.size(); node++) {
+
+			// Get IB node and integration ranges
+			IBnode = elements[el].IBChildNodes[node].nodeID;
+			a = elements[el].IBChildNodes[node].zeta1;
+			b = elements[el].IBChildNodes[node].zeta2;
+
+			// Get subset of transpose matrix
+			T = {{elements[el].T[0][0], elements[el].T[0][1]},
+				 {elements[el].T[1][0], elements[el].T[1][1]}};
+
+			// Convert force to local coordinates
+			F = GridUtils::matrix_multiply(T, GridUtils::vecmultiply(iBodyPtr->markers[IBnode].epsilon * 1.0 * forceScale, iBodyPtr->markers[IBnode].force_xyz));
+
+			// Get the nodal values by integrating over range of IB point
+			Rlocal[0] = F[0] * 0.5 * length * (0.5 * b - 0.5 * a + 0.25 * SQ(a) - 0.25 * SQ(b));
+			Rlocal[1] = F[1] * 0.5 * length * (0.5 * b - 0.5 * a - SQ(a) * SQ(a) / 16.0 + SQ(b) * SQ(b) / 16.0 + 3.0 * SQ(a) / 8.0 - 3.0 * SQ(b) / 8.0);
+			Rlocal[2] = F[1] * 0.5 * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 - length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 + length * (b - a) / 8.0);
+			Rlocal[3] = F[0] * 0.5 * length * (-0.25 * SQ(a) + 0.25 * SQ(b) + 0.5 * b - 0.5 * a);
+			Rlocal[4] = F[1] * 0.5 * length * (0.5 * b - 0.5 * a + SQ(a) * SQ(a) / 16.0 - SQ(b) * SQ(b) / 16.0 - 3.0 * SQ(a) / 8.0 + 3.0 * SQ(b) / 8.0);
+			Rlocal[5] = F[1] * 0.5 * length * (length * (-SQ(a) * SQ(a) + SQ(b) * SQ(b)) / 32.0 + length * (-TH(a) + TH(b)) / 24.0 - length * (-SQ(a) + SQ(b)) / 16.0 - length * (b - a) / 8.0);
+
+			// Get element internal forces
+			RGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Rlocal);
+
+			// Add to global vector
+			GridUtils::assembleGlobalVec(el, DOFsPerNode, RGlobal, R);
+		}
 	}
 }
 
@@ -542,6 +610,55 @@ void FEMBody::updateFEMNodes () {
 		elements[el].T[0][1] = elements[el].T[3][4] = sin(elements[el].angles);
 		elements[el].T[1][0] = elements[el].T[4][3] = -sin(elements[el].angles);
 		elements[el].T[2][2] = elements[el].T[5][5] =  1.0;
+	}
+}
+
+/// \brief	Update the IBM markers using new FEM node vales
+///
+///
+void FEMBody::updateIBMarkers() {
+
+	// Parameters
+	int el, zeta, length;
+	std::vector<double> ULocal, UnodeLocal, UnodeGlobal;
+	std::vector<double> UDotLocal, UDotNodeLocal, UDotNodeGlobal;
+	std::vector<double> UGlobal(DOFsPerElement, 0.0);
+	std::vector<double> UDotGlobal(DOFsPerElement, 0.0);
+	std::vector<std::vector<double>> T(L_DIMS, std::vector<double>(L_DIMS, 0.0));
+
+	// Loop through all IBM nodes
+	for (int node = 0; node < IBNodeParents.size(); node++) {
+
+		// Get element this IB node exists within
+		el = IBNodeParents[node].elementID;
+		zeta = IBNodeParents[node].zeta;
+		length = elements[el].length;
+
+		// Get the element values
+		GridUtils::disassembleGlobalVec(el, DOFsPerNode, U, UGlobal);
+		GridUtils::disassembleGlobalVec(el, DOFsPerNode, Udot, UDotGlobal);
+
+		// Get element values in local coordinates
+		ULocal = GridUtils::matrix_multiply(elements[el].T, UGlobal);
+		UDotLocal = GridUtils::matrix_multiply(elements[el].T, UDotGlobal);
+
+		// Get the local displacement of the IB node
+		UnodeLocal = shapeFunctions(ULocal, zeta, length);
+		UDotNodeLocal = shapeFunctions(UDotLocal, zeta, length);
+
+		// Get subset of transformation matrix
+		T = {{elements[el].T[0][0], elements[el].T[0][1]},
+			 {elements[el].T[1][0], elements[el].T[1][1]}};
+
+		// Get the IB node displacements in global coordinates
+		UnodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UnodeLocal);
+		UDotNodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UDotNodeLocal);
+
+		// Set the IBM node
+		for (int d = 0; d < L_DIMS; d++) {
+			iBodyPtr->markers[node].position[d] = iBodyPtr->markers[node].position0[d] + UnodeGlobal[d];
+			iBodyPtr->markers[node].markerVel[d] = UDotNodeGlobal[d] * iBodyPtr->_Owner->dt / iBodyPtr->_Owner->dh;
+		}
 	}
 }
 

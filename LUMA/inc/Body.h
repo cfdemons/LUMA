@@ -707,7 +707,7 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	fout << "DATASET POLYDATA\n";
 
 	// Write out the positions of each Lagrange marker
-	fout << "POINTS " << markers.size() << " float\n";
+	fout << "POINTS " << validMarkers.size() << " float\n";
 	for (auto i : validMarkers) {
 
 		fout << markers[i].position[0] << " "

@@ -33,6 +33,7 @@ class IBMarker : public Marker {
 	// Same for IBBody
 	friend class IBBody;
 	friend class IBInfo;
+	friend class FEMBody;
 
 public:
 

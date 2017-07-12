@@ -33,18 +33,18 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 	std::vector<std::vector<double>> sendForce(num_ranks, std::vector<double>(0));
 
 	// Pack and send data first
-	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
 
 		// Get body index
-		ib = objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID];
+		ib = objman->bodyIDToIdx[supportCommMarkerSide[level][i].bodyID];
 
 		// Only pack if body belongs to current grid level
 		if (objman->iBody[ib]._Owner->level == level) {
 
 			// Get rank to send to and support ID info
-			toRank = supportCommMarkerSide[i].rankComm;
-			m = supportCommMarkerSide[i].markerIdx;
-			s = supportCommMarkerSide[i].supportID;
+			toRank = supportCommMarkerSide[level][i].rankComm;
+			m = supportCommMarkerSide[level][i].markerIdx;
+			s = supportCommMarkerSide[level][i].supportID;
 
 			// Get volume scaling
 			double volWidth = objman->iBody[ib].markers[m].epsilon;
@@ -74,9 +74,9 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 
 	// Get receive sizes from each rank
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < supportCommSupportSide.size(); i++) {
-		if (objman->iBody[objman->bodyIDToIdx[supportCommSupportSide[i].bodyID]]._Owner->level == level)
-			bufferSize[supportCommSupportSide[i].rankComm] += L_DIMS;
+	for (int i = 0; i < supportCommSupportSide[level].size(); i++) {
+		if (objman->iBody[objman->bodyIDToIdx[supportCommSupportSide[level][i].bodyID]]._Owner->level == level)
+			bufferSize[supportCommSupportSide[level][i].rankComm] += L_DIMS;
 	}
 
 	// Now receive the velocity values
@@ -110,16 +110,16 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 	std::vector<std::vector<double>> sendVel(num_ranks, std::vector<double>(0));
 
 	// Pack and send data first
-	for (int i = 0; i < supportCommSupportSide.size(); i++) {
+	for (int i = 0; i < supportCommSupportSide[level].size(); i++) {
 
 		// Get body ID
-		ib = objman->bodyIDToIdx[supportCommSupportSide[i].bodyID];
+		ib = objman->bodyIDToIdx[supportCommSupportSide[level][i].bodyID];
 
 		// Only pack if body belongs to current grid level
 		if (objman->iBody[ib]._Owner->level == level) {
 
 			// Get rank to send to
-			toRank = supportCommSupportSide[i].rankComm;
+			toRank = supportCommSupportSide[level][i].rankComm;
 
 			// Get grid sizes
 			size_t M_lim = objman->iBody[ib]._Owner->M_lim;
@@ -128,7 +128,7 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 #endif
 
 			// Get indices
-			idx = supportCommSupportSide[i].supportIdx;
+			idx = supportCommSupportSide[level][i].supportIdx;
 
 			// Pack density and momentum into buffer
 #if (L_DIMS == 2)
@@ -167,9 +167,9 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 
 	// Get receive sizes from each rank
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
-		if (objman->iBody[objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID]]._Owner->level == level)
-			bufferSize[supportCommMarkerSide[i].rankComm] += L_DIMS + 1;
+	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
+		if (objman->iBody[objman->bodyIDToIdx[supportCommMarkerSide[level][i].bodyID]]._Owner->level == level)
+			bufferSize[supportCommMarkerSide[level][i].rankComm] += L_DIMS + 1;
 	}
 
 	// Now receive the velocity values
@@ -225,7 +225,7 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 	std::vector<int> bufferSize(num_ranks, 0);
 
 	// Size the receive buffer
-	for (int i = 0; i < markerCommMarkerSide.size(); i++)
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++)
 		bufferSize[markerCommMarkerSide[level][i].rankComm]++;
 
 	// Declare receive buffer
@@ -245,8 +245,8 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 	std::vector<int> idx(num_ranks, 0);
 
 	// Now unpack into epsilon values
-	int fromRank, ib, markerIdx;
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
+	int fromRank, markerIdx;
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
 		// Get ID info
 		fromRank = markerCommMarkerSide[level][i].rankComm;
@@ -469,14 +469,14 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	}
 
 	// Get how many supports site that need to be received from each rank
-	std::vector<int> nSupportSend(num_ranks, 0);
+	std::vector<int> nSupportToRecv(num_ranks, 0);
 	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
-		nSupportSend[supportCommMarkerSide[level][i].rankComm]++;
+		nSupportToRecv[supportCommMarkerSide[level][i].rankComm]++;
 	}
 
 	// Do global comm so that each rank knows how many support sites to send and where
-	std::vector<int> nSupportRecv(num_ranks, 0);
-	MPI_Alltoall(&nSupportRecv.front(), 1, MPI_INT, &nSupportSend.front(), 1, MPI_INT, world_comm);
+	std::vector<int> nSupportToSend(num_ranks, 0);
+	MPI_Alltoall(&nSupportToRecv.front(), 1, MPI_INT, &nSupportToSend.front(), 1, MPI_INT, world_comm);
 
 	// Declare variables for packing positions and body IDs
 	int ib, m, s, toRank;
@@ -487,7 +487,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
 
 		// Get IDs of support site
-		ib = objman->bodyIDToIdx[supportCommMarkerSide[i][level].bodyID];
+		ib = objman->bodyIDToIdx[supportCommMarkerSide[level][i].bodyID];
 		m = supportCommMarkerSide[level][i].markerIdx;
 		s = supportCommMarkerSide[level][i].supportID;
 		toRank = supportCommMarkerSide[level][i].rankComm;
@@ -508,7 +508,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 
 		// Check if it has stuff to send to rank toRank
-		if (nSupportRecv[toRank] > 0) {
+		if (nSupportToRecv[toRank] > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
 			MPI_Isend(&supportPositions[toRank].front(), supportPositions[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 			sendRequests.push_back(MPI_REQUEST_NULL);
@@ -524,11 +524,11 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
 
 		// Resize the buffer
-		supportPositionsRecv[fromRank].resize(nSupportSend[fromRank] * L_DIMS);
-		bodyIDsRecv[fromRank].resize(nSupportSend[fromRank]);
+		supportPositionsRecv[fromRank].resize(nSupportToSend[fromRank] * L_DIMS);
+		bodyIDsRecv[fromRank].resize(nSupportToSend[fromRank]);
 
 		// Check if it has stuff to receive from rank i
-		if (nSupportSend[fromRank] > 0) {
+		if (nSupportToSend[fromRank] > 0) {
 			MPI_Recv(&supportPositionsRecv[fromRank].front(), supportPositionsRecv[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 			MPI_Recv(&bodyIDsRecv[fromRank].front(), bodyIDsRecv[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
@@ -538,7 +538,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	double x, y, z;
 	std::vector<int> nearijk;
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-		for (int i = 0; i < nSupportSend[fromRank]; i++) {
+		for (int i = 0; i < nSupportToSend[fromRank]; i++) {
 
 			// Unpack positions and body ID
 			ib = objman->bodyIDToIdx[bodyIDsRecv[fromRank][i]];

@@ -27,8 +27,8 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 
 	// Initialise all values to zero
 	this->epsilon = 0.0;
-	this->local_area = 0.0;
-	this->dilation = 0.0;
+	this->local_area = 1.0;
+	this->dilation = 1.0;
 	this->interpRho = 0.0;
 
 	// Stationary point

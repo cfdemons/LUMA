@@ -183,10 +183,7 @@ public :
 	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
 
 	// FEM
-	void mpi_offRankForcesComm(int level, std::vector<std::vector<double>> &recvBuffer);
-
-
-
+	void mpi_forceCommGather(int level);
 };
 
 #endif

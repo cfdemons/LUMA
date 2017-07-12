@@ -32,6 +32,7 @@ class IBBody : public Body<IBMarker> {
 	friend class ObjectManager;
 	friend class IBInfo;
 	friend class FEMBody;
+	friend class MpiManager;
 
 public:
 	// Constructor and destructor

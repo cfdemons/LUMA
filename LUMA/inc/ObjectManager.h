@@ -139,10 +139,6 @@ public:
 	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
 	void ibm_finaliseReadIn(int iBodyID);
 
-	// FEM methods //
-	void fem_constructRVector(int level);											// Construct the R vector for all bodies on current level
-	void fem_updateIBMarkers(int level);											// Update the IBM markers using new FEM node vales
-
 	// IBM Debug methods //
 	void ibm_debug_epsilon(int ib);
 	void ibm_debug_interpVel(int ib);
@@ -156,9 +152,6 @@ public:
 	void ibm_updateMPIComms(int level);
 	void ibm_interpolateOffRankVels(int level);
 	void ibm_spreadOffRankForces(int level);
-
-	// FEM-MPI methods
-	void fem_getOffRankForces(int level, std::vector<std::vector<int>> &markerIdx, std::vector<std::vector<std::vector<double>>> &forceBuffer);
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.

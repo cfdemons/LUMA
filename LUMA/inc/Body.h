@@ -58,6 +58,7 @@ protected:
 	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
 	double spacing;						///< Reference spacing of the markers
+	int level;							///< Level on which body exists
 
 	std::vector<int> validMarkers;		///< Vector of indices to valid markers within this body which actually exist on this rank
 
@@ -113,6 +114,9 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 	// Set as unclosed surface by default
 	this->closed_surface = false;
 
+	// Set level
+	this->level = _Owner->level;
+
 	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI
 	this->owningRank = id % MpiManager::getInstance()->num_ranks;
@@ -142,6 +146,9 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 	this->_Owner = g;
 	this->id = bodyID;
 	this->closed_surface = false;
+
+	// Set level
+	this->level = _Owner->level;
 
 	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI
@@ -196,6 +203,9 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	this->_Owner = g;
 	this->id = bodyID;
 	this->closed_surface = false;
+
+	// Set level
+	this->level = _Owner->level;
 
 	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI
@@ -271,6 +281,9 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	this->_Owner = g;
 	this->id = bodyID;
 	this->closed_surface = false;
+
+	// Set level
+	this->level = _Owner->level;
 
 	// Set the rank which owns this body
 #ifdef L_BUILD_FOR_MPI

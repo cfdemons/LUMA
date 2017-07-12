@@ -44,7 +44,7 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -61,20 +61,20 @@
 *******************************************************************************
 */
 
-const int resFactor = 1;
+const int resFactor = 2;
 
 // Using MPI?
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*1)			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES (resFactor*resFactor*1)		///< Specific output frequency of body forces
+#define L_OUT_EVERY (resFactor*resFactor*50)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES (resFactor*resFactor*5)		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT					///< Write out lift and drag (all bodies)
+#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
@@ -94,7 +94,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 1000000000000			///< Frequency of write out of restart file
@@ -111,7 +111,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (resFactor*resFactor*10)		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS (resFactor*resFactor*15000)		///< Number of time steps to run simulation for
 
 
 /*
@@ -121,7 +121,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 /// Number of MPI ranks to divide domain into in Z direction.
 #define L_MPI_ZCORES 2
@@ -137,17 +137,17 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2									///< Number of dimensions to the problem
-#define L_RESOLUTION (resFactor*1)					///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP (0.001/(resFactor*resFactor))	///< The timestep in non-dimensional units
+#define L_DIMS 2				///< Number of dimensions to the problem
+#define L_RESOLUTION (resFactor*100)			///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP (0.001851852/(resFactor*resFactor))			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 20.0								///< End of domain in X (non-dimensional units)
-#define L_BY 20.0								///< End of domain in Y (non-dimensional units)
-#define L_BZ 20.0								///< End of domain in Z (non-dimensional units)
+#define L_BX 2.2								///< End of domain in X (non-dimensional units)
+#define L_BY (0.41 + 2.0 / L_RESOLUTION)		///< End of domain in Y (non-dimensional units)
+#define L_BZ 1.0								///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 0.1		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density
 #define L_RHO_REF 1.0
@@ -161,16 +161,16 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	   	///< Use an inlet profile
-//#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.1			///< Initial/inlet x-velocity
+#define L_UX0 1.0			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 50				///< Desired Reynolds number
+#define L_RE 1000			///< Desired Reynolds number
 
 
 /*
@@ -199,22 +199,22 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
+//#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
 #define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // Inlet (left-hand wall)
-//#define L_INLET_ON				///< Turn on inlet boundary
-//#define L_INLET_RAMP 2.0		///< Ramp up the inlet velocity (this value is the time over which to ramp)
+#define L_INLET_ON				///< Turn on inlet boundary
+#define L_INLET_RAMP 2.0		///< Ramp up the inlet velocity (this value is the time over which to ramp)
 
 // Outlet (right-hand wall)
-//#define L_OUTLET_ON					///< Turn on outlet boundary
+#define L_OUTLET_ON					///< Turn on outlet boundary
 //#define L_EXTRAPOLATED_OUTLET		///< Extrapolate the velocity from the outlet
-//#define L_PRESSURE_OUTLET 0.0		///< Fixed pressure outlet (this value is the delta)
+#define L_PRESSURE_OUTLET 0.0		///< Fixed pressure outlet (this value is the delta)
 
 // Solids
-//#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 //#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 //#define L_WALL_FLOOR_ONLY
 #define L_WALL_THICKNESS_BOTTOM L_COARSE_SITE_THICKNESS			///< Thickness of wall

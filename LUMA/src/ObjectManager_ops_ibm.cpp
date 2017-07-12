@@ -36,7 +36,8 @@ void ObjectManager::ibm_apply(int level) {
 	ibm_updateMacroscopic(level);
 
 	// Perform FEM
-	ibm_moveBodies(level);
+	if (hasFlexibleBodies[level])
+		ibm_moveBodies(level);
 }
 
 

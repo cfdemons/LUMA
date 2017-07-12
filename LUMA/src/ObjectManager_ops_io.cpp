@@ -402,11 +402,10 @@ void ObjectManager::io_readInGeomConfig() {
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-				hasMovingBodies = true;
+				hasFlexibleBodies[lev] = true;
 			}
 			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
-				hasMovingBodies = true;
 			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
@@ -494,11 +493,10 @@ void ObjectManager::io_readInGeomConfig() {
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-				hasMovingBodies = true;
+				hasFlexibleBodies[lev] = true;
 			}
 			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
-				hasMovingBodies = true;
 			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
@@ -582,7 +580,6 @@ void ObjectManager::io_readInGeomConfig() {
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
 			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
-				hasMovingBodies = true;
 			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
@@ -659,7 +656,6 @@ void ObjectManager::io_readInGeomConfig() {
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
 			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
-				hasMovingBodies = true;
 			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;

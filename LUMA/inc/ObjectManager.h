@@ -103,7 +103,7 @@ private:
 	static ObjectManager* me;
 
 	// Flag for if there are any flexible bodies in the simulation
-	bool hasMovingBodies = false;
+	std::vector<bool> hasFlexibleBodies;
 
 	// Map global body ID to an index in the iBody vector
 	std::vector<int> bodyIDToIdx;

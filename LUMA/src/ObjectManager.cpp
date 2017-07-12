@@ -61,6 +61,9 @@ ObjectManager::~ObjectManager(void) {
 /// \param	g	pointer to grid hierarchy.
 ObjectManager::ObjectManager(GridObj* g) : _Grids(g)
 {
+
+	// Resize vector of flexible body flags
+	hasFlexibleBodies.resize(L_NUM_LEVELS+1 ,false);
 };
 
 // ************************************************************************* //

@@ -198,6 +198,7 @@ int main( int argc, char* argv[] )
 	L_INFO("Lattice viscosity = " + std::to_string(Grids->nu), GridUtils::logfile);
 	L_INFO("L0 relaxation time = " + std::to_string(1.0 / Grids->omega), GridUtils::logfile);
 	L_INFO("Lattice reference velocity " + std::to_string(Grids->uref), GridUtils::logfile);
+	L_INFO("Lattice Mach number " + std::to_string(Grids->uref / cs), GridUtils::logfile);
 	// Reynolds Number
 #ifdef L_NU
 #if L_NU != 0

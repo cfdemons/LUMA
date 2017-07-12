@@ -324,9 +324,18 @@ void GridObj::LBM_initGrid() {
 #ifdef L_BUILD_FOR_MPI
 
 	// Create position vectors excluding overlap
-	XPos = GridUtils::linspace(mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2, N_lim - 2);
-	YPos = GridUtils::linspace(mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2, M_lim - 2);
-	ZPos = GridUtils::linspace(mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2, mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2, K_lim - 2);
+	XPos = GridUtils::linspace(
+		mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2,
+		mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2,
+		N_lim - 2);
+	YPos = GridUtils::linspace(
+		mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2,
+		mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2,
+		M_lim - 2);
+	ZPos = GridUtils::linspace(
+		mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2,
+		mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2,
+		K_lim - 2);
 
 	// Add overlap sites taking into account periodicity
 	XPos.insert( XPos.begin(), fmod(XPos[0] - dh + Lx, Lx) );
@@ -406,15 +415,15 @@ void GridObj::LBM_initGrid() {
 #endif
 
 	// Velocity field
-	u.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 	
 	// Density field
-	rho.resize( N_lim*M_lim*K_lim );
+	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
 	// Cartesian force vector
-	force_xyz.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
+	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
 #if (defined L_IBM_ON || defined L_GRAVITY_ON)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
@@ -423,26 +432,29 @@ void GridObj::LBM_initGrid() {
 #endif
 
 	// Lattice force vector
-	force_i.resize(N_lim*M_lim*K_lim*L_NUM_VELS, 0.0);
+	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
 
 	// Time averaged quantities
-	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
-	ui_timeav.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
-	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_DIMS-3), 0.0);
+	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
+	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
+	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
-	f.resize( N_lim*M_lim*K_lim*L_NUM_VELS );
-	feq.resize( N_lim*M_lim*K_lim*L_NUM_VELS );
+	f.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
+	feq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 
 
 	// Loop over grid
-	for (int i = 0; i < N_lim; i++) {
-		for (int j = 0; j < M_lim; j++) {
-			for (int k = 0; k < K_lim; k++) {
-				for (int v = 0; v < L_NUM_VELS; v++) {
-
+	for (int i = 0; i < N_lim; i++)
+	{
+		for (int j = 0; j < M_lim; j++)
+		{
+			for (int k = 0; k < K_lim; k++)
+			{
+				for (int v = 0; v < L_NUM_VELS; v++)
+				{
 					// Initialise f to feq
 					f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
 						_LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
@@ -473,9 +485,8 @@ void GridObj::LBM_initGrid() {
 	 * Suggest a better value for dt to the user if omega is not within 
 	 * acceptable limits. Note that the use of BGKSMAG allows for omega >=2. */
 #ifndef L_USE_BGKSMAG
-	if (omega >= 2.0) {
-		L_ERROR("LBM relaxation frequency omega too large. Check viscosity value. Exiting.", GridUtils::logfile);
-	}
+	if (omega >= 2.0)
+		L_ERROR("LBM relaxation frequency omega too large. Change L_TIMESTEP or L_RESOLUTION. Exiting.", GridUtils::logfile);
 #endif
 
 	// Check if there are incompressibility issues and warn the user if so
@@ -510,7 +521,8 @@ void GridObj::LBM_initGrid() {
 // ****************************************************************************
 /// \brief	Method to initialise all sub-grid quantities.
 /// \param	pGrid	reference to parent grid.
-void GridObj::LBM_initSubGrid (GridObj& pGrid) {
+void GridObj::LBM_initSubGrid (GridObj& pGrid)
+{
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Initialising sub-grid level " << level << ", region " << region_number << "..." << std::endl;
@@ -533,7 +545,8 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	/* Get local grid size of the sub grid based on local ijk limits.
 	 * i.e. how much of the parent grid it covers. Volumetric formulation with refinement
 	 * factor of 2 makes this easy. */
-	int local_size[L_DIMS] = {
+	int local_size[L_DIMS] =
+	{
 		static_cast<int>((CoarseLimsX[eMaximum] - CoarseLimsX[eMinimum] + .5) * 2) + 1,
 		static_cast<int>((CoarseLimsY[eMaximum] - CoarseLimsY[eMinimum] + .5) * 2) + 1
 #if (L_DIMS == 3)
@@ -567,7 +580,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Generate TYPING MATRICES
 
 	// Resize
-	LatTyp.resize( N_lim * M_lim * K_lim );
+	LatTyp.resize(N_lim * M_lim * K_lim);
 
 	// Default labelling of coarse
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
@@ -586,11 +599,11 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 	// Velocity
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
-	LBM_initVelocity( );
+	LBM_initVelocity();
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
-	LBM_initRho( );
+	LBM_initRho();
 
 
 	// Cartesian force vector
@@ -606,9 +619,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
 
 	// Time averaged quantities
-	rho_timeav.resize(N_lim*M_lim*K_lim, 0.0);
-	ui_timeav.resize(N_lim*M_lim*K_lim*L_DIMS, 0.0);
-	uiuj_timeav.resize(N_lim*M_lim*K_lim*(3*L_DIMS-3), 0.0);
+	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
+	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
+	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
 
 
 	// Generate POPULATION MATRICES for lower levels
@@ -619,10 +632,14 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 
 
 	// Loop over grid
-	for (int i = 0; i != N_lim; ++i) {
-		for (int j = 0; j != M_lim; ++j) {
-			for (int k = 0; k != K_lim; ++k) {
-				for (int v = 0; v < L_NUM_VELS; v++) {
+	for (int i = 0; i < N_lim; ++i)
+	{
+		for (int j = 0; j < M_lim; ++j)
+		{
+			for (int k = 0; k < K_lim; ++k)
+			{
+				for (int v = 0; v < L_NUM_VELS; v++)
+				{
 					
 					// Initialise f to feq
 					f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
@@ -964,13 +981,12 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	/* If sub-grid wraps periodically we do not support it wrapping back round to the same rank
 	* again as this will confuse the mapping function so we error here. */
 
-	if (
-		(CoarseLimsX[eMaximum] < CoarseLimsX[eMinimum] && CoarseLimsX[eMinimum] - 1 != CoarseLimsX[eMaximum]) ||
-		(CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) ||
-		(CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum])
-		) {
-		L_ERROR("Refined region wraps periodically but is not connected which is not supported. Exiting.", GridUtils::logfile);
-	}
+	std::string dir;
+	if (CoarseLimsX[eMaximum] < CoarseLimsX[eMinimum] && CoarseLimsX[eMinimum] - 1 != CoarseLimsX[eMaximum]) dir = "X";
+	if (CoarseLimsY[eMaximum] < CoarseLimsY[eMinimum] && CoarseLimsY[eMinimum] - 1 != CoarseLimsY[eMaximum]) dir = "Y";
+	if (CoarseLimsZ[eMaximum] < CoarseLimsZ[eMinimum] && CoarseLimsZ[eMinimum] - 1 != CoarseLimsZ[eMaximum]) dir = "Z";
+	if (dir != "")
+		L_ERROR("Refined region wraps periodically in " + dir + "-direction but is not connected which is not supported. Exiting.", GridUtils::logfile);
 
 #ifdef L_INIT_VERBOSE
 	*GridUtils::logfile << "Local Coarse Lims are " <<

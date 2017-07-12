@@ -93,13 +93,12 @@ void GridObj::LBM_multi_opt(int subcycle) {
 #endif
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
-#ifdef L_USE_BGKSMAG
-					// Compute Smagorinksy-modified relaxation
-					double omega_s = _LBM_smag(id, omega);
+
+#ifdef L_USE_KBC_COLLISION
+					_LBM_kbcCollide_opt(id);
 #else
-					double omega_s = omega;
+					_LBM_collide_opt(id);
 #endif
-					_LBM_collide_opt(id, omega_s);
 				}
 
 			}
@@ -583,6 +582,7 @@ double GridObj::_LBM_smag(int id, double omega)
 	Matrix2D<double> nonEquiStress(3,3);
 	double fneq[L_NUM_VELS];
  
+	// Compute non-equilibrium values
 	for (int v = 0; v < L_NUM_VELS; ++v)
 		fneq[v] = fNew[v + id*L_NUM_VELS] - _LBM_equilibrium_opt(id, v);
 
@@ -608,31 +608,35 @@ double GridObj::_LBM_smag(int id, double omega)
 		}
 	}
 
-	double Q = sqrt(2.0*(nonEquiStress%nonEquiStress));
+	// Inner product
+	double Q = sqrt(2.0 * (nonEquiStress % nonEquiStress));
 
+	// Compute tau correction
 	double tau = 1.0 / omega;
-	double tau_t = 0.5 * (sqrt((tau * tau) + 2.0 * L_SQRT2 * (L_CSMAG * L_CSMAG) * L_RHOIN * SQ(cs) * SQ(cs) * Q ) - tau);  
+	double tau_t = 0.5 * (sqrt(SQ(tau) + 2.0 * L_SQRT2 * SQ(L_CSMAG) * L_RHOIN * SQ(cs) * SQ(cs) * Q ) - tau);  
 	return ( 1.0 / (tau + tau_t) );
 }
 
 // *****************************************************************************
 /// \brief	Optimised collision operation.
 ///
-///			Uses either BGK or KBC depending on definitions. KBC implementation
-///			is currently not optimised.
+///			BGK collision operator. If Smagnorinksy turned on, will modify the 
+///			value of omega locally.
 ///
 /// \param	id	flattened ijk index.
-///	\param	omega_s	Smagorinsky-modified omega value (equal to omega if not using BGK-Smag)
-void GridObj::_LBM_collide_opt(int id, double omega_s) {
+void GridObj::_LBM_collide_opt(int id)
+{
 
-#ifdef L_USE_KBC_COLLISION
-	LBM_kbcCollide();
-
+#ifdef L_USE_BGKSMAG
+	// Compute Smagorinksy-modified relaxation
+	double omega_s = _LBM_smag(id, omega);
 #else
+	double omega_s = omega;
+#endif
 
 	// Perform collision operation (using omega_s -- modified if using Smagorinksy)
-	for (int v = 0; v < L_NUM_VELS; ++v) {
-
+	for (int v = 0; v < L_NUM_VELS; ++v)
+	{
 		fNew[v + id * L_NUM_VELS] +=
 			omega_s *	(
 			_LBM_equilibrium_opt(id, v) -
@@ -640,7 +644,6 @@ void GridObj::_LBM_collide_opt(int id, double omega_s) {
 			) +
 			force_i[v + id * L_NUM_VELS];
 	}
-#endif
 
 }
 
@@ -965,6 +968,194 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 	}
 
 	return true;
+
+}
+
+// *****************************************************************************
+/// \brief	Optimised KBC collision operator.
+///
+///			Applies KBC collision operator using the KBC-N4 and KBC-D models in 
+///			3D and 2D, respectively.
+///
+/// \param id		flattened index of the lattice site.
+void GridObj::_LBM_kbcCollide_opt(int id)
+{
+
+	// Declarations
+	double ds[L_NUM_VELS];
+	double dh[L_NUM_VELS];
+	double fneq[L_NUM_VELS];
+	double gamma;
+	std::vector<double> Mneq;
+	std::vector<int> C;
+
+	// Compute required moments and equilibrium moments //
+#if (L_DIMS == 3)
+	int numMoments = 13;
+#else
+	int numMoments = 3;
+#endif
+	Mneq.resize(numMoments, 0.0);
+	C.resize(numMoments * L_NUM_VELS, 1);
+
+	for (int v = 0; v < L_NUM_VELS; v++)
+	{
+
+		// Update feq and store fneq
+		feq[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
+		fneq[v] = f[v + id * L_NUM_VELS] - feq[v + id * L_NUM_VELS];
+
+		// 2-index and 3-index non-equilibrium moments
+		int idx = 0;
+		for (int sig = 0; sig < L_DIMS; ++sig)
+		{
+			for (int gam = sig; gam < L_DIMS; ++gam)
+			{
+				C[idx + v * numMoments] = c_opt[v][sig] * c_opt[v][gam];
+				Mneq[idx] += fneq[v] * C[idx + v * numMoments];
+				idx++;
+
+#if (L_DIMS == 3)
+				// Only need this inner loop for 3D moments
+				for (int del = gam; del < L_DIMS; ++del)
+				{
+					// Don't include if all the same index
+					if (sig != gam || gam != del || sig != del)
+					{
+						C[idx + v * numMoments] = c_opt[v][sig] * c_opt[v][gam] * c_opt[v][del];
+						Mneq[idx] += fneq[v] * C[idx + v * numMoments];
+						idx++;
+					}
+				}
+#endif
+			}
+		}		
+	}
+
+	// Compute ds
+	for (int v = 0; v < L_NUM_VELS; v++)
+	{
+		/* s part dictated by KBC model choice and directions.
+		 * These are different in 2D and 3D so compile different options. */
+
+#if (L_DIMS == 3)
+
+		if (c_opt[v][0] == 0)
+		{
+			if (c_opt[v][1] == 0)
+			{
+				if (c_opt[v][2] == 0)
+				{
+					// First family
+					ds[v] = (-(Mneq[0] + Mneq[8] + Mneq[12]));
+				}
+				else
+				{
+					// Fourth family
+					ds[v] = ((-(Mneq[0] - Mneq[12]) - (Mneq[8] - Mneq[12])) / 6.0 + (Mneq[0] + Mneq[8] + Mneq[12]) / 6.0 - c_opt[v][2] * 0.5 * (Mneq[2] + Mneq[9]));
+				}
+			}
+			else
+			{
+				if (c_opt[v][2] == 0)
+				{
+					// Third family
+					ds[v] = ((-(Mneq[0] - Mneq[12]) + 2.0 * (Mneq[8] - Mneq[12])) / 6.0 + (Mneq[0] + Mneq[8] + Mneq[12]) / 6.0 - c_opt[v][1] * 0.5 * (Mneq[1] + Mneq[11]));
+				}
+				else
+				{	// Seventh family
+					ds[v] = (C[10 + v * numMoments] * 0.25 * Mneq[10] + (c_opt[v][2] * 0.25 * Mneq[9] + c_opt[v][1] * 0.25 * Mneq[11]));
+				}
+			}
+		}
+		else
+		{
+			if (c_opt[v][1] == 0)
+			{
+				if (c_opt[v][2] == 0)
+				{
+					// Second family
+					ds[v] = ((2.0 * (Mneq[0] - Mneq[12]) - (Mneq[8] - Mneq[12])) / 6.0 + (Mneq[0] + Mneq[8] + Mneq[12]) / 6.0 - c_opt[v][0] * 0.5 * (Mneq[4] + Mneq[7]));
+				}
+				else
+				{
+					// Sixth family
+					ds[v] = (C[6 + v * numMoments] * 0.25 * Mneq[6] + (c_opt[v][2] * 0.25 * Mneq[2] + c_opt[v][0] * 0.25 * Mneq[7]));
+				}
+			}
+			else
+			{
+				if (c_opt[v][2] == 0)
+				{
+					// Fifth family
+					ds[v] = (C[3 + v * numMoments] * 0.25 * Mneq[3] + (c_opt[v][1] * 0.25 * Mneq[1] + c_opt[v][0] * 0.25 * Mneq[4]));
+				}
+				else
+				{
+					// Eighth family
+					ds[v] = (C[5 + v * numMoments] * Mneq[5] / 8.0);
+				}
+			}
+		}
+#else
+
+		if (c_opt[v][0] == 0)
+		{
+			if (c_opt[v][1] == 0)
+			{
+				// First family
+				ds[v] = 0.0;
+			}
+			else
+			{
+				// Third family
+				ds[v] = -0.25 * (Mneq[0] - Mneq[2]);
+			}
+		}
+		else
+		{
+			if (c_opt[v][1] == 0)
+			{
+				// Second family
+				ds[v] = 0.25 * (Mneq[0] - Mneq[2]);
+			}
+			else
+			{
+				// Fourth family
+				ds[v] = 0.25 * C[1 + v * numMoments] * Mneq[1];
+			}
+		}
+
+#endif
+		// Compute dh
+		dh[v] = fneq[v] - ds[v];
+	}
+
+	// Once all dh and ds have been computed, compute the products
+	double top_prod = 0.0, bot_prod = 0.0;
+	for (int v = 0; v < L_NUM_VELS; v++)
+	{
+		// Compute scalar products
+		top_prod += ds[v] * dh[v] / feq[v + id * L_NUM_VELS];
+		bot_prod += dh[v] * dh[v] / feq[v + id * L_NUM_VELS];
+	}
+
+	// Compute 1/beta
+	double beta_m1 = 2.0 / omega;
+
+	// Compute gamma
+	if (bot_prod == 0.0) gamma = 2.0;	// Regularised?
+	else gamma = beta_m1 - (2.0 - beta_m1) * (top_prod / bot_prod);
+
+	// Finally perform collision
+	for (int v = 0; v < L_NUM_VELS; v++)
+	{
+		// Perform collision
+		fNew[v + id * L_NUM_VELS] =
+			f[v + id * L_NUM_VELS] -
+			(1.0 / beta_m1) * (2.0 * ds[v] + gamma * dh[v]) +
+			force_i[v + id * L_NUM_VELS];
+	}
 
 }
 // *****************************************************************************

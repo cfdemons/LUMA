@@ -136,7 +136,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 
 			// Fourth family
 			ds[v] =	( (-(M200 - M002) - (M020 - M002)) / 6 + (M200 + M020 + M002) / 6 - c[2][v] * 0.5 * (M201 + M021) ) - 
-					( (-(M200eq - M002eq) + 2 * (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[2][v] * 0.5 * (M201eq + M021eq) );
+					( (-(M200eq - M002eq) + (M020eq - M002eq)) / 6 + (M200eq + M020eq + M002eq) / 6 - c[2][v] * 0.5 * (M201eq + M021eq) );
 
 		} else if (c[0][v] != 0 && c[1][v] != 0 && c[2][v] == 0) {
 
@@ -183,7 +183,7 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 		
 		// Update feq
 		feq(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = _LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
-
+		
 		// These are actually rho * MXX but no point in dividing to multiply later
 		M20 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[0][v] * c[0][v]);
 		M02 += f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) * (c[1][v] * c[1][v]);

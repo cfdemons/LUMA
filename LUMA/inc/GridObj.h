@@ -134,7 +134,7 @@ public :
 	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
-	void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
+	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_macro(int i, int j, int k);
 	DEPRECATED void LBM_resetForces();								// Resets the force vectors on the grid
 
@@ -158,14 +158,15 @@ private :
 	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
-	void _LBM_collide_opt(int id, double omega_s);
+	void _LBM_collide_opt(int id);
 	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
-
+	void _LBM_kbcCollide_opt(int id);
 	double _LBM_smag(int id, double omega); 
+
 public :
 	void LBM_multi_opt(int subcycle = 0);
 

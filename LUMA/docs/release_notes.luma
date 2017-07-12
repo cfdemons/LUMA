@@ -1,3 +1,7 @@
+version		=	1.5.1-alpha
+
+Issue #97	:	Added KBC to optimised kernel.
+
 version		=	1.5.0
 
 General		:	Updated the HDF5 output and the merge tool to include MPI block labels to make decomposition more apparent.

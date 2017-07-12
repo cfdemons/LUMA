@@ -798,9 +798,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	if (!_PCpts->x.empty())
 	{
 
-#ifdef L_CLOUD_DEBUG
-		*GridUtils::logfile << "Building..." << std::endl;
-#endif
+		L_INFO("Building body on this rank...", GridUtils::logfile);
 
 		// Perform a different post-processing action depending on the type of body
 		switch (geom->objtype)

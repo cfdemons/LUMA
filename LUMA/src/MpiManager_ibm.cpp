@@ -191,34 +191,25 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 /// \brief	Do communication required for epsilon calculation
 ///
 ///
-void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilon) {
+void MpiManager::mpi_epsilonCommScatter(int level) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
-
-	// First fill the markers which already exist on this rank
-	for (int ib = 0; ib < objman->iBody.size(); ib++) {
-		if (my_rank == objman->iBody[ib].owningRank) {
-			for (int m = 0; m < objman->iBody[ib].markers.size(); m++) {
-				objman->iBody[ib].markers[m].epsilon = epsilon[objman->iBody[ib].id][objman->iBody[ib].markers[m].id];
-			}
-		}
-	}
 
 	// Declare send buffer
 	std::vector<std::vector<double>> sendBuffer(num_ranks, std::vector<double>(0));
 
 	// Pack and send the other epsilon values
-	int toRank, bodyID, markerID;
-	for (int i = 0; i < markerCommOwnerSide.size(); i++) {
+	int toRank, ib, markerID;
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
 
 		// Get ID info
-		toRank = markerCommOwnerSide[i].rankComm;
-		bodyID = markerCommOwnerSide[i].bodyID;
-		markerID = markerCommOwnerSide[i].markerID;
+		toRank = markerCommOwnerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID];
+		markerID = markerCommOwnerSide[level][i].markerID;
 
 		// Insert into buffer
-		sendBuffer[toRank].push_back(epsilon[bodyID][markerID]);
+		sendBuffer[toRank].push_back(objman->iBody[ib].markers[markerID].epsilon);
 	}
 
 	// Loop through and post send if there is data
@@ -235,7 +226,7 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 
 	// Size the receive buffer
 	for (int i = 0; i < markerCommMarkerSide.size(); i++)
-		bufferSize[markerCommMarkerSide[i].rankComm]++;
+		bufferSize[markerCommMarkerSide[level][i].rankComm]++;
 
 	// Declare receive buffer
 	std::vector<std::vector<double>> recvBuffer(num_ranks, std::vector<double>(0));
@@ -258,9 +249,9 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
 
 		// Get ID info
-		fromRank = markerCommMarkerSide[i].rankComm;
-		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
-		markerIdx = markerCommMarkerSide[i].markerIdx;
+		fromRank = markerCommMarkerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
+		markerIdx = markerCommMarkerSide[level][i].markerIdx;
 
 		// Put into epsilon
 		objman->iBody[ib].markers[markerIdx].epsilon = recvBuffer[fromRank][idx[fromRank]];
@@ -276,7 +267,7 @@ void MpiManager::mpi_epsilonCommScatter(std::vector<std::vector<double>> &epsilo
 /// \brief	Do communication required for epsilon calculation
 ///
 ///
-void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuffer) {
+void MpiManager::mpi_epsilonCommGather(int level) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
@@ -286,21 +277,12 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 
 	// Pack the data to send
 	int toRank, ib, m;
-	for (int i = 0; i < markerCommMarkerSide.size(); i++) {
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
 		// Get ID info
-		toRank = markerCommMarkerSide[i].rankComm;
-		ib = objman->bodyIDToIdx[markerCommMarkerSide[i].bodyID];
-		m = markerCommMarkerSide[i].markerIdx;
-
-		// Pack marker data
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].position[eXDirection]);
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].position[eYDirection]);
-#if (L_DIMS == 3)
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].position[eZDirection]);
-#endif
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].local_area);
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].dilation);
+		toRank = markerCommMarkerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
+		m = markerCommMarkerSide[level][i].markerIdx;
 
 		// Pack support data
 		for (int s = 0; s < objman->iBody[ib].markers[m].deltaval.size(); s++) {
@@ -324,11 +306,11 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 
 	// Get buffer sizes
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < markerCommOwnerSide.size(); i++)
-		bufferSize[markerCommOwnerSide[i].rankComm] += L_DIMS + 2 + markerCommOwnerSide[i].nSupportSites * (L_DIMS + 1);
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++)
+		bufferSize[markerCommOwnerSide[level][i].rankComm] += markerCommOwnerSide[level][i].nSupportSites * (L_DIMS + 1);
 
 	// Now create receive buffer
-	recvBuffer.resize(num_ranks);
+	std::vector<std::vector<double>> recvBuffer(num_ranks, std::vector<double>(0));
 
 	// Now loop through and receive the buffer
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
@@ -337,6 +319,40 @@ void MpiManager::mpi_epsilonCommGather(std::vector<std::vector<double>> &recvBuf
 		if (bufferSize[fromRank] > 0) {
 			recvBuffer[fromRank].resize(bufferSize[fromRank]);
 			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+		}
+	}
+
+	// Index vector for looping through recvBuffer
+	std::vector<int> idx(num_ranks, 0);
+
+	// Now unpack
+	int fromRank, nSupports;
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+
+		// Get ID info
+		fromRank = markerCommOwnerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID];
+		m = markerCommOwnerSide[level][i].markerID;
+		nSupports = markerCommOwnerSide[level][i].nSupportSites;
+
+		// Clear the vectors
+		objman->iBody[ib].markers[m].supp_x.resize(nSupports, 0.0);
+		objman->iBody[ib].markers[m].supp_y.resize(nSupports, 0.0);
+		objman->iBody[ib].markers[m].supp_z.resize(nSupports, 0.0);
+		objman->iBody[ib].markers[m].deltaval.resize(nSupports, 0.0);
+
+		// Unpack into iBody
+		for (int s = 0; s < nSupports; s++) {
+			objman->iBody[ib].markers[m].supp_x[s] = recvBuffer[fromRank][idx[fromRank]];
+			objman->iBody[ib].markers[m].supp_y[s] = recvBuffer[fromRank][idx[fromRank]+1];
+#if (L_DIMS == 3)
+			objman->iBody[ib].markers[m].supp_z[s] = recvBuffer[fromRank][idx[fromRank]+2];
+#endif
+			idx[fromRank] += L_DIMS;
+
+			// Get delta values
+			objman->iBody[ib].markers[m].deltaval[s] = recvBuffer[fromRank][idx[fromRank]];
+			idx[fromRank]++;
 		}
 	}
 
@@ -431,30 +447,36 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 ///
 void MpiManager::mpi_buildSupportComms(int level) {
 
+	// Clear the vector
+	supportCommMarkerSide[level].clear();
+	supportCommSupportSide[level].clear();
+
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Loop through all bodies, markers and support sites and get places where communication is necessary
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
-		for (int m = 0; m < objman->iBody[ib].markers.size(); m++) {
-			for (int s = 0; s < objman->iBody[ib].markers[m].deltaval.size(); s++) {
+		if (objman->iBody[ib]._Owner->level == level) {
+			for (auto m : objman->iBody[ib].validMarkers) {
+				for (int s = 0; s < objman->iBody[ib].markers[m].deltaval.size(); s++) {
 
-				// If this rank does not own support site then add new element in comm vector
-				if (my_rank != objman->iBody[ib].markers[m].support_rank[s])
-					supportCommMarkerSide.emplace_back(objman->iBody[ib].id, m, s, objman->iBody[ib].markers[m].support_rank[s]);
+					// If this rank does not own support site then add new element in comm vector
+					if (my_rank != objman->iBody[ib].markers[m].support_rank[s])
+						supportCommMarkerSide[level].emplace_back(objman->iBody[ib].id, m, s, objman->iBody[ib].markers[m].support_rank[s]);
+				}
 			}
 		}
 	}
 
 	// Get how many supports site that need to be received from each rank
-	std::vector<int> nSupportsToRecv(num_ranks, 0);
-	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
-		nSupportsToRecv[supportCommMarkerSide[i].rankComm]++;
+	std::vector<int> nSupportSend(num_ranks, 0);
+	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
+		nSupportSend[supportCommMarkerSide[level][i].rankComm]++;
 	}
 
 	// Do global comm so that each rank knows how many support sites to send and where
-	std::vector<int> nSupportsToSend(num_ranks, 0);
-	MPI_Alltoall(&nSupportsToRecv.front(), 1, MPI_INT, &nSupportsToSend.front(), 1, MPI_INT, world_comm);
+	std::vector<int> nSupportRecv(num_ranks, 0);
+	MPI_Alltoall(&nSupportRecv.front(), 1, MPI_INT, &nSupportSend.front(), 1, MPI_INT, world_comm);
 
 	// Declare variables for packing positions and body IDs
 	int ib, m, s, toRank;
@@ -462,16 +484,16 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	std::vector<std::vector<int>> bodyIDs(num_ranks, std::vector<int>(0));
 
 	// Pack the positions of the support sites that need to be received into buffer
-	for (int i = 0; i < supportCommMarkerSide.size(); i++) {
+	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
 
 		// Get IDs of support site
-		ib = objman->bodyIDToIdx[supportCommMarkerSide[i].bodyID];
-		m = supportCommMarkerSide[i].markerIdx;
-		s = supportCommMarkerSide[i].supportID;
-		toRank = supportCommMarkerSide[i].rankComm;
+		ib = objman->bodyIDToIdx[supportCommMarkerSide[i][level].bodyID];
+		m = supportCommMarkerSide[level][i].markerIdx;
+		s = supportCommMarkerSide[level][i].supportID;
+		toRank = supportCommMarkerSide[level][i].rankComm;
 
 		// Body ID
-		bodyIDs[toRank].push_back(supportCommMarkerSide[i].bodyID);
+		bodyIDs[toRank].push_back(supportCommMarkerSide[level][i].bodyID);
 
 		// Add to send buffer
 		supportPositions[toRank].push_back(objman->iBody[ib].markers[m].supp_x[s]);
@@ -486,7 +508,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 
 		// Check if it has stuff to send to rank toRank
-		if (nSupportsToRecv[toRank] > 0) {
+		if (nSupportRecv[toRank] > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
 			MPI_Isend(&supportPositions[toRank].front(), supportPositions[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 			sendRequests.push_back(MPI_REQUEST_NULL);
@@ -502,11 +524,11 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
 
 		// Resize the buffer
-		supportPositionsRecv[fromRank].resize(nSupportsToSend[fromRank] * L_DIMS);
-		bodyIDsRecv[fromRank].resize(nSupportsToSend[fromRank]);
+		supportPositionsRecv[fromRank].resize(nSupportSend[fromRank] * L_DIMS);
+		bodyIDsRecv[fromRank].resize(nSupportSend[fromRank]);
 
 		// Check if it has stuff to receive from rank i
-		if (nSupportsToSend[fromRank] > 0) {
+		if (nSupportSend[fromRank] > 0) {
 			MPI_Recv(&supportPositionsRecv[fromRank].front(), supportPositionsRecv[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 			MPI_Recv(&bodyIDsRecv[fromRank].front(), bodyIDsRecv[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
@@ -516,7 +538,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	double x, y, z;
 	std::vector<int> nearijk;
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
-		for (int i = 0; i < nSupportsToSend[fromRank]; i++) {
+		for (int i = 0; i < nSupportSend[fromRank]; i++) {
 
 			// Unpack positions and body ID
 			ib = objman->bodyIDToIdx[bodyIDsRecv[fromRank][i]];
@@ -531,7 +553,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 			GridUtils::getEnclosingVoxel(x, y, z, objman->iBody[ib]._Owner, &nearijk);
 
 			// Place in sending vector
-			supportCommSupportSide.emplace_back(fromRank, bodyIDsRecv[fromRank][i], nearijk);
+			supportCommSupportSide[level].emplace_back(fromRank, bodyIDsRecv[fromRank][i], nearijk);
 		}
 	}
 

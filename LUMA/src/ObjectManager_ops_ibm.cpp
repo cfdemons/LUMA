@@ -185,7 +185,8 @@ void ObjectManager::ibm_initialise() {
 #endif
 
 	// Find epsilon for the body
-	ibm_findEpsilon();
+	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+		ibm_findEpsilon(lev);
 
 	// Write out epsilon
 #ifdef L_IBM_DEBUG
@@ -708,127 +709,106 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 // *****************************************************************************
 /// \brief	Compute epsilon for a given iBody.
 /// \param	ib	iBody being operated on.
-void ObjectManager::ibm_findEpsilon() {
+void ObjectManager::ibm_findEpsilon(int level) {
 
-	// Dummy iBody vector for gathering information into for epsilon calculation
-	std::vector<IBBody> iBodyTemp;
-
-	// Build dummy iBody vector
-#ifndef L_BUILD_FOR_MPI
-
-	// TODO Need to think of a better way to do this without copying iBody -> use pointers
-	// Populate dummy iBody vector
-	for (int ib = 0; ib < iBody.size(); ib++)
-		iBodyTemp.push_back(iBody[ib]);
-
-#else
+#ifdef L_BUILD_FOR_MPI
 
 	// Get MPI manager instance
 	MpiManager *mpim = MpiManager::getInstance();
 
-	// Pass marker positions and support site information and fill recvBuffer
-	std::vector<std::vector<double>> recvBuffer;
-	mpim->mpi_epsilonCommGather(recvBuffer);
-
-	// Now build temporary iBody objects with custom constructor
-	for (int ib = 0; ib < iBody.size(); ib++) {
-		if (mpim->my_rank == iBody[ib].owningRank)
-			iBodyTemp.emplace_back(iBody[ib], recvBuffer);
-	}
+	// Pass delta values
+	mpim->mpi_epsilonCommGather(level);
 #endif
 
-	// Size epsilon values
-	std::vector<std::vector<double>> epsilon(bodyIDToIdx.size(), std::vector<double>(0));
+	// Get rank
+	int rank = GridUtils::safeGetRank();
 
 	// Loop through all iBodys this rank owns
-	for (int ib = 0; ib < iBodyTemp.size(); ib++) {
+	for (int ib = 0; ib < iBody.size(); ib++) {
+		if (iBody[ib].owningRank == rank && iBody[ib]._Owner->level == level) {
 
-		/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
-		to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
-		We can use built-in libraries to solve the ensuing linear system in future. */
+			/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
+			to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
+			We can use built-in libraries to solve the ensuing linear system in future. */
 
-		// Declarations
-		double Delta_I, Delta_J;
+			// Declarations
+			double Delta_I, Delta_J;
 
-		//////////////////////////////////
-		//	Build coefficient matrix A	//
-		//		with a_ij values.		//
-		//////////////////////////////////
+			//////////////////////////////////
+			//	Build coefficient matrix A	//
+			//		with a_ij values.		//
+			//////////////////////////////////
 
-		// Initialise 2D std vector with zeros
-		std::vector< std::vector<double> > A(iBodyTemp[ib].markers.size(), std::vector<double>(iBodyTemp[ib].markers.size(), 0.0));
+			// Initialise 2D std vector with zeros
+			std::vector< std::vector<double> > A(iBody[ib].markers.size(), std::vector<double>(iBody[ib].markers.size(), 0.0));
 
 
-		// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
-		for (size_t I = 0; I < iBodyTemp[ib].markers.size(); I++) {
+			// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
+			for (size_t I = 0; I < iBody[ib].markers.size(); I++) {
 
-			// Loop over markers J
-			for (size_t J = 0; J < iBodyTemp[ib].markers.size(); J++) {
+				// Loop over markers J
+				for (size_t J = 0; J < iBody[ib].markers.size(); J++) {
 
-				// Sum delta values evaluated for each support of I
-				for (size_t s = 0; s < iBodyTemp[ib].markers[I].deltaval.size(); s++) {
+					// Sum delta values evaluated for each support of I
+					for (size_t s = 0; s < iBody[ib].markers[I].deltaval.size(); s++) {
 
-					Delta_I = iBodyTemp[ib].markers[I].deltaval[s];
+						Delta_I = iBody[ib].markers[I].deltaval[s];
 #if (L_DIMS == 3)
-					Delta_J =
-						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
-						iBodyTemp[ib].markers[J].dilation
-						) *
-						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
-						iBodyTemp[ib].markers[J].dilation
-						) *
-						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eZDirection] - iBodyTemp[ib].markers[I].supp_z[s]) / iBodyTemp[ib]._Owner->dh,
-						iBodyTemp[ib].markers[J].dilation
-						);
+						Delta_J =
+							ibm_deltaKernel(
+							(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
+							iBodyTemp[ib].markers[J].dilation
+							) *
+							ibm_deltaKernel(
+							(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
+							iBodyTemp[ib].markers[J].dilation
+							) *
+							ibm_deltaKernel(
+							(iBodyTemp[ib].markers[J].position[eZDirection] - iBodyTemp[ib].markers[I].supp_z[s]) / iBodyTemp[ib]._Owner->dh,
+							iBodyTemp[ib].markers[J].dilation
+							);
 #else
-					Delta_J =
-						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eXDirection] - iBodyTemp[ib].markers[I].supp_x[s]) / iBodyTemp[ib]._Owner->dh,
-						iBodyTemp[ib].markers[J].dilation
-						) *
-						ibm_deltaKernel(
-						(iBodyTemp[ib].markers[J].position[eYDirection] - iBodyTemp[ib].markers[I].supp_y[s]) / iBodyTemp[ib]._Owner->dh,
-						iBodyTemp[ib].markers[J].dilation
-						);
+						Delta_J =
+							ibm_deltaKernel(
+							(iBody[ib].markers[J].position[eXDirection] - iBody[ib].markers[I].supp_x[s]) / iBody[ib]._Owner->dh,
+							iBody[ib].markers[J].dilation
+							) *
+							ibm_deltaKernel(
+							(iBody[ib].markers[J].position[eYDirection] - iBody[ib].markers[I].supp_y[s]) / iBody[ib]._Owner->dh,
+							iBody[ib].markers[J].dilation
+							);
 #endif
-					// Multiply by local area (or volume in 3D)
-					A[I][J] += Delta_I * Delta_J * iBodyTemp[ib].markers[I].local_area;
-				}
+						// Multiply by local area (or volume in 3D)
+						A[I][J] += Delta_I * Delta_J * iBody[ib].markers[I].local_area;
+					}
 
-				// Multiply by arc length between markers in lattice units
-				A[I][J] = A[I][J] * (iBodyTemp[ib].spacing / iBodyTemp[ib]._Owner->dh);
+					// Multiply by arc length between markers in lattice units
+					A[I][J] = A[I][J] * (iBody[ib].spacing / iBody[ib]._Owner->dh);
+				}
+			}
+
+			// Create vectors
+			std::vector<double> epsilon(iBody[ib].markers.size(), 1.0);
+			std::vector<double> bVector(iBody[ib].markers.size(), 1.0);
+
+			//////////////////
+			// Solve system //
+			//////////////////
+
+			// Solve linear system
+			epsilon = GridUtils::solveLinearSystem(A, bVector);
+
+			// Assign epsilon
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				iBody[ib].markers[m].epsilon = epsilon[m];
 			}
 		}
-
-		// Create vectors
-		epsilon[iBodyTemp[ib].id].resize(iBodyTemp[ib].markers.size(), 0.0);
-		std::vector<double> bVector (iBodyTemp[ib].markers.size(), 1.0);
-
-		//////////////////
-		// Solve system //
-		//////////////////
-
-		// Solve linear system
-		epsilon[iBodyTemp[ib].id] = GridUtils::solveLinearSystem(A, bVector);
 	}
 
-	// Distribute the epsilon values back to the iBody
-#ifndef L_BUILD_FOR_MPI
-
-	// Loop through all iBodies
-	for (int ib = 0; ib < iBody.size(); ib++) {
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
-			iBody[ib].markers[m].epsilon = epsilon[ib][m];
-		}
-	}
-
-#else
+#ifdef L_BUILD_FOR_MPI
 
 	// Perform MPI communication and insert correct epsilon values
-	mpim->mpi_epsilonCommScatter(epsilon);
+	mpim->mpi_epsilonCommScatter(level);
 #endif
 }
 
@@ -936,7 +916,7 @@ void ObjectManager::ibm_debug_supportInfo(int ib, int m, int s) {
 void ObjectManager::ibm_debug_epsilon(int ib) {
 
 	// Only do if there is data to write
-	if (iBody[ib].markers.size() > 0) {
+	if (iBody[ib].validMarkers.size() > 0) {
 
 		// Get rank safely
 		int rank = GridUtils::safeGetRank();
@@ -948,7 +928,7 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 		epout << "Marker\tEpsilon" << std::endl;
 
 		// Loop through markers
-		for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+		for (auto m : iBody[ib].validMarkers) {
 			epout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].epsilon << std::endl;
 		}
 		epout << std::endl;

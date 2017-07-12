@@ -59,6 +59,8 @@ protected:
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
 	double spacing;						///< Reference spacing of the markers
 
+	std::vector<int> validMarkers;		///< Vector of indices to valid markers within this body which actually exist on this rank
+
 
 	// ************************ Methods ************************ //
 
@@ -706,7 +708,7 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 
 	// Write out the positions of each Lagrange marker
 	fout << "POINTS " << markers.size() << " float\n";
-	for (size_t i = 0; i < markers.size(); i++) {
+	for (auto i : validMarkers) {
 
 		fout << markers[i].position[0] << " "
 			<< markers[i].position[1] << " "
@@ -714,7 +716,7 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	}
 
 	// Write out the connectivity of each Lagrange marker
-	size_t nLines = markers.size() - 1;
+	size_t nLines = validMarkers.size() - 1;
 
 	if (closed_surface == false)
 		fout << "LINES " << nLines << " " << 3 * nLines << std::endl;

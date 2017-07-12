@@ -63,8 +63,6 @@ protected:
 	bool isFlexible;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool isMovable;						///< Flag to indicate if body is movable or not.
 
-	std::vector<int> validMarkers;		///< Vector of indices to valid markers within this body which actually exist on this rank
-
 	FEMBody *fBody;						///< Pointer to FEM body object
 
 

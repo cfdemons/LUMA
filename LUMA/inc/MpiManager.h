@@ -21,6 +21,7 @@
 #include "IBInfo.h"
 class GridObj;
 class GridManager;
+class IBBody;
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
@@ -179,6 +180,8 @@ public :
 	void mpi_buildSupportComms(int level);												// Build comms required for support communication
 	void mpi_epsilonCommGather(int level);												// Do communication required for epsilon calculation
 	void mpi_epsilonCommScatter(int level);												// Do communication required for epsilon calculation
+	void mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBodyTmp);			// Do communication required for universal epsilon calculation
+	void mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp);						// Do communication required for universal epsilon calculation
 	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation
 	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
 

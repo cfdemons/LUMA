@@ -52,20 +52,6 @@ public:
 		position.push_back(0.0);
 		position.push_back(0.0);
 		position.push_back(0.0);
-
-		// Set the i, j, and k for the closest voxel to zero
-		supp_i.push_back(0);
-		supp_j.push_back(0);
-		supp_k.push_back(0);
-
-		// Set the i, j, and k for the closest voxel to zero
-		supp_x.push_back(0.0);
-		supp_y.push_back(0.0);
-		supp_z.push_back(0.0);
-
-		// Set rank of first support marker and marker ID in body
-		support_rank.push_back(GridUtils::safeGetRank());
-		id = 0;
 	};
 
 	/// Default destructor

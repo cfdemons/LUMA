@@ -704,9 +704,6 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 /// \param	ib	iBody being operated on.
 void ObjectManager::ibm_findEpsilon(int level) {
 
-	// Get rank
-	int rank = GridUtils::safeGetRank();
-
 #ifdef L_UNIVERSAL_EPSILON_CALC
 
 	// Temorary iBody for storing all markers in whole simulation
@@ -732,6 +729,9 @@ void ObjectManager::ibm_findEpsilon(int level) {
 		// Set the pointer values to avoid copying memory
 		std::vector<IBBody> *iBodyPtr = &iBody;
 #endif
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
 
 	// Loop through all iBodys this rank owns
 	for (int ib = 0; ib < (*iBodyPtr).size(); ib++) {
@@ -864,6 +864,15 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 
 #ifdef L_BUILD_FOR_MPI
 
+	// Set root rank
+	int rootRank = 0;
+
+	// Get mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Gather in the data for all markers in the system
+	mpim->mpi_uniEpsilonCommGather(level, rootRank, iBodyTmp);
+
 #else
 
 	// Loop through all iBodies and all markers
@@ -895,6 +904,15 @@ void ObjectManager::ibm_universalEpsilonScatter(IBBody &iBodyTmp) {
 
 
 #ifdef L_BUILD_FOR_MPI
+
+	// Set root rank
+	int rootRank = 0;
+
+	// Get mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Gather in the data for all markers in the system
+	mpim->mpi_uniEpsilonCommScatter(rootRank, iBodyTmp);
 
 #else
 

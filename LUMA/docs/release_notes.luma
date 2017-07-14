@@ -1,6 +1,7 @@
 version		=	1.5.1-alpha
 
 Issue #97	:	Added KBC to optimised kernel.
+Issue #140	:	Fixed missing pointers in restart method that was causing seg faults on load.
 
 version		=	1.5.0
 

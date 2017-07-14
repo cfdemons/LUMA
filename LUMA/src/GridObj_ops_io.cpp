@@ -478,7 +478,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 		// Input stream
 		std::ifstream file;
-		*GridUtils::logfile << "Initialising grid level " << level << " region " << region_number << " from restart file..." << endl;
+		L_INFO("Initialising grids from restart file...", GridUtils::logfile);
 
 
 		//////////////////////
@@ -486,9 +486,9 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		//////////////////////
 
 		file.open("./input/restart_LBM_Rnk" + rnk_str + ".out", std::ios::in);
-		if (!file.is_open()) {
+		if (!file.is_open())
 			L_ERROR("Error opening LBM restart file. Exiting.", GridUtils::logfile);
-		}
+
 		// Counters, sizes and indices
 		int i,j,k,v;
 		double x, y, z;
@@ -499,7 +499,8 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		std::string line_in;	// String to store line
 		std::istringstream iss;	// Buffer stream
 
-		while( !file.eof() ) {
+		while(!file.eof())
+		{
 
 			// Get line and put in buffer
 			std::getline(file,line_in,'\n');
@@ -512,7 +513,8 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			// Get grid
 			GridObj *g = nullptr;
 			GridUtils::getGrid(gm->Grids, in_level, in_regnum, g);
-			if (!g) L_ERROR("Could not retrieve grid to initialise. Is restart file correct?", GridUtils::logfile);
+			if (!g) L_ERROR("Could not retrieve grid level " + std::to_string(in_level) + 
+				" region " + std::to_string(in_regnum) + ". Is restart file correct?", GridUtils::logfile);
 
 			// Read in positions
 			iss >> x >> y >> z;
@@ -527,21 +529,23 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 			// Read in f values
 			for (v = 0; v < L_NUM_VELS; v++) {
-				iss >> f(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+				iss >> g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
 			}
 
 			// Read in u values
 			for (v = 0; v < L_DIMS; v++) {
-				iss >> u(i,j,k,v,M_lim,K_lim,L_DIMS);
+				iss >> g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS);
 			}
 
 			// Read in rho value
-			iss >> rho(i,j,k,M_lim,K_lim);
+			iss >> g->rho(i, j, k, g->M_lim, g->K_lim);
 
 		}
 
 		// Reached end of file so close file
 		file.close();
+
+		L_INFO("Restart complete.", GridUtils::logfile);
 
 
 		//////////////////////

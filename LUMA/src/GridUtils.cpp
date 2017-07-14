@@ -546,7 +546,7 @@ bool GridUtils::isOnThisRank(double x, double y, double z, eLocationOnRank *loc,
 	// In serial always on Core or not on grid at all
 	GridManager *gm = GridManager::getInstance();
 
-	// Check with coarsest grid limits
+	// Check within coarsest grid limits
 	if (
 		gm->global_edges[eXMin][0] <= x && x < gm->global_edges[eXMax][0] &&
 		gm->global_edges[eYMin][0] <= y && y < gm->global_edges[eYMax][0]
@@ -792,6 +792,9 @@ void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& p
 		return;
 
 	} else {
+
+		L_INFO("Looking for " + std::to_string(Grids->level) + ", " + std::to_string(Grids->region_number) +
+			". Found " + std::to_string(level) + ", " + std::to_string(region), GridUtils::logfile);
 
 		// Loop through array of subgrids on this grid getting each one by reference
 		for (GridObj * const G : Grids->subGrid) {

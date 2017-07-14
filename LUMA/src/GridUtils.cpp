@@ -794,7 +794,7 @@ void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& p
 	} else {
 
 		// Loop through array of subgrids on this grid getting each one by reference
-		for (GridObj *G : Grids->subGrid) {
+		for (GridObj * const G : Grids->subGrid) {
 
 			// Region must match
 			if (G->region_number == region) {

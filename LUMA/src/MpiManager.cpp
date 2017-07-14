@@ -1147,12 +1147,15 @@ float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBloc
 		{
 			for (int k = 0; k < L_MPI_ZCORES; ++k)
 			{
+				// Set bounds from solution vector
 				bounds[eXMin] = XSol[i];
 				bounds[eXMax] = XSol[i + 1];
 				bounds[eYMin] = YSol[j];
 				bounds[eYMax] = YSol[j + 1];
 				bounds[eZMin] = ZSol[k];
 				bounds[eZMax] = ZSol[k + 1];
+
+				// Get active cell count
 				count = GridManager::getInstance()->getActiveCellCount(&bounds[0]);
 
 				// Update the extremes

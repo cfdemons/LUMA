@@ -163,7 +163,16 @@ GridManager::GridManager()
 	local_size.push_back(static_cast<int>(L_M));
 	local_size.push_back(static_cast<int>(L_K));
 
-	
+	// Update active cell count
+	double bounds[6];
+	bounds[eXMin] = 0.0;
+	bounds[eXMax] = L_BX;
+	bounds[eYMin] = 0.0;
+	bounds[eYMax] = L_BY;
+	bounds[eZMin] = 0.0;
+	bounds[eZMax] = L_BZ;
+	activeCellCount = getActiveCellCount(&bounds[0]);
+	L_INFO("Approximate number of active cells = " + std::to_string(activeCellCount), GridUtils::logfile);
 }
 
 /// Default destructor

@@ -410,7 +410,10 @@ int main( int argc, char* argv[] )
 			MPI_Barrier(mpim->world_comm);
 #endif
 			// Write out the time an outer loop is taking to the log file
-			L_INFO("Outer loop taking " + std::to_string(outer_loop_time) + "ms", GridUtils::logfile);
+			L_INFO("Outer loop taking " + std::to_string(outer_loop_time) + 
+				"ms. Approximate MLUPS for active sites only = " + 
+				std::to_string(gm->activeCellCount / (outer_loop_time * 1000)),
+				GridUtils::logfile);
 
 #ifdef L_TEXTOUT
 			*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;

@@ -30,6 +30,13 @@ class GridManager
 	friend class GridUtils;
 	friend class GridObj;
 
+public:
+	/// Number of active cells in the calculation
+	long activeCellCount;
+	
+	/// Number of cells in the calculation
+	long totalCellCount;
+
 protected:
 	/// Pointer to grid hierarchy
 	GridObj *Grids;

@@ -58,9 +58,8 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				eType type_local = LatTyp[id];
 
 				// Ignore Refined sites
-				if (type_local == eRefined)	{
+				if (type_local == eRefined)
 					continue;
-				}
 
 				// MOMENTUM EXCHANGE //
 #ifdef L_LD_OUT
@@ -134,8 +133,6 @@ void GridObj::LBM_multi_opt(int subcycle) {
 
 	// MPI COMMUNICATION //
 #ifdef L_BUILD_FOR_MPI
-
-	// TODO: Can we restrict this to just every 2nd sub-cycle?
 
 	// Launch communication on this grid by passing its level and region number
 	MpiManager::getInstance()->mpi_communicate(level, region_number);
@@ -657,7 +654,7 @@ void GridObj::_LBM_collide_opt(int id)
 ///	\param	type_local	type of site under consideration
 void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
-	// Only update fluid sites (includeing BFL) or TL to finer
+	// Only update fluid sites (including BFL) or TL to finer
 	if (type_local == eFluid || type_local == eBFL ||
 		type_local == eTransitionToFiner) {
 

@@ -512,6 +512,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			// Get grid
 			GridObj *g = nullptr;
 			GridUtils::getGrid(gm->Grids, in_level, in_regnum, g);
+			if (!g) L_ERROR("Could not retrieve grid to initialise. Is restart file correct?", GridUtils::logfile);
 
 			// Read in positions
 			iss >> x >> y >> z;

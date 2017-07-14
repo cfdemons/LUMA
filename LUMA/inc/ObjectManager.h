@@ -136,6 +136,7 @@ public:
 	void ibm_initialiseSupport(int ib, int m, int s, double estimated_position[]);	// Initialises data associated with the support points.
 	void ibm_computeForce(int level);												// Compute restorative force at each marker in ib-th body.
 	void ibm_findEpsilon(int level);												// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_computeDs(int level);
 	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
 	void ibm_finaliseReadIn(int iBodyID);											// Do some house-keeping after geometry read in
 	void ibm_universalEpsilonGather(int level, IBBody &iBodyTmp);						// Gather all the markers into the temporary iBody vector

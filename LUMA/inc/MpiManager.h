@@ -184,6 +184,7 @@ public :
 	void mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp);						// Do communication required for universal epsilon calculation
 	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation
 	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
+	void mpi_dsCommScatter(int level);													// Spread the ds values from owner to other ranks
 
 	// FEM
 	void mpi_forceCommGather(int level);

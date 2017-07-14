@@ -116,7 +116,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 
 				// Write out force on markers
 				for (int dir = 0; dir < L_DIMS; dir++)
-					jout << "\t" << iBody[ib].markers[m].force_xyz[dir] * volWidth * volDepth * (iBody[ib].spacing / iBody[ib]._Owner->dh) * forceScaling;
+					jout << "\t" << iBody[ib].markers[m].force_xyz[dir] * volWidth * volDepth * iBody[ib].markers[m].ds * forceScaling;
 			}
 
 			// Next line and close file

@@ -57,7 +57,6 @@ protected:
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
 	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
-	double spacing;						///< Reference spacing of the markers
 	int level;							///< Level on which body exists
 
 	std::vector<int> validMarkers;		///< Vector of indices to valid markers within this body which actually exist on this rank
@@ -126,9 +125,6 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
-
-	// Define spacing based on first two markers	// TODO Make spacing a marker member
-	this->spacing = _Owner->dh;
 };
 
 /*********************************************/
@@ -167,7 +163,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 
 	// Compute spacing
 	int numMarkers = static_cast<int>(std::floor(length / g->dh)) + 1;
-	spacing = length / (numMarkers - 1);							// Physical spacing between markers
+	double spacing = length / (numMarkers - 1);							// Physical spacing between markers
 	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
 
 	// Add all markers
@@ -202,7 +198,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = bodyID;
-	this->closed_surface = false;
+	this->closed_surface = true;
 
 	// Set level
 	this->level = _Owner->level;
@@ -247,13 +243,6 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	}
 #endif
 
-	// Spacing
-	std::vector<double> diff;
-	for (int d = 0; d < L_DIMS; d++) {
-		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
-	}
-	spacing = GridUtils::vecnorm( diff );
-
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
@@ -280,7 +269,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = bodyID;
-	this->closed_surface = false;
+	this->closed_surface = true;
 
 	// Set level
 	this->level = _Owner->level;

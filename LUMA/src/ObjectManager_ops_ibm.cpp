@@ -179,6 +179,10 @@ void ObjectManager::ibm_initialise() {
 		ibm_updateMPIComms(lev);
 #endif
 
+	// Compute ds
+	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+		ibm_computeDs(lev);
+
 	// Find epsilon for the body
 #ifdef L_UNIVERSAL_EPSILON_CALC
 	ibm_findEpsilon(0);
@@ -600,7 +604,7 @@ void ObjectManager::ibm_spread(int level) {
 									iBody[ib].markers[m].deltaval[s] *
 									iBody[ib].markers[m].force_xyz[dir] *
 									volWidth * volDepth *
-									iBody[ib].spacing / iBody[ib]._Owner->dh;
+									iBody[ib].markers[m].ds;
 						}
 					}
 				}
@@ -793,7 +797,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 					}
 
 					// Multiply by arc length between markers in lattice units
-					A[I][J] = A[I][J] * ((*iBodyPtr)[ib].spacing / (*iBodyPtr)[ib]._Owner->dh);
+					A[I][J] = A[I][J] * (*iBodyPtr)[ib].markers[J].ds;
 				}
 			}
 
@@ -829,6 +833,59 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #endif
 }
 
+
+// *****************************************************************************
+/// \brief	Compute epsilon for a given iBody.
+/// \param	ib	iBody being operated on.
+void ObjectManager::ibm_computeDs(int level) {
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Declare values
+	int mPrevious, mNext;
+	double distPrevious, distNext;
+
+	// First all owning ranks should compute their own Ds
+	for (int ib = 0; ib < iBody.size(); ib++) {
+
+		// Check if owning rank
+		if (iBody[ib].owningRank == rank && iBody[ib].level == level) {
+
+			// Now loop through all markers
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+
+				// Get previous and next indices
+				mPrevious = (m - 1 + iBody[ib].markers.size()) % iBody[ib].markers.size();
+				mNext = (m + 1 + iBody[ib].markers.size()) % iBody[ib].markers.size();
+
+				// Get distances
+				distPrevious = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].position, iBody[ib].markers[mPrevious].position));
+				distNext = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[mNext].position, iBody[ib].markers[m].position));
+
+				// Get ds
+				iBody[ib].markers[m].ds = 0.5 * (distPrevious + distNext) / iBody[ib]._Owner->dh;
+			}
+
+			// If it is an open surface need to fix the end points
+			if (iBody[ib].closed_surface == false) {
+				iBody[ib].markers[0].ds = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[1].position, iBody[ib].markers[0].position)) / iBody[ib]._Owner->dh;
+				iBody[ib].markers[iBody[ib].markers.size()-1].ds = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[iBody[ib].markers.size()-1].position, iBody[ib].markers[iBody[ib].markers.size()-2].position)) / iBody[ib]._Owner->dh;
+			}
+		}
+	}
+
+	// If building for MPI
+#ifdef L_BUILD_FOR_MPI
+
+	// Get mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Gather in the data for all markers in the system
+	mpim->mpi_dsCommScatter(level);
+
+#endif
+}
 
 // *****************************************************************************
 /// \brief	Some final setup required for IBM
@@ -878,10 +935,6 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 	// Loop through all iBodies and all markers
 	for (int ib = 0; ib < iBody.size(); ib++) {
 
-		// Set global values
-		iBodyTmp._Owner = iBody[ib]._Owner;
-		iBodyTmp.spacing = iBody[ib].spacing;
-
 		// Set markers
 		for (int m = 0; m < iBody[ib].markers.size(); m++) {
 			iBodyTmp.markers.push_back(iBody[ib].markers[m]);
@@ -891,6 +944,7 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 	// Set the global values
 	iBodyTmp.owningRank = 0;
 	iBodyTmp.level = level;
+	iBodyTmp._Owner = iBody[0]._Owner;
 
 #endif
 }

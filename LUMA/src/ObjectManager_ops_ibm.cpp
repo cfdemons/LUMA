@@ -589,7 +589,7 @@ void ObjectManager::ibm_spread(int level) {
 						volWidth = iBody[ib].markers[m].epsilon;
 						volDepth = 1.0;
 #if (L_DIMS == 3)
-						volDepth = iBody[ib].markers[m].epsilon;
+						volDepth = iBody[ib].markers[m].ds;
 #endif
 
 						// Loop over directions x y z

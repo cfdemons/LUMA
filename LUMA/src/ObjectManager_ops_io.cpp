@@ -68,7 +68,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 	for (int ib = 0; ib < iBody.size(); ib++) {
 
 		// Only write out if this rank owns some markers
-		if (iBody[ib].markers.size() > 0) {
+		if (iBody[ib].validMarkers.size() > 0) {
 
 			// Open file for given time step
 			std::ofstream jout;
@@ -104,14 +104,14 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 			jout << _Grids->t << "\t" << _Grids->t * _Grids->dt;
 
 			// Compute lift and drag
-			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+			for (auto m : iBody[ib].validMarkers) {
 
 				// Get volume scaling
 				volWidth = iBody[ib].markers[m].epsilon;
 #if (L_DIMS == 2)
 				volDepth = 1.0;
 #elif (L_DIMS == 3)
-				volDepth = iBody[ib].markers[m].epsilon;
+				volDepth = iBody[ib].markers[m].ds;
 #endif
 
 				// Write out force on markers

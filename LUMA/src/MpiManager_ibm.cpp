@@ -50,7 +50,7 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 			double volWidth = objman->iBody[ib].markers[m].epsilon;
 			double volDepth = 1.0;
 #if (L_DIMS == 3)
-			volDepth = objman->iBody[ib].markers[m].epsilon;
+			volDepth = objman->iBody[ib].markers[m].ds;
 #endif
 
 			// Pack into buffer

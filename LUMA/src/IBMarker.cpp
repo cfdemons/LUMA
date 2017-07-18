@@ -35,6 +35,9 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->markerVel.push_back(0.0);
 	this->markerVel.push_back(0.0);
 	this->markerVel.push_back(0.0);
+	this->markerVel_km1.push_back(0.0);
+	this->markerVel_km1.push_back(0.0);
+	this->markerVel_km1.push_back(0.0);
 
 	// Resize vectors
 	this->interpMom.resize(L_DIMS);

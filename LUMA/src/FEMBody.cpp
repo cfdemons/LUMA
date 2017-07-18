@@ -657,7 +657,8 @@ void FEMBody::updateIBMarkers() {
 		// Set the IBM node
 		for (int d = 0; d < L_DIMS; d++) {
 			iBodyPtr->markers[node].position[d] = iBodyPtr->markers[node].position0[d] + UnodeGlobal[d];
-			iBodyPtr->markers[node].markerVel[d] = UDotNodeGlobal[d] * iBodyPtr->_Owner->dt / iBodyPtr->_Owner->dh;
+			iBodyPtr->markers[node].markerVel_km1[d] = iBodyPtr->markers[node].markerVel[d];
+			iBodyPtr->markers[node].markerVel[d] = L_RELAX * UDotNodeGlobal[d] * iBodyPtr->_Owner->dt / iBodyPtr->_Owner->dh + (1.0 - L_RELAX) * iBodyPtr->markers[node].markerVel_km1[d];
 		}
 	}
 }

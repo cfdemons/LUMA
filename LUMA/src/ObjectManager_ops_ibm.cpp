@@ -843,8 +843,7 @@ void ObjectManager::ibm_computeDs(int level) {
 	int rank = GridUtils::safeGetRank();
 
 	// Declare values
-	int mPrevious, mNext;
-	double distPrevious, distNext;
+	double dist, ds, dh;
 
 	// First all owning ranks should compute their own Ds
 	for (int ib = 0; ib < iBody.size(); ib++) {
@@ -852,25 +851,32 @@ void ObjectManager::ibm_computeDs(int level) {
 		// Check if owning rank
 		if (iBody[ib].owningRank == rank && iBody[ib].level == level) {
 
+			// Get grid spacing
+			dh = iBody[ib]._Owner->dh;
+
 			// Now loop through all markers
 			for (int m = 0; m < iBody[ib].markers.size(); m++) {
 
-				// Get previous and next indices
-				mPrevious = (m - 1 + iBody[ib].markers.size()) % iBody[ib].markers.size();
-				mNext = (m + 1 + iBody[ib].markers.size()) % iBody[ib].markers.size();
+				// Set ds to high value
+				ds = 10.0;
 
-				// Get distances
-				distPrevious = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].position, iBody[ib].markers[mPrevious].position));
-				distNext = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[mNext].position, iBody[ib].markers[m].position));
+				// Loop through other markers
+				for (int n = 0; n < iBody[ib].markers.size(); n++) {
 
-				// Get ds
-				iBody[ib].markers[m].ds = 0.5 * (distPrevious + distNext) / iBody[ib]._Owner->dh;
-			}
+					// Don't check itself
+					if (n != m) {
 
-			// If it is an open surface need to fix the end points
-			if (iBody[ib].closed_surface == false) {
-				iBody[ib].markers[0].ds = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[1].position, iBody[ib].markers[0].position)) / iBody[ib]._Owner->dh;
-				iBody[ib].markers[iBody[ib].markers.size()-1].ds = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[iBody[ib].markers.size()-1].position, iBody[ib].markers[iBody[ib].markers.size()-2].position)) / iBody[ib]._Owner->dh;
+						// Get grid normalised distance
+						dist = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].position, iBody[ib].markers[n].position)) / dh;
+
+						// Check if min of found so far
+						if (dist < ds)
+							ds = dist;
+					}
+				}
+
+				// Set ds
+				iBody[ib].markers[m].ds = ds;
 			}
 		}
 	}

@@ -284,3 +284,21 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	// IBM-specific initialisation
 	initialise(moveProperty);
 }
+
+
+
+/*********************************************/
+/// \brief 	Custom constructor for building plate
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre_point		centre point of square
+/// \param dimensions		dimensions of square
+/// \param angles			angle of square
+/// \param moveProperty		determines if body is moveable, flexible or rigid
+IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+		double length, double width, std::vector<double> &angles, eMoveableType moveProperty)
+		: Body(g, bodyID, centre_point, length, width, angles)
+{
+	// IBM-specific initialisation
+	initialise(moveProperty);
+}

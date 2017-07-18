@@ -1069,11 +1069,11 @@ void ObjectManager::ibm_debug_epsilon(int ib) {
 		std::ofstream epout;
 		epout.open(GridUtils::path_str + "/Epsilon_" + std::to_string(iBody[ib].id) + "_rank" + std::to_string(rank) + ".out",std::ios::app);
 		epout << "NEW TIME STEP" << std::endl;
-		epout << "Marker\tEpsilon" << std::endl;
+		epout << "Marker\tEpsilon\tds" << std::endl;
 
 		// Loop through markers
 		for (auto m : iBody[ib].validMarkers) {
-			epout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].epsilon << std::endl;
+			epout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].epsilon << "\t" << iBody[ib].markers[m].ds << std::endl;
 		}
 		epout << std::endl;
 		epout.close();

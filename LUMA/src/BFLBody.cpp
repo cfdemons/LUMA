@@ -190,6 +190,21 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	initialise();
 }
 
+
+/******************************************************************************/
+/// \brief 	Custom constructor for building plate
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre_point		centre point of square
+/// \param dimensions		dimensions of square
+/// \param angles			angle of square
+BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+	double length, double width, std::vector<double> &angles)
+	: Body(g, bodyID, centre_point, length, width, angles)
+{
+	initialise();
+}
+
 /******************************************************************************/
 /// \brief	Routine to compute wall distance Q.
 ///

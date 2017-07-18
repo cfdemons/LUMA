@@ -46,6 +46,9 @@ public:
 	// Custom constructor for building prefab square or cuboid
 	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, std::vector<double> &dimensions, std::vector<double> &angles);
 
+	// Custom constructor for building prefab square or cuboid
+	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, double length, double width, std::vector<double> &angles);
+
 	// Custom constructor for building prefab filament
 	Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles);
 
@@ -393,6 +396,110 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 		deleteOffRankMarkers();
 	}
 };
+
+
+
+/*********************************************/
+/// \brief 	Custom constructor for building plate
+/// \param g					hierarchy pointer to grid hierarchy
+/// \param bodyID				ID of body in array of bodies.
+/// \param centre				centre point of square
+/// \param width_length_depth	dimensions of square
+/// \param angles				angle of square
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
+	double length, double width, std::vector<double> &angles) {
+
+
+	// Set the body base class parameters from constructor inputs
+	this->_Owner = g;
+	this->id = bodyID;
+	this->closed_surface = false;
+
+	// Set level
+	this->level = _Owner->level;
+
+	// Set the rank which owns this body
+#ifdef L_BUILD_FOR_MPI
+	this->owningRank = id % MpiManager::getInstance()->num_ranks;
+#else
+	this->owningRank = 0;
+#endif
+
+	// Get number of markers in each direction
+	int numMarkersLength = static_cast<int>(std::floor(length / g->dh)) + 1;
+	int numMarkersWidth = static_cast<int>(std::floor(width / g->dh)) + 1;
+
+	// Get spacing
+	double spacingLength = length / (numMarkersLength - 1);
+	double spacingWidth = width / (numMarkersWidth - 1);
+
+	// Get start point
+	double xStart = -length / 2.0;
+	double yStart = 0.0;
+	double zStart = -width / 2.0;
+
+	double thetaX = angles[eXDirection] * L_PI / 180.0;
+	double thetaY = angles[eYDirection] * L_PI / 180.0;
+	double thetaZ = angles[eZDirection] * L_PI / 180.0;
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Tx = {{1.0, 0.0, 0.0},
+										   {0.0, cos(thetaX), -sin(thetaX)},
+										   {0.0, sin(thetaX), cos(thetaX)}};
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Ty = {{cos(thetaY), 0.0, sin(thetaY)},
+										   {0.0, 1.0, 0.0},
+										   {-sin(thetaY), 0.0, cos(thetaY)}};
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Tz = {{cos(thetaZ), -sin(thetaZ), 0.0},
+										   {sin(thetaZ), cos(thetaZ), 0.0},
+										   {0.0, 0.0, 1.0}};
+
+	// Get rotation matrix
+	std::vector<std::vector<double>> R =  GridUtils::matrix_multiply(GridUtils::matrix_multiply(Tz, Ty), Tx);
+
+
+	// Marker ID
+	int markerID = 0;
+
+	// Now loop through all markers
+	std::vector<double> position(L_DIMS, 0);
+	for (int i = 0; i < numMarkersLength; i++) {
+		for (int j = 0; j < numMarkersWidth; j++) {
+
+			// Get position
+			position[eXDirection] = xStart + i * spacingLength;
+			position[eYDirection] = yStart;
+			position[eZDirection] = zStart + j * spacingWidth;
+
+			// Rotate about z and x axis
+			position = GridUtils::matrix_multiply(Tz, position);
+			position = GridUtils::matrix_multiply(Tx, position);
+
+			// Add the centre position
+			position[eXDirection] += centre[eXDirection];
+			position[eYDirection] += centre[eYDirection];
+			position[eZDirection] += centre[eZDirection];
+
+			// Add marker
+			addMarker(position[eXDirection], position[eYDirection], position[eZDirection], markerID);
+			markerID++;
+		}
+	}
+
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Delete markers which exist off rank
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
+}
 
 /*********************************************/
 /// \brief	Add marker to the body.

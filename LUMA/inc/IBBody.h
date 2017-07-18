@@ -49,12 +49,14 @@ public:
 	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty);
 
+	// Custom constructor for building prefab plate
+	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+		double length, double width, std::vector<double> &angles, eMoveableType moveProperty);
+
 	// Custom constructor for building prefab filament
 	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElement, bool clamped, double density, double E);
 
-	// Custom constructor for building dummy iBody for epsilon calculation
-	IBBody(IBBody &iBody, std::vector<std::vector<double>> &recvBuffer);
 
 
 protected:

@@ -684,6 +684,86 @@ void ObjectManager::io_readInGeomConfig() {
 				pBodyID++;
 		}
 
+
+		// ** INSERT PLATE ** //
+		else if (bodyCase == "PLATE")
+		{
+
+			// Can't build plate in 2D
+#if (L_DIMS == 2)
+			L_ERROR("Can't build plate in 2D. Exiting.", GridUtils::logfile);
+#endif
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double centreX; file >> centreX;
+			double centreY; file >> centreY;
+			double centreZ; file >> centreZ;
+			double length; file >> length;
+			double width; file >> width;
+			double angleX; file >> angleX;
+			double angleY; file >> angleY;
+			double angleZ; file >> angleZ;
+			std::string flex_rigid; file >> flex_rigid;
+
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a plate..." << std::endl;
+
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
+
+			// Sort data
+			std::vector<double> centre_point, angles;
+			centre_point.push_back(centreX);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
+			angles.push_back(angleX);
+			angles.push_back(angleY);
+			angles.push_back(angleZ);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				L_ERROR("Plate cannot be flexible. Exiting.", GridUtils::logfile);
+			else if (flex_rigid == "MOVABLE") {
+				moveProperty = eMovable;
+			}
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles, moveProperty);
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles);
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
+		}
+
 		// Increment body ID and set case to none
 		bodyCase = "NONE";
 	}

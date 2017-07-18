@@ -64,7 +64,7 @@
 const int resFactor = 1;
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY (resFactor*resFactor*1)			///< How many timesteps before whole grid output
@@ -137,7 +137,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2									///< Number of dimensions to the problem
+#define L_DIMS 3									///< Number of dimensions to the problem
 #define L_RESOLUTION (resFactor*1)					///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP (0.001/(resFactor*resFactor))	///< The timestep in non-dimensional units
 

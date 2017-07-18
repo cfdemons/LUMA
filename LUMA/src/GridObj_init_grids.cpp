@@ -1335,39 +1335,22 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 				par_label = pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim);
 								
 				// If parent is a "TL to lower" then add "TL to upper" label
-				if (par_label == eTransitionToFiner) { 
+				if (par_label == eTransitionToFiner)
+				{ 
 					LatTyp(i, j, k, M_lim, K_lim) = eTransitionToCoarser;
-                
-					// Else if parent is a "refined" label then label as coarse
-				} else if (par_label == eRefined) { 
+				}
+
+				// Else if parent is a "refined" label then label as coarse
+				else if (par_label == eRefined)
+				{ 
 					LatTyp(i, j, k, M_lim, K_lim) = eFluid;
-                
-					// Else parent label is some other kind of boundary so copy the
-					// label to retain the behaviour onto this grid
-				} else { 
+				}
+
+				// Else parent label is some other kind of boundary so copy the
+				// label to retain the behaviour onto this grid
+				else
+				{ 
 					LatTyp(i, j, k, M_lim, K_lim) = par_label;
-					
-					// If last site to be updated in fine block, change parent label
-					// to ensure boundary values are pulled from fine grid
-					if (
-						(j % 2) != 0 && (i % 2) != 0
-#if (L_DIMS == 3)
-						&& (k % 2 != 0)
-#endif
-						) {
-						if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eSolid || 
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedSolid)
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedSolid;
-
-						else if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eSymmetry || 
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedSymmetry)
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedSymmetry;
-						
-						else if (pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eInlet || 
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) == eRefinedInlet)
-							pGrid.LatTyp(p[eXDirection], p[eYDirection], p[eZDirection], Mp_lim, Kp_lim) = eRefinedInlet;
-
-					}
 				}
             }
         }

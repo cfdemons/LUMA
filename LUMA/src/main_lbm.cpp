@@ -412,7 +412,7 @@ int main( int argc, char* argv[] )
 			// Write out the time an outer loop is taking to the log file
 			L_INFO("Outer loop taking " + std::to_string(outer_loop_time) + 
 				"ms. Approximate MLUPS for active sites only = " + 
-				std::to_string(gm->activeCellCount / (outer_loop_time * 1000)),
+				std::to_string(gm->activeCellOps / (outer_loop_time * 1000)),
 				GridUtils::logfile);
 
 #ifdef L_TEXTOUT

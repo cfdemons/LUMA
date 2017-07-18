@@ -35,6 +35,52 @@ class GridManager;
 ///			Class to manage all MPI apsects of the code.
 class MpiManager
 {
+	///	Class to hold smart decomposition data
+	class SDData
+	{
+	public:
+
+		SDData() {};
+		~SDData() {};
+		// Copy constructor
+		SDData(SDData& other)
+			: XSol(other.XSol), YSol(other.YSol), ZSol(other.ZSol),
+			theta(other.theta), thetaNew(other.thetaNew), delta(other.delta)
+		{ };
+
+		// Solution vectors
+		std::vector<double> XSol;	///< Solution vector for X variables in SD problem.
+		std::vector<double> YSol;	///< Solution vector for Y variables in SD problem.
+		std::vector<double> ZSol;	///< Solution vector for Z variables in SD problem.
+
+		// Iteration vectors
+		std::vector<double> theta;		///< Complete vector of variable block edges.
+		std::vector<double> delta;		///< Perturbation vector.
+		std::vector<double> thetaNew;	///< Perturbed vector of block edges.
+	};
+
+	/// class to hold imbalance information
+	class LoadImbalanceData
+	{
+	public:
+		LoadImbalanceData()
+		{
+			heaviestBlock.resize(3);
+		};
+		~LoadImbalanceData() {};
+
+		// Copy constructor
+		LoadImbalanceData(LoadImbalanceData& other)
+			: loadImbalance(other.loadImbalance), uniImbalance(other.uniImbalance),
+			heaviestBlock(other.heaviestBlock), heaviestOps(other.heaviestOps)
+		{ };
+
+		double loadImbalance;		///< Imbalance assocaited with smart decomposition.
+		double uniImbalance;		///< Imbalance assocaited with uniform decomposition.
+		size_t heaviestOps;			///< Number of operations on heaviest rank.
+		std::vector<unsigned int> heaviestBlock;	///< MPI indices of the heaviest block.
+	};
+
 
 private :
 	MpiManager();			///< Private constructor
@@ -56,7 +102,7 @@ public :
 	///			it is valid C++ so I have had to make it static even though it goes
 	///			against the idea of the singleton design.
 	static const int neighbour_vectors[3][26];
-	int dimensions[L_DIMS];						///< Size of MPI Cartesian topology
+	int dimensions[3];							///< Size of MPI Cartesian topology
 	int neighbour_rank[L_MPI_DIRS];				///< Neighbour rank number for each direction in Cartesian topology
 	int neighbour_coords[L_DIMS][L_MPI_DIRS];	///< Coordinates in MPI topology of neighbour ranks
 
@@ -138,18 +184,18 @@ public :
 	static void destroyInstance();
 
 	// Initialisation
-	void mpi_init();											// Initialisation of MpiManager & Cartesian topology
-	void mpi_gridbuild(GridManager* const grid_man);			// Do domain decomposition to build local grid dimensions
-	int mpi_buildCommunicators(GridManager* const grid_man);	// Create a new communicator for each sub-grid and region combo
-	void mpi_updateLoadInfo(GridManager* const grid_man);		// Method to compute the number of active cells on the rank and pass to master
-	void mpi_uniformDecompose(int *numCells, int *numCores);	// Method to perform uniform decomposition into MPI blocks
-	void mpi_smartDecompose(double dh, int *numCores);			// Method to perform load-balanced decomposition into MPI blocks
-	void mpi_SDReconstructSolution(std::vector<double>& theta,
-		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
-	float mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
-		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol);
-	bool mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
-		std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh);
+	void mpi_init();												// Initialisation of MpiManager & Cartesian topology
+	void mpi_gridbuild(GridManager* const grid_man);				// Do domain decomposition to build local grid dimensions
+	int mpi_buildCommunicators(GridManager* const grid_man);		// Create a new communicator for each sub-grid and region combo
+	void mpi_updateLoadInfo(GridManager* const grid_man);			// Method to compute the number of active cells on the rank and pass to master
+	void mpi_uniformDecompose(int *numCells);						// Method to perform uniform decomposition into MPI blocks
+	LoadImbalanceData mpi_smartDecompose(double dh,
+		std::vector<int>& combo = std::vector<int>(0));				// Method to perform load-balanced decomposition into MPI blocks
+	void mpi_reportOnDecomposition(double dh);						// Method to provide a report on decomposition options
+	void mpi_SDReconstructSolution(SDData& solutionData, std::vector<int>& numCores);
+	void mpi_SDComputeImbalance(LoadImbalanceData& load, SDData& solutionData, std::vector<int>& numCores);
+	bool mpi_SDCheckDelta(SDData& solutionData, double dh, std::vector<int>& numCores);
+	void mpi_SDCommunicateSolution(SDData& solutionData, double imbalance, double dh);
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

@@ -68,6 +68,7 @@ public:
 	static int getOpposite(int direction);	// Function: getOpposite
 	static void getGrid(int level, int region, GridObj*& ptr);							// Wrapper using default hierarchy to get grid pointer
 	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
+	static void getFinestGrid(GridObj*& ptr);											// Get a pointer to finest grid in hierarchy
 	static double normaliseToLink(double value, int v);									// Normalise value wrt to the lattice link length
 
 	// MPI-related utilities

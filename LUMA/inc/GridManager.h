@@ -33,6 +33,9 @@ class GridManager
 public:
 	/// Number of active cells in the calculation
 	long activeCellCount;
+
+	/// Number of active cell operations in a coarse time step
+	long activeCellOps;
 	
 	/// Number of cells in the calculation
 	long totalCellCount;
@@ -92,7 +95,7 @@ public:
 	void setGridHierarchy(GridObj *const grids);
 
 
-protected:
+private:
 	// Set the local size (MpiManager can set local size)
 	void setLocalCoarseSize(const std::vector<int>& size_vector);
 
@@ -101,7 +104,8 @@ protected:
 	bool createWritableDataStore(GridObj const * const targetGrid);
 
 	// Get estimated active cell count within the global bounds supplied
-	long getActiveCellCount(double *bounds);
+	void updateGlobalCellCount();
+	long getActiveCellCount(double *bounds, bool bCountAsOps);
 	long getCellCount(int targetLevel, int targetRegion, double *bounds);
 
 

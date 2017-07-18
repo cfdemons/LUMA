@@ -609,7 +609,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 {
 
 	// Temporary variables
-	double tmp_x, tmp_y, tmp_z;
+	double tmp_x, tmp_y, tmp_z, dCell;
 	int a = 0;
 
 	// Case-specific variables
@@ -620,24 +620,38 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	file.open("./input/" + geom->fileName, std::ios::in);
 
 	// Handle failure to open
-	if (!file.is_open()) {
+	if (!file.is_open())
 		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile);
+
+	// If the level is set to -1 then object can span levels
+	if (geom->onGridLev < 0)
+	{
+		// For scaling use the finest grid scale
+		dCell = _Grids[0].dh / pow(2, L_NUM_LEVELS);
+
+		// For range checking use the coarsest grid
+		g = _Grids;
 	}
+	else
+	{
+		// Get required grid pointer
+		GridUtils::getGrid(_Grids, geom->onGridLev, geom->onGridReg, g);
 
-	// Get grid pointer
-	GridUtils::getGrid(_Grids, geom->onGridLev, geom->onGridReg, g);
+		// Return if this process does not have this grid
+		if (g == NULL) return;
 
-	// Return if this process does not have this grid
-	if (g == NULL) return;
+		// Set scaling
+		dCell = g->dh;
+	}
 
 	// Get rank for debugging
 	int rank = GridUtils::safeGetRank();
 
-	// Round reference values to voxel centres
-	double bodyRefX = std::round(geom->bodyRefX / g->dh) * g->dh;
-	double bodyRefY = std::round(geom->bodyRefY / g->dh) * g->dh;
-	double bodyRefZ = std::round(geom->bodyRefZ / g->dh) * g->dh;
-	double bodyLength = std::round(geom->bodyLength / g->dh) * g->dh;
+	// Round reference values to complete number of voxels
+	double bodyRefX = std::round(geom->bodyRefX / dCell) * dCell;
+	double bodyRefY = std::round(geom->bodyRefY / dCell) * dCell;
+	double bodyRefZ = std::round(geom->bodyRefZ / dCell) * dCell;
+	double bodyLength = std::round(geom->bodyLength / dCell) * dCell;
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -690,17 +704,17 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	// Scale slightly smaller as distribution of voxels would be asymmetric if points sit on edge
 	if (geom->scaleDirection == eXDirection)
 	{
-		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * dCell) /
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
 	}
 	else if (geom->scaleDirection == eYDirection)
 	{
-		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * dCell) /
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
 	}
 	else if (geom->scaleDirection == eZDirection)
 	{
-		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * g->dh) /
+		scale_factor = (bodyLength - 2 * L_SMALL_NUMBER * dCell) /
 		std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
 	}
 
@@ -708,51 +722,51 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	double shiftX, shiftY, shiftZ, scaledDistance, startPos;
 	if (geom->isRefXCentre)
 	{
-		bodyRefX += (g->dh / 2.0);
+		bodyRefX += (dCell / 2.0);
 		scaledDistance = scale_factor * 
 			std::fabs(*std::max_element(_PCpts->x.begin(), _PCpts->x.end()) - *std::min_element(_PCpts->x.begin(), _PCpts->x.end()));
-		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;	// Round to nearest voxel multiple
+		scaledDistance = std::round(scaledDistance / dCell) * dCell;	// Round to nearest voxel multiple
 		startPos = bodyRefX - (scaledDistance / 2.0);
 		shiftX = startPos - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	}
 	else
 	{
-		shiftX = (bodyRefX + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
+		shiftX = (bodyRefX + L_SMALL_NUMBER * dCell) - scale_factor * *std::min_element(_PCpts->x.begin(), _PCpts->x.end());
 	}
 
 	if (geom->isRefYCentre)
 	{
-		bodyRefY += (g->dh / 2.0);
+		bodyRefY += (dCell / 2.0);
 		scaledDistance = scale_factor *
 			std::fabs(*std::max_element(_PCpts->y.begin(), _PCpts->y.end()) - *std::min_element(_PCpts->y.begin(), _PCpts->y.end()));
-		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;
+		scaledDistance = std::round(scaledDistance / dCell) * dCell;
 		startPos = bodyRefY - (scaledDistance / 2.0);
 		shiftY = startPos - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	}
 	else
 	{
-		shiftY = (bodyRefY + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
+		shiftY = (bodyRefY + L_SMALL_NUMBER * dCell) - scale_factor * *std::min_element(_PCpts->y.begin(), _PCpts->y.end());
 	}
 
 	if (geom->isRefZCentre)
 	{
-		bodyRefZ += (g->dh / 2.0);
+		bodyRefZ += (dCell / 2.0);
 		scaledDistance = scale_factor *
 			std::fabs(*std::max_element(_PCpts->z.begin(), _PCpts->z.end()) - *std::min_element(_PCpts->z.begin(), _PCpts->z.end()));
-		scaledDistance = std::round(scaledDistance / g->dh) * g->dh;
+		scaledDistance = std::round(scaledDistance / dCell) * dCell;
 		startPos = bodyRefZ - (scaledDistance / 2.0);
 		shiftZ = startPos - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 	}
 	else
 	{
-		shiftZ = (bodyRefZ + L_SMALL_NUMBER * g->dh) - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
+		shiftZ = (bodyRefZ + L_SMALL_NUMBER * dCell) - scale_factor * *std::min_element(_PCpts->z.begin(), _PCpts->z.end());
 	}
 
 	// Declare local indices
 	std::vector<int> ijk;
 	eLocationOnRank loc = eNone;
 
-	// Filter: erase is O(n^2) so propose creating a copy instead
+	// Filter: erase is O(n^2) so create a copy instead
 	PCpts *_filtered = new PCpts();
 
 	// Apply shift and scale to each point to convert to global positions
@@ -764,7 +778,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		_PCpts->z[a] *= scale_factor; _PCpts->z[a] += shiftZ;
 #endif
 
-		// Apply a rnak filter at the same time
+		// Apply a rank filter at the same time
 		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g))
 		{
 			_filtered->x.push_back(_PCpts->x[a]);
@@ -807,7 +821,10 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		case eBBBCloud:
 
 			// Call labeller for BBB
-			addBouncebackObject(g, geom, _PCpts);
+			if (geom->onGridLev < 0)
+				addBouncebackObject(geom, _PCpts);		// Can cross over grid levels
+			else
+				addBouncebackObject(g, geom, _PCpts);
 			break;
 
 		case eBFLCloud:

@@ -45,16 +45,7 @@ MpiManager::MpiManager()
 
 	// Resize buffer arrays based on number of MPI directions
 	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
-	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
-
-	// Assign the MPI topology size for decomposition
-	size_t xSize, ySize, zSize;
-	xSize = L_MPI_XCORES;
-	ySize = L_MPI_YCORES;
-	zSize = L_MPI_ZCORES;
-	cRankSizeX.resize(xSize*ySize*zSize);
-	cRankSizeY.resize(xSize*ySize*zSize);
-	cRankSizeZ.resize(xSize*ySize*zSize);
+	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));	
 
 	// Initialise the manager, grid information and topology
 	mpi_init();
@@ -102,13 +93,14 @@ void MpiManager::mpi_init()
 	// Create communicator and topology
 	int MPI_periodic[L_DIMS], MPI_reorder;
 	MPI_reorder = true;
-	dimensions[0] = L_MPI_XCORES; dimensions[1] = L_MPI_YCORES;
-	MPI_periodic[0] = true;	MPI_periodic[1] = true;
-#if (L_DIMS == 3)
-	dimensions[2] = L_MPI_ZCORES; MPI_periodic[2] = true;
-#endif
+	dimensions[0] = L_MPI_XCORES;
+	dimensions[1] = L_MPI_YCORES;
+	dimensions[2] = L_MPI_ZCORES;
+	MPI_periodic[0] = true;
+	MPI_periodic[1] = true;
+	MPI_periodic[2] = true;
 
-	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, dimensions, MPI_periodic, MPI_reorder, &world_comm);
+	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 
 	// Get Cartesian topology info
 	MPI_Comm_rank( world_comm, &my_rank );
@@ -206,21 +198,24 @@ void MpiManager::mpi_init()
 void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 {
 	// Auxiliary variables
+	cRankSizeX.resize(num_ranks);
+	cRankSizeY.resize(num_ranks);
+	cRankSizeZ.resize(num_ranks);
 	double dh = L_BX / static_cast<double>(L_N);
 	int numCells[3];
-	int numCores[3];
 	numCells[0] = L_N;
 	numCells[1] = L_M;
 	numCells[2] = L_K;
-	numCores[0] = L_MPI_XCORES;
-	numCores[1] = L_MPI_YCORES;
-	numCores[2] = L_MPI_ZCORES;
 
 	// Compute block sizes based on chosen algorithm
-#ifdef L_MPI_SMART_DECOMPOSE
-	mpi_smartDecompose(dh, &numCores[0]);
+#ifdef L_MPI_TOPOLOGY_REPORT
+	mpi_reportOnDecomposition(dh);
+#elif defined L_MPI_SMART_DECOMPOSE
+	// Log use of SD
+	L_INFO("Using Smart Decomposition...", GridUtils::logfile);
+	mpi_smartDecompose(dh);
 #else
-	mpi_uniformDecompose(&numCells[0], &numCores[0]);
+	mpi_uniformDecompose(&numCells[0]);
 #endif
 	
 	// Compute required local grid size to pass to grid manager //
@@ -951,7 +946,7 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 }
 // ************************************************************************* //
 /// \brief	Populate the rank size arrays based on uniform decomposition logic
-void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
+void MpiManager::mpi_uniformDecompose(int *numCells)
 {
 	// Auxiliary variables
 	int cellsInDomains[3];
@@ -966,10 +961,10 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 	{
 
 		// Calculate the size of each domain in dimension d
-		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)numCores[d]);
+		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)dimensions[d]);
 
 		// Calculate the size of the last domain
-		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * numCores[d] - numCells[d]);
+		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * dimensions[d] - numCells[d]);
 
 		// Throw an error if cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
@@ -982,17 +977,17 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 
 	// Fill the cRankSize arrays for each MPI block
 	int ind = 0;
-	for (int i = 0; i < numCores[0]; i++)
+	for (int i = 0; i < dimensions[0]; i++)
 	{
-		int sX = i == (numCores[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+		int sX = i == (dimensions[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
 
-		for (int j = 0; j < numCores[1]; j++)
+		for (int j = 0; j < dimensions[1]; j++)
 		{
-			int sY = j == (numCores[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+			int sY = j == (dimensions[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
 
-			for (int k = 0; k < numCores[2]; k++)
+			for (int k = 0; k < dimensions[2]; k++)
 			{
-				int sZ = k == (numCores[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+				int sZ = k == (dimensions[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
 				cRankSizeX[ind] = sX;
 				cRankSizeY[ind] = sY;
 				cRankSizeZ[ind] = sZ;
@@ -1008,16 +1003,11 @@ void MpiManager::mpi_uniformDecompose(int *numCells, int *numCores)
 ///
 ///			Also reconstructs the solution vector at the same time.
 ///
-///	\param	theta			vector of variable block edges.
-///	\param	delta			perturbation vector.
-///	\param[out]	thetaNew	perturbed vector of variable block edges.
-///	\param[out]	XSol		X solution vector.
-///	\param[out]	YSol		Y solution vector.
-///	\param[out]	ZSol		Z solution vector.
-///	\param		dh			coarsest cell width.
-///	\returns				indication whether the perturbation was valid or not.
-bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double>& delta, std::vector<double>& thetaNew,
-	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol, double dh)
+///	\param		solutionData	structure to hold SD information.
+///	\param		dh				coarsest cell width.
+///	\param		numCores		reference to vector holding core topology.
+///	\returns					indication whether the perturbation was valid or not.
+bool MpiManager::mpi_SDCheckDelta(SDData& solutionData, double dh, std::vector<int>& numCores)
 {
 
 	// Declarations
@@ -1026,11 +1016,11 @@ bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double
 	unsigned int c = 0;
 
 	// Create perturbed variable vector using current delta
-	for (size_t p = 0; p < theta.size(); ++p)
-		thetaNew[p] = theta[p] + delta[p];
+	for (size_t p = 0; p < solutionData.theta.size(); ++p)
+		solutionData.thetaNew[p] = solutionData.theta[p] + solutionData.delta[p];
 
 	// Reconstruct the solution vector
-	mpi_SDReconstructSolution(thetaNew, XSol, YSol, ZSol);
+	mpi_SDReconstructSolution(solutionData, numCores);
 
 	// Loop
 	while (!bAdjustComplete)
@@ -1039,45 +1029,45 @@ bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double
 		bAdjusted = false;		
 
 		// Check validity of edges and reset the delta if causes a problem
-		for (int i = 0; i < L_MPI_XCORES; ++i)
+		for (int i = 0; i < numCores[eXDirection]; ++i)
 		{
-			for (int j = 0; j < L_MPI_YCORES; ++j)
+			for (int j = 0; j < numCores[eYDirection]; ++j)
 			{
-				for (int k = 0; k < L_MPI_ZCORES; ++k)
+				for (int k = 0; k < numCores[eZDirection]; ++k)
 				{
 					// Nothing to change if on the last block
 					if (
-						i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+						i == numCores[eXDirection] - 1 || j == numCores[eYDirection] - 1
 #if (L_DIMS == 3)
-						|| k == L_MPI_ZCORES - 1
+						|| k == numCores[eZDirection] - 1
 #endif
 						) continue;
 
 					// Perturbation cannot cause a block to have a zero size
-					if ((XSol[i + 1] - XSol[i]) < dh)
+					if ((solutionData.XSol[i + 1] - solutionData.XSol[i]) < dh)
 					{
 						// Adjust delta such that size is equal to dh
 						c = i;
-						delta[c] = XSol[i] - theta[c] + dh;
-						thetaNew[c] = theta[c] + delta[c];
-						XSol[i + 1] = thetaNew[c];
+						solutionData.delta[c] = solutionData.XSol[i] - solutionData.theta[c] + dh;
+						solutionData.thetaNew[c] = solutionData.theta[c] + solutionData.delta[c];
+						solutionData.XSol[i + 1] = solutionData.thetaNew[c];
 						bAdjusted = true;
 					}
-					if ((YSol[j + 1] - YSol[j]) < dh)
+					if ((solutionData.YSol[j + 1] - solutionData.YSol[j]) < dh)
 					{
-						c = L_MPI_XCORES - 1 + j;
-						delta[c] = YSol[j] - theta[c] + dh;
-						thetaNew[c] = theta[c] + delta[c];
-						YSol[j + 1] = thetaNew[c];
+						c = numCores[eXDirection] - 1 + j;
+						solutionData.delta[c] = solutionData.YSol[j] - solutionData.theta[c] + dh;
+						solutionData.thetaNew[c] = solutionData.theta[c] + solutionData.delta[c];
+						solutionData.YSol[j + 1] = solutionData.thetaNew[c];
 						bAdjusted = true;
 					}
 #if (L_DIMS == 3)
-					if ((ZSol[k + 1] - ZSol[k]) < dh)
+					if ((solutionData.ZSol[k + 1] - solutionData.ZSol[k]) < dh)
 					{
-						c = L_MPI_XCORES + L_MPI_YCORES - 2 + k;
-						delta[c] = ZSol[k] - theta[c] + dh;
-						thetaNew[c] = theta[c] + delta[c];
-						ZSol[k + 1] = thetaNew[c];
+						c = numCores[eXDirection] + numCores[eYDirection] - 2 + k;
+						solutionData.delta[c] = solutionData.ZSol[k] - solutionData.theta[c] + dh;
+						solutionData.thetaNew[c] = solutionData.theta[c] + solutionData.delta[c];
+						solutionData.ZSol[k + 1] = solutionData.thetaNew[c];
 						bAdjusted = true;
 					}
 #endif
@@ -1094,29 +1084,26 @@ bool MpiManager::mpi_SDCheckDelta(std::vector<double>& theta, std::vector<double
 // ************************************************************************* //
 /// \brief	Reassembles the solutions vectors given the vector of variable block edges.
 ///
-///	\param	theta		vector of variable block edges.
-///	\param	XSol		X solution vector.
-///	\param	YSol		Y solution vector.
-///	\param	ZSol		Z solution vector.
-void MpiManager::mpi_SDReconstructSolution(std::vector<double>& theta,
-	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+///	\param	solutionData	structure to hold SD information.
+///	\param	numCores		reference to vector holding core topology.
+void MpiManager::mpi_SDReconstructSolution(SDData& solutionData, std::vector<int>& numCores)
 {
 	// 1D index for theta
 	int c = 0;
 	int i = 0;
-	for (i = 1; i < L_MPI_XCORES; ++i)
+	for (i = 1; i < numCores[eXDirection]; ++i)
 	{
-		XSol[i] = theta[c];
+		solutionData.XSol[i] = solutionData.theta[c];
 		c++;
 	}
-	for (i = 1; i < L_MPI_YCORES; ++i)
+	for (i = 1; i < numCores[eYDirection]; ++i)
 	{
-		YSol[i] = theta[c];
+		solutionData.YSol[i] = solutionData.theta[c];
 		c++;
 	}
-	for (i = 1; i < L_MPI_ZCORES; ++i)
+	for (i = 1; i < numCores[eZDirection]; ++i)
 	{
-		ZSol[i] = theta[c];
+		solutionData.ZSol[i] = solutionData.theta[c];
 		c++;
 	}
 
@@ -1125,15 +1112,15 @@ void MpiManager::mpi_SDReconstructSolution(std::vector<double>& theta,
 // ************************************************************************* //
 /// \brief	Populate the active cell counts for the given block configuration.
 ///
-///	\param[out]	heaviestBlock	vector of block indices in MPI topology number 
-///								that has the heaviest load.
-///	\param		XSol			X solution vector.
-///	\param		YSol			Y solution vector.
-///	\param		ZSol			Z solution vector.
-///	\returns					imbalance measure as the difference between the heaviest 
-///								and lightest block as a percentage of the heaviest.
-float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBlock,
-	std::vector<double>& XSol, std::vector<double>& YSol, std::vector<double>& ZSol)
+///			Imbalance measured as the difference between the heaviest and 
+///			lightest block as a percentage of the heaviest. The load imbalance
+///			information is used to update the structure provided.
+///
+///	\param[out]	load			load imbalance information structure.
+///	\param		solutionData	structure to hold SD information.
+///	\param		numCores		reference to vector holding core topology.					.
+void MpiManager::mpi_SDComputeImbalance(LoadImbalanceData& load,
+	SDData& solutionData, std::vector<int>& numCores)
 {
 	size_t count = 0;
 	size_t countMax = 0;
@@ -1141,30 +1128,30 @@ float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBloc
 
 	// Construct bounds for each block and then find active cell count from grid manager
 	double bounds[6];
-	for (int i = 0; i < L_MPI_XCORES; ++i)
+	for (int i = 0; i < numCores[eXDirection]; ++i)
 	{
-		for (int j = 0; j < L_MPI_YCORES; ++j)
+		for (int j = 0; j < numCores[eYDirection]; ++j)
 		{
-			for (int k = 0; k < L_MPI_ZCORES; ++k)
+			for (int k = 0; k < numCores[eZDirection]; ++k)
 			{
 				// Set bounds from solution vector
-				bounds[eXMin] = XSol[i];
-				bounds[eXMax] = XSol[i + 1];
-				bounds[eYMin] = YSol[j];
-				bounds[eYMax] = YSol[j + 1];
-				bounds[eZMin] = ZSol[k];
-				bounds[eZMax] = ZSol[k + 1];
+				bounds[eXMin] = solutionData.XSol[i];
+				bounds[eXMax] = solutionData.XSol[i + 1];
+				bounds[eYMin] = solutionData.YSol[j];
+				bounds[eYMax] = solutionData.YSol[j + 1];
+				bounds[eZMin] = solutionData.ZSol[k];
+				bounds[eZMax] = solutionData.ZSol[k + 1];
 
-				// Get active cell count
-				count = GridManager::getInstance()->getActiveCellCount(&bounds[0]);
+				// Get active operation count
+				count = GridManager::getInstance()->getActiveCellCount(&bounds[0], true);
 
 				// Update the extremes
 				if (count > countMax)
 				{
 					countMax = count;
-					heaviestBlock[eXDirection] = i;
-					heaviestBlock[eYDirection] = j;
-					heaviestBlock[eZDirection] = k;
+					load.heaviestBlock[eXDirection] = i;
+					load.heaviestBlock[eYDirection] = j;
+					load.heaviestBlock[eZDirection] = k;
 				}
 				if (count < countMin) countMin = count;
 
@@ -1172,7 +1159,10 @@ float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBloc
 		}
 	}
 
-	return (std::fabs(static_cast<float>(countMax)-static_cast<float>(countMin)) * 100.0f / static_cast<float>(countMax));
+	// Update load imbalance
+	load.loadImbalance = 
+		std::abs(static_cast<double>(countMax) - static_cast<double>(countMin)) * 100.0 / static_cast<double>(countMax);
+	load.heaviestOps = countMax;
 
 }
 
@@ -1180,51 +1170,69 @@ float MpiManager::mpi_SDComputeImbalance(std::vector<unsigned int>& heaviestBloc
 /// \brief	Populate the rank size arrays based on an algorithm that seeks to 
 ///			load balance.
 ///
-///	\param	dh			size of a voxel on the coarsest grid
-///	\param	numCores	pointer to an array holding the MPI core dimenions.
-void MpiManager::mpi_smartDecompose(double dh, int *numCores)
+///			This method is independent of the topology in use. Topologies of custom
+///			dimensions can be passed through the optional argument.
+///
+///	\param	reqDims		pointer to a vector containing the desired MPI dimensions.
+///	\param	dh			size of a voxel on the coarsest grid.
+///	\returns			structure containing imbalance information.
+MpiManager::LoadImbalanceData MpiManager::mpi_smartDecompose(double dh, std::vector<int>& reqDims)
 {
-	// Only rank 0 needs to do the calculation but all create buffer
-	int *bufRankSize = new int[L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES * L_DIMS];
+	// Make a suitable copy of the information depending on the argument passed in
+	std::vector<int> numCores(3);
+	if (!reqDims.size())
+	{
+		numCores[eXDirection] = L_MPI_XCORES;
+		numCores[eYDirection] = L_MPI_YCORES;
+		numCores[eZDirection] = L_MPI_ZCORES;
+	}
+	else
+	{
+		numCores = reqDims;
+	}
 
-	// Stash constant pointer to start of buffer
-	int * const bufRankSizeStart = bufRankSize;
+	// Set up solution vector for variables
+	SDData solutionData;
+	solutionData.XSol.resize(numCores[eXDirection] + 1, -1 * dh);
+	solutionData.YSol.resize(numCores[eYDirection] + 1, -1 * dh);
+	solutionData.ZSol.resize(numCores[eZDirection] + 1, -1 * dh);
 
+	// Create imbalance structure
+	LoadImbalanceData load;
+
+	// Only rank 0 does the calculation and result is pushed to other ranks
 	if (my_rank == 0)
 	{
-		// Log use of SD
-		L_INFO("Using Smart Decomposition...", GridUtils::logfile);
-
 		// Data
-		int numProcs = L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES;
-		int p = (L_MPI_XCORES + L_MPI_YCORES + L_MPI_ZCORES) - 3;	// Number of unknowns
+		int p = (numCores[eXDirection] + numCores[eYDirection] + numCores[eZDirection]) - 3;	// Number of unknowns
 		int i = 0;
 		int c = 0;
-		int *domainSize = new int[3];
+		std::vector<int> domainSize(3);
 		domainSize[eXDirection] = L_N;
 		domainSize[eYDirection] = L_M;
 		domainSize[eZDirection] = L_K;
 
-		// Set up solution vector for variables	
-		std::vector<double> XSolution(L_MPI_XCORES + 1, -1 * dh);
-		std::vector<double> YSolution(L_MPI_YCORES + 1, -1 * dh);
-		std::vector<double> ZSolution(L_MPI_ZCORES + 1, -1 * dh);
-		std::vector<unsigned int> heaviestBlock(3);
-
 		// Fix the edges as we know where they are
-		XSolution[0] = 0.0;
-		YSolution[0] = 0.0;
-		ZSolution[0] = 0.0;
-		XSolution.back() = L_BX;
-		YSolution.back() = L_BY;
-		ZSolution.back() = L_BZ;
+		solutionData.XSol[0] = 0.0;
+		solutionData.YSol[0] = 0.0;
+		solutionData.ZSol[0] = 0.0;
+		solutionData.XSol.back() = L_BX;
+		solutionData.YSol.back() = L_BY;
+		solutionData.ZSol.back() = L_BZ;
 
-		// Create imbalance variable
-		double loadImbalance = 100.0;
+		// Handle the 1, 1, 1 case
+		if (p == 0)
+		{
+			// Communicate information around topology if not performing a report
+			if (!reqDims.size()) mpi_SDCommunicateSolution(solutionData, load.loadImbalance, dh);
+
+			// Return as no need to perform the iteration
+			return load;
+		}
 
 		// Create theta vector with initial guesses (uniform decomposition)
-		std::vector<double> theta(p, 0.0);
-		std::vector<double> thetaNew(theta);
+		solutionData.theta.resize(p, 0.0);
+		solutionData.thetaNew = solutionData.theta;
 		for (int d = 0; d < 3; ++d)
 		{
 			// Coarse sites in a block if decomposed uniformly
@@ -1233,24 +1241,27 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 			// Upper edge of block is a variable
 			for (i = 0; i < numCores[d] - 1; ++i)
 			{
-				theta[c] = (i + 1) * uniSpace * dh;
+				solutionData.theta[c] = (i + 1) * uniSpace * dh;
 				c++;
 			}
 		}
 
 		// Perturbation vector
-		std::vector<double> delta(p, 0);
+		solutionData.delta.resize(p, 0);
 
-		// Populate initial solution vectors
-		mpi_SDCheckDelta(theta, delta, thetaNew, XSolution, YSolution, ZSolution, dh);
-		loadImbalance = mpi_SDComputeImbalance(heaviestBlock, XSolution, YSolution, ZSolution);
-		L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+		// Populate initial solution vectors and imbalance from uniform decomposition
+		mpi_SDCheckDelta(solutionData, dh, numCores);
+		mpi_SDComputeImbalance(load, solutionData, numCores);
+
+		// Update uniform decomposition quantity
+		load.uniImbalance = load.loadImbalance;
+#ifndef L_MPI_TOPOLOGY_REPORT
+		L_INFO("Uniform decomposition produces an imbalance of " + std::to_string(load.uniImbalance) + "%.", GridUtils::logfile);
+#endif
 
 		// Temporaries
-		std::vector<double> tmpX(XSolution);
-		std::vector<double> tmpY(YSolution);
-		std::vector<double> tmpZ(ZSolution);
-		float tmpImbalance;
+		SDData tempData(solutionData);		// Make a copy
+		LoadImbalanceData tmpLoad(load);	// Make a copy
 
 		// Start iteration
 		int k = 0;
@@ -1262,11 +1273,11 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 
 			// Set perturbation directions by driving towards heaviest block
 			midHeavyBlockX =
-				(tmpX[heaviestBlock[eXDirection] + 1] + tmpX[heaviestBlock[eXDirection]]) / 2.0;
+				(tempData.XSol[tmpLoad.heaviestBlock[eXDirection] + 1] + tempData.XSol[tmpLoad.heaviestBlock[eXDirection]]) / 2.0;
 			midHeavyBlockY =
-				(tmpY[heaviestBlock[eYDirection] + 1] + tmpY[heaviestBlock[eYDirection]]) / 2.0;
+				(tempData.YSol[tmpLoad.heaviestBlock[eYDirection] + 1] + tempData.YSol[tmpLoad.heaviestBlock[eYDirection]]) / 2.0;
 			midHeavyBlockZ =
-				(tmpZ[heaviestBlock[eZDirection] + 1] + tmpZ[heaviestBlock[eZDirection]]) / 2.0;
+				(tempData.ZSol[tmpLoad.heaviestBlock[eZDirection] + 1] + tempData.ZSol[tmpLoad.heaviestBlock[eZDirection]]) / 2.0;
 
 			for (int i = 0; i < numCores[eXDirection]; i++)
 			{
@@ -1275,16 +1286,16 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 					for (int k = 0; k < numCores[eZDirection]; k++)
 					{
 						if (
-							i == L_MPI_XCORES - 1 || j == L_MPI_YCORES - 1
+							i == numCores[eXDirection] - 1 || j == numCores[eYDirection] - 1
 #if (L_DIMS == 3)
-							|| k == L_MPI_ZCORES - 1
+							|| k == numCores[eZDirection] - 1
 #endif
 							) continue;
 
 						// Compute middle of current block
-						midCurrentBlockX = (tmpX[i + 1] + tmpX[i]) / 2.0;
-						midCurrentBlockY = (tmpY[j + 1] + tmpY[j]) / 2.0;
-						midCurrentBlockZ = (tmpZ[k + 1] + tmpZ[k]) / 2.0;
+						midCurrentBlockX = (tempData.XSol[i + 1] + tempData.XSol[i]) / 2.0;
+						midCurrentBlockY = (tempData.YSol[j + 1] + tempData.YSol[j]) / 2.0;
+						midCurrentBlockZ = (tempData.ZSol[k + 1] + tempData.ZSol[k]) / 2.0;
 
 						// Compute direction to heaviest block
 						dirX = midHeavyBlockX - midCurrentBlockX;
@@ -1293,64 +1304,90 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 
 						// Set deltas					
 						if (dirX == 0)
-							delta[i] = -dh;
+							tempData.delta[i] = -dh;
 						else
-							delta[i] = (dirX / std::fabs(dirX)) * dh;
+							tempData.delta[i] = (dirX / std::fabs(dirX)) * dh;
 
 						if (dirY == 0)
-							delta[L_MPI_XCORES - 1 + j] = -dh;
+							tempData.delta[numCores[eXDirection] - 1 + j] = -dh;
 						else
-							delta[L_MPI_XCORES - 1 + j] = (dirY / std::fabs(dirY)) * dh;
+							tempData.delta[numCores[eXDirection] - 1 + j] = (dirY / std::fabs(dirY)) * dh;
 
 #if (L_DIMS == 3)
 						if (dirZ == 0)
-							delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = -dh;
+							tempData.delta[numCores[eXDirection] + numCores[eYDirection] - 2 + k] = -dh;
 						else
-							delta[L_MPI_XCORES + L_MPI_YCORES - 2 + k] = (dirZ / std::fabs(dirZ)) * dh;
+							tempData.delta[numCores[eXDirection] + numCores[eYDirection] - 2 + k] = (dirZ / std::fabs(dirZ)) * dh;
 #endif
 					}
 				}
 			}
 
 			// Check and adjust delta if necessary
-			mpi_SDCheckDelta(theta, delta, thetaNew, tmpX, tmpY, tmpZ, dh);
+			mpi_SDCheckDelta(tempData, dh, numCores);
 
 			// Obtain new imbalance under the adjusted delta
-			tmpImbalance = mpi_SDComputeImbalance(heaviestBlock, tmpX, tmpY, tmpZ);
+			mpi_SDComputeImbalance(tmpLoad, tempData, numCores);
 
 			// If better than current solution, update
-			if (tmpImbalance <= loadImbalance)
+			if (tmpLoad.loadImbalance <= load.loadImbalance)
 			{
-				loadImbalance = tmpImbalance;
-				XSolution = tmpX;
-				YSolution = tmpY;
-				ZSolution = tmpZ;
+				load.loadImbalance = tmpLoad.loadImbalance;
+				solutionData.XSol = tempData.XSol;
+				solutionData.YSol = tempData.YSol;
+				solutionData.ZSol = tempData.ZSol;
 			}
 
 			// Update theta
-			theta = thetaNew;
+			tempData.theta = tempData.thetaNew;
 
 			// Increment k
 			k++;
 		}
+	}
 
-		L_INFO("Smart decomposition finished. Imbalance of " + std::to_string(loadImbalance) + "%.", GridUtils::logfile);
+	// Communicate information around topology if not performing a report
+	if (!reqDims.size()) mpi_SDCommunicateSolution(solutionData, load.loadImbalance, dh);
+	return load;
 
-		// Pack information
-		for (int i = 0; i < numCores[eXDirection]; i++)
+}
+// ************************************************************************** //
+/// \brief	Communicate the decomposition result between ranks.
+///
+///			Uses a broadcast throughout the topolgy to communicate the 
+///			information and hence is called by all ranks.
+///
+///	\param	solutionData	structure to hold SD information.
+///	\param	imbalance		percentage of imbalance assocaited with solution.
+///	\param	dh				coarse cell spacing.
+void MpiManager::mpi_SDCommunicateSolution(SDData& solutionData, double imbalance, double dh)
+{
+
+	// Buffer creation for sending/receiving sizes
+	int *bufRankSize = new int[num_ranks * L_DIMS];
+
+	// Stash constant pointer to start of buffer
+	int * const bufRankSizeStart = bufRankSize;
+
+	if (my_rank == 0)
+	{
+		// Pack information to send
+		for (int i = 0; i < dimensions[eXDirection]; i++)
 		{
-			for (int j = 0; j < numCores[eYDirection]; j++)
+			for (int j = 0; j < dimensions[eYDirection]; j++)
 			{
-				for (int k = 0; k < numCores[eZDirection]; k++)
+				for (int k = 0; k < dimensions[eZDirection]; k++)
 				{
-					*bufRankSize++ = static_cast<int>(std::round((XSolution[i + 1] - XSolution[i]) / dh));
-					*bufRankSize++ = static_cast<int>(std::round((YSolution[j + 1] - YSolution[j]) / dh));
+					*bufRankSize++ = static_cast<int>(std::round((solutionData.XSol[i + 1] - solutionData.XSol[i]) / dh));
+					*bufRankSize++ = static_cast<int>(std::round((solutionData.YSol[j + 1] - solutionData.YSol[j]) / dh));
 #if (L_DIMS == 3)
-					*bufRankSize++ = static_cast<int>(std::round((ZSolution[k + 1] - ZSolution[k]) / dh));
+					*bufRankSize++ = static_cast<int>(std::round((solutionData.ZSol[k + 1] - solutionData.ZSol[k]) / dh));
 #endif
 				}
 			}
 		}
+
+		L_INFO("Smart decomposition finished. Imbalance of " + std::to_string(imbalance) + "%.", GridUtils::logfile);
 
 	}
 
@@ -1358,11 +1395,11 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 	MPI_Bcast(bufRankSizeStart, L_MPI_XCORES * L_MPI_YCORES * L_MPI_ZCORES * L_DIMS, MPI_INT, 0, world_comm);
 	int blockIdx = 0;
 	bufRankSize = bufRankSizeStart;
-	for (int i = 0; i < numCores[eXDirection]; i++)
+	for (int i = 0; i < dimensions[eXDirection]; i++)
 	{
-		for (int j = 0; j < numCores[eYDirection]; j++)
+		for (int j = 0; j < dimensions[eYDirection]; j++)
 		{
-			for (int k = 0; k < numCores[eZDirection]; k++)
+			for (int k = 0; k < dimensions[eZDirection]; k++)
 			{
 				// Update vectors
 				cRankSizeX[blockIdx] = *bufRankSize++;
@@ -1377,5 +1414,74 @@ void MpiManager::mpi_smartDecompose(double dh, int *numCores)
 
 	delete[] bufRankSizeStart;
 
+}
+// ************************************************************************** //
+/// \brief	Writes a report on imbalances from different decomposition topologies.
+///
+///			This method terminates the application on completion. Only compatible
+///			with smart decomposition at present. Uses the values of L_MPI_?CORES
+///			as the upper threshold for options.
+///
+///	\param	dh			coarse cell spacing.
+void MpiManager::mpi_reportOnDecomposition(double dh)
+{
+
+#if (L_DIMS != 3)
+	#undef L_MPI_TOP_ZCORES
+	#define L_MPI_TOP_ZCORES 1
+#endif
+
+	L_WARN("Topology report mode enabled. No simulation will take place.", GridUtils::logfile);
+
+	if (my_rank == 0)
+	{
+		// Declarations
+		std::vector<int> coreCombo(3);
+		std::string logInfo;
+		std::ofstream reportFile;
+		reportFile.open(GridUtils::path_str + "/topologyreport.out", std::ios::out);
+		if (!reportFile.is_open()) L_ERROR("Could not open topology report file. Exiting.", GridUtils::logfile);
+		L_INFO("Writing report...", GridUtils::logfile);
+
+		// Write header
+		reportFile << "Case\tXCORES\tYCORES\tZCORES\tTotalCore\tImbalance\tUniform\tHeaviestOps\t" << std::endl;
+
+		// Loop over each case
+		for (int i = 1; i < L_MPI_TOP_XCORES + 1; ++i)
+		{
+			for (int j = 1; j < L_MPI_TOP_YCORES + 1; ++j)
+			{
+				for (int k = 1; k < L_MPI_TOP_ZCORES + 1; ++k)
+				{
+					coreCombo[eXDirection] = i;
+					coreCombo[eYDirection] = j;
+					coreCombo[eZDirection] = k;
+					LoadImbalanceData load = mpi_smartDecompose(dh, coreCombo);
+
+					// Log information
+					reportFile << std::to_string(
+						(k - 1) + (j - 1) * L_MPI_TOP_ZCORES + (i - 1) * L_MPI_TOP_ZCORES * L_MPI_TOP_YCORES
+						) + "\t";
+					reportFile << std::to_string(i) + "\t";
+					reportFile << std::to_string(j) + "\t";
+					reportFile << std::to_string(k) + "\t";
+					reportFile << std::to_string(i * j * k) + "\t";
+					reportFile << std::to_string(load.loadImbalance) + "\t";
+					reportFile << std::to_string(load.uniImbalance) + "\t";
+					reportFile << std::to_string(load.heaviestOps);
+					reportFile << std::endl;
+				}
+			}
+		}
+
+		reportFile.close();
+	}
+
+	// Synchronise before trying to exit to ensure report is complete
+	MPI_Barrier(world_comm);
+
+	// Exit
+	MPI_Finalize();
+	exit(EXIT_SUCCESS);
 }
 // ************************************************************************** //

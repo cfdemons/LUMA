@@ -144,6 +144,7 @@ public:
 		unsigned long indx[], double *d);
 
 	// Bounceback Body Methods
+	void addBouncebackObject(GeomPacked *geom, PCpts *_PCpts);				// Override method to add BBB from cloud reader.
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.
 	void computeLiftDrag(int i, int j, int k, GridObj *g);			// Compute force using Momentum Exchange for BBB on supplied grid.
 	void computeLiftDrag(int v, int id, GridObj *g, int markerID);	// Compute force using Momentum Exchange for BFL on supplied grid.

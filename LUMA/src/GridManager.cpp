@@ -163,15 +163,8 @@ GridManager::GridManager()
 	local_size.push_back(static_cast<int>(L_M));
 	local_size.push_back(static_cast<int>(L_K));
 
-	// Update active cell count
-	double bounds[6];
-	bounds[eXMin] = 0.0;
-	bounds[eXMax] = L_BX;
-	bounds[eYMin] = 0.0;
-	bounds[eYMax] = L_BY;
-	bounds[eZMin] = 0.0;
-	bounds[eZMax] = L_BZ;
-	activeCellCount = getActiveCellCount(&bounds[0]);
+	// Update global active cell count
+	updateGlobalCellCount();
 	L_INFO("Approximate number of active cells = " + std::to_string(activeCellCount), GridUtils::logfile);
 }
 
@@ -500,43 +493,69 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 	return true;
 }
 
-/// \brief	Returns the number of active cells in the union between the domain 
-///			and the bounds.
+///	\brief	Updates the cell count and operation count for the whole domain.
+void GridManager::updateGlobalCellCount()
+{
+	double bounds[6];
+	bounds[eXMin] = 0.0;
+	bounds[eXMax] = L_BX;
+	bounds[eYMin] = 0.0;
+	bounds[eYMax] = L_BY;
+	bounds[eZMin] = 0.0;
+	bounds[eZMax] = L_BZ;
+	activeCellCount = getActiveCellCount(&bounds[0], false);
+	activeCellOps = getActiveCellCount(&bounds[0], true);
+}
+
+/// \brief	Returns the active cell count or, if indicated, the active operations 
+///			count for the union between the bounds the available grids in the 
+///			default hierarchy.
 ///
 ///			This method wraps the getCellCount() method. Grid hierarchy is 
 ///			traversed with active cells from each grid being added to the total 
 ///			in turn. Does not taken into account the halo cells at present 
 ///			although could be modified to do so in the future.
 ///
-///	\param	bounds	pointer to an array containing the bounds of the region to be checked.
-///	\returns		number of active cells in the union.
-long GridManager::getActiveCellCount(double *bounds)
+///	\param	bounds		pointer to an array containing the bounds of the region to be considered.
+///	\param	bCountAsOps	a flag indicating whether the count should take into account sub-cycle operations.
+///	\returns			active cell count within the bounds specified.
+long GridManager::getActiveCellCount(double *bounds, bool bCountAsOps)
 {
 
 	// Get count on course grid
 	unsigned int idx = 0;
-	long cell_count = 0;
+	long activeCells = 0;
 	long cells_on_this_grid = 0;
-	cell_count = getCellCount(0, 0, bounds);
 
 	// Loop over the grids and retrieve cell counts
 	for (int lev = 0; lev < L_NUM_LEVELS + 1; ++lev)
 	{
+
+		// Correction factor
+		long correction = 1;
+		if (bCountAsOps) correction = static_cast<long>(pow(2, lev));
+
 		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 		{
+			// L0 can only be region 0
+			if (lev == 0 && reg != 0) continue;
+
 			// Retrieve cell count in union
 			cells_on_this_grid = getCellCount(lev, reg, bounds);
 
 			// Add the contribution of active cells from this grid
-			cell_count += cells_on_this_grid;
+			activeCells += cells_on_this_grid * correction;
 				
 			// Deduct course cells that are refined
-			cell_count -= cells_on_this_grid / static_cast<long>(pow(2, L_DIMS));
+			if (lev != 0)
+			{
+				activeCells -= (cells_on_this_grid / static_cast<long>(pow(2, L_DIMS))) * correction;
+			}
 
 		}
 	}
 
-	return cell_count;
+	return activeCells;
 }
 
 /// \brief	Returns the number of cells in the union between the target 

@@ -793,9 +793,6 @@ void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& p
 
 	} else {
 
-		L_INFO("Looking for " + std::to_string(Grids->level) + ", " + std::to_string(Grids->region_number) +
-			". Found " + std::to_string(level) + ", " + std::to_string(region), GridUtils::logfile);
-
 		// Loop through array of subgrids on this grid getting each one by reference
 		for (GridObj * const G : Grids->subGrid) {
 
@@ -818,6 +815,26 @@ void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& p
 	
 	// Specified grid has not been found
 	return;
+
+}
+
+// ****************************************************************************
+/// \brief	Get a pointer to a given grid in the default hierarchy.
+///
+///			Takes a NULL pointer by reference and updates it with the address
+///			of the finest grid in default hierarchy.
+///
+/// \param[out] ptr		reference to pointer where address of finest grid in 
+///						hierarchy will be assigned.
+void GridUtils::getFinestGrid(GridObj*& ptr)
+{
+
+	for (int lev = L_NUM_LEVELS; lev >= 0; lev--)
+	{
+		// Try get this level and return if successful
+		GridUtils::getGrid(lev, 0, ptr);
+		if (ptr) return;
+	}
 
 }
 

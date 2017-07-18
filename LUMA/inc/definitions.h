@@ -94,8 +94,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // Initialisation
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
-#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 1			///< Frequency of write out of restart file
+//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_RESTART_OUT_FREQ 50				///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -109,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 3000		///< Number of time steps to run simulation for
 
 
 /*
@@ -121,12 +121,17 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // MPI Data
 #define L_MPI_XCORES 3		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 3		///< Number of MPI ranks to divide domain into in Y direction
-/// Number of MPI ranks to divide domain into in Z direction.
-#define L_MPI_ZCORES 3
+#define L_MPI_ZCORES 3		///< Number of MPI ranks to divide domain into in Z direction.
 
-// Balanced decomposition
-#define L_MPI_SMART_DECOMPOSE
-#define L_MPI_SD_MAX_ITER 5000
+// Decomposition strategy
+#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
+#define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for samrt decomposition algorithm
+
+// Topology report
+//#define L_MPI_TOPOLOGY_REPORT		///< Have the MPI Manager report on different combinations of X Y Z cores
+#define L_MPI_TOP_XCORES 12			///< Max number of X MPI ranks to use for the topology report
+#define L_MPI_TOP_YCORES 12			///< Max number of Y MPI ranks to use for the topology report
+#define L_MPI_TOP_ZCORES 12			///< Max number of Z MPI ranks to use for the topology report
 
 /*
 *******************************************************************************
@@ -135,14 +140,14 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 3				///< Number of dimensions to the problem
-#define L_RESOLUTION 5		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.002	///< The timestep in non-dimensional units
+#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_RESOLUTION 8		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.01	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 7.4		///< End of domain in X (non-dimensional units)
-#define L_BY 1.4		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.6		///< End of domain in Z (non-dimensional units)
+#define L_BX 7.5		///< End of domain in X (non-dimensional units)
+#define L_BY 1.5		///< End of domain in Y (non-dimensional units)
+#define L_BZ 1.5		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
@@ -155,8 +160,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE	   ///< Use an inlet profile
-//#define L_PARABOLIC_INLET	   ///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+//#define L_USE_INLET_PROFILE	///< Use an inlet profile
+//#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -165,7 +170,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 10000			///< Desired Reynolds number
+#define L_RE 1000			///< Desired Reynolds number
 
 
 /*
@@ -216,9 +221,9 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 4		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 5		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
-#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
+//#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)
 #define L_PADDING_X_MIN 0.0		///< Padding between X start of each sub-grid and its child edge
@@ -233,27 +238,28 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.4 }
+	{ 0.4 }, { 0.6 }, { 0.75 }, { 0.8 }, { 1.4 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 3.0 }
+	{ 3.0 }, { 2.8 }, { 2.7 }, { 2.5 }, { 2.0 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 1.0 / static_cast<double>(L_RESOLUTION) }
+	{ 1.0 / static_cast<double>(L_RESOLUTION) }, { 1.0 / static_cast<double>(L_RESOLUTION) },
+	{ 1.0 / static_cast<double>(L_RESOLUTION) }, { 1.0 / static_cast<double>(L_RESOLUTION) },	{ 0.4 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 1.2 }
+	{ 1.2 }, { 1.0 }, { 0.8 }, { 0.65 }, { 0.625 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 0.2 }
+	{ 0.2 }, { 0.4 }, { 0.5 }, { 0.55 }, { 0.525 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 1.4 }
+	{ 1.4 }, { 1.2 }, { 1.1 }, { 1.05 }, { 1.025 }
 };
 
 #endif

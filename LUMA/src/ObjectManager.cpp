@@ -230,6 +230,81 @@ void ObjectManager::resetMomexBodyForces(GridObj * grid)
 
 // ************************************************************************* //
 /// \brief	Adds a bounce-back body to the grid by labelling sites.
+///
+///			Override of the usual method which tries to place the object on the 
+///			finest grid it can rather than a given grid. This will allow objects
+///			to span multiple levels.
+///
+/// \param	geom	pointer to structure containing object information read from config file.
+/// \param	_PCpts	pointer to point cloud information.
+void ObjectManager::addBouncebackObject(GeomPacked *geom, PCpts *_PCpts)
+{
+
+	// Store information about the body in the Object Manager
+	bbbOnGridLevel = geom->onGridLev;
+	bbbOnGridReg = geom->onGridReg;
+
+	// Declarations
+	std::vector<int> ijk;
+	eLocationOnRank loc = eNone;
+	GridObj *g = nullptr;
+	bool bPointAdded = false;
+	eType localType;
+
+	// Loop over the points
+	for (int a = 0; a < static_cast<int>(_PCpts->x.size()); a++)
+	{
+		// Reset flag
+		bPointAdded = false;
+
+		// Loop over possible grids from bottom up
+		for (int lev = L_NUM_LEVELS; lev >= 0; lev--)
+		{
+			for (int reg = 0; reg < L_NUM_REGIONS; reg++)
+			{
+				GridUtils::getGrid(lev, reg, g);
+
+				// Skip if cannot find grid
+				if (!g) continue;
+
+				// If found grid then check in range
+				if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))
+				{
+
+					localType = g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim);
+
+					/* Update Typing Matrix and correct macroscopic.
+					 * We must allow labelling on TL but recall that TL2C sites 
+					 * which pull from a refined region may need to have BB applied
+					 * so also label all the refined sites behind the fine grids 
+					 * with the solid shape to make sure this is consistent. */
+					if (localType != eInlet || localType != eOutlet)
+					{
+						// Change type
+						g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;
+
+						// Change macro
+						g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+						g->u(ijk[0], ijk[1], ijk[2], 1, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+#if (L_DIMS == 3)
+						g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+#endif
+						g->rho(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = L_RHOIN;
+
+					}
+				}
+
+				/* Do not break but try add the solid site on every grid behind 
+				 * the finest grid -- see comment above as to why */
+			}
+		}
+
+	}
+
+}
+
+// ************************************************************************* //
+/// \brief	Adds a bounce-back body to the grid by labelling sites.
 /// \param	g		pointer to grid on which object resides.
 /// \param	geom	pointer to structure containing object information read from config file.
 /// \param	_PCpts	pointer to point cloud information.
@@ -244,7 +319,8 @@ void ObjectManager::addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PC
 	eLocationOnRank loc = eNone;
 
 	// Label the grid sites
-	for (int a = 0; a < static_cast<int>(_PCpts->x.size()); a++) {
+	for (int a = 0; a < static_cast<int>(_PCpts->x.size()); a++)
+	{
 
 		// Get indices if on this rank
 		if (GridUtils::isOnThisRank(_PCpts->x[a], _PCpts->y[a], _PCpts->z[a], &loc, g, &ijk))

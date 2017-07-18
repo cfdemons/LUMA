@@ -73,6 +73,7 @@ private:
 
 	void initialise(eMoveableType moveProperty);		// Initialisation wrapper for setting flags
 	void getValidMarkers();								// Get valid markers in iBody (only relevant for owning rank)
+	void sortPtCloudMarkers();							// Sort pt cloud markers and IDs
 
 };
 

@@ -30,6 +30,7 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	this->local_area = 1.0;
 	this->dilation = 1.0;
 	this->interpRho = 0.0;
+	this->ds = 1.0;
 
 	// Stationary point
 	this->markerVel.push_back(0.0);

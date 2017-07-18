@@ -125,6 +125,79 @@ void IBBody::getValidMarkers() {
 
 
 /*********************************************/
+/// \brief 		Get the indexes of the valid markers (only relevant for owning ranks in parallel)
+void IBBody::sortPtCloudMarkers() {
+
+	// If serial build then sorting is trivial
+#ifndef L_BUILD_FOR_MPI
+
+	// Loop through markers and assign value
+	for (int i = 0; i < markers.size(); i++)
+		markers[i].id = i;
+
+#else
+
+	// Parallel build is more tricky as owning rank needs to gather all markers, sort then scatter to other ranks
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Declare vectors for MPI comms
+	std::vector<double> recvPositionBuffer;
+	std::vector<int> recvIDBuffer;
+	std::vector<int> recvSizeBuffer;
+	std::vector<int> recvDisps;
+
+	// Gather in marker IDs and positions
+	mpim->mpi_ptCloudMarkerGather(this, recvPositionBuffer, recvIDBuffer, recvSizeBuffer, recvDisps);
+
+	// Now do the sorting
+	std::vector<int> sendSortedIDBuffer;
+	if (mpim->my_rank == owningRank) {
+
+		// Create vector for each marker which contains rank ID and an index array
+		std::vector<int> rankIDs(recvIDBuffer.size(), 0);
+		std::vector<int> indexIDs(recvIDBuffer.size(), 0);
+		int count = 0;
+		for (int i = 0; i < recvSizeBuffer.size(); i++) {
+			for (int j = 0; j < recvSizeBuffer[i]; j++) {
+				rankIDs[count] = i;
+				indexIDs[count] = count;
+				count++;
+			}
+		}
+
+		// Sort the IDs according to the current ID values and return the indices
+		std::sort(indexIDs.begin(), indexIDs.end(), [&](int a, int b) {return recvIDBuffer[a] < recvIDBuffer[b];});
+
+		// Pack into send buffer
+		sendSortedIDBuffer.resize(indexIDs.size(), 0);
+		for (int i = 0; i < indexIDs.size(); i++) {
+			sendSortedIDBuffer[indexIDs[i]] = i;
+		}
+
+		// First clear the markers
+		markers.clear();
+
+		// Recreate the markers
+		double x, y, z;
+		for (int i = 0; i < indexIDs.size(); i++) {
+
+			// Get position
+			x = recvPositionBuffer[indexIDs[i] * 3];
+			y = recvPositionBuffer[indexIDs[i] * 3 + 1];
+			z = recvPositionBuffer[indexIDs[i] * 3 + 2];
+
+			// Add marker
+			addMarker(x, y, z, i);
+		}
+	}
+
+	// Gather in marker IDs and positions
+	mpim->mpi_ptCloudMarkerScatter(this, sendSortedIDBuffer, recvSizeBuffer, recvDisps);
+#endif
+}
+
+
+/*********************************************/
 /// \brief Custom constructor to populate body from array of points.
 /// \param g				hierarchy pointer to grid hierarchy
 /// \param bodyID			ID of body in array of bodies.
@@ -138,8 +211,20 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 	// IBM-specific initialisation
 	initialise(moveProperty);
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Delete markers which exist off rank
+	if (rank == owningRank) {
+		*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;
+		deleteRecvLayerMarkers();
+	}
+
 	// Sort the marker IDs as the point cloud reader does not build them consecutively
-	sortMarkerIDs();
+	sortPtCloudMarkers();
+
+	// Get indices of valid markers
+	getValidMarkers();
 }
 
 

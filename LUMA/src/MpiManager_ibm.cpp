@@ -940,4 +940,87 @@ void MpiManager::mpi_dsCommScatter(int level) {
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
+
+// ************************************************************************* //
+/// \brief	Gather in info for pt cloud sorter
+///
+///
+void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &recvPositionBuffer, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
+
+	// Get number of markers to be sent
+	int nMarkers = iBody->markers.size();
+
+	// Only resize if owning rank
+	if (my_rank == iBody->owningRank)
+		recvSizeBuffer.resize(num_ranks, 0);
+
+	// Perform gather so that owning rank knows how many markers to receive
+	MPI_Gather(&nMarkers, 1, MPI_INT, &recvSizeBuffer.front(), 1, MPI_INT, iBody->owningRank, world_comm);
+
+	// Now pack current marker IDs into send buffer
+	std::vector<int> sendIDBuffer(nMarkers,0);
+	std::vector<double> sendPositionBuffer;
+	for (int i = 0; i < nMarkers; i++) {
+		sendIDBuffer[i] = iBody->markers[i].id;
+
+		// Insert position
+		for (int d = 0; d < 3; d++)
+			sendPositionBuffer.push_back(iBody->markers[i].position[d]);
+	}
+
+	// Create the receive buffer and also set receive displacements
+	if (my_rank == iBody->owningRank) {
+
+		// Resize vectors
+		recvIDBuffer.resize(std::accumulate(recvSizeBuffer.begin(), recvSizeBuffer.end(), 0), 0);
+		recvDisps.resize(num_ranks, 0);
+
+		// Set the displacements for receive buffer
+		for (int i = 1; i < recvDisps.size(); i++)
+			recvDisps[i] = std::accumulate(recvSizeBuffer.begin(), recvSizeBuffer.begin()+i, 0);
+	}
+
+	// Gather in marker IDs
+	MPI_Gatherv(&sendIDBuffer.front(), nMarkers, MPI_INT, &recvIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, iBody->owningRank, world_comm);
+
+	// Get sizes for gather of positions
+	std::vector<int> recvPosSizeBuffer;
+	std::vector<int> recvPosDisps;
+	for (int i = 0; i < recvSizeBuffer.size(); i++) {
+		recvPosSizeBuffer.push_back(3 * recvSizeBuffer[i]);
+		recvPosDisps.push_back(3 * recvDisps[i]);
+	}
+
+	// Resize receive buffer
+	if (my_rank == iBody->owningRank)
+		recvPositionBuffer.resize(std::accumulate(recvPosSizeBuffer.begin(), recvPosSizeBuffer.end(), 0), 0);
+
+	// Gather in marker IDs
+	MPI_Gatherv(&sendPositionBuffer.front(), 3*nMarkers, MPI_DOUBLE, &recvPositionBuffer.front(), &recvPosSizeBuffer.front(), &recvPosDisps.front(), MPI_DOUBLE, iBody->owningRank, world_comm);
+}
+
+
+// ************************************************************************* //
+/// \brief	Scatter info for pt cloud sorter
+///
+///
+void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendSortedIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
+
+	// Get number of markers to be sent
+	int nMarkers = iBody->markers.size();
+
+	// Create receive buffers
+	std::vector<int> recvSortedIDBuffer(nMarkers, 0);
+
+	// Scatter to all ranks
+	MPI_Scatterv(&sendSortedIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvSortedIDBuffer.front(), nMarkers, MPI_INT, iBody->owningRank, world_comm);
+
+	// Unpack into correct place
+	if (my_rank != iBody->owningRank) {
+		for (int i = 0; i < nMarkers; i++) {
+			iBody->markers[i].id = recvSortedIDBuffer[i];
+		}
+	}
+}
+
 // ************************************************************************** //

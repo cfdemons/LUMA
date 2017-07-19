@@ -95,7 +95,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 //#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 50				///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ 1000				///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -109,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 3000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
 
 
 /*
@@ -160,7 +160,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 */
 
 // Fluid data in lattice units
-//#define L_USE_INLET_PROFILE	///< Use an inlet profile
+#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
 
 // If not using an inlet profile, specify values or expressions here
@@ -209,8 +209,12 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
 #define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 #define L_WALL_FLOOR_ONLY
+
+// General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of wall
 #define L_WALL_THICKNESS_TOP L_COARSE_SITE_THICKNESS			///< Thickness of top wall
+#define L_WALL_THICKNESS_LEFT (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of left wall
+#define L_WALL_THICKNESS_RIGHT L_COARSE_SITE_THICKNESS			///< Thickness of right wall
 #define L_WALL_THICKNESS_FRONT L_COARSE_SITE_THICKNESS			///< Thickness of front (3D) wall
 #define L_WALL_THICKNESS_BACK L_COARSE_SITE_THICKNESS			///< Thickness of back (3D) wall
 
@@ -238,7 +242,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.4 }, { 0.6 }, { 0.75 }, { 0.8 }, { 1.4 }
+	{ 0.125 }, { 0.125 }, { 0.75 }, { 0.8 }, { 1.4 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {

@@ -1176,7 +1176,7 @@ void MpiManager::mpi_SDComputeImbalance(LoadImbalanceData& load,
 ///	\param	reqDims		pointer to a vector containing the desired MPI dimensions.
 ///	\param	dh			size of a voxel on the coarsest grid.
 ///	\returns			structure containing imbalance information.
-MpiManager::LoadImbalanceData MpiManager::mpi_smartDecompose(double dh, std::vector<int>& reqDims)
+MpiManager::LoadImbalanceData MpiManager::mpi_smartDecompose(double dh, std::vector<int> reqDims)
 {
 	// Make a suitable copy of the information depending on the argument passed in
 	std::vector<int> numCores(3);
@@ -1456,7 +1456,8 @@ void MpiManager::mpi_reportOnDecomposition(double dh)
 					coreCombo[eXDirection] = i;
 					coreCombo[eYDirection] = j;
 					coreCombo[eZDirection] = k;
-					LoadImbalanceData load = mpi_smartDecompose(dh, coreCombo);
+					LoadImbalanceData load;
+					load = mpi_smartDecompose(dh, coreCombo);
 
 					// Log information
 					reportFile << std::to_string(

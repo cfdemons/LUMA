@@ -27,8 +27,10 @@ using namespace std;
 ///			Input data may be over- or under-sampled but it must span the 
 ///			physical dimensions of the inlet otherwise the software does
 ///			not known how to scale the data to fit. Inlet profile is always
-///			assumed to be oriented vertically (y-direction).
-void GridObj::LBM_init_getInletProfile() {
+///			assumed to be oriented vertically (y-direction) and data should be
+///			specified in dimensionless units.
+void GridObj::LBM_init_getInletProfile()
+{
 
 	size_t j;
 
@@ -43,7 +45,9 @@ void GridObj::LBM_init_getInletProfile() {
 	for (j = 0; j < M_lim; j++) {
 
 		// Set the inlet velocity profile values
-		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0,this) * (1 - pow((YPos[j] - (L_BY - 2 * dh) / 2) / ((L_BY - 2 * dh) / 2), 2));
+		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
+		double b = L_COARSE_SITE_THICKNESS - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
+		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0,this) * (1 - pow((YPos[j] - a) / b, 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}
@@ -51,7 +55,7 @@ void GridObj::LBM_init_getInletProfile() {
 #else
 
 	size_t i;
-	double y; // , tmp;
+	double y;
 
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
@@ -117,6 +121,10 @@ void GridObj::LBM_init_getInletProfile() {
 				
 				
 		}
+
+		ux_in[j] = GridUnits::ud2ulbm(ux_in[j], this);
+		uy_in[j] = GridUnits::ud2ulbm(uy_in[j], this);
+		uz_in[j] = GridUnits::ud2ulbm(uz_in[j], this);
 
 	}
 
@@ -1091,17 +1099,12 @@ void GridObj::LBM_initBoundLab ( ) {
 #ifdef L_INLET_ON
 	// Left hand face only
 
-	// Check for potential singularity in BC
-	if (GridUnits::ud2ulbm(L_UX0,this) == 1 || uref == 1) {
-
-		// Singularity so exit
-		L_ERROR("Inlet BC fails with L_UX0 in LBM units = 1, choose something else. Exiting.", GridUtils::logfile);
-	}
-
 	// Search position vector to see if left hand wall on this rank
-	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] <= dh / 2.0) {		// Wall found
-
+	for (i = 0; i < N_lim; i++ )
+	{
+		// Wall found
+		if (XPos[i] <= L_WALL_THICKNESS_LEFT)
+		{
 			// Label inlet
 			for (j = 0; j < M_lim; j++) {
 				for (k = 0; k < K_lim; k++) {
@@ -1111,7 +1114,6 @@ void GridObj::LBM_initBoundLab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}
@@ -1122,7 +1124,7 @@ void GridObj::LBM_initBoundLab ( ) {
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] >= L_BX - dh / 2.0) {		// Wall found
+		if (XPos[i] >= L_BX - L_WALL_THICKNESS_RIGHT) {		// Wall found
 
 			// Label outlet
 			for (j = 0; j < M_lim; j++) {
@@ -1137,7 +1139,6 @@ void GridObj::LBM_initBoundLab ( ) {
 
 				}
 			}
-			break;
 
 		}
 	}

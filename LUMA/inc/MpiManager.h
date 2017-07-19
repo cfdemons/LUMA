@@ -190,7 +190,7 @@ public :
 	void mpi_updateLoadInfo(GridManager* const grid_man);			// Method to compute the number of active cells on the rank and pass to master
 	void mpi_uniformDecompose(int *numCells);						// Method to perform uniform decomposition into MPI blocks
 	LoadImbalanceData mpi_smartDecompose(double dh,
-		std::vector<int>& combo = std::vector<int>(0));				// Method to perform load-balanced decomposition into MPI blocks
+		std::vector<int> combo = std::vector<int>(0));				// Method to perform load-balanced decomposition into MPI blocks
 	void mpi_reportOnDecomposition(double dh);						// Method to provide a report on decomposition options
 	void mpi_SDReconstructSolution(SDData& solutionData, std::vector<int>& numCores);
 	void mpi_SDComputeImbalance(LoadImbalanceData& load, SDData& solutionData, std::vector<int>& numCores);

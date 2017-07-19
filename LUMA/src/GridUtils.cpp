@@ -1185,17 +1185,19 @@ void GridUtils::readVelocityFromFile(std::string path_str, std::vector<double>& 
 	// Buffer information from file
 	std::ifstream datafile;
 	datafile.open(path_str, std::ios::in);
-	if (!datafile.is_open()) {
+	if (!datafile.is_open())
+	{
 		// Error opening file
 		L_ERROR("Cannot open velocity data file named " + path_str + ". Exiting.", GridUtils::logfile);
-
 	}
-	else {
+	else
+	{
 
 		std::string line_in;	// String to store line
 		std::istringstream iss;	// Buffer stream
 
-		while (!datafile.eof()) {
+		while (!datafile.eof())
+		{
 
 			// Get line and put in buffer
 			std::getline(datafile, line_in, '\n');

@@ -57,17 +57,20 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				int id = k + j * K_lim + i * K_lim * M_lim;
 				eType type_local = LatTyp[id];
 
-				// Ignore Refined sites
-				if (type_local == eRefined)
-					continue;
-
 				// MOMENTUM EXCHANGE //
 #ifdef L_LD_OUT
-				if (type_local == eSolid) {
+				if (type_local == eSolid)
+				{
 					// Compute lift and drag contribution of this site
 					objman->computeLiftDrag(i, j, k, this);
 				}
-#endif				
+#endif
+				// IGNORE THESE SITES //
+				if (type_local == eRefined || type_local == eSolid
+#ifndef L_VELOCITY_REGULARISED
+					|| type_local == eInlet
+#endif
+					) continue;
 
 				// STREAM //
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);

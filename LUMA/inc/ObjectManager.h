@@ -132,8 +132,8 @@ public:
 	void ibm_interpolate(int level);												// Interpolation of velocity field onto markers of ib-th body.
 	void ibm_spread(int level);														// Spreading of restoring force from ib-th body.
 	void ibm_updateMacroscopic(int level);											// Update the macroscopic values with the IBM force
-	void ibm_findSupport(int ib, int m);											// Populates support information for the m-th marker of ib-th body.
-	void ibm_initialiseSupport(int ib, int m, int s, double estimated_position[]);	// Initialises data associated with the support points.
+	void ibm_findSupport(int ib);													// Populates support information for the m-th marker of ib-th body.
+	void ibm_initialiseSupport(int ib, int m, std::vector<double> &estimated_position);	// Initialises data associated with the support points.
 	void ibm_computeForce(int level);												// Compute restorative force at each marker in ib-th body.
 	void ibm_findEpsilon(int level);												// Method to find epsilon weighting parameter for ib-th body.
 	void ibm_computeDs(int level);
@@ -147,7 +147,7 @@ public:
 	void ibm_debug_interpVel(int ib);
 	void ibm_debug_markerForce(int ib);
 	void ibm_debug_markerPosition(int ib);
-	void ibm_debug_supportInfo(int ib, int m, int s);
+	void ibm_debug_supportInfo(int ib);
 	void ibm_debug_supportVel(int ib);
 	void ibm_debug_supportForce(int ib);
 

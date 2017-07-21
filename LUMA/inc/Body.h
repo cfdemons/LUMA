@@ -235,13 +235,13 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	// Build circle (2D)
 	int numMarkers = static_cast<int>(std::floor(2.0 * L_PI * radius / g->dh));
 	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
-	for (size_t i = 0; i < theta.size(); i++) {
+	for (size_t i = 1; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
 		addMarker(	centre[0] + radius * cos(theta[i]),
 					centre[1] + radius * sin(theta[i]),
 					centre[2],
-					static_cast<int>(i) );
+					static_cast<int>(i-1) );
 	}
 #endif
 

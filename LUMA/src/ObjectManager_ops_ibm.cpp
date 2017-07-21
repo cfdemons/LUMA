@@ -123,6 +123,11 @@ void ObjectManager::ibm_initialise() {
 
 				// Find support points for IBM marker
 				ibm_findSupport(ib);
+
+				// Write out info for support site
+#ifdef L_IBM_DEBUG
+				ibm_debug_supportInfo(ib);
+#endif
 			}
 		}
 	}
@@ -227,16 +232,12 @@ void ObjectManager::ibm_findSupport(int ib) {
 		// Set indices
 		inear = ijk[eXDirection];
 		jnear = ijk[eYDirection];
-#if (L_DIMS == 3)
 		knear = ijk[eZDirection];
-#endif
 
 		// Insert into support
 		iBody[ib].markers[m].supp_i.push_back(inear);
 		iBody[ib].markers[m].supp_j.push_back(jnear);
-#if (L_DIMS == 3)
 		iBody[ib].markers[m].supp_k.push_back(knear);
-#endif
 
 		// Set position
 		nearpos[eXDirection] = iBody[ib]._Owner->XPos[ijk[eXDirection]];
@@ -248,9 +249,8 @@ void ObjectManager::ibm_findSupport(int ib) {
 		// Set the x-y-z of the support marker
 		iBody[ib].markers[m].supp_x.push_back(nearpos[eXDirection]);
 		iBody[ib].markers[m].supp_y.push_back(nearpos[eYDirection]);
-#if (L_DIMS == 3)
 		iBody[ib].markers[m].supp_z.push_back(nearpos[eZDirection]);
-#endif
+
 
 		// Get the deltaval for the first support point
 		ibm_initialiseSupport(ib, m, nearpos);
@@ -292,9 +292,9 @@ void ObjectManager::ibm_findSupport(int ib) {
 					{
 
 						// Skip the nearest as already added when marker constructed
-						if (i != inear && j != jnear
+						if (i != inear || j != jnear
 #if (L_DIMS == 3)
-							&& k != knear
+							|| k != knear
 #endif
 							)
 						{
@@ -302,15 +302,11 @@ void ObjectManager::ibm_findSupport(int ib) {
 							// Lies within support region so add support point data
 							iBody[ib].markers[m].supp_i.push_back(i);
 							iBody[ib].markers[m].supp_j.push_back(j);
-#if (L_DIMS == 3)
 							iBody[ib].markers[m].supp_k.push_back(k);
-#endif
 
 							iBody[ib].markers[m].supp_x.push_back(estimated_position[eXDirection]);
 							iBody[ib].markers[m].supp_y.push_back(estimated_position[eYDirection]);
-#if (L_DIMS == 3)
 							iBody[ib].markers[m].supp_z.push_back(estimated_position[eZDirection]);
-#endif
 
 							// Initialise delta information for the set of support points including
 							// those not on this rank using estimated positions
@@ -360,11 +356,6 @@ void ObjectManager::ibm_findSupport(int ib) {
 			}
 		}
 	}
-
-	// Write out info for support site
-#ifdef L_IBM_DEBUG
-	ibm_debug_supportInfo(ib);
-#endif
 }
 
 // *****************************************************************************

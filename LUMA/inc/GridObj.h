@@ -163,9 +163,10 @@ private :
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
+	bool _LBM_applySpecReflect_opt(eType type, int id, int v);
 	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
 	void _LBM_kbcCollide_opt(int id);
-	double _LBM_smag(int id, double omega); 
+	double _LBM_smag(int id, double omega);
 
 public :
 	void LBM_multi_opt(int subcycle = 0);

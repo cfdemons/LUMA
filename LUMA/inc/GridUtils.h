@@ -30,7 +30,8 @@ class GridUtils {
 public:
 	static std::ofstream* logfile;			///< Handle to output file
 	static std::string path_str;            ///< Static string representing output path
-	static const int dir_reflect[L_DIMS * 2][L_NUM_VELS];	///< Array with hardcoded direction numbering for specular reflection
+	static const int dir_reflect[L_DIMS][L_NUM_VELS];	///< Array with hardcoded direction numbering for specular reflection
+	static const int dir_opposites[L_NUM_VELS];			///< Array with hardcoded direction numbering for bounce-back opposites
 
 	// Methods //
 
@@ -66,6 +67,7 @@ public:
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
+	static int getReflect(int direction, eCartesianDirection plane);
 	static void getGrid(int level, int region, GridObj*& ptr);							// Wrapper using default hierarchy to get grid pointer
 	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
 	static void getFinestGrid(GridObj*& ptr);											// Get a pointer to finest grid in hierarchy

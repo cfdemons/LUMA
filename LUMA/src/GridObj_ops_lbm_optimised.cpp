@@ -68,7 +68,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 				// IGNORE THESE SITES //
 				if (type_local == eRefined || type_local == eSolid
 #ifndef L_VELOCITY_REGULARISED
-					|| type_local == eInlet
+					|| type_local == eVelocity
 #endif
 					) continue;
 
@@ -80,7 +80,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 
 				// REGULARISED BCs //
 #ifdef L_VELOCITY_REGULARISED
-				if (type_local == eInlet)
+				if (type_local == eVelocity)
 					_LBM_regularised_velocity_opt(i, j, k, id);
 #endif
 
@@ -164,19 +164,6 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 	// Loop over velocities
 	for (int v = 0; v < L_NUM_VELS; ++v)
 	{
-
-		// Forced equilibirum inlets and solid sites are simply reset to equilibrium
-		if	(
-			type_local == eSolid
-#ifndef L_VELOCITY_REGULARISED
-			|| type_local == eInlet
-#endif
-			)
-		{
-			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
-			continue;
-		}
-
 		// Get indicies for source site (periodic by default)
 		int src_x = (i - c_opt[v][0] + N_lim) % N_lim;
 		int src_y = (j - c_opt[v][1] + M_lim) % M_lim;
@@ -193,17 +180,28 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			if (_LBM_applyBFL_opt(id, src_id, v, i, j, k, src_x, src_y, src_z)) continue;
 		}
 
+		// SLIP CONDITIONS //
+		if (type_local == eSlipLeft ||
+			type_local == eSlipRight ||
+			type_local == eSlipTop ||
+			type_local == eSlipBottom ||
+			type_local == eSlipFront ||
+			type_local == eSlipBack)
+		{
+			if (_LBM_applySpecReflect_opt(type_local, id, v)) continue;
+		}
+
 		// BOUNCEBACK
 		if (src_type_local == eSolid)
 		{
 			// F value is its opposite (HWBB)
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
-		}
+		}		
 
 		// VELOCITY BC (forced equilbirium)
 #ifndef L_VELOCITY_REGULARISED
-		else if (src_type_local == eInlet)
+		else if (src_type_local == eVelocity)
 		{
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
@@ -263,7 +261,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	// Find which wall we are on and proceed to assign key variables //
 
 	// Left wall
-	if (XPos[i] > 0.0 && XPos[i] < dh)
+	if (XPos[i] > 0.0 && XPos[i] < L_WALL_THICKNESS_LEFT)
 	{
 		// Assign wall velocity
 		normalVelocity = GridUnits::ud2ulbm(L_UX0, this);
@@ -275,7 +273,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 
 	// Right wall
-	if (XPos[i] < L_BX && XPos[i] > L_BX - dh)
+	if (XPos[i] < L_BX && XPos[i] > L_BX - L_WALL_THICKNESS_RIGHT)
 	{
 		normalVelocity = -GridUnits::ud2ulbm(L_UX0, this);
 		normalDirection = eXDirection;
@@ -284,7 +282,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 
 	// Bottom wall
-	else if (YPos[j] > 0.0 && YPos[j] < dh)
+	else if (YPos[j] > 0.0 && YPos[j] < L_WALL_THICKNESS_BOTTOM)
 	{
 		normalVelocity = GridUnits::ud2ulbm(L_UY0, this);
 		normalDirection = eYDirection;
@@ -293,7 +291,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 	
 	// Top wall
-	else if (YPos[j] < L_BY && YPos[j] > L_BY - dh)
+	else if (YPos[j] < L_BY && YPos[j] > L_BY - L_WALL_THICKNESS_TOP)
 	{
 		normalVelocity = -GridUnits::ud2ulbm(L_UY0, this);
 		normalDirection = eYDirection;
@@ -304,7 +302,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 #if (L_DIMS == 3)
 
 	// Front wall
-	else if (ZPos[k] > 0.0 && ZPos[k] < dh)
+	else if (ZPos[k] > 0.0 && ZPos[k] < L_WALL_THICKNESS_FRONT)
 	{
 		normalVelocity = GridUnits::ud2ulbm(L_UZ0, this);
 		normalDirection = eZDirection;
@@ -313,7 +311,7 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 	
 	// Back wall
-	else if (ZPos[k] < L_BZ && ZPos[k] > L_BZ - dh)
+	else if (ZPos[k] < L_BZ && ZPos[k] > L_BZ - L_WALL_THICKNESS_BACK)
 	{
 		normalVelocity = -GridUnits::ud2ulbm(L_UZ0, this);
 		normalDirection = eZDirection;
@@ -441,6 +439,67 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 
 
 
+}
+
+// *****************************************************************************
+/// \brief	Optimised application of specular reflection slip BC.
+///
+///			This method uses knowledge of the slip type to perform the appropriate
+///			populate reflections. If no reflection is required for the combination
+///			of direction and BC type then returns false and streaming must be 
+///			performed in the usual way.
+///
+///	\param	type	lattice label.
+/// \param	id		flattened ijk index.
+/// \param	v		velocity direction.
+///	\returns		indication whether specular reflection was applied on this 
+///					direction.
+bool GridObj::_LBM_applySpecReflect_opt(eType type, int id, int v)
+{
+
+	if (type == eSlipLeft && c_opt[v][eXDirection] == 1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	if (type == eSlipRight && c_opt[v][eXDirection] == -1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	if (type == eSlipBottom && c_opt[v][eYDirection] == 1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	if (type == eSlipTop && c_opt[v][eYDirection] == -1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	if (type == eSlipFront && c_opt[v][eZDirection] == 1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	if (type == eSlipBack && c_opt[v][eZDirection] == -1)
+	{
+		// Set velocity to reflected value
+		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_LEVELS];
+		return true;
+	}
+
+	return false;
 }
 
 // *****************************************************************************

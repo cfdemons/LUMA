@@ -85,30 +85,21 @@ enum eIBInfoType {
 /// \brief Lattice typing labels
 enum eType
 {
-	eSolid,					///< Rigid, solid site
+	eSolid,					///< Rigid, solid site with no-slip BC
 	eFluid,					///< Fluid site
 	eRefined,				///< Fluid site which is represented on a finer grid
 	eTransitionToCoarser,	///< Fluid site coupled to a coarser grid
 	eTransitionToFiner,		///< Fluid site coupled to a finer grid
 	eBFL,					///< Site containing a BFL marker
-	eSymmetry,				///< Symmetry boundary
-	eInlet,					///< Inlet boundary
-	eOutlet,				///< Outlet boundary
-	eRefinedSolid,			///< Rigid, solid site represented on a finer grid
-	eRefinedSymmetry,		///< Symmtery boundary represented on a finer grid
-	eRefinedInlet			///< Inlet site represented on a finer grid
-};
+	eVelocity,				///< Velocity boundary
+	eExtrapolation,			///< Extrapolation (outlet) site
 
-/// \enum  eBCType
-/// \brief Flag for indicating which BCs to apply
-enum eBCType
-{
-	eBCAll,				///< Apply all BCs
-	eBCSolidSymmetry,	///< Apply just solid and symmetry BCs
-	eBCInlet,			///< Apply just inlet BCs
-	eBCOutlet,			///< Apply just outlet BCs
-	eBCInletOutlet,		///< Apply inlet and outlet BCs
-	eBCBFL				///< Apply just BFL BCs
+	eSlipLeft,				///< Slip boundary (+x normal)
+	eSlipRight,				///< Slip boundary (-x normal)
+	eSlipBottom,			///< Slip boundary (+y normal)
+	eSlipTop,				///< Slip boundary (-y normal)
+	eSlipFront,				///< Slip boundary (+z normal)
+	eSlipBack,				///< Slip boundary (-z normal)
 };
 
 /// \enum  eIOFlag

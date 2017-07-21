@@ -193,22 +193,16 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-// Virtual Wind Tunnels
-#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
+// BC types (unspecified is periodic)
+#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
+#define L_WALL_RIGHT	eVelocity		///< BC used on the right of the domain
+#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
+#define L_WALL_TOP		eSlipTop		///< BC used on the top of the domain
+#define L_WALL_FRONT	eSlipFront		///< BC used on the front of the domain
+#define L_WALL_BACK		eSlipBack		///< BC used on the bottom of the domain
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
-//#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
-
-// Inlet (left-hand wall)
-#define L_INLET_ON				///< Turn on inlet boundary
-
-// Outlet (right-hand wall)
-#define L_OUTLET_ON				///< Turn on outlet boundary
-
-// Solids
-#define L_WALLS_ON				///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
-#define L_WALL_FLOOR_ONLY
+//#define L_VELOCITY_REGULARISED	///< Specify the inlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of wall

@@ -42,8 +42,8 @@ void GridObj::LBM_init_getInletProfile()
 	uz_in.resize(M_lim);
 
 	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < M_lim; j++) {
-
+	for (j = 0; j < M_lim; j++)
+	{
 		// Set the inlet velocity profile values
 		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
 		double b = L_COARSE_SITE_THICKNESS - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
@@ -69,66 +69,73 @@ void GridObj::LBM_init_getInletProfile()
 	uz_in.resize(M_lim);
 
 	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < M_lim; j++) {
+	for (j = 0; j < M_lim; j++)
+	{
 
 		// Get Y-position
 		y = YPos[j];
 
 		// Find values either side of desired
-		for (i = 0; i < ybuffer.size(); i++) {
+		for (i = 0; i < ybuffer.size(); i++)
+		{
 
 			// Bottom point
-			if (i == 0 && ybuffer[i] > y) {
-				
+			if (i == 0 && ybuffer[i] > y)
+			{
 				// Extrapolation
 				ux_in[j] = -(uxbuffer[i+1] - uxbuffer[i]) + uxbuffer[i];
 				uy_in[j] = -(uybuffer[i+1] - uybuffer[i]) + uybuffer[i];
 				uz_in[j] = -(uzbuffer[i+1] - uzbuffer[i]) + uzbuffer[i];
 				break;
 
+			}
 			// Top point
-			} else if (i == ybuffer.size()-1 && ybuffer[i] < y) {
-
+			else if (i == ybuffer.size()-1 && ybuffer[i] < y)
+			{
 				// Extrapolation
 				ux_in[j] = (uxbuffer[i] - uxbuffer[i-1]) + uxbuffer[i];
 				uy_in[j] = (uybuffer[i] - uybuffer[i-1]) + uybuffer[i];
 				uz_in[j] = (uzbuffer[i] - uzbuffer[i-1]) + uzbuffer[i];
 				break;
 
-
+			}
 			// Any middle point
-			} else if (ybuffer[i] < y && ybuffer[i+1] > y) {
-
+			else if (ybuffer[i] < y && ybuffer[i+1] > y)
+			{
 				// Interpolation
 				ux_in[j] = ((uxbuffer[i+1] - uxbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uxbuffer[i];
 				uy_in[j] = ((uybuffer[i+1] - uybuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uybuffer[i];
 				uz_in[j] = ((uzbuffer[i+1] - uzbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uzbuffer[i];
 				break;
 
-			} else if (ybuffer[i] == y ) {
-
+			}
+			// Exactly on a point
+			else if (ybuffer[i] == y )
+			{
 				// Copy
 				ux_in[j] = uxbuffer[i];
 				uy_in[j] = uybuffer[i];
 				uz_in[j] = uzbuffer[i];
 				break;			
 			
-			} else {
-
-				continue;
-
 			}
-				
-				
+			// Not near enough to this point
+			else
+			{
+				continue;
+			}				
 		}
 
+		// Since input specified in dimensionless unit, convert to lattice units.
 		ux_in[j] = GridUnits::ud2ulbm(ux_in[j], this);
 		uy_in[j] = GridUnits::ud2ulbm(uy_in[j], this);
 		uz_in[j] = GridUnits::ud2ulbm(uz_in[j], this);
 
 	}
 
-	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0) {
+	// Check for data read fail
+	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0)
+	{
 		// No data read in
 		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile);
 	}
@@ -197,8 +204,8 @@ void GridObj::LBM_initVelocity ( ) {
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
 
-				// Inlet sites are an exception to the no flow setting
-				if (LatTyp(i, j, k, M_lim, K_lim) == eInlet)
+				// Velocity sites are an exception to the no flow setting
+				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity)
 #endif
 
 				{
@@ -1088,148 +1095,116 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 /// \brief	Method to initialise wall and object labels on L0.
 ///
 ///			The virtual wind tunnel definitions are implemented by this method.
-void GridObj::LBM_initBoundLab ( ) {
-
-	// If we need to label the edges...
-#if defined L_WALLS_ON || defined L_INLET_ON || defined L_OUTLET_ON || defined L_FREESTREAM_TUNNEL
-
+void GridObj::LBM_initBoundLab ( )
+{
+	// Declarations
 	int i, j, k;
 
-
-#ifdef L_INLET_ON
-	// Left hand face only
+	// LEFT WALL //
 
 	// Search position vector to see if left hand wall on this rank
-	for (i = 0; i < N_lim; i++ )
+	for (i = 0; i < N_lim; i++)
 	{
 		// Wall found
 		if (XPos[i] <= L_WALL_THICKNESS_LEFT)
 		{
-			// Label inlet
-			for (j = 0; j < M_lim; j++) {
-				for (k = 0; k < K_lim; k++) {
-
-					// Inlet site
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
+			// Label boundary
+			for (j = 0; j < M_lim; j++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_LEFT;
 
 				}
 			}
-
 		}
 	}
-#endif
 
-#ifdef L_OUTLET_ON
-	// Right hand face only
+	// RIGHT WALL //
 
 	// Search index vector to see if right hand wall on this rank
-	for (i = 0; i < N_lim; i++ ) {
-		if (XPos[i] >= L_BX - L_WALL_THICKNESS_RIGHT) {		// Wall found
-
-			// Label outlet
-			for (j = 0; j < M_lim; j++) {
-				for (k = 0; k < K_lim; k++) {
-
-#ifdef L_FREESTREAM_TUNNEL
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
-#else
-					//LatTyp(i,j,k,M_lim,K_lim) = eOutlet;
-					LatTyp(i, j, k, M_lim, K_lim) = eInlet;		// Set to free stream for now
-#endif
-
-				}
-			}
-
-		}
-	}
-#endif
-
-#if ((defined L_WALLS_ON && !defined L_WALLS_ON_2D) || defined L_FREESTREAM_TUNNEL) && (L_DIMS == 3)
-
-	// Search index vector to see if FRONT wall on this rank
-	for (k = 0; k < K_lim; k++ ) {
-		if (ZPos[k] <= L_WALL_THICKNESS_FRONT) {		// Wall found
-
-			// Label wall
-			for (i = 0; i < N_lim; i++) {
-				for (j = 0; j < M_lim; j++) {
-
-#if (defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
-#else
-					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#endif
-
-				}
-			}
-
-		}
-	}
-
-	// Search index vector to see if BACK wall on this rank
-	for (k = 0; k < K_lim; k++ ) {
-		if (ZPos[k] >= L_BZ - L_WALL_THICKNESS_BACK) {		// Wall found
-
-			// Label wall
-			for (i = 0; i < N_lim; i++) {
-				for (j = 0; j < M_lim; j++) {
-
-#if (defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;
-#else
-					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#endif
-
-				}
-			}
-
-		}
-	}
-
-#endif
-
-
-	// Search index vector to see if BOTTOM wall on this rank
-	for (j = 0; j < M_lim; j++ ) {
-		if (YPos[j] <= L_WALL_THICKNESS_BOTTOM) {		// Wall found
-
-			// Label wall
-			for (i = 0; i < N_lim; i++) {
-				for (k = 0; k < K_lim; k++) {
-
-#ifdef L_WALLS_ON
-					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as inlet (for rolling road -- velocity BC)
-#endif
-
+	for (i = 0; i < N_lim; i++)
+	{
+		if (XPos[i] >= L_BX - L_WALL_THICKNESS_RIGHT)
+		{
+			// Label boundary
+			for (j = 0; j < M_lim; j++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_RIGHT;
 				}
 			}
 		}
 	}
 
+#if (L_DIMS == 3)
 
+	// FRONT WALL //
 
-	// Search index vector to see if TOP wall on this rank
-	for (j = 0; j < M_lim; j++ ) {
-		if (YPos[j] >= L_BY - L_WALL_THICKNESS_TOP) {		// Wall found
+	for (k = 0; k < K_lim; k++)
+	{
+		if (ZPos[k] <= L_WALL_THICKNESS_FRONT)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (j = 0; j < M_lim; j++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_FRONT;
+				}
+			}
+		}
+	}
 
-			// Label wall
-			for (i = 0; i < N_lim; i++) {
-				for (k = 0; k < K_lim; k++) {
+	// BACK WALL //
 
-#if (defined L_WALLS_ON && !defined L_WALL_FLOOR_ONLY)
-					LatTyp(i,j,k,M_lim,K_lim) = eSolid;
-#elif (defined L_FREESTREAM_TUNNEL)
-					LatTyp(i,j,k,M_lim,K_lim) = eInlet;	// Label as free-stream
-#endif
-
+	for (k = 0; k < K_lim; k++)
+	{
+		if (ZPos[k] >= L_BZ - L_WALL_THICKNESS_BACK)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (j = 0; j < M_lim; j++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_BACK;
 				}
 			}
 		}
 	}
 
 #endif
+
+	// BOTTOM WALL //
+
+	for (j = 0; j < M_lim; j++)
+	{
+		if (YPos[j] <= L_WALL_THICKNESS_BOTTOM)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_BOTTOM;
+				}
+			}
+		}
+	}
+
+	// TOP WALL //
+
+	for (j = 0; j < M_lim; j++)
+	{
+		if (YPos[j] >= L_BY - L_WALL_THICKNESS_TOP)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_TOP;
+				}
+			}
+		}
+	}
 
 }
 

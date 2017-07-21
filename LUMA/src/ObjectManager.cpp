@@ -278,7 +278,7 @@ void ObjectManager::addBouncebackObject(GeomPacked *geom, PCpts *_PCpts)
 					 * which pull from a refined region may need to have BB applied
 					 * so also label all the refined sites behind the fine grids 
 					 * with the solid shape to make sure this is consistent. */
-					if (localType != eInlet || localType != eOutlet)
+					if (localType != eVelocity)
 					{
 						// Change type
 						g->LatTyp(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = eSolid;

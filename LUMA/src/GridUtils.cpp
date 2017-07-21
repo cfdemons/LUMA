@@ -16,28 +16,49 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 
-// Mappings of directions for specular reflection: col == normal direction, row == velocity
-// Constants so initialise outside the class but in scope.
-#if (L_DIMS == 3)
+/* Mappings of directions for specular reflection:
+ * row == reflection plane (eDirection enumeration)
+ * col == velocity direction
+ * Constants so initialise outside the class but in scope. */
 
-// THIS IS WRONG AS WE HAVE CHANGED TO D3Q27 NOW!!!!
-const int GridUtils::dir_reflect[L_DIMS * 2][L_NUM_VELS] = 
+#if (L_DIMS == 3 && defined L_USE_KBC_COLLISION)
+
+// D3Q27
+const int GridUtils::dir_reflect[L_DIMS][L_NUM_VELS] = 
 	{
-		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18}, 
-		{1, 0, 2, 3, 4, 5, 9, 8, 7, 6, 10, 11, 12, 13, 16, 17, 14, 15, 18},
-		{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},
-		{0, 1, 3, 2, 4, 5, 8, 9, 6, 7, 13, 12, 11, 10, 14, 15, 16, 17, 18},
-		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18},
-		{0, 1, 2, 3, 5, 4, 6, 7, 8, 9, 12, 13, 10, 11, 17, 16, 15, 14, 18}
+		{1,	0,	2,	3,	4,	5,	6,	7,	8,	9,	13,	12,	11,	10,	17,	16,	15,	14,	22,	23,	24,	25,	18,	19,	20,	21,	26},
+		{0,	1,	3,	2,	4,	5,	9,	8,	7,	6,	10,	11,	12,	13,	16,	17,	14,	15,	24,	25,	22,	23,	20,	21,	18,	19,	26},
+		{0,	1,	2,	3,	5,	4,	8,	9,	6,	7,	12,	13,	10,	11,	14,	15,	16,	17,	21,	20,	19,	18,	25,	24,	23,	22,	26}
+	}
+
+const int GridUtils::dir_opposites[L_NUM_VELS] =
+	{ 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 26};
+
+#elif (L_DIMS == 3)
+
+// D3Q19
+const int GridUtils::dir_reflect[L_DIMS][L_NUM_VELS] = 
+	{
+		{1,	0,	2,	3,	4,	5,	9,	8,	7,	6,	10,	11,	12,	13,	16,	17,	14,	15,	18},
+		{0,	1,	3,	2,	4,	5,	8,	9,	6,	7,	13,	12,	11,	10,	14,	15,	16,	17,	18},
+		{0,	1,	2,	3,	5,	4,	6,	7,	8,	9,	12,	13,	10,	11,	17,	16,	15,	14,	18}
 	};
+
+const int GridUtils::dir_opposites[L_NUM_VELS] =
+	{ 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 18 };
+
 #else
-const int GridUtils::dir_reflect[L_DIMS * 2][L_NUM_VELS] = 
+
+// D2Q9
+const int GridUtils::dir_reflect[L_DIMS][L_NUM_VELS] = 
 	{
 		{1, 0, 2, 3, 7, 6, 5, 4, 8}, 
-		{1, 0, 2, 3, 4, 6, 5, 4, 8},
-		{0, 1, 3, 2, 6, 7, 4, 5, 8},
 		{0, 1, 3, 2, 6, 7, 4, 5, 8}
 	};
+
+const int GridUtils::dir_opposites[L_NUM_VELS] =
+	{ 1, 0, 3, 2, 5, 4, 7, 6, 8 };
+
 #endif
 
 /// Default constructor
@@ -371,37 +392,33 @@ std::vector<int> GridUtils::getCoarseIndices(int fine_i, int x_start, int fine_j
 // *****************************************************************************
 /// \brief	Gets the opposite lattice direction to the one supplied.
 ///
-///			This is model independent as long as the model directions are 
-///			specified such that the oppoiste direction is either one vector on
+///			This is model-independent as long as the model directions are 
+///			specified such that the opposite direction is either one vector on
 ///			or one vector back in the listing depending on whether the direction
-///			supplied is even or odd.
+///			supplied is even or odd. This optimised version no-longer performs a
+///			power-based operation ot determine the direction but simply looks up
+///			hard-coded values for speed.
 ///
 /// \param	direction	direction to be reversed.
-/// \return	opposite direction in lattice model.
-int GridUtils::getOpposite(int direction) {
+/// \return				opposite direction in lattice model.
+int GridUtils::getOpposite(int direction)
+{
+	return dir_opposites[direction];
+}
 
-	int direction_opposite;
-
-	// If rest particle then opposite is simply itself
-	if (direction == L_NUM_VELS-1) {
-
-		direction_opposite = direction;
-
-	} else {
-
-		/*	If direction is even, then opposite is direction+1.
-			If direction is odd, then opposite is direction-1.
-			e.g. direction 0 (+x direction) has opposite 1 (-x direction) --> +1
-			however, direction 1 has opposite 0 --> -1
-			Hence we can add (-1 ^ direction) so it alternates between +/-1
-		*/
-
-		direction_opposite = direction + (int)pow(-1,direction);
-
-	}
-
-	return direction_opposite;
-
+// *****************************************************************************
+/// \brief	Gets the lattice direction reflected in the specified noraml plane.
+///
+///			Principally used for applying specular reflection boundary conditions.
+///			Plane should be specified using the eCartesianDirection enumeration.
+///			Values are hard=coded based on the lattice models available for speed.
+///
+/// \param	direction	direction to be reflected.
+///	\param	plane		plane in which reflection is required.
+/// \return				reflected direction in lattice model.
+int GridUtils::getReflect(int direction, eCartesianDirection plane)
+{
+	return dir_reflect[plane][direction];
 }
 
 // *****************************************************************************

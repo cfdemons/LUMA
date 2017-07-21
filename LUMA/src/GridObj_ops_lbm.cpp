@@ -290,7 +290,7 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
-	} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid || LatTyp(i,j,k,M_lim,K_lim) == eRefinedSolid) {
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == eSolid) {
 
 		// Solid site so do not update density but set velocity to zero
 		rho(i,j,k,M_lim,K_lim) = 1.0;
@@ -300,10 +300,9 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		u(i,j,k,2,M_lim,K_lim,L_DIMS) = 0.0;
 #endif
 
-	} else if ( LatTyp(i,j,k,M_lim,K_lim) == eSymmetry ||
-		(LatTyp(i,j,k,M_lim,K_lim) == eInlet || LatTyp(i,j,k,M_lim,K_lim) == eRefinedInlet) ) {
+	} else if (LatTyp(i,j,k,M_lim,K_lim) == eVelocity) {
 
-		// Symmetry or Inlet BC which update themselves prior to collision
+		// Velocity BC update themselves prior to collision
 
 	} else {
 

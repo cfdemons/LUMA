@@ -460,42 +460,42 @@ bool GridObj::_LBM_applySpecReflect_opt(eType type, int id, int v)
 	if (type == eSlipLeft && c_opt[v][eXDirection] == 1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
 	if (type == eSlipRight && c_opt[v][eXDirection] == -1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
 	if (type == eSlipBottom && c_opt[v][eYDirection] == 1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
 	if (type == eSlipTop && c_opt[v][eYDirection] == -1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
 	if (type == eSlipFront && c_opt[v][eZDirection] == 1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
 	if (type == eSlipBack && c_opt[v][eZDirection] == -1)
 	{
 		// Set velocity to reflected value
-		fNew[v + id * L_NUM_LEVELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_LEVELS];
+		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
 		return true;
 	}
 
@@ -716,9 +716,17 @@ void GridObj::_LBM_collide_opt(int id)
 ///	\param	type_local	type of site under consideration
 void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 
-	// Only update fluid sites (including BFL) or TL to finer
+	// Only update fluid sites (including BFL and Slip) or TL to finer
 	if (type_local == eFluid || type_local == eBFL ||
-		type_local == eTransitionToFiner) {
+		type_local == eTransitionToFiner ||
+		type_local == eSlipLeft ||
+		type_local == eSlipRight ||
+		type_local == eSlipTop ||
+		type_local == eSlipBottom ||
+		type_local == eSlipFront ||
+		type_local == eSlipBack
+		)
+	{
 
 		// Reset
 		double rho_temp = 0.0;

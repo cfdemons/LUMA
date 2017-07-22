@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.3.0"
+#define H5MGM_VERSION "0.3.1"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -74,18 +74,21 @@ const int e2[2][4] =
 // Typing enumeration from LUMA
 enum eType
 {
-	eSolid,					// Rigid, solid site
-	eFluid,					// Fluid site
-	eRefined,				// Fluid site which is represented on a finer grid
-	eTransitionToCoarser,	// Fluid site coupled to a coarser grid
-	eTransitionToFiner,		// Fluid site coupled to a finer grid
-	eBFL,					// Site containing a BFL marker
-	eSymmetry,				// Symmetry boundary
-	eInlet,					// Inlet boundary
-	eOutlet,				// Outlet boundary
-	eRefinedSolid,			// Rigid, solid site represented on a finer grid
-	eRefinedSymmetry,		// Symmtery boundary represented on a finer grid
-	eRefinedInlet			// Inlet site represented on a finer grid
+	eSolid,					///< Rigid, solid site with no-slip BC
+	eFluid,					///< Fluid site
+	eRefined,				///< Fluid site which is represented on a finer grid
+	eTransitionToCoarser,	///< Fluid site coupled to a coarser grid
+	eTransitionToFiner,		///< Fluid site coupled to a finer grid
+	eBFL,					///< Site containing a BFL marker
+	eVelocity,				///< Velocity boundary
+	eExtrapolation,			///< Extrapolation (outlet) site
+
+	eSlipLeft,				///< Slip boundary (+x normal)
+	eSlipRight,				///< Slip boundary (-x normal)
+	eSlipBottom,			///< Slip boundary (+y normal)
+	eSlipTop,				///< Slip boundary (-y normal)
+	eSlipFront,				///< Slip boundary (+z normal)
+	eSlipBack,				///< Slip boundary (-z normal)
 };
 
 // Error enumeration
@@ -130,9 +133,6 @@ bool isOnIgnoreList(eType cell_type)
 
 	if (
 		cell_type == eRefined ||
-		cell_type == eRefinedInlet ||
-		cell_type == eRefinedSolid ||
-		cell_type == eRefinedSymmetry ||
 		cell_type == eTransitionToCoarser ||
 		(bCutSolid = true && cell_type == eSolid)
 		) return true;

@@ -65,7 +65,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 25			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
@@ -100,7 +100,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
 #define L_USE_BGKSMAG
-#define L_CSMAG 0.1
+#define L_CSMAG 0.06
 
 
 /*
@@ -170,7 +170,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 3000			///< Desired Reynolds number
 
 
 /*

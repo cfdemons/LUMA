@@ -125,12 +125,6 @@ void GridObj::LBM_init_getInletProfile()
 				continue;
 			}				
 		}
-
-		// Since input specified in dimensionless unit, convert to lattice units.
-		ux_in[j] = GridUnits::ud2ulbm(ux_in[j], this);
-		uy_in[j] = GridUnits::ud2ulbm(uy_in[j], this);
-		uz_in[j] = GridUnits::ud2ulbm(uz_in[j], this);
-
 	}
 
 	// Check for data read fail
@@ -1113,8 +1107,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (k = 0; k < K_lim; k++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_LEFT;
-
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_LEFT);
 				}
 			}
 		}
@@ -1132,7 +1126,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (k = 0; k < K_lim; k++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_RIGHT;
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
 				}
 			}
 		}
@@ -1150,7 +1145,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (j = 0; j < M_lim; j++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_FRONT;
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_FRONT);
 				}
 			}
 		}
@@ -1166,7 +1162,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (j = 0; j < M_lim; j++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_BACK;
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BACK);
 				}
 			}
 		}
@@ -1184,7 +1181,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (k = 0; k < K_lim; k++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_BOTTOM;
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BOTTOM);
 				}
 			}
 		}
@@ -1200,7 +1198,8 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (k = 0; k < K_lim; k++)
 				{
-					LatTyp(i,j,k,M_lim,K_lim) = L_WALL_TOP;
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_TOP);
 				}
 			}
 		}

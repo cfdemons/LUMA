@@ -72,6 +72,7 @@ public:
 	static void getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr);	// Function to get pointer to grid in hierarchy
 	static void getFinestGrid(GridObj*& ptr);											// Get a pointer to finest grid in hierarchy
 	static double normaliseToLink(double value, int v);									// Normalise value wrt to the lattice link length
+	static eType setBCPrecedence(eType currentBC, eType desiredBC);						// Determine BC based on any existing BC
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, GridObj const & pGrid);		// Is this halo periodically connected to neighbour

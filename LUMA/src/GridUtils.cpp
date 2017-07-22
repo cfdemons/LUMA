@@ -435,6 +435,24 @@ double GridUtils::normaliseToLink(double value, int v)
 }
 
 // *****************************************************************************
+/// \brief	Used to preserve the precedence of BCs during labelling.
+///
+///			This is necessary in particular for corners where types of BCs meet.
+///			This method ensures that velocity BCs are always preserved over slip 
+///			conditions for example.
+///
+/// \param	desiredBC	new BC type for a given site.
+///	\param	existingBC	BC type already assigned to given site.
+/// \return				permitted BC type for given site.
+eType GridUtils::setBCPrecedence(eType currentBC, eType desiredBC)
+{
+	if (currentBC == eSolid || desiredBC == eSolid) return eSolid;
+	else if (currentBC == eVelocity) return eVelocity;
+	else return desiredBC;
+}
+static eType setBCPrecedence(eType desiredBC);
+
+// *****************************************************************************
 /// \brief	Finds out whether halo containng i,j,k links to neighbour rank periodically.
 ///
 ///			Checks the receiver layer containing local site i,j,k and determines 

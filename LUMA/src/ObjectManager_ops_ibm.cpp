@@ -21,23 +21,31 @@
 
 // *****************************************************************************
 /// Perform IBM procedure.
-void ObjectManager::ibm_apply(int level) {
+void ObjectManager::ibm_apply(GridObj *g, bool doSubIterate) {
+
+	// Set post-LBM velocities
+	if (hasFlexibleBodies[g->level])
+		g->u_n = g->u;
 
 	// Interpolate the velocity onto the markers
-	ibm_interpolate(level);
+	ibm_interpolate(g->level);
 
 	// Compute force
-	ibm_computeForce(level);
+	ibm_computeForce(g->level);
 
 	// Spread force
-	ibm_spread(level);
+	ibm_spread(g->level);
 
 	// Update the macroscopic values
-	ibm_updateMacroscopic(level);
+	ibm_updateMacroscopic(g->level);
 
 	// Perform FEM
-	if (hasFlexibleBodies[level])
-		ibm_moveBodies(level);
+	if (hasFlexibleBodies[g->level])
+		ibm_moveBodies(g->level);
+
+	// Do subiteration step to enforce kinematic condition at interface
+	if (doSubIterate == true && hasFlexibleBodies[g->level])
+		ibm_subIterate(g);
 }
 
 
@@ -62,22 +70,21 @@ void ObjectManager::ibm_moveBodies(int level) {
 	mpim->mpi_forceCommGather(level);
 #endif
 
-	// Loop through bodies and apply FEM
+	// Loop through flexible bodies and apply FEM
 	for (auto ib : IdxFEM) {
 
 		// Only do if on this grid level
-		if (iBody[ib]._Owner->level == level) {
+		if (iBody[ib]._Owner->level == level)
 			iBody[ib].fBody->dynamicFEM();
-		}
 	}
 
 	// ** SPREAD MARKER POSITIONS ACROSS RANKS
 
-	// Update the support points for all valid markers existing on this rank
-	for (int ib = 0; ib < iBody.size(); ib++) {
+	// Loop through flexible bodies and update the support points for all valid markers existing on this rank
+	for (auto ib : IdxFEM) {
 
-		// Only needs updating if flexible and on this level
-		if (iBody[ib].isFlexible == true && iBody[ib]._Owner->level == level)
+		// Only do if on this grid level
+		if (iBody[ib]._Owner->level == level)
 			ibm_findSupport(ib);
 	}
 
@@ -87,15 +94,64 @@ void ObjectManager::ibm_moveBodies(int level) {
 	ibm_computeDs(level);
 
 	// Find epsilon for the body
-#ifdef L_UNIVERSAL_EPSILON_CALC
-	ibm_findEpsilon(0);
-#else
-	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
-		ibm_findEpsilon(lev);
-#endif
+	ibm_findEpsilon(level);
+}
 
-	// ** RESET VEL & FORCES THEN SUBITERATE
 
+// *****************************************************************************
+/// \brief	Do sub-iteration to enforce correct kinematic condition at interface
+///
+/// \param level current grid level
+void ObjectManager::ibm_subIterate(GridObj *g) {
+
+	// While loop parameters
+	double res;
+	int it = 0;
+	int MAXIT = 10;
+	double TOL = 1e-4;
+	bool keepLooping = true;
+
+	// Do the while loop for sub iteration
+	do {
+
+		// Reset velocities to start of time step
+		g->u = g->u_n;
+
+		// Reset forces
+		g->_LBM_resetForces();
+
+		// Apply IBM again
+		ibm_apply(g, false);
+
+		// Get the residual
+		res = ibm_checkVelDiff(g->level);
+
+		// Increment counter
+		it++;
+
+		// Check while loop parameters
+		if (res < TOL || it > MAXIT)
+			keepLooping = false;
+
+	} while (keepLooping == true);
+
+	// Set the new start-of-timestep values
+	for (auto ib : IdxFEM) {
+
+		// If on this level
+		if (iBody[ib]._Owner->level == g->level) {
+
+			// Set displacement vector
+			iBody[ib].fBody->U_n = iBody[ib].fBody->U;
+
+			// Set elemental values
+			for (int el = 0; el < iBody[ib].fBody->elements.size(); el++) {
+				iBody[ib].fBody->elements[el].length_n = iBody[ib].fBody->elements[el].length;
+				iBody[ib].fBody->elements[el].angles_n = iBody[ib].fBody->elements[el].angles;
+				iBody[ib].fBody->elements[el].T_n = iBody[ib].fBody->elements[el].T;
+			}
+		}
+	}
 }
 
 
@@ -855,6 +911,42 @@ void ObjectManager::ibm_computeDs(int level) {
 	mpim->mpi_dsCommScatter(level);
 
 #endif
+}
+
+
+// *****************************************************************************
+/// \brief	Compute residual for subiteration step
+/// \param	level	current grid level
+double ObjectManager::ibm_checkVelDiff(int level) {
+
+	// Loop through all bodies and find maximum difference in velocity
+	double velMagDiff;
+	double res = 0.0;
+
+	// Loop through flexible bodies
+	for (auto ib : IdxFEM) {
+
+		// Only do if on this grid level
+		if (iBody[ib]._Owner->level == level) {
+
+			// Now loop through all markers
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+
+				// Get velocity difference
+				velMagDiff = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].markerVel, iBody[ib].markers[m].markerVel_km1));
+
+				// Normalise it
+				velMagDiff = velMagDiff / (iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
+
+				// Get the max difference
+				if (fabs(velMagDiff) > res)
+					res = fabs(velMagDiff);
+			}
+		}
+	}
+
+	// Return residual
+	return res;
 }
 
 // *****************************************************************************

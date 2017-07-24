@@ -126,7 +126,7 @@ public:
 	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
-	void ibm_apply(int level);														// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_apply(GridObj *g, bool doSubIterate);									// Apply interpolate, compute and spread operations for all bodies.
 	void ibm_initialise();															// Initialise a built immersed body with support.
 	double ibm_deltaKernel(double rad, double dilation);							// Evaluate kernel (delta function approximation).
 	void ibm_interpolate(int level);												// Interpolation of velocity field onto markers of ib-th body.
@@ -141,6 +141,8 @@ public:
 	void ibm_finaliseReadIn(int iBodyID);											// Do some house-keeping after geometry read in
 	void ibm_universalEpsilonGather(int level, IBBody &iBodyTmp);						// Gather all the markers into the temporary iBody vector
 	void ibm_universalEpsilonScatter(IBBody &iBodyTmp);								// Gather all the markers into the temporary iBody vector
+	void ibm_subIterate(GridObj *g);												// Subiterate to enforce correct kinematic conditions at interface
+	double ibm_checkVelDiff(int level);												// Check residual from sub-iteration step
 
 	// IBM Debug methods //
 	void ibm_debug_epsilon(int ib);

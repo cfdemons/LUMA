@@ -44,7 +44,7 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -67,7 +67,7 @@ const int resFactor = 2;
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*50)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY (resFactor*resFactor*2)			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES (resFactor*resFactor*5)		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
@@ -142,7 +142,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_TIMESTEP (0.001851852/(resFactor*resFactor))			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.2								///< End of domain in X (non-dimensional units)
+#define L_BX 2.5								///< End of domain in X (non-dimensional units)
 #define L_BY (0.41 + 2.0 / L_RESOLUTION)		///< End of domain in Y (non-dimensional units)
 #define L_BZ 1.0								///< End of domain in Z (non-dimensional units)
 
@@ -161,7 +161,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	   	///< Use an inlet profile
-#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity

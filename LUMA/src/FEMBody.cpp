@@ -113,6 +113,16 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 //
 void FEMBody::dynamicFEM () {
 
+	// Set values to start of timestep
+	U = U_n;
+
+	// Set elemental values
+	for (int el = 0; el < elements.size(); el++) {
+		elements[el].length = elements[el].length_n;
+		elements[el].angles = elements[el].angles_n;
+		elements[el].T = elements[el].T_n;
+	}
+
 	// Construct load vector as invariant during Newton-Raphson iterations
 	constructRVector();
 

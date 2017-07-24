@@ -405,6 +405,10 @@ void GridObj::LBM_initGrid() {
 	u.resize( N_lim*M_lim*K_lim*L_DIMS );
 	LBM_initVelocity();
 	
+	// Set start-of-timestep-velocity
+	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u_n = u;
+
 	// Density field
 	rho.resize( N_lim*M_lim*K_lim );
 	LBM_initRho();
@@ -583,6 +587,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid) {
 	// Velocity
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity( );
+
+	// Set start-of-timestep-velocity
+	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u_n = u;
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);

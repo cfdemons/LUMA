@@ -88,7 +88,7 @@ void GridObj::LBM_multi_opt(int subcycle) {
 	}
 
 	// Perform IBM steps (interpolate, force calc, spread and update macro)
-	objman->ibm_apply(this->level);
+	objman->ibm_apply(this, true);
 
 
 	// Loop over grid

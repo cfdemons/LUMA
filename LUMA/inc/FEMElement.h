@@ -68,7 +68,9 @@ private:
 	// Geometry properties
 	double length0;									///< Initial length of element
 	double length;									///< Current length of element
+	double length_n;								///< Length of element at start of timestep
 	double angles;									///< Current orientation of element
+	double angles_n;								///< Orientation of element at start of timestep
 	double area;									///< Cross-sectional area of element
 	double I;										///< Second moment areas
 
@@ -78,6 +80,7 @@ private:
 
 	// Transformation matrix
 	std::vector<std::vector<double>> T;				///< Local transformation matrix
+	std::vector<std::vector<double>> T_n;				///< Local transformation matrix
 
 	// Internal forces
 	std::vector<double> F;							///< Vector of internal forces

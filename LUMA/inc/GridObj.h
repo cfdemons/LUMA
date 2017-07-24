@@ -74,6 +74,7 @@ private :
 	IVector<double> feq;			///< Equilibrium distribution functions
 	IVector<double> fNew;			///< Copy of distribution functions
 	IVector<double> u;				///< Macropscopic velocity components
+	IVector<double> u_n;			///< Macropscopic velocity components at start of current time step
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
 

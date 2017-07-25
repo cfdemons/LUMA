@@ -65,7 +65,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 10			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
@@ -100,7 +100,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
 #define L_USE_BGKSMAG
-#define L_CSMAG 0.06
+#define L_CSMAG 0.1
 
 
 /*
@@ -109,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 500		///< Number of time steps to run simulation for
 
 
 /*
@@ -141,8 +141,8 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 // Lattice properties
 #define L_DIMS 2			///< Number of dimensions to the problem
-#define L_RESOLUTION 8		///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.01	///< The timestep in non-dimensional units
+#define L_RESOLUTION 10		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.005	///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 7.5		///< End of domain in X (non-dimensional units)
@@ -170,7 +170,9 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
-#define L_RE 3000			///< Desired Reynolds number
+#define L_RE 5000			///< Desired Reynolds number
+#define L_REYNOLDS_RAMP		///< Switch to enable/disable ramping of the Reynolds number from Re = 100
+#define L_RAMP_DURATION 500	///< How many time steps over which to ramp
 
 
 /*
@@ -202,7 +204,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_WALL_BACK		eSlipBack		///< BC used on the bottom of the domain
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
-//#define L_VELOCITY_REGULARISED	///< Specify the inlet BC to be a regularised velocity condition (Latt & Chopard)
+#define L_VELOCITY_REGULARISED	///< Specify the inlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of wall
@@ -236,7 +238,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.125 }, { 0.125 }, { 0.75 }, { 0.8 }, { 1.4 }
+	{ 0.1 }, { 0.1 }, { 0.5 }, { 0.6 }, { 1.4 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
@@ -249,15 +251,15 @@ static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] =
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 1.2 }, { 1.0 }, { 0.8 }, { 0.65 }, { 0.625 }
+	{ 1.0 }, { 0.8 }, { 0.65 }, { 0.6 }, { 0.55 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 0.2 }, { 0.4 }, { 0.5 }, { 0.55 }, { 0.525 }
+	{ 0.2 }, { 0.4 }, { 0.5 }, { 0.55 }, { 0.575 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 1.4 }, { 1.2 }, { 1.1 }, { 1.05 }, { 1.025 }
+	{ 1.4 }, { 1.2 }, { 1.1 }, { 1.05 }, { 1.075 }
 };
 
 #endif

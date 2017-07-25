@@ -151,6 +151,8 @@ public :
 
 private :
 
+	void _LBM_updateReynolds(double newReynolds);		// Updates the reynolds number at run time
+
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.

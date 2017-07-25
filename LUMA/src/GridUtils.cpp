@@ -450,10 +450,9 @@ eType GridUtils::setBCPrecedence(eType currentBC, eType desiredBC)
 	else if (currentBC == eVelocity) return eVelocity;
 	else return desiredBC;
 }
-static eType setBCPrecedence(eType desiredBC);
 
 // *****************************************************************************
-/// \brief	Finds out whether halo containng i,j,k links to neighbour rank periodically.
+/// \brief	Finds out whether halo containing i,j,k links to neighbour rank periodically.
 ///
 ///			Checks the receiver layer containing local site i,j,k and determines 
 ///			from the MPI topology information whether this layer couples to an 

@@ -28,7 +28,14 @@
 ///			Use with caution.
 ///
 ///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
-void GridObj::LBM_multi_opt(int subcycle) {
+void GridObj::LBM_multi_opt(int subcycle)
+{
+
+#ifdef L_REYNOLDS_RAMP
+	// Update the Reynolds number if ramping up
+	if (t < L_RAMP_DURATION) _LBM_updateReynolds(
+		static_cast<double>(L_RE) * (static_cast<double>(t + 1) / static_cast<double>(L_RAMP_DURATION)));
+#endif
 
 	// Two iterations on sub-grid first
 	if (subGrid.size()) {
@@ -1223,6 +1230,22 @@ void GridObj::_LBM_kbcCollide_opt(int id)
 			(1.0 / beta_m1) * (2.0 * ds[v] + gamma * dh[v]) +
 			force_i[v + id * L_NUM_VELS];
 	}
+
+}
+// *****************************************************************************
+/// \brief	Updates the Reynolds number at run time.
+///
+///			Sets the Reynolds number and adjusts all Reynolds-number dependent 
+///			grid quantities to match i.e. omega and nu.
+///
+/// \param newReynolds	the Reynolds number to set.
+void GridObj::_LBM_updateReynolds(double newReynolds)
+{
+	// Update Nu
+	nu = GridUnits::nud2nulbm(1.0 / static_cast<double>(newReynolds), this);
+
+	// Update Omega
+	omega = 1.0 / ((nu / SQ(cs)) + 0.5);
 
 }
 // *****************************************************************************

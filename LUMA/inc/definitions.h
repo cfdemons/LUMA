@@ -67,8 +67,8 @@ const int resFactor = 2;
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*2)			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES (resFactor*resFactor*5)		///< Specific output frequency of body forces
+#define L_OUT_EVERY (resFactor*resFactor*20)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES L_OUT_EVERY		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
 // Types of output

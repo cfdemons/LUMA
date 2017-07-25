@@ -603,7 +603,7 @@ void FEMBody::updateFEMNodes () {
 			nodes[n].position[d] = nodes[n].position0[d] + U[n*DOFsPerNode+d];
 
 		// Set angle
-		nodes[n].angles = nodes[n].angles + U[n*DOFsPerNode+L_DIMS];
+		nodes[n].angles = nodes[n].angles0 + U[n*DOFsPerNode+L_DIMS];
 	}
 
 	// Set the new angles and lengths of the elements
@@ -629,7 +629,8 @@ void FEMBody::updateFEMNodes () {
 void FEMBody::updateIBMarkers() {
 
 	// Parameters
-	int el, zeta, length;
+	int el;
+	double zeta, length;
 	std::vector<double> ULocal, UnodeLocal, UnodeGlobal;
 	std::vector<double> UDotLocal, UDotNodeLocal, UDotNodeGlobal;
 	std::vector<double> UGlobal(DOFsPerElement, 0.0);
@@ -662,13 +663,13 @@ void FEMBody::updateIBMarkers() {
 
 		// Get the IB node displacements in global coordinates
 		UnodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UnodeLocal);
-		UDotNodeGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UDotNodeLocal);
+		UDotNodeGlobal = GridUtils::vecmultiply(iBodyPtr->_Owner->dt / iBodyPtr->_Owner->dh, GridUtils::matrix_multiply(GridUtils::matrix_transpose(T), UDotNodeLocal));
 
 		// Set the IBM node
 		for (int d = 0; d < L_DIMS; d++) {
 			iBodyPtr->markers[node].position[d] = iBodyPtr->markers[node].position0[d] + UnodeGlobal[d];
 			iBodyPtr->markers[node].markerVel_km1[d] = iBodyPtr->markers[node].markerVel[d];
-			iBodyPtr->markers[node].markerVel[d] = L_RELAX * UDotNodeGlobal[d] * iBodyPtr->_Owner->dt / iBodyPtr->_Owner->dh + (1.0 - L_RELAX) * iBodyPtr->markers[node].markerVel_km1[d];
+			iBodyPtr->markers[node].markerVel[d] = L_RELAX * UDotNodeGlobal[d] + (1.0 - L_RELAX) * iBodyPtr->markers[node].markerVel_km1[d];
 		}
 	}
 }

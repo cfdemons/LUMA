@@ -1162,4 +1162,35 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	fout.close();
 }
 
+// ************************************************************************** //
+/// \brief	Write out tip positions of flexible filaments
+///
+/// \param	tval	time value at which the write out is being performed.
+void ObjectManager::io_writeTipPositions(int tval) {
+
+	// Loop through FEM bodies which this rank owns
+	for (auto ib : IdxFEM) {
+
+		// Create string and file streams
+		std::ofstream fout;
+		fout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_TipPositions.out", std::ios::app);
+
+		// Write out header
+		if (tval == 0)
+			fout << "Timestep\tt\tTipX\tTipY\tTipZ" << std::endl;
+
+		// Index of last markers
+		int idx = iBody[ib].markers.size() - 1;
+
+		// Write out data
+		fout << tval << "\t" << tval * _Grids->dt << "\t" << iBody[ib].markers[idx].position[eXDirection] << "\t"
+														  << iBody[ib].markers[idx].position[eYDirection] << "\t"
+														  << iBody[ib].markers[idx].position[eZDirection] << std::endl;
+
+		// Close file
+		fout.close();
+	}
+}
+
+
 // *****************************************************************************

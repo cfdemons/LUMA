@@ -67,7 +67,7 @@ const int resFactor = 2;
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*10)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY (resFactor*resFactor*5)			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES L_OUT_EVERY		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
@@ -192,6 +192,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
 #define L_NB_DELTA 0.5					///< Parameter for Newmark-Beta time integration (0.5 for 2nd order)
 #define L_RELAX 0.5						///< Under-relaxation for FSI coupling
+#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
 
 /*
 *******************************************************************************

@@ -44,7 +44,7 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -67,7 +67,7 @@ const int resFactor = 2;
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*20)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY (resFactor*resFactor*10)			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES L_OUT_EVERY		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8		///< Precision of output (for text writers)
 
@@ -111,7 +111,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (resFactor*resFactor*5000)		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS (resFactor*resFactor*15000)		///< Number of time steps to run simulation for
 
 
 /*
@@ -139,7 +139,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 // Lattice properties
 #define L_DIMS 2				///< Number of dimensions to the problem
 #define L_RESOLUTION (resFactor*100)			///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP (0.001851852/(resFactor*resFactor))			///< The timestep in non-dimensional units
+#define L_TIMESTEP (0.002380952/(resFactor*resFactor))			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 2.5								///< End of domain in X (non-dimensional units)
@@ -150,7 +150,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density
-#define L_RHO_REF 1.0
+#define L_RHO_REF 1000.0
 
 
 /*

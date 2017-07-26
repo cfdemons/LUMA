@@ -135,6 +135,15 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 
 	} while (keepLooping == true);
 
+	// Get time averaged sub-iteration values
+	timeav_subResidual *= (g->t % L_OUT_EVERY);
+	timeav_subResidual += res;
+	timeav_subResidual /= (g->t % L_OUT_EVERY + 1);
+
+	timeav_subIterations *= (g->t % L_OUT_EVERY);
+	timeav_subIterations += it;
+	timeav_subIterations /= (g->t % L_OUT_EVERY + 1);
+
 	// Set the new start-of-timestep values
 	for (auto ib : IdxFEM) {
 
@@ -143,12 +152,39 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 
 			// Set displacement vector
 			iBody[ib].fBody->U_n = iBody[ib].fBody->U;
+			iBody[ib].fBody->Udot_n = iBody[ib].fBody->Udot;
+			iBody[ib].fBody->Udotdot_n = iBody[ib].fBody->Udotdot;
 
 			// Set elemental values
 			for (int el = 0; el < iBody[ib].fBody->elements.size(); el++) {
 				iBody[ib].fBody->elements[el].length_n = iBody[ib].fBody->elements[el].length;
 				iBody[ib].fBody->elements[el].angles_n = iBody[ib].fBody->elements[el].angles;
 				iBody[ib].fBody->elements[el].T_n = iBody[ib].fBody->elements[el].T;
+			}
+
+			// Get time averaged FEM values
+			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMIterations += iBody[ib].fBody->it;
+			iBody[ib].fBody->timeav_FEMIterations /= (g->t % L_OUT_EVERY + 1);
+
+			iBody[ib].fBody->timeav_FEMResidual *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMResidual += iBody[ib].fBody->res;
+			iBody[ib].fBody->timeav_FEMResidual /= (g->t % L_OUT_EVERY + 1);
+		}
+	}
+
+	// Write out time-averaged iterator loop values
+	if (g->t % L_OUT_EVERY == 0) {
+
+		// Write out
+		*GridUtils::logfile << "Grid " << g->level << ": Sub-iterations taking " << timeav_subIterations <<
+				" iterations to reach a residual of " << timeav_subResidual << std::endl;
+
+		// Write out FEM body values
+		for (auto ib : IdxFEM) {
+			if (iBody[ib]._Owner->level == g->level) {
+				*GridUtils::logfile << "Body " << iBody[ib].id << ": FEM solver taking " << iBody[ib].fBody->timeav_FEMIterations <<
+						" iterations to reach a residual of " << iBody[ib].fBody->timeav_FEMResidual << std::endl;
 			}
 		}
 	}

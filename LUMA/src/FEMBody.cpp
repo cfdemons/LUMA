@@ -29,8 +29,10 @@ FEMBody::FEMBody () {
 	DOFsPerNode = 0;
 	DOFsPerElement = 0;
 	systemDOFs = 0;
-	NRIterations = 0;
-	NRResidual = 0.0;
+	it = 0;
+	res = 0.0;
+	timeav_FEMIterations = 0.0;
+	timeav_FEMResidual = 0.0;
 	BC_DOFs = 0;
 }
 
@@ -49,8 +51,10 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	DOFsPerNode = 3;
 	DOFsPerElement = 6;
 	systemDOFs = (nElements + 1) * DOFsPerNode;
-	NRIterations = 0;
-	NRResidual = 0.0;
+	it = 0;
+	res = 0.0;
+	timeav_FEMIterations = 0.0;
+	timeav_FEMResidual = 0.0;
 
 	// Set number of DOFs to remove in BC
 	if (clamped == true)
@@ -106,7 +110,9 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	U_n.resize(systemDOFs, 0.0);
 	delU.resize(systemDOFs, 0.0);
 	Udot.resize(systemDOFs, 0.0);
+	Udot_n.resize(systemDOFs, 0.0);
 	Udotdot.resize(systemDOFs, 0.0);
+	Udotdot_n.resize(systemDOFs, 0.0);
 }
 
 // \brief Main outer routine for solving FEM.
@@ -115,6 +121,8 @@ void FEMBody::dynamicFEM () {
 
 	// Set values to start of timestep
 	U = U_n;
+	Udot = Udot_n;
+	Udotdot = Udotdot_n;
 
 	// Set elemental values
 	for (int el = 0; el < elements.size(); el++) {
@@ -127,8 +135,6 @@ void FEMBody::dynamicFEM () {
 	constructRVector();
 
 	// While loop parameters
-	double res;
-	int it;
 	double TOL = 1e-10;
 	double MAXIT = 20;
 
@@ -148,10 +154,6 @@ void FEMBody::dynamicFEM () {
 		it++;
 
 	} while (res > TOL && it < MAXIT);
-
-	// Store the number of iterations
-	NRIterations = it;
-	NRResidual = res;
 
 	// Calculate velocities and accelerations
 	updateVelocityAndAcceleration();

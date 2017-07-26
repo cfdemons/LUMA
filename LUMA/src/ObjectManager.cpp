@@ -64,6 +64,10 @@ ObjectManager::ObjectManager(GridObj* g) : _Grids(g)
 
 	// Resize vector of flexible body flags
 	hasFlexibleBodies.resize(L_NUM_LEVELS+1 ,false);
+
+	// Set sub-iteration loop values
+	timeav_subResidual = 0.0;
+	timeav_subIterations = 0.0;
 };
 
 // ************************************************************************* //

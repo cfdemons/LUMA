@@ -111,6 +111,10 @@ private:
 	// Vector of indices for iBody vector for which this rank owns and is flexible
 	std::vector<int> IdxFEM;
 
+	// Subiteration loop parameters
+	double timeav_subResidual;
+	double timeav_subIterations;
+
 	/* Methods */
 
 private:

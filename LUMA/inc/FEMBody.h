@@ -65,13 +65,15 @@ class FEMBody {
 	/************** Member Data **************/
 
 	// System values
-	IBBody *iBodyPtr;			///< Pointer to owning iBody
-	int DOFsPerNode;			///< DOFs per node
-	int DOFsPerElement;			///< DOFs per element
-	int systemDOFs;				///< DOFs for whole system
-	int BC_DOFs;				///< Number of DOFs removed when applying BCs
-	int NRIterations;			///< Number of iterations for Newton-Raphson solver
-	double NRResidual;			///< Residual Newton-Raphson solver reached
+	IBBody *iBodyPtr;				///< Pointer to owning iBody
+	int DOFsPerNode;				///< DOFs per node
+	int DOFsPerElement;				///< DOFs per element
+	int systemDOFs;					///< DOFs for whole system
+	int BC_DOFs;					///< Number of DOFs removed when applying BCs
+	int it;							///< Number of iterations for Newton-Raphson solver
+	double res;						///< Residual Newton-Raphson solver reached
+	double timeav_FEMIterations;	///< Number of iterations for Newton-Raphson solver (time-averaged)
+	double timeav_FEMResidual;		///< Residual Newton-Raphson solver reached (time-averaged)
 
 	// Nodes and elements
 	std::vector<FEMNode> nodes;				///< Vector of FEM nodes
@@ -87,7 +89,9 @@ class FEMBody {
 	std::vector<double> U_n;					///< Vector of displacements at start of current time step
 	std::vector<double> delU;					///< Vector of incremental displacements
 	std::vector<double> Udot;					///< Vector velocities
+	std::vector<double> Udot_n;					///< Vector velocities at start of current time step
 	std::vector<double> Udotdot;				///< Vector of accelerations
+	std::vector<double> Udotdot_n;				///< Vector of accelerations at start of current time step
 
 	// Vector of parent elements for each IBM node
 	std::vector<IBMParentElements> IBNodeParents;

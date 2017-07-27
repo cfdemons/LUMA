@@ -63,6 +63,7 @@
 #include <numeric>
 #include <valarray>
 #include <assert.h>
+#include <functional>
 
 // Check OS is Windows or not
 #ifdef _WIN32
@@ -109,53 +110,6 @@
 
 // Failure coede
 #define LUMA_FAILED 12345
-
-
-/****************************************************/
-// Our headers (include after the enumerations) //
-/****************************************************/
-
-// Include definitions, singletons and headers to be made available everywhere for convenience.
-#include "definitions.h"
-#include "GridManager.h"
-#include <mpi.h>
-#include "MpiManager.h"
-#include "GridUtils.h"
-#include "GridUnits.h"
-
-
-/****************************************************/
-// Our global functions //
-/****************************************************/
-
-// Global variable references
-extern const int c[3][L_NUM_VELS];				///< Lattice velocities
-extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
-extern const double w[L_NUM_VELS];				///< Quadrature weights
-extern const double cs;							///< Lattice sound speed
-
-// Debug stuff -- maybe I should put all these debug statements into some static
-// class and just compile blank functions if not in debugging mode?
-#ifdef L_IBM_DEBUG
-#define L_DACTION_WRITE_OUT_FORCES \
-std::ofstream testout; \
-testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app); \
-testout << "\nNEW TIME STEP" << std::endl; \
-for (size_t j = 1; j < M_lim - 1; j++) { \
-	for (size_t i = 0; i < N_lim; i++) { \
-		for (size_t v = 0; v < L_NUM_VELS; v++) { \
-			testout << force_i(i, j, 0, v, M_lim, K_lim, L_NUM_VELS) << "\t"; \
-		} \
-		testout << std::endl; \
-	} \
-	testout << std::endl; \
-} \
-testout.close(); \
-
-#else
-	#define L_DACTION_WRITE_OUT_FORCES
-#endif
-
 
 /// Error definition
 #define L_ERROR errorfcn	///< Error function shorthand
@@ -211,5 +165,54 @@ inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 
 	*logfile << "WARNING: " << msg << std::endl;
 }
+
+
+
+/****************************************************/
+// Our headers (include after the enumerations) //
+/****************************************************/
+
+// Include definitions, singletons and headers to be made available everywhere for convenience.
+#include "definitions.h"
+#include "GridManager.h"
+#include <mpi.h>
+#include "MpiManager.h"
+#include "GridUtils.h"
+#include "GridUnits.h"
+
+
+/****************************************************/
+// Our global functions //
+/****************************************************/
+
+// Global variable references
+extern const int c[3][L_NUM_VELS];				///< Lattice velocities
+extern const int c_opt[L_NUM_VELS][3];			///< Lattice velocities optimised arrangement
+extern const double w[L_NUM_VELS];				///< Quadrature weights
+extern const double cs;							///< Lattice sound speed
+
+// Debug stuff -- maybe I should put all these debug statements into some static
+// class and just compile blank functions if not in debugging mode?
+#ifdef L_IBM_DEBUG
+#define L_DACTION_WRITE_OUT_FORCES \
+std::ofstream testout; \
+testout.open(GridUtils::path_str + "/force_i_LB.out", std::ios::app); \
+testout << "\nNEW TIME STEP" << std::endl; \
+for (size_t j = 1; j < M_lim - 1; j++) { \
+	for (size_t i = 0; i < N_lim; i++) { \
+		for (size_t v = 0; v < L_NUM_VELS; v++) { \
+			testout << force_i(i, j, 0, v, M_lim, K_lim, L_NUM_VELS) << "\t"; \
+		} \
+		testout << std::endl; \
+	} \
+	testout << std::endl; \
+} \
+testout.close(); \
+
+#else
+	#define L_DACTION_WRITE_OUT_FORCES
+#endif
+
+
 
 #endif

@@ -132,7 +132,6 @@ std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> ve
 	}
 	return result;
 }
-	
 
 // *****************************************************************************
 /// \brief	Creates a linearly-spaced vector of values.
@@ -1105,7 +1104,8 @@ bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, Gr
 /// \param	edge			combination of cartesian direction and choice of edge.
 /// \param	grid		given grid on which to check.
 /// \return	boolean answer.
-bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, GridObj const * grid) {
+bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, GridObj const * grid)
+{
 
 	// L0 has no TL so always return false
 	if (grid->level == 0) return false;
@@ -1172,6 +1172,110 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, Grid
 	if (position >= left_edge && position < right_edge) return true;
 	else return false;
 
+}
+
+// *****************************************************************************
+/// \brief	Determines whether a location is within the domain wall regions.
+///
+///			Wraps the more complicated version which offers more information.
+///
+///	\param		posX			X position to be queried.
+///	\param		posY			Y position to be queried.
+///	\param		posZ			Z position to be queried.
+/// \param[out] inwardVector	unit vector pointing into the domain.
+/// \return	boolean answer.
+bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ, std::vector<int>* inwardVector)
+{
+	// Declare missing quantities
+	if (!inwardVector)
+	{
+		std::vector<int> ivec(3);
+		inwardVector = &ivec;
+	}
+	eCartesianDirection dir;
+	unsigned int edges;
+
+	// Call wrapper
+	return isWithinDomainWall(posX, posY, posZ, inwardVector, &dir, &edges);
+
+}
+
+// *****************************************************************************
+/// \brief	Determines whether a location is within the domain wall regions.
+///
+///			If passed certain other quantities more information is provided about
+///			the specific location.
+///
+///	\param		posX			X position to be queried.
+///	\param		posY			Y position to be queried.
+///	\param		posZ			Z position to be queried.
+/// \param[out]	inwardVector	unit vector pointing into the domain.
+/// \param[out]	normalDirection	if appropriate, returns direction of wall normal.
+/// \param[out]	edgeCount		an integer indicating number of non-zero inward 
+///								vector components. Can be used to quickly identify 
+///								if it is a side, edge or corner.
+/// \return	boolean answer.
+bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ, 
+	std::vector<int>* inwardVector, eCartesianDirection* normalDirection, unsigned int* edgeCount)
+{
+	// Reset variables
+	std::fill(inwardVector->begin(), inwardVector->end(), 0);
+	*normalDirection = eNoDirection;
+	*edgeCount = 0;
+
+	// Left wall
+	if (posX > 0.0 && posX < L_WALL_THICKNESS_LEFT)
+	{
+		*normalDirection = eXDirection;
+		(*inwardVector)[*normalDirection] = 1;
+		(*edgeCount)++;
+	}
+
+	// Right wall
+	if (posX < L_BX && posX > L_BX - L_WALL_THICKNESS_RIGHT)
+	{
+		*normalDirection = eXDirection;
+		(*inwardVector)[*normalDirection] = -1;
+		(*edgeCount)++;
+	}
+
+	// Bottom wall
+	else if (posY > 0.0 && posY < L_WALL_THICKNESS_BOTTOM)
+	{
+		*normalDirection = eYDirection;
+		(*inwardVector)[*normalDirection] = 1;
+		(*edgeCount)++;
+	}
+
+	// Top wall
+	else if (posY < L_BY && posY > L_BY - L_WALL_THICKNESS_TOP)
+	{
+		*normalDirection = eYDirection;
+		(*inwardVector)[*normalDirection] = -1;
+		(*edgeCount)++;
+	}
+
+#if (L_DIMS == 3)
+
+	// Front wall
+	else if (posZ > 0.0 && posZ < L_WALL_THICKNESS_FRONT)
+	{
+		*normalDirection = eZDirection;
+		(*inwardVector)[*normalDirection] = 1;
+		(*edgeCount)++;
+	}
+
+	// Back wall
+	else if (posZ < L_BZ && posZ > L_BZ - L_WALL_THICKNESS_BACK)
+	{
+		*normalDirection = eZDirection;
+		(*inwardVector)[*normalDirection] = -1;
+		(*edgeCount)++;
+	}
+#endif
+
+	if (*edgeCount > 0) return true;
+	else return false;
 }
 
 // ****************************************************************************

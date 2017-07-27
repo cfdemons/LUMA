@@ -65,7 +65,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 10			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 50			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
@@ -109,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 500		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -171,8 +171,7 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
 #define L_RE 5000			///< Desired Reynolds number
-#define L_REYNOLDS_RAMP		///< Switch to enable/disable ramping of the Reynolds number from Re = 100
-#define L_RAMP_DURATION 500	///< How many time steps over which to ramp
+#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 
 /*
@@ -199,12 +198,14 @@ const static double cProbeLimsZ[2] = {0.5, 0.5};	///< Limits of Z plane for arra
 #define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
 #define L_WALL_RIGHT	eVelocity		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
-#define L_WALL_TOP		eSlipTop		///< BC used on the top of the domain
-#define L_WALL_FRONT	eSlipFront		///< BC used on the front of the domain
-#define L_WALL_BACK		eSlipBack		///< BC used on the bottom of the domain
+#define L_WALL_TOP		eSlip			///< BC used on the top of the domain
+#define L_WALL_FRONT	eSlip			///< BC used on the front of the domain
+#define L_WALL_BACK		eSlip			///< BC used on the bottom of the domain
 
-// Type of Inlet/Outlet BC (default Forced Equilibrium)
-#define L_VELOCITY_REGULARISED	///< Specify the inlet BC to be a regularised velocity condition (Latt & Chopard)
+// BC qualifiers
+//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+//#define L_OUTLET_EXTRAPOLATED		///< Specifies that the outlet BC extrapolates information from the domain
+//#define L_VELOCITY_RAMP 100		///< Defines the number of timesteps over which to ramp up the inlet velocity
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of wall

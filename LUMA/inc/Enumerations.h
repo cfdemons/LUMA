@@ -22,7 +22,8 @@ enum eCartesianDirection
 {
 	eXDirection,	///< X-direction
 	eYDirection,	///< Y-direction
-	eZDirection		///< Z-direction
+	eZDirection,	///< Z-direction
+	eNoDirection	///< Null option
 };
 
 /// \enum eCartMinMax
@@ -92,14 +93,44 @@ enum eType
 	eTransitionToFiner,		///< Fluid site coupled to a finer grid
 	eBFL,					///< Site containing a BFL marker
 	eVelocity,				///< Velocity boundary
-	eExtrapolation,			///< Extrapolation (outlet) site
+	ePressure,				///< Pressure boundary
+	eSlip					///< Slip boundary
+};
 
-	eSlipLeft,				///< Slip boundary (+x normal)
-	eSlipRight,				///< Slip boundary (-x normal)
-	eSlipBottom,			///< Slip boundary (+y normal)
-	eSlipTop,				///< Slip boundary (-y normal)
-	eSlipFront,				///< Slip boundary (+z normal)
-	eSlipBack,				///< Slip boundary (-z normal)
+/// \enum eWallLocation
+/// \brief Enumeration to describe locations in terms of domain walls.
+enum eWallLocation
+{
+	eLeftWall,		///< Left wall location
+	eRightWall,		///< Right wall location
+	eBottomWall,	///< Bottom wall location
+	eTopWall,		///< Top wall location
+	eFrontWall,		///< Front wall location
+	eBackWall,		///< Back wall location
+
+	eLeftBottomWall,	///< Left-bottom edge/corner
+	eLeftTopWall,		///< Left-top edge/corner
+	eRightBottomWall,	///< Right-bottom edge/corner
+	eRightTopWall,		///< Right-top edge/corner
+
+	eLeftFrontWall,		///< Left-front edge
+	eLeftBackWall,		///< Left-back edge
+	eRightFrontWall,	///< Right-front edge
+	eRightBackWall,		///< Right-back edge
+
+	eBottomFrontWall,	///< Bottom-front edge
+	eBottomBackWall,	///< Bottom-front edge
+	eTopFrontWall,		///< Top-front edge
+	eTopBackWall,		///< Top-front edge
+
+	eLeftBottomFrontWall,	///< Bottom-left-front corner
+	eRightBottomFrontWall,	///< Bottom-right-front corner
+	eLeftTopFrontWall,		///< Top-left-front corner
+	eRightTopFrontWall,		///< Top-right-front corner
+	eLeftBottomBackWall,	///< Bottom-left-back corner
+	eRightBottomBackWall,	///< Bottom-right-back corner
+	eLeftTopBackWall,		///< Top-left-back corner
+	eRightTopBackWall,		///< Top-right-back corner
 };
 
 /// \enum  eIOFlag
@@ -126,6 +157,7 @@ enum eObjectType {
 enum eHdf5SlabType {
 	eScalar,		///< 2/3D data	-- One variable per grid site
 	eVector,		///< 2/3D data	-- L_DIMS variables per grid site
+	eLatticeVector,	///< 2/3D data	-- L_NUM_VELS variables per grid site
 	eProductVector,	///< 1D data	-- 3*L_DIMS-3 variables per grid site
 	ePosX,			///< 1D data	-- Single L_dim vector per dimension
 	ePosY,			///< 1D data	-- Single L_dim vector per dimension

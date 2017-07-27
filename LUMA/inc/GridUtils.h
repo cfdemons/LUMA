@@ -96,8 +96,27 @@ public:
 	static void getEnclosingVoxel(double x, GridObj const * const g, eCartesianDirection dir, int *ijk);
 	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);	// Is site on any TL to upper
 	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);			// Is site on specified TL to upper
+	static bool isWithinDomainWall(double posX, double posY, double posZ, std::vector<int>* normalVector = nullptr);
+	static bool isWithinDomainWall(double posX, double posY, double posZ,
+		std::vector<int>* normalVector, eCartesianDirection* normalDirection, unsigned int* edgeCount);	// Is site within a wall region
 
 	// Templated functions //
+
+	/// \brief	Multiplies a scalar by a vector.
+	/// \param	vec1	a vector double.
+	/// \param	vec2	another vector double.
+	/// \return a vector which is an elementwise mulitplication of the two vectors.
+	template <typename T, typename T1, typename Ret>
+	static std::vector<Ret> vecmultiply(std::vector<T> vec1, std::vector<T1> vec2)
+	{
+		assert(vec1.size() == vec2.size());
+		std::vector<Ret> result(vec1.size());
+		for (size_t i = 0; i < vec1.size(); i++)
+		{
+			result[i] = vec1[i] * vec2[i];
+		}
+		return result;
+	}
 
 	/// \brief Computes the L2-norm.
 	/// \param a1 first component of the vector
@@ -179,6 +198,77 @@ public:
 			buf_offset += block;
 		}
 	};
+
+	/// \brief	Function capable of extrapolating any quantity.
+	///
+	///	\param	grid		grid on which quantity resides.
+	/// \param	quantity	quantity to search.
+	/// \param	direction	direction in which to source extrapolation data.
+	///	\param	order		order of extrapolation.
+	/// \param	i			target site x index.
+	/// \param	j			target site y index.
+	/// \param	k			target site z index.
+	/// \param	p			target site extra index.
+	/// \param	max			extra index max size for flattening.
+	///	\returns			extrapolated value.
+	template <typename NumType>
+	static NumType extrapolate(GridObj const & grid, IVector<NumType> const & quantity,
+		const std::vector<int> direction, int order, 
+		const int i, const int j, const int k,
+		const int p = NULL, const int max = 1)
+	{
+		int status = 0;
+		NumType result;
+
+		if (order == 0)
+		{
+			int i1 = i + direction[eXDirection];
+			int j1 = j + direction[eYDirection];
+			int k1 = k + direction[eZDirection];
+
+			if (GridUtils::isOffGrid(i1, j1, k1, &grid))
+				status = -1;
+			else
+				result = quantity[flatten(i1, j1, k1, p, max, grid)];
+
+		}
+		else if (order == 1)
+		{
+			int i1 = i + direction[eXDirection];
+			int i2 = i1 + direction[eXDirection];
+			int j1 = j + direction[eYDirection];
+			int j2 = j1 + direction[eYDirection];
+			int k1 = k + direction[eZDirection];
+			int k2 = k1 + direction[eZDirection];
+
+			if (GridUtils::isOffGrid(i1, j1, k1, &grid) || GridUtils::isOffGrid(i2, j2, k2, &grid))
+				status = -1;
+			else
+			{
+				result = 2.0 * quantity[flatten(i1, j1, k1, p, max, grid)] -
+					quantity[flatten(i2, j2, k2, p, max, grid)];
+			}
+		}
+		else
+			L_ERROR("Invalid order of extrapolation requested.", GridUtils::logfile);
+
+		if (status != 0)
+		{
+			std::string msg;
+			msg += "Extrapolation does not have enough available cells.";
+			L_ERROR(msg, GridUtils::logfile);
+		}
+
+		return result;
+	};
+
+
+private:
+	/// 2D/3D/4D flattener
+	static int flatten(const int i, const int j, const int k, const int v, const int max, GridObj const & grid)
+	{
+		return (v + k * max + j * max * grid.K_lim + i * max * grid.K_lim * grid.M_lim);
+	}
 
 };
 

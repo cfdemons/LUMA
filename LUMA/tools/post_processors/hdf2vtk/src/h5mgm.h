@@ -82,13 +82,7 @@ enum eType
 	eBFL,					///< Site containing a BFL marker
 	eVelocity,				///< Velocity boundary
 	eExtrapolation,			///< Extrapolation (outlet) site
-
-	eSlipLeft,				///< Slip boundary (+x normal)
-	eSlipRight,				///< Slip boundary (-x normal)
-	eSlipBottom,			///< Slip boundary (+y normal)
-	eSlipTop,				///< Slip boundary (-y normal)
-	eSlipFront,				///< Slip boundary (+z normal)
-	eSlipBack,				///< Slip boundary (-z normal)
+	eSlip					///< Slip boundary
 };
 
 // Error enumeration

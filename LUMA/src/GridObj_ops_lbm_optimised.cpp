@@ -33,8 +33,8 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 #ifdef L_REYNOLDS_RAMP
 	// Update the Reynolds number if ramping up
-	if (t < L_RAMP_DURATION) _LBM_updateReynolds(
-		static_cast<double>(L_RE) * (static_cast<double>(t + 1) / static_cast<double>(L_RAMP_DURATION)));
+	if (t < L_REYNOLDS_RAMP) _LBM_updateReynolds(
+		static_cast<double>(L_RE)* (static_cast<double>(t + 1) / static_cast<double>(L_REYNOLDS_RAMP)));
 #endif
 
 	// Two iterations on sub-grid first
@@ -74,7 +74,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 #endif
 				// IGNORE THESE SITES //
 				if (type_local == eRefined || type_local == eSolid
-#ifndef L_VELOCITY_REGULARISED
+#ifndef L_REGULARISED_BOUNDARIES
 					|| type_local == eVelocity
 #endif
 					) continue;
@@ -86,7 +86,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 				_LBM_macro_opt(i, j, k, id, type_local);
 
 				// REGULARISED BCs //
-#ifdef L_VELOCITY_REGULARISED
+#ifdef L_REGULARISED_BOUNDARIES
 				if (type_local == eVelocity)
 					_LBM_regularised_velocity_opt(i, j, k, id);
 #endif
@@ -188,14 +188,9 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		}
 
 		// SLIP CONDITIONS //
-		if (type_local == eSlipLeft ||
-			type_local == eSlipRight ||
-			type_local == eSlipTop ||
-			type_local == eSlipBottom ||
-			type_local == eSlipFront ||
-			type_local == eSlipBack)
+		if (type_local == eSlip)
 		{
-			if (_LBM_applySpecReflect_opt(type_local, id, v)) continue;
+			if (_LBM_applySpecReflect_opt(i, j, k, id, v)) continue;
 		}
 
 		// BOUNCEBACK
@@ -204,12 +199,24 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			// F value is its opposite (HWBB)
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
-		}		
+		}
 
 		// VELOCITY BC (forced equilbirium)
-#ifndef L_VELOCITY_REGULARISED
+#ifndef L_REGULARISED_BOUNDARIES
 		else if (src_type_local == eVelocity)
 		{
+
+#ifdef L_VELOCITY_RAMP
+			if (t <= L_VELOCITY_RAMP)
+			{
+				double rampCoefficient = 1.0 - cos(L_PI * t / L_VELOCITY_RAMP);
+				u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
+				u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+#if (L_DIMS == 3)
+				u[2 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+#endif
+			}
+#endif
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
 		}
@@ -256,107 +263,80 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 {
 	// Declarations
+	std::vector<double> VelVector(3, 0);
 	double normalVelocity;
-	int normalVector[3] = { 0, 0, 0 };
+	std::vector<int> normalVector(3, 0);
 	eCartesianDirection normalDirection;
 	double f_plus = 0.0, f_zero = 0.0;
 	double Sxx = 0, Syy = 0, Sxy = 0;	// 2D & 3D
 	double fneq;
 	double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
 	unsigned int edgeCount = 0;
+	double rampCoefficient = 1.0;		// Initialise ramp coefficient
+
+#ifdef L_VELOCITY_RAMP
+	// Update coefficient	
+	if (t <= L_VELOCITY_RAMP)
+	{
+		rampCoefficient = 1.0 - cos(L_PI * t / L_VELOCITY_RAMP);
+	}
+#endif
 
 	// Find which wall we are on and proceed to assign key variables //
 
-	// Left wall
-	if (XPos[i] > 0.0 && XPos[i] < L_WALL_THICKNESS_LEFT)
-	{
-		// Assign wall velocity
-		normalVelocity = GridUnits::ud2ulbm(L_UX0, this);
+	// Cannot handle cases where BC is inside domain somewhere
+	if (!GridUtils::isWithinDomainWall(XPos[i], YPos[j], ZPos[k], &normalVector, &normalDirection, &edgeCount))
+		L_ERROR("Velocity site not outside domain walls is currently not supported.", GridUtils::logfile);
 
-		// Select the wall normal velocity direction
-		normalDirection = eXDirection;
-		normalVector[normalDirection] = 1;
-		edgeCount++;
-	}
-
-	// Right wall
-	if (XPos[i] < L_BX && XPos[i] > L_BX - L_WALL_THICKNESS_RIGHT)
-	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UX0, this);
-		normalDirection = eXDirection;
-		normalVector[normalDirection] = -1;
-		edgeCount++;
-	}
-
-	// Bottom wall
-	else if (YPos[j] > 0.0 && YPos[j] < L_WALL_THICKNESS_BOTTOM)
-	{
-		normalVelocity = GridUnits::ud2ulbm(L_UY0, this);
-		normalDirection = eYDirection;
-		normalVector[normalDirection] = 1;
-		edgeCount++;
-	}
-	
-	// Top wall
-	else if (YPos[j] < L_BY && YPos[j] > L_BY - L_WALL_THICKNESS_TOP)
-	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UY0, this);
-		normalDirection = eYDirection;
-		normalVector[normalDirection] = -1;
-		edgeCount++;
-	}
-
-#if (L_DIMS == 3)
-
-	// Front wall
-	else if (ZPos[k] > 0.0 && ZPos[k] < L_WALL_THICKNESS_FRONT)
-	{
-		normalVelocity = GridUnits::ud2ulbm(L_UZ0, this);
-		normalDirection = eZDirection;
-		normalVector[normalDirection] = 1;
-		edgeCount++;
-	}
-	
-	// Back wall
-	else if (ZPos[k] < L_BZ && ZPos[k] > L_BZ - L_WALL_THICKNESS_BACK)
-	{
-		normalVelocity = -GridUnits::ud2ulbm(L_UZ0, this);
-		normalDirection = eZDirection;
-		normalVector[normalDirection] = -1;
-		edgeCount++;
-	}
-#endif
 
 	/* If it is a corner or an edge then get wall density by extrapolating in 
 	 * the direction of the normal. Since this is non-local, when using MPI
 	 * cannot be performed correctly if site on receiver layer */
 	if (edgeCount > 1)
 	{
-		// Quadratic extrapolation (non-local)
-		int i1 = i + normalVector[eXDirection];
-		int i2 = i1 + normalVector[eXDirection];
-		int j1 = j + normalVector[eYDirection];
-		int j2 = j1 + normalVector[eYDirection];
-		int k1 = k + normalVector[eZDirection];
-		int k2 = k1 + normalVector[eZDirection];
 
 #ifdef L_BUILD_FOR_MPI
-		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]) &&
-			(GridUtils::isOffGrid(i1, j1, k1, this) || GridUtils::isOffGrid(i2, j2, k2, this)))
-		{
-			std::string msg;
-			msg += "Regularised BC edges/corners perform quadratic extrapolation.";
-			msg += "The inlets on this block do not have enough points next to the inlet sites to perform this procedure. Exiting.";
-			L_ERROR(msg, GridUtils::logfile);
-		}
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
 #endif
-		rho[id] = 2.0 * rho(i1, j1, k1, M_lim, K_lim) - rho(i2, j2, k2, M_lim, K_lim);
+		{
+			rho[id] = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
+		}
 
 	}
 
-	// Only in one edge region so not a corner or an edge
+
+	// Only in one edge count so not a corner or an edge but a face
 	else
 	{
+		// Assign velocity vector components from fixed velocity
+		VelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
+		VelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+		VelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+		
+		// Correct velocity assignments with extrapolated ones
+#ifdef L_OUTLET_EXTRAPOLATED
+		// Can only extrapolate on the outlet
+		if (normalVector[eXDirection] == -1)
+		{
+
+#ifdef L_BUILD_FOR_MPI
+			if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
+#endif
+			{
+				// Compute normal velocity using extrapolation
+				VelVector[eXDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eXDirection, L_DIMS);
+				VelVector[eYDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eYDirection, L_DIMS);
+#if (L_DIMS == 3)
+				VelVector[eZDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eZDirection, L_DIMS);
+#endif
+			}
+		}
+#endif
+
+		// Get sign correct for normal velocity
+		normalVelocity = GridUtils::vecnorm(
+			GridUtils::vecmultiply<double, int, double>(VelVector, normalVector));
+		if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
 
 		// Compute f_plus and f_0
 		for (int v = 0; v < L_NUM_VELS; ++v)
@@ -381,11 +361,13 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	}
 
 	// Update velocity
-	u[eXDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this);
-	u[eYDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this);
+	u[eXDirection + id * L_DIMS] = VelVector[eXDirection];
+	u[eYDirection + id * L_DIMS] = VelVector[eYDirection];
 #if (L_DIMS == 3)
-	u[eZDirection + id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this);
+	u[eZDirection + id * L_DIMS] = VelVector[eZDirection];
 #endif
+
+
 
 	// Loop over directions now macroscopic are up-to-date
 	for (int v = 0; v < L_NUM_VELS; ++v)
@@ -456,55 +438,65 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 ///			of direction and BC type then returns false and streaming must be 
 ///			performed in the usual way.
 ///
-///	\param	type	lattice label.
+///	\param	i		x index.
+///	\param	j		y index.
+///	\param	k		z index.
 /// \param	id		flattened ijk index.
 /// \param	v		velocity direction.
 ///	\returns		indication whether specular reflection was applied on this 
 ///					direction.
-bool GridObj::_LBM_applySpecReflect_opt(eType type, int id, int v)
+bool GridObj::_LBM_applySpecReflect_opt(int i, int j, int k, int id, int v)
 {
 
-	if (type == eSlipLeft && c_opt[v][eXDirection] == 1)
+	// Get inward normal information
+	std::vector<int> normVec(3);
+	if (GridUtils::isWithinDomainWall(XPos[i], YPos[j], ZPos[k], &normVec))
 	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
-		return true;
-	}
+		// Left slip
+		if (normVec[eXDirection] == 1 && c_opt[v][eXDirection] == 1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
+			return true;
+		}
 
-	if (type == eSlipRight && c_opt[v][eXDirection] == -1)
-	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
-		return true;
-	}
+		// Right slip
+		if (normVec[eXDirection] == -1 && c_opt[v][eXDirection] == -1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eXDirection) + id * L_NUM_VELS];
+			return true;
+		}
 
-	if (type == eSlipBottom && c_opt[v][eYDirection] == 1)
-	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
-		return true;
-	}
+		// Bottom slip
+		if (normVec[eYDirection] == 1 && c_opt[v][eYDirection] == 1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
+			return true;
+		}
 
-	if (type == eSlipTop && c_opt[v][eYDirection] == -1)
-	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
-		return true;
-	}
+		// Top slip
+		if (normVec[eYDirection] == -1 && c_opt[v][eYDirection] == -1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eYDirection) + id * L_NUM_VELS];
+			return true;
+		}
 
-	if (type == eSlipFront && c_opt[v][eZDirection] == 1)
-	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
-		return true;
-	}
+		// Front slip
+		if (normVec[eZDirection] == 1 && c_opt[v][eZDirection] == 1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
+			return true;
+		}
 
-	if (type == eSlipBack && c_opt[v][eZDirection] == -1)
-	{
-		// Set velocity to reflected value
-		fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
-		return true;
+		// Back slip
+		if (normVec[eZDirection] == -1 && c_opt[v][eZDirection] == -1)
+		{
+			fNew[v + id * L_NUM_VELS] = f[GridUtils::getReflect(v, eZDirection) + id * L_NUM_VELS];
+			return true;
+		}
+
 	}
+	else
+		L_ERROR("Slip wall not located inside a domain wall region. Not currently supported.", GridUtils::logfile);
 
 	return false;
 }
@@ -726,12 +718,7 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 	// Only update fluid sites (including BFL and Slip) or TL to finer
 	if (type_local == eFluid || type_local == eBFL ||
 		type_local == eTransitionToFiner ||
-		type_local == eSlipLeft ||
-		type_local == eSlipRight ||
-		type_local == eSlipTop ||
-		type_local == eSlipBottom ||
-		type_local == eSlipFront ||
-		type_local == eSlipBack
+		type_local == eSlip
 		)
 	{
 

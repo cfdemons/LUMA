@@ -190,6 +190,7 @@ public :
 
 	// FEM
 	void mpi_forceCommGather(int level);
+	void mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &markerIDs, std::vector<std::vector<std::vector<double>>> &positions, std::vector<std::vector<std::vector<double>>> &vels);
 };
 
 #endif

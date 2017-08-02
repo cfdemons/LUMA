@@ -297,7 +297,7 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	for (IBBody& body : iBody) {
 
 		// Call the writer
-		if (body.validMarkers.size() > 0)
+		if (body.owningRank == rank)
 			body.writeVtkPosition(tval);
 	}
 
@@ -305,7 +305,7 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	for (BFLBody& body : pBody) {
 
 		// Call the writer
-		if (body.validMarkers.size() > 0)
+		if (body.owningRank == rank)
 			body.writeVtkPosition(tval);
 	}
 }

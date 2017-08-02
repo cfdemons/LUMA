@@ -815,31 +815,30 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	fout << "DATASET POLYDATA\n";
 
 	// Write out the positions of each Lagrange marker
-	fout << "POINTS " << validMarkers.size() << " float\n";
-	for (auto i : validMarkers) {
+	fout << "POINTS " << markers.size() << " float\n";
+	for (auto m : markers) {
 
-		fout << markers[i].position[0] << " "
-			<< markers[i].position[1] << " "
-			<< markers[i].position[2] << std::endl;
+		fout << m.position[0] << " "
+			 << m.position[1] << " "
+			 << m.position[2] << std::endl;
 	}
 
 	// Write out the connectivity of each Lagrange marker
-	size_t nLines = validMarkers.size() - 1;
+	size_t nLines;
+	if (closed_surface == true)
+		nLines = markers.size();
+	else
+		nLines = markers.size() - 1;
 
-	if (closed_surface == false)
-		fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-	else if (closed_surface == true)
-		fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
+	// Write out number of lines
+	fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
 
+	// Write out connectivity
 	for (size_t i = 0; i < nLines; i++) {
-		fout << 2 << " " << i << " " << i + 1 << std::endl;
+		fout << 2 << " " << i << " " << (i + 1) % markers.size() << std::endl;
 	}
 
-	// If body is a closed surface then join last point to first point
-	if (closed_surface == true) {
-		fout << 2 << " " << nLines << " " << 0 << std::endl;
-	}
-
+	// Close file
 	fout.close();
 };
 

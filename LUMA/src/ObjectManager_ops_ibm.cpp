@@ -78,17 +78,23 @@ void ObjectManager::ibm_moveBodies(int level) {
 			iBody[ib].fBody->dynamicFEM();
 	}
 
-	// ** SPREAD MARKER POSITIONS ACROSS RANKS
+	// Update IBM markers
+#ifdef L_BUILD_FOR_MPI
+	ibm_updateMarkers(level);
+#endif
 
 	// Loop through flexible bodies and update the support points for all valid markers existing on this rank
-	for (auto ib : IdxFEM) {
+	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 		// Only do if on this grid level
-		if (iBody[ib]._Owner->level == level)
+		if (iBody[ib]._Owner->level == level && iBody[ib].isFlexible)
 			ibm_findSupport(ib);
 	}
 
-	// ** UPDATE MPI_COMMS
+	// Update MPI comm vector
+#ifdef L_BUILD_FOR_MPI
+	ibm_updateMPIComms(level);
+#endif
 
 	// Compute ds
 	ibm_computeDs(level);

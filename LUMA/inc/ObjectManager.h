@@ -161,6 +161,7 @@ public:
 	void ibm_updateMPIComms(int level);
 	void ibm_interpolateOffRankVels(int level);
 	void ibm_spreadOffRankForces(int level);
+	void ibm_updateMarkers(int level);
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GridObj *g, GeomPacked *geom, PCpts *_PCpts);	// Method to add a BBB from the cloud reader.

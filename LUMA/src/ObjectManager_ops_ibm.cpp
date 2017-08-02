@@ -981,6 +981,20 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 		}
 	}
 
+	// If using MPI get the max value across all ranks
+#ifdef L_BUILD_FOR_MPI
+
+	// Get mpi manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Get the max value across all ranks
+	double resAll;
+	MPI_Allreduce(&res, &resAll, 1, MPI_DOUBLE, MPI_MAX, mpim->world_comm);
+
+	// Set to return value
+	res = resAll;
+#endif
+
 	// Return residual
 	return res;
 }

@@ -15,7 +15,7 @@
 
 /* H5 Multi-Grid Merge Tool for post-processing HDF5 files written by LUMA */
 
-#define H5MGM_VERSION "0.3.1"
+#define H5MGM_VERSION "0.3.2"
 
 #include "hdf5.h"
 #define H5_BUILT_AS_DYNAMIC_LIB
@@ -45,8 +45,6 @@
 
 #define DATASET_READ_FAIL -321
 #define EARLY_EXIT 998
-#define NUM_DATASETS_3D (15 + mpi_flag)
-#define NUM_DATASETS_2D (10 + mpi_flag)
 #define H5MGM_OUTPUT_PATH "./postprocessedoutput"
 
 // Static variables

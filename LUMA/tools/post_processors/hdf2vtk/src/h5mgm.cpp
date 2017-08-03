@@ -442,11 +442,9 @@ int main(int argc, char* argv[])
 	unstructuredGrid = cleaner->GetOutput();
 
 	// Time loop and data addition
-	int count = 0; int missed_set_count;
-	for (size_t t = 0; t <= (size_t)timesteps; t += out_every) {
-
-		// Reset counter
-		missed_set_count = 0;
+	int count = 0;
+	for (size_t t = 0; t <= (size_t)timesteps; t += out_every)
+	{
 
 		// Create filename
 		std::string vtkFilename = path_str + "/luma_" + case_num + "." + std::to_string(t);
@@ -460,7 +458,13 @@ int main(int argc, char* argv[])
 		LatTyp->Allocate(unstructuredGrid->GetNumberOfCells());
 		LatTyp->SetName("LatTyp");
 		status = addDataToGrid("/LatTyp", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, LatTyp);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
+		
+		// If no typing matrix then assume the time step is not available and exit
+		if (status == DATASET_READ_FAIL)
+		{
+			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
+			exit(EARLY_EXIT);
+		}
 
 		// MPI block data always read from Time_0
 		if (mpi_flag)
@@ -469,108 +473,82 @@ int main(int argc, char* argv[])
 			Block->Allocate(unstructuredGrid->GetNumberOfCells());
 			Block->SetName("MpiBlockNumber");
 			status = addDataToGrid("/MpiBlock", "/Time_0", levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, Block);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 		}
 
 		vtkSmartPointer<vtkDoubleArray> RhoArray = vtkSmartPointer<vtkDoubleArray>::New();
 		RhoArray->Allocate(unstructuredGrid->GetNumberOfCells());
 		RhoArray->SetName("Rho");
 		status = addDataToGrid("/Rho", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, RhoArray);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Rho_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Rho_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Rho_TimeAv->SetName("Rho_TimeAv");
 		status = addDataToGrid("/Rho_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Rho_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Ux = vtkSmartPointer<vtkDoubleArray>::New();
 		Ux->Allocate(unstructuredGrid->GetNumberOfCells());
 		Ux->SetName("Ux");
 		status = addDataToGrid("/Ux", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Uy = vtkSmartPointer<vtkDoubleArray>::New();
 		Uy->Allocate(unstructuredGrid->GetNumberOfCells());
 		Uy->SetName("Uy");
 		status = addDataToGrid("/Uy", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Ux_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Ux_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Ux_TimeAv->SetName("Ux_TimeAv");
 		status = addDataToGrid("/Ux_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Ux_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> Uy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		Uy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		Uy_TimeAv->SetName("Uy_TimeAv");
 		status = addDataToGrid("/Uy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uy_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UxUx_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UxUx_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UxUx_TimeAv->SetName("UxUx_TimeAv");
 		status = addDataToGrid("/UxUx_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUx_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UxUy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UxUy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UxUy_TimeAv->SetName("UxUy_TimeAv");
 		status = addDataToGrid("/UxUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUy_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
 		vtkSmartPointer<vtkDoubleArray> UyUy_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 		UyUy_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 		UyUy_TimeAv->SetName("UyUy_TimeAv");
 		status = addDataToGrid("/UyUy_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUy_TimeAv);
-		if (status == DATASET_READ_FAIL) missed_set_count++;
 
-		if (dimensions_p == 3) {
+		if (dimensions_p == 3)
+		{
 
 			vtkSmartPointer<vtkDoubleArray> Uz = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz->SetName("Uz");
 			status = addDataToGrid("/Uz", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> Uz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			Uz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			Uz_TimeAv->SetName("Uz_TimeAv");
 			status = addDataToGrid("/Uz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, Uz_TimeAv);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UxUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UxUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UxUz_TimeAv->SetName("UxUz_TimeAv");
 			status = addDataToGrid("/UxUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UxUz_TimeAv);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UyUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UyUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UyUz_TimeAv->SetName("UyUz_TimeAv");
 			status = addDataToGrid("/UyUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UyUz_TimeAv);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 
 			vtkSmartPointer<vtkDoubleArray> UzUz_TimeAv = vtkSmartPointer<vtkDoubleArray>::New();
 			UzUz_TimeAv->Allocate(unstructuredGrid->GetNumberOfCells());
 			UzUz_TimeAv->SetName("UzUz_TimeAv");
 			status = addDataToGrid("/UzUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UzUz_TimeAv);
-			if (status == DATASET_READ_FAIL) missed_set_count++;
 		}
 
-		// If failed to read every dataset then end of time limit has been reached
-		if (dimensions_p == 3 && missed_set_count == NUM_DATASETS_3D)
-		{
-			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
-			exit(EARLY_EXIT);
-		}
-		else if (dimensions_p == 2 && missed_set_count == NUM_DATASETS_2D)
-		{
-			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
-			exit(EARLY_EXIT);
-		}
-	
 		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
 

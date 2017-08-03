@@ -170,15 +170,15 @@ public:
 	void resetMomexBodyForces(GridObj * grid);						// Reset the force stores for Momentum Exchange
 
 	// IO methods //
-	void io_vtkBodyWriter(int tval);				// VTK body writer wrapper
-	void io_vtkFEMWriter(int tval);					// VTK FEM writer
-	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
-	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
-	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
+	void io_vtkBodyWriter(int tval);						// VTK body writer wrapper
+	void io_vtkFEMWriter(int tval);							// VTK FEM writer
+	void io_writeBodyPosition(int timestep);				// Write out IBBody positions at specified timestep to text files
+	void io_writeLiftDrag();								// Write out IBBody lift and drag at specified timestep
+	void io_restart(eIOFlag IO_flag, int level);			// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts*& _PCpts, GeomPacked *geom);	// Method to read in Point Cloud data
-	void io_writeForcesOnObjects(double tval);		// Method to write object forces to a csv file
-	void io_readInGeomConfig();						// Read in geometry configuration file
-	void io_writeTipPositions(int t);				// Write out tip positions of flexible filaments
+	void io_writeForcesOnObjects(double tval);				// Method to write object forces to a csv file
+	void io_readInGeomConfig();								// Read in geometry configuration file
+	void io_writeTipPositions(int t);						// Write out tip positions of flexible filaments
 
 	// Debug
 	void toggleDebugStream(GridObj *g);		// Method to open/close a debugging file

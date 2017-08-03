@@ -20,7 +20,10 @@
 #include "../inc/IBInfo.h"
 
 
-/// \brief	Builds MPI comm class for MPI communication in IBM.
+// *****************************************************************************
+///	\brief	Build MPI-IBM comm classes
+///
+///	\param	level		current grid level
 void ObjectManager::ibm_updateMPIComms(int level) {
 
 	// Get MPI manager instance
@@ -34,7 +37,10 @@ void ObjectManager::ibm_updateMPIComms(int level) {
 }
 
 
-/// \brief	Pass velocity values from support site which exist off-rank.
+// *****************************************************************************
+///	\brief	Pass velocity values from support site which exist off-rank
+///
+///	\param	level		current grid level
 void ObjectManager::ibm_interpolateOffRankVels(int level) {
 
 	// Get the mpi manager instance
@@ -78,7 +84,11 @@ void ObjectManager::ibm_interpolateOffRankVels(int level) {
 	}
 }
 
-/// \brief	Pass velocity values from support site which exist off-rank.
+
+// *****************************************************************************
+///	\brief	Spread forces to support site which exist off-rank
+///
+///	\param	level		current grid level
 void ObjectManager::ibm_spreadOffRankForces(int level) {
 
 	// Get the mpi manager instance
@@ -122,7 +132,10 @@ void ObjectManager::ibm_spreadOffRankForces(int level) {
 }
 
 
-/// \brief	Update new markers across all ranks
+// *****************************************************************************
+///	\brief	Update new markers across all ranks
+///
+///	\param	level		current grid level
 void ObjectManager::ibm_updateMarkers(int level) {
 
 	// Get the mpi manager instance
@@ -256,5 +269,3 @@ void ObjectManager::ibm_updateMarkers(int level) {
 		}
 	}
 }
-
-// ****************************************************************************

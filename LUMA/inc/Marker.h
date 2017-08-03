@@ -17,58 +17,43 @@
 
 #include "stdafx.h"
 
-/// \brief	Generic marker class.
+/// \brief	Generic marker class
+///
+///			Other markers (e.g. IBMarker) inherit from this.
 class Marker
 {
 
-	// Members //
 public:
-	std::vector<double> position;		///< Position vector of marker location in physical units
 
-	/* Vector of indices for lattice sites considered to be in support of the marker:
-	* In IBM these are all the lattice support sites for spreading and interpolating;
-	* In BFL these are the voxel indices in which the BFL marker resides;
-	*/
-	std::vector<int> supp_i;	///< X-indices of lattice sites in support of this marker
-	std::vector<int> supp_j;	///< Y-indices of lattice sites in support of this marker
-	std::vector<int> supp_k;	///< Z-indices of lattice sites in support of this marker
+	/************** Constructors **************/
 
-	std::vector<double> supp_x;	///< X-indices of lattice sites in support of this marker
-	std::vector<double> supp_y;	///< Y-indices of lattice sites in support of this marker
-	std::vector<double> supp_z;	///< Z-indices of lattice sites in support of this marker
-
-	/// Array of indices indicating on which rank the given support point resides
-	std::vector<int> support_rank;
-
-	/// ID of marker within its owning body
-	int id;
-
-
-public:
-	/// Default constructor
+	// Default constructor
 	Marker(void)
 	{
 		// Set marker position to zero by default
 		position.push_back(0.0);
 		position.push_back(0.0);
 		position.push_back(0.0);
+
+		// Set ID to zero by default
+		id = 0;
 	};
 
-	/// Default destructor
+	// Default destructor
 	~Marker(void)
 	{
 	};
 
-	/// \brief Custom constructor which locates marker.
+	/// \brief Custom constructor which locates marker
 	///
-	///			In order to properley initialise during construction, a
+	///			In order to properly initialise during construction, a
 	///			grid should be passed in on which primary support point
 	///			can be found.
 	///
 	/// \param	x			X-position of marker
 	/// \param	y			Y-position of marker
 	/// \param	z			Z-position of marker
-	/// \param markerID		ID of marker within body
+	/// \param	markerID	ID of marker within body
 	///	\param	body_owner	Grid on which primary support point is to be found.
 	Marker(double x, double y, double z, int markerID, GridObj const * const body_owner)
 	{
@@ -94,6 +79,29 @@ public:
 		support_rank.push_back(GridUtils::safeGetRank());
 		id = markerID;
 	}
+
+
+public:
+
+	/************** Member Data **************/
+
+	int id;			///< ID of marker within its owning body
+
+	std::vector<double> position;	///< Position vector of marker location in physical units
+
+	/* Vector of indices for lattice sites considered to be in support of the marker:
+	* In IBM these are all the lattice support sites for spreading and interpolating;
+	* In BFL these are the voxel indices in which the BFL marker resides;
+	*/
+	std::vector<int> supp_i;	///< X-indices of lattice sites in support of this marker
+	std::vector<int> supp_j;	///< Y-indices of lattice sites in support of this marker
+	std::vector<int> supp_k;	///< Z-indices of lattice sites in support of this marker
+
+	std::vector<double> supp_x;	///< X-position of lattice sites in support of this marker
+	std::vector<double> supp_y;	///< Y-position of lattice sites in support of this marker
+	std::vector<double> supp_z;	///< Z-position of lattice sites in support of this marker
+
+	std::vector<int> support_rank; ///< Array of indices indicating on which rank the given support point resides
 };
 
 #endif

@@ -25,22 +25,25 @@ class PCpts;
 class GridObj;
 class FEMBody;
 
-/// \brief	Immersed boundary body.
+/// \brief	Immersed boundary body class
+///
+///			Class for immersed boundary bodies (inherits from Body class with IB markers).
 class IBBody : public Body<IBMarker> {
 
-	// Add friend classes so they can access the protected data of IBBody objects
+	/************** Friends **************/
 	friend class ObjectManager;
 	friend class IBInfo;
 	friend class FEMBody;
 	friend class MpiManager;
 
 public:
-	// Constructor and destructor
+
+	/************** Constructors **************/
 	IBBody(void);
 	~IBBody(void);
 
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
-	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
+	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty);
 
 	// Custom constructor for building prefab circle or sphere
 	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);

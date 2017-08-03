@@ -22,7 +22,7 @@ class GridObj;
 #include "MarkerData.h"
 
 
-/// \brief	Generic body class.
+/// \brief	Generic body class
 ///
 ///			Can consist of any type of Marker so templated.
 template <typename MarkerType>
@@ -58,7 +58,7 @@ protected:
 	GridObj* _Owner;					///< Pointer to owning grid
 	int id;								///< Unique ID of the body
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
-	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
+	int owningRank;						///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
 	int level;							///< Level on which body exists
 
@@ -82,8 +82,6 @@ private:
 protected:
 	void buildFromCloud(PCpts *_PCpts);										// Method to build body from point cloud
 	virtual void writeVtkPosition(int tval);								// VTK body writer
-
-
 };
 
 
@@ -102,11 +100,11 @@ Body<MarkerType>::~Body(void)
 {
 };
 
-// TODO Point cloud reader needs sorting for MPI-IBM
 /*********************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g		hierarchy pointer to grid hierarchy
-/// \param bodyID	ID of body in array of bodies.
+/// \brief	Custom constructor to populate body from array of points
+///
+///	\param g		hierarchy pointer to grid hierarchy
+/// \param bodyID	ID of body in array of bodies
 /// \param _PCpts	pointer to point cloud data
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
@@ -130,12 +128,13 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 };
 
 /*********************************************/
-/// \brief 	Custom constructor for building prefab filament
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param start_position	start position of base of filament
-/// \param length			length of filament
-/// \param angles			angle of filament
+/// \brief	Custom constructor for building prefab filament
+///
+/// \param 	g				hierarchy pointer to grid hierarchy
+/// \param 	bodyID			ID of body in array of bodies
+/// \param 	start_position	start position of base of filament
+/// \param 	length			length of filament
+/// \param 	angles			angle of filament
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles)
 {
@@ -166,7 +165,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 	// Compute spacing
 	int numMarkers = static_cast<int>(std::floor(length / g->dh)) + 1;
 	double spacing = length / (numMarkers - 1);							// Physical spacing between markers
-	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
+	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);		// Local spacing projected onto the horizontal plane
 
 	// Add all markers
 	for (int i = 0; i < numMarkers; i++) {
@@ -188,11 +187,12 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 
 
 /*********************************************/
-/// \brief 	Custom constructor for building prefab circle/sphere
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param centre		centre point of circle
-/// \param radius			radius of circle
+/// \brief	Custom constructor for building prefab circle/sphere
+///
+/// \param 	g				hierarchy pointer to grid hierarchy
+/// \param 	bodyID			ID of body in array of bodies
+/// \param 	centre			centre point of circle
+/// \param 	radius			radius of circle
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, double radius)
 {
@@ -257,12 +257,13 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 
 
 /*********************************************/
-/// \brief 	Custom constructor for building square/cuboid
-/// \param g					hierarchy pointer to grid hierarchy
-/// \param bodyID				ID of body in array of bodies.
-/// \param centre				centre point of square
-/// \param width_length_depth	dimensions of square
-/// \param angles				angle of square
+/// \brief	Custom constructor for building square/cuboid
+///
+/// \param 	g					hierarchy pointer to grid hierarchy
+/// \param 	bodyID				ID of body in array of bodies
+/// \param 	centre				centre point of square
+/// \param 	width_length_depth	dimensions of square
+/// \param 	angles				angle of square
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	
 	std::vector<double> &width_length_depth, std::vector<double> &angles)
@@ -400,16 +401,16 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 
 
 /*********************************************/
-/// \brief 	Custom constructor for building plate
-/// \param g					hierarchy pointer to grid hierarchy
-/// \param bodyID				ID of body in array of bodies.
-/// \param centre				centre point of square
-/// \param width_length_depth	dimensions of square
-/// \param angles				angle of square
+/// \brief	Custom constructor for building plate
+///
+/// \param 	g					hierarchy pointer to grid hierarchy
+/// \param 	bodyID				ID of body in array of bodies
+/// \param 	centre				centre point of square
+/// \param 	width_length_depth	dimensions of square
+/// \param 	angles				angle of square
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	double length, double width, std::vector<double> &angles) {
-
 
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
@@ -502,11 +503,12 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 }
 
 /*********************************************/
-/// \brief	Add marker to the body.
-/// \param	x			global X-position of marker.
-/// \param	y			global Y-position of marker.
-/// \param	z 			global Z-position of marker.
-/// \param markerID		rank independent ID of marker within body
+/// \brief	Add marker to the body
+///
+/// \param	x			global X-position of marker
+/// \param	y			global Y-position of marker
+/// \param	z 			global Z-position of marker
+/// \param 	markerID	rank independent ID of marker within body
 template <typename MarkerType>
 void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 {
@@ -545,7 +547,7 @@ void Body<MarkerType>::deleteRecvLayerMarkers()
 }
 
 /*********************************************/
-/// \brief	Delete markers which have been built but exist off rank.
+/// \brief	Delete markers which have been built but exist off rank
 template <typename MarkerType>
 void Body<MarkerType>::deleteOffRankMarkers()
 {
@@ -573,15 +575,15 @@ void Body<MarkerType>::deleteOffRankMarkers()
 };
 
 /*********************************************/
-/// \brief	Retrieve marker data.
+/// \brief	Retrieve marker data
 ///
 ///			Return marker whose primary support data is nearest the
 ///			supplied global position.
 ///
-/// \param x X-position nearest to marker to be retrieved.
-/// \param y Y-position nearest to marker to be retrieved.
-/// \param z Z-position nearest to marker to be retrieved.
-/// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid by assigning an ID of -1.
+/// \param	x 			X-position nearest to marker to be retrieved
+/// \param	y 			Y-position nearest to marker to be retrieved
+/// \param	z 			Z-position nearest to marker to be retrieved
+/// \return	MarkerData 	marker data structure returned - if no marker found structure is marked as invalid by assigning an ID of -1
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
@@ -620,7 +622,7 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 };
 
 /*********************************************/
-/// \brief	Downsampling voxel-grid filter to take a point and add it to current body.
+/// \brief	Downsampling voxel-grid filter to take a point and add it to current body
 ///
 ///			This method attempts to add a marker to body at the global location 
 ///			but obeys the rules of a 1 marker per cell voxel-grid filter to 
@@ -628,12 +630,12 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 ///			the background lattice. It is usually called inside a loop and requires
 ///			a few extra pieces of information to be tracked throughout.
 ///
-/// \param	x			desired global X-position of new marker.
-/// \param	y			desired global Y-position of new marker.
-/// \param	z			desired global Z-position of new marker.
-///	\param	markerID	requested rank independent ID of marker within body.
-/// \param	curr_mark	is a reference to the index of last marker added.
-///	\param	counter		is a reference to the total number of markers in the body.
+/// \param	x			desired global X-position of new marker
+/// \param	y			desired global Y-position of new marker
+/// \param	z			desired global Z-position of new marker
+///	\param	markerID	requested rank independent ID of marker within body
+/// \param	curr_mark	is a reference to the index of last marker added
+///	\param	counter		is a reference to the total number of markers in the body
 template <typename MarkerType>
 void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int markerID, int& curr_mark, std::vector<int>& counter) {
 
@@ -688,15 +690,15 @@ void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int marke
 };
 
 /*********************************************/
-/// \brief	Determines whether a point is inside another marker's support voxel.
+/// \brief	Determines whether a point is inside another marker's support voxel
 ///
 ///			Typically called indirectly by the voxel-grid filter method and not directly.
 ///
-/// \param x X-position of point.
-/// \param y Y-position of point.
-/// \param z Z-position of point.
-/// \param curr_mark ID of the marker.
-/// \return true of false
+/// \param	x				X-position of point
+/// \param	y				Y-position of point
+/// \param	z				Z-position of point
+/// \param	curr_mark		ID of the marker
+/// \return true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
@@ -728,15 +730,14 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 };
 
 /*********************************************/
-/// \brief	Determines whether a point is inside an existing marker's support voxel.
+/// \brief	Determines whether a point is inside an existing marker's support voxel
 ///
 ///			Typically called indirectly by the voxel-grid filter method and not directly.
 ///
-/// \param x X-position of point.
-/// \param y Y-position of point.
-/// \param z Z-position of point.
-/// \return true of false
-// Returns boolean as to whether a given point is in an existing marker voxel
+/// \param	x				X-position of point
+/// \param	y				Y-position of point
+/// \param	z				Z-position of point
+/// \return true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 
@@ -758,8 +759,9 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 
 
 /*********************************************/
-/// \brief	Method to build a body from point cloud data.
-/// \param _PCpts	point cloud data from which to build body.
+/// \brief	Method to build a body from point cloud data
+///
+/// \param	_PCpts	point cloud data from which to build body
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
@@ -792,7 +794,7 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 };
 
 // ************************************************************************** //
-/// \brief	VTK body writer.
+/// \brief	VTK body writer
 ///
 /// \param	tval	time value at which the write out is being performed.
 template <typename MarkerType>

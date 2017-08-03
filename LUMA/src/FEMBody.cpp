@@ -13,15 +13,12 @@
  *
  */
 
-/* This file defines the constructors and methods for the immersed boundary body object.
-*/
-
 #include "../inc/stdafx.h"
 #include "../inc/FEMBody.h"
 #include "../inc/IBMarker.h"
 
-// ***************************************************************************************************
-/// \brief Default constructor for FEM body.
+// *****************************************************************************
+/// \brief	Default constructor for FEM body
 FEMBody::FEMBody () {
 
 	// Set members to default values
@@ -36,13 +33,24 @@ FEMBody::FEMBody () {
 	BC_DOFs = 0;
 }
 
-// ***************************************************************************************************
-/// \brief Default destructor for FEM body.
+// *****************************************************************************
+/// \brief	Default destructor for FEM body.
 FEMBody::~FEMBody () {
 }
 
-// ***************************************************************************************************
-/// \brief Custom constructor for building FEM body from inputs.
+// *****************************************************************************
+///	\brief	Custom constructor for building FEM body from inputs
+///
+///	\param	iBody			pointer to owning IBBody
+///	\param	start_position	start position of FEMBody
+///	\param	length			length of FEMBody
+///	\param	height			height of FEMBody
+///	\param	depth			depth of FEMBody (set to dh in 2D cases)
+///	\param	angles			angles of FEMBody
+///	\param	nElements		number of elements in FEMBody
+///	\param	clamped			boundary condition
+///	\param	density			material density
+///	\param	E				Young's Modulus
 FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double length,
 		double height, double depth, std::vector<double> &angles, int nElements, bool clamped, double density, double E) {
 
@@ -115,8 +123,9 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	Udotdot_n.resize(systemDOFs, 0.0);
 }
 
-// \brief Main outer routine for solving FEM.
-//
+
+// *****************************************************************************
+///	\brief	Main outer routine for FEM solver
 void FEMBody::dynamicFEM () {
 
 	// Set values to start of timestep
@@ -125,7 +134,7 @@ void FEMBody::dynamicFEM () {
 	Udotdot = Udotdot_n;
 
 	// Set elemental values
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 		elements[el].length = elements[el].length_n;
 		elements[el].angles = elements[el].angles_n;
 		elements[el].T = elements[el].T_n;
@@ -162,9 +171,8 @@ void FEMBody::dynamicFEM () {
 	updateIBMarkers();
 }
 
-
-// \brief Newton-Raphson routine for solve non-linear FEM
-//
+// *****************************************************************************
+///	\brief	Newton-Raphson routine for solving non-linear FEM
 void FEMBody::newtonRaphsonIterator () {
 
 	// Construct mass matrix
@@ -208,9 +216,10 @@ void FEMBody::newtonRaphsonIterator () {
 	updateFEMNodes();
 }
 
-
-// \brief Check convergence of the Newton-Raphson scheme
-//
+// *****************************************************************************
+///	\brief	Check convergence of the Newton-Raphson scheme
+///
+/// \return	residual
 double FEMBody::checkNRConvergence () {
 
 	// Get original length of body
@@ -218,7 +227,7 @@ double FEMBody::checkNRConvergence () {
 
 	// Normalise the displacement
 	std::vector<double> delUStar(delU.size(), 0.0);
-	for (int i = 0; i < delUStar.size(); i++)
+	for (size_t i = 0; i < delUStar.size(); i++)
 		delUStar[i] = delU[i] / L;
 
 	// Get the norm but divide by length so it is resolution independent and return
@@ -226,8 +235,8 @@ double FEMBody::checkNRConvergence () {
 }
 
 
-// \brief Newmark-Beta scheme for getting FEM velocities and accelerations
-//
+// *****************************************************************************
+///	\brief	Newmark-Beta scheme for getting FEM velocities and accelerations
 void FEMBody::updateVelocityAndAcceleration () {
 
 	// Get velocity and acceleration using Newmark-Beta scheme
@@ -251,9 +260,7 @@ void FEMBody::updateVelocityAndAcceleration () {
 
 
 // *****************************************************************************
-/// \brief	Construct load vector.
-///
-///
+///	\brief	Construct load vector
 void FEMBody::constructRVector() {
 
 	// Initialise arrays and matrices for calculating load vector
@@ -273,13 +280,13 @@ void FEMBody::constructRVector() {
 	forceScale = iBodyPtr->_Owner->dm / SQ(iBodyPtr->_Owner->dt);
 
 	// Loop through all FEM elements
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Get element parameters
 		length = elements[el].length;
 
 		// Now loop through all child IB nodes this element has
-		for (int node = 0; node < elements[el].IBChildNodes.size(); node++) {
+		for (size_t node = 0; node < elements[el].IBChildNodes.size(); node++) {
 
 			// Get IB node and integration ranges
 			IBnode = elements[el].IBChildNodes[node].nodeID;
@@ -310,9 +317,8 @@ void FEMBody::constructRVector() {
 	}
 }
 
-
-// \brief Construct mass matrix
-//
+// *****************************************************************************
+///	\brief	Construct mass matrix
 void FEMBody::constructMassMat () {
 
 	// Initialise arrays and matrices for calculating mass matrix
@@ -320,24 +326,21 @@ void FEMBody::constructMassMat () {
 	std::vector<std::vector<double>> Mlocal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
 
 	// Reset mass matrix to zero
-	for (int i = 0; i < M.size(); i++) {
+	for (size_t i = 0; i < M.size(); i++) {
 		fill(M[i].begin(), M[i].end(), 0.0);
 	}
 
 	// Coefficients
-	double A, rho, I, L0, L, C1, C2;
+	double A, rho, L0, C1;
 
 	// Loop through each element and create stiffness matrix
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Coefficients
 		A = elements[el].area;
 		rho = elements[el].density;
-		I = elements[el].I;
 		L0 = elements[el].length0;
-		L = elements[el].length;
 		C1 = rho * A * L0 / 420.0;
-		C2 = rho * I / (30.0 * L0);
 
 		// Construct part 1 of mass matrix (axial and transverse)
 		Mlocal[0][0] = C1 * 140.0;
@@ -369,9 +372,8 @@ void FEMBody::constructMassMat () {
 	}
 }
 
-
-// \brief Construct linear stiffness matrix
-//
+// *****************************************************************************
+///	\brief	Construct linear stiffness matrix
 void FEMBody::constructStiffMat () {
 
 	// Initialise arrays and matrices for calculating linear stiffness matrix
@@ -380,22 +382,21 @@ void FEMBody::constructStiffMat () {
 
 
 	// Reset linear stiffness matrix to zero
-	for (int i = 0; i < K_L.size(); i++) {
+	for (size_t i = 0; i < K_L.size(); i++) {
 		fill(K_L[i].begin(), K_L[i].end(), 0.0);
 	}
 
 	// Coefficients
-	double A, E, I, L0, L;
+	double A, E, I, L0;
 
 	// Loop through each element and create stiffness matrix
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Coefficients
 		A = elements[el].area;
 		E = elements[el].E;
 		I = elements[el].I;
 		L0 = elements[el].length0;
-		L = elements[el].length;
 
 		// Construct upper half of local stiffness matrix for single element
 		Klocal[0][0] = E * A / L0;
@@ -427,9 +428,8 @@ void FEMBody::constructStiffMat () {
 	}
 }
 
-
-// \brief Construct internal force vector
-//
+// *****************************************************************************
+///	\brief	Construct internal force vector
 void FEMBody::constructFVector () {
 
 	// Element internal forces in global coordinates
@@ -445,7 +445,7 @@ void FEMBody::constructFVector () {
 	fill(F.begin(), F.end(), 0.0);
 
 	// Loop through each element
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Set various values for element
 		E = elements[el].E;
@@ -483,9 +483,8 @@ void FEMBody::constructFVector () {
 	}
 }
 
-
-// \brief Construct non-linear stiffness matrix
-//
+// *****************************************************************************
+///	\brief	Construct nonlinear stiffness matrix
 void FEMBody::constructNLStiffMat () {
 
 	// Initialise arrays and matrices for calculating non-linear stiffness matrix
@@ -493,19 +492,18 @@ void FEMBody::constructNLStiffMat () {
 	std::vector<std::vector<double>> Klocal(DOFsPerElement, std::vector<double>(DOFsPerElement, 0.0));
 
 	// Reset non-linear stiffness matrix to zero
-	for (int i = 0; i < K_NL.size(); i++) {
+	for (size_t i = 0; i < K_NL.size(); i++) {
 		fill(K_NL[i].begin(), K_NL[i].end(), 0.0);
 	}
 
 	// Coefficients
-	double L0, L, F0, V0;
+	double L0, F0, V0;
 
 	// Loop through each element and create stiffness matrix
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Calculate length of element
 		L0 = elements[el].length0;
-		L = elements[el].length;
 
 		// Internal forces
 		F0 = -elements[el].F[0];
@@ -533,11 +531,12 @@ void FEMBody::constructNLStiffMat () {
 }
 
 
-// \brief Apply BCs by removing elements in global matrices
-//
-///	\param	M_hat	mass matrix with BCs about to be applied
-///	\param	K_hat	stiffness matrix with BCs about to be applied
-///	\param	RmF_hat	balanced load vector with BCs about to be applied
+// *****************************************************************************
+///	\brief	Apply BCs by removing elements in global matrices
+///
+///	\param	M_hat		mass matrix with BCs about to be applied
+///	\param	K_hat		stiffness matrix with BCs about to be applied
+///	\param	RmF_hat		balanced load vector with BCs about to be applied
 void FEMBody::bcFEM (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
 
 	// Loop through reduced size
@@ -554,12 +553,12 @@ void FEMBody::bcFEM (std::vector<std::vector<double>> &M_hat, std::vector<std::v
 	}
 }
 
-
-// \brief First step in Newmark-Beta time integration
-//
-///	\param	M_hat	mass matrix with BCs applied
-///	\param	K_hat	stiffness matrix with BCs applied
-///	\param	RmF_hat	balanced load vector with BCs applied
+// *****************************************************************************
+///	\brief	First step in Newmark-Beta time integration
+///
+///	\param	M_hat		mass matrix with BCs applied
+///	\param	K_hat		stiffness matrix with BCs applied
+///	\param	RmF_hat		balanced load vector with BCs applied
 void FEMBody::setNewmark (std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat) {
 
 	// Newmark-beta method for time integration
@@ -592,13 +591,12 @@ void FEMBody::setNewmark (std::vector<std::vector<double>> &M_hat, std::vector<s
 	}
 }
 
-
-// \brief Update the FEM node data using the new displacements
-//
+// *****************************************************************************
+///	\brief	Update the new FEM node data using the displacements
 void FEMBody::updateFEMNodes () {
 
 	// Set the new positions in the particle_struct
-	for (int n = 0; n < nodes.size(); n++) {
+	for (size_t n = 0; n < nodes.size(); n++) {
 
 		// Positions
 		for (int d = 0; d < L_DIMS; d++)
@@ -610,7 +608,7 @@ void FEMBody::updateFEMNodes () {
 
 	// Set the new angles and lengths of the elements
 	std::vector<double> elVector;
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Set the new angles and lengths of the elements
 		elVector = GridUtils::subtract(nodes[el+1].position, nodes[el].position);
@@ -625,9 +623,8 @@ void FEMBody::updateFEMNodes () {
 	}
 }
 
-/// \brief	Update the IBM markers using new FEM node vales
-///
-///
+// *****************************************************************************
+///	\brief	Update the new IBMaker data using the FEM data
 void FEMBody::updateIBMarkers() {
 
 	// Parameters
@@ -640,7 +637,7 @@ void FEMBody::updateIBMarkers() {
 	std::vector<std::vector<double>> T(L_DIMS, std::vector<double>(L_DIMS, 0.0));
 
 	// Loop through all IBM nodes
-	for (int node = 0; node < IBNodeParents.size(); node++) {
+	for (size_t node = 0; node < IBNodeParents.size(); node++) {
 
 		// Get element this IB node exists within
 		el = IBNodeParents[node].elementID;
@@ -676,8 +673,13 @@ void FEMBody::updateIBMarkers() {
 	}
 }
 
-// \brief Update the FEM node data using the new displacements
-//
+// *****************************************************************************
+///	\brief	Get shape functions given natural value
+///
+///	\param DOFVec	vector containing the values in natural coordinates
+///	\param zeta		the natural coordinate
+/// \param length	length of element
+/// \return value at the coordinate
 std::vector<double> FEMBody::shapeFunctions (std::vector<double> &DOFVec, double zeta, double length) {
 
 	// Results vector
@@ -700,10 +702,11 @@ std::vector<double> FEMBody::shapeFunctions (std::vector<double> &DOFVec, double
 }
 
 
-// \brief Compute the mapping parameters for FEM-IBM nodes.
-//
-///	\param	nIBMNodes	number of IBM nodes in body.
-///	\param	nFEMNodes	number of FEM nodes in body.
+// *****************************************************************************
+///	\brief	Compute the mapping parameters for FEM-IBM nodes
+///
+///	\param nIBMNodes	number of IBM nodes in body
+///	\param nFEMNodes	number of FEM nodes in body
 void FEMBody::computeNodeMapping (int nIBMNodes, int nFEMNodes) {
 
 	// Set the IBM parent elements
@@ -729,7 +732,7 @@ void FEMBody::computeNodeMapping (int nIBMNodes, int nFEMNodes) {
 
 	// Loop through elements
 	double node1, node2;
-	for (int el = 0; el < elements.size(); el++) {
+	for (size_t el = 0; el < elements.size(); el++) {
 
 		// Loop through all nodes and scale range to local coordinates for element
 		for (int node = 0; node < nIBMNodes; node++) {
@@ -752,8 +755,8 @@ void FEMBody::computeNodeMapping (int nIBMNodes, int nFEMNodes) {
 	}
 }
 
-
-// \brief Constructor for parent element class.
+// *****************************************************************************
+///	\brief	Default constructor for parent element class
 FEMBody::IBMParentElements::IBMParentElements() {
 
 	// Set default values
@@ -761,7 +764,8 @@ FEMBody::IBMParentElements::IBMParentElements() {
 	zeta = 0.0;
 }
 
-// \brief Destructor for parent element class.
+// *****************************************************************************
+///	\brief	Default destructor for parent element class
 FEMBody::IBMParentElements::~IBMParentElements() {
 }
 

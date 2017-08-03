@@ -256,7 +256,6 @@ int main( int argc, char* argv[] )
 	objMan->io_readInGeomConfig();
 #endif
 
-
 #if !defined L_RESTARTING
 
 	/* Initialise the bodies (compute support etc.) using initial body positions
@@ -462,7 +461,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
-			objMan->io_writeLiftDrag(Grids->t);
+			objMan->io_writeLiftDrag();
 #endif
 		}
 #endif	

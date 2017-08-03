@@ -22,27 +22,32 @@
 #include "../inc/PCpts.h"
 #include "../inc/ObjectManager.h"
 
-// ***************************************************************************************************
-/// \brief Constructor which sets group ID to zero by default.
+// *****************************************************************************
+///	\brief	Default constructor for immersed boundary body
 IBBody::IBBody()
 {
 	this->_Owner = nullptr;
 	this->id = 0;
+	fBody = NULL;
+	isFlexible = false;
+	isMovable = false;
 }
 
-/// Default destructor
+
+// *****************************************************************************
+///	\brief	Default destructor for immersed boundary body
 IBBody::~IBBody(void)
 {
 }
 
-/******************************************************************************/
-/// \brief	Initialiser for a general IB body.
+// *****************************************************************************
+///	\brief	Initialiser for a general IB body
 ///
 ///			This initialiser performs debugging IO and sets the property flags. 
 ///			It is called immediately after the appropriate constructor by all 
 ///			derived constructors.
 ///
-///	\param	moveProperty	movable body flag passed on by the constructor.
+///	\param	moveProperty	movable body flag passed on by the constructor
 void IBBody::initialise(eMoveableType moveProperty)
 {
 
@@ -77,8 +82,8 @@ void IBBody::initialise(eMoveableType moveProperty)
 }
 
 
-/*********************************************/
-/// \brief 		Get the indexes of the valid markers (only relevant for owning ranks in parallel)
+// *****************************************************************************
+///	\brief	Get the indexes of the valid markers (only relevant for owning ranks in parallel)
 void IBBody::getValidMarkers() {
 
 	// Clear the vector
@@ -98,7 +103,7 @@ void IBBody::getValidMarkers() {
 		eLocationOnRank loc;
 
 		// Loop through all markers
-		for (int m = 0; m < markers.size(); m++) {
+		for (size_t m = 0; m < markers.size(); m++) {
 
 			// Get positions
 			x = markers[m].position[eXDirection];
@@ -124,8 +129,8 @@ void IBBody::getValidMarkers() {
 }
 
 
-/*********************************************/
-/// \brief 		Get the indexes of the valid markers (only relevant for owning ranks in parallel)
+// *****************************************************************************
+///	\brief	Point cloud marker IDs are not built in order - this step is required to sort them
 void IBBody::sortPtCloudMarkers() {
 
 	// If serial build then sorting is trivial
@@ -157,7 +162,7 @@ void IBBody::sortPtCloudMarkers() {
 		std::vector<int> rankIDs(recvIDBuffer.size(), 0);
 		std::vector<int> indexIDs(recvIDBuffer.size(), 0);
 		int count = 0;
-		for (int i = 0; i < recvSizeBuffer.size(); i++) {
+		for (size_t i = 0; i < recvSizeBuffer.size(); i++) {
 			for (int j = 0; j < recvSizeBuffer[i]; j++) {
 				rankIDs[count] = i;
 				indexIDs[count] = count;
@@ -170,7 +175,7 @@ void IBBody::sortPtCloudMarkers() {
 
 		// Pack into send buffer
 		sendSortedIDBuffer.resize(indexIDs.size(), 0);
-		for (int i = 0; i < indexIDs.size(); i++) {
+		for (size_t i = 0; i < indexIDs.size(); i++) {
 			sendSortedIDBuffer[indexIDs[i]] = i;
 		}
 
@@ -179,7 +184,7 @@ void IBBody::sortPtCloudMarkers() {
 
 		// Recreate the markers
 		double x, y, z;
-		for (int i = 0; i < indexIDs.size(); i++) {
+		for (size_t i = 0; i < indexIDs.size(); i++) {
 
 			// Get position
 			x = recvPositionBuffer[indexIDs[i] * 3];
@@ -197,14 +202,14 @@ void IBBody::sortPtCloudMarkers() {
 }
 
 
-/*********************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param _PCpts			pointer to point cloud data
-/// \param moveProperty		determines if body is moveable, flexible or rigid
-/// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
-IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped)
+// *****************************************************************************
+///	\brief	Custom constructor to populate body from array of points
+///
+///	\param 	g				hierarchy pointer to grid hierarchy
+///	\param 	bodyID			global ID of body in array of bodies
+///	\param 	_PCpts			pointer to point cloud data
+///	\param 	moveProperty	determines if body is moveable, flexible or rigid
+IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty)
 	: Body(g, bodyID, _PCpts)
 {
 
@@ -228,15 +233,21 @@ IBBody::IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty
 }
 
 
-/*********************************************/
-/// \brief 	Custom constructor for building prefab filament
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param start_position	start position of base of filament
-/// \param length			length of filament
-/// \param angles			angle of filament
-/// \param moveProperty		determines if body is moveable, flexible or rigid
-/// \param clamped			boundary condition for fixed end (only relevant if body is flexible)
+// *****************************************************************************
+///	\brief	Custom constructor for building prefab filament
+///
+///	\param 	g					hierarchy pointer to grid hierarchy
+///	\param 	bodyID				global ID of body in array of bodies
+///	\param 	start_position		base of filament
+/// \param	length				length of filament
+/// \param	height				height of filament
+/// \param	depth				depth of filament
+/// \param	angles				angle of filament
+///	\param 	moveProperty		determines if body is moveable, flexible or rigid
+///	\param 	nElements			number of FEM elements
+///	\param 	clamped				boundary condition for structural solver
+///	\param 	density				material density
+///	\param 	E					Young's modulus
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElements, bool clamped, double density, double E)
 		: Body(g, bodyID, start_position, length, angles)
@@ -254,13 +265,14 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
 }
 
 
-/*********************************************/
-/// \brief 	Custom constructor for building prefab circle/sphere
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param centre_point		centre point of circle
-/// \param radius			radius of circle
-/// \param moveProperty		determines if body is moveable, flexible or rigid
+// *****************************************************************************
+///	\brief	Custom constructor for building prefab circle/sphere
+///
+///	\param 	g					hierarchy pointer to grid hierarchy
+///	\param 	bodyID				global ID of body in array of bodies
+///	\param 	centre_point		centre of body
+/// \param	radius				radius of body
+///	\param 	moveProperty		determines if body is moveable, flexible or rigid
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		double radius, eMoveableType moveProperty)
 		: Body(g, bodyID, centre_point, radius)
@@ -269,14 +281,16 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	initialise(moveProperty);
 }
 
-/*********************************************/
-/// \brief 	Custom constructor for building square/cuboid
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param centre_point		centre point of square
-/// \param dimensions		dimensions of square
-/// \param angles			angle of square
-/// \param moveProperty		determines if body is moveable, flexible or rigid
+
+// *****************************************************************************
+///	\brief	Custom constructor for building square/cuboid
+///
+///	\param 	g					hierarchy pointer to grid hierarchy
+///	\param 	bodyID				global ID of body in array of bodies
+///	\param 	centre_point		centre of body
+/// \param	dimensions			dimensions of body
+/// \param	angles				angles of body
+///	\param 	moveProperty		determines if body is moveable, flexible or rigid
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty)
 		: Body(g, bodyID, centre_point, dimensions, angles)
@@ -286,15 +300,16 @@ IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 }
 
 
-
-/*********************************************/
-/// \brief 	Custom constructor for building plate
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param centre_point		centre point of square
-/// \param dimensions		dimensions of square
-/// \param angles			angle of square
-/// \param moveProperty		determines if body is moveable, flexible or rigid
+// *****************************************************************************
+///	\brief	Custom constructor for building plate
+///
+///	\param 	g					hierarchy pointer to grid hierarchy
+///	\param 	bodyID				global ID of body in array of bodies
+///	\param 	centre_point		centre of body
+/// \param	length				length of body
+/// \param	width				width of body
+/// \param	angles				angles of body
+///	\param 	moveProperty		determines if body is moveable, flexible or rigid
 IBBody::IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		double length, double width, std::vector<double> &angles, eMoveableType moveProperty)
 		: Body(g, bodyID, centre_point, length, width, angles)

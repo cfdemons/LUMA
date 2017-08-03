@@ -17,7 +17,9 @@
 
 // Forward declarations
 
-/// \brief	Finite element body.
+/// \brief	Finite element node class
+///
+///			Class for the finite element nodes which are contained within the FEMBody.
 class FEMNode {
 
 	/************** Friends **************/

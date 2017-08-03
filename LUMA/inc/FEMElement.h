@@ -17,7 +17,9 @@
 
 // Forward declarations
 
-/// \brief	Finite element body.
+/// \brief	Finite element class
+///
+///			Class for the finite elements which are contained within the FEMBody.
 class FEMElement {
 
 	/************** Friends **************/
@@ -25,7 +27,7 @@ class FEMElement {
 	friend class ObjectManager;
 
 	/************** Nested classes **************/
-	/// \brief	Nested child IBM node class for FEM elements.
+	/// \brief	Nested child IBM node class for FEM elements
 	///
 	///			Stores which nodes and where along itself each IBM
 	///			node sits.

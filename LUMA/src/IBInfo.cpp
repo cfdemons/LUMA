@@ -16,7 +16,11 @@
 #include "../inc/stdafx.h"
 #include "../inc/IBInfo.h"
 
-// Default constructor
+
+// *********************** Marker-Owner Comm Methods ***************************
+
+// *****************************************************************************
+///	\brief	Default constructor for owner-side marker-owner comm class
 markerCommOwnerSideClass::markerCommOwnerSideClass() {
 
 	// Set default values
@@ -26,10 +30,13 @@ markerCommOwnerSideClass::markerCommOwnerSideClass() {
 	nSupportSites = 0;
 }
 
-/// \brief 	Custom constructor for creating epsCommOwnerSideClass object
-///	\param	rank				rank receiving from.
-///	\param	body				body ID to receive.
-///	\param	marker				marker ID to receive.
+
+// *****************************************************************************
+///	\brief	Custom constructor for owner-side marker-owner comm class
+///
+///	\param	rank	rank to communicate with
+///	\param	body	global body ID
+///	\param	marker	marker ID within body
 markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marker) {
 
 	// Set values
@@ -40,7 +47,8 @@ markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marke
 }
 
 
-// Default constructor
+// *****************************************************************************
+///	\brief	Default constructor for marker-side marker-owner comm class
 markerCommMarkerSideClass::markerCommMarkerSideClass() {
 
 	// Set default values
@@ -49,10 +57,12 @@ markerCommMarkerSideClass::markerCommMarkerSideClass() {
 	markerIdx = 0;
 }
 
-/// \brief 	Custom constructor for creating epsCommMarkerSideClass object
-///	\param	rank				rank sending to.
-///	\param	body				body ID to receive.
-///	\param	marker				marker ID to receive.
+// *****************************************************************************
+///	\brief	Custom constructor for marker-side marker-owner comm class
+///
+///	\param	rank	rank to communicate with
+///	\param	body	global body ID
+///	\param	idx		marker local index within body
 markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx) {
 
 	// Set values
@@ -63,12 +73,12 @@ markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx
 
 
 
-
-/// ******************** ///
-
+// ********************** Marker-Support Comm Methods **************************
 
 
-// Default constructor
+
+// *****************************************************************************
+///	\brief	Default constructor for support-side marker-support comm class
 supportCommSupportSideClass::supportCommSupportSideClass() {
 
 	// Default values
@@ -76,10 +86,12 @@ supportCommSupportSideClass::supportCommSupportSideClass() {
 	bodyID = 0;
 }
 
-/// \brief Custom constructor for support side communication class.
-///	\param	rank to send to		index of body.
-///	\param	marker				index of marker.
-///	\param	support				index of support.
+// *****************************************************************************
+///	\brief	Custom constructor for support-side marker-support comm class
+///
+///	\param	rankID		rank to communicate with
+///	\param	body		global body ID
+///	\param	position	position indices of support point
 supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, std::vector<int> &position) {
 
 	// Default values
@@ -91,7 +103,8 @@ supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, s
 }
 
 
-// Default constructor
+// *****************************************************************************
+///	\brief	Default constructor for marker-side marker-support comm class
 supportCommMarkerSideClass::supportCommMarkerSideClass() {
 
 	// Default values
@@ -101,11 +114,15 @@ supportCommMarkerSideClass::supportCommMarkerSideClass() {
 	rankComm = 0;
 }
 
-/// \brief Custom constructor for support receiver communication class.
-///	\param	body				index of body.
-///	\param	marker				index of marker.
-///	\param	support				index of support.
-supportCommMarkerSideClass::supportCommMarkerSideClass(int body, int marker, int support, int rankID) {
+
+// *****************************************************************************
+///	\brief	Custom constructor for marker-side marker-support comm class
+///
+///	\param	rankID		rank to communicate with
+///	\param	body		global body ID
+///	\param	marker		marker ID within body
+///	\param	support		support ID within marker
+supportCommMarkerSideClass::supportCommMarkerSideClass(int rankID, int body, int marker, int support) {
 
 	// Default values
 	bodyID = body;

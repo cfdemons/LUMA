@@ -18,19 +18,19 @@
 #include "stdafx.h"
 
 
-/// \brief Class for arranging data for epsilon communication on owner side.
+/// \brief Owner-side comm class for marker-owner communications
 ///
-///
+///			Class for arranging marker-owner MPI communication.
 class markerCommOwnerSideClass {
 
-	// Make MPIManager a friend so it can access body data
+	/************** Friends **************/
 	friend class MpiManager;
 	friend class IBBody;
 	friend class ObjectManager;
 
 public:
 
-	// Default Constructor
+	/************** Constructors **************/
 	markerCommOwnerSideClass();
 
 	// Custom constructor for creating epsCommOwnerSideClass object
@@ -38,25 +38,25 @@ public:
 
 private:
 
-	// Member data
-	int rankComm;
-	int bodyID;
-	int markerID;
-	int nSupportSites;
+	/************** Member Data **************/
+	int rankComm;				///< Rank to be communicating with
+	int bodyID;					///< Global body ID for communicating
+	int markerID;				///< Marker ID for communicating
+	int nSupportSites;			///< Number of support sites that need to be communicated
 };
 
 
-/// \brief Class for arranging data for epsilon communication on marker side.
+/// \brief Marker-side comm class for marker-owner communications
 ///
-///
+///			Class for arranging marker-owner MPI communication.
 class markerCommMarkerSideClass {
 
-	// Make MPIManager a friend so it can access body data
+	/************** Friends **************/
 	friend class MpiManager;
 
 public:
 
-	// Default Constructor
+	/************** Constructors **************/
 	markerCommMarkerSideClass();
 
 	// Custom constructor for creating epsCommMarkerSideClass object
@@ -64,22 +64,22 @@ public:
 
 private:
 
-	// Member data
-	int rankComm;
-	int bodyID;
-	int markerIdx;
+	/************** Member Data **************/
+	int rankComm;				///< Rank to be communicating with
+	int bodyID;					///< Global body ID for communicating
+	int markerIdx;				///< Local (rank) index of marker for communicating
 };
 
 
 
-///	\brief	Class for arranging data for support-marker communication on support side.
+/// \brief Support-side comm class for marker-support communications
 ///
-///
+///			Class for arranging marker-support MPI communication.
 class supportCommSupportSideClass {
 
 public:
 
-	// Default Constructor
+	/************** Constructors **************/
 	supportCommSupportSideClass();
 
 	// Custom constructor for creating supportCommSupportSide object
@@ -87,34 +87,32 @@ public:
 
 public:
 
-	// ID data
-	int rankComm;
-	int bodyID;
-
-	// Support index
-	std::vector<int> supportIdx;
+	/************** Member Data **************/
+	int rankComm;						///< Rank to be communicating with
+	int bodyID;							///< Global body ID for communicating
+	std::vector<int> supportIdx;		///< Local (rank) grid indices of support point
 };
 
 
-///	\brief	Class for arranging data for support-marker communication on marker side.
+/// \brief Marker-side comm class for marker-support communications
 ///
-///
+///			Class for arranging marker-support MPI communication.
 class supportCommMarkerSideClass {
 
 public:
 
-	// Default Constructor
+	/************** Constructors **************/
 	supportCommMarkerSideClass();
 
 	// Custom constructor for creating supportCommMarkerSide object
-	supportCommMarkerSideClass(int body, int marker, int support, int rankID);
+	supportCommMarkerSideClass(int rankID, int body, int marker, int support);
 
 public:
 
-	// ID data
-	int rankComm;
-	int bodyID;
-	int markerIdx;
-	int supportID;
+	/************** Member Data **************/
+	int rankComm;					///< Rank to be communicating with
+	int bodyID;						///< Global body ID for communicating
+	int markerIdx;					///< Local (rank) index of marker for communicating
+	int supportID;					///< Support index within the marker
 };
 #endif	// L_IBINFO_H

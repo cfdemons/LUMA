@@ -13,14 +13,12 @@
  *
  */
 
-/* This file defines the constructors and methods for the immersed boundary body object.
-*/
-
 #include "../inc/stdafx.h"
 #include "../inc/FEMElement.h"
 
-// ***************************************************************************************************
-/// \brief Default constructor for FEM element.
+
+// *****************************************************************************
+///	\brief	Default constructor for finite element class
 FEMElement::FEMElement () {
 
 	// Set members to default values
@@ -32,16 +30,28 @@ FEMElement::FEMElement () {
 	density = 0;
 	angles = 0.0;
 	I = 0.0;
+	angles_n = 0.0;
+	length_n = 0.0;
 }
 
-// ***************************************************************************************************
-/// \brief Default constructor for FEM element.
+
+// *****************************************************************************
+///	\brief	Default destructor for finite element class
 FEMElement::~FEMElement () {
 }
 
 
-// ***************************************************************************************************
-/// \brief Custom constructor to build FEM element from inputs.
+// *****************************************************************************
+///	\brief	Custom constructor to build FEM element from inputs
+///
+///	\param	i				element ID
+///	\param	DOFs			number of degrees of freedom per element
+///	\param	spacing			element length
+///	\param	height			element height
+///	\param	depth			element depth (set to dh for 2D cases)
+///	\param	inputAngles		angle of element
+///	\param	inputDensity	material density
+///	\param	inputE			Young's modulus
 FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 		double depth, std::vector<double> &inputAngles, double inputDensity, double inputE) {
 
@@ -82,7 +92,8 @@ FEMElement::FEMElement (int i, int DOFs, double spacing, double height,
 }
 
 
-// \brief Constructor for parent element class.
+// *****************************************************************************
+///	\brief	Default constructor for child IB marker class
 FEMElement::FEMChildNodes::FEMChildNodes() {
 
 	// Set default values
@@ -91,15 +102,19 @@ FEMElement::FEMChildNodes::FEMChildNodes() {
 	zeta2 = 0.0;
 }
 
-// \brief Destructor for parent element class.
+
+// *****************************************************************************
+///	\brief	Default destructor for child IB marker class
 FEMElement::FEMChildNodes::~FEMChildNodes() {
 }
 
-// \brief Constructor for parent element class.
-//
-///	\param	node	node ID
-///	\param	zetaA	start of integration range
-///	\param	zetaB	end of integration range
+
+// *****************************************************************************
+///	\brief	Custom constructor for child IB marker class
+///
+///	\param	node			node ID
+///	\param	zetaA			start of integration range
+///	\param	zetaB			end of integration range
 FEMElement::FEMChildNodes::FEMChildNodes(int node, double zetaA, double zetaB) {
 
 	// Set default values

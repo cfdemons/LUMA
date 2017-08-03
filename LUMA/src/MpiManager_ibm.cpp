@@ -19,10 +19,11 @@
 
 
 
-// ************************************************************************* //
-/// \brief	Do communication required for force spreading
+// *****************************************************************************
+///	\brief	Do communication required for spreading to off-rank support points
 ///
-///
+///	\param	level			current grid level
+///	\param	spreadForces	forces that have been spread
 void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces) {
 
 	// Get object manager instance
@@ -95,10 +96,11 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 }
 
 
-// ************************************************************************* //
-/// \brief	Do communication required for velocity interpolation
+// *****************************************************************************
+///	\brief	Do communication required for interpolating from off-rank support points
 ///
-///
+///	\param	level			current grid level
+///	\param	recvVel			velocities that have been interpolated
 void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>> &recvVel) {
 
 	// Get object manager instance
@@ -187,10 +189,11 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
-// ************************************************************************* //
-/// \brief	Do communication required for epsilon calculation
+
+// *****************************************************************************
+///	\brief	Do communication required to spread new epsilon values to off-rank markers
 ///
-///
+///	\param	level			current grid level
 void MpiManager::mpi_epsilonCommScatter(int level) {
 
 	// Get object manager instance
@@ -263,10 +266,10 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 }
 
 
-// ************************************************************************* //
-/// \brief	Do communication required for epsilon calculation
+// *****************************************************************************
+///	\brief	Do communication required to gather values for epsilon calculation
 ///
-///
+///	\param	level			current grid level
 void MpiManager::mpi_epsilonCommGather(int level) {
 
 	// Get object manager instance
@@ -361,10 +364,11 @@ void MpiManager::mpi_epsilonCommGather(int level) {
 }
 
 
-// ************************************************************************* //
-/// \brief	Do communication required for universal epsilon calculation
+// *****************************************************************************
+///	\brief	Do communication required to gather values for universal epsilon calculation
 ///
-///
+///	\param	level			current grid level
+///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation
 void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBodyTmp) {
 
 	// Get object manager instance
@@ -538,10 +542,11 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 }
 
 
-// ************************************************************************* //
-/// \brief	Do communication required for universal epsilon calculation
+// *****************************************************************************
+///	\brief	Do communication required to send values after universal epsilon calculation
 ///
-///
+///	\param	rootRank		root rank which did the calculation
+///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation
 void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 
 	// Get object manager instance
@@ -663,10 +668,11 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
-// ************************************************************************* //
-/// \brief	Build helper classes for bodyOwner-marker communication
+
+// *****************************************************************************
+///	\brief	Build the classes for the marker-owner comms
 ///
-///
+///	\param	level			current grid level
 void MpiManager::mpi_buildMarkerComms(int level) {
 
 	// Clear the vector
@@ -742,12 +748,10 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
-// ************************************************************************* //
-/// \brief	Build communication information required for support communication.
+// *****************************************************************************
+///	\brief	Build the classes for the marker-support comms
 ///
-///			The owning rank of each marker needs to know where to get support
-///			information from.
-///
+///	\param	level			current grid level
 void MpiManager::mpi_buildSupportComms(int level) {
 
 	// Clear the vector
@@ -765,7 +769,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 
 					// If this rank does not own support site then add new element in comm vector
 					if (my_rank != objman->iBody[ib].markers[m].support_rank[s])
-						supportCommMarkerSide[level].emplace_back(objman->iBody[ib].id, m, s, objman->iBody[ib].markers[m].support_rank[s]);
+						supportCommMarkerSide[level].emplace_back(objman->iBody[ib].markers[m].support_rank[s], objman->iBody[ib].id, m, s);
 				}
 			}
 		}
@@ -805,6 +809,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 		supportPositions[toRank].push_back(objman->iBody[ib].markers[m].supp_z[s]);
 #endif
 	}
+
 
 	// Loop through all sends that are required
 	std::vector<MPI_Request> sendRequests;
@@ -865,10 +870,10 @@ void MpiManager::mpi_buildSupportComms(int level) {
 }
 
 
-// ************************************************************************* //
-/// \brief	Spread ds values from owning rank to other ranks
+// *****************************************************************************
+///	\brief	Spread the ds values from the body owner to off-rank markers
 ///
-///
+///	\param	level			current grid level
 void MpiManager::mpi_dsCommScatter(int level) {
 
 	// Get object manager instance
@@ -941,10 +946,14 @@ void MpiManager::mpi_dsCommScatter(int level) {
 }
 
 
-// ************************************************************************* //
-/// \brief	Gather in info for pt cloud sorter
+// *****************************************************************************
+///	\brief	Gather information required for sorting the point cloud marker IDs
 ///
-///
+///	\param	iBody					pointer to current IBBody
+///	\param	recvPositionBuffer		buffer with the marker positions
+///	\param	recvIDBuffer			buffer with the marker IDs
+///	\param	recvSizeBuffer			size of the buffers
+///	\param	recvDisps				vector with the relative displacements for the buffers
 void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &recvPositionBuffer, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
 	// Get number of markers to be sent
@@ -1000,10 +1009,13 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 }
 
 
-// ************************************************************************* //
-/// \brief	Scatter info for pt cloud sorter
+// *****************************************************************************
+///	\brief	Scatter information after sorting the point cloud marker IDs
 ///
-///
+///	\param	iBody					pointer to current IBBody
+///	\param	sendSortedIDBuffer		buffer with the marker positions
+///	\param	recvSizeBuffer			size of the buffers
+///	\param	recvDisps				vector with the relative displacements for the buffers
 void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendSortedIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
 	// Get number of markers to be sent
@@ -1022,5 +1034,3 @@ void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendS
 		}
 	}
 }
-
-// ************************************************************************** //

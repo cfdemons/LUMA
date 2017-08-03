@@ -15,11 +15,11 @@
 
 #include "../inc/ObjectManager.h"
 
-// ************************************************************************* //
-/// \brief	Do communication required for getting off-rank markers
+
+// *****************************************************************************
+///	\brief	Do communication required for gathering forces from off-rank markers
 ///
-///
-/// \param current grid level
+///	\param	level		current grid level
 void MpiManager::mpi_forceCommGather(int level) {
 
 	// Get object manager instance
@@ -30,7 +30,7 @@ void MpiManager::mpi_forceCommGather(int level) {
 
 	// Pack the data to send
 	int toRank, ib, m;
-	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
+	for (size_t i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
 		// Get body ID
 		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
@@ -62,7 +62,7 @@ void MpiManager::mpi_forceCommGather(int level) {
 
 	// Get buffer sizes
 	std::vector<int> bufferSize(num_ranks, 0);
-	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+	for (size_t i = 0; i < markerCommOwnerSide[level].size(); i++) {
 		if (objman->iBody[objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID]].isFlexible)
 			bufferSize[markerCommOwnerSide[level][i].rankComm] += L_DIMS;
 	}
@@ -85,7 +85,7 @@ void MpiManager::mpi_forceCommGather(int level) {
 
 	// Now unpack
 	int fromRank;
-	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
+	for (size_t i = 0; i < markerCommOwnerSide[level].size(); i++) {
 
 		// Get body idx
 		ib = objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID];
@@ -110,10 +110,13 @@ void MpiManager::mpi_forceCommGather(int level) {
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
-/// \brief	Spread new marker positions from owning rank to all other ranks
+// *****************************************************************************
+///	\brief	Do communication required for sending new marker positions after FEM
 ///
-///
-/// \param current grid level
+///	\param	level			current grid level
+///	\param	markerIDs		IDs of markers that have been sent
+///	\param	positions		positions of markers that have been sent
+///	\param	vels			velocities of markers that have been sent
 void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &markerIDs, std::vector<std::vector<std::vector<double>>> &positions, std::vector<std::vector<std::vector<double>>> &vels) {
 
 	// Get object manager instance
@@ -218,5 +221,3 @@ void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &
 	// If sending any messages then wait for request status
 	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
-
-// ************************************************************************** //

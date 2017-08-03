@@ -13,14 +13,11 @@
  *
  */
 
-/* This file defines the constructors and methods for the immersed boundary body object.
-*/
-
 #include "../inc/stdafx.h"
 #include "../inc/FEMNode.h"
 
-// ***************************************************************************************************
-/// \brief Default constructor for FEM body.
+// *****************************************************************************
+///	\brief	Default constructor for finite element node class
 FEMNode::FEMNode () {
 
 	// Set members to default values
@@ -30,14 +27,20 @@ FEMNode::FEMNode () {
 }
 
 
-// ***************************************************************************************************
-/// \brief Default destructor for FEM node.
+// *****************************************************************************
+///	\brief	Default destructor for finite element node class
 FEMNode::~FEMNode () {
 }
 
 
-// ***************************************************************************************************
-/// \brief Custom constructor for building FEM node from input parameters
+// *****************************************************************************
+///	\brief	Custom constructor for building FEM node from input parameters
+///
+///	\param	idx				marker ID
+///	\param	x				x-position
+///	\param	y				y-position
+///	\param	z				z-position
+///	\param	inputAngles		node angle
 FEMNode::FEMNode (int idx, double x, double y, double z, std::vector<double> &inputAngles) {
 
 	// Set values

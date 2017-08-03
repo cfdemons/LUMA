@@ -22,7 +22,9 @@
 
 class IBBody;
 
-/// \brief	Finite element body.
+/// \brief	Finite element body
+///
+///			Class for the finite elements body which is contained within the IBBody.
 class FEMBody {
 
 	/************** Friends **************/
@@ -31,10 +33,10 @@ class FEMBody {
 
 
 	/************** Nested classes **************/
-	/// \brief	Nested parent element class for each IBM node.
+	/// \brief	Nested parent element class for each IBM node
 	///
-	///			Stores which element and where along it each IBM
-	///			node sits.
+	///			Stores which element and where in the element
+	///			it each IBM node sits.
 	class IBMParentElements {
 
 		// Set friend class
@@ -110,9 +112,9 @@ class FEMBody {
 	void constructNLStiffMat();									// Construct non-linear stiffness matrix
 	void updateFEMNodes();										// Update the FEM node data using the new displacements
 	void updateIBMarkers();										// Update the IBM markers using new FEM node vales
+	std::vector<double> shapeFunctions(std::vector<double> &vec, double zeta, double length);											// Sum the shape functions to get displacement/velocity
 	void bcFEM(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);			// Apply BCs by removing elements in global matrices
 	void setNewmark(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);	// First step in Newmar-Beta time integration
-	std::vector<double> shapeFunctions(std::vector<double> &vec, double zeta, double length);		// Sum the shape functions to get displacement/velocity
 
 	// Helper methods
 	double checkNRConvergence();								// Check convergence of the Newton-Raphson scheme

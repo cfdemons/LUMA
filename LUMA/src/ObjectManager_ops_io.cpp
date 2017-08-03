@@ -18,9 +18,11 @@
 #include "../inc/PCpts.h"
 #include "../inc/GridObj.h"
 
-// ************************************************************************** //
-/// \brief Write out position of immersed boundary bodies.
-/// \param	timestep	timestep at which the write out is being performed.
+
+// *****************************************************************************
+///	\brief	Write out position of immersed boundary bodies
+///
+///	\param	timestep		current time step
 void ObjectManager::io_writeBodyPosition(int timestep) {
 
 	int rank = GridUtils::safeGetRank();
@@ -47,16 +49,13 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 #endif
 			}
 			jout.close();
-
 	}
-
 }
 
 
-// ************************************************************************** //
-/// \brief Write out forces on the markers of immersed boundary bodies.
-/// \param	timestep	timestep at which the write out is being performed.
-void ObjectManager::io_writeLiftDrag(int timestep) {
+// *****************************************************************************
+///	\brief	Write out forces on the markers of immersed boundary bodies
+void ObjectManager::io_writeLiftDrag() {
 
 	// Force conversion
 	double forceScaling, volWidth, volDepth;
@@ -65,7 +64,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 	int rank = GridUtils::safeGetRank();
 
 	// Loop through all bodies
-	for (int ib = 0; ib < iBody.size(); ib++) {
+	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 		// Only write out if this rank owns some markers
 		if (iBody[ib].validMarkers.size() > 0) {
@@ -84,7 +83,7 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 				jout << 0 << "\t" << 0.0;
 
 				// Compute lift and drag
-				for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 
 					// Write out force on markers
 					for (int dir = 0; dir < L_DIMS; dir++)
@@ -126,10 +125,12 @@ void ObjectManager::io_writeLiftDrag(int timestep) {
 	}
 }
 
-// ************************************************************************** //
-/// \brief	Read/write body information to restart file.
-/// \param	IO_flag	flag indicating write (true) or read (false).
-/// \param	level	level of the grid begin written/read
+
+// *****************************************************************************
+///	\brief	Read/write body information to restart file
+///
+///	\param	IO_flag		flag indicating write (true) or read (false)
+///	\param	level		current grid level
 void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 	int rank = GridUtils::safeGetRank();
@@ -283,10 +284,10 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 }
 
 
-// ************************************************************************** //
-/// \brief	Wrapper for writing body position data to VTK file.
+// *****************************************************************************
+///	\brief	Wrapper for writing body position data to VTK file
 ///
-/// \param	tval	time value at which the write out is being performed.
+///	\param	tval		time value at which the write out is being performed
 void ObjectManager::io_vtkBodyWriter(int tval)
 {
 
@@ -310,8 +311,9 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	}
 }
 
-// ************************************************************************** //
-/// \brief	Read in geometry config file.
+
+// *****************************************************************************
+///	\brief	Read in geometry config file
 ///
 ///			Input data must be in correct format as specified in documentation.
 ///
@@ -774,14 +776,15 @@ void ObjectManager::io_readInGeomConfig() {
 }
 
 
-// ************************************************************************** //
-/// \brief	Read in point cloud data.
+
+// *****************************************************************************
+/// \brief	Read in point cloud data
 ///
-///			Input data must be in tab separated, 3-column format in the input 
+///			Input data must be in tab separated, 3-column format in the input
 ///			directory.
 ///
-/// \param	_PCpts	reference to pointer to empty point cloud data container.
-/// \param	geom	structure containing object data as parsed from the config file.
+///	\param	_PCpts		reference to pointer to empty point cloud data container
+///	\param	geom		structure containing object data as parsed from the config file
 void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 {
 
@@ -806,9 +809,6 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 
 	// Return if this process does not have this grid
 	if (g == NULL) return;
-
-	// Get rank for debugging
-	int rank = GridUtils::safeGetRank();
 
 	// Round reference values to voxel centres
 	double bodyRefX = std::round(geom->bodyRefX / g->dh) * g->dh;
@@ -999,15 +999,18 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	else if (geom->objtype == eIBBCloud) {
 
 		// Call constructor to build IBM body
-		iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->isClamped);
+		iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty);
 	}
 }
+
+
 // *****************************************************************************
-/// \brief	Write out the forces on a solid object.
+/// \brief	Write out the forces on a solid object
 ///
 ///			Writes out the forces on solid objects in the domain computed using
 ///			momentum exchange. Each rank writes its own file. Output is a CSV file.
-/// \param	tval	time value at which write out is taking place.
+///
+///	\param	tval		time value at which write out is taking place
 void ObjectManager::io_writeForcesOnObjects(double tval) {
 	
 	// Declarations
@@ -1093,10 +1096,10 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 }
 
 
-// ************************************************************************** //
-/// \brief	Wrapper for writing body position data to VTK file.
+// *****************************************************************************
+/// \brief	Write out FEM body to VTK
 ///
-/// \param	tval	time value at which the write out is being performed.
+///	\param	tval		time value at which write out is taking place
 void ObjectManager::io_vtkFEMWriter(int tval)
 {
 
@@ -1118,7 +1121,7 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	std::vector<int> nLinesBody;
 
     // Loop through all bodies
-	for (int ib = 0; ib < IdxFEM.size(); ib++) {
+	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
 
 		// Increment number of nodes and lines
 		nNodes += iBody[IdxFEM[ib]].fBody->nodes.size();
@@ -1135,8 +1138,8 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	fout << "POINTS " << nNodes << " float\n";
 
     // Loop through all bodies and there nodes
-	for (int ib = 0; ib < IdxFEM.size(); ib++) {
-		for (int m = 0; m < iBody[IdxFEM[ib]].fBody->nodes.size(); m++) {
+	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
+		for (size_t m = 0; m < iBody[IdxFEM[ib]].fBody->nodes.size(); m++) {
 
 			// Write out positions
 			fout << iBody[IdxFEM[ib]].fBody->nodes[m].position[eXDirection] << " "
@@ -1150,7 +1153,7 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 
 	// Loop through number of lines
 	int count = 0;
-	for (int i = 0; i < nLinesBody.size(); i++) {
+	for (size_t i = 0; i < nLinesBody.size(); i++) {
 		for (int j = 0; j < nLinesBody[i]; j++) {
 			fout << 2 << " " << count << " " << count + 1 << std::endl;
 			count++;
@@ -1162,10 +1165,11 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	fout.close();
 }
 
-// ************************************************************************** //
+
+// *****************************************************************************
 /// \brief	Write out tip positions of flexible filaments
 ///
-/// \param	tval	time value at which the write out is being performed.
+///	\param	tval		time value at which write out is taking place
 void ObjectManager::io_writeTipPositions(int tval) {
 
 	// Loop through FEM bodies which this rank owns
@@ -1191,6 +1195,3 @@ void ObjectManager::io_writeTipPositions(int tval) {
 		fout.close();
 	}
 }
-
-
-// *****************************************************************************

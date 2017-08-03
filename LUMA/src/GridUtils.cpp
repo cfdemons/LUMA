@@ -330,17 +330,18 @@ std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
 
 
 // *****************************************************************************
-/// \brief	Tranpose a matrix.
-/// \param	origMat		original matrix.
-/// \return	transMat	transposed matrix.
+///	\brief	Get traspose of matrix
+///
+///	\param	origMat			original matrx
+///	\return	transposed matrix
 std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::vector<double>> &origMat) {
 
 	// Intialise tranpose
 	std::vector<std::vector<double>> transMat(origMat[0].size(), std::vector<double>(origMat.size(), 0.0));
 
 	// Loop over matrix and swap i and j values
-	for (int i = 0; i < origMat.size(); i++) {
-		for (int j = 0; j < origMat[0].size(); j++) {
+	for (size_t i = 0; i < origMat.size(); i++) {
+		for (size_t j = 0; j < origMat[0].size(); j++) {
 			transMat[j][i] = origMat[i][j];
 		}
 	}
@@ -352,16 +353,17 @@ std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::ve
 
 
 // *****************************************************************************
-/// \brief	Assemble global matrix from local matrix.
-/// \param	el			element number.
-/// \param	offset		offset between elements.
-/// \param	localMat	local matrix.
-/// \param	globalMat	global matrix.
+///	\brief	Assemble into global matrix
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	localMat	local element matrix
+///	\param	globalMat	global matrix to be assembled
 void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat) {
 
 	// Add the values of the single element matrix to the full system matrix
-	for (int i = 0; i < localMat.size(); i++) {
-		for (int j = 0; j < localMat[i].size(); j++) {
+	for (size_t i = 0; i < localMat.size(); i++) {
+		for (size_t j = 0; j < localMat[i].size(); j++) {
 			globalMat[i+el*offset][j+el*offset] += localMat[i][j];
 		}
 	}
@@ -369,30 +371,32 @@ void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<do
 
 
 // *****************************************************************************
-/// \brief	Assemble global vector from local vector.
-/// \param	el			element number.
-/// \param	offset		offset between elements.
-/// \param	localMat	local vector.
-/// \param	globalMat	global vector.
+///	\brief	Assemble into global vector
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	localMat	local element vector
+///	\param	globalMat	global vector to be assembled
 void GridUtils::assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat) {
 
 	// Add the values of the single element matrix to the full system matrix
-	for (int i = 0; i < localMat.size(); i++) {
+	for (size_t i = 0; i < localMat.size(); i++) {
 		globalMat[i+el*offset] += localMat[i];
 	}
 }
 
 
 // *****************************************************************************
-/// \brief	Extract local vector from global vector.
-/// \param	el			element number.
-/// \param	offset		offset between elements.
-/// \param	localMat	local vector.
-/// \param	globalMat	global vector.
+///	\brief	Extract local vector from global vector
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	globalMat	global vector to be extracted from
+///	\param	localMat	local element vector
 void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &globalMat, std::vector<double> &localMat) {
 
 	// Add the values of the single element matrix to the full system matrix
-	for (int i = 0; i < localMat.size(); i++) {
+	for (size_t i = 0; i < localMat.size(); i++) {
 		localMat[i] = globalMat[i+el*offset];
 	}
 }
@@ -403,6 +407,13 @@ void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &gl
 /// \param	A	A.
 /// \param	b	b.
 /// \return	x	x.
+
+// *****************************************************************************
+///	\brief	Solve the linear system A.x = b
+///
+///	\param	A		A matrix
+///	\param	b		b vector (RHS)
+///	\return	x
 std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b) {
 
 	// Set up the correct values
@@ -815,10 +826,12 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 
 }
 
+
 // *****************************************************************************
-/// \brief	Get rank where this position is
+///	\brief	Get rank where this position is
 ///
-/// \param	position		position (x, y or z)
+///	\param	position	position (x, y or z)
+///	\return	rank
 int GridUtils::getRankfromPosition(std::vector<double> &position) {
 
 	// TODO Search through the ranks using a self-organised list as more often than not the markers are going back to their original rank
@@ -847,7 +860,8 @@ int GridUtils::getRankfromPosition(std::vector<double> &position) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 	// Loop through all ranks
-	for (int rank = 0; rank < mpim->num_ranks; rank++) {
+	int rank;
+	for (rank = 0; rank < mpim->num_ranks; rank++) {
 
 		// Check if within the grid
 		if (position[eXDirection] >= mpim->rank_core_edge[eXMin][rank] && position[eXDirection] < mpim->rank_core_edge[eXMax][rank]
@@ -858,9 +872,12 @@ int GridUtils::getRankfromPosition(std::vector<double> &position) {
 			) {
 
 			// Return rank number
-			return rank;
+			break;
 		}
 	}
+
+	// If it gets here then this is valid
+	return rank;
 #endif
 }
 

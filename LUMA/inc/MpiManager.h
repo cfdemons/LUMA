@@ -131,11 +131,11 @@ public :
 	/// Logfile handle
 	std::ofstream* logout;
 
-	// MPI-IBM specific members
-	std::vector<std::vector<markerCommOwnerSideClass>> markerCommOwnerSide;
-	std::vector<std::vector<markerCommMarkerSideClass>> markerCommMarkerSide;
-	std::vector<std::vector<supportCommMarkerSideClass>> supportCommMarkerSide;
-	std::vector<std::vector<supportCommSupportSideClass>> supportCommSupportSide;
+	// IBM comm classes
+	std::vector<std::vector<markerCommOwnerSideClass>> markerCommOwnerSide;			///< Owner-side marker-owner comm
+	std::vector<std::vector<markerCommMarkerSideClass>> markerCommMarkerSide;		///< Marker-side marker-owner comm
+	std::vector<std::vector<supportCommMarkerSideClass>> supportCommMarkerSide;		///< Marker-side marker-support comm
+	std::vector<std::vector<supportCommSupportSideClass>> supportCommSupportSide;	///< Support-side marker-support comm
 
 
 

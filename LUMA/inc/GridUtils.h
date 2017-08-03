@@ -98,11 +98,11 @@ public:
 	static int safeGetRank();														// Parallel/Serial safe method to get rank
 
 	// Coordinate Management
-	static bool isOffGrid(int i, int j, int k, GridObj const * const g);					// Is site off supplied grid
+	static bool isOffGrid(int i, int j, int k, GridObj const * const g);											// Is site off supplied grid
 	static void getEnclosingVoxel(double x, double y, double z, GridObj const * const g, std::vector<int> *ijk);	// Take a position and a get a local ijk
 	static void getEnclosingVoxel(double x, GridObj const * const g, eCartesianDirection dir, int *ijk);
-	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);	// Is site on any TL to upper
-	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);			// Is site on specified TL to upper
+	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);			// Is site on any TL to upper
+	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);					// Is site on specified TL to upper
 
 	// Templated functions //
 

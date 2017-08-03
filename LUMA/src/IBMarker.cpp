@@ -16,14 +16,38 @@
 #include "../inc/stdafx.h"
 #include "../inc/IBMarker.h"
 
-// ***************************************************************************************************
-/// \brief Custom constructor for IBMarker (calls the non-default base constructor).
-/// \param xPos			x-position of marker.
-/// \param yPos			y-position of marker.
-/// \param zPos			z-position of marker.
-/// \param markerID		ID of marker within body
-///	\param body_owner	Grid on which primary support point is to be found
-IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj const * const body_owner) : Marker(xPos, yPos, zPos, markerID, body_owner) {
+
+
+// *****************************************************************************
+///	\brief	Default constructor for immersed boundary marker
+IBMarker::IBMarker() {
+
+	// Initialise all values to zero
+	epsilon = 0.0;
+	local_area = 1.0;
+	dilation = 1.0;
+	interpRho = 0.0;
+	ds = 1.0;
+	owningRank = 0;
+}
+
+
+// *****************************************************************************
+///	\brief	Default destructor for immersed boundary marker
+IBMarker::~IBMarker() {
+}
+
+
+// *****************************************************************************
+///	\brief	Custom constructor for immersed boundary marker
+///
+///	\param	xPos			x-position of marker
+///	\param	yPos			y-position of marker
+///	\param	zPos			z-position of marker
+///	\param	markerID		ID of marker within body
+///	\param	body_owner		owning grid of body
+IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj const * const body_owner)
+			: Marker(xPos, yPos, zPos, markerID, body_owner) {
 
 	// Initialise all values to zero
 	this->epsilon = 0.0;
@@ -53,6 +77,3 @@ IBMarker::IBMarker(double xPos, double yPos, double zPos, int markerID, GridObj 
 	// Get rank which owns area where this marker is
 	this->owningRank = GridUtils::getRankfromPosition(position);
 }
-
-
-// ***************************************************************************************************

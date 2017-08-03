@@ -51,6 +51,9 @@ IBBody::~IBBody(void)
 void IBBody::initialise(eMoveableType moveProperty)
 {
 
+	// Set local grid spacing
+	dh = _Owner->dh;
+
 	// Set FEM body pointer to NULL (if required it will be set properly later)
 	fBody = NULL;
 

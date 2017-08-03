@@ -827,25 +827,25 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #if (L_DIMS == 3)
 						Delta_J =
 							ibm_deltaKernel(
-							((*iBodyPtr)[ib].markers[J].position[eXDirection] - (*iBodyPtr)[ib].markers[I].supp_x[s]) / (*iBodyPtr)[ib]._Owner->dh,
+							((*iBodyPtr)[ib].markers[J].position[eXDirection] - (*iBodyPtr)[ib].markers[I].supp_x[s]) / (*iBodyPtr)[ib].dh,
 							(*iBodyPtr)[ib].markers[J].dilation
 							) *
 							ibm_deltaKernel(
-							((*iBodyPtr)[ib].markers[J].position[eYDirection] - (*iBodyPtr)[ib].markers[I].supp_y[s]) / (*iBodyPtr)[ib]._Owner->dh,
+							((*iBodyPtr)[ib].markers[J].position[eYDirection] - (*iBodyPtr)[ib].markers[I].supp_y[s]) / (*iBodyPtr)[ib].dh,
 							(*iBodyPtr)[ib].markers[J].dilation
 							) *
 							ibm_deltaKernel(
-							((*iBodyPtr)[ib].markers[J].position[eZDirection] - (*iBodyPtr)[ib].markers[I].supp_z[s]) / (*iBodyPtr)[ib]._Owner->dh,
+							((*iBodyPtr)[ib].markers[J].position[eZDirection] - (*iBodyPtr)[ib].markers[I].supp_z[s]) / (*iBodyPtr)[ib].dh,
 							(*iBodyPtr)[ib].markers[J].dilation
 							);
 #else
 						Delta_J =
 							ibm_deltaKernel(
-							((*iBodyPtr)[ib].markers[J].position[eXDirection] - (*iBodyPtr)[ib].markers[I].supp_x[s]) / (*iBodyPtr)[ib]._Owner->dh,
+							((*iBodyPtr)[ib].markers[J].position[eXDirection] - (*iBodyPtr)[ib].markers[I].supp_x[s]) / (*iBodyPtr)[ib].dh,
 							(*iBodyPtr)[ib].markers[J].dilation
 							) *
 							ibm_deltaKernel(
-							((*iBodyPtr)[ib].markers[J].position[eYDirection] - (*iBodyPtr)[ib].markers[I].supp_y[s]) / (*iBodyPtr)[ib]._Owner->dh,
+							((*iBodyPtr)[ib].markers[J].position[eYDirection] - (*iBodyPtr)[ib].markers[I].supp_y[s]) / (*iBodyPtr)[ib].dh,
 							(*iBodyPtr)[ib].markers[J].dilation
 							);
 #endif

@@ -119,6 +119,8 @@ public :
 	DEPRECATED double YOrigin;		///< Position of grid bottom edge
 	DEPRECATED double ZOrigin;		///< Position of grid front edge
 
+	std::vector<int> rankGrids;		///< Vector of size num_ranks which contains how many subgrids each rank has access to
+
 
 	/************** Member Methods **************/
 
@@ -141,6 +143,7 @@ public :
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
+	void LBM_calculateRankGrids();						// Get which ranks have access to which subgrids
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file

@@ -69,6 +69,8 @@ protected:
 	bool isFlexible;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool isMovable;						///< Flag to indicate if body is movable or not.
 
+	double dh;							///< Local grid spacing for this body
+
 	FEMBody *fBody;						///< Pointer to FEM body object
 
 

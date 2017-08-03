@@ -237,6 +237,9 @@ int main( int argc, char* argv[] )
 
 	}
 
+	// Set the rankGrids value which contains a list of how many subgrids each rank has access to
+	Grids->LBM_calculateRankGrids();
+
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
 	gm->setGridHierarchy(Grids);
 

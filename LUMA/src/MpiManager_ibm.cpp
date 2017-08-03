@@ -491,7 +491,8 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	// Set global values
 	iBodyTmp.owningRank = rootRank;
 	iBodyTmp.level = level;
-	iBodyTmp._Owner = objman->iBody[0]._Owner;
+	iBodyTmp._Owner = objman->_Grids;
+	iBodyTmp.dh = objman->_Grids->dh / pow(2.0, level);
 
 	// Unpack receive buffer
 	if (my_rank == rootRank) {

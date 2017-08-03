@@ -77,6 +77,7 @@ protected:
 private:
 	bool isInVoxel(double x, double y, double z, int curr_mark);			// Check a point is inside an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z);					// Check whether nearest voxel is a marker voxel
+	int assignOwningRank(int id);											// Assign owning rank based on which ranks own which grids
 
 
 protected:
@@ -117,11 +118,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
@@ -148,11 +145,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
 
 	// Get horizontal and vertical angles
 	double body_angle_v = angles[0];
@@ -206,11 +199,8 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
+
 
 	// Build sphere (3D)
 #if (L_DIMS == 3)	// TODO Sort out 3D sphere builder
@@ -278,11 +268,8 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
+
 
 	// Shorter variable names for convenience
 	double length = width_length_depth[0];
@@ -421,11 +408,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
 
 	// Get number of markers in each direction
 	int numMarkersLength = static_cast<int>(std::floor(length / g->dh)) + 1;
@@ -842,6 +825,39 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 
 	// Close file
 	fout.close();
+};
+
+
+/*********************************************/
+/// \brief	Assigns owning rank of body based on which grids each rank has access to
+///
+/// \param	id				global body ID
+/// \return rank
+template <typename MarkerType>
+int Body<MarkerType>::assignOwningRank(int id) {
+
+	// If serial just return 0
+#ifndef L_BUILD_FOR_MPI
+	return 0;
+#else
+
+	// Some work required if in parallel
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Vector of valid ranks which are allowed to own it
+	std::vector<int> validRanks;
+
+	// Loop through rankGrids to see which ranks are allowed to own it
+	for (int rank = 0; rank < mpim->num_ranks; rank++) {
+
+		// Check if this rank has this level
+		if (_Owner->rankGrids[rank] >= level)
+			validRanks.push_back(rank);
+	}
+
+	// Return
+	return validRanks[id % validRanks.size()];
+#endif
 };
 
 #endif

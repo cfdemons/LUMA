@@ -52,7 +52,7 @@
 //#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
-#define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
+#define L_SHOW_TIME_TO_COMPLETE		        ///< Write the estimated time to completion to the terminal
 
 
 /*
@@ -61,15 +61,13 @@
 *******************************************************************************
 */
 
-const int resFactor = 2;
-
 // Using MPI?
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*5)			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES L_OUT_EVERY				///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 8						///< Precision of output (for text writers)
+#define L_OUT_EVERY 200									///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 5		///< Specific output frequency of body forces
+#define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -79,9 +77,9 @@ const int resFactor = 2;
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
 // High frequency output options
-//#define L_PROBE_OUTPUT							///< Turn on probe output
-#define L_PROBE_OUT_FREQ 200						///< Write out frequency of probe output
-const static int cNumProbes[3] = {3, 3, 3};			///< Number of probes in each direction (x, y, z)
+//#define L_PROBE_OUTPUT						///< Turn on probe output
+#define L_PROBE_OUT_FREQ 200					///< Write out frequency of probe output
+const static int cNumProbes[3] = {3, 3, 3};		///< Number of probes in each direction (x, y, z)
 const static double cProbeLimsX[2] = {0.1, 0.2};	///< Limits of X plane for array of probes
 const static double cProbeLimsY[2] = {0.1, 0.2};	///< Limits of Y plane for array of probes
 const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for array of probes
@@ -94,7 +92,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 #define L_RESTART_OUT_FREQ 1000000000000			///< Frequency of write out of restart file
@@ -111,7 +109,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (resFactor*resFactor*15000)		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 12000		///< Number of time steps to run simulation for
 
 
 /*
@@ -122,12 +120,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_YCORES 4		///< Number of MPI ranks to divide domain into in Y direction
+/// Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 3
 
 // Balanced decomposition
-#define L_MPI_SMART_DECOMPOSE
-#define L_MPI_SD_MAX_ITER 1000
+//#define L_MPI_SMART_DECOMPOSE
+#define L_MPI_SD_MAX_ITER 3000
 
 /*
 *******************************************************************************
@@ -136,20 +135,20 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Lattice properties
-#define L_DIMS 2												///< Number of dimensions to the problem
-#define L_RESOLUTION (resFactor*100)							///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP (0.002380952/(resFactor*resFactor))			///< The timestep in non-dimensional units
+#define L_DIMS 3									///< Number of dimensions to the problem
+#define L_RESOLUTION 4								///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.01875								///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.5								///< End of domain in X (non-dimensional units)
-#define L_BY (0.41 + 2.0 / L_RESOLUTION)		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0								///< End of domain in Z (non-dimensional units)
+#define L_BX 10.0								///< End of domain in X (non-dimensional units)
+#define L_BY 10.0								///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0								///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0						///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density
-#define L_RHO_REF 1000.0
+#define L_RHO_REF 1.0
 
 
 /*
@@ -160,7 +159,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	   	///< Use an inlet profile
-#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile
+//#define L_PARABOLIC_INLET	   		///< Use analytic expression for inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -169,7 +168,7 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 300			///< Desired Reynolds number
 
 
 /*
@@ -185,13 +184,13 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 
 // IBM //
 #define L_IBM_ON						///< Turn on IBM
-#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+//#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
 #define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
 #define L_NB_DELTA 0.5					///< Parameter for Newmark-Beta time integration (0.5 for 2nd order)
-#define L_RELAX 0.5						///< Under-relaxation for FSI coupling
-#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
+#define L_RELAX 0.2						///< Under-relaxation for FSI coupling
+//#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
 
 /*
 *******************************************************************************
@@ -200,23 +199,23 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 */
 
 // Virtual Wind Tunnels
-//#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
+#define L_FREESTREAM_TUNNEL		///< Adds a velocity BC to all faces
 
 // Type of Inlet/Outlet BC (default Forced Equilibrium)
-#define L_VELOCITY_REGULARISED		///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
+//#define L_VELOCITY_REGULARISED	///< Specify the inlet/outlet BC to be a regularised velocity condition (Latt & Chopard)
 
 // Inlet (left-hand wall)
-#define L_INLET_ON					///< Turn on inlet boundary
-#define L_INLET_RAMP 2.0			///< Ramp up the inlet velocity (this value is the time over which to ramp)
+#define L_INLET_ON				///< Turn on inlet boundary
+//#define L_INLET_RAMP 2.0		///< Ramp up the inlet velocity (this value is the time over which to ramp)
 
 // Outlet (right-hand wall)
 #define L_OUTLET_ON					///< Turn on outlet boundary
 //#define L_EXTRAPOLATED_OUTLET		///< Extrapolate the velocity from the outlet
-#define L_PRESSURE_OUTLET 0.0		///< Fixed pressure outlet (this value is the delta)
+//#define L_PRESSURE_OUTLET 0.0		///< Fixed pressure outlet (this value is the delta)
 
 // Solids
-#define L_WALLS_ON					///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
-//#define L_WALLS_ON_2D				///< Limit no-slip walls to top and bottom no-slip walls only
+//#define L_WALLS_ON			///< Turn on no-slip walls (default is top, bottom, front, back unless L_WALLS_ON_2D is used)
+//#define L_WALLS_ON_2D			///< Limit no-slip walls to top and bottom no-slip walls only
 //#define L_WALL_FLOOR_ONLY
 #define L_WALL_THICKNESS_BOTTOM L_COARSE_SITE_THICKNESS			///< Thickness of wall
 #define L_WALL_THICKNESS_TOP L_COARSE_SITE_THICKNESS			///< Thickness of top wall
@@ -230,8 +229,8 @@ const static double cProbeLimsZ[2] = {0.1, 0.2};	///< Limits of Z plane for arra
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
-#define L_NUM_REGIONS 0		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_NUM_LEVELS 4		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // If you want coincident edges then set to (-2.0 * dh)

@@ -847,11 +847,15 @@ int Body<MarkerType>::assignOwningRank(int id) {
 	// Vector of valid ranks which are allowed to own it
 	std::vector<int> validRanks;
 
+	// Set pointer to current grid owner
+	GridObj *g = NULL;
+	GridUtils::getGrid(0, 0, g);
+
 	// Loop through rankGrids to see which ranks are allowed to own it
 	for (int rank = 0; rank < mpim->num_ranks; rank++) {
 
 		// Check if this rank has this level
-		if (_Owner->rankGrids[rank] >= level)
+		if (g->rankGrids[rank] >= level)
 			validRanks.push_back(rank);
 	}
 

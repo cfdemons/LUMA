@@ -232,12 +232,8 @@ void ObjectManager::ibm_initialise() {
 		ibm_computeDs(lev);
 
 	// Find epsilon for the body
-#ifdef L_UNIVERSAL_EPSILON_CALC
-	ibm_findEpsilon(0);
-#else
 	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
 		ibm_findEpsilon(lev);
-#endif
 
 	// Write out epsilon
 #ifdef L_IBM_DEBUG
@@ -879,7 +875,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #ifdef L_UNIVERSAL_EPSILON_CALC
 
 	// Redistribute epsilon
-	ibm_universalEpsilonScatter(iBodyTmp[0]);
+	ibm_universalEpsilonScatter(level, iBodyTmp[0]);
 
 #else
 	#ifdef L_BUILD_FOR_MPI
@@ -1073,7 +1069,7 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 ///	\brief	Spread all the epsilon values to all ranks which own markers
 ///
 ///	\param	iBodyTmp	container for all markers in entire simulation
-void ObjectManager::ibm_universalEpsilonScatter(IBBody &iBodyTmp) {
+void ObjectManager::ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp) {
 
 
 #ifdef L_BUILD_FOR_MPI
@@ -1085,7 +1081,7 @@ void ObjectManager::ibm_universalEpsilonScatter(IBBody &iBodyTmp) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 	// Gather in the data for all markers in the system
-	mpim->mpi_uniEpsilonCommScatter(rootRank, iBodyTmp);
+	mpim->mpi_uniEpsilonCommScatter(level, rootRank, iBodyTmp);
 
 #else
 

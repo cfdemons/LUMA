@@ -143,8 +143,8 @@ public:
 	void ibm_computeDs(int level);
 	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
 	void ibm_finaliseReadIn(int iBodyID);											// Do some house-keeping after geometry read in
-	void ibm_universalEpsilonGather(int level, IBBody &iBodyTmp);						// Gather all the markers into the temporary iBody vector
-	void ibm_universalEpsilonScatter(IBBody &iBodyTmp);								// Gather all the markers into the temporary iBody vector
+	void ibm_universalEpsilonGather(int level, IBBody &iBodyTmp);					// Gather all the markers into the temporary iBody vector
+	void ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp);					// Gather all the markers into the temporary iBody vector
 	void ibm_subIterate(GridObj *g);												// Subiterate to enforce correct kinematic conditions at interface
 	double ibm_checkVelDiff(int level);												// Check residual from sub-iteration step
 

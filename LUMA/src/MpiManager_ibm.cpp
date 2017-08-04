@@ -381,12 +381,16 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	// Get how many markers and supports exist on each rank
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
 
-		// Number of markers on this rank
-		nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+		// If this body is on this level
+		if (objman->iBody[ib].level == level) {
 
-		// Loop through markers and get number of deltas
-		for (auto m : objman->iBody[ib].validMarkers)
-			deltasPerMarkerOnThisRank.push_back(objman->iBody[ib].markers[m].deltaval.size());
+			// Number of markers on this rank
+			nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+
+			// Loop through markers and get number of deltas
+			for (auto m : objman->iBody[ib].validMarkers)
+				deltasPerMarkerOnThisRank.push_back(objman->iBody[ib].markers[m].deltaval.size());
+		}
 	}
 
 	// Set receive buffer for how many markers on each rank
@@ -461,26 +465,32 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 
 	// Now pack data into send buffer
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
-		for (auto m : objman->iBody[ib].validMarkers) {
 
-			// Pack position first
-			sendBuffer.push_back(objman->iBody[ib].markers[m].position[eXDirection]);
-			sendBuffer.push_back(objman->iBody[ib].markers[m].position[eYDirection]);
-#if (L_DIMS == 3)
-			sendBuffer.push_back(objman->iBody[ib].markers[m].position[eZDirection]);
-#endif
-			sendBuffer.push_back(objman->iBody[ib].markers[m].local_area);
-			sendBuffer.push_back(objman->iBody[ib].markers[m].dilation);
-			sendBuffer.push_back(objman->iBody[ib].markers[m].ds);
+		// If this body is on this level
+		if (objman->iBody[ib].level == level) {
 
-			// Now pack the support site data
-			for (int s = 0; s < objman->iBody[ib].markers[m].deltaval.size(); s++) {
-				sendBuffer.push_back(objman->iBody[ib].markers[m].supp_x[s]);
-				sendBuffer.push_back(objman->iBody[ib].markers[m].supp_y[s]);
+			// Loop through valid markers on this body
+			for (auto m : objman->iBody[ib].validMarkers) {
+
+				// Pack position first
+				sendBuffer.push_back(objman->iBody[ib].markers[m].position[eXDirection]);
+				sendBuffer.push_back(objman->iBody[ib].markers[m].position[eYDirection]);
 #if (L_DIMS == 3)
-				sendBuffer.push_back(objman->iBody[ib].markers[m].supp_z[s]);
+				sendBuffer.push_back(objman->iBody[ib].markers[m].position[eZDirection]);
 #endif
-				sendBuffer.push_back(objman->iBody[ib].markers[m].deltaval[s]);
+				sendBuffer.push_back(objman->iBody[ib].markers[m].local_area);
+				sendBuffer.push_back(objman->iBody[ib].markers[m].dilation);
+				sendBuffer.push_back(objman->iBody[ib].markers[m].ds);
+
+				// Now pack the support site data
+				for (int s = 0; s < objman->iBody[ib].markers[m].deltaval.size(); s++) {
+					sendBuffer.push_back(objman->iBody[ib].markers[m].supp_x[s]);
+					sendBuffer.push_back(objman->iBody[ib].markers[m].supp_y[s]);
+#if (L_DIMS == 3)
+					sendBuffer.push_back(objman->iBody[ib].markers[m].supp_z[s]);
+#endif
+					sendBuffer.push_back(objman->iBody[ib].markers[m].deltaval[s]);
+				}
 			}
 		}
 	}
@@ -491,7 +501,6 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	// Set global values
 	iBodyTmp.owningRank = rootRank;
 	iBodyTmp.level = level;
-	iBodyTmp._Owner = objman->_Grids;
 	iBodyTmp.dh = objman->_Grids->dh / pow(2.0, level);
 
 	// Unpack receive buffer
@@ -510,7 +519,7 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 		for (int rank = 0; rank < num_ranks; rank++) {
 			for (int marker = 0; marker < nMarkersOnEachRank[rank]; marker++) {
 
-				// Get owning rank of marker (need this for the scatter later
+				// Get owning rank of marker (need this for the scatter later)
 				iBodyTmp.markers[m].owningRank = rank;
 
 				// Pack position
@@ -548,7 +557,7 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 ///
 ///	\param	rootRank		root rank which did the calculation
 ///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation
-void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
+void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBodyTmp) {
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
@@ -578,8 +587,12 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 
 	// Get how many markers and supports exist on each rank
 	int nMarkersOnThisRank = 0;
-	for (int ib = 0; ib < objman->iBody.size(); ib++)
-		nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+	for (int ib = 0; ib < objman->iBody.size(); ib++) {
+		if (objman->iBody[ib].level == level) {
+			nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+		}
+	}
+
 
 	// Create receive buffer
 	std::vector<double> recvBuffer(nMarkersOnThisRank, 0.0);
@@ -590,9 +603,11 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 	// Now unpack
 	int count = 0;
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
-		for (auto m : objman->iBody[ib].validMarkers) {
-			objman->iBody[ib].markers[m].epsilon = recvBuffer[count];
-			count++;
+		if (objman->iBody[ib].level == level) {
+			for (auto m : objman->iBody[ib].validMarkers) {
+				objman->iBody[ib].markers[m].epsilon = recvBuffer[count];
+				count++;
+			}
 		}
 	}
 
@@ -601,17 +616,15 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 
 	// Pack and send the other epsilon values
 	int toRank, ib, markerIdx;
-	for (int lev = 0; lev < markerCommMarkerSide.size(); lev++) {
-		for (int i = 0; i < markerCommMarkerSide[lev].size(); i++) {
+	for (int i = 0; i < markerCommMarkerSide[level].size(); i++) {
 
-			// Get ID info
-			toRank = markerCommMarkerSide[lev][i].rankComm;
-			ib = objman->bodyIDToIdx[markerCommMarkerSide[lev][i].bodyID];
-			markerIdx = markerCommMarkerSide[lev][i].markerIdx;
+		// Get ID info
+		toRank = markerCommMarkerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommMarkerSide[level][i].bodyID];
+		markerIdx = markerCommMarkerSide[level][i].markerIdx;
 
-			// Insert into buffer
-			sendEpsBuffer[toRank].push_back(objman->iBody[ib].markers[markerIdx].epsilon);
-		}
+		// Insert into buffer
+		sendEpsBuffer[toRank].push_back(objman->iBody[ib].markers[markerIdx].epsilon);
 	}
 
 	// Loop through and post send if there is data
@@ -627,11 +640,8 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 	std::vector<int> bufferSize(num_ranks, 0);
 
 	// Size the receive buffer
-	for (int lev = 0; lev < markerCommOwnerSide.size(); lev++) {
-		for (int i = 0; i < markerCommOwnerSide[lev].size(); i++) {
-			bufferSize[markerCommOwnerSide[lev][i].rankComm]++;
-		}
-	}
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++)
+		bufferSize[markerCommOwnerSide[level][i].rankComm]++;
 
 	// Declare receive buffer
 	std::vector<std::vector<double>> recvEpsBuffer(num_ranks, std::vector<double>(0));
@@ -651,18 +661,16 @@ void MpiManager::mpi_uniEpsilonCommScatter(int rootRank, IBBody &iBodyTmp) {
 
 	// Now unpack into epsilon values
 	int fromRank, markerID;
-	for (int lev = 0; lev < markerCommOwnerSide.size(); lev++) {
-		for (int i = 0; i < markerCommOwnerSide[lev].size(); i++) {
+	for (int i = 0; i < markerCommOwnerSide[level].size(); i++) {
 
-			// Get ID info
-			fromRank = markerCommOwnerSide[lev][i].rankComm;
-			ib = objman->bodyIDToIdx[markerCommOwnerSide[lev][i].bodyID];
-			markerID = markerCommOwnerSide[lev][i].markerID;
+		// Get ID info
+		fromRank = markerCommOwnerSide[level][i].rankComm;
+		ib = objman->bodyIDToIdx[markerCommOwnerSide[level][i].bodyID];
+		markerID = markerCommOwnerSide[level][i].markerID;
 
-			// Put into epsilon
-			objman->iBody[ib].markers[markerID].epsilon = recvEpsBuffer[fromRank][idx[fromRank]];
-			idx[fromRank]++;
-		}
+		// Put into epsilon
+		objman->iBody[ib].markers[markerID].epsilon = recvEpsBuffer[fromRank][idx[fromRank]];
+		idx[fromRank]++;
 	}
 
 	// If sending any messages then wait for request status

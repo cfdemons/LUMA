@@ -1050,9 +1050,13 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 	// Loop through all iBodies and all markers
 	for (int ib = 0; ib < iBody.size(); ib++) {
 
-		// Set markers
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
-			iBodyTmp.markers.push_back(iBody[ib].markers[m]);
+		// Check if this body is on this grid level
+		if (iBody[ib].level == level) {
+
+			// Set markers
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				iBodyTmp.markers.push_back(iBody[ib].markers[m]);
+			}
 		}
 	}
 
@@ -1060,7 +1064,7 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 	iBodyTmp.owningRank = 0;
 	iBodyTmp.level = level;
 	iBodyTmp._Owner = iBody[0]._Owner;
-
+	iBodyTmp.dh = iBody[0].dh;
 #endif
 }
 
@@ -1088,9 +1092,11 @@ void ObjectManager::ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp) {
 	// Loop through all iBodies and all markers
 	int markerIdx = 0;
 	for (int ib = 0; ib < iBody.size(); ib++) {
-		for (int m = 0; m < iBody[ib].markers.size(); m++) {
-			iBody[ib].markers[m].epsilon = iBodyTmp.markers[markerIdx].epsilon;
-			markerIdx++;
+		if (iBody[ib].level == level) {
+			for (int m = 0; m < iBody[ib].markers.size(); m++) {
+				iBody[ib].markers[m].epsilon = iBodyTmp.markers[markerIdx].epsilon;
+				markerIdx++;
+			}
 		}
 	}
 

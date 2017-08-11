@@ -72,6 +72,8 @@ void ObjectManager::io_writeLiftDrag() {
 			// Open file for given time step
 			std::ofstream jout;
 			jout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_LD_rank" + std::to_string(rank) + ".out", std::ios::app);
+			jout.precision(L_OUTPUT_PRECISION);
+
 
 			// If first time step ten write out initial values
 			if (_Grids->t == L_OUT_EVERY_FORCES) {
@@ -1178,6 +1180,7 @@ void ObjectManager::io_writeTipPositions(int tval) {
 		// Create string and file streams
 		std::ofstream fout;
 		fout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_TipPositions.out", std::ios::app);
+		fout.precision(L_OUTPUT_PRECISION);
 
 		// Write out header
 		if (tval == 0)

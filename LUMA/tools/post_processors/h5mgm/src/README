@@ -1,4 +1,4 @@
-h5mgm is a tool to convert the HDF5 files written by LUMA into a set of VTK files to be read by Paraview.
+h5mgm is a tool to convert the HDF5 files written by LUMA into a set of VTK/VTU files to be read by Paraview.
 Parameters are passed as space separated command line argument as follows:
 	h5mgm <arg1> <arg2> ...
 

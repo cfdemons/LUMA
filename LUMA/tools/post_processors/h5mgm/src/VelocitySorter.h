@@ -1,3 +1,17 @@
+/*
+* --------------------------------------------------------------
+*
+* ------ Lattice Boltzmann @ The University of Manchester ------
+*
+* -------------------------- L-U-M-A ---------------------------
+*
+*  Copyright (C) The University of Manchester 2017
+*  E-mail contact: info@luma.manchester.ac.uk
+*
+* This software is for academic use only and not available for
+* further distribution commericially or otherwise without written consent.
+*
+*/
 
 #include "h5mgm.h"
 

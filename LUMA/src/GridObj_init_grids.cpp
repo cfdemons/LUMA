@@ -274,9 +274,9 @@ void GridObj::LBM_initGrid() {
 	
 	// Store physical spacing
 	// Global dimensions
-	double Lx = L_BX;
-	double Ly = L_BY;
-	double Lz = L_BZ;
+	double Lx = gm->global_edges[eXMax][0];
+	double Ly = gm->global_edges[eYMax][0];
+	double Lz = gm->global_edges[eZMax][0];
 	dh = Lx / static_cast<double>(L_N);
 
 	// Store temporal spacing
@@ -287,28 +287,6 @@ void GridObj::LBM_initGrid() {
 
 	// Reference velocity in LBM units -- always 1 in dimensionless units but varies in LBM units
 	uref = GridUnits::ud2ulbm(1, this);
-	
-
-
-	////////////////////////////
-	// Check input parameters //
-	////////////////////////////
-
-#if (L_DIMS == 3)
-	// Check that lattice volumes are cubes in 3D
-	if (abs((Lx / L_N) - (Ly / L_M)) > L_SMALL_NUMBER || abs((Lx / L_N) - (Lz / L_K)) > L_SMALL_NUMBER) {
-		L_ERROR("Need to have lattice volumes which are cubes -- either change L_N/L_M/L_K or change domain dimensions. Exiting.", 
-			GridUtils::logfile);
-	}
-	
-#else
-	// 2D so need square lattice cells
-	if ( abs((Lx/L_N) - (Ly/L_M)) > L_SMALL_NUMBER ) {
-		L_ERROR("Need to have lattice cells which are squares -- either change L_N/L_M or change domain dimensions. Exiting.",
-			GridUtils::logfile);
-	}
-
-#endif
 
 
     ///////////////////
@@ -392,10 +370,10 @@ void GridObj::LBM_initGrid() {
 
 #else
 	// When not builiding for MPI positions are straightforward
-	XPos = GridUtils::linspace(dh / 2, L_BX - dh / 2, static_cast<int>(L_N));
-	YPos = GridUtils::linspace(dh / 2, L_BY - dh / 2, static_cast<int>(L_M));
+	XPos = GridUtils::linspace(dh / 2, gm->global_edges[eXMax][0] - dh / 2, static_cast<int>(L_N));
+	YPos = GridUtils::linspace(dh / 2, gm->global_edges[eYMax][0] - dh / 2, static_cast<int>(L_M));
 #if (L_DIMS == 3)
-	ZPos = GridUtils::linspace(dh / 2, L_BZ - dh / 2, static_cast<int>(L_K));
+	ZPos = GridUtils::linspace(dh / 2, gm->global_edges[eZMax][0] - dh / 2, static_cast<int>(L_K));
 #else
 	ZPos.push_back(0.0);
 #endif
@@ -687,7 +665,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 
 	// If not using MPI then it is easy
 	/* Coarse Limits stored as local indices as they are used to map between the
-	 * fine and coarse grid cells during multi - grid operations.Therefore, we
+	 * fine and coarse grid cells during multi-grid operations. Therefore, we
 	 * must only store local values relevant to the grid on the rank to ensure
 	 * mapping is correct.
 	 *
@@ -697,9 +675,9 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	 * rank so we must round the coarse limits to the edge of the parent grid so
 	 * the correct offset is supplied to the mapping routine.
 	 *
-	 * When dealing with sub - grids embedded in walls, it is more complicated.If the
-	 * sub - grid starts on a max receiver layer which is also a periodic overlap then
-	 * we need to make sure the limits are set properly.Likewise if the sub - grid ends
+	 * When dealing with sub-grids embedded in walls, it is more complicated. If the
+	 * sub-grid starts on a max receiver layer which is also a periodic overlap then
+	 * we need to make sure the limits are set properly. Likewise if the sub-grid ends
 	 * on a min receiver layer which is also periodic. */
 
 	int position = 0;
@@ -811,7 +789,9 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	{
 
 		// Check sites are next to each other in space
-		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+			||
+			gm->periodic_flags[eXDirection][gm_idx])
 		{
 			// Set as if middle of complete block
 			CoarseLimsX[eMinimum] = 0;
@@ -891,7 +871,9 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
 	{
-		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+			||
+			gm->periodic_flags[eYDirection][gm_idx])
 		{
 			CoarseLimsY[eMinimum] = 0;
 			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
@@ -968,7 +950,9 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
 	{
-		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+			||
+			gm->periodic_flags[eZDirection][gm_idx])
 		{
 			CoarseLimsZ[eMinimum] = 0;
 			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
@@ -1021,7 +1005,7 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 {
 
 #ifdef L_INIT_VERBOSE
-	*GridUtils::logfile << "Building position vector for grid level " << level << ", direction " << dir << "...";
+	*GridUtils::logfile << "Building position vector for grid level " << level << ", region " << region_number << ", direction " << dir << "...";
 #endif
 
 	GridManager *gm = GridManager::getInstance();
@@ -1119,7 +1103,7 @@ void GridObj::LBM_initBoundLab ( )
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++)
 	{
-		if (XPos[i] >= L_BX - L_WALL_THICKNESS_RIGHT)
+		if (XPos[i] >= GridManager::getInstance()->global_edges[eXMax][0] - L_WALL_THICKNESS_RIGHT)
 		{
 			// Label boundary
 			for (j = 0; j < M_lim; j++)
@@ -1156,7 +1140,7 @@ void GridObj::LBM_initBoundLab ( )
 
 	for (k = 0; k < K_lim; k++)
 	{
-		if (ZPos[k] >= L_BZ - L_WALL_THICKNESS_BACK)
+		if (ZPos[k] >= GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
 		{
 			for (i = 0; i < N_lim; i++)
 			{
@@ -1192,7 +1176,7 @@ void GridObj::LBM_initBoundLab ( )
 
 	for (j = 0; j < M_lim; j++)
 	{
-		if (YPos[j] >= L_BY - L_WALL_THICKNESS_TOP)
+		if (YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
 		{
 			for (i = 0; i < N_lim; i++)
 			{
@@ -1242,6 +1226,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 		{
 			for (k = 0; k < Kp_lim; ++k)
 			{
+				// If this parent site is within the bounds of the sub-grid
 				if (
 					pGrid.XPos[i] > edges[eXMin] && pGrid.XPos[i] < edges[eXMax] &&
 					pGrid.YPos[j] > edges[eYMin] && pGrid.YPos[j] < edges[eYMax]
@@ -1252,7 +1237,7 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
 					)
 				{
 
-					// If within single cell width of refined region edge and TL is present then it is TL to lower
+					// If within single cell width of sub-grid edge and TL is present then it is TL to lower
 					if (
 						(pGrid.XPos[i] > edges[eXMin] && pGrid.XPos[i] < edges[eXMin] + pGrid.dh && TL_present[eXMin]) ||
 						(pGrid.XPos[i] < edges[eXMax] && pGrid.XPos[i] > edges[eXMax] - pGrid.dh && TL_present[eXMax]) ||

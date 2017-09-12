@@ -50,7 +50,7 @@ protected:
 	///			Since L0 can only be region = 0 this array should be accessed as 
 	///			[level + region_number * L_NUM_LEVELS] in a loop where level 
 	///			cannot be 0. To retrieve L0 info, simply access [0]. The first
-	///			index can be acessed using the eCartesianDirection enumeration.
+	///			index can be accessed using the eCartesianDirection enumeration.
 	///
 	int global_size[3][L_NUM_LEVELS * L_NUM_REGIONS + 1];
 
@@ -78,6 +78,9 @@ protected:
 #else
 	bool subgrid_tlayer_key[6][L_NUM_LEVELS * L_NUM_REGIONS];
 #endif
+
+	/// Vector indicating periodicity of grid
+	bool periodic_flags[3][L_NUM_LEVELS * L_NUM_REGIONS + 1];
 
 	/// Dimensions of coarsest lattice represented on this rank (includes halo if using MPI).
 	std::vector<int> local_size;

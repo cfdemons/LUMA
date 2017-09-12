@@ -201,7 +201,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	cRankSizeX.resize(num_ranks);
 	cRankSizeY.resize(num_ranks);
 	cRankSizeZ.resize(num_ranks);
-	double dh = L_BX / static_cast<double>(L_N);
+	double dh = grid_man->global_edges[eXMax][0] / static_cast<double>(L_N);
 	int numCells[3];
 	numCells[0] = L_N;
 	numCells[1] = L_M;
@@ -1216,9 +1216,9 @@ MpiManager::LoadImbalanceData MpiManager::mpi_smartDecompose(double dh, std::vec
 		solutionData.XSol[0] = 0.0;
 		solutionData.YSol[0] = 0.0;
 		solutionData.ZSol[0] = 0.0;
-		solutionData.XSol.back() = L_BX;
-		solutionData.YSol.back() = L_BY;
-		solutionData.ZSol.back() = L_BZ;
+		solutionData.XSol.back() = GridManager::getInstance()->global_edges[eXMax][0];
+		solutionData.YSol.back() = GridManager::getInstance()->global_edges[eYMax][0];
+		solutionData.ZSol.back() = GridManager::getInstance()->global_edges[eZMax][0];
 
 		// Handle the 1, 1, 1 case
 		if (p == 0)

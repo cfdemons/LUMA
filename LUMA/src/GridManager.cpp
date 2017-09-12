@@ -28,17 +28,30 @@ GridManager::GridManager()
 	// Store the discrete interpretation of the grid information //
 
 	// Store global sizes and edges for L0 from definitions
-	global_size[eXDirection][0] = static_cast<int>(L_N);
+	global_size[eXDirection][0] = L_N;
+	global_size[eYDirection][0] = L_M;
+	global_size[eZDirection][0] = L_K;
+
+	// Get base dh based on X-direction
+	double dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
+
+	// Set edges
 	global_edges[eXMin][0] = 0.0;
-	global_edges[eXMax][0] = L_BX;
-
-	global_size[eYDirection][0] = static_cast<int>(L_M);
+	global_edges[eXMax][0] = dh * global_size[eXDirection][0];	
 	global_edges[eYMin][0] = 0.0;
-	global_edges[eYMax][0] = L_BY;
-
-	global_size[eZDirection][0] = static_cast<int>(L_K);
+	global_edges[eYMax][0] = dh * global_size[eYDirection][0];
 	global_edges[eZMin][0] = 0.0;
-	global_edges[eZMax][0] = L_BZ;
+	global_edges[eZMax][0] = dh * global_size[eZDirection][0];
+
+	// Warn if not what the user requested
+	if (global_edges[eXMax][0] - L_BX > L_SMALL_NUMBER) L_WARN("Due to selected resolution, domain has been resized in the X-Direction to maintain cubic cells.", GridUtils::logfile);
+	if (global_edges[eYMax][0] - L_BY > L_SMALL_NUMBER) L_WARN("Due to selected resolution, domain has been resized in the Y-Direction to maintain cubic cells.", GridUtils::logfile);
+	if (global_edges[eZMax][0] - L_BZ > L_SMALL_NUMBER) L_WARN("Due to selected resolution, domain has been resized in the Z-Direction to maintain cubic cells.", GridUtils::logfile);
+
+	// Set size of periodic flag vector
+	periodic_flags[eXDirection][0] = true;
+	periodic_flags[eYDirection][0] = true;
+	periodic_flags[eZDirection][0] = true;
 
 	/* Store global sizes for all sub-grids:
 	* This is an initialisation before any grids are built so cannot use any
@@ -46,18 +59,29 @@ GridManager::GridManager()
 	* must perform the correct rounding and sizing explicitly. Logic is to round
 	* loose boundaries up and down depending on their position relative to the
 	* discrete voxel centre of the previous grid built. */
-
-	// Get base dh
-	double dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
-	int idx;
+	int idx, idx_parent;
 	
 	// Loop over every sub-grid
-	for (int lev = 1; lev <= L_NUM_LEVELS; ++lev)
+	for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 	{
-		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
-		{
+		// Reset spacing for next set of regions
+		dh = (static_cast<double>(L_BX) / static_cast<double>(L_N)) / 2.0;
 
+		for (int lev = 1; lev <= L_NUM_LEVELS; ++lev)
+		{
+			// Get index of grid in special array
 			idx = lev + reg * L_NUM_LEVELS;
+
+			// Get index of its parent
+			if (lev == 1)
+				idx_parent = 0;			// L1 links back to idx 0 for L0 grid
+			else
+				idx_parent = idx - 1;
+
+			// Set periodic flags to false by default
+			periodic_flags[eXDirection][idx] = false;
+			periodic_flags[eYDirection][idx] = false;
+			periodic_flags[eZDirection][idx] = false;
 
 			/* If using auto sub-grid generation, the padding from the definitions 
 			 * file will be used to define the grid edges. */
@@ -65,12 +89,12 @@ GridManager::GridManager()
 			if (lev > 1)
 			{
 				// Use padding parameters to specify relative to TL of parent
-				global_edges[eXMin][idx] = global_edges[eXMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_X_MIN / dh) * dh;
-				global_edges[eXMax][idx] = global_edges[eXMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_X_MAX / dh) * dh;
-				global_edges[eYMin][idx] = global_edges[eYMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_Y_MIN / dh) * dh;
-				global_edges[eYMax][idx] = global_edges[eYMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_Y_MAX / dh) * dh;
-				global_edges[eZMin][idx] = global_edges[eZMin][idx - 1] + (2.0 * dh) + std::round(L_PADDING_Z_MIN / dh) * dh;
-				global_edges[eZMax][idx] = global_edges[eZMax][idx - 1] - (2.0 * dh) - std::round(L_PADDING_Z_MAX / dh) * dh;
+				global_edges[eXMin][idx] = global_edges[eXMin][idx_parent] + (2.0 * dh) + std::round(L_PADDING_X_MIN / dh) * dh;
+				global_edges[eXMax][idx] = global_edges[eXMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_X_MAX / dh) * dh;
+				global_edges[eYMin][idx] = global_edges[eYMin][idx_parent] + (2.0 * dh) + std::round(L_PADDING_Y_MIN / dh) * dh;
+				global_edges[eYMax][idx] = global_edges[eYMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_Y_MAX / dh) * dh;
+				global_edges[eZMin][idx] = global_edges[eZMin][idx_parent] + (2.0 * dh) + std::round(L_PADDING_Z_MIN / dh) * dh;
+				global_edges[eZMax][idx] = global_edges[eZMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_Z_MAX / dh) * dh;
 
 			}
 			else
@@ -87,21 +111,37 @@ GridManager::GridManager()
 
 			}
 
-			// Print warnings for grids sizes that extend beyond parent grid
+			// Print warnings for grids sizes that are coincident with parent edge
 			if (lev > 1)
 			{
-				if (global_edges[eXMin][idx] <= global_edges[eXMin][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is coincident with or outside its parent grid!", GridUtils::logfile);
-				if (global_edges[eXMax][idx] >= global_edges[eXMax][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is coincident with or outside its parent grid!", GridUtils::logfile);
-				if (global_edges[eYMin][idx] <= global_edges[eYMin][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is coincident with or outside its parent grid!", GridUtils::logfile);
-				if (global_edges[eYMax][idx] >= global_edges[eYMax][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is coincident with or outside its parent grid!", GridUtils::logfile);
-				if (global_edges[eZMin][idx] <= global_edges[eZMin][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is coincident with or outside its parent grid!", GridUtils::logfile);
-				if (global_edges[eZMax][idx] >= global_edges[eZMax][idx - 1])
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is coincident with or outside its parent grid!", GridUtils::logfile);
+#ifdef L_INIT_VERBOSE
+				if (abs(global_edges[eXMin][idx] - global_edges[eXMin][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is coincident with its parent grid!", GridUtils::logfile);
+				if (abs(global_edges[eXMax][idx] - global_edges[eXMax][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is coincident with its parent grid!", GridUtils::logfile);
+				if (abs(global_edges[eYMin][idx] - global_edges[eYMin][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is coincident with its parent grid!", GridUtils::logfile);
+				if (abs(global_edges[eYMax][idx] - global_edges[eYMax][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is coincident with its parent grid!", GridUtils::logfile);
+				if (abs(global_edges[eZMin][idx] - global_edges[eZMin][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is coincident with its parent grid!", GridUtils::logfile);
+				if (abs(global_edges[eZMax][idx] - global_edges[eZMax][idx_parent]) < L_SMALL_NUMBER)
+					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is coincident with its parent grid!", GridUtils::logfile);
+#endif
+
+				// Errors if outside
+				if (global_edges[eXMin][idx] < global_edges[eXMin][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eXMax][idx] > global_edges[eXMax][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eYMin][idx] < global_edges[eYMin][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eYMax][idx] > global_edges[eYMax][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eZMin][idx] < global_edges[eZMin][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is outside its parent grid!", GridUtils::logfile);
+				if (global_edges[eZMax][idx] > global_edges[eZMax][idx_parent])
+					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is outside its parent grid!", GridUtils::logfile);
 			}
 
 
@@ -114,18 +154,59 @@ GridManager::GridManager()
 			global_size[eZDirection][idx] = 1;
 #endif
 
-			// Error if grid sizes are negative or zero
-			if (global_size[eXDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in X-direction -- not enough base resolution to support this level!", GridUtils::logfile);
-			if (global_size[eYDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in Y-direction -- not enough base resolution to support this level!", GridUtils::logfile);
-			if (global_size[eZDirection][idx] <= 0) L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " sub-grid has size < 0 in Z-direction -- not enough base resolution to support this level!", GridUtils::logfile);
-
 			/* If the start and end edges are the same, assume the user is trying to 
 			 * make the sub-grid periodic so size of sub-grid is just double the 
-			 * parent grid size in that direction. */
-			if (global_edges[eXMin][idx] == global_edges[eXMax][idx]) global_size[eXDirection][idx] = global_size[eXDirection][idx - 1] * 2;
-			if (global_edges[eYMin][idx] == global_edges[eYMax][idx]) global_size[eYDirection][idx] = global_size[eYDirection][idx - 1] * 2;
-			if (global_edges[eZMin][idx] == global_edges[eZMax][idx]) global_size[eZDirection][idx] = global_size[eZDirection][idx - 1] * 2;
+			 * parent grid size in that direction and set the edges as the grid edges. */
+			if (global_edges[eXMin][idx] == global_edges[eXMax][idx])
+			{
+				global_size[eXDirection][idx] = global_size[eXDirection][idx_parent] * 2;
+				global_edges[eXMin][idx] = global_edges[eXMin][idx_parent];
+				global_edges[eXMax][idx] = global_edges[eXMax][idx_parent];
+#ifdef L_INIT_VERBOSE
+				L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" X grid assumed to be periodic.", GridUtils::logfile);
+#endif
+				periodic_flags[eXDirection][idx] = true;
+			}
+			else if (global_size[eXDirection][idx] < 0)
+			{
+				L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" sub-grid has size < 0 in X-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+			}
 
+			if (global_edges[eYMin][idx] == global_edges[eYMax][idx])
+			{
+				global_size[eYDirection][idx] = global_size[eYDirection][idx_parent] * 2;
+				global_edges[eYMin][idx] = global_edges[eYMin][idx_parent];
+				global_edges[eYMax][idx] = global_edges[eYMax][idx_parent];
+#ifdef L_INIT_VERBOSE
+				L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" Y grid assumed to be periodic.", GridUtils::logfile);
+#endif
+				periodic_flags[eYDirection][idx] = true;
+			}
+			else if (global_size[eYDirection][idx] < 0)
+			{
+				L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" sub-grid has size < 0 in Y-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+			}
+
+			if (global_edges[eZMin][idx] == global_edges[eZMax][idx])
+			{
+				global_size[eZDirection][idx] = global_size[eZDirection][idx_parent] * 2;
+				global_edges[eZMin][idx] = global_edges[eZMin][idx_parent];
+				global_edges[eZMax][idx] = global_edges[eZMax][idx_parent];
+#ifdef L_INIT_VERBOSE
+				L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" Z grid assumed to be periodic.", GridUtils::logfile);
+#endif
+				periodic_flags[eZDirection][idx] = true;
+			}
+			else if (global_size[eZDirection][idx] < 0)
+			{
+				L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) +
+					" sub-grid has size < 0 in Z-direction -- not enough base resolution to support this level!", GridUtils::logfile);
+			}
 
 		}
 
@@ -136,11 +217,10 @@ GridManager::GridManager()
 	// Print out grid edges to file
 	std::string msg("Global Grid Edges computed and stored as:\n");
 
-	for (int lev = 0; lev <= L_NUM_LEVELS; ++lev)
+	for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 	{
-		for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
+		for (int lev = 0; lev <= L_NUM_LEVELS; ++lev)
 		{
-
 			// Skip invalid combos
 			if (lev == 0 && reg != 0) continue;
 
@@ -251,7 +331,7 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 #endif
 
 #else
-		// In serial, no halos or TL
+		// In serial, no halos
 		p_data->i_end = N_lim - 1;
 		p_data->i_start = 0;
 		p_data->j_end = M_lim - 1;
@@ -498,11 +578,11 @@ void GridManager::updateGlobalCellCount()
 {
 	double bounds[6];
 	bounds[eXMin] = 0.0;
-	bounds[eXMax] = L_BX;
+	bounds[eXMax] = global_edges[eXMax][0];
 	bounds[eYMin] = 0.0;
-	bounds[eYMax] = L_BY;
+	bounds[eYMax] = global_edges[eYMax][0];
 	bounds[eZMin] = 0.0;
-	bounds[eZMax] = L_BZ;
+	bounds[eZMax] = global_edges[eZMax][0];
 	activeCellCount = getActiveCellCount(&bounds[0], false);
 	activeCellOps = getActiveCellCount(&bounds[0], true);
 }
@@ -615,7 +695,7 @@ long GridManager::getCellCount(int targetLevel, int targetRegion, double *bounds
 #endif
 
 	// Use knowledge of discretisation to return the number of cells in union
-	double base_cell_size = L_BX / static_cast<double>(L_N);
+	double base_cell_size = global_edges[eXMax][0] / static_cast<double>(L_N);
 	double local_cell_size = base_cell_size / pow(2, targetLevel);
 #if (L_DIMS == 3)
 	return static_cast<long>(volume / (local_cell_size * local_cell_size * local_cell_size));

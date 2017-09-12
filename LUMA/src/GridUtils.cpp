@@ -1232,7 +1232,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Right wall
-	if (posX < L_BX && posX > L_BX - L_WALL_THICKNESS_RIGHT)
+	if (posX < GridManager::getInstance()->global_edges[eXMax][0] && posX > GridManager::getInstance()->global_edges[eXMax][0] - L_WALL_THICKNESS_RIGHT)
 	{
 		*normalDirection = eXDirection;
 		(*inwardVector)[*normalDirection] = -1;
@@ -1248,7 +1248,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Top wall
-	else if (posY < L_BY && posY > L_BY - L_WALL_THICKNESS_TOP)
+	else if (posY < GridManager::getInstance()->global_edges[eYMax][0] && posY > GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
 	{
 		*normalDirection = eYDirection;
 		(*inwardVector)[*normalDirection] = -1;
@@ -1266,7 +1266,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Back wall
-	else if (posZ < L_BZ && posZ > L_BZ - L_WALL_THICKNESS_BACK)
+	else if (posZ < GridManager::getInstance()->global_edges[eZMax][0] && posZ > GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
 	{
 		*normalDirection = eZDirection;
 		(*inwardVector)[*normalDirection] = -1;
@@ -1503,7 +1503,7 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 		idxUpper = eZMax;
 	}
 
-	// Set offset baseline to grid start edge of grid for serial builds
+	// Set offset baseline to grid start edge for serial builds
 	offset_baseline = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
 	local_edge = offset_baseline;
 

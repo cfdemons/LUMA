@@ -22,12 +22,15 @@ class GridObj;
 #include "MarkerData.h"
 
 
-/// \brief	Generic body class.
+/// \brief	Generic body class
 ///
 ///			Can consist of any type of Marker so templated.
 template <typename MarkerType>
 class Body
 {
+
+	// Make MPIManager a friend so it can access body data
+	friend class MpiManager;
 
 public:
 
@@ -43,6 +46,9 @@ public:
 	// Custom constructor for building prefab square or cuboid
 	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, std::vector<double> &dimensions, std::vector<double> &angles);
 
+	// Custom constructor for building prefab square or cuboid
+	Body(GridObj* g, int bodyID, std::vector<double> &centre_point, double length, double width, std::vector<double> &angles);
+
 	// Custom constructor for building prefab filament
 	Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles);
 
@@ -52,9 +58,11 @@ protected:
 	GridObj* _Owner;					///< Pointer to owning grid
 	int id;								///< Unique ID of the body
 	bool closed_surface;				///< Flag to specify whether or not it is a closed surface (i.e. last marker should link to first)
-	size_t owningRank;					///< ID of the rank that owns this body (for epsilon and structural calculation)
+	int owningRank;						///< ID of the rank that owns this body (for epsilon and structural calculation)
 	std::vector<MarkerType> markers;	///< Array of markers which make up the body
-	double spacing;						///< Reference spacing of the markers
+	int level;							///< Level on which body exists
+
+	std::vector<int> validMarkers;		///< Vector of indices to valid markers within this body which actually exist on this rank
 
 
 	// ************************ Methods ************************ //
@@ -69,13 +77,12 @@ protected:
 private:
 	bool isInVoxel(double x, double y, double z, int curr_mark);			// Check a point is inside an existing marker voxel
 	bool isVoxelMarkerVoxel(double x, double y, double z);					// Check whether nearest voxel is a marker voxel
+	int assignOwningRank(int id);											// Assign owning rank based on which ranks own which grids
 
 
 protected:
 	void buildFromCloud(PCpts *_PCpts);										// Method to build body from point cloud
 	virtual void writeVtkPosition(int tval);								// VTK body writer
-
-
 };
 
 
@@ -95,9 +102,10 @@ Body<MarkerType>::~Body(void)
 };
 
 /*********************************************/
-/// \brief Custom constructor to populate body from array of points.
-/// \param g		hierarchy pointer to grid hierarchy
-/// \param bodyID	ID of body in array of bodies.
+/// \brief	Custom constructor to populate body from array of points
+///
+///	\param g		hierarchy pointer to grid hierarchy
+/// \param bodyID	ID of body in array of bodies
 /// \param _PCpts	pointer to point cloud data
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
@@ -106,27 +114,24 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, PCpts* _PCpts)
 	// Set as unclosed surface by default
 	this->closed_surface = false;
 
+	// Set level
+	this->level = _Owner->level;
+
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
 
 	// Call method to build from point cloud
 	this->buildFromCloud(_PCpts);
-
-	// Define spacing based on first two markers	// TODO Make spacing a marker member
-	this->spacing = _Owner->dh;
 };
 
 /*********************************************/
-/// \brief 	Custom constructor for building prefab filament
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param start_position	start position of base of filament
-/// \param length			length of filament
-/// \param angles			angle of filament
+/// \brief	Custom constructor for building prefab filament
+///
+/// \param 	g				hierarchy pointer to grid hierarchy
+/// \param 	bodyID			ID of body in array of bodies
+/// \param 	start_position	start position of base of filament
+/// \param 	length			length of filament
+/// \param 	angles			angle of filament
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles)
 {
@@ -136,12 +141,11 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 	this->id = bodyID;
 	this->closed_surface = false;
 
+	// Set level
+	this->level = _Owner->level;
+
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
 
 	// Get horizontal and vertical angles
 	double body_angle_v = angles[0];
@@ -153,8 +157,8 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 
 	// Compute spacing
 	int numMarkers = static_cast<int>(std::floor(length / g->dh)) + 1;
-	spacing = length / (numMarkers - 1);							// Physical spacing between markers
-	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);	// Local spacing projected onto the horizontal plane
+	double spacing = length / (numMarkers - 1);							// Physical spacing between markers
+	double spacing_h = spacing * cos(body_angle_v * L_PI / 180);		// Local spacing projected onto the horizontal plane
 
 	// Add all markers
 	for (int i = 0; i < numMarkers; i++) {
@@ -164,18 +168,24 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 					i);
 	}
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
 
 /*********************************************/
-/// \brief 	Custom constructor for building prefab circle/sphere
-/// \param g				hierarchy pointer to grid hierarchy
-/// \param bodyID			ID of body in array of bodies.
-/// \param centre		centre point of circle
-/// \param radius			radius of circle
+/// \brief	Custom constructor for building prefab circle/sphere
+///
+/// \param 	g				hierarchy pointer to grid hierarchy
+/// \param 	bodyID			ID of body in array of bodies
+/// \param 	centre			centre point of circle
+/// \param 	radius			radius of circle
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, double radius)
 {
@@ -183,14 +193,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = bodyID;
-	this->closed_surface = false;
+	this->closed_surface = true;
+
+	// Set level
+	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
+
 
 	// Build sphere (3D)
 #if (L_DIMS == 3)	// TODO Sort out 3D sphere builder
@@ -215,36 +225,35 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 	// Build circle (2D)
 	int numMarkers = static_cast<int>(std::floor(2.0 * L_PI * radius / g->dh));
 	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
-	for (size_t i = 0; i < theta.size(); i++) {
+	for (size_t i = 1; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
 		addMarker(	centre[0] + radius * cos(theta[i]),
 					centre[1] + radius * sin(theta[i]),
 					centre[2],
-					static_cast<int>(i) );
+					static_cast<int>(i-1) );
 	}
 #endif
 
-	// Spacing
-	std::vector<double> diff;
-	for (int d = 0; d < L_DIMS; d++) {
-		diff.push_back ( markers[1].position[d] - markers[0].position[d] );
-	}
-	spacing = GridUtils::vecnorm( diff );
+	// Get rank
+	int rank = GridUtils::safeGetRank();
 
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
 
 /*********************************************/
-/// \brief 	Custom constructor for building square/cuboid
-/// \param g					hierarchy pointer to grid hierarchy
-/// \param bodyID				ID of body in array of bodies.
-/// \param centre				centre point of square
-/// \param width_length_depth	dimensions of square
-/// \param angles				angle of square
+/// \brief	Custom constructor for building square/cuboid
+///
+/// \param 	g					hierarchy pointer to grid hierarchy
+/// \param 	bodyID				ID of body in array of bodies
+/// \param 	centre				centre point of square
+/// \param 	width_length_depth	dimensions of square
+/// \param 	angles				angle of square
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,	
 	std::vector<double> &width_length_depth, std::vector<double> &angles)
@@ -253,14 +262,14 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = bodyID;
-	this->closed_surface = false;
+	this->closed_surface = true;
+
+	// Set level
+	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-#ifdef L_BUILD_FOR_MPI
-	this->owningRank = id % MpiManager::getInstance()->num_ranks;
-#else
-	this->owningRank = 0;
-#endif
+	this->owningRank = assignOwningRank(id);
+
 
 	// Shorter variable names for convenience
 	double length = width_length_depth[0];
@@ -366,17 +375,123 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	}
 #endif
 
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
 	// Delete markers which exist off rank
-	*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
-	deleteOffRankMarkers();
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
 };
 
+
+
 /*********************************************/
-/// \brief	Add marker to the body.
-/// \param	x			global X-position of marker.
-/// \param	y			global Y-position of marker.
-/// \param	z 			global Z-position of marker.
-/// \param markerID		rank independent ID of marker within body
+/// \brief	Custom constructor for building plate
+///
+/// \param 	g					hierarchy pointer to grid hierarchy
+/// \param 	bodyID				ID of body in array of bodies
+/// \param 	centre				centre point of square
+/// \param 	width_length_depth	dimensions of square
+/// \param 	angles				angle of square
+template <typename MarkerType>
+Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
+	double length, double width, std::vector<double> &angles) {
+
+	// Set the body base class parameters from constructor inputs
+	this->_Owner = g;
+	this->id = bodyID;
+	this->closed_surface = false;
+
+	// Set level
+	this->level = _Owner->level;
+
+	// Set the rank which owns this body
+	this->owningRank = assignOwningRank(id);
+
+	// Get number of markers in each direction
+	int numMarkersLength = static_cast<int>(std::floor(length / g->dh)) + 1;
+	int numMarkersWidth = static_cast<int>(std::floor(width / g->dh)) + 1;
+
+	// Get spacing
+	double spacingLength = length / (numMarkersLength - 1);
+	double spacingWidth = width / (numMarkersWidth - 1);
+
+	// Get start point
+	double xStart = -length / 2.0;
+	double yStart = 0.0;
+	double zStart = -width / 2.0;
+
+	double thetaX = angles[eXDirection] * L_PI / 180.0;
+	double thetaY = angles[eYDirection] * L_PI / 180.0;
+	double thetaZ = angles[eZDirection] * L_PI / 180.0;
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Tx = {{1.0, 0.0, 0.0},
+										   {0.0, cos(thetaX), -sin(thetaX)},
+										   {0.0, sin(thetaX), cos(thetaX)}};
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Ty = {{cos(thetaY), 0.0, sin(thetaY)},
+										   {0.0, 1.0, 0.0},
+										   {-sin(thetaY), 0.0, cos(thetaY)}};
+
+	// Set Tz rotation matrix
+	std::vector<std::vector<double>> Tz = {{cos(thetaZ), -sin(thetaZ), 0.0},
+										   {sin(thetaZ), cos(thetaZ), 0.0},
+										   {0.0, 0.0, 1.0}};
+
+	// Get rotation matrix
+	std::vector<std::vector<double>> R =  GridUtils::matrix_multiply(GridUtils::matrix_multiply(Tz, Ty), Tx);
+
+
+	// Marker ID
+	int markerID = 0;
+
+	// Now loop through all markers
+	std::vector<double> position(L_DIMS, 0);
+	for (int i = 0; i < numMarkersLength; i++) {
+		for (int j = 0; j < numMarkersWidth; j++) {
+
+			// Get position
+			position[eXDirection] = xStart + i * spacingLength;
+			position[eYDirection] = yStart;
+			position[eZDirection] = zStart + j * spacingWidth;
+
+			// Rotate about z and x axis
+			position = GridUtils::matrix_multiply(Tz, position);
+			position = GridUtils::matrix_multiply(Tx, position);
+
+			// Add the centre position
+			position[eXDirection] += centre[eXDirection];
+			position[eYDirection] += centre[eYDirection];
+			position[eZDirection] += centre[eZDirection];
+
+			// Add marker
+			addMarker(position[eXDirection], position[eYDirection], position[eZDirection], markerID);
+			markerID++;
+		}
+	}
+
+
+	// Get rank
+	int rank = GridUtils::safeGetRank();
+
+	// Delete markers which exist off rank
+	if (rank != owningRank) {
+		*GridUtils::logfile << "Deleting markers which are not on this rank..." << std::endl;
+		deleteOffRankMarkers();
+	}
+}
+
+/*********************************************/
+/// \brief	Add marker to the body
+///
+/// \param	x			global X-position of marker
+/// \param	y			global Y-position of marker
+/// \param	z 			global Z-position of marker
+/// \param 	markerID	rank independent ID of marker within body
 template <typename MarkerType>
 void Body<MarkerType>::addMarker(double x, double y, double z, int markerID)
 {
@@ -392,28 +507,30 @@ template <typename MarkerType>
 void Body<MarkerType>::deleteRecvLayerMarkers()
 {
 
-	// Loop through markers in body and delete ones which are on receiver layer
-	int a = 0;
-	do {
-		// If on receiver layer then delete that marker
-		if (GridUtils::isOnRecvLayer(
-			this->markers[a].position[eXDirection],
-			this->markers[a].position[eYDirection],
-			this->markers[a].position[eZDirection]))
-		{
-			this->markers.erase(this->markers.begin() + a);
-		}
-		// If not, keep and move onto next one
-		else {
+	// Loop through markers in body (if any) and delete ones which are on receiver layer
+	if (this->markers.size() > 0) {
+		int a = 0;
+		do {
+			// If on receiver layer then delete that marker
+			if (GridUtils::isOnRecvLayer(
+				this->markers[a].position[eXDirection],
+				this->markers[a].position[eYDirection],
+				this->markers[a].position[eZDirection]))
+			{
+				this->markers.erase(this->markers.begin() + a);
+			}
+			// If not, keep and move onto next one
+			else {
 
-			// Increment counter
-			a++;
-		}
-	} while (a < static_cast<int>(this->markers.size()));
+				// Increment counter
+				a++;
+			}
+		} while (a < static_cast<int>(this->markers.size()));
+	}
 }
 
 /*********************************************/
-/// \brief	Delete markers which have been built but exist off rank.
+/// \brief	Delete markers which have been built but exist off rank
 template <typename MarkerType>
 void Body<MarkerType>::deleteOffRankMarkers()
 {
@@ -441,15 +558,15 @@ void Body<MarkerType>::deleteOffRankMarkers()
 };
 
 /*********************************************/
-/// \brief	Retrieve marker data.
+/// \brief	Retrieve marker data
 ///
 ///			Return marker whose primary support data is nearest the
 ///			supplied global position.
 ///
-/// \param x X-position nearest to marker to be retrieved.
-/// \param y Y-position nearest to marker to be retrieved.
-/// \param z Z-position nearest to marker to be retrieved.
-/// \return MarkerData marker data structure returned. If no marker found, structure is marked as invalid by assigning an ID of -1.
+/// \param	x 			X-position nearest to marker to be retrieved
+/// \param	y 			Y-position nearest to marker to be retrieved
+/// \param	z 			Z-position nearest to marker to be retrieved
+/// \return	MarkerData 	marker data structure returned - if no marker found structure is marked as invalid by assigning an ID of -1
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
@@ -488,7 +605,7 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 };
 
 /*********************************************/
-/// \brief	Downsampling voxel-grid filter to take a point and add it to current body.
+/// \brief	Downsampling voxel-grid filter to take a point and add it to current body
 ///
 ///			This method attempts to add a marker to body at the global location 
 ///			but obeys the rules of a 1 marker per cell voxel-grid filter to 
@@ -496,12 +613,12 @@ MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 ///			the background lattice. It is usually called inside a loop and requires
 ///			a few extra pieces of information to be tracked throughout.
 ///
-/// \param	x			desired global X-position of new marker.
-/// \param	y			desired global Y-position of new marker.
-/// \param	z			desired global Z-position of new marker.
-///	\param	markerID	requested rank independent ID of marker within body.
-/// \param	curr_mark	is a reference to the index of last marker added.
-///	\param	counter		is a reference to the total number of markers in the body.
+/// \param	x			desired global X-position of new marker
+/// \param	y			desired global Y-position of new marker
+/// \param	z			desired global Z-position of new marker
+///	\param	markerID	requested rank independent ID of marker within body
+/// \param	curr_mark	is a reference to the index of last marker added
+///	\param	counter		is a reference to the total number of markers in the body
 template <typename MarkerType>
 void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int markerID, int& curr_mark, std::vector<int>& counter) {
 
@@ -556,15 +673,15 @@ void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int marke
 };
 
 /*********************************************/
-/// \brief	Determines whether a point is inside another marker's support voxel.
+/// \brief	Determines whether a point is inside another marker's support voxel
 ///
 ///			Typically called indirectly by the voxel-grid filter method and not directly.
 ///
-/// \param x X-position of point.
-/// \param y Y-position of point.
-/// \param z Z-position of point.
-/// \param curr_mark ID of the marker.
-/// \return true of false
+/// \param	x				X-position of point
+/// \param	y				Y-position of point
+/// \param	z				Z-position of point
+/// \param	curr_mark		ID of the marker
+/// \return true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
@@ -596,15 +713,14 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 };
 
 /*********************************************/
-/// \brief	Determines whether a point is inside an existing marker's support voxel.
+/// \brief	Determines whether a point is inside an existing marker's support voxel
 ///
 ///			Typically called indirectly by the voxel-grid filter method and not directly.
 ///
-/// \param x X-position of point.
-/// \param y Y-position of point.
-/// \param z Z-position of point.
-/// \return true of false
-// Returns boolean as to whether a given point is in an existing marker voxel
+/// \param	x				X-position of point
+/// \param	y				Y-position of point
+/// \param	z				Z-position of point
+/// \return true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 
@@ -626,8 +742,9 @@ bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 
 
 /*********************************************/
-/// \brief	Method to build a body from point cloud data.
-/// \param _PCpts	point cloud data from which to build body.
+/// \brief	Method to build a body from point cloud data
+///
+/// \param	_PCpts	point cloud data from which to build body
 template <typename MarkerType>
 void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 {
@@ -640,7 +757,8 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 	*GridUtils::logfile << "ObjectManager: Applying voxel grid filter..." << std::endl;
 
 	// Place first marker
-	addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
+	if (!_PCpts->x.empty())
+		addMarker(_PCpts->x[0], _PCpts->y[0], _PCpts->z[0], _PCpts->id[0]);
 
 	// Increment counters
 	int curr_marker = 0;
@@ -659,13 +777,12 @@ void Body<MarkerType>::buildFromCloud(PCpts *_PCpts)
 };
 
 // ************************************************************************** //
-/// \brief	VTK body writer.
+/// \brief	VTK body writer
 ///
 /// \param	tval	time value at which the write out is being performed.
 template <typename MarkerType>
 void Body<MarkerType>::writeVtkPosition(int tval)
 {
-
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
@@ -682,35 +799,69 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 	fout << "ASCII\n";
 	fout << "DATASET POLYDATA\n";
 
-
 	// Write out the positions of each Lagrange marker
 	fout << "POINTS " << markers.size() << " float\n";
-	for (size_t i = 0; i < markers.size(); i++) {
+	for (auto m : markers) {
 
-		fout << markers[i].position[0] << " "
-			<< markers[i].position[1] << " "
-			<< markers[i].position[2] << std::endl;
+		fout << m.position[0] << " "
+			 << m.position[1] << " "
+			 << m.position[2] << std::endl;
 	}
-
 
 	// Write out the connectivity of each Lagrange marker
-	size_t nLines = markers.size() - 1;
+	size_t nLines;
+	if (closed_surface == true)
+		nLines = markers.size();
+	else
+		nLines = markers.size() - 1;
 
-	if (closed_surface == false)
-		fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
-	else if (closed_surface == true)
-		fout << "LINES " << nLines + 1 << " " << 3 * (nLines + 1) << std::endl;
+	// Write out number of lines
+	fout << "LINES " << nLines << " " << 3 * nLines << std::endl;
 
+	// Write out connectivity
 	for (size_t i = 0; i < nLines; i++) {
-		fout << 2 << " " << i << " " << i + 1 << std::endl;
+		fout << 2 << " " << i << " " << (i + 1) % markers.size() << std::endl;
 	}
 
-	// If body is a closed surface then join last point to first point
-	if (closed_surface == true) {
-		fout << 2 << " " << nLines << " " << 0 << std::endl;
-	}
-
+	// Close file
 	fout.close();
+};
+
+
+/*********************************************/
+/// \brief	Assigns owning rank of body based on which grids each rank has access to
+///
+/// \param	id				global body ID
+/// \return rank
+template <typename MarkerType>
+int Body<MarkerType>::assignOwningRank(int id) {
+
+	// If serial just return 0
+#ifndef L_BUILD_FOR_MPI
+	return 0;
+#else
+
+	// Some work required if in parallel
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Vector of valid ranks which are allowed to own it
+	std::vector<int> validRanks;
+
+	// Set pointer to current grid owner
+	GridObj *g = NULL;
+	GridUtils::getGrid(0, 0, g);
+
+	// Loop through rankGrids to see which ranks are allowed to own it
+	for (int rank = 0; rank < mpim->num_ranks; rank++) {
+
+		// Check if this rank has this level
+		if (g->rankGrids[rank] >= level)
+			validRanks.push_back(rank);
+	}
+
+	// Return
+	return validRanks[id % validRanks.size()];
+#endif
 };
 
 #endif

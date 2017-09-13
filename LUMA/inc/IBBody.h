@@ -18,25 +18,32 @@
 #include "stdafx.h"
 
 // Forward declarations
-#include "Body.h"	// This is a templated class so include the whole file
+#include "Body.h"		// This is a templated class so include the whole file
+#include "FEMBody.h"
 class IBMarker;
 class PCpts;
 class GridObj;
+class FEMBody;
 
-/// \brief	Immersed boundary body.
+/// \brief	Immersed boundary body class
+///
+///			Class for immersed boundary bodies (inherits from Body class with IB markers).
 class IBBody : public Body<IBMarker> {
 
-	// Add friend classes so they can access the protected data of IBBody objects
+	/************** Friends **************/
 	friend class ObjectManager;
 	friend class IBInfo;
+	friend class FEMBody;
+	friend class MpiManager;
 
 public:
-	// Constructor and destructor
+
+	/************** Constructors **************/
 	IBBody(void);
 	~IBBody(void);
 
 	// Custom constructor which takes pointer to point cloud data and a pointer to the grid owner for the labelling
-	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty, bool clamped);
+	IBBody(GridObj* g, int bodyID, PCpts* _PCpts, eMoveableType moveProperty);
 
 	// Custom constructor for building prefab circle or sphere
 	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point, double radius, eMoveableType moveProperty);
@@ -45,9 +52,15 @@ public:
 	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 		std::vector<double> &dimensions, std::vector<double> &angles, eMoveableType moveProperty);
 
+	// Custom constructor for building prefab plate
+	IBBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+		double length, double width, std::vector<double> &angles, eMoveableType moveProperty);
+
 	// Custom constructor for building prefab filament
 	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, std::vector<double> &angles, eMoveableType moveProperty, bool clamped);
+		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElement, bool clamped, double density, double E);
+
+
 
 protected:
 
@@ -56,12 +69,18 @@ protected:
 	bool isFlexible;					///< Flag to indicate flexibility: false == rigid body; true == flexible filament
 	bool isMovable;						///< Flag to indicate if body is movable or not.
 
+	double dh;							///< Local grid spacing for this body
+
+	FEMBody *fBody;						///< Pointer to FEM body object
+
 
 	/************** Member Methods **************/
 
 private:
 
 	void initialise(eMoveableType moveProperty);		// Initialisation wrapper for setting flags
+	void getValidMarkers();								// Get valid markers in iBody (only relevant for owning rank)
+	void sortPtCloudMarkers();							// Sort pt cloud markers and IDs
 
 };
 

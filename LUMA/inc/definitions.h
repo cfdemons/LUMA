@@ -55,7 +55,7 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -73,7 +73,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI			///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
@@ -167,7 +167,10 @@
 #define L_BZ 3.14		///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 0.2		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
+
+// Reference density
+#define L_RHO_REF 1000.0
 
 
 /*
@@ -186,7 +189,7 @@
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
-//#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.  
+//#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
 #define L_RE 3294			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
@@ -199,11 +202,18 @@
 
 // General //
 //#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-//#define L_IBM_ON						///< Turn on IBM
-//#define L_STOP_EPSILON_RECOMPUTE		///< Prevent recomputing of epsilon in an attempt to save time
+#define L_IBM_ON						///< Turn on IBM
+#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+
+// FEM //
+#define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
+#define L_NB_DELTA 0.5					///< Parameter for Newmark-Beta time integration (0.5 for 2nd order)
+#define L_RELAX 0.5						///< Under-relaxation for FSI coupling
+#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
 
 /*
 *******************************************************************************
@@ -222,7 +232,7 @@
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 //#define L_OUTLET_EXTRAPOLATED		///< Specifies that the outlet BC extrapolates information from the domain
-//#define L_VELOCITY_RAMP 100		///< Defines the number of timesteps over which to ramp up the inlet velocity
+//#define L_VELOCITY_RAMP 1		///< Defines time in dimensionless units over which to ramp up the inlet velocity
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall

@@ -15,60 +15,118 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/IBInfo.h"
-#include "../inc/IBBody.h"
-#include "../inc/IBMarker.h"
 
-IBInfo::IBInfo()
-{
-	// Default constructor
+
+// *********************** Marker-Owner Comm Methods ***************************
+
+// *****************************************************************************
+///	\brief	Default constructor for owner-side marker-owner comm class
+markerCommOwnerSideClass::markerCommOwnerSideClass() {
+
+	// Set default values
+	rankComm = 0;
+	bodyID = 0;
+	markerID = 0;
+	nSupportSites = 0;
 }
 
-/// \brief Custom constructor for different types of message containers.
-///	\param	iBody	pointer to the iBody being packed.
-///	\param	type	the type fo container to be created.
-IBInfo::IBInfo(IBBody *iBody, eIBInfoType type)
-{
 
-	switch (type)
-	{
+// *****************************************************************************
+///	\brief	Custom constructor for owner-side marker-owner comm class
+///
+///	\param	rank	rank to communicate with
+///	\param	body	global body ID
+///	\param	marker	marker ID within body
+markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marker) {
 
-	case eIBDeltaSum:
-		// Pack voxel_centres for each marker and sum of delta functions
-		for (size_t m = 0; m < iBody->markers.size(); ++m)
-		{
-			// First support point should be the closest
-			voxel_centre_X.push_back(iBody->_Owner->XPos[iBody->markers[m].supp_i[0]]);
-			voxel_centre_Y.push_back(iBody->_Owner->YPos[iBody->markers[m].supp_j[0]]);
-			voxel_centre_Z.push_back(iBody->_Owner->ZPos[iBody->markers[m].supp_k[0]]);
-
-			// Sum of deltas
-			delta_sum.push_back(
-				std::accumulate(iBody->markers[m].deltaval.begin(), iBody->markers[m].deltaval.end(), 0.0)
-				);
-		}
-		break;
-
-		// Add other cases here
-
-	}
+	// Set values
+	rankComm = rank;
+	bodyID = body;
+	markerID = marker;
+	nSupportSites = 0;
 }
 
-///	\brief Maps a version of the IBInfo structure to an MPI_Struct datatype.
-///	\param	type	type of container you want to map.
-///	\return	handle to the MPI struct data.
-int IBInfo::mapToMpiStruct(eIBInfoType type)
-{
 
-	switch (type)
-	{
+// *****************************************************************************
+///	\brief	Default constructor for marker-side marker-owner comm class
+markerCommMarkerSideClass::markerCommMarkerSideClass() {
 
-	case eIBDeltaSum:
+	// Set default values
+	rankComm = 0;
+	bodyID = 0;
+	markerIdx = 0;
+}
 
-		// TODO: Map to a sturcture
-		//return MPI_Type_struct();
+// *****************************************************************************
+///	\brief	Custom constructor for marker-side marker-owner comm class
+///
+///	\param	rank	rank to communicate with
+///	\param	body	global body ID
+///	\param	idx		marker local index within body
+markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx) {
 
-		break;
-	}
+	// Set values
+	rankComm = rank;
+	bodyID = body;
+	markerIdx = idx;
+}
 
-	return 0;
+
+
+// ********************** Marker-Support Comm Methods **************************
+
+
+
+// *****************************************************************************
+///	\brief	Default constructor for support-side marker-support comm class
+supportCommSupportSideClass::supportCommSupportSideClass() {
+
+	// Default values
+	rankComm = 0;
+	bodyID = 0;
+}
+
+// *****************************************************************************
+///	\brief	Custom constructor for support-side marker-support comm class
+///
+///	\param	rankID		rank to communicate with
+///	\param	body		global body ID
+///	\param	position	position indices of support point
+supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, std::vector<int> &position) {
+
+	// Default values
+	rankComm = rankID;
+	bodyID = body;
+	supportIdx.push_back(position[eXDirection]);
+	supportIdx.push_back(position[eYDirection]);
+	supportIdx.push_back(position[eZDirection]);
+}
+
+
+// *****************************************************************************
+///	\brief	Default constructor for marker-side marker-support comm class
+supportCommMarkerSideClass::supportCommMarkerSideClass() {
+
+	// Default values
+	bodyID = 0;
+	markerIdx = 0;
+	supportID = 0;
+	rankComm = 0;
+}
+
+
+// *****************************************************************************
+///	\brief	Custom constructor for marker-side marker-support comm class
+///
+///	\param	rankID		rank to communicate with
+///	\param	body		global body ID
+///	\param	marker		marker ID within body
+///	\param	support		support ID within marker
+supportCommMarkerSideClass::supportCommMarkerSideClass(int rankID, int body, int marker, int support) {
+
+	// Default values
+	bodyID = body;
+	markerIdx = marker;
+	supportID = support;
+	rankComm = rankID;
 }

@@ -200,9 +200,6 @@ void GridObj::LBM_initVelocity ( ) {
 
 				// Velocity sites are an exception to the no flow setting
 				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity)
-#endif
-
-				{
 
 					/* Input velocity is specified by individual vectors for x, y and z which
 					 * have either been read in from an input file or defined by an expression
@@ -213,8 +210,7 @@ void GridObj::LBM_initVelocity ( ) {
 					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
 #endif
 
-				}
-
+#endif
 
 				// Wall sites set to zero
 				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid)
@@ -226,8 +222,6 @@ void GridObj::LBM_initVelocity ( ) {
 #endif
 
 				}
-
-
 			}
 		}
 	}
@@ -281,6 +275,9 @@ void GridObj::LBM_initGrid() {
 
 	// Store temporal spacing
 	dt = L_TIMESTEP;
+
+	// Store mass conversion
+	dm = (L_RHO_REF / L_RHOIN) * dh * dh * dh;
 
 	// Gravity in LBM units
 	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);
@@ -405,6 +402,10 @@ void GridObj::LBM_initGrid() {
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 	
+	// Set start-of-timestep-velocity
+	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u_n = u;
+
 	// Density field
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
@@ -412,10 +413,9 @@ void GridObj::LBM_initGrid() {
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
-#if (defined L_IBM_ON || defined L_GRAVITY_ON)
+#if (defined L_GRAVITY_ON)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
-	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Lattice force vector
@@ -522,6 +522,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	// Define scales
 	dh = pGrid.dh / 2.0;
 	dt = pGrid.dt / 2.0;
+	dm = pGrid.dm / 8.0;
 	gravity = pGrid.gravity;
 	uref = pGrid.uref;
 	
@@ -588,6 +589,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 
+	// Set start-of-timestep-velocity
+	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u_n = u;
+
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
@@ -596,10 +601,9 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
-#if (defined L_IBM_ON || defined L_GRAVITY_ON)
+#if (defined L_GRAVITY_ON)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
-		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 #endif
 
 	// Lattice force vector
@@ -1077,6 +1081,7 @@ void GridObj::LBM_initBoundLab ( )
 {
 	// Declarations
 	int i, j, k;
+	double delta = dh / 1000.0;
 
 	// LEFT WALL //
 

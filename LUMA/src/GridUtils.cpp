@@ -300,6 +300,37 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 	return product;
 }
 
+
+// *****************************************************************************
+/// \brief	Multiplies matrix A by matrix B.
+/// \param	A	a matrix represented as a vector or vectors.
+/// \param	B	a matrix represented as a vector or vectors.
+/// \return	a matrx which is A * B.
+std::vector<std::vector<double>> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B) {
+
+	// Check to makes sure dimensions are correct
+	if (A[0].size() != B.size()) {
+		L_ERROR("Dimension mismatch -- cannot proceed. Exiting.", logfile);
+	}
+
+	// Initialise answer
+	std::vector<std::vector<double>> product(A.size(), std::vector<double>(B[0].size(), 0.0));
+
+	// Do multiplication
+    for (size_t row = 0; row < A.size(); row++) {
+        for (size_t col = 0; col < B[0].size(); col++) {
+        	for (size_t k = 0; k < A[0].size(); k++) {
+
+        		// Multiply the row of A by the column of B to get the row, column of product.
+        		product[row][col] += A[row][k] * B[k][col];
+        	}
+		}
+	}
+
+    // Return
+	return product;
+}
+
 // *****************************************************************************
 /// \brief	Computes the vector divided by the scalar.
 /// \param	vec1	a vector.
@@ -315,6 +346,119 @@ std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
 
 	// Return answer
 	return answer;
+}
+
+
+// *****************************************************************************
+///	\brief	Get traspose of matrix
+///
+///	\param	origMat			original matrx
+///	\return	transposed matrix
+std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::vector<double>> &origMat) {
+
+	// Intialise tranpose
+	std::vector<std::vector<double>> transMat(origMat[0].size(), std::vector<double>(origMat.size(), 0.0));
+
+	// Loop over matrix and swap i and j values
+	for (size_t i = 0; i < origMat.size(); i++) {
+		for (size_t j = 0; j < origMat[0].size(); j++) {
+			transMat[j][i] = origMat[i][j];
+		}
+	}
+
+	// Return
+	return transMat;
+}
+
+
+
+// *****************************************************************************
+///	\brief	Assemble into global matrix
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	localMat	local element matrix
+///	\param	globalMat	global matrix to be assembled
+void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (size_t i = 0; i < localMat.size(); i++) {
+		for (size_t j = 0; j < localMat[i].size(); j++) {
+			globalMat[i+el*offset][j+el*offset] += localMat[i][j];
+		}
+	}
+}
+
+
+// *****************************************************************************
+///	\brief	Assemble into global vector
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	localMat	local element vector
+///	\param	globalMat	global vector to be assembled
+void GridUtils::assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (size_t i = 0; i < localMat.size(); i++) {
+		globalMat[i+el*offset] += localMat[i];
+	}
+}
+
+
+// *****************************************************************************
+///	\brief	Extract local vector from global vector
+///
+///	\param	el			element ID
+///	\param	offset		how much to offset each local matrix
+///	\param	globalMat	global vector to be extracted from
+///	\param	localMat	local element vector
+void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &globalMat, std::vector<double> &localMat) {
+
+	// Add the values of the single element matrix to the full system matrix
+	for (size_t i = 0; i < localMat.size(); i++) {
+		localMat[i] = globalMat[i+el*offset];
+	}
+}
+
+
+// *****************************************************************************
+/// \brief	Solve the linear system A.x = b
+/// \param	A	A.
+/// \param	b	b.
+/// \return	x	x.
+
+// *****************************************************************************
+///	\brief	Solve the linear system A.x = b
+///
+///	\param	A		A matrix
+///	\param	b		b vector (RHS)
+///	\return	x
+std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b) {
+
+	// Set up the correct values
+	char trans = 'T';
+	int dim = A.size();
+    int nrhs = 1;
+    int LDA = dim;
+    int LDB = dim;
+    int info;
+    int ipiv[dim];
+
+    // Put A into 1D array	// TODO Sort out how this is done so no need to tranpose it
+    std::vector<double> a(dim * dim, 0.0);
+    for (int i = 0; i < dim; i++) {
+    	for (int j = 0; j < dim; j++) {
+    		a[j + i * dim] = A[i][j];
+    	}
+    }
+
+    // Factorise and solve
+	dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
+	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
+
+	// Return
+	return b;
 }
 
 // *****************************************************************************
@@ -715,6 +859,61 @@ bool GridUtils::isOnThisRank(double xyz, eCartesianDirection dir,
 
 }
 
+
+// *****************************************************************************
+///	\brief	Get rank where this position is
+///
+///	\param	position	position (x, y or z)
+///	\return	rank
+int GridUtils::getRankfromPosition(std::vector<double> &position) {
+
+	// TODO Search through the ranks using a self-organised list as more often than not the markers are going back to their original rank
+
+	// Get grid manager
+	GridManager *gm = GridManager::getInstance();
+
+	// Check with coarsest grid limits
+	if (position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
+	 || position[eYDirection] < gm->global_edges[eYMin][0] || position[eYDirection] > gm->global_edges[eYMax][0]
+#if (L_DIMS == 3)
+	 ||	position[eZDirection] < gm->global_edges[eZMin][0] || position[eZDirection] > gm->global_edges[eZMax][0]
+#endif
+		) {
+
+		// Position is not witihn global grid limits
+		L_ERROR("Position is off entire grid hierarchy. Exiting.", GridUtils::logfile);
+	}
+
+	// It is makes it here and serial build then definitely rank 0
+#ifndef L_BUILD_FOR_MPI
+	return 0;
+#else
+
+	// Get MPI Manager instance
+	MpiManager *mpim = MpiManager::getInstance();
+
+	// Loop through all ranks
+	int rank;
+	for (rank = 0; rank < mpim->num_ranks; rank++) {
+
+		// Check if within the grid
+		if (position[eXDirection] >= mpim->rank_core_edge[eXMin][rank] && position[eXDirection] < mpim->rank_core_edge[eXMax][rank]
+		 && position[eYDirection] >= mpim->rank_core_edge[eYMin][rank] && position[eYDirection] < mpim->rank_core_edge[eYMax][rank]
+#if (L_DIMS == 3)
+		 && position[eZDirection] >= mpim->rank_core_edge[eZMin][rank] && position[eZDirection] < mpim->rank_core_edge[eZMax][rank]
+#endif
+			) {
+
+			// Return rank number
+			break;
+		}
+	}
+
+	// If it gets here then this is valid
+	return rank;
+#endif
+}
+
 // *****************************************************************************
 /// \brief	Finds out whether all or part of specified refined region intersects
 ///			with the space occupied by the grid provided.
@@ -996,6 +1195,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 	 * be a receiver layer site regardless of the other coordinates so the logic is
 	 * simple. */
 
+#ifdef L_BUILD_FOR_MPI
 	if (
 		GridUtils::isOnRecvLayer(pos_x,eXMin) || GridUtils::isOnRecvLayer(pos_x,eXMax) ||
 		GridUtils::isOnRecvLayer(pos_y,eYMin) || GridUtils::isOnRecvLayer(pos_y,eYMax)
@@ -1006,6 +1206,7 @@ bool GridUtils::isOnRecvLayer(double pos_x, double pos_y, double pos_z) {
 		) {
 			return true;
 	}
+#endif
 
 	return false;
 

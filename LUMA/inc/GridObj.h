@@ -74,6 +74,7 @@ private :
 	IVector<double> feq;			///< Equilibrium distribution functions
 	IVector<double> fNew;			///< Copy of distribution functions
 	IVector<double> u;				///< Macropscopic velocity components
+	IVector<double> u_n;			///< Macropscopic velocity components at start of current time step
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
 
@@ -99,6 +100,7 @@ public :
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
 	double dt;						///< Physical time step size
+	double dm;
 	int t;							///< Number of completed iterations on this level
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency
@@ -116,6 +118,8 @@ public :
 	DEPRECATED double XOrigin;		///< Position of grid left edge
 	DEPRECATED double YOrigin;		///< Position of grid bottom edge
 	DEPRECATED double ZOrigin;		///< Position of grid front edge
+
+	std::vector<int> rankGrids;		///< Vector of size num_ranks which contains how many subgrids each rank has access to
 
 
 	/************** Member Methods **************/
@@ -140,6 +144,7 @@ public :
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
+	void LBM_calculateRankGrids();						// Get which ranks have access to which subgrids
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
@@ -168,6 +173,8 @@ private :
 	bool _LBM_applySpecReflect_opt(int i, int j, int k, int id, int v);
 	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
 	void _LBM_kbcCollide_opt(int id);
+	void _LBM_resetForces();
+
 	double _LBM_smag(int id, double omega);
 
 public :

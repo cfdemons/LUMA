@@ -17,32 +17,102 @@
 
 #include "stdafx.h"
 
-// Forward declare
-class IBBody;
 
-///	\brief	Structure for passing IB information between MPI processes.
+/// \brief Owner-side comm class for marker-owner communications
 ///
-///			This structure has a series of different constructors depending on 
-///			what information should be passed.
-///
-class IBInfo
-{
+///			Class for arranging marker-owner MPI communication.
+class markerCommOwnerSideClass {
+
+	/************** Friends **************/
+	friend class MpiManager;
+	friend class IBBody;
+	friend class ObjectManager;
 
 public:
-	// Default Constructor
-	IBInfo();
-	IBInfo(IBBody *iBody, eIBInfoType type);
 
-	// Methods
-	int mapToMpiStruct(eIBInfoType type);
+	/************** Constructors **************/
+	markerCommOwnerSideClass();
+
+	// Custom constructor for creating epsCommOwnerSideClass object
+	markerCommOwnerSideClass(int rank, int body, int marker);
 
 private:
-	// Possible member data
-	std::vector<double> voxel_centre_X;
-	std::vector<double> voxel_centre_Y;
-	std::vector<double> voxel_centre_Z;
-	std::vector<double> delta_sum;
 
+	/************** Member Data **************/
+	int rankComm;				///< Rank to be communicating with
+	int bodyID;					///< Global body ID for communicating
+	int markerID;				///< Marker ID for communicating
+	int nSupportSites;			///< Number of support sites that need to be communicated
 };
 
+
+/// \brief Marker-side comm class for marker-owner communications
+///
+///			Class for arranging marker-owner MPI communication.
+class markerCommMarkerSideClass {
+
+	/************** Friends **************/
+	friend class MpiManager;
+
+public:
+
+	/************** Constructors **************/
+	markerCommMarkerSideClass();
+
+	// Custom constructor for creating epsCommMarkerSideClass object
+	markerCommMarkerSideClass(int rank, int body, int idx);
+
+private:
+
+	/************** Member Data **************/
+	int rankComm;				///< Rank to be communicating with
+	int bodyID;					///< Global body ID for communicating
+	int markerIdx;				///< Local (rank) index of marker for communicating
+};
+
+
+
+/// \brief Support-side comm class for marker-support communications
+///
+///			Class for arranging marker-support MPI communication.
+class supportCommSupportSideClass {
+
+public:
+
+	/************** Constructors **************/
+	supportCommSupportSideClass();
+
+	// Custom constructor for creating supportCommSupportSide object
+	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &idx);
+
+public:
+
+	/************** Member Data **************/
+	int rankComm;						///< Rank to be communicating with
+	int bodyID;							///< Global body ID for communicating
+	std::vector<int> supportIdx;		///< Local (rank) grid indices of support point
+};
+
+
+/// \brief Marker-side comm class for marker-support communications
+///
+///			Class for arranging marker-support MPI communication.
+class supportCommMarkerSideClass {
+
+public:
+
+	/************** Constructors **************/
+	supportCommMarkerSideClass();
+
+	// Custom constructor for creating supportCommMarkerSide object
+	supportCommMarkerSideClass(int rankID, int body, int marker, int support);
+
+public:
+
+	/************** Member Data **************/
+	int rankComm;					///< Rank to be communicating with
+	int bodyID;						///< Global body ID for communicating
+	int markerIdx;					///< Local (rank) index of marker for communicating
+	int supportID;					///< Support index within the marker
+};
 #endif	// L_IBINFO_H

@@ -18,8 +18,10 @@
 
 #include "stdafx.h"
 #include "HDFstruct.h"
+#include "IBInfo.h"
 class GridObj;
 class GridManager;
+class IBBody;
 
 
 // Define the loop expressions required to inspect the overlap regions of a grid for ease of coding
@@ -175,6 +177,12 @@ public :
 	/// Logfile handle
 	std::ofstream* logout;
 
+	// IBM comm classes
+	std::vector<std::vector<markerCommOwnerSideClass>> markerCommOwnerSide;			///< Owner-side marker-owner comm
+	std::vector<std::vector<markerCommMarkerSideClass>> markerCommMarkerSide;		///< Marker-side marker-owner comm
+	std::vector<std::vector<supportCommMarkerSideClass>> supportCommMarkerSide;		///< Marker-side marker-support comm
+	std::vector<std::vector<supportCommSupportSideClass>> supportCommSupportSide;	///< Support-side marker-support comm
+
 
 
 	/************** Member Methods **************/
@@ -186,6 +194,7 @@ public :
 	// Initialisation
 	void mpi_init();												// Initialisation of MpiManager & Cartesian topology
 	void mpi_gridbuild(GridManager* const grid_man);				// Do domain decomposition to build local grid dimensions
+	void mpi_getAllRankLimits();								// Get the positional limits of all ranks
 	int mpi_buildCommunicators(GridManager* const grid_man);		// Create a new communicator for each sub-grid and region combo
 	void mpi_updateLoadInfo(GridManager* const grid_man);			// Method to compute the number of active cells on the rank and pass to master
 	void mpi_uniformDecompose(int *numCells);						// Method to perform uniform decomposition into MPI blocks
@@ -212,6 +221,22 @@ public :
 	void mpi_communicate( int level, int regnum );		// Wrapper routine for communication between grids of given level/region
 	int mpi_getOpposite(int direction);					// Version of GridUtils::getOpposite for MPI_directions rather than lattice directions
 
+	// IBM
+	void mpi_buildMarkerComms(int level);												// Build comms required for epsilon calculation
+	void mpi_buildSupportComms(int level);												// Build comms required for support communication
+	void mpi_epsilonCommGather(int level);												// Do communication required for epsilon calculation
+	void mpi_epsilonCommScatter(int level);												// Do communication required for epsilon calculation
+	void mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBodyTmp);			// Do communication required for universal epsilon calculation
+	void mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBodyTmp);			// Do communication required for universal epsilon calculation
+	void mpi_interpolateComm(int level, std::vector<std::vector<double>> &interpVels);	// Do communication required for velocity interpolation
+	void mpi_spreadComm(int level, std::vector<std::vector<double>> &spreadForces);		// Do communication required for force spreading
+	void mpi_dsCommScatter(int level);													// Spread the ds values from owner to other ranks
+	void mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &recvPositionBuffer, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps);		// Gather in info for pt cloud sorter
+	void mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps);	// Scatter info for pt cloud sorter
+
+	// FEM
+	void mpi_forceCommGather(int level);
+	void mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &markerIDs, std::vector<std::vector<std::vector<double>>> &positions, std::vector<std::vector<std::vector<double>>> &vels);
 };
 
 #endif

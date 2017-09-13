@@ -25,20 +25,6 @@ streaming and macroscopic calulcation.
 using namespace std;
 
 // *****************************************************************************
-/// \brief	Method to reset body forces.
-///
-///			Resets both Cartesian and Lattice force vectors to zero.
-void GridObj::LBM_resetForces() {
-
-	// Reset lattice force vectors on every grid site
-	std::fill(force_i.begin(), force_i.end(), 0.0);
-
-	// Reset Cartesian force vector on every grid site
-	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
-
-}
-
-// *****************************************************************************
 /// \brief	KBC collision operator.
 ///
 ///			Applies KBC collision operator using the KBC-N4 and KBC-D models in 

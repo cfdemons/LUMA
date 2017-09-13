@@ -34,6 +34,7 @@ class ObjectManager
 
 	// Make Grid a friend so boundary conditions can access the body data
 	friend class GridObj;
+	friend class MpiManager;
 
 	/// \brief	Nested Geometry data structure class.
 	///
@@ -101,6 +102,18 @@ private:
 	/// Pointer to self
 	static ObjectManager* me;
 
+	// Flag for if there are any flexible bodies in the simulation
+	std::vector<bool> hasFlexibleBodies;
+
+	// Map global body ID to an index in the iBody vector
+	std::vector<int> bodyIDToIdx;
+
+	// Vector of indices for iBody vector for which this rank owns and is flexible
+	std::vector<int> IdxFEM;
+
+	// Subiteration loop parameters
+	double timeav_subResidual;
+	double timeav_subIterations;
 
 	/* Methods */
 
@@ -117,31 +130,38 @@ public:
 	static ObjectManager *getInstance(GridObj* g);	///< Overloaded get instance passing in pointer to grid hierarchy
 
 	// IBM methods //
-	void ibm_apply();						// Apply interpolate, compute and spread operations for all bodies.
-	void ibm_initialise();					// Initialise a built immersed body with support.
-	double ibm_deltaKernel(double rad, double dilation);	// Evaluate kernel (delta function approximation).
-	void ibm_interpol(int ib);				// Interpolation of velocity field onto markers of ib-th body.
-	void ibm_spread(int ib);				// Spreading of restoring force from ib-th body.
-	void ibm_findSupport(int ib, int m);	// Populates support information for the m-th marker of ib-th body.
-	void ibm_initialiseSupport(int ib, int m, 
-		int s, double estimated_position[]);		// Initialises data associated with the support points.
-	void ibm_computeForce(int ib);			// Compute restorative force at each marker in ib-th body.
-	double ibm_findEpsilon(int ib);			// Method to find epsilon weighting parameter for ib-th body.
-	void ibm_moveBodies();					// Update all IBBody positions and support.
-	double ibm_bicgstab(std::vector< std::vector<double> >& Amatrix,
-		std::vector<double>& bVector, std::vector<double>& epsilon,
-						   double tolerance, int maxiterations);	// Biconjugate gradient stablised method for solving asymmetric 
-																	// linear system required by finding epsilon
+	void ibm_apply(GridObj *g, bool doSubIterate);									// Apply interpolate, compute and spread operations for all bodies.
+	void ibm_initialise();															// Initialise a built immersed body with support.
+	double ibm_deltaKernel(double rad, double dilation);							// Evaluate kernel (delta function approximation).
+	void ibm_interpolate(int level);												// Interpolation of velocity field onto markers of ib-th body.
+	void ibm_spread(int level);														// Spreading of restoring force from ib-th body.
+	void ibm_updateMacroscopic(int level);											// Update the macroscopic values with the IBM force
+	void ibm_findSupport(int ib);													// Populates support information for the m-th marker of ib-th body.
+	void ibm_initialiseSupport(int ib, int m, std::vector<double> &estimated_position);	// Initialises data associated with the support points.
+	void ibm_computeForce(int level);												// Compute restorative force at each marker in ib-th body.
+	void ibm_findEpsilon(int level);												// Method to find epsilon weighting parameter for ib-th body.
+	void ibm_computeDs(int level);
+	void ibm_moveBodies(int level);													// Update all IBBody positions and support.
+	void ibm_finaliseReadIn(int iBodyID);											// Do some house-keeping after geometry read in
+	void ibm_universalEpsilonGather(int level, IBBody &iBodyTmp);					// Gather all the markers into the temporary iBody vector
+	void ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp);					// Gather all the markers into the temporary iBody vector
+	void ibm_subIterate(GridObj *g);												// Subiterate to enforce correct kinematic conditions at interface
+	double ibm_checkVelDiff(int level);												// Check residual from sub-iteration step
 
-	// Flexible body methods
-	void ibm_jacowire(int ib);					// Computes the tension and position of a 2D inextensible, flexible filament.
-	void ibm_positionUpdate(int ib);			// Updates the position of movable body markers.
-	void ibm_positionUpdateGroup(int group);	// Updates the positions of movable bodies in a group.
-	// Methods to solve the Jacobian system associated with Jacowire
-	void ibm_banbks(double **a, long n, int m1, int m2, double **al,
-		unsigned long indx[], double b[]);
-	void ibm_bandec(double **a, long n, int m1, int m2, double **al,
-		unsigned long indx[], double *d);
+	// IBM Debug methods //
+	void ibm_debug_epsilon(int ib);
+	void ibm_debug_interpVel(int ib);
+	void ibm_debug_markerForce(int ib);
+	void ibm_debug_markerPosition(int ib);
+	void ibm_debug_supportInfo(int ib);
+	void ibm_debug_supportVel(int ib);
+	void ibm_debug_supportForce(int ib);
+
+	// IBM-MPI methods
+	void ibm_updateMPIComms(int level);
+	void ibm_interpolateOffRankVels(int level);
+	void ibm_spreadOffRankForces(int level);
+	void ibm_updateMarkers(int level);
 
 	// Bounceback Body Methods
 	void addBouncebackObject(GeomPacked *geom, PCpts *_PCpts);				// Override method to add BBB from cloud reader.
@@ -151,13 +171,15 @@ public:
 	void resetMomexBodyForces(GridObj * grid);						// Reset the force stores for Momentum Exchange
 
 	// IO methods //
-	void io_vtkBodyWriter(int tval);				// VTK body writer wrapper
-	void io_writeBodyPosition(int timestep);		// Write out IBBody positions at specified timestep to text files
-	void io_writeLiftDrag(int timestep);			// Write out IBBody lift and drag at specified timestep
-	void io_restart(eIOFlag IO_flag, int level);	// Restart read and write for IBBodies given grid level
+	void io_vtkBodyWriter(int tval);						// VTK body writer wrapper
+	void io_vtkFEMWriter(int tval);							// VTK FEM writer
+	void io_writeBodyPosition(int timestep);				// Write out IBBody positions at specified timestep to text files
+	void io_writeLiftDrag();								// Write out IBBody lift and drag at specified timestep
+	void io_restart(eIOFlag IO_flag, int level);			// Restart read and write for IBBodies given grid level
 	void io_readInCloud(PCpts*& _PCpts, GeomPacked *geom);	// Method to read in Point Cloud data
-	void io_writeForcesOnObjects(double tval);		// Method to write object forces to a csv file
-	void io_readInGeomConfig();						// Read in geometry configuration file
+	void io_writeForcesOnObjects(double tval);				// Method to write object forces to a csv file
+	void io_readInGeomConfig();								// Read in geometry configuration file
+	void io_writeTipPositions(int t);						// Write out tip positions of flexible filaments
 
 	// Debug
 	void toggleDebugStream(GridObj *g);		// Method to open/close a debugging file

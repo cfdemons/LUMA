@@ -46,6 +46,9 @@ public:
 	// Custom constructor for building prefab square or cuboid
 	BFLBody(GridObj* g, int bodyID, std::vector<double> &start_position, double length, std::vector<double> &angles);
 
+	// Custom constructor for building prefab plate
+	BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point, double length, double width, std::vector<double> &angles);
+
 protected:
 
 	/************** Member Data **************/

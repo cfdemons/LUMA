@@ -115,6 +115,8 @@ void BFLBody::initialise()
 	// Computation of Q complete
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
+	// Set valid markers
+	validMarkers = GridUtils::onespace(0, markers.size()-1);
 
 	// Write out Q values for each marker
 #ifdef L_BFL_DEBUG
@@ -184,6 +186,21 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	std::vector<double> &dimensions, std::vector<double> &angles)
 	: Body(g, bodyID, centre_point, dimensions, angles)
+{
+	initialise();
+}
+
+
+/******************************************************************************/
+/// \brief 	Custom constructor for building plate
+/// \param g				hierarchy pointer to grid hierarchy
+/// \param bodyID			ID of body in array of bodies.
+/// \param centre_point		centre point of square
+/// \param dimensions		dimensions of square
+/// \param angles			angle of square
+BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
+	double length, double width, std::vector<double> &angles)
+	: Body(g, bodyID, centre_point, length, width, angles)
 {
 	initialise();
 }

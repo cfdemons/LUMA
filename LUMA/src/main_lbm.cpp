@@ -130,7 +130,7 @@ int main( int argc, char* argv[] )
 		std::cout << version_string << std::endl;
 
 	}
-	
+
 	// Create application log file
 	std::ofstream logfile;
 	logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".log", std::ios::out);
@@ -238,6 +238,9 @@ int main( int argc, char* argv[] )
 
 	}
 
+	// Set the rankGrids value which contains a list of how many subgrids each rank has access to
+	Grids->LBM_calculateRankGrids();
+
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
 	gm->setGridHierarchy(Grids);
 
@@ -257,11 +260,10 @@ int main( int argc, char* argv[] )
 	objMan->io_readInGeomConfig();
 #endif
 
-
 #if !defined L_RESTARTING
 
-	/* Initialise the bodies (compute support etc.) using initial body positions 
-	 * and compute support from supplied grid. Only attempts to initialise IBM bodies 
+	/* Initialise the bodies (compute support etc.) using initial body positions
+	 * and compute support from supplied grid. Only attempts to initialise IBM bodies
 	 * in this way. */
 	objMan->ibm_initialise();
 
@@ -343,6 +345,7 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
+<<<<<<< HEAD
 #ifdef L_PROBE_OUTPUT
 
 #ifdef L_BUILD_FOR_MPI
@@ -359,6 +362,15 @@ int main( int argc, char* argv[] )
 			Grids->io_probeOutput();
 		}
 	}
+=======
+#ifdef L_VTK_FEM_WRITE
+	*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+	objMan->io_vtkFEMWriter(Grids->t);
+#endif
+
+#ifdef L_WRITE_TIP_POSITIONS
+	objMan->io_writeTipPositions(Grids->t);
+>>>>>>> origin/MPI_IBM
 #endif
 
 #ifdef L_BUILD_FOR_MPI
@@ -389,7 +401,7 @@ int main( int argc, char* argv[] )
 		t_start = clock();
 #endif
 		if ((Grids->t + 1) % L_OUT_EVERY == 0 && rank == 0)
-			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
+			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>\n" << std::flush;
 
 
 		///////////////////////
@@ -439,9 +451,16 @@ int main( int argc, char* argv[] )
 			objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
-#if (defined L_INSERT_FILAMENT || defined L_INSERT_FILARRAY || defined L_2D_RIGID_PLATE_IBM || \
-	defined L_2D_PLATE_WITH_FLAP || defined L_3D_RIGID_PLATE_IBM || defined L_3D_PLATE_WITH_FLAP) \
-	&& defined L_IBM_ON && defined L_IBBODY_TRACER
+#ifdef L_VTK_FEM_WRITE
+			*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+			objMan->io_vtkFEMWriter(Grids->t);
+#endif
+
+#ifdef L_WRITE_TIP_POSITIONS
+			objMan->io_writeTipPositions(Grids->t);
+#endif
+
+#if (defined L_IBM_ON && defined L_IBBODY_TRACER)
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
 #endif
@@ -460,7 +479,7 @@ int main( int argc, char* argv[] )
 #endif
 
 		// Write out forces of objects
-#ifdef L_LD_OUT
+#if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
 		if (Grids->t % L_OUT_EVERY_FORCES == 0) {
 
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;
@@ -468,7 +487,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_IBM_ON
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
-			objMan->io_writeLiftDrag(Grids->t);
+			objMan->io_writeLiftDrag();
 #endif
 		}
 #endif	

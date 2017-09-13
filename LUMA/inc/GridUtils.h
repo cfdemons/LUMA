@@ -19,6 +19,10 @@
 #include "stdafx.h"
 #include "GridObj.h"
 
+// LAPACK interfaces
+extern "C" void dgetrf_(int* dim1, int* dim2, double* a, int* lda, int* ipiv, int* info);
+extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO );
+
 /// \brief	Grid utility class.
 ///
 ///			Class provides grid utilities including commonly used logical tests. 
@@ -63,7 +67,13 @@ public:
 	static std::vector<double> vecmultiply(double scalar, std::vector<double> vec);				// Function: multiply
 	static std::vector<double> crossprod(std::vector<double> vec1, std::vector<double> vec2);	// Function: crossprod
 	static std::vector<double> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector<double>& x);	// Function: matrix_multiply
+	static std::vector<std::vector<double>> matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B); // Function: matrix_multiply
 	static std::vector<double> divide(std::vector<double> vec1, double scalar);					// Divide vector by a scalar
+	static std::vector<std::vector<double>> matrix_transpose(std::vector<std::vector<double>> &origMat);			// Transpose a matrix
+	static void assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat);		// Assemble global matrix
+	static void assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat);		// Assemble global vector
+	static void disassembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat);		// Assemble global vector
+	static std::vector<double> solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b);		// Solve A.x = b
 
 	// LBM-specific utilities
 	static int getOpposite(int direction);	// Function: getOpposite
@@ -81,6 +91,7 @@ public:
 		std::vector<int> *pos = nullptr);											// Is a site on this MPI rank nad if so, where is it?
 	static bool isOnThisRank(double xyz, eCartesianDirection dir, 
 		eLocationOnRank *loc = nullptr, GridObj const * const grid = nullptr, int *pos = nullptr);
+	static int getRankfromPosition(std::vector<double> &position);					// Get rank where this position is
 	static bool intersectsRefinedRegion(GridObj const & pGrid, int RegNum);	// Does the refined region interesect the current rank.
 	// The following supercede the old isOnEdge function to allow for different sized overlaps produced by different refinement levels.
 	static bool isOnSenderLayer(double pos_x, double pos_y, double pos_z);			// Is site on any sender layer
@@ -91,11 +102,11 @@ public:
 	static int safeGetRank();														// Parallel/Serial safe method to get rank
 
 	// Coordinate Management
-	static bool isOffGrid(int i, int j, int k, GridObj const * const g);					// Is site off supplied grid
+	static bool isOffGrid(int i, int j, int k, GridObj const * const g);											// Is site off supplied grid
 	static void getEnclosingVoxel(double x, double y, double z, GridObj const * const g, std::vector<int> *ijk);	// Take a position and a get a local ijk
 	static void getEnclosingVoxel(double x, GridObj const * const g, eCartesianDirection dir, int *ijk);
-	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);	// Is site on any TL to upper
-	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);			// Is site on specified TL to upper
+	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);			// Is site on any TL to upper
+	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);					// Is site on specified TL to upper
 	static bool isWithinDomainWall(double posX, double posY, double posZ, std::vector<int>* normalVector = nullptr);
 	static bool isWithinDomainWall(double posX, double posY, double posZ,
 		std::vector<int>* normalVector, eCartesianDirection* normalDirection, unsigned int* edgeCount);	// Is site within a wall region

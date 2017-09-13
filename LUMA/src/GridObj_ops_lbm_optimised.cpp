@@ -44,6 +44,11 @@ void GridObj::LBM_multi_opt(int subcycle)
 		}
 	}
 
+	// If IBM is on then reset the forces
+#ifdef L_IBM_ON
+	_LBM_resetForces();
+#endif
+
 	// Start the clock to time this kernel
 	clock_t secs, t_start = clock();
 
@@ -85,6 +90,27 @@ void GridObj::LBM_multi_opt(int subcycle)
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
 
+				// If IBM is on then split loop and perform IBM step
+#ifdef L_IBM_ON
+			}
+		}
+	}
+
+	// Perform IBM steps (interpolate, force calc, spread and update macro)
+	objman->ibm_apply(this, true);
+
+
+	// Loop over grid
+	for (int i = 0; i < N_lim; ++i) {
+		for (int j = 0; j < M_lim; ++j) {
+			for (int k = 0; k < K_lim; ++k) {
+
+				// Local index and type
+				int id = k + j * K_lim + i * K_lim * M_lim;
+				eType type_local = LatTyp[id];
+
+#endif
+
 				// REGULARISED BCs //
 #ifdef L_REGULARISED_BOUNDARIES
 				if (type_local == eVelocity)
@@ -95,10 +121,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 #if (defined L_IBM_ON || defined L_GRAVITY_ON)
 				// Do not force solid sites
 				if (type_local != eSolid)
-				{
 					_LBM_forceGrid_opt(id);
-				}
-				L_DACTION_WRITE_OUT_FORCES
 #endif
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) { // Do not collide on UpperTL
@@ -207,9 +230,9 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		{
 
 #ifdef L_VELOCITY_RAMP
-			if (t <= L_VELOCITY_RAMP)
+			if (t * dt <= L_VELOCITY_RAMP)
 			{
-				double rampCoefficient = 1.0 - cos(L_PI * t / L_VELOCITY_RAMP);
+				double rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
 				u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
 				u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
 #if (L_DIMS == 3)
@@ -276,10 +299,8 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 
 #ifdef L_VELOCITY_RAMP
 	// Update coefficient	
-	if (t <= L_VELOCITY_RAMP)
-	{
-		rampCoefficient = 1.0 - cos(L_PI * t / L_VELOCITY_RAMP);
-	}
+	if (t * dt <= L_VELOCITY_RAMP)
+		rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
 #endif
 
 	// Find which wall we are on and proceed to assign key variables //
@@ -288,12 +309,69 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	if (!GridUtils::isWithinDomainWall(XPos[i], YPos[j], ZPos[k], &normalVector, &normalDirection, &edgeCount))
 		L_ERROR("Velocity site not outside domain walls is currently not supported.", GridUtils::logfile);
 
-
 	/* If it is a corner or an edge then get wall density by extrapolating in 
 	 * the direction of the normal. Since this is non-local, when using MPI
 	 * cannot be performed correctly if site on receiver layer */
 	if (edgeCount > 1)
 	{
+
+		// Extrapolate from previous lattice site (don't do on receiver layers)
+#ifdef L_EXTRAPOLATED_OUTLET
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
+
+			// Get index of previous lattice site
+			int idBack = id - K_lim * M_lim;
+
+			// Set velocity
+			ux = GridUnits::ulat2uphys(u[eXDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+			uy = GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+#if (L_DIMS == 3)
+			uz = GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
+#endif
+		}
+
+		// Fixed pressure outlet (don't do on receiver layer
+#elif (defined L_PRESSURE_OUTLET)
+		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
+
+			// Get index of previous lattice site
+			int idBack = id - K_lim * M_lim;
+			int idBack2 = id - 2 * K_lim * M_lim;
+
+			// Get values at outlet
+			double rhoOutlet = L_RHOIN + (L_PRESSURE_OUTLET * (dh * SQ(dt)) / dm) / SQ(cs);
+			uy = (2.0 * GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eYDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
+#if (L_DIMS == 3)
+			uz = (2.0 * GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eZDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
+#endif
+
+			// Compute f_plus and f_0
+			for (int v = 0; v < L_NUM_VELS; ++v) {
+
+				// If has opposite normal direction component then part of f_plus
+				if (c_opt[v][normalDirection] == -normalVector[normalDirection])
+				{
+					// Add to known momentum leaving the domain
+					f_plus += fNew[v + id * L_NUM_VELS];
+
+				}
+				// If it is perpendicular to wall part of f_zero
+				else if (c_opt[v][normalDirection] == 0)
+				{
+					f_zero += fNew[v + id * L_NUM_VELS];
+				}
+			}
+
+			// Update density
+			ux = GridUnits::ulat2uphys(-1.0 + (2.0 * f_plus + f_zero) / rhoOutlet, this) / L_PHYSICAL_U;
+
+			// Reset to zero
+			f_plus = 0.0, f_zero = 0.0;
+		}
+#endif
+
+		// Set boundary normal velocity
+		normalVelocity = -GridUnits::ud2ulbm(ux, this);
 
 #ifdef L_BUILD_FOR_MPI
 		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
@@ -874,15 +952,12 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	// Declarations
 	double lambda_v, beta_v;
 
-#ifdef L_GRAVITY_ON
-	// Add gravity and reset the lattice forces
-	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] =
-		rho[id] * gravity * refinement_ratio;
+	// Reset the lattice forces
 	memset(&force_i[id * L_NUM_VELS], 0, sizeof(double) * L_NUM_VELS);
-#endif
-
+	
 	// Now compute force_i components from Cartesian force vector
-	for (size_t v = 0; v < L_NUM_VELS; v++) {
+	for (size_t v = 0; v < L_NUM_VELS; v++)
+	{
 
 		// Reset beta_v
 		beta_v = 0.0;
@@ -898,15 +973,13 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 
 		// Compute force using shorthand sum described above
 		for (int d = 0; d < L_DIMS; d++) {
-			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] *
+			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] * 
 				(c_opt[v][d] * (1 + beta_v) - u[d + id * L_DIMS]);
 		}
 
 		// Multiply by lambda_v
 		force_i[v + id * L_NUM_VELS] *= lambda_v;
-
 	}
-
 }
 
 // *****************************************************************************
@@ -1234,5 +1307,21 @@ void GridObj::_LBM_updateReynolds(double newReynolds)
 	// Update Omega
 	omega = 1.0 / ((nu / SQ(cs)) + 0.5);
 
+}
+
+// *****************************************************************************
+/// \brief	Method to reset body forces.
+///
+///			Resets Cartesian force vector to zero or the gravity force if enabled.
+void GridObj::_LBM_resetForces()
+{
+
+	// Reset Cartesian force vector on every grid site
+#ifdef L_GRAVITY_ON
+	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
+#else
+	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
+#endif
 }
 // *****************************************************************************

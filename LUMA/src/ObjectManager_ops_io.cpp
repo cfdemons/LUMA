@@ -18,9 +18,11 @@
 #include "../inc/PCpts.h"
 #include "../inc/GridObj.h"
 
-// ************************************************************************** //
-/// \brief Write out position of immersed boundary bodies.
-/// \param	timestep	timestep at which the write out is being performed.
+
+// *****************************************************************************
+///	\brief	Write out position of immersed boundary bodies
+///
+///	\param	timestep		current time step
 void ObjectManager::io_writeBodyPosition(int timestep) {
 
 	int rank = GridUtils::safeGetRank();
@@ -47,50 +49,90 @@ void ObjectManager::io_writeBodyPosition(int timestep) {
 #endif
 			}
 			jout.close();
-
 	}
-
 }
 
 
-// ************************************************************************** //
-/// \brief Write out forces on the markers of immersed boundary bodies.
-/// \param	timestep	timestep at which the write out is being performed.
-void ObjectManager::io_writeLiftDrag(int timestep) {
+// *****************************************************************************
+///	\brief	Write out forces on the markers of immersed boundary bodies
+void ObjectManager::io_writeLiftDrag() {
 
+	// Force conversion
+	double forceScaling, volWidth, volDepth;
+
+	// Write out lift and drag
 	int rank = GridUtils::safeGetRank();
 
+	// Loop through all bodies
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
+		// Only write out if this rank owns some markers
+		if (iBody[ib].validMarkers.size() > 0) {
 
 			// Open file for given time step
 			std::ofstream jout;
-			jout.open(GridUtils::path_str + "/Body_" + std::to_string(ib) + "_LD_" + std::to_string(timestep) + "_rank" + std::to_string(rank) + ".out", std::ios::out);
-			jout << "L" + std::to_string(timestep) + ", D" + std::to_string(timestep) << std::endl;
+			jout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_LD_rank" + std::to_string(rank) + ".out", std::ios::app);
+			jout.precision(L_OUTPUT_PRECISION);
 
-			// Sum variables
-			double Lsum = 0.0, Dsum = 0.0;
 
-			// Compute lift and drag
-			for (size_t i = 0; i < iBody[ib].markers.size(); i++) {
-				jout	<< iBody[ib].markers[i].force_xyz[0] << ", " 
-						<< iBody[ib].markers[i].force_xyz[1] << std::endl;
-				Lsum += iBody[ib].markers[i].force_xyz[0];
-				Dsum += iBody[ib].markers[i].force_xyz[1];
+			// If first time step ten write out initial values
+			if (_Grids->t == L_OUT_EVERY_FORCES) {
+
+				// Header
+				jout << "Timestep\tTime (s)\tLift (N)\tDrag (N)" << std::endl;
+
+				// Write out timestep data
+				jout << 0 << "\t" << 0.0;
+
+				// Compute lift and drag
+				for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
+
+					// Write out force on markers
+					for (int dir = 0; dir < L_DIMS; dir++)
+						jout << "\t" << 0.0;
+				}
+				jout << std::endl;
 			}
 
-			jout << "Totals = " << std::endl;
-			jout << Lsum << ", " << Dsum << std::endl;
+			// Convert force per volume to force
+#if (L_DIMS == 2)
+			forceScaling = iBody[ib]._Owner->dm * iBody[ib]._Owner->dh / SQ(iBody[ib]._Owner->dt) * 1.0 / iBody[ib]._Owner->dh;
+#elif (L_DIMS == 3)
+			forceScaling = iBody[ib]._Owner->dm * iBody[ib]._Owner->dh / SQ(iBody[ib]._Owner->dt);
+#endif
+
+			// Write out timestep data
+			jout << _Grids->t << "\t" << _Grids->t * _Grids->dt;
+
+			// Compute lift and drag
+			for (auto m : iBody[ib].validMarkers) {
+
+				// Get volume scaling
+				volWidth = iBody[ib].markers[m].epsilon;
+#if (L_DIMS == 2)
+				volDepth = 1.0;
+#elif (L_DIMS == 3)
+				volDepth = iBody[ib].markers[m].ds;
+#endif
+
+				// Write out force on markers
+				for (int dir = 0; dir < L_DIMS; dir++)
+					jout << "\t" << iBody[ib].markers[m].force_xyz[dir] * volWidth * volDepth * iBody[ib].markers[m].ds * forceScaling;
+			}
+
+			// Next line and close file
+			jout << std::endl;
 			jout.close();
-
+		}
 	}
-
 }
 
-// ************************************************************************** //
-/// \brief	Read/write body information to restart file.
-/// \param	IO_flag	flag indicating write (true) or read (false).
-/// \param	level	level of the grid begin written/read
+
+// *****************************************************************************
+///	\brief	Read/write body information to restart file
+///
+///	\param	IO_flag		flag indicating write (true) or read (false)
+///	\param	level		current grid level
 void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 
 	int rank = GridUtils::safeGetRank();
@@ -140,9 +182,9 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
-					file << iBody[b].markers[m].position_old[0] << "\t"
-						<< iBody[b].markers[m].position_old[1] << "\t"
-						<< iBody[b].markers[m].position_old[2] << "\t";
+					file << iBody[b].markers[m].position0[0] << "\t"
+						<< iBody[b].markers[m].position0[1] << "\t"
+						<< iBody[b].markers[m].position0[2] << "\t";
 				}
 
 			}
@@ -223,9 +265,9 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 				if (iBody[b].isFlexible) {
 
 					// Old positions of each marker
-					iss		>> iBody[b].markers[m].position_old[0]
-							>> iBody[b].markers[m].position_old[1]
-							>> iBody[b].markers[m].position_old[2];
+					iss		>> iBody[b].markers[m].position0[0]
+							>> iBody[b].markers[m].position0[1]
+							>> iBody[b].markers[m].position0[2];
 				}
 			}
 
@@ -244,10 +286,10 @@ void ObjectManager::io_restart(eIOFlag IO_flag, int level) {
 }
 
 
-// ************************************************************************** //
-/// \brief	Wrapper for writing body position data to VTK file.
+// *****************************************************************************
+///	\brief	Wrapper for writing body position data to VTK file
 ///
-/// \param	tval	time value at which the write out is being performed.
+///	\param	tval		time value at which the write out is being performed
 void ObjectManager::io_vtkBodyWriter(int tval)
 {
 
@@ -255,23 +297,25 @@ void ObjectManager::io_vtkBodyWriter(int tval)
 	int rank = GridUtils::safeGetRank();
 
     // Loop through each iBody
-	for (IBBody& body : iBody)
-	{
-		// Call the writer
-		body.writeVtkPosition(tval);
+	for (IBBody& body : iBody) {
 
+		// Call the writer
+		if (body.owningRank == rank)
+			body.writeVtkPosition(tval);
 	}
 
     // Loop through each BFL Body
-	for (BFLBody& body : pBody)
-	{
+	for (BFLBody& body : pBody) {
+
 		// Call the writer
-		body.writeVtkPosition(tval);
+		if (body.owningRank == rank)
+			body.writeVtkPosition(tval);
 	}
 }
 
-// ************************************************************************** //
-/// \brief	Read in geometry config file.
+
+// *****************************************************************************
+///	\brief	Read in geometry config file
 ///
 ///			Input data must be in correct format as specified in documentation.
 ///
@@ -308,7 +352,7 @@ void ObjectManager::io_readInGeomConfig() {
 	std::string bodyCase;
 
 	// Start reading in config file
-	int bodyID = 0;
+	int iBodyID = 0, pBodyID = 0;
 	while(!file.eof()) {
 
 		// Get type of body
@@ -338,8 +382,7 @@ void ObjectManager::io_readInGeomConfig() {
 			bool yRefCen = GeomPacked::interpretRef(yRefType);
 			bool zRefCen = GeomPacked::interpretRef(zRefType);
 
-			L_INFO("Initialising Body " + std::to_string(bodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
-
+			L_INFO("Initialising Body " + std::to_string(iBodyID+pBodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
 
 			// Get body type
 			eObjectType bodyType;
@@ -361,10 +404,13 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
-			if (flex_rigid == "FLEXIBLE")
+			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-			else if (flex_rigid == "MOVABLE")
+				hasFlexibleBodies[lev] = true;
+			}
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 			else
@@ -381,7 +427,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Packed information into a geometry instance
 			GeomPacked *geom = new GeomPacked(
-				bodyType, bodyID, fileName, lev, reg, 
+				bodyType, iBodyID+pBodyID, fileName, lev, reg,
 				xRefCen, xRef, yRefCen, yRef, zRefCen, zRef,
 				length, scaleDirection, moveProperty, clamped
 				);
@@ -394,7 +440,13 @@ void ObjectManager::io_readInGeomConfig() {
 			this->io_readInCloud(_PCpts, geom);
 			delete _PCpts;
 			delete geom;
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (bodyType == eBFLCloud)
+				pBodyID++;
+			else if (bodyType == eIBBCloud)
+				iBodyID++;
 		}
 
 		// ** INSERT FILAMENT ** //
@@ -409,27 +461,47 @@ void ObjectManager::io_readInGeomConfig() {
 			double startY; file >> startY;
 			double startZ; file >> startZ;
 			double length; file >> length;
+			double height; file >> height;
+			double depth; file >> depth;
 			double angleVert; file >> angleVert;
 			double angleHorz; file >> angleHorz;
+			std::string nElementsString; file >> nElementsString;
 			std::string flex_rigid; file >> flex_rigid;
 			std::string BC; file >> BC;
+			double density; file >> density;
+			double YoungMod; file >> YoungMod;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
 
 			// Sort data
 			std::vector<double> start_position, angles;
 			start_position.push_back(startX);
-			start_position.push_back(startY);
-			start_position.push_back(startZ);
+			start_position.push_back(startY + shiftY);
+			start_position.push_back(startZ + shiftZ);
 			angles.push_back(angleVert);
 			angles.push_back(angleHorz);
 
+
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
-			if (flex_rigid == "FLEXIBLE")
+			if (flex_rigid == "FLEXIBLE") {
 				moveProperty = eFlexible;
-			else if (flex_rigid == "MOVABLE")
+				hasFlexibleBodies[lev] = true;
+			}
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 
@@ -447,23 +519,30 @@ void ObjectManager::io_readInGeomConfig() {
 			// If rank has grid
 			if (g != NULL) {
 
+				// Get number of elements to use in FEM
+				double nElements;
+				if (nElementsString == "CONFORMING") {
+					nElements = floor(length / g->dh);
+				}
+				else {
+					nElements = stod(nElementsString);
+				}
+
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, start_position, length, angles, moveProperty, clamped);
-
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
+					iBody.emplace_back(g, iBodyID+pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, start_position, length, angles);
-
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
+					pBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// ** INSERT CIRCLE/SPHERE ** //
@@ -480,20 +559,32 @@ void ObjectManager::io_readInGeomConfig() {
 			double radius; file >> radius;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
 
 			// Sort data
 			std::vector<double> centre_point, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY);
-			centre_point.push_back(centreZ);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE")
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
-			else if (flex_rigid == "MOVABLE")
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 
@@ -506,21 +597,19 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, centre_point, radius, moveProperty);
-
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, centre_point, radius);
-
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// ** INSERT SQUARE/CUBE ** //
@@ -541,13 +630,24 @@ void ObjectManager::io_readInGeomConfig() {
 			double angleHorz; file >> angleHorz;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << bodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
+
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
 
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
 			centre_point.push_back(centreX);
-			centre_point.push_back(centreY);
-			centre_point.push_back(centreZ);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
 			dimensions.push_back(length);
 			dimensions.push_back(height);
 			dimensions.push_back(depth);
@@ -558,8 +658,9 @@ void ObjectManager::io_readInGeomConfig() {
 			eMoveableType moveProperty;
 			if (flex_rigid == "FLEXIBLE")
 				L_ERROR("Circle/sphere cannot be flexible. Exiting.", GridUtils::logfile);
-			else if (flex_rigid == "MOVABLE")
+			else if (flex_rigid == "MOVABLE") {
 				moveProperty = eMovable;
+			}
 			else if (flex_rigid == "RIGID")
 				moveProperty = eRigid;
 
@@ -572,39 +673,120 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, bodyID, centre_point, dimensions, angles, moveProperty);
-
-					// If no markers then get rid of the body
-					if (iBody.back().markers.size() == 0)
-						iBody.erase(iBody.end());
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, bodyID, centre_point, dimensions, angles);
-
-					// If no markers then get rid of the body
-					if (pBody.back().markers.size() == 0)
-						pBody.erase(pBody.end());
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << bodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
+		}
+
+
+		// ** INSERT PLATE ** //
+		else if (bodyCase == "PLATE")
+		{
+
+			// Can't build plate in 2D
+#if (L_DIMS == 2)
+			L_ERROR("Can't build plate in 2D. Exiting.", GridUtils::logfile);
+#endif
+
+			// Read in the rest of the data for this case
+			std::string boundaryType; file >> boundaryType;
+			int lev; file >> lev;
+			int reg; file >> reg;
+			double centreX; file >> centreX;
+			double centreY; file >> centreY;
+			double centreZ; file >> centreZ;
+			double length; file >> length;
+			double width; file >> width;
+			double angleX; file >> angleX;
+			double angleY; file >> angleY;
+			double angleZ; file >> angleZ;
+			std::string flex_rigid; file >> flex_rigid;
+
+			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a plate..." << std::endl;
+
+			// Need to shift the body if using walls
+			double shiftY = 0.0, shiftZ = 0.0;
+#ifdef L_WALLS_ON
+			shiftZ = _Grids->dh;
+#ifdef L_WALLS_ON_2D
+			shiftY = 0.0;
+#else
+			shiftY = _Grids->dh;
+#endif
+#endif
+
+			// Sort data
+			std::vector<double> centre_point, angles;
+			centre_point.push_back(centreX);
+			centre_point.push_back(centreY + shiftY);
+			centre_point.push_back(centreZ + shiftZ);
+			angles.push_back(angleX);
+			angles.push_back(angleY);
+			angles.push_back(angleZ);
+
+			// Check if flexible (note: BFL is always rigid no matter what the input is)
+			eMoveableType moveProperty;
+			if (flex_rigid == "FLEXIBLE")
+				L_ERROR("Plate cannot be flexible. Exiting.", GridUtils::logfile);
+			else if (flex_rigid == "MOVABLE") {
+				moveProperty = eMovable;
+			}
+			else if (flex_rigid == "RIGID")
+				moveProperty = eRigid;
+
+			// Get grid pointer
+			GridObj* g = NULL;
+			GridUtils::getGrid(_Grids, lev, reg, g);
+
+			// If rank has grid
+			if (g != NULL) {
+
+				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+				if (boundaryType == "IBM") {
+					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles, moveProperty);
+				}
+				else if (boundaryType == "BFL") {
+					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles);
+				}
+			}
+			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+
+			// Increment counter
+			if (boundaryType == "IBM")
+				iBodyID++;
+			else if (boundaryType == "BFL")
+				pBodyID++;
 		}
 
 		// Increment body ID and set case to none
-		bodyID++;
 		bodyCase = "NONE";
 	}
 	file.close();
+
+	// Do some more IBM setup required after reading all bodies
+	ibm_finaliseReadIn(iBodyID);
 }
 
 
-// ************************************************************************** //
-/// \brief	Read in point cloud data.
+
+// *****************************************************************************
+/// \brief	Read in point cloud data
 ///
-///			Input data must be in tab separated, 3-column format in the input 
+///			Input data must be in tab separated, 3-column format in the input
 ///			directory.
 ///
-/// \param	_PCpts	reference to pointer to empty point cloud data container.
-/// \param	geom	structure containing object data as parsed from the config file.
+///	\param	_PCpts		reference to pointer to empty point cloud data container
+///	\param	geom		structure containing object data as parsed from the config file
 void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 {
 
@@ -643,9 +825,6 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		// Set scaling
 		dCell = g->dh;
 	}
-
-	// Get rank for debugging
-	int rank = GridUtils::safeGetRank();
 
 	// Round reference values to complete number of voxels
 	double bodyRefX = std::round(geom->bodyRefX / dCell) * dCell;
@@ -809,7 +988,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 #endif	
 
 	// If there are points left
-	if (!_PCpts->x.empty())
+	if (!_PCpts->x.empty() && geom->objtype != eIBBCloud)
 	{
 
 		L_INFO("Building body on this rank...", GridUtils::logfile);
@@ -832,22 +1011,23 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 			// Call constructor to build BFL body
 			pBody.emplace_back(g, geom->bodyID, _PCpts);
 			break;
-
-		case eIBBCloud:
-
-			// Call constructor to build IBM body
-			iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty, geom->isClamped);
-			break;
-
 		}
 	}
+	else if (geom->objtype == eIBBCloud) {
+
+		// Call constructor to build IBM body
+		iBody.emplace_back(g, geom->bodyID, _PCpts, geom->moveProperty);
+	}
 }
+
+
 // *****************************************************************************
-/// \brief	Write out the forces on a solid object.
+/// \brief	Write out the forces on a solid object
 ///
 ///			Writes out the forces on solid objects in the domain computed using
 ///			momentum exchange. Each rank writes its own file. Output is a CSV file.
-/// \param	tval	time value at which write out is taking place.
+///
+///	\param	tval		time value at which write out is taking place
 void ObjectManager::io_writeForcesOnObjects(double tval) {
 	
 	// Declarations
@@ -931,4 +1111,105 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 	}
 
 }
+
+
 // *****************************************************************************
+/// \brief	Write out FEM body to VTK
+///
+///	\param	tval		time value at which write out is taking place
+void ObjectManager::io_vtkFEMWriter(int tval)
+{
+
+	// If there are no flexible bodies on this rank then exit
+	if (IdxFEM.size() == 0)
+		return;
+
+	// Get the rank
+	int rank = GridUtils::safeGetRank();
+
+	// Create string and file streams
+	std::stringstream fileName;
+	fileName << GridUtils::path_str + "/vtk_out.FEM" << std::to_string(rank) << "." << (int)tval << ".vtk";
+	std::ofstream fout;
+	fout.open(fileName.str().c_str());
+
+	// Number of nodes and lines
+	int nNodes = 0;
+	std::vector<int> nLinesBody;
+
+    // Loop through all bodies
+	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
+
+		// Increment number of nodes and lines
+		nNodes += iBody[IdxFEM[ib]].fBody->nodes.size();
+		nLinesBody.push_back(iBody[IdxFEM[ib]].fBody->nodes.size() - 1);
+	}
+
+	// Add header information
+	fout << "# vtk DataFile Version 3.0f\n";
+	fout << "Output for rank " << std::to_string(rank) << " at time t = " << (int)tval << "\n";
+	fout << "ASCII\n";
+	fout << "DATASET POLYDATA\n";
+
+	// Write out the positions of each Lagrange marker
+	fout << "POINTS " << nNodes << " float\n";
+
+    // Loop through all bodies and there nodes
+	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
+		for (size_t m = 0; m < iBody[IdxFEM[ib]].fBody->nodes.size(); m++) {
+
+			// Write out positions
+			fout << iBody[IdxFEM[ib]].fBody->nodes[m].position[eXDirection] << " "
+				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eYDirection] << " "
+				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eZDirection] << std::endl;
+		}
+	}
+
+	// Write out the connectivity of each Lagrange marker
+	fout << "LINES " << std::accumulate(nLinesBody.begin(), nLinesBody.end(), 0) << " " << 3 * std::accumulate(nLinesBody.begin(), nLinesBody.end(), 0) << std::endl;
+
+	// Loop through number of lines
+	int count = 0;
+	for (size_t i = 0; i < nLinesBody.size(); i++) {
+		for (int j = 0; j < nLinesBody[i]; j++) {
+			fout << 2 << " " << count << " " << count + 1 << std::endl;
+			count++;
+		}
+		count++;
+	}
+
+	// Close file
+	fout.close();
+}
+
+
+// *****************************************************************************
+/// \brief	Write out tip positions of flexible filaments
+///
+///	\param	tval		time value at which write out is taking place
+void ObjectManager::io_writeTipPositions(int tval) {
+
+	// Loop through FEM bodies which this rank owns
+	for (auto ib : IdxFEM) {
+
+		// Create string and file streams
+		std::ofstream fout;
+		fout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_TipPositions.out", std::ios::app);
+		fout.precision(L_OUTPUT_PRECISION);
+
+		// Write out header
+		if (tval == 0)
+			fout << "Timestep\tt\tTipX\tTipY\tTipZ" << std::endl;
+
+		// Index of last markers
+		int idx = iBody[ib].markers.size() - 1;
+
+		// Write out data
+		fout << tval << "\t" << tval * _Grids->dt << "\t" << iBody[ib].markers[idx].position[eXDirection] << "\t"
+														  << iBody[ib].markers[idx].position[eYDirection] << "\t"
+														  << iBody[ib].markers[idx].position[eZDirection] << std::endl;
+
+		// Close file
+		fout.close();
+	}
+}

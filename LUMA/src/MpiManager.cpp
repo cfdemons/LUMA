@@ -352,7 +352,8 @@ void MpiManager::mpi_getAllRankLimits() {
 	std::vector<double> recvBuffer(rank_core_edge.size() * num_ranks, 0.0);
 
 	// Do and all-gather so each rank has all information
-	MPI_Allgather(&sendBuffer.front(), sendBuffer.size(), MPI_DOUBLE, &recvBuffer.front(), sendBuffer.size(), MPI_DOUBLE, world_comm);
+	MPI_Allgather(&sendBuffer.front(), static_cast<int>(sendBuffer.size()), MPI_DOUBLE, 
+		&recvBuffer.front(), static_cast<int>(sendBuffer.size()), MPI_DOUBLE, world_comm);
 
 	// Now loop through and unpack buffer
 	for (int rank = 0; rank < num_ranks; rank++) {

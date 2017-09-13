@@ -116,7 +116,7 @@ void BFLBody::initialise()
 	*GridUtils::logfile << "ObjectManagerBFL: Q computation complete." << std::endl;
 
 	// Set valid markers
-	validMarkers = GridUtils::onespace(0, markers.size()-1);
+	validMarkers = GridUtils::onespace(0, static_cast<int>(markers.size()) - 1);
 
 	// Write out Q values for each marker
 #ifdef L_BFL_DEBUG

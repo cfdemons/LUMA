@@ -58,7 +58,8 @@ public:
 
 	// Custom constructor for building prefab filament
 	IBBody(GridObj* g, int bodyID, std::vector<double> &start_position,
-		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty, int nElement, bool clamped, double density, double E);
+		double length, double height, double depth, std::vector<double> &angles, eMoveableType moveProperty,
+		int nElement, bool clamped, double density, double E);
 
 
 

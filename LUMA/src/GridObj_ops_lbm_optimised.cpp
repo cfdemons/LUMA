@@ -315,6 +315,8 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	if (edgeCount > 1)
 	{
 
+		// TODO: This whole section may conflict -- need to reinstate an extrapolated outlet BC and a pressusre BC as per Joe's code.
+
 //		// Extrapolate from previous lattice site (don't do on receiver layers)
 //#ifdef L_EXTRAPOLATED_OUTLET
 //		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
@@ -373,45 +375,30 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 //		// Set boundary normal velocity
 //		normalVelocity = -GridUnits::ud2ulbm(ux, this);
 
+
+
+
+
 #ifdef L_BUILD_FOR_MPI
 		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
 #endif
 		{
+			// Extrapolate density value for edges and corners
 			rho[id] = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
 		}
 
 	}
 
 
-	// Only in one edge count so not a corner or an edge but a face
+	// Edge count = 1 so not a corner or an edge but a face and can compute density
 	else
 	{
-		// Assign velocity vector components from fixed velocity
+		// Assign velocity vector components from reference velocity
 		VelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
 		VelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
 		VelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
-		
-		// Correct velocity assignments with extrapolated ones
-#ifdef L_OUTLET_EXTRAPOLATED
-		// Can only extrapolate on the outlet
-		if (normalVector[eXDirection] == -1)
-		{
 
-#ifdef L_BUILD_FOR_MPI
-			if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
-#endif
-			{
-				// Compute normal velocity using extrapolation
-				VelVector[eXDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eXDirection, L_DIMS);
-				VelVector[eYDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eYDirection, L_DIMS);
-#if (L_DIMS == 3)
-				VelVector[eZDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, eZDirection, L_DIMS);
-#endif
-			}
-		}
-#endif
-
-		// Get sign correct for normal velocity
+		// Get sign correct for wall-normal velocity
 		normalVelocity = GridUtils::vecnorm(
 			GridUtils::vecmultiply<double, int, double>(VelVector, normalVector));
 		if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
@@ -446,6 +433,9 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 #endif
 
 
+	/*************************************************/
+	// Proceed with regularised by updating f values //
+	/*************************************************/
 
 	// Loop over directions now macroscopic are up-to-date
 	for (int v = 0; v < L_NUM_VELS; ++v)
@@ -503,8 +493,6 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 			(2.0 * c_opt[v][eYDirection] * c_opt[v][eZDirection] * Syz)
 			);
 	}
-
-
 
 }
 

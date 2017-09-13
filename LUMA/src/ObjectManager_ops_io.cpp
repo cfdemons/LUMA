@@ -382,7 +382,7 @@ void ObjectManager::io_readInGeomConfig() {
 			bool yRefCen = GeomPacked::interpretRef(yRefType);
 			bool zRefCen = GeomPacked::interpretRef(zRefType);
 
-			L_INFO("Initialising Body " + std::to_string(iBodyID+pBodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
+			L_INFO("Initialising Body " + std::to_string(iBodyID + pBodyID) + " (" + boundaryType + ") from file...", GridUtils::logfile);
 
 			// Get body type
 			eObjectType bodyType;
@@ -427,7 +427,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Packed information into a geometry instance
 			GeomPacked *geom = new GeomPacked(
-				bodyType, iBodyID+pBodyID, fileName, lev, reg,
+				bodyType, iBodyID + pBodyID, fileName, lev, reg,
 				xRefCen, xRef, yRefCen, yRef, zRefCen, zRef,
 				length, scaleDirection, moveProperty, clamped
 				);
@@ -440,7 +440,7 @@ void ObjectManager::io_readInGeomConfig() {
 			this->io_readInCloud(_PCpts, geom);
 			delete _PCpts;
 			delete geom;
-			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
 			// Increment counter
 			if (bodyType == eBFLCloud)
@@ -471,7 +471,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double density; file >> density;
 			double YoungMod; file >> YoungMod;
 
-			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
 			// Need to shift the body if using walls
 			double shiftY = 0.0, shiftZ = 0.0;
@@ -520,23 +520,23 @@ void ObjectManager::io_readInGeomConfig() {
 			if (g != NULL) {
 
 				// Get number of elements to use in FEM
-				double nElements;
+				int nElements;
 				if (nElementsString == "CONFORMING") {
-					nElements = floor(length / g->dh);
+					nElements = static_cast<int>(std::floor(length / g->dh));
 				}
 				else {
-					nElements = stod(nElementsString);
+					nElements = static_cast<int>(std::stod(nElementsString));
 				}
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, iBodyID+pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
+					iBody.emplace_back(g, iBodyID + pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, iBodyID+pBodyID, start_position, length, angles);
+					pBody.emplace_back(g, iBodyID + pBodyID, start_position, length, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
 			// Increment counter
 			if (boundaryType == "IBM")
@@ -559,7 +559,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double radius; file >> radius;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
 
 			// Need to shift the body if using walls
 			double shiftY = 0.0, shiftZ = 0.0;
@@ -597,13 +597,13 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius, moveProperty);
+					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, radius, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, radius);
+					pBody.emplace_back(g, iBodyID + pBodyID, centre_point, radius);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
 			// Increment counter
 			if (boundaryType == "IBM")
@@ -630,7 +630,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double angleHorz; file >> angleHorz;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
 
 			// Need to shift the body if using walls
 			double shiftY = 0.0, shiftZ = 0.0;
@@ -673,13 +673,13 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles, moveProperty);
+					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, dimensions, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, dimensions, angles);
+					pBody.emplace_back(g, iBodyID + pBodyID, centre_point, dimensions, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
 			// Increment counter
 			if (boundaryType == "IBM")
@@ -712,7 +712,7 @@ void ObjectManager::io_readInGeomConfig() {
 			double angleZ; file >> angleZ;
 			std::string flex_rigid; file >> flex_rigid;
 
-			*GridUtils::logfile << "Initialising Body " << iBodyID+pBodyID << " (" << boundaryType << ") as a plate..." << std::endl;
+			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a plate..." << std::endl;
 
 			// Need to shift the body if using walls
 			double shiftY = 0.0, shiftZ = 0.0;
@@ -753,13 +753,13 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
-					iBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles, moveProperty);
+					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, length, width, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, iBodyID+pBodyID, centre_point, length, width, angles);
+					pBody.emplace_back(g, iBodyID + pBodyID, centre_point, length, width, angles);
 				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << iBodyID+pBodyID << "..." << std::endl;
+			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
 			// Increment counter
 			if (boundaryType == "IBM")
@@ -1141,8 +1141,8 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	for (size_t ib = 0; ib < idxFEM.size(); ib++) {
 
 		// Increment number of nodes and lines
-		nNodes += iBody[idxFEM[ib]].fBody->nodes.size();
-		nLinesBody.push_back(iBody[idxFEM[ib]].fBody->nodes.size() - 1);
+		nNodes += static_cast<int>(iBody[idxFEM[ib]].fBody->nodes.size());
+		nLinesBody.push_back(static_cast<int>(iBody[idxFEM[ib]].fBody->nodes.size()) - 1);
 	}
 
 	// Add header information
@@ -1202,7 +1202,7 @@ void ObjectManager::io_writeTipPositions(int tval) {
 			fout << "Timestep\tt\tTipX\tTipY\tTipZ" << std::endl;
 
 		// Index of last markers
-		int idx = iBody[ib].markers.size() - 1;
+		int idx = static_cast<int>(iBody[ib].markers.size()) - 1;
 
 		// Write out data
 		fout << tval << "\t" << tval * _Grids->dt << "\t" << iBody[ib].markers[idx].position[eXDirection] << "\t"

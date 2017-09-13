@@ -433,7 +433,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
 
 	// Set up the correct values
 	char trans = 'T';
-	int dim = A.size();
+	int dim = static_cast<int>(A.size());
     int nrhs = 1;
     int LDA = dim;
     int LDB = dim;

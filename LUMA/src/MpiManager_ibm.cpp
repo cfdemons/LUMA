@@ -69,7 +69,8 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 		// Check if current rank needs to send stuff to rank toRank
 		if (sendForce[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendForce[toRank].front(), sendForce[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendForce[toRank].front(), static_cast<int>(sendForce[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -87,12 +88,13 @@ void MpiManager::mpi_spreadComm(int level, std::vector<std::vector<double>> &spr
 		// If there is data to receive from rank fromRank
 		if (bufferSize[fromRank] > 0) {
 			spreadForces[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&spreadForces[fromRank].front(), spreadForces[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&spreadForces[fromRank].front(), static_cast<int>(spreadForces[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -163,7 +165,8 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 		// Check if current rank needs to send stuff to rank toRank
 		if (sendVel[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendVel[toRank].front(), sendVel[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendVel[toRank].front(), static_cast<int>(sendVel[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -181,12 +184,13 @@ void MpiManager::mpi_interpolateComm(int level, std::vector<std::vector<double>>
 		// If there is data to receive from rank fromRank
 		if (bufferSize[fromRank] > 0) {
 			recvVel[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&recvVel[fromRank].front(), recvVel[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvVel[fromRank].front(), static_cast<int>(recvVel[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -220,7 +224,8 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendBuffer[toRank].front(), static_cast<int>(sendBuffer[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -240,7 +245,8 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 		// Only do if there is information to receive
 		if (bufferSize[fromRank] > 0) {
 			recvBuffer[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvBuffer[fromRank].front(), static_cast<int>(recvBuffer[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -262,7 +268,7 @@ void MpiManager::mpi_epsilonCommScatter(int level) {
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -303,7 +309,7 @@ void MpiManager::mpi_epsilonCommGather(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendBuffer[toRank].front(), static_cast<int>(sendBuffer[toRank].size()), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -321,7 +327,8 @@ void MpiManager::mpi_epsilonCommGather(int level) {
 		// Only do if there is information to receive
 		if (bufferSize[fromRank] > 0) {
 			recvBuffer[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvBuffer[fromRank].front(), static_cast<int>(recvBuffer[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -360,7 +367,7 @@ void MpiManager::mpi_epsilonCommGather(int level) {
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -385,11 +392,11 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 		if (objman->iBody[ib].level == level) {
 
 			// Number of markers on this rank
-			nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+			nMarkersOnThisRank += static_cast<int>(objman->iBody[ib].validMarkers.size());
 
 			// Loop through markers and get number of deltas
 			for (auto m : objman->iBody[ib].validMarkers)
-				deltasPerMarkerOnThisRank.push_back(objman->iBody[ib].markers[m].deltaval.size());
+				deltasPerMarkerOnThisRank.push_back(static_cast<int>(objman->iBody[ib].markers[m].deltaval.size()));
 		}
 	}
 
@@ -496,7 +503,9 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	}
 
 	// Now send all data to root
-	MPI_Gatherv(&sendBuffer.front(), sendBuffer.size(), MPI_DOUBLE, &recvBuffer.front(), &recvBufferSizes.front(), &recvBufferDisps.front(), MPI_DOUBLE, rootRank, world_comm);
+	MPI_Gatherv(&sendBuffer.front(), static_cast<int>(sendBuffer.size()),
+		MPI_DOUBLE, &recvBuffer.front(), &recvBufferSizes.front(), &recvBufferDisps.front(),
+		MPI_DOUBLE, rootRank, world_comm);
 
 	// Set global values
 	iBodyTmp.owningRank = rootRank;
@@ -589,7 +598,7 @@ void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBod
 	int nMarkersOnThisRank = 0;
 	for (int ib = 0; ib < objman->iBody.size(); ib++) {
 		if (objman->iBody[ib].level == level) {
-			nMarkersOnThisRank += objman->iBody[ib].validMarkers.size();
+			nMarkersOnThisRank += static_cast<int>(objman->iBody[ib].validMarkers.size());
 		}
 	}
 
@@ -632,7 +641,8 @@ void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBod
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendEpsBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendEpsBuffer[toRank].front(), sendEpsBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendEpsBuffer[toRank].front(), static_cast<int>(sendEpsBuffer[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -652,7 +662,8 @@ void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBod
 		// Only do if there is information to receive
 		if (bufferSize[fromRank] > 0) {
 			recvEpsBuffer[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&recvEpsBuffer[fromRank].front(), recvEpsBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvEpsBuffer[fromRank].front(), static_cast<int>(recvEpsBuffer[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -674,7 +685,7 @@ void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBod
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -722,7 +733,7 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 		m = markerCommMarkerSide[level][i].markerIdx;
 
 		// Pack into send buffer
-		sendBuffer[toRank].push_back(objman->iBody[ib].markers[m].deltaval.size());
+		sendBuffer[toRank].push_back(static_cast<int>(objman->iBody[ib].markers[m].deltaval.size()));
 	}
 
 	// Now loop through and send to required ranks
@@ -730,7 +741,8 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendBuffer[toRank].front(), static_cast<int>(sendBuffer[toRank].size()),
+				MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -742,7 +754,8 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 	// Now loop through and receive
 	for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
 		if (recvBuffer[fromRank].size() > 0) {
-			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvBuffer[fromRank].front(), static_cast<int>(recvBuffer[fromRank].size()),
+				MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -754,7 +767,7 @@ void MpiManager::mpi_buildMarkerComms(int level) {
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 // *****************************************************************************
@@ -827,9 +840,11 @@ void MpiManager::mpi_buildSupportComms(int level) {
 		// Check if it has stuff to send to rank toRank
 		if (nSupportToRecv[toRank] > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&supportPositions[toRank].front(), supportPositions[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&supportPositions[toRank].front(), static_cast<int>(supportPositions[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&bodyIDs[toRank].front(), bodyIDs[toRank].size(), MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&bodyIDs[toRank].front(), static_cast<int>(bodyIDs[toRank].size()),
+				MPI_INT, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -846,8 +861,10 @@ void MpiManager::mpi_buildSupportComms(int level) {
 
 		// Check if it has stuff to receive from rank i
 		if (nSupportToSend[fromRank] > 0) {
-			MPI_Recv(&supportPositionsRecv[fromRank].front(), supportPositionsRecv[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
-			MPI_Recv(&bodyIDsRecv[fromRank].front(), bodyIDsRecv[fromRank].size(), MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&supportPositionsRecv[fromRank].front(), static_cast<int>(supportPositionsRecv[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&bodyIDsRecv[fromRank].front(), static_cast<int>(bodyIDsRecv[fromRank].size()),
+				MPI_INT, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -875,7 +892,7 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -909,7 +926,8 @@ void MpiManager::mpi_dsCommScatter(int level) {
 	for (int toRank = 0; toRank < num_ranks; toRank++) {
 		if (sendBuffer[toRank].size() > 0) {
 			sendRequests.push_back(MPI_REQUEST_NULL);
-			MPI_Isend(&sendBuffer[toRank].front(), sendBuffer[toRank].size(), MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
+			MPI_Isend(&sendBuffer[toRank].front(), static_cast<int>(sendBuffer[toRank].size()),
+				MPI_DOUBLE, toRank, my_rank, world_comm, &sendRequests.back());
 		}
 	}
 
@@ -929,7 +947,8 @@ void MpiManager::mpi_dsCommScatter(int level) {
 		// Only do if there is information to receive
 		if (bufferSize[fromRank] > 0) {
 			recvBuffer[fromRank].resize(bufferSize[fromRank]);
-			MPI_Recv(&recvBuffer[fromRank].front(), recvBuffer[fromRank].size(), MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
+			MPI_Recv(&recvBuffer[fromRank].front(), static_cast<int>(recvBuffer[fromRank].size()),
+				MPI_DOUBLE, fromRank, fromRank, world_comm, MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -951,7 +970,7 @@ void MpiManager::mpi_dsCommScatter(int level) {
 	}
 
 	// If sending any messages then wait for request status
-	MPI_Waitall(sendRequests.size(), &sendRequests.front(), MPI_STATUS_IGNORE);
+	MPI_Waitall(static_cast<int>(sendRequests.size()), &sendRequests.front(), MPI_STATUS_IGNORE);
 }
 
 
@@ -966,7 +985,7 @@ void MpiManager::mpi_dsCommScatter(int level) {
 void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &recvPositionBuffer, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
 	// Get number of markers to be sent
-	int nMarkers = iBody->markers.size();
+	int nMarkers = static_cast<int>(iBody->markers.size());
 
 	// Only resize if owning rank
 	if (my_rank == iBody->owningRank)
@@ -1028,7 +1047,7 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendSortedIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
 	// Get number of markers to be sent
-	int nMarkers = iBody->markers.size();
+	int nMarkers = static_cast<int>(iBody->markers.size());
 
 	// Create receive buffers
 	std::vector<int> recvSortedIDBuffer(nMarkers, 0);

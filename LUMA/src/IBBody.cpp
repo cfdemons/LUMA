@@ -116,13 +116,13 @@ void IBBody::getValidMarkers() {
 
 			// Check if on rank and not a receiver layer
 			if (GridUtils::isOnThisRank(x, y, z, &loc, _Owner) && !GridUtils::isOnRecvLayer(x, y, z))
-				validMarkers.push_back(m);
+				validMarkers.push_back(static_cast<int>(m));
 		}
 	}
 	else {
 
 		// If not owning rank then all markers on this rank are valid
-		validMarkers = GridUtils::onespace(0, markers.size()-1);
+		validMarkers = GridUtils::onespace(0, static_cast<int>(markers.size()) - 1);
 	}
 
 #else
@@ -167,7 +167,7 @@ void IBBody::sortPtCloudMarkers() {
 		int count = 0;
 		for (size_t i = 0; i < recvSizeBuffer.size(); i++) {
 			for (int j = 0; j < recvSizeBuffer[i]; j++) {
-				rankIDs[count] = i;
+				rankIDs[count] = static_cast<int>(i);
 				indexIDs[count] = count;
 				count++;
 			}
@@ -179,7 +179,7 @@ void IBBody::sortPtCloudMarkers() {
 		// Pack into send buffer
 		sendSortedIDBuffer.resize(indexIDs.size(), 0);
 		for (size_t i = 0; i < indexIDs.size(); i++) {
-			sendSortedIDBuffer[indexIDs[i]] = i;
+			sendSortedIDBuffer[indexIDs[i]] = static_cast<int>(i);
 		}
 
 		// First clear the markers
@@ -195,7 +195,7 @@ void IBBody::sortPtCloudMarkers() {
 			z = recvPositionBuffer[indexIDs[i] * 3 + 2];
 
 			// Add marker
-			addMarker(x, y, z, i);
+			addMarker(x, y, z, static_cast<int>(i));
 		}
 	}
 

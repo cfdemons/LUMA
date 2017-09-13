@@ -142,7 +142,7 @@ void ObjectManager::ibm_updateMarkers(int level) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 	// Loop through all flexible bodies that this rank owns
-	for (auto ib : IdxFEM) {
+	for (auto ib : idxFEM) {
 
 		// Only do if on this grid level
 		if (iBody[ib]._Owner->level == level) {
@@ -203,7 +203,7 @@ void ObjectManager::ibm_updateMarkers(int level) {
 
 					// If we get to hear on the last new marker then this old marker needs to be deleted
 					if (deleteFlag == true)
-						deleteMarkers.push_back(oldMarker);
+						deleteMarkers.push_back(static_cast<int>(oldMarker));
 				}
 
 				// Now delete those markers
@@ -234,7 +234,7 @@ void ObjectManager::ibm_updateMarkers(int level) {
 
 					// If we get to hear on the last new marker then this old marker needs to be deleted
 					if (insertFlag == true) {
-						insertMarkers.push_back(newMarker);
+						insertMarkers.push_back(static_cast<int>(newMarker));
 						insertMarkersAt.push_back(insertAt);
 					}
 				}

@@ -102,8 +102,8 @@ FEMBody::FEMBody (IBBody *iBody, std::vector<double> &start_position, double len
 	}
 
 	// Get number of IBM nodes
-	int nIBMNodes = floor(length / iBodyPtr->_Owner->dh) + 1;
-	int nFEMNodes = nodes.size();
+	int nIBMNodes = static_cast<int>(std::floor(length / iBodyPtr->_Owner->dh)) + 1;
+	int nFEMNodes = static_cast<int>(nodes.size());
 
 	// Compute IBM-FEM conforming parameters
 	computeNodeMapping(nIBMNodes, nFEMNodes);
@@ -312,7 +312,7 @@ void FEMBody::constructRVector() {
 			RGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Rlocal);
 
 			// Add to global vector
-			GridUtils::assembleGlobalVec(el, DOFsPerNode, RGlobal, R);
+			GridUtils::assembleGlobalVec(static_cast<int>(el), DOFsPerNode, RGlobal, R);
 		}
 	}
 }
@@ -368,7 +368,7 @@ void FEMBody::constructMassMat () {
 		Mglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Mlocal), elements[el].T);
 
 		// Add to global matrix
-		GridUtils::assembleGlobalMat(el, DOFsPerNode, Mglobal, M);
+		GridUtils::assembleGlobalMat(static_cast<int>(el), DOFsPerNode, Mglobal, M);
 	}
 }
 
@@ -424,7 +424,7 @@ void FEMBody::constructStiffMat () {
 		Kglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Klocal), elements[el].T);
 
 		// Add to global matrix
-		GridUtils::assembleGlobalMat(el, DOFsPerNode, Kglobal, K_L);
+		GridUtils::assembleGlobalMat(static_cast<int>(el), DOFsPerNode, Kglobal, K_L);
 	}
 }
 
@@ -479,7 +479,7 @@ void FEMBody::constructFVector () {
 		FGlobal = GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), elements[el].F);
 
 		// Add to global vector
-		GridUtils::assembleGlobalVec(el, DOFsPerNode, FGlobal, F);
+		GridUtils::assembleGlobalVec(static_cast<int>(el), DOFsPerNode, FGlobal, F);
 	}
 }
 
@@ -526,7 +526,7 @@ void FEMBody::constructNLStiffMat () {
 		Kglobal = GridUtils::matrix_multiply(GridUtils::matrix_multiply(GridUtils::matrix_transpose(elements[el].T), Klocal), elements[el].T);
 
 		// Add to global matrix
-		GridUtils::assembleGlobalMat(el, DOFsPerNode, Kglobal, K_NL);
+		GridUtils::assembleGlobalMat(static_cast<int>(el), DOFsPerNode, Kglobal, K_NL);
 	}
 }
 
@@ -721,11 +721,11 @@ void FEMBody::computeNodeMapping (int nIBMNodes, int nFEMNodes) {
 
 		// Check if remainder is zero
 		if (fmod(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0)), 1.0) == 0.0) {
-			IBNodeParents[i].elementID = floor(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0))) - 1;
+			IBNodeParents[i].elementID = static_cast<int>(std::floor(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0)))) - 1;
 			IBNodeParents[i].zeta = 1.0;
 		}
 		else {
-			IBNodeParents[i].elementID = floor(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0)));
+			IBNodeParents[i].elementID = static_cast<int>(std::floor(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0))));
 			IBNodeParents[i].zeta = fmod(i * ((nFEMNodes - 1.0) / (nIBMNodes - 1.0)), 1.0) * 2.0 - 1.0;
 		}
 	}

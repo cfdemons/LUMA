@@ -85,7 +85,7 @@ void ObjectManager::ibm_moveBodies(int level) {
 
 		// Only do if on this grid level
 		if (iBody[ib]._Owner->level == level && iBody[ib].isFlexible)
-			ibm_findSupport(ib);
+			ibm_findSupport(static_cast<int>(ib));
 	}
 
 	// Update MPI comm vector
@@ -1015,11 +1015,11 @@ void ObjectManager::ibm_finaliseReadIn(int iBodyID) {
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
 		// Create vector which maps the bodyID to it's index in the iBody vector
-		bodyIDToIdx[iBody[ib].id] = ib;
+		bodyIDToIdx[iBody[ib].id] = static_cast<int>(ib);
 
 		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
 		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-			idxFEM.push_back(ib);
+			idxFEM.push_back(static_cast<int>(ib));
 			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
 		}
 	}

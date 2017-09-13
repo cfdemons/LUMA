@@ -306,7 +306,8 @@ std::vector<double> GridUtils::matrix_multiply(const std::vector< std::vector<do
 /// \param	A	a matrix represented as a vector or vectors.
 /// \param	B	a matrix represented as a vector or vectors.
 /// \return	a matrx which is A * B.
-std::vector<std::vector<double>> GridUtils::matrix_multiply(const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B) {
+std::vector<std::vector<double>> GridUtils::matrix_multiply(
+	const std::vector< std::vector<double> >& A, const std::vector< std::vector<double> >& B) {
 
 	// Check to makes sure dimensions are correct
 	if (A[0].size() != B.size()) {
@@ -379,7 +380,8 @@ std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::ve
 ///	\param	offset		how much to offset each local matrix
 ///	\param	localMat	local element matrix
 ///	\param	globalMat	global matrix to be assembled
-void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat) {
+void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat,
+	std::vector<std::vector<double>> &globalMat) {
 
 	// Add the values of the single element matrix to the full system matrix
 	for (size_t i = 0; i < localMat.size(); i++) {
@@ -421,13 +423,6 @@ void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &gl
 	}
 }
 
-
-// *****************************************************************************
-/// \brief	Solve the linear system A.x = b
-/// \param	A	A.
-/// \param	b	b.
-/// \return	x	x.
-
 // *****************************************************************************
 ///	\brief	Solve the linear system A.x = b
 ///
@@ -443,7 +438,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
     int LDA = dim;
     int LDB = dim;
     int info;
-    int ipiv[dim];
+    int* ipiv = new int(dim);
 
     // Put A into 1D array	// TODO Sort out how this is done so no need to tranpose it
     std::vector<double> a(dim * dim, 0.0);
@@ -458,6 +453,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
 	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
 
 	// Return
+	delete ipiv;
 	return b;
 }
 

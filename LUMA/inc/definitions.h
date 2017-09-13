@@ -231,8 +231,7 @@
 
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-//#define L_OUTLET_EXTRAPOLATED		///< Specifies that the outlet BC extrapolates information from the domain
-//#define L_VELOCITY_RAMP 1		///< Defines time in dimensionless units over which to ramp up the inlet velocity
+//#define L_VELOCITY_RAMP 1			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall

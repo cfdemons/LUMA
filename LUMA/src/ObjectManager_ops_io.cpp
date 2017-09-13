@@ -1121,7 +1121,7 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 {
 
 	// If there are no flexible bodies on this rank then exit
-	if (IdxFEM.size() == 0)
+	if (idxFEM.size() == 0)
 		return;
 
 	// Get the rank
@@ -1138,11 +1138,11 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	std::vector<int> nLinesBody;
 
     // Loop through all bodies
-	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
+	for (size_t ib = 0; ib < idxFEM.size(); ib++) {
 
 		// Increment number of nodes and lines
-		nNodes += iBody[IdxFEM[ib]].fBody->nodes.size();
-		nLinesBody.push_back(iBody[IdxFEM[ib]].fBody->nodes.size() - 1);
+		nNodes += iBody[idxFEM[ib]].fBody->nodes.size();
+		nLinesBody.push_back(iBody[idxFEM[ib]].fBody->nodes.size() - 1);
 	}
 
 	// Add header information
@@ -1155,13 +1155,13 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 	fout << "POINTS " << nNodes << " float\n";
 
     // Loop through all bodies and there nodes
-	for (size_t ib = 0; ib < IdxFEM.size(); ib++) {
-		for (size_t m = 0; m < iBody[IdxFEM[ib]].fBody->nodes.size(); m++) {
+	for (size_t ib = 0; ib < idxFEM.size(); ib++) {
+		for (size_t m = 0; m < iBody[idxFEM[ib]].fBody->nodes.size(); m++) {
 
 			// Write out positions
-			fout << iBody[IdxFEM[ib]].fBody->nodes[m].position[eXDirection] << " "
-				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eYDirection] << " "
-				 << iBody[IdxFEM[ib]].fBody->nodes[m].position[eZDirection] << std::endl;
+			fout << iBody[idxFEM[ib]].fBody->nodes[m].position[eXDirection] << " "
+				 << iBody[idxFEM[ib]].fBody->nodes[m].position[eYDirection] << " "
+				 << iBody[idxFEM[ib]].fBody->nodes[m].position[eZDirection] << std::endl;
 		}
 	}
 
@@ -1190,7 +1190,7 @@ void ObjectManager::io_vtkFEMWriter(int tval)
 void ObjectManager::io_writeTipPositions(int tval) {
 
 	// Loop through FEM bodies which this rank owns
-	for (auto ib : IdxFEM) {
+	for (auto ib : idxFEM) {
 
 		// Create string and file streams
 		std::ofstream fout;

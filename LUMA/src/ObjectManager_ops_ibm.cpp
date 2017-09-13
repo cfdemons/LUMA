@@ -68,7 +68,7 @@ void ObjectManager::ibm_moveBodies(int level) {
 #endif
 
 	// Loop through flexible bodies and apply FEM
-	for (auto ib : IdxFEM) {
+	for (auto ib : idxFEM) {
 
 		// Only do if on this grid level
 		if (iBody[ib]._Owner->level == level)
@@ -148,7 +148,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 	timeav_subIterations /= (g->t % L_OUT_EVERY + 1);
 
 	// Set the new start-of-timestep values
-	for (auto ib : IdxFEM) {
+	for (auto ib : idxFEM) {
 
 		// If on this level
 		if (iBody[ib]._Owner->level == g->level) {
@@ -184,7 +184,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 				" iterations to reach a residual of " << timeav_subResidual << std::endl;
 
 		// Write out FEM body values
-		for (auto ib : IdxFEM) {
+		for (auto ib : idxFEM) {
 			if (iBody[ib]._Owner->level == g->level) {
 				*GridUtils::logfile << "Body " << iBody[ib].id << ": FEM solver taking " << iBody[ib].fBody->timeav_FEMIterations <<
 						" iterations to reach a residual of " << iBody[ib].fBody->timeav_FEMResidual << std::endl;
@@ -959,7 +959,7 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 	double res = 0.0;
 
 	// Loop through flexible bodies
-	for (auto ib : IdxFEM) {
+	for (auto ib : idxFEM) {
 
 		// Only do if on this grid level
 		if (iBody[ib]._Owner->level == level) {
@@ -1019,7 +1019,7 @@ void ObjectManager::ibm_finaliseReadIn(int iBodyID) {
 
 		// Also reset the FEM pointers which will have shifted due to resizing of the iBody vector
 		if (iBody[ib].isFlexible == true && iBody[ib].owningRank == rank) {
-			IdxFEM.push_back(ib);
+			idxFEM.push_back(ib);
 			iBody[ib].fBody->iBodyPtr = &(iBody[ib]);
 		}
 	}

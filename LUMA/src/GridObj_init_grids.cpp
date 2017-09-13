@@ -29,7 +29,7 @@ using namespace std;
 ///			not known how to scale the data to fit. Inlet profile is always
 ///			assumed to be oriented vertically (y-direction) and data should be
 ///			specified in dimensionless units.
-void GridObj::LBM_init_getInletProfile()
+void GridObj::LBM_initGetInletProfile()
 {
 
 	size_t j;
@@ -394,7 +394,7 @@ void GridObj::LBM_initGrid() {
 	// Get the inlet profile data
 #ifdef L_USE_INLET_PROFILE
 
-	LBM_init_getInletProfile();
+	LBM_initGetInletProfile();
 	
 #endif
 
@@ -402,24 +402,27 @@ void GridObj::LBM_initGrid() {
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 	
+#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
-	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
+#endif
 
 	// Density field
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
-#if (defined L_GRAVITY_ON)
+	// Initialise with gravity
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
-#endif
 
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
+#endif
 
 	// Time averaged quantities
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
@@ -581,7 +584,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 
 #ifdef L_USE_INLET_PROFILE
 
-	LBM_init_getInletProfile();
+	LBM_initGetInletProfile();
 	
 #endif
 
@@ -590,29 +593,34 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	LBM_initVelocity();
 
 	// Set start-of-timestep-velocity
-	u_n.resize( N_lim*M_lim*K_lim*L_DIMS );
+#ifdef L_IBM_ON
+	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
+#endif
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
 
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
-#if (defined L_GRAVITY_ON)
+	// Initialise with gravity
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
-#endif
 
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
+#endif
 
 	// Time averaged quantities
+#ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
 	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
+#endif
 
 
 	// Generate POPULATION MATRICES for lower levels
@@ -1081,7 +1089,6 @@ void GridObj::LBM_initBoundLab ( )
 {
 	// Declarations
 	int i, j, k;
-	double delta = dh / 1000.0;
 
 	// LEFT WALL //
 

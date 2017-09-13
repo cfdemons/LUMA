@@ -109,7 +109,7 @@ private:
 	std::vector<int> bodyIDToIdx;
 
 	// Vector of indices for iBody vector for which this rank owns and is flexible
-	std::vector<int> IdxFEM;
+	std::vector<int> idxFEM;
 
 	// Subiteration loop parameters
 	double timeav_subResidual;

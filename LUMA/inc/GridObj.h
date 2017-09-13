@@ -99,8 +99,8 @@ public :
 	double dh;						///< Dimensionless lattice spacing (same for x, y and z)
 	int region_number;				///< Region number
 	int level;						///< Level in embedded grid hierarchy
-	double dt;						///< Physical time step size
-	double dm;
+	double dt;						///< Dimensionless time step size
+	double dm;						///< Dimensionless mass reference
 	int t;							///< Number of completed iterations on this level
 	double nu;						///< Kinematic viscosity (in lattice units)
 	double omega;					///< Relaxation frequency
@@ -118,7 +118,6 @@ public :
 	DEPRECATED double XOrigin;		///< Position of grid left edge
 	DEPRECATED double YOrigin;		///< Position of grid bottom edge
 	DEPRECATED double ZOrigin;		///< Position of grid front edge
-
 	std::vector<int> rankGrids;		///< Vector of size num_ranks which contains how many subgrids each rank has access to
 
 
@@ -135,7 +134,7 @@ public :
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
-	void LBM_init_getInletProfile();			// Initialise the store for inlet profile data from file
+	void LBM_initGetInletProfile();			// Initialise the store for inlet profile data from file
 
 	// LBM operations
 	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator

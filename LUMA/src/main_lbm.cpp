@@ -345,9 +345,16 @@ int main( int argc, char* argv[] )
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
-<<<<<<< HEAD
-#ifdef L_PROBE_OUTPUT
+#ifdef L_VTK_FEM_WRITE
+	*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+	objMan->io_vtkFEMWriter(Grids->t);
+#endif
 
+#ifdef L_WRITE_TIP_POSITIONS
+	objMan->io_writeTipPositions(Grids->t);
+#endif
+
+#ifdef L_PROBE_OUTPUT
 #ifdef L_BUILD_FOR_MPI
 	for (int n = 0; n < mpim->num_ranks; n++)
 #endif
@@ -362,16 +369,7 @@ int main( int argc, char* argv[] )
 			Grids->io_probeOutput();
 		}
 	}
-=======
-#ifdef L_VTK_FEM_WRITE
-	*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
-	objMan->io_vtkFEMWriter(Grids->t);
-#endif
-
-#ifdef L_WRITE_TIP_POSITIONS
-	objMan->io_writeTipPositions(Grids->t);
->>>>>>> origin/MPI_IBM
-#endif
+#endif	// L_PROBE_OUTPUT
 
 #ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation

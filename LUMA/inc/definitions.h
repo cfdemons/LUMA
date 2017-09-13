@@ -36,10 +36,11 @@
 **************************** DO NOT EDIT!!!!!! ********************************
 *******************************************************************************
 */
-#define L_N static_cast<int>(L_BX * L_RESOLUTION)
-#define L_M static_cast<int>(L_BY * L_RESOLUTION)
-#define L_K static_cast<int>(L_BZ * L_RESOLUTION)
-#define L_COARSE_SITE_THICKNESS (static_cast<double>(L_BX)/static_cast<double>(L_N))
+#define L_N static_cast<int>(L_BX * L_RESOLUTION)	///< Number of coarse cells in X-direction
+#define L_M static_cast<int>(L_BY * L_RESOLUTION)	///< Number of coarse cells in Y-direction
+#define L_K static_cast<int>(L_BZ * L_RESOLUTION)	///< Number of coarse cells in Z-direction
+/// Width of a coarse cell in dimensionless units
+#define L_COARSE_SITE_WIDTH (static_cast<double>(L_BX)/static_cast<double>(L_N))
 
 
 /*
@@ -51,7 +52,7 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
@@ -59,7 +60,7 @@
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 #define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
@@ -75,7 +76,7 @@
 #define L_BUILD_FOR_MPI			///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
@@ -84,10 +85,9 @@
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
 //#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
-//#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
+//#define L_PROBE_OUTPUT			///< Write out probe data
 
-// High frequency output options
-//#define L_PROBE_OUTPUT						///< Turn on probe output
+// Probe output options
 #define L_PROBE_OUT_FREQ 100000					///< Write out frequency of probe output
 #define L_PROBE_NUM_X 2							///< Number of probes in X direction
 #define L_PROBE_NUM_Y 5							///< Number of probes in Y direction
@@ -99,7 +99,7 @@
 #define L_PROBE_MAX_Y (1.6 + L_WALL_THICKNESS_BOTTOM)	///< End position of probe array in Y direction
 #define L_PROBE_MAX_Z 0.0						///< End position of probe array in Z direction
 
-// Gravity
+// Forcing
 #define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 2.986e-3
@@ -116,6 +116,9 @@
 //#define L_USE_BGKSMAG
 #define L_CSMAG 0.1
 
+/// Compute the time-averaged values of velocity, density and the velocity products.
+//#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
+
 
 /*
 *******************************************************************************
@@ -123,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 10000		///< Number of time steps to run simulation for
 
 
 /*
@@ -222,12 +225,12 @@
 //#define L_VELOCITY_RAMP 100		///< Defines the number of timesteps over which to ramp up the inlet velocity
 
 // General
-#define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of wall
-#define L_WALL_THICKNESS_TOP (2.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of top wall
-#define L_WALL_THICKNESS_LEFT (1.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of left wall
-#define L_WALL_THICKNESS_RIGHT (1.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of right wall
-#define L_WALL_THICKNESS_FRONT (1.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of front (3D) wall
-#define L_WALL_THICKNESS_BACK (1.0 * L_COARSE_SITE_THICKNESS)	///< Thickness of back (3D) wall
+#define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall
+#define L_WALL_THICKNESS_TOP (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of top wall
+#define L_WALL_THICKNESS_LEFT (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of left wall
+#define L_WALL_THICKNESS_RIGHT (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of right wall
+#define L_WALL_THICKNESS_FRONT (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of front (3D) wall
+#define L_WALL_THICKNESS_BACK (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of back (3D) wall
 
 
 /*
@@ -240,7 +243,7 @@
 #define L_NUM_REGIONS 2		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 //#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
-// If you want coincident edges then set to (-2.0 * dh)
+// Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
 #define L_PADDING_X_MIN (-2.0 * dh)		///< Padding between X start of each sub-grid and its child edge
 #define L_PADDING_X_MAX (2.0 * dh)		///< Padding between X end of each sub-grid and its child edge
 #define L_PADDING_Y_MIN (L_BY - 0.1)	///< Padding between Y start of each sub-grid and its child edge
@@ -261,13 +264,13 @@ static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ (0.0 + L_WALL_THICKNESS_BOTTOM + 1.2), L_COARSE_SITE_THICKNESS },
-	{ (0.0 + L_WALL_THICKNESS_BOTTOM + 1.6), L_COARSE_SITE_THICKNESS }
+	{ (0.0 + L_WALL_THICKNESS_BOTTOM + 1.2), L_COARSE_SITE_WIDTH },
+	{ (0.0 + L_WALL_THICKNESS_BOTTOM + 1.6), L_COARSE_SITE_WIDTH }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ (L_BY - L_COARSE_SITE_THICKNESS), (0.0 + L_WALL_THICKNESS_BOTTOM + 0.8) },
-	{ (L_BY - L_COARSE_SITE_THICKNESS), (0.0 + L_WALL_THICKNESS_BOTTOM + 0.4) }
+	{ (L_BY - L_COARSE_SITE_WIDTH), (0.0 + L_WALL_THICKNESS_BOTTOM + 0.8) },
+	{ (L_BY - L_COARSE_SITE_WIDTH), (0.0 + L_WALL_THICKNESS_BOTTOM + 0.4) }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {

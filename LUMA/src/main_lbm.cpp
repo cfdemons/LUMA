@@ -133,7 +133,7 @@ int main( int argc, char* argv[] )
 	
 	// Create application log file
 	std::ofstream logfile;
-	logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".out", std::ios::out);
+	logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".log", std::ios::out);
 	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
 	// TODO: Handle case when logfile doesn't open correctly

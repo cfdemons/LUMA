@@ -126,7 +126,7 @@ void MpiManager::mpi_init()
 #ifdef L_MPI_VERBOSE
 	
 	// Open logfile now my_rank has been assigned
-	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".out", std::ios::out );
+	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".log", std::ios::out );
 
 #else
 

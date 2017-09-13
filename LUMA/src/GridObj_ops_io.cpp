@@ -931,8 +931,23 @@ int GridObj::io_hdf5(double tval)
 		int idx = level + region_number * L_NUM_LEVELS;
 		dimsf[0] = gm->global_size[eXDirection][idx];
 		dimsf[1] = gm->global_size[eYDirection][idx];
+
 		if (level > 0)
 		{
+
+#ifdef L_HDF_DEBUG
+			// Write file space sizing parameters
+			L_INFO("Global Size (inc. TL): Level " + std::to_string(level) + ", Region " + std::to_string(region_number) + ": "
+				+ std::to_string(gm->global_size[eXDirection][idx]) + ","
+				+ std::to_string(gm->global_size[eYDirection][idx]) + ","
+				+ std::to_string(gm->global_size[eZDirection][idx]), GridUtils::logfile);
+			L_WARN("TL Thickness: " + std::to_string(TL_thickness), GridUtils::logfile);
+			L_WARN("TL keys: " + std::to_string(gm->subgrid_tlayer_key[eXMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eXMax][idx - 1]) + "/" +
+				std::to_string(gm->subgrid_tlayer_key[eYMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eYMax][idx - 1]) + "/" +
+				std::to_string(gm->subgrid_tlayer_key[eZMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eZMax][idx - 1]),
+				GridUtils::logfile);
+#endif
+			// Corretc global size using knowledge of TLs that need clipping
 			dimsf[0] -= 
 				(gm->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
 				+ gm->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness);
@@ -949,7 +964,22 @@ int GridObj::io_hdf5(double tval)
 				+ gm->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness);
 		}
 #endif
-		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);	// File space is globally sized
+		// File space is globally sized
+		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);
+
+		// Write out file space to log file for reference
+#ifdef L_HDF_DEBUG
+		L_INFO("Level " + std::to_string(level) + ", Region " + std::to_string(region_number)
+			+ ": Filespace size = "
+			+ std::to_string(dimsf[eXDirection]) + " x "
+			+ std::to_string(dimsf[eYDirection]) + " x "
+#if (L_DIMS == 3)
+			+ std::to_string(dimsf[eZDirection])
+#else
+			std::to_string(1)
+#endif			
+			, GridUtils::logfile);
+#endif
 
 		// Memory space is always 1D scalar sized (ex. TL and halo for MPI builds)
 		dimsm[0] = p_data.writable_data_count;

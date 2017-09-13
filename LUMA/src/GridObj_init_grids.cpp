@@ -46,7 +46,7 @@ void GridObj::LBM_init_getInletProfile()
 	{
 		// Set the inlet velocity profile values
 		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
-		double b = L_COARSE_SITE_THICKNESS - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
+		double b = L_COARSE_SITE_WIDTH - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
 		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1 - pow((YPos[j] - a) / b, 2));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
@@ -500,7 +500,7 @@ void GridObj::LBM_initGrid() {
 #endif
 
 #ifdef L_INIT_VERBOSE
-	*GridUtils::logfile << "Initialisation Complete.";
+	L_INFO("Initialisation Complete.", GridUtils::logfile);
 #endif
 }
 	

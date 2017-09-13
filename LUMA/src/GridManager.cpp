@@ -48,7 +48,7 @@ GridManager::GridManager()
 	if (global_edges[eYMax][0] - L_BY > L_SMALL_NUMBER) L_WARN("Due to selected resolution, domain has been resized in the Y-Direction to maintain cubic cells.", GridUtils::logfile);
 	if (global_edges[eZMax][0] - L_BZ > L_SMALL_NUMBER) L_WARN("Due to selected resolution, domain has been resized in the Z-Direction to maintain cubic cells.", GridUtils::logfile);
 
-	// Set size of periodic flag vector
+	// Set periodic flag vector (not used on L0)
 	periodic_flags[eXDirection][0] = true;
 	periodic_flags[eYDirection][0] = true;
 	periodic_flags[eZDirection][0] = true;
@@ -64,8 +64,8 @@ GridManager::GridManager()
 	// Loop over every sub-grid
 	for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 	{
-		// Reset spacing for next set of regions
-		dh = (static_cast<double>(L_BX) / static_cast<double>(L_N)) / 2.0;
+		// Reset spacing for next set of regions to base spacing
+		dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
 
 		for (int lev = 1; lev <= L_NUM_LEVELS; ++lev)
 		{
@@ -208,10 +208,9 @@ GridManager::GridManager()
 					" sub-grid has size < 0 in Z-direction -- not enough base resolution to support this level!", GridUtils::logfile);
 			}
 
+			// Get resolution for next level
+			dh /= 2.0;
 		}
-
-		// Get resolution for next
-		dh /= 2.0;
 	}
 	
 	// Print out grid edges to file

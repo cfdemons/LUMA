@@ -76,9 +76,11 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
+#define L_RESTART_OUT_FREQ L_OUT_EVERY		///< Frequency of write out of restart file
+#define L_PROBE_OUT_FREQ 100					///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -88,7 +90,6 @@
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
 // Probe output options
-#define L_PROBE_OUT_FREQ 10000					///< Write out frequency of probe output
 #define L_PROBE_NUM_X 2							///< Number of probes in X direction
 #define L_PROBE_NUM_Y 5							///< Number of probes in Y direction
 #define L_PROBE_NUM_Z 1							///< Number of probes in Z direction
@@ -109,7 +110,6 @@
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ L_OUT_EVERY		///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1000000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 10000		///< Number of time steps to run simulation for
 
 
 /*

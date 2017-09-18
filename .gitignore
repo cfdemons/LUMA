@@ -1,4 +1,7 @@
 *.vcxproj
-../x64/
+**/x64/
 *.filters
 *.avi
+*.suo
+*.user
+*.cd

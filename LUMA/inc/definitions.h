@@ -55,7 +55,7 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -76,7 +76,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 100000			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 
@@ -88,7 +88,7 @@
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
 // Probe output options
-#define L_PROBE_OUT_FREQ 100000					///< Write out frequency of probe output
+#define L_PROBE_OUT_FREQ 10000					///< Write out frequency of probe output
 #define L_PROBE_NUM_X 2							///< Number of probes in X direction
 #define L_PROBE_NUM_Y 5							///< Number of probes in Y direction
 #define L_PROBE_NUM_Z 1							///< Number of probes in Z direction
@@ -102,14 +102,14 @@
 // Forcing
 #define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 2.986e-3
+#define L_GRAVITY_FORCE 2.986e-4
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
-#define L_RESTART_OUT_FREQ 1000000				///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ L_OUT_EVERY		///< Frequency of write out of restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 10000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000000		///< Number of time steps to run simulation for
 
 
 /*
@@ -169,8 +169,8 @@
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
-// Reference density
-#define L_RHO_REF 1000.0
+// Reference density	
+#define L_PHYSICAL_RHO 1000.0	///< Reference density in physical units
 
 
 /*
@@ -202,11 +202,11 @@
 
 // General //
 //#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 #define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //

@@ -277,7 +277,7 @@ void GridObj::LBM_initGrid() {
 	dt = L_TIMESTEP;
 
 	// Store mass conversion
-	dm = (L_RHO_REF / L_RHOIN) * dh * dh * dh;
+	dm = (L_PHYSICAL_RHO / L_RHOIN) * dh * dh * dh;
 
 	// Gravity in LBM units
 	gravity = GridUnits::fd2flbm(L_GRAVITY_FORCE, this);

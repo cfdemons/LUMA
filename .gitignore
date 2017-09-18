@@ -1,0 +1,4 @@
+*.vcxproj
+../x64/
+*.filters
+*.avi

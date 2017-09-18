@@ -1799,3 +1799,49 @@ int GridUtils::safeGetRank()
 #endif
 
 }
+
+// ****************************************************************************
+/// \brief	Method to retireve the sub-grid corresponding to the supplied coarse 
+///			indices.
+///
+///			For level 0 grids it is possible to have multiple sub-grids -- one 
+///			for each refinement region. The coalesce operation must get the correct
+///			sub-grid to function properly. For other levels, there is no ambiguity.
+///			
+/// \param	i	i-index of the coarse site.
+/// \param	j	j-index of the coarse site.
+/// \param	k	k-index of the coarse site.
+///	\returns	a pointer to the sub-grid.
+GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
+{
+	// Create Grid pointer
+	GridObj * g = nullptr;
+
+	if (parent->level == 0)
+	{
+		// Get grid manager
+		GridManager * gm = GridManager::getInstance();
+
+		// Get grid from region based on edges
+		for (int idx = 1; idx < (L_NUM_REGIONS * L_NUM_LEVELS); idx += L_NUM_LEVELS)
+		{
+			if (
+				gm->global_edges[eXMin][idx] <= gm->Grids->XPos[i] && gm->global_edges[eXMax][idx] >= gm->Grids->XPos[i] &&
+				gm->global_edges[eYMin][idx] <= gm->Grids->YPos[j] && gm->global_edges[eYMax][idx] >= gm->Grids->YPos[j]
+#if (L_DIMS == 3)
+				&&
+				gm->global_edges[eZMin][idx] <= gm->Grids->ZPos[k] && gm->global_edges[eZMax][idx] >= gm->Grids->ZPos[k]
+#endif
+				)
+			{
+				getGrid(1, (idx / L_NUM_LEVELS), g);
+				break;
+			}
+		}
+	}
+	else
+	{
+		g = parent->subGrid[0];
+	}
+	return g;
+}

@@ -76,11 +76,11 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 1000		///< Specific output frequency of body forces
+#define L_OUT_EVERY 100000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY		///< Frequency of write out of restart file
-#define L_PROBE_OUT_FREQ 100					///< Write out frequency of probe output
+#define L_PROBE_OUT_FREQ 1000				///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 10000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000000		///< Number of time steps to run simulation for
 
 
 /*
@@ -136,9 +136,9 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 8		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 12		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing

@@ -127,7 +127,7 @@ void IBBody::getValidMarkers() {
 
 #else
 	// For serial all markers are valid
-	validMarkers = GridUtils::onespace(0, markers.size()-1);
+	validMarkers = GridUtils::onespace(0, static_cast<int>(markers.size()) - 1);
 #endif
 }
 

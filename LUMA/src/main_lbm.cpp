@@ -65,7 +65,7 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 
 	// Usual initialise
-	MPI_Init( &argc, &argv );
+	MPI_Init(&argc, &argv);
 
 #endif
 
@@ -238,9 +238,6 @@ int main( int argc, char* argv[] )
 
 	}
 
-	// Set the rankGrids value which contains a list of how many subgrids each rank has access to
-	Grids->LBM_calculateRankGrids();
-
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
 	gm->setGridHierarchy(Grids);
 
@@ -260,7 +257,7 @@ int main( int argc, char* argv[] )
 	objMan->io_readInGeomConfig();
 #endif
 
-#if !defined L_RESTARTING
+#if (defined L_IBM_ON && !defined L_RESTARTING)
 
 	/* Initialise the bodies (compute support etc.) using initial body positions
 	 * and compute support from supplied grid. Only attempts to initialise IBM bodies
@@ -306,6 +303,9 @@ int main( int argc, char* argv[] )
 	// Get time of grid and object initialisation
 #ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(mpim->world_comm);
+
+	// Set sub-grid accessibility counter
+	mpim->mpi_setSubGridDepth();
 #endif
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
@@ -399,7 +399,7 @@ int main( int argc, char* argv[] )
 		t_start = clock();
 #endif
 		if ((Grids->t + 1) % L_OUT_EVERY == 0 && rank == 0)
-			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>\n" << std::flush;
+			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
 
 
 		///////////////////////

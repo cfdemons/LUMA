@@ -855,7 +855,7 @@ int Body<MarkerType>::assignOwningRank(int id) {
 	for (int rank = 0; rank < mpim->num_ranks; rank++) {
 
 		// Check if this rank has this level
-		if (g->rankGrids[rank] >= level)
+		if (mpim->rankGrids[rank] >= level)
 			validRanks.push_back(rank);
 	}
 

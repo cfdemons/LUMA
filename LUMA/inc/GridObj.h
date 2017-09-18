@@ -118,7 +118,6 @@ public :
 	DEPRECATED double XOrigin;		///< Position of grid left edge
 	DEPRECATED double YOrigin;		///< Position of grid bottom edge
 	DEPRECATED double ZOrigin;		///< Position of grid front edge
-	std::vector<int> rankGrids;		///< Vector of size num_ranks which contains how many subgrids each rank has access to
 
 
 	/************** Member Methods **************/
@@ -143,7 +142,6 @@ public :
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
-	void LBM_calculateRankGrids();						// Get which ranks have access to which subgrids
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
@@ -156,7 +154,6 @@ public :
 private :
 
 	void _LBM_updateReynolds(double newReynolds);		// Updates the reynolds number at run time
-
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 
 											// Engine 4 VectorField object.
@@ -173,7 +170,6 @@ private :
 	void _LBM_regularised_opt(int i, int j, int k, int id, eType type);
 	void _LBM_kbcCollide_opt(int id);
 	void _LBM_resetForces();
-
 	double _LBM_smag(int id, double omega);
 
 public :

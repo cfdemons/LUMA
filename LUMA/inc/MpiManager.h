@@ -136,6 +136,8 @@ public :
 	///			Access the rows using the eCartMinMax enumeration.
 	std::vector< std::vector<double> > rank_core_edge;
 
+	/// Vector of size num_ranks which indicates how many sub-grids each rank has access to
+	std::vector<int> rankGrids;
 
 	/// \struct layer_edges
 	/// \brief	Structure containing absolute positions of the edges of halos.
@@ -205,6 +207,7 @@ public :
 	void mpi_SDComputeImbalance(LoadImbalanceData& load, SDData& solutionData, std::vector<int>& numCores);
 	bool mpi_SDCheckDelta(SDData& solutionData, double dh, std::vector<int>& numCores);
 	void mpi_SDCommunicateSolution(SDData& solutionData, double imbalance, double dh);
+	void mpi_setSubGridDepth();										// Method to initialiset eh rankGrids variable
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

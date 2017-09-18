@@ -1525,3 +1525,35 @@ void MpiManager::mpi_reportOnDecomposition(double dh)
 	exit(EXIT_SUCCESS);
 }
 // ************************************************************************** //
+/// \brief Called by the initialiser once the grid hierarchy has been populated.
+void MpiManager::mpi_setSubGridDepth()
+{
+#ifdef L_BUILD_FOR_MPI
+
+	// Highest level this rank owns
+	int highestLevel = 0;
+
+	// Grid pointer
+	GridObj* g = NULL;
+
+	// Loop through all subgrids on this rank
+	for (int lev = 1; lev < (L_NUM_LEVELS + 1); lev++)
+	{
+		// Check if this rank has this level
+		g = NULL;
+		GridUtils::getGrid(GridManager::getInstance()->Grids, lev, 0, g);
+
+		// Check if g is NULL
+		if (g == NULL) break;
+
+		// If it makes it here then it has this level
+		highestLevel = lev;
+	}
+
+	// Resize vector
+	rankGrids.resize(num_ranks, 0);
+
+	// Now pass this value to all ranks
+	MPI_Allgather(&highestLevel, 1, MPI_INT, &rankGrids.front(), 1, MPI_INT, world_comm);
+#endif
+}

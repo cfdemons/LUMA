@@ -21,7 +21,7 @@
 
 // LAPACK interfaces
 extern "C" void dgetrf_(int* dim1, int* dim2, double* a, int* lda, int* ipiv, int* info);
-extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO );
+extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO);
 
 /// \brief	Grid utility class.
 ///
@@ -83,6 +83,7 @@ public:
 	static void getFinestGrid(GridObj*& ptr);											// Get a pointer to finest grid in hierarchy
 	static double normaliseToLink(double value, int v);									// Normalise value wrt to the lattice link length
 	static eType setBCPrecedence(eType currentBC, eType desiredBC);						// Determine BC based on any existing BC
+	static GridObj * getSubGrid(int i, int j, int k, GridObj * parent);					// Get the correct child grid for multi-region refinement
 
 	// MPI-related utilities
 	static bool isOverlapPeriodic(int i, int j, int k, GridObj const & pGrid);		// Is this halo periodically connected to neighbour

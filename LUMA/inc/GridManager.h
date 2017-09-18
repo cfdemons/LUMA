@@ -36,9 +36,6 @@ public:
 
 	/// Number of active cell operations in a coarse time step
 	long activeCellOps;
-	
-	/// Number of cells in the calculation
-	long totalCellCount;
 
 protected:
 	/// Pointer to grid hierarchy
@@ -87,7 +84,6 @@ protected:
 
 	/// Vector of structures containing writable region descriptors for block writing (HDF5)
 	std::vector<HDFstruct> p_data;
-
 
 	// METHODS //
 

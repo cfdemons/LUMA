@@ -23,9 +23,7 @@
 /// \brief	Optimised LBM multi-grid kernel.
 ///
 ///			This kernel compresses the old kernel into a single loop in order to
-///			make it more efficient. Capabilities are current limited with this 
-///			kernel with incompatible options giving unpredictable results.
-///			Use with caution.
+///			make it more efficient.
 ///
 ///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
 void GridObj::LBM_multi_opt(int subcycle)
@@ -37,11 +35,11 @@ void GridObj::LBM_multi_opt(int subcycle)
 		static_cast<double>(L_RE)* (static_cast<double>(t + 1) / static_cast<double>(L_REYNOLDS_RAMP)));
 #endif
 
-	// Two iterations on sub-grid first
-	if (subGrid.size()) {
-		for (int i = 0; i < 2; ++i) {
-			subGrid[0]->LBM_multi_opt(i);
-		}
+	// Two iterations on sub-grids
+	for (GridObj * sg : subGrid)
+	{
+		for (int i = 0; i < 2; ++i)
+			sg->LBM_multi_opt(i);
 	}
 
 	// If IBM is on then reset the forces
@@ -376,7 +374,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 		{
 			// Update the wall-normal velocity
 			tmpVelVector[normalDirection] = 1.0 - ((1.0 / tmpDensity) * (2.0 * f_plus + f_zero));
-			if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
+			if (normalVector[normalDirection] == -1) tmpVelVector[normalDirection] *= -1.0;
 		}
 		else if (type == eVelocity)
 		{
@@ -544,8 +542,9 @@ bool GridObj::_LBM_applySpecReflect_opt(int i, int j, int k, int id, int v)
 /// \param	v	lattice direction.
 void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 
-	// Get pointer to child grid
-	GridObj *childGrid = subGrid[0];
+	// Get pointer to appropriate child grid
+	GridObj *childGrid = GridUtils::getSubGrid(i, j, k, this);
+	if (!childGrid) L_ERROR("Could not get correct grid for coalesce operation.", GridUtils::logfile);
 
 	// Get sizes
 	int cM_lim = childGrid->M_lim;
@@ -798,7 +797,7 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 	if (type_local == eTransitionToFiner) {
 
 		// Get child grid
-		GridObj *childGrid = subGrid[0];
+		GridObj *childGrid = GridUtils::getSubGrid(i, j, k, this);
 
 		// Get indices
 		std::vector<int> cInd =
@@ -828,7 +827,7 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 						] = u[d + id * L_DIMS];
 					}
 
-					subGrid[0]->rho[
+					childGrid->rho[
 						(cInd[2] + kk) +
 							(cInd[1] + jj) * cK_lim +
 							(cInd[0] + ii) * cK_lim * cM_lim

@@ -689,7 +689,7 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 	int rank = GridUtils::safeGetRank();
 
 	// Grid indices and type
-	int ib, idx, jdx, kdx, id;
+	int idx, jdx, kdx, id;
 	eType type_local;
 
 	// First do all support points that belong to markers that this rank owns
@@ -725,6 +725,7 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 
 	// Now loop through any support sites this rank owns which belong to markers off-rank
 #ifdef L_BUILD_FOR_MPI
+	int ib;
 
 	// Get MPI manager instance
 	MpiManager *mpim = MpiManager::getInstance();

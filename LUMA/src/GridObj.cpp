@@ -133,49 +133,6 @@ void GridObj::LBM_addSubGrid(int RegionNumber)
 
 }
 
-
-// ****************************************************************************
-/// \brief Set the rankGrids value which contains a list of how many subgrids each rank has access to
-void GridObj::LBM_calculateRankGrids() {
-
-	// Serial is straightforward
-#ifndef L_BUILD_FOR_MPI
-	rankGrids.push_back(L_NUM_LEVELS);
-#else
-
-	// Parallel requires some more work
-	MpiManager *mpim = MpiManager::getInstance();
-
-	// Highest level this rank owns
-	int highestLevel = 0;
-
-	// Grid pointer
-	GridObj* g = NULL;
-
-	// Loop through all subgrids
-	for (int lev = 1; lev < (L_NUM_LEVELS+1); lev++) {
-
-		// Check if this rank has this level
-		g = NULL;
-		GridUtils::getGrid(this, lev, 0, g);
-
-		// Check if g is NULL
-		if (g == NULL) {
-			break;
-		}
-
-		// If it makes it here then it has this level
-		highestLevel = lev;
-	}
-
-	// Resize vector
-	rankGrids.resize(mpim->num_ranks, 0);
-
-	// Now pass this value to all ranks
-	MPI_Allgather(&highestLevel, 1, MPI_INT, &rankGrids.front(), 1, MPI_INT, mpim->world_comm);
-#endif
-}
-
 // ****************************************************************************
 // ****************************************************************************
 // Other member methods are in their own files prefixed GridObj_

@@ -232,6 +232,7 @@
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 //#define L_VELOCITY_RAMP 1			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+#define L_PRESSURE_DELTA 0.1		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall

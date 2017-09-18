@@ -123,6 +123,18 @@ public:
 			static_cast<double>(hms[0]) * 60.0 * 60.0
 			));
 	}
+
+	// *****************************************************************************
+	/// \brief	Converts pressure in dimensionless units to density in LBM units.
+	///
+	/// \param p_dimensionless	Dimensionless pressure.
+	/// \param currentGrid		Pointer to the current grid. 
+	/// \return density in LBM units.
+	template <typename T>
+	static double pd2dlbm(T p_dimensionless, GridObj* currentGrid)
+	{
+		return (p_dimensionless * currentGrid->dh * SQ(currentGrid->dt) / currentGrid->dm) / SQ(cs);
+	}
 	
 };
 

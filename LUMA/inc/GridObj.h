@@ -170,7 +170,7 @@ private :
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	bool _LBM_applySpecReflect_opt(int i, int j, int k, int id, int v);
-	void _LBM_regularised_velocity_opt(int i, int j, int k, int id);
+	void _LBM_regularised_opt(int i, int j, int k, int id, eType type);
 	void _LBM_kbcCollide_opt(int id);
 	void _LBM_resetForces();
 

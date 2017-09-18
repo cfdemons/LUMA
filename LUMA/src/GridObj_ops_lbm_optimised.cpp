@@ -113,8 +113,8 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 				// REGULARISED BCs //
 #ifdef L_REGULARISED_BOUNDARIES
-				if (type_local == eVelocity)
-					_LBM_regularised_velocity_opt(i, j, k, id);
+				if (type_local == eVelocity || type_local == ePressure)
+					_LBM_regularised_opt(i, j, k, id, type_local);
 #endif
 
 				// FORCING //
@@ -230,6 +230,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		{
 
 #ifdef L_VELOCITY_RAMP
+			// Apply velocity ramp with forced equilibrium
 			if (t * dt <= L_VELOCITY_RAMP)
 			{
 				double rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
@@ -273,20 +274,23 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 }
 
 // *****************************************************************************
-/// \brief	Optimised application of regularised velocity BC
+/// \brief	Optimised application of regularised BC
 ///
 ///			This implementation assumes the velocity is normal to the wall as is
 ///			the case in the Latt et al. 2008 paper on which the conditions are
-///			based. https://doi.org/10.1103/PhysRevE.77.056703
+///			based. https://doi.org/10.1103/PhysRevE.77.056703 Not sure what it
+///			will do if velocity is at an angle.
 ///
 /// \param	i			x-index of current site.
 /// \param	j			y-index of current site.
 /// \param	k			z-index of current site.
 ///	\param	id			flattened ijk index.
-void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
+///	\param	type		lattice type (assumed to be either velocity or pressure)
+void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 {
 	// Declarations
-	std::vector<double> VelVector(3, 0);
+	std::vector<double> tmpVelVector(3, 0);
+	double tmpDensity;
 	double normalVelocity;
 	std::vector<int> normalVector(3, 0);
 	eCartesianDirection normalDirection;
@@ -297,113 +301,60 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 	unsigned int edgeCount = 0;
 	double rampCoefficient = 1.0;		// Initialise ramp coefficient
 
-#ifdef L_VELOCITY_RAMP
-	// Update coefficient	
-	if (t * dt <= L_VELOCITY_RAMP)
-		rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
-#endif
-
-	// Find which wall we are on and proceed to assign key variables //
+	
+	/*****************************/
+	/* Find which wall we are on */
+	/*****************************/
 
 	// Cannot handle cases where BC is inside domain somewhere
 	if (!GridUtils::isWithinDomainWall(XPos[i], YPos[j], ZPos[k], &normalVector, &normalDirection, &edgeCount))
 		L_ERROR("Velocity site not outside domain walls is currently not supported.", GridUtils::logfile);
 
-	/* If it is a corner or an edge then get wall density by extrapolating in 
-	 * the direction of the normal. Since this is non-local, when using MPI
-	 * cannot be performed correctly if site on receiver layer */
+	// Initialise velocity / density with reference values
+#ifdef L_VELOCITY_RAMP
+	// Update ramp coefficient if required
+	if (t * dt <= L_VELOCITY_RAMP)
+		rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
+#endif
+
+	// Assign velocity vector components from reference velocity
+	tmpVelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
+	tmpVelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+	tmpVelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+
+	// Assign reference density
+	tmpDensity = L_RHOIN + GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);
+
+
+	/* If it is a corner or an edge then get missing quantity by extrapolating in 
+	 * the direction of the normal as there are not enough known f values to 
+	 * compute it. Since this is non-local, when using MPI cannot be performed 
+	 * correctly if site on receiver layer. */
 	if (edgeCount > 1)
 	{
-
-		// TODO: This whole section may conflict -- need to reinstate an extrapolated outlet BC and a pressusre BC as per Joe's code.
-
-//		// Extrapolate from previous lattice site (don't do on receiver layers)
-//#ifdef L_EXTRAPOLATED_OUTLET
-//		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
-//
-//			// Get index of previous lattice site
-//			int idBack = id - K_lim * M_lim;
-//
-//			// Set velocity
-//			ux = GridUnits::ulat2uphys(u[eXDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
-//			uy = GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
-//#if (L_DIMS == 3)
-//			uz = GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) / L_PHYSICAL_U;
-//#endif
-//		}
-//
-//		// Fixed pressure outlet (don't do on receiver layer
-//#elif (defined L_PRESSURE_OUTLET)
-//		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k])) {
-//
-//			// Get index of previous lattice site
-//			int idBack = id - K_lim * M_lim;
-//			int idBack2 = id - 2 * K_lim * M_lim;
-//
-//			// Get values at outlet
-//			double rhoOutlet = L_RHOIN + (L_PRESSURE_OUTLET * (dh * SQ(dt)) / dm) / SQ(cs);
-//			uy = (2.0 * GridUnits::ulat2uphys(u[eYDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eYDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
-//#if (L_DIMS == 3)
-//			uz = (2.0 * GridUnits::ulat2uphys(u[eZDirection + idBack * L_DIMS], this) - GridUnits::ulat2uphys(u[eZDirection + idBack2 * L_DIMS], this)) / L_PHYSICAL_U;
-//#endif
-//
-//			// Compute f_plus and f_0
-//			for (int v = 0; v < L_NUM_VELS; ++v) {
-//
-//				// If has opposite normal direction component then part of f_plus
-//				if (c_opt[v][normalDirection] == -normalVector[normalDirection])
-//				{
-//					// Add to known momentum leaving the domain
-//					f_plus += fNew[v + id * L_NUM_VELS];
-//
-//				}
-//				// If it is perpendicular to wall part of f_zero
-//				else if (c_opt[v][normalDirection] == 0)
-//				{
-//					f_zero += fNew[v + id * L_NUM_VELS];
-//				}
-//			}
-//
-//			// Update density
-//			ux = GridUnits::ulat2uphys(-1.0 + (2.0 * f_plus + f_zero) / rhoOutlet, this) / L_PHYSICAL_U;
-//
-//			// Reset to zero
-//			f_plus = 0.0, f_zero = 0.0;
-//		}
-//#endif
-//
-//		// Set boundary normal velocity
-//		normalVelocity = -GridUnits::ud2ulbm(ux, this);
-
-
-
-
-
-#ifdef L_BUILD_FOR_MPI
+		// Do not extrapolate on recv layers
 		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
-#endif
 		{
-			// Extrapolate density value for edges and corners
-			rho[id] = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
+			if (type == ePressure)
+			{
+				// Extrapolate wall-normal velocity component
+				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, normalDirection, L_DIMS);
+			}
+			else if (type == eVelocity)
+			{
+				// Extrapolate density value
+				tmpDensity = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
+			}
+			else L_ERROR("Unknown BC type: regularised BC.", GridUtils::logfile);
 		}
 
 	}
 
 
-	// Edge count = 1 so not a corner or an edge but a face and can compute density
+	// Edge count = 1 so this is a face (not a corner or edge)
 	else
 	{
-		// Assign velocity vector components from reference velocity
-		VelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
-		VelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
-		VelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
-
-		// Get sign correct for wall-normal velocity
-		normalVelocity = GridUtils::vecnorm(
-			GridUtils::vecmultiply<double, int, double>(VelVector, normalVector));
-		if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
-
-		// Compute f_plus and f_0
+		// Compute f_plus and f_0 from known f values
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{
 			// If has opposite normal direction component then part of f_plus
@@ -418,18 +369,34 @@ void GridObj::_LBM_regularised_velocity_opt(int i, int j, int k, int id)
 			{
 				f_zero += fNew[v + id * L_NUM_VELS];
 			}
-
 		}
 
-		// Update density
-		rho[id] = (1.0 / (1.0 - normalVelocity)) * (2.0 * f_plus + f_zero);
+		// Use f_plus and f_zero to compute missing quantity
+		if (type == ePressure)
+		{
+			// Update the wall-normal velocity
+			tmpVelVector[normalDirection] = 1.0 - ((1.0 / tmpDensity) * (2.0 * f_plus + f_zero));
+			if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
+		}
+		else if (type == eVelocity)
+		{
+			// Get wall-normal velocity
+			normalVelocity = tmpVelVector[normalDirection];
+			if (normalVector[normalDirection] == -1) normalVelocity *= -1.0;
+
+			// Update density
+			tmpDensity = (1.0 / (1.0 - normalVelocity)) * (2.0 * f_plus + f_zero);
+		}
+		else L_ERROR("Unknown BC type: regularised BC.", GridUtils::logfile);
 	}
 
-	// Update velocity
-	u[eXDirection + id * L_DIMS] = VelVector[eXDirection];
-	u[eYDirection + id * L_DIMS] = VelVector[eYDirection];
+
+	// Update macroscopic quantities
+	rho[id] = tmpDensity;
+	u[eXDirection + id * L_DIMS] = tmpVelVector[eXDirection];
+	u[eYDirection + id * L_DIMS] = tmpVelVector[eYDirection];
 #if (L_DIMS == 3)
-	u[eZDirection + id * L_DIMS] = VelVector[eZDirection];
+	u[eZDirection + id * L_DIMS] = tmpVelVector[eZDirection];
 #endif
 
 

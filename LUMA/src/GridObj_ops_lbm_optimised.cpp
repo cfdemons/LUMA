@@ -231,7 +231,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			// Apply velocity ramp with forced equilibrium
 			if (t * dt <= L_VELOCITY_RAMP)
 			{
-				double rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
+				double rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
 				u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
 				u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
 #if (L_DIMS == 3)
@@ -298,6 +298,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
 	unsigned int edgeCount = 0;
 	double rampCoefficient = 1.0;		// Initialise ramp coefficient
+	double parabCoefficient = 1.0;		// Initialise parabolic profile coefficient
 
 	
 	/*****************************/
@@ -312,13 +313,20 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 #ifdef L_VELOCITY_RAMP
 	// Update ramp coefficient if required
 	if (t * dt <= L_VELOCITY_RAMP)
-		rampCoefficient = 1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP);
+		rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
+#endif
+
+	// Get coefficient for parabolic profile
+#ifdef L_PARABOLIC_INLET
+	double a = YPos[j] - L_WALL_THICKNESS_BOTTOM - (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
+	double b = (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
+	parabCoefficient = 1.5 * (1.0 - pow(a / b, 2.0));
 #endif
 
 	// Assign velocity vector components from reference velocity
-	tmpVelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
-	tmpVelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
-	tmpVelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+	tmpVelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient * parabCoefficient;
+	tmpVelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient * parabCoefficient;
+	tmpVelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient * parabCoefficient;
 
 	// Assign reference density
 	tmpDensity = L_RHOIN + GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);

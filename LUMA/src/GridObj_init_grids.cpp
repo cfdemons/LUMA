@@ -199,16 +199,24 @@ void GridObj::LBM_initVelocity ( ) {
 				}
 
 				// Velocity sites are an exception to the no flow setting
-				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity)
+				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity) {
 
 					/* Input velocity is specified by individual vectors for x, y and z which
 					 * have either been read in from an input file or defined by an expression
 					 * given in the definitions. */
-					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UX0, this);
-					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UY0, this);
-#if (L_DIMS == 3)
-					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this);
+
+					// If doing a ramp velocity then initial velocity should be set to ramp at t = 0
+					double rampCoefficient = 1.0;
+#ifdef L_VELOCITY_RAMP
+					rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
 #endif
+
+					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
+					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+#if (L_DIMS == 3)
+					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this) * rampCoefficient;
+#endif
+				}
 
 #endif
 

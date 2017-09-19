@@ -5,11 +5,11 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-*  Copyright (C) 2015, 2016
+*  Copyright (C) The University of Manchester 2017
 *  E-mail contact: info@luma.manchester.ac.uk
 *
 * This software is for academic use only and not available for
-* distribution without written consent.
+* further distribution commericially or otherwise without written consent.
 *
 */
 #ifndef IBINFO_H

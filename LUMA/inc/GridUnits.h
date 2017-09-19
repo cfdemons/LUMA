@@ -16,6 +16,7 @@
 #pragma once
 
 #include "GridObj.h"
+extern const double cs;
 
 /// \brief	GridUnits.
 ///

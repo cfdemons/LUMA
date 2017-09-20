@@ -571,23 +571,6 @@ double GridUtils::normaliseToLink(double value, int v)
 }
 
 // *****************************************************************************
-/// \brief	Used to preserve the precedence of BCs during labelling.
-///
-///			This is necessary in particular for corners where types of BCs meet.
-///			This method ensures that velocity BCs are always preserved over slip 
-///			conditions for example.
-///
-/// \param	desiredBC	new BC type for a given site.
-///	\param	existingBC	BC type already assigned to given site.
-/// \return				permitted BC type for given site.
-eType GridUtils::setBCPrecedence(eType currentBC, eType desiredBC)
-{
-	if (currentBC == eSolid || desiredBC == eSolid) return eSolid;
-	else if (currentBC == eVelocity) return eVelocity;
-	else return desiredBC;
-}
-
-// *****************************************************************************
 /// \brief	Finds out whether halo containing i,j,k links to neighbour rank periodically.
 ///
 ///			Checks the receiver layer containing local site i,j,k and determines 
@@ -1841,4 +1824,38 @@ GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 		g = parent->subGrid[0];
 	}
 	return g;
+}
+
+// ****************************************************************************
+/// \brief	Compute the ramp coefficient for velocity boundaries.
+///
+///			Coefficient is between 0 and 1. If no ramp is in effect, returns 1.0.
+///			
+/// \param	t	Current time in dimensionless time units.
+///	\returns	ramp coefficient.
+double GridUtils::getVelocityRampCoefficient(double t)
+{
+#ifdef L_VELOCITY_RAMP
+	// Update ramp coefficient if required
+	if (t <= L_VELOCITY_RAMP)
+		return (1.0 - cos(L_PI * t / L_VELOCITY_RAMP)) / 2.0;
+#endif
+	return 1.0;
+}
+
+// ****************************************************************************
+/// \brief	Compute the ramp coefficient for a ramping Reynolds number.
+///
+///			Coefficient is between 0 and 1. If no ramp is in effect, returns 1.0.
+///			
+/// \param	t	Current time in dimensionless time units.
+///	\returns	ramp coefficient.
+double GridUtils::getReynoldsRampCoefficient(double t)
+{
+#ifdef L_REYNOLDS_RAMP
+	// Update ramp coefficient if required
+	if (t <= L_REYNOLDS_RAMP)
+		return 1.0 - cos(L_PI * t / L_REYNOLDS_RAMP);
+#endif
+	return 1.0;
 }

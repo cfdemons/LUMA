@@ -31,8 +31,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 #ifdef L_REYNOLDS_RAMP
 	// Update the Reynolds number if ramping up
-	if (t < L_REYNOLDS_RAMP) _LBM_updateReynolds(
-		static_cast<double>(L_RE)* (static_cast<double>(t + 1) / static_cast<double>(L_REYNOLDS_RAMP)));
+	_LBM_updateReynolds(static_cast<double>(L_RE) * GridUtils::getReynoldsRampCoefficient((t + 1) * dt));
 #endif
 
 	// Two iterations on sub-grids
@@ -228,16 +227,13 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		{
 
 #ifdef L_VELOCITY_RAMP
-			// Apply velocity ramp with forced equilibrium
-			if (t * dt <= L_VELOCITY_RAMP)
-			{
-				double rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
-				u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
-				u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+			double rampCoefficient = GridUtils::getVelocityRampCoefficient(t * dt);
+			u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
+			u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
 #if (L_DIMS == 3)
-				u[2 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+			u[2 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
 #endif
-			}
+
 #endif
 			// Set f to equilibrium (forced equilibrium BC)
 			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(src_id, v);
@@ -297,8 +293,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	double fneq;
 	double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
 	unsigned int edgeCount = 0;
-	double rampCoefficient = 1.0;		// Initialise ramp coefficient
-	double parabCoefficient = 1.0;		// Initialise parabolic profile coefficient
+	double rampCoefficient = GridUtils::getVelocityRampCoefficient(t * dt);		// Initialise ramp coefficient
 
 	
 	/*****************************/
@@ -309,24 +304,10 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	if (!GridUtils::isWithinDomainWall(XPos[i], YPos[j], ZPos[k], &normalVector, &normalDirection, &edgeCount))
 		L_ERROR("Velocity site not outside domain walls is currently not supported.", GridUtils::logfile);
 
-	// Initialise velocity / density with reference values
-#ifdef L_VELOCITY_RAMP
-	// Update ramp coefficient if required
-	if (t * dt <= L_VELOCITY_RAMP)
-		rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
-#endif
-
-	// Get coefficient for parabolic profile
-#ifdef L_PARABOLIC_INLET
-	double a = YPos[j] - L_WALL_THICKNESS_BOTTOM - (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
-	double b = (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
-	parabCoefficient = 1.5 * (1.0 - pow(a / b, 2.0));
-#endif
-
 	// Assign velocity vector components from reference velocity
-	tmpVelVector[eXDirection] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient * parabCoefficient;
-	tmpVelVector[eYDirection] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient * parabCoefficient;
-	tmpVelVector[eZDirection] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient * parabCoefficient;
+	tmpVelVector[eXDirection] = ux_in[j] * rampCoefficient;
+	tmpVelVector[eYDirection] = uy_in[j] * rampCoefficient;
+	tmpVelVector[eZDirection] = uz_in[j] * rampCoefficient;
 
 	// Assign reference density
 	tmpDensity = L_RHOIN + GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);

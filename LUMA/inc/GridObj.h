@@ -133,7 +133,7 @@ public :
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
 	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
-	void LBM_initGetInletProfile();			// Initialise the store for inlet profile data from file
+	eType LBM_setBCPrecedence(eType currentBC, eType desiredBC);		// Determine BC based on any existing BC
 
 	// LBM operations
 	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
@@ -153,6 +153,8 @@ public :
 
 private :
 
+	void _LBM_initGetInletProfileFromFile();		// Set inlet profile data from file
+	void _LBM_initSetInletProfile();				// Set the inlet profile data used for velocity BCs
 	void _LBM_updateReynolds(double newReynolds);		// Updates the reynolds number at run time
 	void _io_fgaout(int timeStepL0);		// Writes out the macroscopic velocity components for the class as well as any subgrids 
 											// to a different .fga file for each subgrid. .fga format is the one used for Unreal 

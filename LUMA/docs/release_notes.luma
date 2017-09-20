@@ -4,6 +4,11 @@ General		:	Added kernel performance improvements which are especially effective 
 				As a result, a new filled box point cloud is available to add to the domain to effectively switch off unnecessary fluid sites by turning them solid.
 				Changed BC setup to make it more flexible in terms of enumerations. Also added slip BC.
 				Added ability to ramp up the Reynolds number from the beginning of the simulation to mitigate crashes due to initial transients.
+				Parallel IBM enabled.
+				Pressure boundary condition added (regularised only).
+				Efficiencies introduced for ramping functions.
+				Moved setBCPrecedence method from utilities to GridObj and renamed.
+				Reworked inlet initialisation.
 
 Issue #55	:	Periodic wrapping of sub-grids is now available by specifying the start and end point to be the same.
 Issue #142	:	Added a reporting mode to MPI builds to use the smart decomposition and load balancing methods to estimate config performance.

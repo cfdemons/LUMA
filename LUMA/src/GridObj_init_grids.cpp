@@ -22,129 +22,16 @@
 using namespace std;
 
 // ****************************************************************************
-/// \brief	Method to import an input profile from a file.
-///
-///			Input data may be over- or under-sampled but it must span the 
-///			physical dimensions of the inlet otherwise the software does
-///			not known how to scale the data to fit. Inlet profile is always
-///			assumed to be oriented vertically (y-direction) and data should be
-///			specified in dimensionless units.
-void GridObj::LBM_initGetInletProfile()
-{
-
-	size_t j;
-
-#ifdef L_PARABOLIC_INLET
-
-	// Resize vectors
-	ux_in.resize(M_lim);
-	uy_in.resize(M_lim);
-	uz_in.resize(M_lim);
-
-	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < M_lim; j++)
-	{
-		// Set the inlet velocity profile values
-		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
-		double b = L_COARSE_SITE_WIDTH - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
-		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1 - pow((YPos[j] - a) / b, 2));
-		uy_in[j] = 0.0;
-		uz_in[j] = 0.0;
-	}
-
-#else
-
-	size_t i;
-	double y;
-
-	// Indicate to log
-	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
-
-	IVector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
-	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
-
-	// Resize vectors
-	ux_in.resize(M_lim);
-	uy_in.resize(M_lim);
-	uz_in.resize(M_lim);
-
-	// Loop over site positions (for left hand inlet, y positions)
-	for (j = 0; j < M_lim; j++)
-	{
-
-		// Get Y-position
-		y = YPos[j];
-
-		// Find values either side of desired
-		for (i = 0; i < ybuffer.size(); i++)
-		{
-
-			// Bottom point
-			if (i == 0 && ybuffer[i] > y)
-			{
-				// Extrapolation
-				ux_in[j] = -(uxbuffer[i+1] - uxbuffer[i]) + uxbuffer[i];
-				uy_in[j] = -(uybuffer[i+1] - uybuffer[i]) + uybuffer[i];
-				uz_in[j] = -(uzbuffer[i+1] - uzbuffer[i]) + uzbuffer[i];
-				break;
-
-			}
-			// Top point
-			else if (i == ybuffer.size()-1 && ybuffer[i] < y)
-			{
-				// Extrapolation
-				ux_in[j] = (uxbuffer[i] - uxbuffer[i-1]) + uxbuffer[i];
-				uy_in[j] = (uybuffer[i] - uybuffer[i-1]) + uybuffer[i];
-				uz_in[j] = (uzbuffer[i] - uzbuffer[i-1]) + uzbuffer[i];
-				break;
-
-			}
-			// Any middle point
-			else if (ybuffer[i] < y && ybuffer[i+1] > y)
-			{
-				// Interpolation
-				ux_in[j] = ((uxbuffer[i+1] - uxbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uxbuffer[i];
-				uy_in[j] = ((uybuffer[i+1] - uybuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uybuffer[i];
-				uz_in[j] = ((uzbuffer[i+1] - uzbuffer[i])/(ybuffer[i+1] - ybuffer[i])) * (y-ybuffer[i]) + uzbuffer[i];
-				break;
-
-			}
-			// Exactly on a point
-			else if (ybuffer[i] == y )
-			{
-				// Copy
-				ux_in[j] = uxbuffer[i];
-				uy_in[j] = uybuffer[i];
-				uz_in[j] = uzbuffer[i];
-				break;			
-			
-			}
-			// Not near enough to this point
-			else
-			{
-				continue;
-			}				
-		}
-	}
-
-	// Check for data read fail
-	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0)
-	{
-		// No data read in
-		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile);
-	}
-#endif // L_PARABOLIC_INLET
-
-
-}
-
-// ****************************************************************************
 /// \brief	Method to initialise the lattice velocity.
 ///
-///			Unless the L_NO_FLOW macro is defined, the initial velocity 
-///			everywhere will be set to the values specified in the definitions 
-///			file.
-void GridObj::LBM_initVelocity ( ) {
+///			If the L_NO_FLOW macro is defined, velocity set to zero everywhere.
+///			If L_INIT_VELOCITY_FROM_FILE defined, velocity read from file.
+///			Otherwise set from stored profile.
+void GridObj::LBM_initVelocity()
+{
+
+	// Setup the inlet profile data on this grid
+	_LBM_initSetInletProfile();
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
 
@@ -193,28 +80,25 @@ void GridObj::LBM_initVelocity ( ) {
 #ifdef L_NO_FLOW				
 				for (size_t d = 0; d < L_DIMS; d++)
 				{
-
 					// No flow case
 					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
 				}
 
 				// Velocity sites are an exception to the no flow setting
-				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity) {
+				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity)
+				{
 
 					/* Input velocity is specified by individual vectors for x, y and z which
 					 * have either been read in from an input file or defined by an expression
 					 * given in the definitions. */
 
 					// If doing a ramp velocity then initial velocity should be set to ramp at t = 0
-					double rampCoefficient = 1.0;
-#ifdef L_VELOCITY_RAMP
-					rampCoefficient = (1.0 - cos(L_PI * t * dt / L_VELOCITY_RAMP)) / 2.0;
-#endif
+					double rampCoefficient = GridUtils::getVelocityRampCoefficient(0.0);
 
-					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
-					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = ux_in[j] * rampCoefficient;
+					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = uy_in[j] * rampCoefficient;
 #if (L_DIMS == 3)
-					u(i,j,k,2,M_lim,K_lim,L_DIMS) = GridUnits::ud2ulbm(L_UZ0,this) * rampCoefficient;
+					u(i, j, k, 2, M_lim, K_lim, L_DIMS) = uz_in[j] * rampCoefficient;
 #endif
 				}
 
@@ -241,7 +125,7 @@ void GridObj::LBM_initVelocity ( ) {
 
 // ****************************************************************************
 /// \brief	Method to initialise the lattice density.
-void GridObj::LBM_initRho ( ) {
+void GridObj::LBM_initRho() {
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++) {
@@ -398,13 +282,6 @@ void GridObj::LBM_initGrid() {
 	LBM_initBoundLab();
 
 	// Initialise L0 MACROSCOPIC quantities
-
-	// Get the inlet profile data
-#ifdef L_USE_INLET_PROFILE
-
-	LBM_initGetInletProfile();
-	
-#endif
 
 	// Velocity field
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
@@ -589,12 +466,6 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 
 	
 	// Assign MACROSCOPIC quantities
-
-#ifdef L_USE_INLET_PROFILE
-
-	LBM_initGetInletProfile();
-	
-#endif
 
 	// Velocity
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
@@ -1112,7 +983,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (k = 0; k < K_lim; k++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_LEFT);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_LEFT);
 				}
 			}
 		}
@@ -1131,7 +1002,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (k = 0; k < K_lim; k++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
 				}
 			}
 		}
@@ -1150,7 +1021,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (j = 0; j < M_lim; j++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_FRONT);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_FRONT);
 				}
 			}
 		}
@@ -1167,7 +1038,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (j = 0; j < M_lim; j++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BACK);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BACK);
 				}
 			}
 		}
@@ -1186,7 +1057,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (k = 0; k < K_lim; k++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BOTTOM);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_BOTTOM);
 				}
 			}
 		}
@@ -1203,7 +1074,7 @@ void GridObj::LBM_initBoundLab ( )
 				for (k = 0; k < K_lim; k++)
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
-						GridUtils::setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_TOP);
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_TOP);
 				}
 			}
 		}
@@ -1337,4 +1208,159 @@ void GridObj::LBM_initRefinedLab (GridObj& pGrid) {
     }
 
 }
+
+// ****************************************************************************
+/// \brief	Method to import an input profile from a file.
+///
+///			Input data may be over- or under-sampled but it must span the 
+///			physical dimensions of the inlet otherwise the software does
+///			not known how to scale the data to fit. Inlet profile is always
+///			assumed to be oriented vertically (y-direction) and data should be
+///			specified in dimensionless units.
+void GridObj::_LBM_initGetInletProfileFromFile()
+{
+
+	// Declare index
+	size_t j;
+	size_t i;
+	double y;
+
+	// Resize vectors
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
+
+
+	// Indicate to log
+	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
+
+	IVector<double> xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer;
+	GridUtils::readVelocityFromFile("./input/inlet_profile.in", xbuffer, ybuffer, zbuffer, uxbuffer, uybuffer, uzbuffer);
+
+	// Loop over site positions (for left hand inlet, y positions)
+	for (j = 0; j < M_lim; j++)
+	{
+
+		// Get Y-position
+		y = YPos[j];
+
+		// Find values either side of desired
+		for (i = 0; i < ybuffer.size(); i++)
+		{
+
+			// Bottom point
+			if (i == 0 && ybuffer[i] > y)
+			{
+				// Extrapolation
+				ux_in[j] = -(uxbuffer[i + 1] - uxbuffer[i]) + uxbuffer[i];
+				uy_in[j] = -(uybuffer[i + 1] - uybuffer[i]) + uybuffer[i];
+				uz_in[j] = -(uzbuffer[i + 1] - uzbuffer[i]) + uzbuffer[i];
+				break;
+
+			}
+			// Top point
+			else if (i == ybuffer.size() - 1 && ybuffer[i] < y)
+			{
+				// Extrapolation
+				ux_in[j] = (uxbuffer[i] - uxbuffer[i - 1]) + uxbuffer[i];
+				uy_in[j] = (uybuffer[i] - uybuffer[i - 1]) + uybuffer[i];
+				uz_in[j] = (uzbuffer[i] - uzbuffer[i - 1]) + uzbuffer[i];
+				break;
+
+			}
+			// Any middle point
+			else if (ybuffer[i] < y && ybuffer[i + 1] > y)
+			{
+				// Interpolation
+				ux_in[j] = ((uxbuffer[i + 1] - uxbuffer[i]) / (ybuffer[i + 1] - ybuffer[i])) * (y - ybuffer[i]) + uxbuffer[i];
+				uy_in[j] = ((uybuffer[i + 1] - uybuffer[i]) / (ybuffer[i + 1] - ybuffer[i])) * (y - ybuffer[i]) + uybuffer[i];
+				uz_in[j] = ((uzbuffer[i + 1] - uzbuffer[i]) / (ybuffer[i + 1] - ybuffer[i])) * (y - ybuffer[i]) + uzbuffer[i];
+				break;
+
+			}
+			// Exactly on a point
+			else if (ybuffer[i] == y)
+			{
+				// Copy
+				ux_in[j] = uxbuffer[i];
+				uy_in[j] = uybuffer[i];
+				uz_in[j] = uzbuffer[i];
+				break;
+
+			}
+			// Not near enough to this point
+			else
+			{
+				continue;
+			}
+		}
+	}
+
+	// Check for data read fail
+	if (ux_in.size() == 0 || uy_in.size() == 0 || uz_in.size() == 0)
+	{
+		// No data read in
+		L_ERROR("Failed to read in inlet profile data. Exiting.", GridUtils::logfile);
+	}
+
+}
+
+// ****************************************************************************
+/// \brief	Method to initialise the velocity profile used for velocity BCs.
+///
+///			By default sets the profile to be based on the macro defined velocity 
+///			components. If required will initialise from a file or as an
+///			analytical parabola.
+void GridObj::_LBM_initSetInletProfile()
+{
+	
+#ifdef L_USE_INLET_PROFILE
+
+	// Get from file
+	_LBM_initGetInletProfileFromFile();
+
+#elif defined L_PARABOLIC_INLET
+	// Specify as an anlytical parabola
+
+	// Loop over site positions (for left hand inlet, y positions)
+	for (int j = 0; j < M_lim; j++)
+	{
+		// Set the inlet velocity profile values
+		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
+		double b = L_COARSE_SITE_WIDTH - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
+		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1 - pow((YPos[j] - a) / b, 2));
+		uy_in[j] = 0.0;
+		uz_in[j] = 0.0;
+	}
+
+#else
+
+	// Otherwise, set from basic definitions
+	for (int j = 0; j < M_lim; j++)
+	{
+		ux_in[j] = GridUnits::ud2ulbm(L_UX0, this);
+		uy_in[j] = GridUnits::ud2ulbm(L_UY0, this);
+		uz_in[j] = GridUnits::ud2ulbm(L_UZ0, this);
+	}
+
+#endif
+}
+
+// *****************************************************************************
+/// \brief	Used to preserve the precedence of BCs during labelling.
+///
+///			This is necessary in particular for corners where types of BCs meet.
+///			This method ensures that velocity BCs are always preserved over slip 
+///			conditions for example.
+///
+/// \param	desiredBC	new BC type for a given site.
+///	\param	existingBC	BC type already assigned to given site.
+/// \return				permitted BC type for given site.
+eType GridObj::LBM_setBCPrecedence(eType currentBC, eType desiredBC)
+{
+	if (currentBC == eSolid || desiredBC == eSolid) return eSolid;
+	else if (currentBC == eVelocity) return eVelocity;
+	else return desiredBC;
+}
+
 // ***************************************************************************************************

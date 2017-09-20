@@ -1225,12 +1225,6 @@ void GridObj::_LBM_initGetInletProfileFromFile()
 	size_t i;
 	double y;
 
-	// Resize vectors
-	ux_in.resize(M_lim);
-	uy_in.resize(M_lim);
-	uz_in.resize(M_lim);
-
-
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
@@ -1314,6 +1308,11 @@ void GridObj::_LBM_initGetInletProfileFromFile()
 void GridObj::_LBM_initSetInletProfile()
 {
 	
+	// Resize vectors
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
+
 #ifdef L_USE_INLET_PROFILE
 
 	// Get from file
@@ -1326,9 +1325,9 @@ void GridObj::_LBM_initSetInletProfile()
 	for (int j = 0; j < M_lim; j++)
 	{
 		// Set the inlet velocity profile values
-		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
-		double b = L_COARSE_SITE_WIDTH - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
-		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1 - pow((YPos[j] - a) / b, 2));
+		double a = YPos[j] - L_WALL_THICKNESS_BOTTOM - (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
+		double b = (L_BY - L_WALL_THICKNESS_BOTTOM - L_WALL_THICKNESS_TOP) / 2.0;
+		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1.0 - pow(a / b, 2.0));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}

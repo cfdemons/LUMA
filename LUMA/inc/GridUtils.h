@@ -19,9 +19,8 @@
 #include "stdafx.h"
 #include "GridObj.h"
 
-// LAPACK interfaces
-extern "C" void dgetrf_(int* dim1, int* dim2, double* a, int* lda, int* ipiv, int* info);
-extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO);
+// LAPACK interface
+extern "C" void dgesv_(int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO);
 
 /// \brief	Grid utility class.
 ///

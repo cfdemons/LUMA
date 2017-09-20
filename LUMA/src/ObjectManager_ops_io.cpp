@@ -474,15 +474,13 @@ void ObjectManager::io_readInGeomConfig() {
 			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
 			// Need to shift the body if using walls
-			double shiftY = 0.0, shiftZ = 0.0;
-#ifdef L_WALLS_ON
-			shiftZ = _Grids->dh;
-#ifdef L_WALLS_ON_2D
-			shiftY = 0.0;
-#else
-			shiftY = _Grids->dh;
-#endif
-#endif
+			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> start_position, angles;
@@ -562,15 +560,13 @@ void ObjectManager::io_readInGeomConfig() {
 			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a circle/sphere..." << std::endl;
 
 			// Need to shift the body if using walls
-			double shiftY = 0.0, shiftZ = 0.0;
-#ifdef L_WALLS_ON
-			shiftZ = _Grids->dh;
-#ifdef L_WALLS_ON_2D
-			shiftY = 0.0;
-#else
-			shiftY = _Grids->dh;
-#endif
-#endif
+			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, angles;
@@ -633,15 +629,13 @@ void ObjectManager::io_readInGeomConfig() {
 			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a square/cube..." << std::endl;
 
 			// Need to shift the body if using walls
-			double shiftY = 0.0, shiftZ = 0.0;
-#ifdef L_WALLS_ON
-			shiftZ = _Grids->dh;
-#ifdef L_WALLS_ON_2D
-			shiftY = 0.0;
-#else
-			shiftY = _Grids->dh;
-#endif
-#endif
+			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
@@ -715,15 +709,13 @@ void ObjectManager::io_readInGeomConfig() {
 			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a plate..." << std::endl;
 
 			// Need to shift the body if using walls
-			double shiftY = 0.0, shiftZ = 0.0;
-#ifdef L_WALLS_ON
-			shiftZ = _Grids->dh;
-#ifdef L_WALLS_ON_2D
-			shiftY = 0.0;
-#else
-			shiftY = _Grids->dh;
-#endif
-#endif
+			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, angles;

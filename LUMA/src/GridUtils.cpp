@@ -432,28 +432,25 @@ void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &gl
 std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b) {
 
 	// Set up the correct values
-	char trans = 'T';
 	int dim = static_cast<int>(A.size());
-    int nrhs = 1;
-    int LDA = dim;
-    int LDB = dim;
-    int info;
-    int* ipiv = new int(dim);
+	int nrhs = 1;
+	int LDA = dim;
+	int LDB = dim;
+	int info;
+	std::vector<int> ipiv(dim, 0);
 
-    // Put A into 1D array	// TODO Sort out how this is done so no need to tranpose it
+    // Put A into 1D array
     std::vector<double> a(dim * dim, 0.0);
     for (int i = 0; i < dim; i++) {
     	for (int j = 0; j < dim; j++) {
-    		a[j + i * dim] = A[i][j];
+    		a[i + j * dim] = A[i][j];
     	}
     }
 
     // Factorise and solve
-	dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
-	dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
+	dgesv_(&dim, &nrhs, a.data(), &LDA, ipiv.data(), b.data(), &LDB, &info);
 
 	// Return
-	delete ipiv;
 	return b;
 }
 

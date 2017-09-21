@@ -1524,12 +1524,11 @@ void MpiManager::mpi_reportOnDecomposition(double dh)
 	MPI_Finalize();
 	exit(EXIT_SUCCESS);
 }
+
 // ************************************************************************** //
 /// \brief Called by the initialiser once the grid hierarchy has been populated.
 void MpiManager::mpi_setSubGridDepth()
 {
-#ifdef L_BUILD_FOR_MPI
-
 	// Highest level this rank owns
 	int highestLevel = 0;
 
@@ -1554,6 +1553,5 @@ void MpiManager::mpi_setSubGridDepth()
 	rankGrids.resize(num_ranks, 0);
 
 	// Now pass this value to all ranks
-	MPI_Allgather(&highestLevel, 1, MPI_INT, &rankGrids.front(), 1, MPI_INT, world_comm);
-#endif
+	MPI_Allgather(&highestLevel, 1, MPI_INT, rankGrids.data(), 1, MPI_INT, world_comm);
 }

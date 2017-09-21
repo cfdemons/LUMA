@@ -239,6 +239,11 @@ int main( int argc, char* argv[] )
 
 	}
 
+	// Calculate which ranks have access to which subgrids
+#ifdef L_BUILD_FOR_MPI
+	mpim->mpi_setSubGridDepth();
+#endif
+
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
 	gm->setGridHierarchy(Grids);
 

@@ -1058,14 +1058,14 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 			for (int m = 0; m < iBody[ib].markers.size(); m++) {
 				iBodyTmp.markers.push_back(iBody[ib].markers[m]);
 			}
+
+			// Set the global values
+			iBodyTmp.owningRank = 0;
+			iBodyTmp.level = level;
+			iBodyTmp._Owner = iBody[ib]._Owner;
+			iBodyTmp.dh = iBody[ib].dh;
 		}
 	}
-
-	// Set the global values
-	iBodyTmp.owningRank = 0;
-	iBodyTmp.level = level;
-	iBodyTmp._Owner = iBody[0]._Owner;
-	iBodyTmp.dh = iBody[0].dh;
 #endif
 }
 

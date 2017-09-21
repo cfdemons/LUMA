@@ -76,7 +76,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 100000			///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1			///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 1		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 6		///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY		///< Frequency of write out of restart file
@@ -101,7 +101,7 @@
 #define L_PROBE_MAX_Z 0.0						///< End position of probe array in Z direction
 
 // Forcing
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 2.986e-4
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1000000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100		///< Number of time steps to run simulation for
 
 
 /*
@@ -136,9 +136,9 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 8		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 12		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
@@ -157,7 +157,7 @@
 */
 
 // Lattice properties
-#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 5.25e-3	///< The timestep in non-dimensional units
 
@@ -181,7 +181,7 @@
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
-//#define L_PARABOLIC_INLET		///< Use analytic expression for inlet profile - if not then ASCII file is read (requires L_USE_INLET_PROFILE)
+#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -357,16 +357,6 @@ const static double cProbeLimsZ[2] = { L_PROBE_MIN_Z, L_PROBE_MAX_Z };	///< Limi
 
 	#undef L_NUM_REGIONS
 	#define L_NUM_REGIONS 1
-#endif
-
-// Clean up for using profiled inlet
-#ifdef L_USE_INLET_PROFILE
-	#undef L_UX0
-	#define L_UX0 ux_in[j]
-	#undef L_UY0
-	#define L_UY0 uy_in[j]
-	#undef L_UZ0
-	#define L_UZ0 uz_in[j]
 #endif
 
 #endif

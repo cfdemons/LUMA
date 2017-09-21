@@ -228,10 +228,10 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 
 #ifdef L_VELOCITY_RAMP
 			double rampCoefficient = GridUtils::getVelocityRampCoefficient(t * dt);
-			u[0 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UX0, this) * rampCoefficient;
-			u[1 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UY0, this) * rampCoefficient;
+			u[0 + src_id * L_DIMS] = ux_in[j] * rampCoefficient;
+			u[1 + src_id * L_DIMS] = uy_in[j] * rampCoefficient;
 #if (L_DIMS == 3)
-			u[2 + src_id * L_DIMS] = GridUnits::ud2ulbm(L_UZ0, this) * rampCoefficient;
+			u[2 + src_id * L_DIMS] = uz_in[j] * rampCoefficient;
 #endif
 
 #endif

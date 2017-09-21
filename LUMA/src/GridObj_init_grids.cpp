@@ -76,41 +76,44 @@ void GridObj::LBM_initVelocity()
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {
 			for (int k = 0; k < K_lim; k++) {
-				
-#ifdef L_NO_FLOW				
-				for (size_t d = 0; d < L_DIMS; d++)
+
+#ifdef L_NO_FLOW
+				if (LatTyp(i, j, k, M_lim, K_lim) != eVelocity)
 				{
-					// No flow case
-					u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
+					for (size_t d = 0; d < L_DIMS; d++)
+					{
+						// No flow case
+						u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
+					}
 				}
 
-				// Velocity sites are an exception to the no flow setting
-				if (LatTyp(i, j, k, M_lim, K_lim) == eVelocity)
+				// Even with no flow still set velocity BCs
+				else
+#endif
 				{
 
 					/* Input velocity is specified by individual vectors for x, y and z which
-					 * have either been read in from an input file or defined by an expression
-					 * given in the definitions. */
+					* have either been read in from an input file or defined by an expression
+					* given in the definitions. */
 
 					// If doing a ramp velocity then initial velocity should be set to ramp at t = 0
 					double rampCoefficient = GridUtils::getVelocityRampCoefficient(0.0);
 
-					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = ux_in[j] * rampCoefficient;
-					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = uy_in[j] * rampCoefficient;
+					// Get velocity from profile store
+					u(i, j, k, eXDirection, M_lim, K_lim, L_DIMS) = ux_in[j] * rampCoefficient;
+					u(i, j, k, eYDirection, M_lim, K_lim, L_DIMS) = uy_in[j] * rampCoefficient;
 #if (L_DIMS == 3)
-					u(i, j, k, 2, M_lim, K_lim, L_DIMS) = uz_in[j] * rampCoefficient;
+					u(i, j, k, eZDirection, M_lim, K_lim, L_DIMS) = uz_in[j] * rampCoefficient;
 #endif
 				}
-
-#endif
 
 				// Wall sites set to zero
 				if (LatTyp(i, j, k, M_lim, K_lim) == eSolid)
 				{
-					u(i, j, k, 0, M_lim, K_lim, L_DIMS) = 0.0;
-					u(i, j, k, 1, M_lim, K_lim, L_DIMS) = 0.0;
+					u(i, j, k, eXDirection, M_lim, K_lim, L_DIMS) = 0.0;
+					u(i, j, k, eYDirection, M_lim, K_lim, L_DIMS) = 0.0;
 #if (L_DIMS == 3)
-					u(i, j, k, 2, M_lim, K_lim, L_DIMS) = 0.0;
+					u(i, j, k, eZDirection, M_lim, K_lim, L_DIMS) = 0.0;
 #endif
 
 				}
@@ -304,10 +307,10 @@ void GridObj::LBM_initGrid() {
 	// Initialise with gravity
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
+#endif
 
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
-#endif
 
 	// Time averaged quantities
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
@@ -490,9 +493,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 
+#endif
+
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
-#endif
 
 	// Time averaged quantities
 #ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES
@@ -1225,12 +1229,6 @@ void GridObj::_LBM_initGetInletProfileFromFile()
 	size_t i;
 	double y;
 
-	// Resize vectors
-	ux_in.resize(M_lim);
-	uy_in.resize(M_lim);
-	uz_in.resize(M_lim);
-
-
 	// Indicate to log
 	*GridUtils::logfile << "Loading inlet profile..." << std::endl;
 
@@ -1313,6 +1311,10 @@ void GridObj::_LBM_initGetInletProfileFromFile()
 ///			analytical parabola.
 void GridObj::_LBM_initSetInletProfile()
 {
+	// Resize vectors
+	ux_in.resize(M_lim);
+	uy_in.resize(M_lim);
+	uz_in.resize(M_lim);
 	
 #ifdef L_USE_INLET_PROFILE
 
@@ -1321,14 +1323,15 @@ void GridObj::_LBM_initSetInletProfile()
 
 #elif defined L_PARABOLIC_INLET
 	// Specify as an anlytical parabola
+	double b = L_BY - L_WALL_THICKNESS_TOP;
+	double p = (b + L_WALL_THICKNESS_BOTTOM) / 2.0;
+	double q = b - p;
 
 	// Loop over site positions (for left hand inlet, y positions)
 	for (int j = 0; j < M_lim; j++)
 	{
 		// Set the inlet velocity profile values
-		double a = (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) / 2.0;
-		double b = L_COARSE_SITE_WIDTH - (L_WALL_THICKNESS_TOP - L_WALL_THICKNESS_BOTTOM) / 2.0;
-		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1 - pow((YPos[j] - a) / b, 2));
+		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1.0 - pow((YPos[j] - p) / q, 2.0));
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
 	}

@@ -212,7 +212,7 @@ void ObjectManager::resetMomexBodyForces(GridObj * grid)
 
 #ifdef L_MOMEX_DEBUG
 		// Open file for momentum exchange information
-		toggleDebugStream(this);
+		toggleDebugStream(grid);
 #endif
 
 	}

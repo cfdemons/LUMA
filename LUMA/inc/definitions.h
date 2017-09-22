@@ -55,7 +55,11 @@
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
 //#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
+<<<<<<< HEAD
 //#define L_IBM_DEBUG					///< Write IBM body and matrix data out to text files
+=======
+#define L_IBM_DEBUG					///< Write IBM body and matrix data out to text files
+>>>>>>> origin/pullrequest
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -203,7 +207,11 @@ const int resFactor = 2;
 */
 
 // General //
+<<<<<<< HEAD
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+=======
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+>>>>>>> origin/pullrequest
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 

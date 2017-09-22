@@ -203,12 +203,12 @@ const int resFactor = 2;
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 #define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 #define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //

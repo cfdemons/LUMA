@@ -970,7 +970,7 @@ bool GridUtils::intersectsRefinedRegion(GridObj const & pGrid, int RegNum) {
 ///			checking if a NULL pointer is returned.
 ///
 /// \param		level	level desired.
-/// \param		region	region desried.
+/// \param		region	region desired.
 /// \param[out] ptr		reference to pointer where address of grid matching in hierarchy will be assigned.
 void GridUtils::getGrid(int level, int region, GridObj*& ptr)
 {
@@ -989,31 +989,35 @@ void GridUtils::getGrid(int level, int region, GridObj*& ptr)
 ///
 /// \param		Grids	constant pointer to the grid at which to start searching.
 /// \param		level	level desired.
-/// \param		region	region desried.
+/// \param		region	region desired.
 /// \param[out] ptr		reference to pointer where address of grid matching in hierarchy will be assigned.
 void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& ptr)
 {
+	// Check we have an intialised grid hierarchy (if not, the user has called this too soon)
+	if (!GridManager::getInstance()->Grids)
+		L_ERROR("getGrid called too soon -- grid manager has not finished initiliasing hierarchy yet.",
+		GridUtils::logfile);
 
 	// Check supplied grid for a match
-	if (Grids->level == level && Grids->region_number == region) {
+	if (Grids->level == level && Grids->region_number == region)
+	{
 		ptr = Grids;
 		return;
 
-	} else {
-
+	}
+	else
+	{
 		// Loop through array of subgrids on this grid getting each one by reference
-		for (GridObj * const G : Grids->subGrid) {
-
+		for (GridObj * const G : Grids->subGrid)
+		{
 			// Region must match
-			if (G->region_number == region) {
-
+			if (G->region_number == region)
+			{
 				// Look for match on this subgrid
 				GridUtils::getGrid(G, level, region, ptr);
 
 				// If a match found then return the non-null pointer
-				if (ptr != NULL) {
-					return;
-				}
+				if (ptr != NULL) return;
 
 			}
 
@@ -1023,7 +1027,6 @@ void GridUtils::getGrid(GridObj* const Grids, int level, int region, GridObj*& p
 	
 	// Specified grid has not been found
 	return;
-
 }
 
 // ****************************************************************************

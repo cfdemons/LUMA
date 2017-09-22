@@ -142,7 +142,7 @@
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
-#define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for samrt decomposition algorithm
+#define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
 //#define L_MPI_TOPOLOGY_REPORT		///< Have the MPI Manager report on different combinations of X Y Z cores

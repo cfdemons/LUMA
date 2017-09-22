@@ -484,7 +484,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Sort data
 			std::vector<double> start_position, angles;
-			start_position.push_back(startX);
+			start_position.push_back(startX + shiftX);
 			start_position.push_back(startY + shiftY);
 			start_position.push_back(startZ + shiftZ);
 			angles.push_back(angleVert);
@@ -570,7 +570,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Sort data
 			std::vector<double> centre_point, angles;
-			centre_point.push_back(centreX);
+			centre_point.push_back(centreX + shiftX);
 			centre_point.push_back(centreY + shiftY);
 			centre_point.push_back(centreZ + shiftZ);
 
@@ -639,7 +639,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
-			centre_point.push_back(centreX);
+			centre_point.push_back(centreX + shiftX);
 			centre_point.push_back(centreY + shiftY);
 			centre_point.push_back(centreZ + shiftZ);
 			dimensions.push_back(length);
@@ -719,7 +719,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Sort data
 			std::vector<double> centre_point, angles;
-			centre_point.push_back(centreX);
+			centre_point.push_back(centreX + shiftX);
 			centre_point.push_back(centreY + shiftY);
 			centre_point.push_back(centreZ + shiftZ);
 			angles.push_back(angleX);

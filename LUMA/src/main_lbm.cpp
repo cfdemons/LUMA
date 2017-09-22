@@ -239,6 +239,13 @@ int main( int argc, char* argv[] )
 
 	}
 
+#ifdef L_BUILD_FOR_MPI
+
+	// Set sub-grid accessibility counter
+	mpim->mpi_setSubGridDepth();
+
+#endif
+
 	// Set the pointer to the hierarchy in the Grid Manager now all grids are built
 	gm->setGridHierarchy(Grids);
 
@@ -304,9 +311,6 @@ int main( int argc, char* argv[] )
 	// Get time of grid and object initialisation
 #ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(mpim->world_comm);
-
-	// Set sub-grid accessibility counter
-	mpim->mpi_setSubGridDepth();
 #endif
 	secs = clock() - t_start;
 	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;

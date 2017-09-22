@@ -1803,7 +1803,7 @@ GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 		GridManager * gm = GridManager::getInstance();
 
 		// Get grid from region based on edges
-		for (int idx = 1; idx < (L_NUM_REGIONS * L_NUM_LEVELS); idx += L_NUM_LEVELS)
+		for (int idx = 1; idx < L_NUM_REGIONS * (L_NUM_LEVELS + 1); idx += L_NUM_LEVELS)
 		{
 			if (
 				gm->global_edges[eXMin][idx] <= gm->Grids->XPos[i] && gm->global_edges[eXMax][idx] >= gm->Grids->XPos[i] &&
@@ -1814,7 +1814,7 @@ GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 #endif
 				)
 			{
-				getGrid(1, (idx / L_NUM_LEVELS), g);
+				getGrid(1, (idx - 1) / L_NUM_LEVELS, g);
 				break;
 			}
 		}

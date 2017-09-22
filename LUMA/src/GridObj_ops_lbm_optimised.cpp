@@ -533,7 +533,8 @@ void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 
 	// Get pointer to appropriate child grid
 	GridObj *childGrid = GridUtils::getSubGrid(i, j, k, this);
-	if (!childGrid) L_ERROR("Could not get correct grid for coalesce operation.", GridUtils::logfile);
+	if (!childGrid)
+		L_ERROR("Could not get correct grid for coalesce operation.", GridUtils::logfile);
 
 	// Get sizes
 	int cM_lim = childGrid->M_lim;

@@ -720,8 +720,12 @@ void GridObj::_LBM_collide_opt(int id)
 			omega_s *	(
 			_LBM_equilibrium_opt(id, v) -
 			fNew[v + id * L_NUM_VELS]
-			) +
-			force_i[v + id * L_NUM_VELS];
+			)
+
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
+			+ force_i[v + id * L_NUM_VELS]
+#endif
+			;
 	}
 
 }
@@ -1230,8 +1234,12 @@ void GridObj::_LBM_kbcCollide_opt(int id)
 		// Perform collision
 		fNew[v + id * L_NUM_VELS] =
 			f[v + id * L_NUM_VELS] -
-			(1.0 / beta_m1) * (2.0 * ds[v] + gamma * dh[v]) +
-			force_i[v + id * L_NUM_VELS];
+			(1.0 / beta_m1) * (2.0 * ds[v] + gamma * dh[v])
+
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
+			+ force_i[v + id * L_NUM_VELS]
+#endif
+			;
 	}
 
 }

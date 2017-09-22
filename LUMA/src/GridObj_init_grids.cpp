@@ -307,10 +307,10 @@ void GridObj::LBM_initGrid() {
 	// Initialise with gravity
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
-#endif
 
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
+#endif
 
 	// Time averaged quantities
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
@@ -486,6 +486,7 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
+
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 
@@ -493,10 +494,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 
-#endif
-
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
+
+#endif
 
 	// Time averaged quantities
 #ifdef L_COMPUTE_TIME_AVERAGED_QUANTITIES

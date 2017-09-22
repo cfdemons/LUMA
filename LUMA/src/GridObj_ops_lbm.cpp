@@ -235,11 +235,14 @@ void GridObj::LBM_kbcCollide( int i, int j, int k, IVector<double>& f_new ) {
 	for (int v = 0; v < L_NUM_VELS; v++) {
 
 		// Perform collision
-		f_new(i,j,k,v,M_lim,K_lim,L_NUM_VELS) = 
-			f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) - 
-			(omega/2) * ( 2 * ds[v] + gamma * dh[v] ) +
-			force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS);
+		f_new(i, j, k, v, M_lim, K_lim, L_NUM_VELS) =
+			f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) -
+			(omega / 2) * (2 * ds[v] + gamma * dh[v])
 
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
+			+ force_i(i,j,k,v,M_lim,K_lim,L_NUM_VELS)
+#endif
+			;
 	}
 
 
@@ -310,11 +313,13 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 		// Assign density
 		rho(i,j,k,M_lim,K_lim) = rho_temp;
 
+#if (defined L_GRAVITY_ON || defined L_IBM_ON)
 		// Add forces to momentum (rho * time step * 0.5 * force -- eqn 19 in Favier 2014)
 		fux_temp += 0.5 * force_xyz(i,j,k,0,M_lim,K_lim,L_DIMS);
 		fuy_temp += 0.5 * force_xyz(i,j,k,1,M_lim,K_lim,L_DIMS);
 #if (L_DIMS == 3)
 		fuz_temp += 0.5 * force_xyz(i,j,k,2,M_lim,K_lim,L_DIMS);
+#endif
 #endif
 
 		// Assign velocity

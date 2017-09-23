@@ -978,7 +978,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 				if (grid_man->createWritableDataStore(targetGrid))
 				{
 					// Writable data found to include in communicator
-					colour = 1;					
+					colour = lev + reg * L_NUM_LEVELS;
 				}
 
 				else
@@ -1004,6 +1004,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			// Define new communicator which contains writable sub-grids of this level and region
 			// by splitting the global communicator using the flags provided.
 			status = MPI_Comm_split(world_comm, colour, key, &subGrid_comm[(lev - 1) + reg * L_NUM_LEVELS]);
+			if (status != MPI_SUCCESS) L_ERROR("Sub-grid comm split was unsuccessful.", GridUtils::logfile);
 
 #if defined L_HDF_DEBUG
 
@@ -1676,7 +1677,9 @@ void MpiManager::mpi_reportOnDecomposition(double dh)
 }
 
 // ************************************************************************** //
-/// \brief Called by the initialiser once the grid hierarchy has been populated.
+/// \brief Sets the number of accessible sub-grids on this rank.
+///
+///			Called by the initialiser once the grid hierarchy has been populated.
 void MpiManager::mpi_setSubGridDepth()
 {
 

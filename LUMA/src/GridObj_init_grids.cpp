@@ -205,7 +205,7 @@ void GridObj::LBM_initGrid() {
 #if (L_DIMS == 3)
 	LBM_initPositionVector(mpim->recv_layer_pos.Z[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Z[eRightMax] - dh / 2.0, eZDirection);
 #else
-	ZPos.push_back(0.0);
+	LBM_initPositionVector(0.0, gm->global_edges[eZMax][0], eZDirection);
 #endif
 
 #else
@@ -648,9 +648,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	{
 
 		// Check sites are next to each other in space
-		if (gm->periodic_flags[eXDirection][gm_idx]
-			||
-			abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
+		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+			|| gm->periodic_flags[eXDirection][gm_idx])
 		{
 			// Set as if middle of complete block
 			CoarseLimsX[eMinimum] = 0;
@@ -666,6 +665,12 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		}
 	}
 
+	// If they do not start and end on the same process we still need to update the TL keys 
+	if (gm->periodic_flags[eXDirection][gm_idx])
+	{
+		gm->subgrid_tlayer_key[eXMin][gm_idx - 1] = false;
+		gm->subgrid_tlayer_key[eXMax][gm_idx - 1] = false;
+	}
 
 
 	// Y //
@@ -731,8 +736,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
 	{
 		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER
-			||
-			gm->periodic_flags[eYDirection][gm_idx])
+			|| gm->periodic_flags[eYDirection][gm_idx])
 		{
 			CoarseLimsY[eMinimum] = 0;
 			CoarseLimsY[eMaximum] = pGrid.M_lim - 1;
@@ -743,6 +747,11 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 			*GridUtils::logfile << "Y: Periodically wrapped and joined" << std::endl;
 #endif
 		}
+	}
+	if (gm->periodic_flags[eYDirection][gm_idx])
+	{
+		gm->subgrid_tlayer_key[eYMin][gm_idx - 1] = false;
+		gm->subgrid_tlayer_key[eYMax][gm_idx - 1] = false;
 	}
 
 
@@ -810,8 +819,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
 	{
 		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER
-			||
-			gm->periodic_flags[eZDirection][gm_idx])
+			|| gm->periodic_flags[eZDirection][gm_idx])
 		{
 			CoarseLimsZ[eMinimum] = 0;
 			CoarseLimsZ[eMaximum] = pGrid.K_lim - 1;
@@ -822,6 +830,11 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 			*GridUtils::logfile << "Z: Periodically wrapped and joined" << std::endl;
 #endif
 		}
+	}
+	if (gm->periodic_flags[eZDirection][gm_idx])
+	{
+		gm->subgrid_tlayer_key[eZMin][gm_idx - 1] = false;
+		gm->subgrid_tlayer_key[eZMax][gm_idx - 1] = false;
 	}
 #else
 	// Reset the refined region z-limits if only 2D

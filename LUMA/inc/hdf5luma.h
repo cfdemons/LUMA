@@ -425,3 +425,52 @@ void hdf5_writeDataSet(hid_t& memspace, hid_t& filespace, hid_t& dataset_id,
 };
 
 #endif
+
+#ifdef L_BUILD_FOR_MPI
+
+// ************************************************************************** //
+/// \brief	Checks for consistent file space calculations before creating HDF5 
+///			datasets.
+///
+///			This was created as the H5Fclose() method can hang if a dataset is
+///			created in a file where all ranks contributing to the file do not
+///			agree on the file size. It was hard to debug.
+///
+///	\param	dimsf	pointer to the file space dimensions on this rank.
+///	\param	comm	communicator.
+void hdf_checkFileSpace(hsize_t * dimsf, MPI_Comm& comm)
+{
+	// Get size of the communicator
+	int numProc;
+	MPI_Comm_size(comm, &numProc);
+
+	// Create send and recv buffers
+	std::vector<int> sendBuf(numProc * L_DIMS);
+	for (size_t i = 0; i < sendBuf.size(); i += L_DIMS)
+	{
+		for (int d = 0; d < L_DIMS; d++)
+		{
+			sendBuf[i + d] = static_cast<int>(dimsf[d]);
+		}
+	}
+	std::vector<int> recvBuf(sendBuf);
+
+	// Send all to all
+	MPI_Alltoall(&sendBuf[0], L_DIMS, MPI_INT, &recvBuf[0], L_DIMS, MPI_INT, comm);
+
+	// Check the recv buffer to make sure all the value sets are equal
+	for (size_t i = 0; i < recvBuf.size(); i += L_DIMS)
+	{
+		for (int d = 0; d < L_DIMS; d++)
+		{
+			if (recvBuf[i + d] != sendBuf[i + d])
+			{
+				L_ERROR("Filespace received = " + std::to_string(recvBuf[i + d]) +
+					", Filespace sent = " + std::to_string(sendBuf[i + d]), GridUtils::logfile);
+			}
+		}
+	}
+
+}
+
+#endif

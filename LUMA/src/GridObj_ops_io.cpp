@@ -919,6 +919,12 @@ int GridObj::io_hdf5(double tval)
 		status = H5Pclose(plist_id);	 // Close access to property list now we have finished with it
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close file property list failed: " << status << std::endl;
 
+#ifdef L_BUILD_FOR_MPI
+		// Synchronise after opening
+		if (level == 0) MPI_Barrier(mpim->world_comm);
+		else MPI_Barrier(mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]);
+#endif
+
 
 		/***********************/
 		/****** DATA SETUP *****/
@@ -947,7 +953,7 @@ int GridObj::io_hdf5(double tval)
 				std::to_string(gm->subgrid_tlayer_key[eZMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eZMax][idx - 1]),
 				GridUtils::logfile);
 #endif
-			// Corretc global size using knowledge of TLs that need clipping
+			// Correct global size using knowledge of TLs that need clipping
 			dimsf[0] -= 
 				(gm->subgrid_tlayer_key[eXMin][idx - 1] * TL_thickness
 				+ gm->subgrid_tlayer_key[eXMax][idx - 1] * TL_thickness);
@@ -964,6 +970,12 @@ int GridObj::io_hdf5(double tval)
 				+ gm->subgrid_tlayer_key[eZMax][idx - 1] * TL_thickness);
 		}
 #endif
+
+#if (defined L_BUILD_FOR_MPI && defined L_HDF_DEBUG)
+		// Check all members of communicator have same file size
+		if (level != 0)	hdf_checkFileSpace(&dimsf[0], mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]);
+#endif
+
 		// File space is globally sized
 		filespace = H5Screate_simple(L_DIMS, dimsf, NULL);
 
@@ -1269,7 +1281,17 @@ int GridObj::io_hdf5(double tval)
 
 		}
 
+#ifdef L_BUILD_FOR_MPI
+		// Synchronise before closing anything
+		if (level == 0) MPI_Barrier(mpim->world_comm);
+		else MPI_Barrier(mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]);
+#endif
 
+#ifdef L_HDF_DEBUG
+		// Signal write completion
+		L_INFO("Writing finished. Closing files...", GridUtils::logfile);
+#endif
+		
 		// Close memspace
 		status = H5Sclose(memspace);
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close memspace failed: " << status << std::endl;
@@ -1304,7 +1326,7 @@ int GridObj::io_hdf5(double tval)
 				std::to_string(mpim->subGrid_comm[(level - 1) + region_number * L_NUM_LEVELS]),
 				GridUtils::logfile);
 		}
-#endif
+#endif	// L_HDF_DEBUG
 
 	}
 #endif	// L_BUILD_FOR_MPI

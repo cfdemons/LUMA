@@ -60,7 +60,7 @@
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 #define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
@@ -136,7 +136,7 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 3		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
@@ -157,7 +157,7 @@
 */
 
 // Lattice properties
-#define L_DIMS 2			///< Number of dimensions to the problem
+#define L_DIMS 3			///< Number of dimensions to the problem
 #define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 5.25e-3	///< The timestep in non-dimensional units
 

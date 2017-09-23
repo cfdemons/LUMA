@@ -146,10 +146,10 @@ GridManager::GridManager()
 
 
 			// Populate sizes
-			global_size[eXDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eXMax][idx] - global_edges[eXMin][idx]) / dh));
-			global_size[eYDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eYMax][idx] - global_edges[eYMin][idx]) / dh));
+			global_size[eXDirection][idx] = static_cast<int>(2.0 * std::round((global_edges[eXMax][idx] - global_edges[eXMin][idx]) / dh));
+			global_size[eYDirection][idx] = static_cast<int>(2.0 * std::round((global_edges[eYMax][idx] - global_edges[eYMin][idx]) / dh));
 #if (L_DIMS == 3)
-			global_size[eZDirection][idx] = static_cast<int>(std::round(2.0 * (global_edges[eZMax][idx] - global_edges[eZMin][idx]) / dh));
+			global_size[eZDirection][idx] = static_cast<int>(2.0 * std::round((global_edges[eZMax][idx] - global_edges[eZMin][idx]) / dh));
 #else
 			global_size[eZDirection][idx] = 1;
 #endif

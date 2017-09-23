@@ -196,36 +196,29 @@ void GridObj::LBM_initGrid() {
 	
 
 	// L0 lattice site POSITION VECTORS
-	/* When using MPI:
-	 * The overlap is assume periodic in all directions on L0.
-	 */
 
 #ifdef L_BUILD_FOR_MPI
-
-	// Create position vectors excluding overlap
-	XPos = GridUtils::linspace(
-		mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2.0,
-		mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2.0,
-		N_lim - 2);
-	YPos = GridUtils::linspace(
-		mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2.0,
-		mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2.0,
-		M_lim - 2);
-	ZPos = GridUtils::linspace(
-		mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2.0,
-		mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2.0,
-		K_lim - 2);
-
-	// Add overlap sites taking into account periodicity
-	XPos.insert(XPos.begin(), std::fmod(XPos[0] - dh + Lx, Lx));
-	XPos.insert(XPos.end(), std::fmod(XPos[XPos.size() - 1] + dh + Lx, Lx));
-
-	YPos.insert(YPos.begin(), std::fmod(YPos[0] - dh + Ly, Ly));
-	YPos.insert(YPos.end(), std::fmod(YPos[YPos.size() - 1] + dh + Ly, Ly));
+	
+	// Create position vectors using receiver layers as reference positions for wrapping
+	LBM_initPositionVector(mpim->recv_layer_pos.X[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.X[eRightMax] - dh / 2.0, eXDirection);
+	LBM_initPositionVector(mpim->recv_layer_pos.Y[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Y[eRightMax] - dh / 2.0, eYDirection);
 #if (L_DIMS == 3)
-	ZPos.insert(ZPos.begin(), std::fmod(ZPos[0] - dh + Lz, Lz));
-	ZPos.insert(ZPos.end(), std::fmod(ZPos[ZPos.size() - 1] + dh + Lz, Lz));
+	LBM_initPositionVector(mpim->recv_layer_pos.Z[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Z[eRightMax] - dh / 2.0, eZDirection);
+#else
+	ZPos.push_back(0.0);
 #endif
+
+#else
+	// When not builiding for MPI positions can be built from global edges directly
+	XPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eXMax][0] - dh / 2.0, static_cast<int>(L_N));
+	YPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eYMax][0] - dh / 2.0, static_cast<int>(L_M));
+#if (L_DIMS == 3)
+	ZPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eZMax][0] - dh / 2.0, static_cast<int>(L_K));
+#else
+	ZPos.push_back(0.0);
+#endif
+
+#endif	// L_BUILD_FOR_MPI
 
 #ifdef L_INIT_VERBOSE
 	// Write out the position vectors
@@ -242,84 +235,6 @@ void GridObj::LBM_initGrid() {
 	L_INFO(msg, GridUtils::logfile); msg.clear();
 #endif
 #endif
-
-
-	// Update the sender/recv layer positions in the MpiManager
-
-	// X
-	mpim->sender_layer_pos.X[eLeftMin]	= XPos[1] - dh / 2.0;
-	mpim->sender_layer_pos.X[eLeftMax]	= XPos[1] + dh / 2.0;
-	mpim->sender_layer_pos.X[eRightMin] = XPos[gm->local_size[0] - 2] - dh / 2.0;
-	mpim->sender_layer_pos.X[eRightMax] = XPos[gm->local_size[0] - 2] + dh / 2.0;
-	mpim->recv_layer_pos.X[eLeftMin]	= XPos[0] - dh / 2.0;
-	mpim->recv_layer_pos.X[eLeftMax]	= XPos[0] + dh / 2.0;
-	mpim->recv_layer_pos.X[eRightMin]	= XPos[gm->local_size[0] - 1] - dh / 2.0;
-	mpim->recv_layer_pos.X[eRightMax]	= XPos[gm->local_size[0] - 1] + dh / 2.0;
-
-	// Y
-	mpim->sender_layer_pos.Y[eLeftMin]	= YPos[1] - dh / 2.0;
-	mpim->sender_layer_pos.Y[eLeftMax]	= YPos[1] + dh / 2.0;
-	mpim->sender_layer_pos.Y[eRightMin] = YPos[gm->local_size[1] - 2] - dh / 2.0;
-	mpim->sender_layer_pos.Y[eRightMax] = YPos[gm->local_size[1] - 2] + dh / 2.0;
-	mpim->recv_layer_pos.Y[eLeftMin]	= YPos[0] - dh / 2.0;
-	mpim->recv_layer_pos.Y[eLeftMax]	= YPos[0] + dh / 2.0;
-	mpim->recv_layer_pos.Y[eRightMin]	= YPos[gm->local_size[1] - 1] - dh / 2.0;
-	mpim->recv_layer_pos.Y[eRightMax]	= YPos[gm->local_size[1] - 1] + dh / 2.0;
-	// Z
-#if (L_DIMS == 3)
-	mpim->sender_layer_pos.Z[eLeftMin]	= ZPos[1] - dh / 2.0;
-	mpim->sender_layer_pos.Z[eLeftMax]	= ZPos[1] + dh / 2.0;
-	mpim->sender_layer_pos.Z[eRightMin] = ZPos[gm->local_size[2] - 2] - dh / 2.0;
-	mpim->sender_layer_pos.Z[eRightMax] = ZPos[gm->local_size[2] - 2] + dh / 2.0;
-	mpim->recv_layer_pos.Z[eLeftMin]	= ZPos[0] - dh / 2.0;
-	mpim->recv_layer_pos.Z[eLeftMax]	= ZPos[0] + dh / 2.0;
-	mpim->recv_layer_pos.Z[eRightMin]	= ZPos[gm->local_size[2] - 1] - dh / 2.0;
-	mpim->recv_layer_pos.Z[eRightMax]	= ZPos[gm->local_size[2] - 1] + dh / 2.0;
-#endif
-
-#ifdef L_MPI_VERBOSE
-	L_INFO("X sender layers are: " + 
-		std::to_string(mpim->sender_layer_pos.X[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.X[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->sender_layer_pos.X[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.X[eRightMax]) + " (max edge)",
-		mpim->logout);
-	L_INFO("X recv layers are: " +
-		std::to_string(mpim->recv_layer_pos.X[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.X[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->recv_layer_pos.X[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.X[eRightMax]) + " (max edge)",
-		mpim->logout);
-
-	L_INFO("Y sender layers are: " +
-		std::to_string(mpim->sender_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Y[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->sender_layer_pos.Y[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Y[eRightMax]) + " (max edge)",
-		mpim->logout);
-	L_INFO("Y recv layers are: " +
-		std::to_string(mpim->recv_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Y[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->recv_layer_pos.Y[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Y[eRightMax]) + " (max edge)",
-		mpim->logout);
-
-#if (L_DIMS == 3)
-	L_INFO("Z sender layers are: " +
-		std::to_string(mpim->sender_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Z[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->sender_layer_pos.Z[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Z[eRightMax]) + " (max edge)",
-		mpim->logout);
-	L_INFO("Z recv layers are: " +
-		std::to_string(mpim->recv_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Z[eLeftMax]) + " (min edge) , " +
-		std::to_string(mpim->recv_layer_pos.Z[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Z[eRightMax]) + " (max edge)",
-		mpim->logout);
-#endif
-#endif
-
-#else
-	// When not builiding for MPI positions are straightforward
-	XPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eXMax][0] - dh / 2.0, static_cast<int>(L_N));
-	YPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eYMax][0] - dh / 2.0, static_cast<int>(L_M));
-#if (L_DIMS == 3)
-	ZPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eZMax][0] - dh / 2.0, static_cast<int>(L_K));
-#else
-	ZPos.push_back(0.0);
-#endif
-
-#endif	// L_BUILD_FOR_MPI
-
 	
 
 	// Define TYPING MATRICES

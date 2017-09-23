@@ -359,6 +359,121 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		")", logout);
 #endif
 
+	// Now update the halo regions taking into account periodicity
+
+	// X
+	sender_layer_pos.X[eLeftMin] = rank_core_edge[eXMin][my_rank];
+	sender_layer_pos.X[eLeftMax] = rank_core_edge[eXMin][my_rank] + dh;
+	sender_layer_pos.X[eRightMin] = rank_core_edge[eXMax][my_rank] - dh;
+	sender_layer_pos.X[eRightMax] = rank_core_edge[eXMax][my_rank];
+
+	// Check if need to wrap or not
+	if (sender_layer_pos.X[eLeftMin] - dh < 0.0)
+	{
+		recv_layer_pos.X[eLeftMin] = grid_man->global_edges[eXMax][0] - dh;
+		recv_layer_pos.X[eLeftMax] = grid_man->global_edges[eXMax][0];
+	}
+	else
+	{
+		recv_layer_pos.X[eLeftMin] = sender_layer_pos.X[eLeftMin] - dh;
+		recv_layer_pos.X[eLeftMax] = sender_layer_pos.X[eLeftMin];
+	}
+	if (sender_layer_pos.X[eRightMax] + dh > grid_man->global_edges[eXMax][0])
+	{
+		recv_layer_pos.X[eRightMin] = 0.0;
+		recv_layer_pos.X[eRightMax] = dh;
+	}
+	else
+	{
+		recv_layer_pos.X[eRightMin] = sender_layer_pos.X[eRightMax];
+		recv_layer_pos.X[eRightMax] = sender_layer_pos.X[eRightMax] + dh;
+	}
+	
+	// Y
+	sender_layer_pos.Y[eLeftMin] = rank_core_edge[eYMin][my_rank];
+	sender_layer_pos.Y[eLeftMax] = rank_core_edge[eYMin][my_rank] + dh;
+	sender_layer_pos.Y[eRightMin] = rank_core_edge[eYMax][my_rank] - dh;
+	sender_layer_pos.Y[eRightMax] = rank_core_edge[eYMax][my_rank];
+	if (sender_layer_pos.Y[eLeftMin] - dh < 0.0)
+	{
+		recv_layer_pos.Y[eLeftMin] = grid_man->global_edges[eYMax][0] - dh;
+		recv_layer_pos.Y[eLeftMax] = grid_man->global_edges[eYMax][0];
+	}
+	else
+	{
+		recv_layer_pos.Y[eLeftMin] = sender_layer_pos.Y[eLeftMin] - dh;
+		recv_layer_pos.Y[eLeftMax] = sender_layer_pos.Y[eLeftMin];
+	}
+	if (sender_layer_pos.Y[eRightMax] + dh > grid_man->global_edges[eYMax][0])
+	{
+		recv_layer_pos.Y[eRightMin] = 0.0;
+		recv_layer_pos.Y[eRightMax] = dh;
+	}
+	else
+	{
+		recv_layer_pos.Y[eRightMin] = sender_layer_pos.Y[eRightMax];
+		recv_layer_pos.Y[eRightMax] = sender_layer_pos.Y[eRightMax] + dh;
+	}
+
+	// Z
+#if (L_DIMS == 3)
+	sender_layer_pos.Z[eLeftMin] = rank_core_edge[eZMin][my_rank];
+	sender_layer_pos.Z[eLeftMax] = rank_core_edge[eZMin][my_rank] + dh;
+	sender_layer_pos.Z[eRightMin] = rank_core_edge[eZMax][my_rank] - dh;
+	sender_layer_pos.Z[eRightMax] = rank_core_edge[eZMax][my_rank];
+	if (sender_layer_pos.Z[eLeftMin] - dh < 0.0)
+	{
+		recv_layer_pos.Z[eLeftMin] = grid_man->global_edges[eZMax][0] - dh;
+		recv_layer_pos.Z[eLeftMax] = grid_man->global_edges[eZMax][0];
+	}
+	else
+	{
+		recv_layer_pos.Z[eLeftMin] = sender_layer_pos.Z[eLeftMin] - dh;
+		recv_layer_pos.Z[eLeftMax] = sender_layer_pos.Z[eLeftMin];
+	}
+	if (sender_layer_pos.Z[eRightMax] + dh > grid_man->global_edges[eZMax][0])
+	{
+		recv_layer_pos.Z[eRightMin] = 0.0;
+		recv_layer_pos.Z[eRightMax] = dh;
+	}
+	else
+	{
+		recv_layer_pos.Z[eRightMin] = sender_layer_pos.Z[eRightMax];
+		recv_layer_pos.Z[eRightMax] = sender_layer_pos.Z[eRightMax] + dh;
+	}
+#endif
+
+#ifdef L_MPI_VERBOSE
+	L_INFO("X sender layers are: " +
+		std::to_string(sender_layer_pos.X[eLeftMin]) + " -- " + std::to_string(sender_layer_pos.X[eLeftMax]) + " (min edge) , " +
+		std::to_string(sender_layer_pos.X[eRightMin]) + " -- " + std::to_string(sender_layer_pos.X[eRightMax]) + " (max edge)",
+		logout);
+	L_INFO("X recv layers are: " +
+		std::to_string(recv_layer_pos.X[eLeftMin]) + " -- " + std::to_string(recv_layer_pos.X[eLeftMax]) + " (min edge) , " +
+		std::to_string(recv_layer_pos.X[eRightMin]) + " -- " + std::to_string(recv_layer_pos.X[eRightMax]) + " (max edge)",
+		logout);
+
+	L_INFO("Y sender layers are: " +
+		std::to_string(sender_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(sender_layer_pos.Y[eLeftMax]) + " (min edge) , " +
+		std::to_string(sender_layer_pos.Y[eRightMin]) + " -- " + std::to_string(sender_layer_pos.Y[eRightMax]) + " (max edge)",
+		logout);
+	L_INFO("Y recv layers are: " +
+		std::to_string(recv_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(recv_layer_pos.Y[eLeftMax]) + " (min edge) , " +
+		std::to_string(recv_layer_pos.Y[eRightMin]) + " -- " + std::to_string(recv_layer_pos.Y[eRightMax]) + " (max edge)",
+		logout);
+
+#if (L_DIMS == 3)
+	L_INFO("Z sender layers are: " +
+		std::to_string(sender_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(sender_layer_pos.Z[eLeftMax]) + " (min edge) , " +
+		std::to_string(sender_layer_pos.Z[eRightMin]) + " -- " + std::to_string(sender_layer_pos.Z[eRightMax]) + " (max edge)",
+		logout);
+	L_INFO("Z recv layers are: " +
+		std::to_string(recv_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(recv_layer_pos.Z[eLeftMax]) + " (min edge) , " +
+		std::to_string(recv_layer_pos.Z[eRightMin]) + " -- " + std::to_string(recv_layer_pos.Z[eRightMax]) + " (max edge)",
+		logout);
+#endif
+#endif
+
 }
 
 
@@ -897,7 +1012,7 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 			{
 				L_INFO("Grid has writable data of size " + std::to_string(grid_man->p_data.back().writable_data_count)
 					+ ": Region " + std::to_string(reg) + ", Level " + std::to_string(lev)
-					+ " has communicator value: " + std::to_string(subGrid_comm[lev + reg * L_NUM_LEVELS])
+					+ " has communicator value: " + std::to_string(subGrid_comm[(lev - 1) + reg * L_NUM_LEVELS])
 					+ " and colour " + std::to_string(colour), GridUtils::logfile);
 			}
 			else
@@ -986,7 +1101,7 @@ void MpiManager::mpi_updateLoadInfo(GridManager* const grid_man) {
 
 	// Write information
 #ifdef L_MPI_VERBOSE
-	*logout << "Lattice updates (this rank) = " << ops_count << std::endl;
+	*logout << "Lattice updates on this rank = " << ops_count << std::endl;
 #endif
 
 	// If master, write special log file

@@ -937,12 +937,12 @@ int GridObj::io_hdf5(double tval)
 
 #ifdef L_HDF_DEBUG
 			// Write file space sizing parameters
-			L_INFO("Global Size (inc. TL): Level " + std::to_string(level) + ", Region " + std::to_string(region_number) + ": "
+			L_WARN("Global Size (inc. TL): Level " + std::to_string(level) + ", Region " + std::to_string(region_number) + ": "
 				+ std::to_string(gm->global_size[eXDirection][idx]) + ","
 				+ std::to_string(gm->global_size[eYDirection][idx]) + ","
 				+ std::to_string(gm->global_size[eZDirection][idx]), GridUtils::logfile);
-			L_WARN("TL Thickness: " + std::to_string(TL_thickness), GridUtils::logfile);
-			L_WARN("TL keys: " + std::to_string(gm->subgrid_tlayer_key[eXMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eXMax][idx - 1]) + "/" +
+			L_INFO("TL Thickness: " + std::to_string(TL_thickness), GridUtils::logfile);
+			L_INFO("TL keys: " + std::to_string(gm->subgrid_tlayer_key[eXMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eXMax][idx - 1]) + "/" +
 				std::to_string(gm->subgrid_tlayer_key[eYMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eYMax][idx - 1]) + "/" +
 				std::to_string(gm->subgrid_tlayer_key[eZMin][idx - 1]) + "," + std::to_string(gm->subgrid_tlayer_key[eZMax][idx - 1]),
 				GridUtils::logfile);
@@ -976,7 +976,7 @@ int GridObj::io_hdf5(double tval)
 #if (L_DIMS == 3)
 			+ std::to_string(dimsf[eZDirection])
 #else
-			std::to_string(1)
+			+ std::to_string(1)
 #endif			
 			, GridUtils::logfile);
 #endif
@@ -1308,6 +1308,11 @@ int GridObj::io_hdf5(double tval)
 
 	}
 #endif	// L_BUILD_FOR_MPI
+
+#ifdef L_HDF_DEBUG
+	// Signal write completion
+	L_WARN("Write out on this grid complete.", GridUtils::logfile);
+#endif
 
 	// Try call recursively on any present sub-grids
 	for (GridObj *g : subGrid) g->io_hdf5(tval);	

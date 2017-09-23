@@ -52,15 +52,15 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
 //#define L_LOG_TIMINGS				///< Write out the initialisation, time step and mpi timings to an output file
-//#define L_HDF_DEBUG				///< Write some HDF5 debugging information
+#define L_HDF_DEBUG				///< Write some HDF5 debugging information
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 #define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
@@ -136,7 +136,7 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 

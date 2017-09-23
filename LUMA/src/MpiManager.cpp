@@ -207,7 +207,7 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	cRankSizeX.resize(num_ranks);
 	cRankSizeY.resize(num_ranks);
 	cRankSizeZ.resize(num_ranks);
-	double dh = grid_man->global_edges[eXMax][0] / static_cast<double>(L_N);
+	double dh = L_COARSE_SITE_WIDTH;
 	int numCells[3];
 	numCells[0] = L_N;
 	numCells[1] = L_M;
@@ -222,6 +222,18 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	mpi_smartDecompose(dh);
 #else
 	mpi_uniformDecompose(&numCells[0]);
+#endif
+
+#ifdef L_MPI_VERBOSE
+	std::string msg("Rank Sizes in the X direction = ");
+	for (int i = 0; i < num_ranks; i++) msg += std::to_string(cRankSizeX[i]) + " ";
+	L_INFO(msg, logout); msg.clear();
+	msg = "Rank Sizes in the Y direction = ";
+	for (int i = 0; i < num_ranks; i++) msg += std::to_string(cRankSizeY[i]) + " ";
+	L_INFO(msg, logout); msg.clear();
+	msg = "Rank Sizes in the Z direction = ";
+	for (int i = 0; i < num_ranks; i++) msg += std::to_string(cRankSizeZ[i]) + " ";
+	L_INFO(msg, logout); msg.clear();
 #endif
 	
 	// Compute required local grid size to pass to grid manager //
@@ -258,61 +270,76 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	// Set sizes in grid manager
 	grid_man->setLocalCoarseSize(local_size);
 
+
+	/* Only rank 0 does the assignment of rank core edges and communicates the
+	* result to the other ranks for consistency. */
+
 	// Resize the rank core edge array
 	rank_core_edge.resize(6, std::vector<double>(num_ranks));
 
-	// Find positions of edges of each grid excluding the overlap (recv layer)
-	// If using custom sizing need to cumulatively establish how far from origin
-	int adj_rank;
-	
-	// X edges
-	rank_core_edge[eXMax][my_rank] = 0.0;
-	for (int i = 0; i < rank_coords[0] + 1; i++) {
-		// Find i-th rank
-#if (L_DIMS == 3)
-		int adj_coords[L_DIMS] = {i, rank_coords[1], rank_coords[2]};
-#else
-		int adj_coords[L_DIMS] = {i, rank_coords[1]};
-#endif
-		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
-		// Add the width of this rank to total width
-		rank_core_edge[eXMax][my_rank] += cRankSizeX[adj_rank] * dh;
-	}
-	rank_core_edge[eXMin][my_rank] = rank_core_edge[eXMax][my_rank] - cRankSizeX[my_rank] * dh;
+	if (my_rank == 0)
+	{
+		// Variables
+		int currentRank;
+		int prevRank;
+		std::vector<int> currentCoords(L_DIMS);
+		std::vector<int> prevCoords(L_DIMS);
 
-	// Y edges
-	rank_core_edge[eYMax][my_rank] = 0.0;
-	for (int i = 0; i < rank_coords[1] + 1; i++) {
-		// Find i-th rank
+		// Loop over topology
 #if (L_DIMS == 3)
-		int adj_coords[L_DIMS] = {rank_coords[0], i, rank_coords[2]};
-#else
-		int adj_coords[L_DIMS] = {rank_coords[0], i};
+		for (int k = 0; k < dimensions[eZDirection]; k++)
 #endif
-		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
-		// Add the width of this rank to total width
-		rank_core_edge[eYMax][my_rank] += cRankSizeY[adj_rank] * dh;
-	}
-	rank_core_edge[eYMin][my_rank] = rank_core_edge[eYMax][my_rank] - cRankSizeY[my_rank] * dh;
+
+		{
+#if (L_DIMS == 3)
+			// Update Z edges
+			currentCoords[eZDirection] = k;
+			prevCoords[eZDirection] = GridUtils::upToZero(currentCoords[eZDirection] - 1);
+#endif
+
+			for (int j = 0; j < dimensions[eYDirection]; j++)
+			{
+
+				// Update Y edges
+				currentCoords[eYDirection] = j;
+				prevCoords[eYDirection] = GridUtils::upToZero(currentCoords[eYDirection] - 1);
+
+				for (int i = 0; i < dimensions[eXDirection]; i++)
+				{
+					// Increment the coordinates
+					currentCoords[eXDirection] = i;
+					prevCoords[eXDirection] = GridUtils::upToZero(currentCoords[eXDirection] - 1);
+
+					// Get rank numbers
+					MPI_Cart_rank(world_comm, &currentCoords[0], &currentRank);
+					MPI_Cart_rank(world_comm, &prevCoords[0], &prevRank);
+
+					// Assign limits where minimum is the same as maximum from previous rank
+					if (i == 0) rank_core_edge[eXMin][currentRank] = 0.0;
+					else rank_core_edge[eXMin][currentRank] = rank_core_edge[eXMax][prevRank];
+					rank_core_edge[eXMax][currentRank] = rank_core_edge[eXMin][currentRank] + (cRankSizeX[currentRank] * dh);
+
+					if (j == 0) rank_core_edge[eYMin][currentRank] = 0.0;
+					else rank_core_edge[eYMin][currentRank] = rank_core_edge[eYMax][prevRank];
+					rank_core_edge[eYMax][currentRank] = rank_core_edge[eYMin][currentRank] + (cRankSizeY[currentRank] * dh);
 
 #if (L_DIMS == 3)
-	// Z edges
-	rank_core_edge[eZMax][my_rank] = 0.0;
-	for (int i = 0; i < rank_coords[2] + 1; i++) {
-		// Find i-th rank
-		int adj_coords[L_DIMS] = {rank_coords[0], rank_coords[1], i};
-		MPI_Cart_rank(world_comm, adj_coords, &adj_rank);
-		// Add the width of this rank to total width
-		rank_core_edge[eZMax][my_rank] += cRankSizeZ[adj_rank] * dh;
-	}
-	rank_core_edge[eZMin][my_rank] = rank_core_edge[eZMax][my_rank] - cRankSizeZ[my_rank] * dh;
+					if (k == 0) rank_core_edge[eZMin][currentRank] = 0.0;
+					else rank_core_edge[eZMin][currentRank] = rank_core_edge[eZMax][prevRank];
+					rank_core_edge[eZMax][currentRank] = rank_core_edge[eZMin][currentRank] + (cRankSizeZ[currentRank] * dh);
 #else
-	rank_core_edge[eZMax][my_rank] = L_BZ;
-	rank_core_edge[eZMin][my_rank] = 0.0;
+					rank_core_edge[eZMin][currentRank] = 0.0;
+					rank_core_edge[eZMax][currentRank] = grid_man->global_edges[eZMax][0];
 #endif
-	
-	// Pass MPI grid positional limits to all ranks
-	mpi_getAllRankLimits();
+
+				}
+			}
+		}
+
+	}
+
+	// Communicate all the grid edges around the topology
+	mpi_communicateBlockEdges();
 
 	// Wait for all ranks
 	MPI_Barrier(world_comm);
@@ -325,40 +352,48 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	}
 	*logout << "\t)" << std::endl;
 
-	*logout << "Limits of the grid core (position) are (" <<
-				rank_core_edge[eXMin][my_rank] << "-" << rank_core_edge[eXMax][my_rank] <<
-		", " << rank_core_edge[eYMin][my_rank] << "-" << rank_core_edge[eYMax][my_rank] <<
-		", " << rank_core_edge[eZMin][my_rank] << "-" << rank_core_edge[eZMax][my_rank] <<
-		")" << std:: endl;
+	L_INFO("Limits of the grid core (position) are ("
+		+ std::to_string(rank_core_edge[eXMin][my_rank]) + "-" + std::to_string(rank_core_edge[eXMax][my_rank]) + ", "
+		+ std::to_string(rank_core_edge[eYMin][my_rank]) + "-" + std::to_string(rank_core_edge[eYMax][my_rank]) + ", "
+		+ std::to_string(rank_core_edge[eZMin][my_rank]) + "-" + std::to_string(rank_core_edge[eZMax][my_rank]) +
+		")", logout);
 #endif
 
 }
 
 
 // ************************************************************************* //
-/// \brief	Get the positional limits of all ranks
+/// \brief	Communication of all rank core edges around the topology.
 ///
-///			After this all ranks will have positional limits of all ranks
-void MpiManager::mpi_getAllRankLimits() {
+///			After this all ranks will have positional limits of all rank cores.
+void MpiManager::mpi_communicateBlockEdges()
+{
 
-	// Declare send buffer
-	std::vector<double> sendBuffer(rank_core_edge.size(), 0.0);
+	// Declare exchange buffer
+	int numElements = static_cast<int>(rank_core_edge.size() * rank_core_edge[0].size());
+	std::vector<double> buffer(numElements, 0.0);
 
-	// Create send buffer
-	for (int i = 0; i < rank_core_edge.size(); i++)
-		sendBuffer[i] = rank_core_edge[i][my_rank];
+	if (my_rank == 0)
+	{
+		// Populate buffer
+		for (int edge = 0; edge < rank_core_edge.size(); edge++)
+		{
+			for (int rank = 0; rank < num_ranks; rank++)
+			{
+				buffer[edge + rank_core_edge.size() * rank] = rank_core_edge[edge][rank];
+			}
+		}
+	}
 
-	// Create receive buffer
-	std::vector<double> recvBuffer(rank_core_edge.size() * num_ranks, 0.0);
+	// Broadcast to other ranks
+	MPI_Bcast(&buffer[0], numElements, MPI_DOUBLE, 0, world_comm);
 
-	// Do and all-gather so each rank has all information
-	MPI_Allgather(&sendBuffer.front(), static_cast<int>(sendBuffer.size()), MPI_DOUBLE, 
-		&recvBuffer.front(), static_cast<int>(sendBuffer.size()), MPI_DOUBLE, world_comm);
-
-	// Now loop through and unpack buffer
-	for (int rank = 0; rank < num_ranks; rank++) {
-		for (int i = 0; i < sendBuffer.size(); i++) {
-			rank_core_edge[i][rank] = recvBuffer[i + rank * sendBuffer.size()];
+	// Unpack the buffer
+	for (int edge = 0; edge < rank_core_edge.size(); edge++)
+	{
+		for (int rank = 0; rank < num_ranks; rank++)
+		{
+			rank_core_edge[edge][rank] = buffer[edge + rank_core_edge.size() * rank];
 		}
 	}
 }
@@ -998,9 +1033,8 @@ void MpiManager::mpi_uniformDecompose(int *numCells)
 	// Compute domain size based on uniform decomposition
 	for (size_t d = 0; d < L_DIMS; d++)
 	{
-
 		// Calculate the size of each domain in dimension d
-		cellsInDomains[d] = (int)ceil((float)numCells[d] / (float)dimensions[d]);
+		cellsInDomains[d] = static_cast<int>(std::ceil(static_cast<double>(numCells[d]) / static_cast<double>(dimensions[d])));
 
 		// Calculate the size of the last domain
 		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * dimensions[d] - numCells[d]);
@@ -1016,17 +1050,17 @@ void MpiManager::mpi_uniformDecompose(int *numCells)
 
 	// Fill the cRankSize arrays for each MPI block
 	int ind = 0;
-	for (int i = 0; i < dimensions[0]; i++)
+	for (int i = 0; i < dimensions[eXDirection]; i++)
 	{
-		int sX = i == (dimensions[0] - 1) ? cellsLastDomain[0] : cellsInDomains[0];
+		int sX = i == (dimensions[eXDirection] - 1) ? cellsLastDomain[eXDirection] : cellsInDomains[eXDirection];
 
-		for (int j = 0; j < dimensions[1]; j++)
+		for (int j = 0; j < dimensions[eYDirection]; j++)
 		{
-			int sY = j == (dimensions[1] - 1) ? cellsLastDomain[1] : cellsInDomains[1];
+			int sY = j == (dimensions[eYDirection] - 1) ? cellsLastDomain[eYDirection] : cellsInDomains[eYDirection];
 
-			for (int k = 0; k < dimensions[2]; k++)
+			for (int k = 0; k < dimensions[eZDirection]; k++)
 			{
-				int sZ = k == (dimensions[2] - 1) ? cellsLastDomain[2] : cellsInDomains[2];
+				int sZ = k == (dimensions[eZDirection] - 1) ? cellsLastDomain[eZDirection] : cellsInDomains[eZDirection];
 				cRankSizeX[ind] = sX;
 				cRankSizeY[ind] = sY;
 				cRankSizeZ[ind] = sZ;
@@ -1417,6 +1451,7 @@ void MpiManager::mpi_SDCommunicateSolution(SDData& solutionData, double imbalanc
 			{
 				for (int k = 0; k < dimensions[eZDirection]; k++)
 				{
+					// Snap to nearest complete cell
 					*bufRankSize++ = static_cast<int>(std::round((solutionData.XSol[i + 1] - solutionData.XSol[i]) / dh));
 					*bufRankSize++ = static_cast<int>(std::round((solutionData.YSol[j + 1] - solutionData.YSol[j]) / dh));
 #if (L_DIMS == 3)

@@ -33,7 +33,6 @@ GridObj::~GridObj(void)
 {
 	// Loop over subgrid array and destroy each one
 	for (GridObj *g : subGrid) if (g) delete g;
-
 }
 
 // ****************************************************************************
@@ -43,13 +42,10 @@ GridObj::~GridObj(void)
 ///
 /// \param level always should be zero as top level grid.
 GridObj::GridObj(int level)
+	: t(0), level(level), region_number(0),
+	timeav_mpi_overhead(0.0), timeav_timestep(0.0),
+	refinement_ratio(1.0 / pow(2.0, static_cast<double>(level)))
 {
-	// Defaults
-	this->t = 0;
-
-	// Assign level and region number
-	this->level = level;
-	this->region_number = 0;
 	// Set limits of refinement to zero as top level
 	for (int i = 0; i < 2; i++) {
 		this->CoarseLimsX[i] = 0;
@@ -57,14 +53,7 @@ GridObj::GridObj(int level)
 		this->CoarseLimsZ[i] = 0;
 	}
 
-	// Assign refinement ratio
-	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
-
-	// Reset timers
-	this->timeav_mpi_overhead = 0.0;
-	this->timeav_timestep = 0.0;
-
-	*GridUtils::logfile << "Constructing Grid level " << level  << std::endl;
+	L_INFO("Constructing Grid level " + std::to_string(level) + "...", GridUtils::logfile);
 
 	// Call L0 non-MPI initialiser
 	this->LBM_initGrid();
@@ -80,25 +69,13 @@ GridObj::GridObj(int level)
 ///							this sub-grid belongs.
 /// \param pGrid			pointer to parent grid.
 GridObj::GridObj(int RegionNumber, GridObj& pGrid)
-{
-
-	// Assign
-	this->level = pGrid.level + 1;
-    this->region_number = RegionNumber;
-	this->t = 0;
-	this->parentGrid = &pGrid;
-
-	// Assign refinement ratio
-	this->refinement_ratio = (1.0 / pow(2.0, static_cast<double>(level)));
-
-	// Reset timers
-	this->timeav_mpi_overhead = 0.0;
-	this->timeav_timestep = 0.0;
-	
-	// Get MpiManager instance
-	*GridUtils::logfile << "Constructing Sub-Grid level " << level << ", region " << 
-		region_number << "..." << std::endl;
-
+	: t(0), level(pGrid.level + 1), region_number(RegionNumber),
+	parentGrid(&pGrid), refinement_ratio(1.0 / pow(2.0, static_cast<double>(pGrid.level + 1))),
+	timeav_mpi_overhead(0.0), timeav_timestep(0.0)
+{	
+	// Notify user that grid constructor has been called
+	L_INFO("Constructing Sub-Grid level " + std::to_string(level) +
+		", region " + std::to_string(region_number) + "...", GridUtils::logfile);
 }
 
 // ****************************************************************************
@@ -113,10 +90,10 @@ void GridObj::LBM_addSubGrid(int RegionNumber)
 	 * is rounded to the nearest discrete voxel). */
 
 	// Return if no subgrid required for the current grid
-	if ( !GridUtils::intersectsRefinedRegion(*this, RegionNumber) ) return;
+	if (!GridUtils::intersectsRefinedRegion(*this, RegionNumber)) return;
 	
 	// Ok to proceed and add the subgrid passing parent grid as a reference for initialisation
-	subGrid.push_back( new GridObj(RegionNumber, *this) );	
+	subGrid.push_back(new GridObj(RegionNumber, *this));	
 	
 	// Initialise the subgrid passing position of corner of the refined region on parent grid
 	this->subGrid.back()->LBM_initSubGrid(*this);

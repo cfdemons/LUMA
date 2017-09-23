@@ -134,38 +134,6 @@ std::vector<double> GridUtils::vecmultiply(double scalar, std::vector<double> ve
 }
 
 // *****************************************************************************
-/// \brief	Creates a linearly-spaced vector of values.
-/// \param	min	starting value of output vector.
-/// \param	max	ending point of output vector.
-/// \param	n	number of values in output vector.
-/// \return	a vector with n uniformly spaced values between min and max.
-std::vector<double> GridUtils::linspace(double min, double max, int n)
-{
-	// Declare resulting vector
-	std::vector<double> result;
-
-	// Set counter to zero
-	int count = 0;
-
-	// Number of values
-	int numvals = n - 1; // Cast n to a double to use floor
-
-	// Loop
-	for (int i = 0; i <= n-2; i++)
-	{
-		double temp = min + i * (max - min) / numvals;
-		result.insert(result.begin() + count, temp); // Insert element
-		count += 1;
-	}
-
-	// Add last element
-	result.insert(result.begin() + count, max);
-
-	// Return vector
-	return result;
-}
-
-// *****************************************************************************
 /// \brief	Creates a linearly-spaced vector of integers.
 /// \param	min	starting value of output vector.
 /// \param	max	ending point of output vector.
@@ -1682,7 +1650,7 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 		idxLower = eZMin;
 		idxUpper = eZMax;
 	}
-
+	
 	// Set offset baseline to grid start edge for serial builds
 	offset_baseline = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
 	local_edge = offset_baseline;
@@ -1753,7 +1721,6 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 	*ijk += offset;
 
 	return;
-
 }
 
 

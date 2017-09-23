@@ -166,7 +166,7 @@ void GridObj::LBM_initGrid() {
 	double Lx = gm->global_edges[eXMax][0];
 	double Ly = gm->global_edges[eYMax][0];
 	double Lz = gm->global_edges[eZMax][0];
-	dh = Lx / static_cast<double>(L_N);
+	dh = L_COARSE_SITE_WIDTH;
 
 	// Store temporal spacing
 	dt = L_TIMESTEP;
@@ -204,68 +204,116 @@ void GridObj::LBM_initGrid() {
 
 	// Create position vectors excluding overlap
 	XPos = GridUtils::linspace(
-		mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2,
-		mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2,
+		mpim->rank_core_edge[eXMin][mpim->my_rank] + dh / 2.0,
+		mpim->rank_core_edge[eXMax][mpim->my_rank] - dh / 2.0,
 		N_lim - 2);
 	YPos = GridUtils::linspace(
-		mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2,
-		mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2,
+		mpim->rank_core_edge[eYMin][mpim->my_rank] + dh / 2.0,
+		mpim->rank_core_edge[eYMax][mpim->my_rank] - dh / 2.0,
 		M_lim - 2);
 	ZPos = GridUtils::linspace(
-		mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2,
-		mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2,
+		mpim->rank_core_edge[eZMin][mpim->my_rank] + dh / 2.0,
+		mpim->rank_core_edge[eZMax][mpim->my_rank] - dh / 2.0,
 		K_lim - 2);
 
 	// Add overlap sites taking into account periodicity
-	XPos.insert( XPos.begin(), fmod(XPos[0] - dh + Lx, Lx) );
-	XPos.insert( XPos.end(), fmod(XPos[XPos.size() - 1] + dh + Lx, Lx) );
+	XPos.insert(XPos.begin(), std::fmod(XPos[0] - dh + Lx, Lx));
+	XPos.insert(XPos.end(), std::fmod(XPos[XPos.size() - 1] + dh + Lx, Lx));
 
-	YPos.insert( YPos.begin(), fmod(YPos[0] - dh + Ly, Ly) );
-	YPos.insert( YPos.end(), fmod(YPos[YPos.size() - 1] + dh + Ly, Ly) );
+	YPos.insert(YPos.begin(), std::fmod(YPos[0] - dh + Ly, Ly));
+	YPos.insert(YPos.end(), std::fmod(YPos[YPos.size() - 1] + dh + Ly, Ly));
 #if (L_DIMS == 3)
-	ZPos.insert( ZPos.begin(), fmod(ZPos[0] - dh + Lz, Lz) );
-	ZPos.insert( ZPos.end(), fmod(ZPos[ZPos.size() - 1] + dh + Lz, Lz) );
+	ZPos.insert(ZPos.begin(), std::fmod(ZPos[0] - dh + Lz, Lz));
+	ZPos.insert(ZPos.end(), std::fmod(ZPos[ZPos.size() - 1] + dh + Lz, Lz));
 #endif
+
+#ifdef L_INIT_VERBOSE
+	// Write out the position vectors
+	std::string msg;
+	msg += "XPos: ";
+	for (size_t i = 0; i < XPos.size(); ++i) msg += std::to_string(XPos[i]) + " ";
+	L_INFO(msg, GridUtils::logfile); msg.clear();
+	msg += "YPos: ";
+	for (size_t i = 0; i < YPos.size(); ++i) msg += std::to_string(YPos[i]) + " ";
+	L_INFO(msg, GridUtils::logfile); msg.clear();
+#if (L_DIMS == 3)
+	msg += "ZPos: ";
+	for (size_t i = 0; i < ZPos.size(); ++i) msg += std::to_string(ZPos[i]) + " ";
+	L_INFO(msg, GridUtils::logfile); msg.clear();
+#endif
+#endif
+
 
 	// Update the sender/recv layer positions in the MpiManager
 
 	// X
-	mpim->sender_layer_pos.X[eLeftMin]	= XPos[1] - dh/2;						mpim->sender_layer_pos.X[eLeftMax]	= XPos[1] + dh/2;
-	mpim->sender_layer_pos.X[eRightMin] = XPos[gm->local_size[0] - 2] - dh / 2;	mpim->sender_layer_pos.X[eRightMax] = XPos[gm->local_size[0] - 2] + dh / 2;
-	mpim->recv_layer_pos.X[eLeftMin]	= XPos[0] - dh/2;						mpim->recv_layer_pos.X[eLeftMax]	= XPos[0] + dh/2;
-	mpim->recv_layer_pos.X[eRightMin]	= XPos[gm->local_size[0] - 1] - dh / 2;	mpim->recv_layer_pos.X[eRightMax]	= XPos[gm->local_size[0] - 1] + dh / 2;
+	mpim->sender_layer_pos.X[eLeftMin]	= XPos[1] - dh / 2.0;
+	mpim->sender_layer_pos.X[eLeftMax]	= XPos[1] + dh / 2.0;
+	mpim->sender_layer_pos.X[eRightMin] = XPos[gm->local_size[0] - 2] - dh / 2.0;
+	mpim->sender_layer_pos.X[eRightMax] = XPos[gm->local_size[0] - 2] + dh / 2.0;
+	mpim->recv_layer_pos.X[eLeftMin]	= XPos[0] - dh / 2.0;
+	mpim->recv_layer_pos.X[eLeftMax]	= XPos[0] + dh / 2.0;
+	mpim->recv_layer_pos.X[eRightMin]	= XPos[gm->local_size[0] - 1] - dh / 2.0;
+	mpim->recv_layer_pos.X[eRightMax]	= XPos[gm->local_size[0] - 1] + dh / 2.0;
+
 	// Y
-	mpim->sender_layer_pos.Y[eLeftMin]	= YPos[1] - dh/2;						mpim->sender_layer_pos.Y[eLeftMax]	= YPos[1] + dh/2;
-	mpim->sender_layer_pos.Y[eRightMin] = YPos[gm->local_size[1] - 2] - dh / 2;	mpim->sender_layer_pos.Y[eRightMax] = YPos[gm->local_size[1] - 2] + dh / 2;
-	mpim->recv_layer_pos.Y[eLeftMin]	= YPos[0] - dh/2;						mpim->recv_layer_pos.Y[eLeftMax]	= YPos[0] + dh/2;
-	mpim->recv_layer_pos.Y[eRightMin]	= YPos[gm->local_size[1] - 1] - dh / 2;	mpim->recv_layer_pos.Y[eRightMax]	= YPos[gm->local_size[1] - 1] + dh / 2;
+	mpim->sender_layer_pos.Y[eLeftMin]	= YPos[1] - dh / 2.0;
+	mpim->sender_layer_pos.Y[eLeftMax]	= YPos[1] + dh / 2.0;
+	mpim->sender_layer_pos.Y[eRightMin] = YPos[gm->local_size[1] - 2] - dh / 2.0;
+	mpim->sender_layer_pos.Y[eRightMax] = YPos[gm->local_size[1] - 2] + dh / 2.0;
+	mpim->recv_layer_pos.Y[eLeftMin]	= YPos[0] - dh / 2.0;
+	mpim->recv_layer_pos.Y[eLeftMax]	= YPos[0] + dh / 2.0;
+	mpim->recv_layer_pos.Y[eRightMin]	= YPos[gm->local_size[1] - 1] - dh / 2.0;
+	mpim->recv_layer_pos.Y[eRightMax]	= YPos[gm->local_size[1] - 1] + dh / 2.0;
 	// Z
 #if (L_DIMS == 3)
-	mpim->sender_layer_pos.Z[eLeftMin]	= ZPos[1] - dh/2;						mpim->sender_layer_pos.Z[eLeftMax]	= ZPos[1] + dh/2;
-	mpim->sender_layer_pos.Z[eRightMin] = ZPos[gm->local_size[2] - 2] - dh/2;	mpim->sender_layer_pos.Z[eRightMax] = ZPos[gm->local_size[2] - 2] + dh/2;
-	mpim->recv_layer_pos.Z[eLeftMin]	= ZPos[0] - dh/2;						mpim->recv_layer_pos.Z[eLeftMax]	= ZPos[0] + dh/2;
-	mpim->recv_layer_pos.Z[eRightMin]	= ZPos[gm->local_size[2] - 1] - dh/2;	mpim->recv_layer_pos.Z[eRightMax]	= ZPos[gm->local_size[2] - 1] + dh/2;
+	mpim->sender_layer_pos.Z[eLeftMin]	= ZPos[1] - dh / 2.0;
+	mpim->sender_layer_pos.Z[eLeftMax]	= ZPos[1] + dh / 2.0;
+	mpim->sender_layer_pos.Z[eRightMin] = ZPos[gm->local_size[2] - 2] - dh / 2.0;
+	mpim->sender_layer_pos.Z[eRightMax] = ZPos[gm->local_size[2] - 2] + dh / 2.0;
+	mpim->recv_layer_pos.Z[eLeftMin]	= ZPos[0] - dh / 2.0;
+	mpim->recv_layer_pos.Z[eLeftMax]	= ZPos[0] + dh / 2.0;
+	mpim->recv_layer_pos.Z[eRightMin]	= ZPos[gm->local_size[2] - 1] - dh / 2.0;
+	mpim->recv_layer_pos.Z[eRightMax]	= ZPos[gm->local_size[2] - 1] + dh / 2.0;
 #endif
 
 #ifdef L_MPI_VERBOSE
-	*mpim->logout << "X sender layers are: " << mpim->sender_layer_pos.X[eLeftMin] << " -- " << mpim->sender_layer_pos.X[eLeftMax] << " (min edge) , " << mpim->sender_layer_pos.X[eRightMin] << " -- " << mpim->sender_layer_pos.X[eRightMax] << " (max edge)" << std::endl;
-	*mpim->logout << "X recv layers are: " << mpim->recv_layer_pos.X[eLeftMin] << " -- " << mpim->recv_layer_pos.X[eLeftMax] << " (min edge) , " << mpim->recv_layer_pos.X[eRightMin] << " -- " << mpim->recv_layer_pos.X[eRightMax] << " (max edge)" << std::endl;
+	L_INFO("X sender layers are: " + 
+		std::to_string(mpim->sender_layer_pos.X[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.X[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->sender_layer_pos.X[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.X[eRightMax]) + " (max edge)",
+		mpim->logout);
+	L_INFO("X recv layers are: " +
+		std::to_string(mpim->recv_layer_pos.X[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.X[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->recv_layer_pos.X[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.X[eRightMax]) + " (max edge)",
+		mpim->logout);
 
-	*mpim->logout << "Y sender layers are: " << mpim->sender_layer_pos.Y[eLeftMin] << " -- " << mpim->sender_layer_pos.Y[eLeftMax] << " (min edge) , " << mpim->sender_layer_pos.Y[eRightMin] << " -- " << mpim->sender_layer_pos.Y[eRightMax] << " (max edge)" << std::endl;
-	*mpim->logout << "Y recv layers are: " << mpim->recv_layer_pos.Y[eLeftMin] << " -- " << mpim->recv_layer_pos.Y[eLeftMax] << " (min edge) , " << mpim->recv_layer_pos.Y[eRightMin] << " -- " << mpim->recv_layer_pos.Y[eRightMax] << " (max edge)" << std::endl;
+	L_INFO("Y sender layers are: " +
+		std::to_string(mpim->sender_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Y[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->sender_layer_pos.Y[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Y[eRightMax]) + " (max edge)",
+		mpim->logout);
+	L_INFO("Y recv layers are: " +
+		std::to_string(mpim->recv_layer_pos.Y[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Y[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->recv_layer_pos.Y[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Y[eRightMax]) + " (max edge)",
+		mpim->logout);
 
 #if (L_DIMS == 3)
-	*mpim->logout << "Z sender layers are: " << mpim->sender_layer_pos.Z[eLeftMin] << " -- " << mpim->sender_layer_pos.Z[eLeftMax] << " (min edge) , " << mpim->sender_layer_pos.Z[eRightMin] << " -- " << mpim->sender_layer_pos.Z[eRightMax] << " (max edge)" << std::endl;
-	*mpim->logout << "Z recv layers are: " << mpim->recv_layer_pos.Z[eLeftMin] << " -- " << mpim->recv_layer_pos.Z[eLeftMax] << " (min edge) , " << mpim->recv_layer_pos.Z[eRightMin] << " -- " << mpim->recv_layer_pos.Z[eRightMax] << " (max edge)" << std::endl;
+	L_INFO("Z sender layers are: " +
+		std::to_string(mpim->sender_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Z[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->sender_layer_pos.Z[eRightMin]) + " -- " + std::to_string(mpim->sender_layer_pos.Z[eRightMax]) + " (max edge)",
+		mpim->logout);
+	L_INFO("Z recv layers are: " +
+		std::to_string(mpim->recv_layer_pos.Z[eLeftMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Z[eLeftMax]) + " (min edge) , " +
+		std::to_string(mpim->recv_layer_pos.Z[eRightMin]) + " -- " + std::to_string(mpim->recv_layer_pos.Z[eRightMax]) + " (max edge)",
+		mpim->logout);
 #endif
 #endif
 
 #else
 	// When not builiding for MPI positions are straightforward
-	XPos = GridUtils::linspace(dh / 2, gm->global_edges[eXMax][0] - dh / 2, static_cast<int>(L_N));
-	YPos = GridUtils::linspace(dh / 2, gm->global_edges[eYMax][0] - dh / 2, static_cast<int>(L_M));
+	XPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eXMax][0] - dh / 2.0, static_cast<int>(L_N));
+	YPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eYMax][0] - dh / 2.0, static_cast<int>(L_M));
 #if (L_DIMS == 3)
-	ZPos = GridUtils::linspace(dh / 2, gm->global_edges[eZMax][0] - dh / 2, static_cast<int>(L_K));
+	ZPos = GridUtils::linspace(dh / 2.0, gm->global_edges[eZMax][0] - dh / 2.0, static_cast<int>(L_K));
 #else
 	ZPos.push_back(0.0);
 #endif
@@ -685,9 +733,9 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	{
 
 		// Check sites are next to each other in space
-		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+		if (gm->periodic_flags[eXDirection][gm_idx]
 			||
-			gm->periodic_flags[eXDirection][gm_idx])
+			abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER)
 		{
 			// Set as if middle of complete block
 			CoarseLimsX[eMinimum] = 0;
@@ -706,8 +754,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 
 
 	// Y //
-	subgrid_start_voxel_centre = gm->global_edges[eYMin][gm_idx] + dh / 2;
-	subgrid_end_voxel_centre = gm->global_edges[eYMax][gm_idx] - dh / 2;
+	subgrid_start_voxel_centre = gm->global_edges[eYMin][gm_idx] + dh / 2.0;
+	subgrid_end_voxel_centre = gm->global_edges[eYMax][gm_idx] - dh / 2.0;
 	gm->subgrid_tlayer_key[eYMin][gm_idx - 1] = true;
 	gm->subgrid_tlayer_key[eYMax][gm_idx - 1] = true;
 
@@ -785,8 +833,8 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 
 #if (L_DIMS == 3)
 	// Z //
-	subgrid_start_voxel_centre = gm->global_edges[eZMin][gm_idx] + dh / 2;
-	subgrid_end_voxel_centre = gm->global_edges[eZMax][gm_idx] - dh / 2;
+	subgrid_start_voxel_centre = gm->global_edges[eZMin][gm_idx] + dh / 2.0;
+	subgrid_end_voxel_centre = gm->global_edges[eZMax][gm_idx] - dh / 2.0;
 	gm->subgrid_tlayer_key[eZMin][gm_idx - 1] = true;
 	gm->subgrid_tlayer_key[eZMax][gm_idx - 1] = true;
 
@@ -946,7 +994,7 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 	arr->push_back(start_pos);
 	do
 	{
-		if (arr->back() + dh > end_lim) arr->push_back(start_lim + dh / 2);
+		if (arr->back() + dh > end_lim) arr->push_back(start_lim + dh / 2.0);
 		else arr->push_back(arr->back() + dh);
 	}
 	while (arr->size() < req_size);
@@ -1324,7 +1372,7 @@ void GridObj::_LBM_initSetInletProfile()
 
 #elif defined L_PARABOLIC_INLET
 	// Specify as an anlytical parabola
-	double b = L_BY - L_WALL_THICKNESS_TOP;
+	double b = GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP;
 	double p = (b + L_WALL_THICKNESS_BOTTOM) / 2.0;
 	double q = b - p;
 

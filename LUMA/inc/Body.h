@@ -224,7 +224,7 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 
 	// Build circle (2D)
 	int numMarkers = static_cast<int>(std::floor(2.0 * L_PI * radius / g->dh));
-	std::vector<double> theta = GridUtils::linspace(0, 2.0 * L_PI - (2.0 * L_PI / numMarkers), numMarkers);
+	std::vector<double> theta = GridUtils::linspace(0.0, 2.0 * L_PI - (2.0 * L_PI / static_cast<double>(numMarkers)), numMarkers);
 	for (size_t i = 1; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
@@ -694,9 +694,9 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 		double vz = _Owner->ZPos[markers[curr_mark].supp_k[0]];
 
 		// Test within
-		if ((x >= vx - (_Owner->dh / 2) && x < vx + (_Owner->dh / 2)) &&
-			(y >= vy - (_Owner->dh / 2) && y < vy + (_Owner->dh / 2)) &&
-			(z >= vz - (_Owner->dh / 2) && z < vz + (_Owner->dh / 2))
+		if ((x >= vx - (_Owner->dh / 2.0) && x < vx + (_Owner->dh / 2.0)) &&
+			(y >= vy - (_Owner->dh / 2.0) && y < vy + (_Owner->dh / 2.0)) &&
+			(z >= vz - (_Owner->dh / 2.0) && z < vz + (_Owner->dh / 2.0))
 			) return true;
 
 		// Catch all

@@ -51,7 +51,6 @@ public:
 
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace
-	static std::vector<double> linspace(double min, double max, int n);		// Function: linspace
 	static double vecnorm(double vec[L_DIMS]);								// Function: vecnorm + overloads
 	static double vecnorm(double val1, double val2);
 	static double vecnorm(double val1, double val2, double val3);
@@ -273,6 +272,35 @@ public:
 
 		return result;
 	};
+
+	// *****************************************************************************
+	/// \brief	Creates a linearly-spaced vector of values.
+	/// \param	min	starting value of output vector.
+	/// \param	max	ending point of output vector.
+	/// \param	n	number of values in output vector.
+	/// \return	a vector with n uniformly spaced values between min and max.
+	template <typename T>
+	static std::vector<T> linspace(T min, T max, int n)
+	{
+		// Cannot have fewer values than 2
+		if (n < 2) n = 2;
+
+		// Declare resulting vector
+		std::vector<T> result(n);
+
+		// Spacing
+		T spacing = (max - min) / static_cast<T>(n - 1);
+
+		// Insert elements
+		for (int i = 0; i < n; i++)	*(result.begin() + i) = min + spacing * i;
+
+		// Check for error
+		T vecerr = std::abs(max - result.back());
+		if (vecerr > static_cast<T>(L_SMALL_NUMBER)) L_WARN("Error in linspace creation of " + std::to_string(vecerr), GridUtils::logfile);
+		
+		// Return vector
+		return result;
+	}
 
 
 private:

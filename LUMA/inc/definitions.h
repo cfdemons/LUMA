@@ -40,7 +40,7 @@
 #define L_M static_cast<int>(L_BY * L_RESOLUTION)	///< Number of coarse cells in Y-direction
 #define L_K static_cast<int>(L_BZ * L_RESOLUTION)	///< Number of coarse cells in Z-direction
 /// Width of a coarse cell in dimensionless units
-#define L_COARSE_SITE_WIDTH (static_cast<double>(L_BX)/static_cast<double>(L_N))
+#define L_COARSE_SITE_WIDTH (1.0 / static_cast<double>(L_RESOLUTION))
 
 
 /*
@@ -52,8 +52,8 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions

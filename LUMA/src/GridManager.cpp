@@ -32,8 +32,8 @@ GridManager::GridManager()
 	global_size[eYDirection][0] = L_M;
 	global_size[eZDirection][0] = L_K;
 
-	// Get base dh based on X-direction
-	double dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
+	// Get base dh using the standard macro
+	double dh = L_COARSE_SITE_WIDTH;
 
 	// Set edges
 	global_edges[eXMin][0] = 0.0;
@@ -65,7 +65,7 @@ GridManager::GridManager()
 	for (int reg = 0; reg < L_NUM_REGIONS; ++reg)
 	{
 		// Reset spacing for next set of regions to base spacing
-		dh = static_cast<double>(L_BX) / static_cast<double>(L_N);
+		dh = L_COARSE_SITE_WIDTH;
 
 		for (int lev = 1; lev <= L_NUM_LEVELS; ++lev)
 		{
@@ -694,7 +694,7 @@ long GridManager::getCellCount(int targetLevel, int targetRegion, double *bounds
 #endif
 
 	// Use knowledge of discretisation to return the number of cells in union
-	double base_cell_size = global_edges[eXMax][0] / static_cast<double>(L_N);
+	double base_cell_size = L_COARSE_SITE_WIDTH;
 	double local_cell_size = base_cell_size / pow(2, targetLevel);
 #if (L_DIMS == 3)
 	return static_cast<long>(volume / (local_cell_size * local_cell_size * local_cell_size));

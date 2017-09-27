@@ -63,6 +63,7 @@ ObjectManager::ObjectManager(GridObj* g) : _Grids(g)
 {
 
 	// Resize vector of flexible body flags
+	hasIBMBodies.resize(L_NUM_LEVELS+1 ,false);
 	hasFlexibleBodies.resize(L_NUM_LEVELS+1 ,false);
 
 	// Set sub-iteration loop values

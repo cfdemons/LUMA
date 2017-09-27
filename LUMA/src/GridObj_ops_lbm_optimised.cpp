@@ -41,16 +41,17 @@ void GridObj::LBM_multi_opt(int subcycle)
 			sg->LBM_multi_opt(i);
 	}
 
+	// Get object manager instance
+	ObjectManager *objman = ObjectManager::getInstance();
+
 	// If IBM is on then reset the forces
 #ifdef L_IBM_ON
-	_LBM_resetForces();
+	if (objman->hasIBMBodies[level])
+		_LBM_resetForces();
 #endif
 
 	// Start the clock to time this kernel
 	clock_t secs, t_start = clock();
-
-	// Get object manager instance
-	ObjectManager *objman = ObjectManager::getInstance();
 
 #ifdef L_LD_OUT
 	// Reset object forces for momentum exchange force calculation
@@ -94,7 +95,8 @@ void GridObj::LBM_multi_opt(int subcycle)
 	}
 
 	// Perform IBM steps (interpolate, force calc, spread and update macro)
-	objman->ibm_apply(this, true);
+	if (objman->hasIBMBodies[level])
+		objman->ibm_apply(this, true);
 
 
 	// Loop over grid
@@ -361,6 +363,16 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 		// Use f_plus and f_zero to compute missing quantity
 		if (type == ePressure)
 		{
+
+			// 1st order extrapolation for tangential velocities
+			for (int d = 0; d < L_DIMS; d++) {
+
+				// Check if tangential velocity
+				if (d != normalDirection) {
+					tmpVelVector[d] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, d, L_DIMS);
+				}
+			}
+
 			// Update the wall-normal velocity
 			tmpVelVector[normalDirection] = 1.0 - ((1.0 / tmpDensity) * (2.0 * f_plus + f_zero));
 			if (normalVector[normalDirection] == -1) tmpVelVector[normalDirection] *= -1.0;

@@ -53,9 +53,9 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -78,8 +78,8 @@ const int resFactor = 2;
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (resFactor*resFactor*5)			///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES (resFactor*resFactor*5)		///< Specific output frequency of body forces
+#define L_OUT_EVERY (resFactor*resFactor*50)			///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES (resFactor*resFactor*50)		///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
@@ -128,7 +128,7 @@ const int resFactor = 2;
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (resFactor*resFactor*15000)		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS (resFactor*resFactor*10000)		///< Number of time steps to run simulation for
 
 
 /*
@@ -251,8 +251,8 @@ const int resFactor = 2;
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
-#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 0		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 //#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
@@ -268,19 +268,19 @@ const int resFactor = 2;
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.12 }
+	{ 0.05 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.63 }
+	{ 1.5 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 0.12 + L_WALL_THICKNESS_BOTTOM }
+	{ 0.03 + L_WALL_THICKNESS_BOTTOM }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {
-	{ 0.29 + L_WALL_THICKNESS_BOTTOM }
+	{ 0.38 + L_WALL_THICKNESS_BOTTOM }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
 {

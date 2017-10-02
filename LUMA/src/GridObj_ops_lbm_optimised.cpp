@@ -365,12 +365,11 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 		{
 
 			// 1st order extrapolation for tangential velocities
-			for (int d = 0; d < L_DIMS; d++) {
-
-				// Check if tangential velocity
-				if (d != normalDirection) {
+			for (int d = 0; d < L_DIMS; d++)
+			{
+				// Check if tangential velocity and do not extrapolate on recv layer
+				if (d != normalDirection && !GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
 					tmpVelVector[d] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, d, L_DIMS);
-				}
 			}
 
 			// Update the wall-normal velocity

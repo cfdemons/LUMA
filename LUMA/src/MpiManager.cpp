@@ -1714,8 +1714,8 @@ void MpiManager::mpi_setSubGridDepth()
 	int key = my_rank;
 
 	// Now loop through all levels and split communicators
-	for (int lev = 0; lev < (L_NUM_LEVELS + 1); lev++) {
-
+	for (int lev = 0; lev < (L_NUM_LEVELS + 1); lev++)
+	{
 		// Set colour to undefined
 		int colour = MPI_UNDEFINED;
 
@@ -1729,11 +1729,11 @@ void MpiManager::mpi_setSubGridDepth()
 }
 
 // *****************************************************************************
-///	\brief	Map ranks from current level communicator to global rank ID
+///	\brief	Maps rank numbers from level communicator to world communcator
 ///
-///	\param	level			current grid level
-///	\return	mapping			vector of ranks mappings
-std::vector<int> MpiManager::mpi_mapCommLevel2Global(int level) {
+///	\param	level	current grid level
+///	\returns		vector of ranks mappings
+std::vector<int> MpiManager::mpi_mapRankLevelToWorld(int level) {
 
 	// Declare vector
 	std::vector<int> mapping;
@@ -1753,9 +1753,9 @@ std::vector<int> MpiManager::mpi_mapCommLevel2Global(int level) {
 // *****************************************************************************
 ///	\brief	Map ranks from global communicator to level rank ID
 ///
-///	\param	level			current grid level
-///	\return	mapping			vector of ranks mappings
-std::vector<int> MpiManager::mpi_mapCommGlobal2Level(int level) {
+///	\param	level	current grid level
+///	\returns		vector of ranks mappings
+std::vector<int> MpiManager::mpi_mapRankWorldToLevel(int level) {
 
 	// Declare vector
 	std::vector<int> mapping(num_ranks, MPI_UNDEFINED);

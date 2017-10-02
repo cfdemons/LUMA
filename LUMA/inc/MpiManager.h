@@ -210,11 +210,11 @@ public :
 	void mpi_SDComputeImbalance(LoadImbalanceData& load, SDData& solutionData, std::vector<int>& numCores);
 	bool mpi_SDCheckDelta(SDData& solutionData, double dh, std::vector<int>& numCores);
 	void mpi_SDCommunicateSolution(SDData& solutionData, double imbalance, double dh);
-	void mpi_setSubGridDepth();										// Method to initialiset eh rankGrids variable
+	void mpi_setSubGridDepth();										// Method to initialise the rankGrids variable
 
 	// Helper functions
-	std::vector<int> mpi_mapCommLevel2Global(int level);				// Map ranks from current level communicator to global rank ID
-	std::vector<int> mpi_mapCommGlobal2Level(int level);				// Map ranks from global communicator to level rank ID
+	std::vector<int> mpi_mapRankLevelToWorld(int level);			// Map rank numbers from level communicator to world communcator
+	std::vector<int> mpi_mapRankWorldToLevel(int level);			// Map rank numbers from world communicator to level communicator
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

@@ -382,8 +382,8 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Get ranks which exist on this level
-	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
-	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+	std::vector<int> lev2glob = mpi_mapRankLevelToWorld(level);
+	std::vector<int> glob2lev = mpi_mapRankWorldToLevel(level);
 
 	// Initialise values
 	int nMarkersOnThisRank = 0;
@@ -794,8 +794,8 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	supportCommSupportSide[level].clear();
 
 	// Get ranks which exist on this level
-	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
-	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+	std::vector<int> lev2glob = mpi_mapRankLevelToWorld(level);
+	std::vector<int> glob2lev = mpi_mapRankWorldToLevel(level);
 
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();

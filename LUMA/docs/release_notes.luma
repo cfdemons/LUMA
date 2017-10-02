@@ -13,6 +13,7 @@ General		:	Added kernel performance improvements which are especially effective 
 				Added helper for diagnosing HDF5 hangs.
 				Fixed bug with HDF5 hanging when filespaces disagree.
 
+Issue #145	:	Added missing condition for applying extrapolation on a recv layer outlet.
 Issue #55	:	Periodic wrapping of sub-grids is now available by specifying the start and end point to be the same.
 Issue #142	:	Added a reporting mode to MPI builds to use the smart decomposition and load balancing methods to estimate config performance.
 				Need to compile with the L_MPI_TOPOLOGY_REPORT flag on to switch to the mode.

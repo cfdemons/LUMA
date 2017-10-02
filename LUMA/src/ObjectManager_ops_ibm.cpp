@@ -1048,7 +1048,7 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 	MpiManager *mpim = MpiManager::getInstance();
 
 	// Set root rank
-	std::vector<int> lev2glob = mpim->mpi_mapCommLevel2Global(level);
+	std::vector<int> lev2glob = mpim->mpi_mapRankLevelToWorld(level);
 	int rootRank = lev2glob[0];
 
 	// Gather in the data for all markers in the system

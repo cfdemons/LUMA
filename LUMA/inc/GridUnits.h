@@ -44,7 +44,7 @@ public:
 	///
 	/// \param u_lattice	Lattice velocity.
 	/// \param currentGrid	Pointer to the current grid. 
-	/// \return physical velocity
+	/// \returns			physical velocity
 	template <typename T>
 	static double ulat2uphys(T u_lattice, GridObj* currentGrid)
 	{
@@ -56,7 +56,7 @@ public:
 	///
 	/// \param u_dimensionless	Dimensionless velocity.
 	/// \param currentGrid		Pointer to the current grid. 
-	/// \return velocity in LBM units.
+	/// \returns				velocity in LBM units.
 	template <typename T>
 	static double ud2ulbm(T u_dimensionless, GridObj* currentGrid)
 	{
@@ -67,8 +67,8 @@ public:
 	/// \brief	Converts length in dimensionless units to LBM units.
 	///
 	/// \param l_dimensionless	Dimensionless length.
-	/// \param currentGrid Pointer to the current grid. 
-	/// \return LBM length
+	/// \param currentGrid	Pointer to the current grid. 
+	/// \returns			LBM length
 	template <typename T>
 	static double ld2llbm(T l_dimensionless, GridObj* currentGrid)
 	{
@@ -80,7 +80,7 @@ public:
 	///
 	/// \param nu_dimensionless		Dimensionless kinematic viscosity.
 	/// \param currentGrid			Pointer to the current grid. 
-	/// \return kinematic viscosity in LBM units.
+	/// \returns					kinematic viscosity in LBM units.
 	template <typename T>
 	static double nud2nulbm(T nu_dimensionless, GridObj* currentGrid)
 	{
@@ -92,7 +92,7 @@ public:
 	///
 	/// \param a_dimensionless	Dimensionless acceleration.
 	/// \param currentGrid		Pointer to the current grid. 
-	/// \return acceleration in LBM units.
+	/// \returns				acceleration in LBM units.
 	template <typename T>
 	static double fd2flbm(T a_dimensionless, GridObj* currentGrid)
 	{
@@ -130,7 +130,7 @@ public:
 	///
 	/// \param p_dimensionless	Dimensionless pressure.
 	/// \param currentGrid		Pointer to the current grid. 
-	/// \return density in LBM units.
+	/// \returns				density in LBM units.
 	template <typename T>
 	static double pd2dlbm(T p_dimensionless, GridObj* currentGrid)
 	{

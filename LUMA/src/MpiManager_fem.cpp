@@ -124,8 +124,8 @@ void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &
 	ObjectManager *objman = ObjectManager::getInstance();
 
 	// Get ranks which exist on this level
-	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
-	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+	std::vector<int> lev2glob = mpi_mapRankLevelToWorld(level);
+	std::vector<int> glob2lev = mpi_mapRankWorldToLevel(level);
 
 	// Declare send buffers
 	std::vector<int> nMarkersToSend(num_ranks, 0);

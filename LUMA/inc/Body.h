@@ -566,7 +566,7 @@ void Body<MarkerType>::deleteOffRankMarkers()
 /// \param	x 			X-position nearest to marker to be retrieved
 /// \param	y 			Y-position nearest to marker to be retrieved
 /// \param	z 			Z-position nearest to marker to be retrieved
-/// \return	MarkerData 	marker data structure returned - if no marker found structure is marked as invalid by assigning an ID of -1
+/// \returns			marker data structure returned - if no marker found structure is marked as invalid by assigning an ID of -1
 template <typename MarkerType>
 MarkerData* Body<MarkerType>::getMarkerData(double x, double y, double z) {
 
@@ -681,7 +681,7 @@ void Body<MarkerType>::passToVoxelFilter(double x, double y, double z, int marke
 /// \param	y				Y-position of point
 /// \param	z				Z-position of point
 /// \param	curr_mark		ID of the marker
-/// \return true or false
+/// \returns				true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 
@@ -720,7 +720,7 @@ bool Body<MarkerType>::isInVoxel(double x, double y, double z, int curr_mark) {
 /// \param	x				X-position of point
 /// \param	y				Y-position of point
 /// \param	z				Z-position of point
-/// \return true or false
+/// \returns				true or false
 template <typename MarkerType>
 bool Body<MarkerType>::isVoxelMarkerVoxel(double x, double y, double z) {
 
@@ -831,8 +831,8 @@ void Body<MarkerType>::writeVtkPosition(int tval)
 /*********************************************/
 /// \brief	Assigns owning rank of body based on which grids each rank has access to
 ///
-/// \param	id				global body ID
-/// \return rank
+/// \param	id	global body ID
+/// \returns	rank number
 template <typename MarkerType>
 int Body<MarkerType>::assignOwningRank(int id) {
 

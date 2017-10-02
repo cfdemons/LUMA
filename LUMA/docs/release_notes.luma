@@ -1,10 +1,10 @@
-version		=	1.6.0-alpha
+version		=	1.6.0
 
 General		:	Added kernel performance improvements which are especially effective when using BB objects. 
-				As a result, a new filled box point cloud is available to add to the domain to effectively switch off unnecessary fluid sites by turning them solid.
+				A new filled box point cloud is available to add to the domain to effectively switch off unnecessary fluid sites by turning them solid.
 				Changed BC setup to make it more flexible in terms of enumerations. Also added slip BC.
 				Added ability to ramp up the Reynolds number from the beginning of the simulation to mitigate crashes due to initial transients.
-				Parallel IBM enabled.
+				Parallel IBM implemented.
 				Pressure boundary condition added (regularised only).
 				Efficiencies introduced for ramping functions.
 				Moved setBCPrecedence method from utilities to GridObj and renamed.

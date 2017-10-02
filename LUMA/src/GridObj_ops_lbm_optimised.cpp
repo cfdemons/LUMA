@@ -312,7 +312,9 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	tmpVelVector[eZDirection] = uz_in[j] * rampCoefficient;
 
 	// Assign reference density
+#ifdef L_PRESSURE_DELTA
 	tmpDensity = L_RHOIN + GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);
+#endif
 
 
 	/* If it is a corner or an edge then get missing quantity by extrapolating in 

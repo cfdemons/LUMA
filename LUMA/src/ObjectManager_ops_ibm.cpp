@@ -1083,6 +1083,7 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 // *****************************************************************************
 ///	\brief	Spread all the epsilon values to all ranks which own markers
 ///
+///	\param	level		current grid level.
 ///	\param	iBodyTmp	container for all markers in entire simulation
 void ObjectManager::ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp) {
 

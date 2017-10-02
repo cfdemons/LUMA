@@ -390,11 +390,12 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 /*********************************************/
 /// \brief	Custom constructor for building plate
 ///
-/// \param 	g					hierarchy pointer to grid hierarchy
-/// \param 	bodyID				ID of body in array of bodies
-/// \param 	centre				centre point of square
-/// \param 	width_length_depth	dimensions of square
-/// \param 	angles				angle of square
+/// \param 	g			hierarchy pointer to grid hierarchy
+/// \param 	bodyID		ID of body in array of bodies
+/// \param centre		centre point of plate
+/// \param length		length of plate
+/// \param width		width of plate
+/// \param angles		angle of plate
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre,
 	double length, double width, std::vector<double> &angles) {

@@ -374,8 +374,9 @@ void MpiManager::mpi_epsilonCommGather(int level) {
 // *****************************************************************************
 ///	\brief	Do communication required to gather values for universal epsilon calculation
 ///
-///	\param	level			current grid level
-///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation
+///	\param	level			current grid level.
+///	\param	rootRank		rank to which data should be passed.
+///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation.
 void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBodyTmp) {
 
 	// Get object manager instance
@@ -577,7 +578,8 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 // *****************************************************************************
 ///	\brief	Do communication required to send values after universal epsilon calculation
 ///
-///	\param	rootRank		root rank which did the calculation
+///	\param	level			current grid level.
+///	\param	rootRank		root rank which did the calculation.
 ///	\param	iBodyTmp		temporary IBBody which is used for epsilon calculation
 void MpiManager::mpi_uniEpsilonCommScatter(int level, int rootRank, IBBody &iBodyTmp) {
 

@@ -195,9 +195,10 @@ BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 /// \brief 	Custom constructor for building plate
 /// \param g				hierarchy pointer to grid hierarchy
 /// \param bodyID			ID of body in array of bodies.
-/// \param centre_point		centre point of square
-/// \param dimensions		dimensions of square
-/// \param angles			angle of square
+/// \param centre_point		centre point of plate
+/// \param length			length of plate
+/// \param width			width of plate
+/// \param angles			angle of plate
 BFLBody::BFLBody(GridObj* g, int bodyID, std::vector<double> &centre_point,
 	double length, double width, std::vector<double> &angles)
 	: Body(g, bodyID, centre_point, length, width, angles)

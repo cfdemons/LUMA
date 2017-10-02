@@ -6,3 +6,5 @@
 *.user
 *.cd
 **/output_*
+**/html/
+**/latex/

@@ -1758,10 +1758,11 @@ int GridUtils::safeGetRank()
 ///			for each refinement region. The coalesce operation must get the correct
 ///			sub-grid to function properly. For other levels, there is no ambiguity.
 ///			
-/// \param	i	i-index of the coarse site.
-/// \param	j	j-index of the coarse site.
-/// \param	k	k-index of the coarse site.
-///	\returns	a pointer to the sub-grid.
+/// \param	i		i-index of the coarse site.
+/// \param	j		j-index of the coarse site.
+/// \param	k		k-index of the coarse site.
+///	\param	parent	pointer to the parent grid in teh excahange.
+///	\returns		a pointer to the sub-grid.
 GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 {
 	// Create Grid pointer

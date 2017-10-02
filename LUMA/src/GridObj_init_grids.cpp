@@ -1333,9 +1333,9 @@ void GridObj::_LBM_initSetInletProfile()
 ///			This method ensures that velocity BCs are always preserved over slip 
 ///			conditions for example.
 ///
+///	\param	currentBC	BC type already assigned to given site.
 /// \param	desiredBC	new BC type for a given site.
-///	\param	existingBC	BC type already assigned to given site.
-/// \return				permitted BC type for given site.
+/// \returns			permitted BC type for given site.
 eType GridObj::LBM_setBCPrecedence(eType currentBC, eType desiredBC)
 {
 	if (currentBC == eSolid || desiredBC == eSolid) return eSolid;

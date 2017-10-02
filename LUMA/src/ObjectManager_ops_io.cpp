@@ -390,8 +390,10 @@ void ObjectManager::io_readInGeomConfig() {
 				bodyType = eBBBCloud;
 			else if (boundaryType == "BFL")
 				bodyType = eBFLCloud;
-			else if (boundaryType == "IBM")
+			else if (boundaryType == "IBM") {
 				bodyType = eIBBCloud;
+				hasIBMBodies[lev] = true;
+			}
 
 			// Get direction
 			eCartesianDirection scaleDirection;
@@ -528,6 +530,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
+					hasIBMBodies[lev] = true;
 					iBody.emplace_back(g, iBodyID + pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
 				}
 				else if (boundaryType == "BFL") {
@@ -593,6 +596,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
+					hasIBMBodies[lev] = true;
 					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, radius, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
@@ -667,6 +671,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
+					hasIBMBodies[lev] = true;
 					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, dimensions, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {
@@ -745,6 +750,7 @@ void ObjectManager::io_readInGeomConfig() {
 
 				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
 				if (boundaryType == "IBM") {
+					hasIBMBodies[lev] = true;
 					iBody.emplace_back(g, iBodyID + pBodyID, centre_point, length, width, angles, moveProperty);
 				}
 				else if (boundaryType == "BFL") {

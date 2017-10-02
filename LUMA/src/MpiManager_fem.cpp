@@ -123,8 +123,13 @@ void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
+	// Get ranks which exist on this level
+	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
+	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+
 	// Declare send buffers
 	std::vector<int> nMarkersToSend(num_ranks, 0);
+	std::vector<int> nMarkersToSendLev(lev2glob.size(), 0);
 	std::vector<std::vector<int>> sendIDs(num_ranks, std::vector<int>(0));
 	std::vector<std::vector<double>> sendPosAndVel(num_ranks, std::vector<double>());
 
@@ -142,6 +147,7 @@ void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &
 
 					// Increment the number of markers to send to this rank
 					nMarkersToSend[objman->iBody[ib].markers[m].owningRank]++;
+					nMarkersToSendLev[glob2lev[objman->iBody[ib].markers[m].owningRank]]++;
 
 					// Pack body and marker IDs
 					sendIDs[objman->iBody[ib].markers[m].owningRank].push_back(objman->iBody[ib].id);
@@ -161,7 +167,12 @@ void MpiManager::mpi_spreadNewMarkers(int level, std::vector<std::vector<int>> &
 
 	// To an all gather so each rank knows how many markers it is receiving from each of the other ranks
 	std::vector<int> nMarkersToRecv(num_ranks, 0);
-	MPI_Alltoall(&nMarkersToSend.front(), 1, MPI_INT, &nMarkersToRecv.front(), 1, MPI_INT, world_comm);
+	std::vector<int> nMarkersToRecvLev(lev2glob.size(), 0);
+	MPI_Alltoall(&nMarkersToSendLev.front(), 1, MPI_INT, &nMarkersToRecvLev.front(), 1, MPI_INT, lev_comm[level]);
+
+	// Insert into full vector
+	for (int levRank = 0; levRank < lev2glob.size(); levRank++)
+		nMarkersToRecv[lev2glob[levRank]] = nMarkersToRecvLev[levRank];
 
 	// Loop through all sends that are required
 	std::vector<MPI_Request> sendRequests;

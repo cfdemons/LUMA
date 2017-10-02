@@ -221,18 +221,25 @@ void ObjectManager::ibm_initialise() {
 		}
 	}
 
+	// Get number of levels to loop through
+#ifdef L_BUILD_FOR_MPI
+	int levToLoop = MpiManager::getInstance()->rankGrids[MpiManager::getInstance()->my_rank];
+#else
+	int levToLoop = L_NUM_LEVELS+1;
+#endif
+
 	// Build helper classes for MPI comms
 #ifdef L_BUILD_FOR_MPI
-	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_updateMPIComms(lev);
 #endif
 
 	// Compute ds
-	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_computeDs(lev);
 
 	// Find epsilon for the body
-	for (int lev = 0; lev < (L_NUM_LEVELS+1); lev++)
+	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_findEpsilon(lev);
 
 	// Write out epsilon
@@ -793,7 +800,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 
 	// Loop through all iBodys this rank owns
 	for (size_t ib = 0; ib < (*iBodyPtr).size(); ib++) {
-		if ((*iBodyPtr)[ib].owningRank == rank && (*iBodyPtr)[ib].level == level) {
+		if ((*iBodyPtr)[ib].owningRank == rank && (*iBodyPtr)[ib].level == level && (*iBodyPtr)[ib].markers.size() > 0) {
 
 			/* The Reproducing Kernel Particle Method (see Pinelli et al. 2010, JCP) requires suitable weighting
 			to be computed to ensure conservation while using the interpolation functions. Epsilon is this weighting.
@@ -989,7 +996,7 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 
 	// Get the max value across all ranks
 	double resAll;
-	MPI_Allreduce(&res, &resAll, 1, MPI_DOUBLE, MPI_MAX, mpim->world_comm);
+	MPI_Allreduce(&res, &resAll, 1, MPI_DOUBLE, MPI_MAX, mpim->lev_comm[level]);
 
 	// Set to return value
 	res = resAll;
@@ -1037,11 +1044,12 @@ void ObjectManager::ibm_universalEpsilonGather(int level, IBBody &iBodyTmp) {
 
 #ifdef L_BUILD_FOR_MPI
 
-	// Set root rank
-	int rootRank = 0;
-
 	// Get mpi manager instance
 	MpiManager *mpim = MpiManager::getInstance();
+
+	// Set root rank
+	std::vector<int> lev2glob = mpim->mpi_mapCommLevel2Global(level);
+	int rootRank = lev2glob[0];
 
 	// Gather in the data for all markers in the system
 	mpim->mpi_uniEpsilonCommGather(level, rootRank, iBodyTmp);

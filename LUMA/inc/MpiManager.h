@@ -123,6 +123,9 @@ public :
 	MPI_Comm subGrid_comm[1];	// Default to size = 1
 #endif
 	
+	// Communicators for IBM-level specific communications
+	std::vector<MPI_Comm> lev_comm;
+
 	// Commonly used properties of the rank / topology
 	int my_rank;				///< Rank number
 	int num_ranks;				///< Total number of ranks in MPI Cartesian topology
@@ -208,6 +211,10 @@ public :
 	bool mpi_SDCheckDelta(SDData& solutionData, double dh, std::vector<int>& numCores);
 	void mpi_SDCommunicateSolution(SDData& solutionData, double imbalance, double dh);
 	void mpi_setSubGridDepth();										// Method to initialiset eh rankGrids variable
+
+	// Helper functions
+	std::vector<int> mpi_mapCommLevel2Global(int level);				// Map ranks from current level communicator to global rank ID
+	std::vector<int> mpi_mapCommGlobal2Level(int level);				// Map ranks from global communicator to level rank ID
 
 	// Buffer methods
 	void mpi_buffer_pack(int dir, GridObj* const g);		// Pack the buffer ready for data transfer on the supplied grid in specified direction

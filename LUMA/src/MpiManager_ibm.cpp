@@ -381,6 +381,10 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
+	// Get ranks which exist on this level
+	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
+	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+
 	// Initialise values
 	int nMarkersOnThisRank = 0;
 	std::vector<int> deltasPerMarkerOnThisRank;
@@ -402,14 +406,23 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 
 	// Set receive buffer for how many markers on each rank
 	std::vector<int> nMarkersOnEachRank;
-	if (my_rank == rootRank)
-		nMarkersOnEachRank.resize(num_ranks);
+	std::vector<int> nMarkersOnEachRankLev;
+	if (my_rank == rootRank) {
+		nMarkersOnEachRank.resize(num_ranks, 0);
+		nMarkersOnEachRankLev.resize(lev2glob.size(), 0);
+	}
 
 	// Perform gather so root rank knows how many markers on each rank
-	MPI_Gather(&nMarkersOnThisRank, 1, MPI_INT, &nMarkersOnEachRank.front(), 1, MPI_INT, rootRank, world_comm);
+	MPI_Gather(&nMarkersOnThisRank, 1, MPI_INT, &nMarkersOnEachRankLev.front(), 1, MPI_INT, rootRank, lev_comm[level]);
+
+	// Insert into full vector
+	if (my_rank == rootRank) {
+		for (int levRank = 0; levRank < lev2glob.size(); levRank++)
+			nMarkersOnEachRank[lev2glob[levRank]] = nMarkersOnEachRankLev[levRank];
+	}
 
 	// Get number of markers in whole system
-	int nSystemMarkers = std::accumulate(nMarkersOnEachRank.begin(), nMarkersOnEachRank.end(), 0);
+	int nSystemMarkers = std::accumulate(nMarkersOnEachRankLev.begin(), nMarkersOnEachRankLev.end(), 0);
 
 	// Create result and displacement arrays
 	std::vector<int> deltasPerMarkerOnEachRank;
@@ -420,15 +433,15 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 
 		// Resize result vector
 		deltasPerMarkerOnEachRank.resize(nSystemMarkers);
-		markerDisps.resize(num_ranks);
+		markerDisps.resize(lev2glob.size());
 
 		// Calculate block displacements
-		for (int i = 1; i < num_ranks; i++)
-			markerDisps[i] = std::accumulate(nMarkersOnEachRank.begin(), nMarkersOnEachRank.begin()+i, 0);
+		for (int i = 1; i < lev2glob.size(); i++)
+			markerDisps[i] = std::accumulate(nMarkersOnEachRankLev.begin(), nMarkersOnEachRankLev.begin()+i, 0);
 	}
 
 	// Gather so root rank knows how many support sites each markers has
-	MPI_Gatherv(&deltasPerMarkerOnThisRank.front(), nMarkersOnThisRank, MPI_INT, &deltasPerMarkerOnEachRank.front(), &nMarkersOnEachRank.front(), &markerDisps.front(), MPI_INT, rootRank, world_comm);
+	MPI_Gatherv(&deltasPerMarkerOnThisRank.front(), nMarkersOnThisRank, MPI_INT, &deltasPerMarkerOnEachRank.front(), &nMarkersOnEachRankLev.front(), &markerDisps.front(), MPI_INT, rootRank, lev_comm[level]);
 
 	// Declare receive buffer vectors
 	std::vector<int> recvBufferSizes;
@@ -439,17 +452,17 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	if (my_rank == rootRank) {
 
 		// Resize for number of ranks
-		recvBufferSizes.resize(num_ranks, 0);
-		recvBufferDisps.resize(num_ranks, 0);
+		recvBufferSizes.resize(lev2glob.size(), 0);
+		recvBufferDisps.resize(lev2glob.size(), 0);
 
 		// Counter
 		int count = 0;
 
 		// Loop through all ranks and sort out receive buffer
-		for (int fromRank = 0; fromRank < num_ranks; fromRank++) {
+		for (int fromRank = 0; fromRank < lev2glob.size(); fromRank++) {
 
 			// Loop through all markers which exist on this rank
-			for (int m = 0; m < nMarkersOnEachRank[fromRank]; m++) {
+			for (int m = 0; m < nMarkersOnEachRankLev[fromRank]; m++) {
 
 				// Add contribution to buffer size
 				recvBufferSizes[fromRank] += (L_DIMS + 3) + deltasPerMarkerOnEachRank[count] * (L_DIMS + 1);
@@ -460,7 +473,7 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 		}
 
 		// Calculate block displacements
-		for (int i = 1; i < num_ranks; i++)
+		for (int i = 1; i < lev2glob.size(); i++)
 			recvBufferDisps[i] = std::accumulate(recvBufferSizes.begin(), recvBufferSizes.begin()+i, 0);
 
 		// Resize receive buffer
@@ -505,7 +518,7 @@ void MpiManager::mpi_uniEpsilonCommGather(int level, int rootRank, IBBody &iBody
 	// Now send all data to root
 	MPI_Gatherv(&sendBuffer.front(), static_cast<int>(sendBuffer.size()),
 		MPI_DOUBLE, &recvBuffer.front(), &recvBufferSizes.front(), &recvBufferDisps.front(),
-		MPI_DOUBLE, rootRank, world_comm);
+		MPI_DOUBLE, rootRank, lev_comm[level]);
 
 	// Set global values
 	iBodyTmp.owningRank = rootRank;
@@ -780,6 +793,10 @@ void MpiManager::mpi_buildSupportComms(int level) {
 	supportCommMarkerSide[level].clear();
 	supportCommSupportSide[level].clear();
 
+	// Get ranks which exist on this level
+	std::vector<int> lev2glob = mpi_mapCommLevel2Global(level);
+	std::vector<int> glob2lev = mpi_mapCommGlobal2Level(level);
+
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
 
@@ -799,13 +816,20 @@ void MpiManager::mpi_buildSupportComms(int level) {
 
 	// Get how many supports site that need to be received from each rank
 	std::vector<int> nSupportToRecv(num_ranks, 0);
+	std::vector<int> nSupportToRecvLev(lev2glob.size(), 0);
 	for (int i = 0; i < supportCommMarkerSide[level].size(); i++) {
 		nSupportToRecv[supportCommMarkerSide[level][i].rankComm]++;
+		nSupportToRecvLev[glob2lev[supportCommMarkerSide[level][i].rankComm]]++;
 	}
 
 	// Do global comm so that each rank knows how many support sites to send and where
 	std::vector<int> nSupportToSend(num_ranks, 0);
-	MPI_Alltoall(&nSupportToRecv.front(), 1, MPI_INT, &nSupportToSend.front(), 1, MPI_INT, world_comm);
+	std::vector<int> nSupportToSendLev(lev2glob.size(), 0);
+	MPI_Alltoall(&nSupportToRecvLev.front(), 1, MPI_INT, &nSupportToSendLev.front(), 1, MPI_INT, lev_comm[level]);
+
+	// Insert into full vector
+	for (int levRank = 0; levRank < lev2glob.size(); levRank++)
+		nSupportToSend[lev2glob[levRank]] = nSupportToSendLev[levRank];
 
 	// Declare variables for packing positions and body IDs
 	int ib, m, s, toRank;

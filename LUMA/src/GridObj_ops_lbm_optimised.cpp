@@ -286,7 +286,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 {
 	// Declarations
 	std::vector<double> tmpVelVector(3, 0);
-	double tmpDensity;
+	double tmpDensity = L_RHOIN;
 	double normalVelocity;
 	std::vector<int> normalVector(3, 0);
 	eCartesianDirection normalDirection;
@@ -313,7 +313,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 
 	// Assign reference density
 #ifdef L_PRESSURE_DELTA
-	tmpDensity = L_RHOIN + GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);
+	tmpDensity += GridUnits::pd2dlbm(L_PRESSURE_DELTA, this);
 #endif
 
 

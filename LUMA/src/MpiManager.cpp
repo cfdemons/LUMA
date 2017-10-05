@@ -97,7 +97,7 @@ void MpiManager::mpi_init()
 {
 
 	// Create communicator and topology
-	int MPI_periodic[L_DIMS], MPI_reorder;
+	int MPI_periodic[3], MPI_reorder;
 	MPI_reorder = true;
 	dimensions[0] = L_MPI_XCORES;
 	dimensions[1] = L_MPI_YCORES;

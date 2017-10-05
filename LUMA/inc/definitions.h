@@ -157,7 +157,7 @@
 */
 
 // Lattice properties
-#define L_DIMS 3			///< Number of dimensions to the problem
+#define L_DIMS 2			///< Number of dimensions to the problem
 #define L_RESOLUTION 12		///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 5.25e-3	///< The timestep in non-dimensional units
 

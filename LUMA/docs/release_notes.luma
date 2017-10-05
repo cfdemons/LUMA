@@ -1,3 +1,7 @@
+version 	=	1.6.1
+
+Issue #146	:	Fixed bug in MPI manager initialisation that caused an overrun exception.
+
 version		=	1.6.0
 
 General		:	Added kernel performance improvements which are especially effective when using BB objects. 

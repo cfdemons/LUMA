@@ -221,7 +221,7 @@
 *******************************************************************************
 */
 
-// BC types (unspecified is periodic)
+// BC types -- specify site type to be used on each domain face (eFluid implies periodic BC)
 #define L_WALL_LEFT		eFluid		///< BC used on the left of the domain
 #define L_WALL_RIGHT	eFluid		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain

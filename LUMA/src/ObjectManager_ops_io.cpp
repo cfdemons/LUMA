@@ -452,28 +452,30 @@ void ObjectManager::io_readInGeomConfig() {
 		}
 
 		// ** INSERT FILAMENT ** //
-		else if (bodyCase == "FILAMENT")
+		else if (bodyCase == "FILAMENT_ARRAY")
 		{
 
 			// Read in the rest of the data for this case
 			std::string boundaryType; file >> boundaryType;
 			int lev; file >> lev;
 			int reg; file >> reg;
+			int nFil; file >> nFil;
 			double startX; file >> startX;
 			double startY; file >> startY;
 			double startZ; file >> startZ;
+			double spaceX; file >> spaceX;
+			double spaceY; file >> spaceY;
+			double spaceZ; file >> spaceZ;
 			double length; file >> length;
 			double height; file >> height;
 			double depth; file >> depth;
 			double angleVert; file >> angleVert;
 			double angleHorz; file >> angleHorz;
-			std::string nElementsString; file >> nElementsString;
 			std::string flex_rigid; file >> flex_rigid;
+			std::string nElementsString; file >> nElementsString;
 			std::string BC; file >> BC;
 			double density; file >> density;
 			double YoungMod; file >> YoungMod;
-
-			*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
 
 			// Need to shift the body if using walls
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
@@ -485,13 +487,15 @@ void ObjectManager::io_readInGeomConfig() {
 				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
-			std::vector<double> start_position, angles;
+			std::vector<double> start_position, spacing, angles;
 			start_position.push_back(startX + shiftX);
 			start_position.push_back(startY + shiftY);
 			start_position.push_back(startZ + shiftZ);
+			spacing.push_back(spaceX);
+			spacing.push_back(spaceY);
+			spacing.push_back(spaceZ);
 			angles.push_back(angleVert);
 			angles.push_back(angleHorz);
-
 
 			// Check if flexible (note: BFL is always rigid no matter what the input is)
 			eMoveableType moveProperty;
@@ -517,33 +521,49 @@ void ObjectManager::io_readInGeomConfig() {
 			GridUtils::getGrid(_Grids, lev, reg, g);
 
 			// If rank has grid
+			int nElements;
 			if (g != NULL) {
 
 				// Get number of elements to use in FEM
-				int nElements;
 				if (nElementsString == "CONFORMING") {
 					nElements = static_cast<int>(std::floor(length / g->dh));
 				}
 				else {
 					nElements = static_cast<int>(std::stod(nElementsString));
 				}
-
-				// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
-				if (boundaryType == "IBM") {
-					hasIBMBodies[lev] = true;
-					iBody.emplace_back(g, iBodyID + pBodyID, start_position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
-				}
-				else if (boundaryType == "BFL") {
-					pBody.emplace_back(g, iBodyID + pBodyID, start_position, length, angles);
-				}
 			}
-			*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
 
-			// Increment counter
-			if (boundaryType == "IBM")
-				iBodyID++;
-			else if (boundaryType == "BFL")
-				pBodyID++;
+			// Loop through and build bodies
+			std::vector<double> position(3, 0.0);
+			for (int i = 0; i < nFil; i++) {
+
+				*GridUtils::logfile << "Initialising Body " << iBodyID + pBodyID << " (" << boundaryType << ") as a filament..." << std::endl;
+
+				// Only build if this rank has this grid
+				if (g != NULL) {
+
+					// Loop through dimensions
+					for (int d = 0; d < L_DIMS; d++)
+						position[d] = start_position[d] + i * spacing[d];
+
+					// Build either BFL or IBM body constructor (note: most of the actual building takes place in the base constructor)
+					if (boundaryType == "IBM") {
+						hasIBMBodies[lev] = true;
+						iBody.emplace_back(g, iBodyID + pBodyID, position, length, height, depth, angles, moveProperty, nElements, clamped, density, YoungMod);
+					}
+					else if (boundaryType == "BFL") {
+						pBody.emplace_back(g, iBodyID + pBodyID, position, length, angles);
+					}
+				}
+
+				*GridUtils::logfile << "Finished creating Body " << iBodyID + pBodyID << "..." << std::endl;
+
+				// Increment counter
+				if (boundaryType == "IBM")
+					iBodyID++;
+				else if (boundaryType == "BFL")
+					pBodyID++;
+			}
 		}
 
 		// ** INSERT CIRCLE/SPHERE ** //

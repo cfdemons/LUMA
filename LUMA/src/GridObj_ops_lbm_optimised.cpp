@@ -94,6 +94,12 @@ void GridObj::LBM_multi_opt(int subcycle)
 		}
 	}
 
+	// Set post-LBM macros
+	if (objman->hasFlexibleBodies[level]) {
+		u_n = u;
+		rho_n = rho;
+	}
+
 	// Perform IBM steps (interpolate, force calc, spread and update macro)
 	if (objman->hasIBMBodies[level])
 		objman->ibm_apply(this, true);

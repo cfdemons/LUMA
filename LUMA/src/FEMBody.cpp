@@ -625,7 +625,7 @@ void FEMBody::updateFEMNodes () {
 
 // *****************************************************************************
 ///	\brief	Update the new IBMaker data using the FEM data
-void FEMBody::updateIBMarkers() {
+void FEMBody::updateIBMarkers(double relax) {
 
 	// Parameters
 	int el;
@@ -668,7 +668,7 @@ void FEMBody::updateIBMarkers() {
 		for (int d = 0; d < L_DIMS; d++) {
 			iBodyPtr->markers[node].position[d] = iBodyPtr->markers[node].position0[d] + UnodeGlobal[d];
 			iBodyPtr->markers[node].markerVel_km1[d] = iBodyPtr->markers[node].markerVel[d];
-			iBodyPtr->markers[node].markerVel[d] = L_RELAX * UDotNodeGlobal[d] + (1.0 - L_RELAX) * iBodyPtr->markers[node].markerVel_km1[d];
+			iBodyPtr->markers[node].markerVel[d] = relax * UDotNodeGlobal[d] + (1.0 - relax) * iBodyPtr->markers[node].markerVel_km1[d];
 		}
 	}
 }

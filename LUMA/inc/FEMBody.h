@@ -111,7 +111,7 @@ class FEMBody {
 	void constructFVector();									// Construct internal force vector
 	void constructNLStiffMat();									// Construct non-linear stiffness matrix
 	void updateFEMNodes();										// Update the FEM node data using the new displacements
-	void updateIBMarkers();										// Update the IBM markers using new FEM node vales
+	void updateIBMarkers(double relax = L_RELAX);				// Update the IBM markers using new FEM node vales
 	std::vector<double> shapeFunctions(std::vector<double> &vec, double zeta, double length);											// Sum the shape functions to get displacement/velocity
 	void bcFEM(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);			// Apply BCs by removing elements in global matrices
 	void setNewmark(std::vector<std::vector<double>> &M_hat, std::vector<std::vector<double>> &K_hat, std::vector<double> &RmF_hat);	// First step in Newmar-Beta time integration

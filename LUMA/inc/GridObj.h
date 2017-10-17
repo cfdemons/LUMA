@@ -81,6 +81,7 @@ private :
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
 	IVector<double> rho;			///< Macroscopic density
+	IVector<double> rho_n;			///< Macroscopic density at start of current time step
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)

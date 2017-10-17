@@ -25,10 +25,6 @@
 ///	\param	doSubIterate		flag to switch sub-iterations on
 void ObjectManager::ibm_apply(GridObj *g, bool doSubIterate) {
 
-	// Set post-LBM velocities
-	if (hasFlexibleBodies[g->level])
-		g->u_n = g->u;
-
 	// Interpolate the velocity onto the markers
 	ibm_interpolate(g->level);
 
@@ -112,13 +108,15 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 	int it = 0;
 	int MAXIT = 10;
 	double TOL = 1e-4;
-	bool keepLooping = true;
+
+	// TODO This always does at least one loop - pointless
 
 	// Do the while loop for sub iteration
 	do {
 
 		// Reset velocities to start of time step
 		g->u = g->u_n;
+		g->rho = g->rho_n;
 
 		// Reset forces
 		g->_LBM_resetForces();
@@ -132,11 +130,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 		// Increment counter
 		it++;
 
-		// Check while loop parameters
-		if (res < TOL || it > MAXIT)
-			keepLooping = false;
-
-	} while (keepLooping == true);
+	} while (res > TOL && it < MAXIT);
 
 	// Get time averaged sub-iteration values
 	timeav_subResidual *= (g->t % L_OUT_EVERY);
@@ -164,6 +158,9 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 				iBody[ib].fBody->elements[el].angles_n = iBody[ib].fBody->elements[el].angles;
 				iBody[ib].fBody->elements[el].T_n = iBody[ib].fBody->elements[el].T;
 			}
+
+			// Set IB velocities
+			iBody[ib].fBody->updateIBMarkers(1.0);
 
 			// Get time averaged FEM values
 			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);
@@ -979,7 +976,7 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 				velMagDiff = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].markerVel, iBody[ib].markers[m].markerVel_km1));
 
 				// Normalise it
-				velMagDiff = velMagDiff / (iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
+				velMagDiff = velMagDiff / (L_UX0 * iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
 
 				// Get the max difference
 				if (fabs(velMagDiff) > res)

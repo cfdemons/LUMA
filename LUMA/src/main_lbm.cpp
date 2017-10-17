@@ -417,6 +417,18 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
+		if (Grids->t % L_OUT_EVERY_INFO == 0)
+		{
+#ifdef L_BUILD_FOR_MPI
+			MPI_Barrier(mpim->world_comm);
+#endif
+
+#ifdef L_WRITE_TIP_POSITIONS
+			objMan->io_writeTipPositions(Grids->t);
+#endif
+		}
+
+		// Write out here
 		if (Grids->t % L_OUT_EVERY == 0)
 		{
 #ifdef L_BUILD_FOR_MPI
@@ -457,15 +469,10 @@ int main( int argc, char* argv[] )
 			objMan->io_vtkFEMWriter(Grids->t);
 #endif
 
-#ifdef L_WRITE_TIP_POSITIONS
-			objMan->io_writeTipPositions(Grids->t);
-#endif
-
 #if (defined L_IBM_ON && defined L_IBBODY_TRACER)
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
 #endif
-
 		}
 
 		// Completion time

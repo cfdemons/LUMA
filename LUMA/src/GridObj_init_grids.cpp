@@ -263,6 +263,12 @@ void GridObj::LBM_initGrid() {
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
+#ifdef L_IBM_ON
+	// Set start-of-timestep-velocity
+	rho_n.resize(N_lim * M_lim * K_lim);
+	rho_n = rho;
+#endif
+
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
@@ -446,6 +452,12 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
+
+#ifdef L_IBM_ON
+	// Set start-of-timestep-velocity
+	rho_n.resize(N_lim * M_lim * K_lim);
+	rho_n = rho;
+#endif
 
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)

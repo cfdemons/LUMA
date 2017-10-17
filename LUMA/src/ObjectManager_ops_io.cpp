@@ -481,10 +481,16 @@ void ObjectManager::io_readInGeomConfig() {
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
 			if (L_WALL_LEFT == eSolid)
 				shiftX = L_WALL_THICKNESS_LEFT;
+			else if (L_WALL_LEFT == eVelocity)
+				shiftX = 0.5 * L_WALL_THICKNESS_LEFT;
 			if (L_WALL_BOTTOM == eSolid)
 				shiftY = L_WALL_THICKNESS_BOTTOM;
+			else if (L_WALL_BOTTOM == eVelocity)
+				shiftY = 0.5 * L_WALL_THICKNESS_BOTTOM;
 			if (L_WALL_FRONT == eSolid)
 				shiftZ = L_WALL_THICKNESS_FRONT;
+			else if (L_WALL_FRONT == eVelocity)
+				shiftZ = 0.5 * L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> start_position, spacing, angles;

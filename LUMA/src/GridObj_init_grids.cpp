@@ -982,8 +982,17 @@ void GridObj::LBM_initBoundLab ( )
 			{
 				for (k = 0; k < K_lim; k++)
 				{
-					LatTyp(i, j, k, M_lim, K_lim) = 
-						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
+					// Get wall adjusted y value
+					double YPosVal = YPos[j] - 0.5 * L_WALL_THICKNESS_BOTTOM;
+					double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 / L_BLOCK_CHANNEL) + 0.5 * L_WALL_THICKNESS_BOTTOM;
+
+					// Check if still in wall // TODO Check to see if it should be <= or <
+					if (YPosVal <= YPosStart) {
+						LatTyp(i, j, k, M_lim, K_lim) = LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), eVelocity);
+					}
+					else {
+						LatTyp(i, j, k, M_lim, K_lim) = LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
+					}
 				}
 			}
 		}
@@ -1299,19 +1308,47 @@ void GridObj::_LBM_initSetInletProfile()
 	_LBM_initGetInletProfileFromFile();
 
 #elif defined L_PARABOLIC_INLET
-	// Specify as an anlytical parabola
-	double b = GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP;
-	double p = (b + L_WALL_THICKNESS_BOTTOM) / 2.0;
-	double q = b - p;
 
 	// Loop over site positions (for left hand inlet, y positions)
-	for (int j = 0; j < M_lim; j++)
-	{
-		// Set the inlet velocity profile values
-		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1.0 - pow((YPos[j] - p) / q, 2.0));
+	for (int j = 0; j < M_lim; j++) {
+
+		// Set tangential velocities to zero
 		uy_in[j] = 0.0;
 		uz_in[j] = 0.0;
+
+		// Block channel geometries
+		double R = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 - 1.0 / L_BLOCK_CHANNEL) / 2.0;
+		double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 / L_BLOCK_CHANNEL);
+
+		// Get wall adjusted y value
+		double YPosVal = YPos[j] - 0.5 * L_WALL_THICKNESS_BOTTOM;
+
+		// Check where on wall we are
+		if (YPosVal < YPosStart) {
+
+			// If it in wall then set velocity to zero
+			ux_in[j] = 0.0;
+		}
+		else {
+
+			// Set parabolic profile
+			ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1.0 - pow((YPosVal - YPosStart - R) / R, 2.0));
+		}
 	}
+
+//	// Specify as an anlytical parabola
+//	double b = GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP;
+//	double p = (b + L_WALL_THICKNESS_BOTTOM) / 2.0;
+//	double q = b - p;
+//
+//	// Loop over site positions (for left hand inlet, y positions)
+//	for (int j = 0; j < M_lim; j++)
+//	{
+//		// Set the inlet velocity profile values
+//		ux_in[j] = GridUnits::ud2ulbm(1.5 * L_UX0, this) * (1.0 - pow((YPos[j] - p) / q, 2.0));
+//		uy_in[j] = 0.0;
+//		uz_in[j] = 0.0;
+//	}
 
 #else
 

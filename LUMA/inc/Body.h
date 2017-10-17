@@ -145,7 +145,8 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 	this->level = _Owner->level;
 
 	// Set the rank which owns this body
-	this->owningRank = assignOwningRank(id);
+//	this->owningRank = assignOwningRank(id);
+	this->owningRank = GridUtils::getRankfromPosition(start_position);
 
 	// Get horizontal and vertical angles
 	double body_angle_v = angles[0];

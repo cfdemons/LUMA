@@ -330,7 +330,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	if (edgeCount > 1)
 	{
 		// Do not extrapolate on recv layers
-		if (!GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
+		if (i != 0 && i != N_lim-1 && j != 0 && j != M_lim-1)
 		{
 			if (type == ePressure)
 			{

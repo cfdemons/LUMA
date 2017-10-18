@@ -374,7 +374,7 @@ void ObjectManager::ibm_findSupport(int ib) {
 						(fabs(iBody[ib].markers[m].position[eZDirection] - estimated_position[eZDirection]) / iBody[ib]._Owner->dh
 						< 1.5 * iBody[ib].markers[m].dilation)
 #endif
-						)
+						&& GridUtils::isWithinDomain(estimated_position))
 					{
 
 						// Skip the nearest as already added when marker constructed

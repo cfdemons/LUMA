@@ -619,7 +619,7 @@ void GridObj::_LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z) {
 // *****************************************************************************
 /// \brief	Optimised equilibrium calculation.
 ///
-///			Computes the equilibrium distribution in direction supplied at the 
+///			Computes the incompressible equilibrium distribution in direction supplied at the 
 ///			given lattice site and returns the value.
 ///
 /// \param id	flattened ijk index.
@@ -654,7 +654,7 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 
 
 	// Compute f^eq
-	return rho[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
+	return w[v] * (rho[id] + L_RHOIN*(A / SQ(cs)) + L_RHOIN*(B / (2.0 * SQ(cs)*SQ(cs))));
 
 }
 
@@ -787,11 +787,11 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 #endif
 #endif
 
-		// Divide by rho to get velocity
-		u[0 + id * L_DIMS] = rhouX_temp / rho_temp;
-		u[1 + id * L_DIMS] = rhouY_temp / rho_temp;
+		// Divide by rho_0 to get velocity
+		u[0 + id * L_DIMS] = rhouX_temp / L_RHOIN;
+		u[1 + id * L_DIMS] = rhouY_temp / L_RHOIN;
 #if (L_DIMS == 3)
-		u[2 + id * L_DIMS] = rhouZ_temp / rho_temp;
+		u[2 + id * L_DIMS] = rhouZ_temp / L_RHOIN;
 #endif
 
 		// Assign density

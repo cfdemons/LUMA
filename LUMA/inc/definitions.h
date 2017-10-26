@@ -73,12 +73,12 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1200				///< How many timesteps before whole grid output
-#define L_OUT_EVERY_INFO 20				///< How many timesteps before writing out some info
-#define L_OUT_EVERY_FORCES 1200			///< Specific output frequency of body forces
+#define L_OUT_EVERY 1				///< How many timesteps before whole grid output
+#define L_OUT_EVERY_INFO 1				///< How many timesteps before writing out some info
+#define L_OUT_EVERY_FORCES L_OUT_EVERY			///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10			///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ 99999999999	///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 99999999999	///< Write out frequency of probe output
@@ -127,7 +127,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1200000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 20		///< Number of time steps to run simulation for
 
 
 /*
@@ -163,7 +163,7 @@
 #define L_TIMESTEP 5e-5			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX (2.0055 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))		///< End of domain in X (non-dimensional units)
+#define L_BX (0.01 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))		///< End of domain in X (non-dimensional units)
 #define L_BY (0.06 + 0.5*(L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))		///< End of domain in Y (non-dimensional units)
 #define L_BZ 3.14		///< End of domain in Z (non-dimensional units)
 

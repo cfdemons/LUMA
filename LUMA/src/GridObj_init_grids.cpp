@@ -78,7 +78,7 @@ void GridObj::LBM_initVelocity()
 			for (int k = 0; k < K_lim; k++) {
 
 #ifdef L_NO_FLOW
-				if (LatTyp(i, j, k, M_lim, K_lim) != eVelocity)
+				if (1 == 1)
 				{
 					for (size_t d = 0; d < L_DIMS; d++)
 					{
@@ -253,21 +253,17 @@ void GridObj::LBM_initGrid() {
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 	
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
-#endif
 
 	// Density field
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	rho_n.resize(N_lim * M_lim * K_lim);
 	rho_n = rho;
-#endif
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
@@ -444,20 +440,16 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	LBM_initVelocity();
 
 	// Set start-of-timestep-velocity
-#ifdef L_IBM_ON
 	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
-#endif
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	rho_n.resize(N_lim * M_lim * K_lim);
 	rho_n = rho;
-#endif
 
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)

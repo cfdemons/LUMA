@@ -151,6 +151,7 @@ public :
 	void io_probeOutput();						// Output routine for point probes
 	void io_lite(double tval, std::string Tag);	// Generic writer to individual files with Tag
 	int io_hdf5(double tval);					// HDF5 writer returning integer to indicate success or failure
+	void writeVTK(int tval);					// HDF5 writer returning integer to indicate success or failure
 
 private :
 

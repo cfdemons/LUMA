@@ -780,6 +780,63 @@ void GridObj::io_lite(double tval, std::string TAG) {
 
 }
 
+// Write out fluid to VTK file
+void GridObj::writeVTK(int t) {
+
+	// Create file
+	ofstream output;
+	output.open(GridUtils::path_str + "/fluidLUMA_t" + std::to_string(t) + ".vtk");
+	output.precision(L_OUTPUT_PRECISION);
+
+	// Write VTK header
+	output << "# vtk DataFile Version 3.0\n";
+	output << "FLUID\n";
+	output << "ASCII\n";
+	output << "DATASET RECTILINEAR_GRID\n";
+	output << "DIMENSIONS " << N_lim << " " << M_lim << " 1\n";
+
+	// Write out x-coordinates
+	output << "X_COORDINATES " << N_lim << " double\n";
+	for (int i = 0; i < N_lim; i++)
+		output << i * dh << " ";
+
+	// Write out y-coordinates
+	output << endl;
+	output << "Y_COORDINATES " << M_lim << " double\n";
+	for (int j = 0; j < M_lim; j++)
+		output << j * dh << " ";
+
+	// Write out z-coordinates
+	output << endl;
+	output << "Z_COORDINATES " << 1 << " double\n";
+	output << 0 << "\n";
+
+	// Point data
+	output << "POINT_DATA " << N_lim * M_lim << "\n";
+
+	// Write density
+	output << "SCALARS Density double 1\n";
+	output << "LOOKUP_TABLE default\n";
+	for (int j = 0; j < M_lim; j++) {
+		for (int i = 0; i < N_lim; i++) {
+			int id = i * M_lim + j;
+			output << rho[id] * L_PHYSICAL_RHO << "\n";
+		}
+	}
+
+	// Write density
+	output << "VECTORS Velocity double\n";
+	for (int j = 0; j < M_lim; j++) {
+		for (int i = 0; i < N_lim; i++) {
+			int id = i * M_lim + j;
+			output << u[id * L_DIMS + 0] * (dh / dt) << " " << u[id * L_DIMS + 1] * (dh / dt) << " 0\n";
+		}
+	}
+
+	// Close file
+	output.close();
+}
+
 // *****************************************************************************
 /// \brief	HDF5 writer.
 ///

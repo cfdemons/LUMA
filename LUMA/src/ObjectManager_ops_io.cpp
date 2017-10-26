@@ -1229,8 +1229,8 @@ void ObjectManager::io_writeTipPositions(int tval) {
 		int idx = static_cast<int>(iBody[ib].markers.size()) - 1;
 
 		// Write out data
-		fout << tval << "\t" << tval * _Grids->dt << "\t" << iBody[ib].markers[idx].position[eXDirection] << "\t"
-														  << iBody[ib].markers[idx].position[eYDirection] << "\t"
+		fout << tval << "\t" << tval * _Grids->dt << "\t" << iBody[ib].markers[idx].position[eXDirection]-0.0005 << "\t"
+														  << iBody[ib].markers[idx].position[eYDirection]-0.0005 << "\t"
 														  << iBody[ib].markers[idx].position[eZDirection] << std::endl;
 
 		// Close file

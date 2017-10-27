@@ -341,7 +341,7 @@ int main( int argc, char* argv[] )
 #ifdef L_HDF5_OUTPUT
 	*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
 	Grids->io_hdf5(Grids->t);
-	Grids->writeVTK(Grids->t);
+//	Grids->writeVTK(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE
@@ -458,7 +458,7 @@ int main( int argc, char* argv[] )
 #ifdef L_HDF5_OUTPUT
 			*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
 			Grids->io_hdf5(Grids->t);
-			Grids->writeVTK(Grids->t);
+//			Grids->writeVTK(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE

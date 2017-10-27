@@ -76,8 +76,8 @@
 //#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 1000				///< How many timesteps before whole grid output
-#define L_OUT_EVERY_INFO 100				///< How many timesteps before writing out some info
+#define L_OUT_EVERY 10				///< How many timesteps before whole grid output
+#define L_OUT_EVERY_INFO 1				///< How many timesteps before writing out some info
 #define L_OUT_EVERY_FORCES L_OUT_EVERY			///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10			///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ 99999999999	///< Frequency of write out of restart file
@@ -127,7 +127,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
 
 
 /*
@@ -137,8 +137,8 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 24		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
@@ -163,7 +163,7 @@
 #define L_TIMESTEP 5e-5			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX (0.01 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))		///< End of domain in X (non-dimensional units)
+#define L_BX (0.06 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))		///< End of domain in X (non-dimensional units)
 #define L_BY (0.06 + 0.5*(L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))		///< End of domain in Y (non-dimensional units)
 #define L_BZ 3.14		///< End of domain in Z (non-dimensional units)
 
@@ -202,12 +202,12 @@
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 //#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //

@@ -58,7 +58,7 @@ and then LUMA can be built using the command
 
 ```
 #!c++
-mpiCC -w -std=c++11 -I$HDF5DIR/include src/*.cpp -o luma -L$HDF5DIR/lib -lhdf5
+mpiCC -w -std=c++11 -I$HDF5DIR/include  src/*.cpp  -o LUMA  -L$HDF5DIR/lib -lhdf5 –llapack
 ```
 
 Any questions contact Adrian.

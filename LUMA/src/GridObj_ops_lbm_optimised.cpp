@@ -29,6 +29,9 @@
 void GridObj::LBM_multi_opt(int subcycle)
 {
 
+	// Increment internal loop counter
+	++t;
+
 	// Set start of timestep values
 	u_n = u;
 	rho_n = rho;
@@ -157,9 +160,6 @@ void GridObj::LBM_multi_opt(int subcycle)
 		objman->toggleDebugStream(this);
 	}
 #endif
-
-	// Increment internal loop counter
-	++t;
 
 	// Get time of loop
 	secs = clock() - t_start;

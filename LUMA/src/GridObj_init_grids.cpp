@@ -208,9 +208,9 @@ void GridObj::LBM_initGrid() {
 	LBM_initPositionVector(0.0, gm->global_edges[eZMax][0], eZDirection);
 #endif
 
-//	if (GridUtils::safeGetRank() == 2) {
+//	if (GridUtils::safeGetRank() == 0) {
 //		for (auto x : XPos)
-//			std::cout << std::setprecision(32) << x << std::endl;
+//			std::cout << std::setprecision(16) << x << std::endl;
 //		exit(0);
 //	}
 

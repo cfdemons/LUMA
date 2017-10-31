@@ -71,10 +71,26 @@ void ObjectManager::ibm_moveBodies(int level) {
 			iBody[ib].fBody->dynamicFEM();
 	}
 
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].markerVel[0] << "\t" << iBody[0].markers[m].markerVel[1] << "\t" << iBody[0].markers[m].markerVel_km1[0] << "\t" << iBody[0].markers[m].markerVel_km1[1] << std::endl;
+//		}
+//		exit(0);
+//	}
+
 	// Update IBM markers
 #ifdef L_BUILD_FOR_MPI
 	ibm_updateMarkers(level);
 #endif
+
+//	if (GridUtils::safeGetRank() == 2 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].markerVel[0] << "\t" << iBody[0].markers[m].markerVel[1] << "\t" << iBody[0].markers[m].markerVel_km1[0] << "\t" << iBody[0].markers[m].markerVel_km1[1] << std::endl;
+//		}
+//		exit(0);
+//	}
 
 	// Loop through flexible bodies and update the support points for all valid markers existing on this rank
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
@@ -83,6 +99,15 @@ void ObjectManager::ibm_moveBodies(int level) {
 		if (iBody[ib]._Owner->level == level && iBody[ib].isFlexible)
 			ibm_findSupport(static_cast<int>(ib));
 	}
+
+//	if (GridUtils::safeGetRank() == 2 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			for (int s = 0; s < iBody[0].markers[m].deltaval.size(); s++)
+//				std::cout << std::setprecision(16) << iBody[0].markers[m].id << "\t" << iBody[0].markers[m].supp_x[s] << "\t" << iBody[0].markers[m].supp_y[s] << "\t" << iBody[0].markers[m].support_rank[s] << "\t" << iBody[0].markers[m].deltaval[s] << std::endl;
+//		}
+//		exit(0);
+//	}
 
 	// Update MPI comm vector
 #ifdef L_BUILD_FOR_MPI
@@ -94,6 +119,14 @@ void ObjectManager::ibm_moveBodies(int level) {
 
 	// Find epsilon for the body
 	ibm_findEpsilon(level);
+
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (int m = 0; m < iBody[0].markers.size(); m++) {
+//			std::cout << std::setprecision(16) << iBody[0].markers[m].id << "\t" << iBody[0].markers[m].ds << "\t" << iBody[0].markers[m].epsilon << std::endl;
+//		}
+//		exit(0);
+//	}
 }
 
 
@@ -571,12 +604,45 @@ void ObjectManager::ibm_interpolate(int level) {
 	ibm_interpolateOffRankVels(level);
 #endif
 
-//	if (rank == 0 && iBody[0]._Owner->t == 130) {
-//		for (auto m : iBody[0].validMarkers) {
-//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].interpMom[0] << "\t" << iBody[0].markers[m].interpMom[1] << "\t" << iBody[0].markers[m].interpRho << std::endl;
+	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+
+		static int count = -1;
+		count++;
+
+//		if (count == 1) {
+//			std::cout << std::endl;
+//			for (auto m : iBody[0].validMarkers)
+//				std::cout << std::setprecision(16) << iBody[0].markers[m].id << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].interpMom[0] << "\t" << iBody[0].markers[m].interpMom[1] << "\t" << iBody[0].markers[m].interpRho << std::endl;
+//			exit(0);
 //		}
-//		exit(0);
-//	}
+
+//		if (count == 1) {
+//			std::cout << std::endl;
+//			for (auto m : iBody[0].validMarkers) {
+//				for (size_t s = 0; s < iBody[0].markers[m].deltaval.size(); s++) {
+//					if (GridUtils::safeGetRank() == iBody[0].markers[m].support_rank[s]) {
+//						int i = iBody[0].markers[m].supp_i[s];
+//						int j = iBody[0].markers[m].supp_j[s];
+//						size_t M_lim = iBody[0]._Owner->M_lim;
+//						std::cout << std::setprecision(16) << iBody[0].markers[m].id << "\t" << s << "\t" << iBody[0]._Owner->u(i, j, 0, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->u(i, j, 1, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->rho(i, j, M_lim) << "\t" << iBody[0].markers[m].deltaval[s] << std::endl;
+//					}
+//				}
+//			}
+//			exit(0);
+//		}
+
+		if (count == 1) {
+			std::cout << std::endl;
+			MpiManager *mpim = MpiManager::getInstance();
+			for (int s = 0; s < mpim->supportCommSupportSide[level].size(); s++) {
+				int i = mpim->supportCommSupportSide[level][s].supportIdx[0];
+				int j = mpim->supportCommSupportSide[level][s].supportIdx[1];
+				size_t M_lim = iBody[0]._Owner->M_lim;
+				std::cout << std::setprecision(16) << iBody[0]._Owner->u(i, j, 0, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->u(i, j, 1, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->rho(i, j, M_lim) << std::endl;
+			}
+			exit(0);
+		}
+	}
 
 	// Write out interpolate velocity
 #ifdef L_IBM_DEBUG
@@ -610,6 +676,14 @@ void ObjectManager::ibm_computeForce(int level) {
 			}
 		}
 	}
+
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].force_xyz[0] << "\t" << iBody[0].markers[m].force_xyz[1] << std::endl;
+//		}
+//		exit(0);
+//	}
 }
 
 
@@ -675,6 +749,35 @@ void ObjectManager::ibm_spread(int level) {
 #ifdef L_BUILD_FOR_MPI
 	ibm_spreadOffRankForces(level);
 #endif
+
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			for (size_t s = 0; s < iBody[0].markers[m].deltaval.size(); s++) {
+//				if (GridUtils::safeGetRank() == iBody[0].markers[m].support_rank[s]) {
+//					int i = iBody[0].markers[m].supp_i[s];
+//					int j = iBody[0].markers[m].supp_j[s];
+//					int k = iBody[0].markers[m].supp_k[s];
+//					size_t M_lim = iBody[0]._Owner->M_lim;
+//					size_t K_lim = iBody[0]._Owner->K_lim;
+//					std::cout << std::setprecision(16) << m << "\t" << s << "\t" << iBody[0]._Owner->force_xyz(i, j, k, 0, M_lim, K_lim, L_DIMS) << "\t" << iBody[0]._Owner->force_xyz(i, j, k, 1, M_lim, K_lim, L_DIMS) << std::endl;
+//				}
+//			}
+//		}
+//		exit(0);
+//	}
+
+//	if (GridUtils::safeGetRank() == 2 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		MpiManager *mpim = MpiManager::getInstance();
+//		for (int i = 0; i < mpim->supportCommSupportSide[level].size(); i++) {
+//			std::vector<int> suppIdx = mpim->supportCommSupportSide[level][i].supportIdx;
+//			size_t M_lim = iBody[0]._Owner->M_lim;
+//			size_t K_lim = iBody[0]._Owner->K_lim;
+//			std::cout << std::setprecision(16) << iBody[0]._Owner->force_xyz(suppIdx[eXDirection], suppIdx[eYDirection], suppIdx[eZDirection], 0, M_lim, K_lim, L_DIMS) << "\t" << iBody[0]._Owner->force_xyz(suppIdx[eXDirection], suppIdx[eYDirection], suppIdx[eZDirection], 1, M_lim, K_lim, L_DIMS) << std::endl;
+//		}
+//		exit(0);
+//	}
 
 	// Write out the spread force
 #ifdef L_IBM_DEBUG
@@ -762,6 +865,32 @@ void ObjectManager::ibm_updateMacroscopic(int level) {
 		}
 	}
 #endif
+
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		for (auto m : iBody[0].validMarkers) {
+//			for (size_t s = 0; s < iBody[0].markers[m].deltaval.size(); s++) {
+//				if (GridUtils::safeGetRank() == iBody[0].markers[m].support_rank[s]) {
+//					int i = iBody[0].markers[m].supp_i[s];
+//					int j = iBody[0].markers[m].supp_j[s];
+//					size_t M_lim = iBody[0]._Owner->M_lim;
+//					std::cout << std::setprecision(16) << m << "\t" << s << "\t" << iBody[0]._Owner->u(i, j, 0, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->u(i, j, 1, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->rho(i, j, M_lim) << std::endl;
+//				}
+//			}
+//		}
+//		exit(0);
+//	}
+
+//	if (GridUtils::safeGetRank() == 2 && iBody[0]._Owner->t == 171) {
+//		std::cout << std::endl;
+//		MpiManager *mpim = MpiManager::getInstance();
+//		for (int i = 0; i < mpim->supportCommSupportSide[level].size(); i++) {
+//			std::vector<int> suppIdx = mpim->supportCommSupportSide[level][i].supportIdx;
+//			size_t M_lim = iBody[0]._Owner->M_lim;
+//			std::cout << std::setprecision(16) << iBody[0]._Owner->u(suppIdx[eXDirection], suppIdx[eYDirection], 0, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->u(suppIdx[eXDirection], suppIdx[eYDirection], 1, M_lim, L_DIMS) << "\t" << iBody[0]._Owner->rho(suppIdx[eXDirection], suppIdx[eYDirection], M_lim) << std::endl;
+//		}
+//		exit(0);
+//	}
 }
 
 

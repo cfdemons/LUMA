@@ -148,13 +148,15 @@ void ObjectManager::ibm_updateMarkers(int level) {
 			// Loop through all markers and assign rank
 			for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
 				iBody[ib].markers[m].owningRank = GridUtils::getRankfromPosition(iBody[ib].markers[m].position);
-
-//				if (iBody[ib]._Owner->t == 130) {
-//					std::cout << std::setprecision(16) << m << "\t" << iBody[ib].markers[m].position[0] << "\t" << iBody[ib].markers[m].owningRank << std::endl;
-//				}
 			}
 		}
 	}
+
+//	if (GridUtils::safeGetRank() == 0 && iBody[0]._Owner->t == 131) {
+//		for (size_t m = 0; m < iBody[0].markers.size(); m++)
+//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].owningRank << std::endl;
+//		exit(0);
+//	}
 
 	// Vectors of received markers
 	std::vector<std::vector<int>> markerIDs(iBody.size(), std::vector<int>(0));

@@ -136,7 +136,7 @@ void GridObj::LBM_initRho() {
 			for (int k = 0; k < K_lim; k++) {
 
 				// Uniform Density
-				rho(i,j,k,M_lim,K_lim) = 0.0;
+				rho(i,j,k,M_lim,K_lim) = L_RHOIN;
 			}
 		}
 	}

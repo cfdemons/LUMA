@@ -73,10 +73,10 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 20									///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1000									///< How many timesteps before whole grid output
 #define L_OUT_EVERY_FORCES 20							///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
@@ -85,7 +85,7 @@
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -101,20 +101,20 @@
 #define L_PROBE_MAX_Z 0.0									///< End position of probe array in Z direction
 
 // Forcing
-//#define L_GRAVITY_ON						///< Turn on gravity force
+#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 2.986e-4
+#define L_GRAVITY_FORCE 0.0003944
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
-//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
-//#define L_USE_BGKSMAG
-#define L_CSMAG 0.1
+#define L_USE_BGKSMAG
+#define L_CSMAG 0.3
 
 /// Compute the time-averaged values of velocity, density and the velocity products.
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 40000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 3000				///< Number of time steps to run simulation for
 
 
 /*
@@ -138,7 +138,7 @@
 // MPI Data
 #define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 12		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
@@ -157,17 +157,17 @@
 */
 
 // Lattice properties
-#define L_DIMS 2													///< Number of dimensions to the problem
-#define L_RESOLUTION 200											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.00045											///< The timestep in non-dimensional units
+#define L_DIMS 3													///< Number of dimensions to the problem
+#define L_RESOLUTION 5											///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.04											///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.5															///< End of domain in X (non-dimensional units)
-#define L_BY (0.41 + (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
+#define L_BX 4.0															///< End of domain in X (non-dimensional units)
+#define L_BY 3.0		///< End of domain in Y (non-dimensional units)
+#define L_BZ 4.0															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 3.86		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
 #define L_PHYSICAL_RHO 1000.0		///< Reference density in physical units
@@ -181,7 +181,7 @@
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
-#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
+//#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -190,7 +190,7 @@
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 1.0/0.000261	///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 
@@ -202,11 +202,11 @@
 
 // General //
 #define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
-#define L_IBM_ON						///< Turn on IBM
+//#define L_IBM_ON						///< Turn on IBM
 #define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
@@ -222,17 +222,17 @@
 */
 
 // BC types (unspecified is periodic)
-#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
-#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
+#define L_WALL_LEFT		eFluid		///< BC used on the left of the domain
+#define L_WALL_RIGHT	eFluid		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
 #define L_WALL_TOP		eSolid			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
 
 // BC qualifiers
-#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
-#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
+//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+//#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall

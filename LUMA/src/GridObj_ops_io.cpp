@@ -382,9 +382,9 @@ void GridObj::_io_fgaout(int timeStepL0) {
 // *****************************************************************************
 /// \brief	Restart file read-writer.
 ///
-///			This routine writes/reads the current rank's data in the custom restart 
-///			file format. If the file already exists, data is appended. IB body data
-///			are also written out but no other body information at present. 
+///			This routine writes/reads the current rank's particle distribution functions
+///			in the custom restart file format. If the file already exists, data is appended. 
+///			IB body data are also written out but no other body information at present. 
 ///
 /// \param IO_flag	flag to indicate whether a write or read
 void GridObj::io_restart(eIOFlag IO_flag) {
@@ -440,13 +440,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 						file << f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << "\t";
 					}
 
-					// u values
-					for (v = 0; v < L_DIMS; v++) {
-						file << u(i,j,k,v,M_lim,K_lim,L_DIMS) << "\t";
-					}
-
-					// rho value
-					file << rho(i,j,k,M_lim,K_lim) << std::endl;
+					file << std::endl;
 
 				}
 			}
@@ -530,15 +524,14 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			// Read in f values
 			for (v = 0; v < L_NUM_VELS; v++) {
 				iss >> g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
+				g->fNew = g->f;
 			}
 
-			// Read in u values
-			for (v = 0; v < L_DIMS; v++) {
-				iss >> g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS);
-			}
+			// Calculate the velocities and densities from the distribution functions
+			// I don't know the cell type, so I will assume it is a fluid so it calculates the macroscopic quantities.
+			int id = k + j * K_lim + i * K_lim * M_lim;
+			_LBM_macro_opt(i, j, k, id, eFluid);
 
-			// Read in rho value
-			iss >> g->rho(i, j, k, g->M_lim, g->K_lim);
 
 		}
 

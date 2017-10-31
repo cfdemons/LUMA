@@ -73,10 +73,10 @@
 */
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 10				///< How many timesteps before whole grid output
+#define L_OUT_EVERY 1					///< How many timesteps before whole grid output
 #define L_OUT_EVERY_INFO 1				///< How many timesteps before writing out some info
 #define L_OUT_EVERY_FORCES L_OUT_EVERY			///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10			///< Precision of output (for text writers)
@@ -127,7 +127,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 1000		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 500		///< Number of time steps to run simulation for
 
 
 /*
@@ -202,12 +202,12 @@
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the bodies to a VTK file
 
 // IBM //
-//#define L_IBM_ON						///< Turn on IBM
+#define L_IBM_ON						///< Turn on IBM
 //#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
@@ -223,10 +223,10 @@
 */
 
 // BC types (unspecified is periodic)
-#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
-#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eVelocity		///< BC used on the bottom of the domain
-#define L_WALL_TOP		eVelocity		///< BC used on the top of the domain
+//#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
+//#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
+//#define L_WALL_BOTTOM	eVelocity		///< BC used on the bottom of the domain
+//#define L_WALL_TOP		eVelocity		///< BC used on the top of the domain
 #define L_WALL_FRONT	eSolid			///< BC used on the front of the domain
 #define L_WALL_BACK		eSolid			///< BC used on the bottom of the domain
 #define L_BLOCK_CHANNEL 3				///< Blockage ratio

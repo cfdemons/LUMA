@@ -827,6 +827,13 @@ int GridUtils::getRankfromPosition(std::vector<double> &position) {
 	// Get MPI Manager instance
 	MpiManager *mpim = MpiManager::getInstance();
 
+//	if (mpim->my_rank == 3) {
+//
+//		std::cout << std::setprecision(16) << mpim->rank_core_edge[eXMin][mpim->my_rank] << " " << mpim->rank_core_edge[eXMax][mpim->my_rank] << std::endl;
+//
+//		exit(0);
+//	}
+
 	// Loop through all ranks
 	int rank;
 	for (rank = 0; rank < mpim->num_ranks; rank++) {

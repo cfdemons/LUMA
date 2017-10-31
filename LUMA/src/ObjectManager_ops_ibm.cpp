@@ -160,7 +160,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 			}
 
 			// Set IB velocities
-			iBody[ib].fBody->updateIBMarkers(1.0);
+//			iBody[ib].fBody->updateIBMarkers(1.0);
 
 			// Get time averaged FEM values
 			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);
@@ -566,12 +566,17 @@ void ObjectManager::ibm_interpolate(int level) {
 		}
 	}
 
-
-
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
 	ibm_interpolateOffRankVels(level);
 #endif
+
+//	if (rank == 0 && iBody[0]._Owner->t == 130) {
+//		for (auto m : iBody[0].validMarkers) {
+//			std::cout << std::setprecision(16) << m << "\t" << iBody[0].markers[m].position[0] << "\t" << iBody[0].markers[m].position[1] << "\t" << iBody[0].markers[m].interpMom[0] << "\t" << iBody[0].markers[m].interpMom[1] << "\t" << iBody[0].markers[m].interpRho << std::endl;
+//		}
+//		exit(0);
+//	}
 
 	// Write out interpolate velocity
 #ifdef L_IBM_DEBUG

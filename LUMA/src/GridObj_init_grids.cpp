@@ -83,7 +83,7 @@ void GridObj::LBM_initVelocity()
 					for (size_t d = 0; d < L_DIMS; d++)
 					{
 						// No flow case
-						u(i,j,k,d,M_lim,K_lim,L_DIMS) = 0.0;
+						u(i,j,k,d,M_lim,K_lim,L_DIMS) = L_UX0 * dt / dh;
 					}
 				}
 
@@ -207,6 +207,12 @@ void GridObj::LBM_initGrid() {
 #else
 	LBM_initPositionVector(0.0, gm->global_edges[eZMax][0], eZDirection);
 #endif
+
+//	if (GridUtils::safeGetRank() == 2) {
+//		for (auto x : XPos)
+//			std::cout << std::setprecision(32) << x << std::endl;
+//		exit(0);
+//	}
 
 #else
 	// When not builiding for MPI positions can be built from global edges directly
@@ -956,6 +962,7 @@ void GridObj::LBM_initBoundLab ( )
 
 	// LEFT WALL //
 
+#ifdef L_WALL_LEFT
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++)
 	{
@@ -973,9 +980,11 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// RIGHT WALL //
 
+#ifdef L_WALL_RIGHT
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++)
 	{
@@ -1001,6 +1010,7 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 #if (L_DIMS == 3)
 
@@ -1042,6 +1052,7 @@ void GridObj::LBM_initBoundLab ( )
 
 	// BOTTOM WALL //
 
+#ifdef L_WALL_BOTTOM
 	for (j = 0; j < M_lim; j++)
 	{
 		if (YPos[j] <= L_WALL_THICKNESS_BOTTOM)
@@ -1056,9 +1067,11 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// TOP WALL //
 
+#ifdef L_WALL_TOP
 	for (j = 0; j < M_lim; j++)
 	{
 		if (YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
@@ -1073,7 +1086,7 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
+#endif
 }
 
 // ****************************************************************************

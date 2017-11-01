@@ -993,9 +993,9 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	// Write out the points after scaling, shifting and filtering
 #ifdef L_CLOUD_DEBUG
 	if (!_PCpts->x.empty()) {
-		if (rank == 0) {
+		if (GridUtils::safeGetRank() == 0) {
 			std::ofstream fileout;
-			fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(rank) + ".out", std::ios::out);
+			fileout.open(GridUtils::path_str + "/CloudPts_Body" + std::to_string(geom->bodyID) + "_Rank" + std::to_string(GridUtils::safeGetRank()) + ".out", std::ios::out);
 			for (size_t i = 0; i < _PCpts->x.size(); i++) {
 				fileout << std::to_string(_PCpts->x[i]) + '\t' + std::to_string(_PCpts->y[i]) + '\t' + std::to_string(_PCpts->z[i]) + '\t' + std::to_string(_PCpts->id[i]);
 				fileout << std::endl;

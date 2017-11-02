@@ -195,15 +195,29 @@ void GridObj::LBM_initGrid() {
 #endif
 	
 
-	// L0 lattice site POSITION VECTORS
+	// L0 lattice site POSITION VECTORS //
 
 #ifdef L_BUILD_FOR_MPI
 	
 	// Create position vectors using receiver layers as reference positions for wrapping
-	LBM_initPositionVector(mpim->recv_layer_pos.X[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.X[eRightMax] - dh / 2.0, eXDirection);
-	LBM_initPositionVector(mpim->recv_layer_pos.Y[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Y[eRightMax] - dh / 2.0, eYDirection);
+	// X
+	if (MpiManager::getInstance()->dimensions[eXDirection] == 1)
+		LBM_initPositionVector(gm->global_edges[eXMin][0] + dh / 2.0, gm->global_edges[eXMax][0] - dh / 2.0, eXDirection);
+	else
+		LBM_initPositionVector(mpim->recv_layer_pos.X[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.X[eRightMax] - dh / 2.0, eXDirection);
+
+	// Y
+	if (MpiManager::getInstance()->dimensions[eYDirection] == 1)
+		LBM_initPositionVector(gm->global_edges[eYMin][0] + dh / 2.0, gm->global_edges[eYMax][0] - dh / 2.0, eYDirection);
+	else
+		LBM_initPositionVector(mpim->recv_layer_pos.Y[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Y[eRightMax] - dh / 2.0, eYDirection);
+
+	// Z
 #if (L_DIMS == 3)
-	LBM_initPositionVector(mpim->recv_layer_pos.Z[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Z[eRightMax] - dh / 2.0, eZDirection);
+	if (MpiManager::getInstance()->dimensions[eZDirection] == 1)
+		LBM_initPositionVector(gm->global_edges[eZMin][0] + dh / 2.0, gm->global_edges[eZMax][0] - dh / 2.0, eZDirection);
+	else
+		LBM_initPositionVector(mpim->recv_layer_pos.Z[eLeftMin] + dh / 2.0, mpim->recv_layer_pos.Z[eRightMax] - dh / 2.0, eZDirection);
 #else
 	LBM_initPositionVector(0.0, gm->global_edges[eZMax][0], eZDirection);
 #endif

@@ -303,7 +303,6 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 
 	if (targetGrid->level == 0)
 	{
-
 		// Start by adding the L0 details
 		HDFstruct *p_data = nullptr;
 		createWritableDataStore(p_data);
@@ -319,14 +318,39 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 		p_data->k_end = 0;
 
 #ifdef L_BUILD_FOR_MPI
-		// Halo exists on all edges on L0 and there are no transition layers
-		p_data->i_end = N_lim - 2;
-		p_data->i_start = 1;
-		p_data->j_end = M_lim - 2;
-		p_data->j_start = 1;
+		// No transition layers on L0 and halo won't exist if MPI dimension is 1
+		if (MpiManager::getInstance()->dimensions[eXDirection] == 1)
+		{
+			p_data->i_end = N_lim - 1;
+			p_data->i_start = 0;
+		}
+		else
+		{
+			p_data->i_end = N_lim - 2;
+			p_data->i_start = 1;
+		}
+
+		if (MpiManager::getInstance()->dimensions[eYDirection] == 1)
+		{
+			p_data->j_end = M_lim - 1;
+			p_data->j_start = 0;
+		}
+		else
+		{
+			p_data->j_end = M_lim - 2;
+			p_data->j_start = 1;
+		}
 #if (L_DIMS == 3)
-		p_data->k_end = K_lim - 2;
-		p_data->k_start = 1;
+		if (MpiManager::getInstance()->dimensions[eZDirection] == 1)
+		{
+			p_data->k_end = K_lim - 1;
+			p_data->k_start = 0;
+		}
+		else
+		{		
+			p_data->k_end = K_lim - 2;
+			p_data->k_start = 1;
+		}
 #endif
 
 #else

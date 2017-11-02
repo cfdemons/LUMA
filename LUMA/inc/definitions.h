@@ -73,7 +73,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 1200				///< How many timesteps before whole grid output
@@ -137,8 +137,8 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 24		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_XCORES 8		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy

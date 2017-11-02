@@ -253,21 +253,17 @@ void GridObj::LBM_initGrid() {
 	u.resize(N_lim * M_lim * K_lim * L_DIMS);
 	LBM_initVelocity();
 	
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
-#endif
 
 	// Density field
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	rho_n.resize(N_lim * M_lim * K_lim);
 	rho_n = rho;
-#endif
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
@@ -444,21 +440,16 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	LBM_initVelocity();
 
 	// Set start-of-timestep-velocity
-#ifdef L_IBM_ON
 	u_n.resize(N_lim * M_lim * K_lim * L_DIMS);
 	u_n = u;
-#endif
 
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
-#ifdef L_IBM_ON
 	// Set start-of-timestep-velocity
 	rho_n.resize(N_lim * M_lim * K_lim);
 	rho_n = rho;
-#endif
-
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 
@@ -963,7 +954,7 @@ void GridObj::LBM_initBoundLab ( )
 	int i, j, k;
 
 	// LEFT WALL //
-
+#ifdef L_WALL_LEFT
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++)
 	{
@@ -981,9 +972,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// RIGHT WALL //
-
+#ifdef L_WALL_RIGHT
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++)
 	{
@@ -1009,11 +1001,12 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 #if (L_DIMS == 3)
 
 	// FRONT WALL //
-
+#ifdef L_WALL_FRONT
 	for (k = 0; k < K_lim; k++)
 	{
 		if (ZPos[k] <= L_WALL_THICKNESS_FRONT)
@@ -1028,9 +1021,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// BACK WALL //
-
+#ifdef L_WALL_BACK
 	for (k = 0; k < K_lim; k++)
 	{
 		if (ZPos[k] >= GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
@@ -1045,11 +1039,12 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 #endif
 
 	// BOTTOM WALL //
-
+#ifdef L_WALL_BOTTOM
 	for (j = 0; j < M_lim; j++)
 	{
 		if (YPos[j] <= L_WALL_THICKNESS_BOTTOM)
@@ -1064,9 +1059,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// TOP WALL //
-
+#ifdef L_WALL_TOP
 	for (j = 0; j < M_lim; j++)
 	{
 		if (YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
@@ -1081,7 +1077,7 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
+#endif
 }
 
 // ****************************************************************************

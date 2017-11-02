@@ -29,6 +29,13 @@
 void GridObj::LBM_multi_opt(int subcycle)
 {
 
+	// Increment internal loop counter
+	++t;
+
+	// Set start of timestep values
+	u_n = u;
+	rho_n = rho;
+
 #ifdef L_REYNOLDS_RAMP
 	// Update the Reynolds number if ramping up
 	_LBM_updateReynolds(static_cast<double>(L_RE) * GridUtils::getReynoldsRampCoefficient((t + 1) * dt));
@@ -85,6 +92,12 @@ void GridObj::LBM_multi_opt(int subcycle)
 				// STREAM //
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
 
+				// REGULARISED BCs //
+#ifdef L_REGULARISED_BOUNDARIES
+				if (type_local == eVelocity || type_local == ePressure)
+					_LBM_regularised_opt(i, j, k, id, type_local);
+#endif
+
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
 
@@ -114,12 +127,6 @@ void GridObj::LBM_multi_opt(int subcycle)
 				int id = k + j * K_lim + i * K_lim * M_lim;
 				eType type_local = LatTyp[id];
 
-#endif
-
-				// REGULARISED BCs //
-#ifdef L_REGULARISED_BOUNDARIES
-				if (type_local == eVelocity || type_local == ePressure)
-					_LBM_regularised_opt(i, j, k, id, type_local);
 #endif
 
 				// FORCING //
@@ -152,9 +159,6 @@ void GridObj::LBM_multi_opt(int subcycle)
 		objman->toggleDebugStream(this);
 	}
 #endif
-
-	// Increment internal loop counter
-	++t;
 
 	// Get time of loop
 	secs = clock() - t_start;
@@ -330,17 +334,19 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	if (edgeCount > 1)
 	{
 		// Do not extrapolate on recv layers
+#ifdef L_BUILD_FOR_MPI
 		if (i != 0 && i != N_lim-1 && j != 0 && j != M_lim-1)
+#endif
 		{
 			if (type == ePressure)
 			{
 				// Extrapolate wall-normal velocity component
-				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, normalDirection, L_DIMS);
+				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u_n, normalVector, 0, i, j, k, normalDirection, L_DIMS);
 			}
 			else if (type == eVelocity)
 			{
 				// Extrapolate density value
-				tmpDensity = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
+				tmpDensity = GridUtils::extrapolate(*this, rho_n, normalVector, 1, i, j, k);
 			}
 			else L_ERROR("Unknown BC type: regularised BC.", GridUtils::logfile);
 		}
@@ -377,7 +383,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			{
 				// Check if tangential velocity and do not extrapolate on recv layer
 				if (d != normalDirection && !GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
-					tmpVelVector[d] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, d, L_DIMS);
+					tmpVelVector[d] = GridUtils::extrapolate(*this, u_n, normalVector, 0, i, j, k, d, L_DIMS);
 			}
 
 			// Update the wall-normal velocity
@@ -433,8 +439,13 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			)
 			)
 		{
-			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
-				(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+			// Buried links should be set to feq else bounce back neq part
+			if ((c_opt[v][eXDirection] == normalVector[eXDirection] && c_opt[v][eYDirection] == -normalVector[eYDirection]) ||
+					(c_opt[v][eXDirection] == -normalVector[eXDirection] && c_opt[v][eYDirection] == normalVector[eYDirection]))
+				fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
+			else
+				fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+					(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
 		}
 
 		// Store off-equilibrium and update stress components

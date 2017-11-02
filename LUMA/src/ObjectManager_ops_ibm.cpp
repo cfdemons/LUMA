@@ -160,7 +160,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 			}
 
 			// Set IB velocities
-			iBody[ib].fBody->updateIBMarkers(1.0);
+//			iBody[ib].fBody->updateIBMarkers(1.0);
 
 			// Get time averaged FEM values
 			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);

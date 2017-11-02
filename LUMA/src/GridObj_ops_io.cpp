@@ -435,9 +435,9 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 					// Global Position
 					file << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 
-					// f values
+					// dimensionless f values
 					for (v = 0; v < L_NUM_VELS; v++) {
-						file << f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << "\t";
+						file << GridUnits::filbm2fid( f(i,j,k,v,M_lim,K_lim,L_NUM_VELS),this) << "\t";
 					}
 
 					file << std::endl;
@@ -523,7 +523,9 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 			// Read in f values
 			for (v = 0; v < L_NUM_VELS; v++) {
-				iss >> g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
+				double f_temp;
+				iss >> f_temp;
+				g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = GridUnits::fid2filbm(f_temp, this);
 				g->fNew = g->f;
 			}
 

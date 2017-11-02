@@ -1388,7 +1388,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Bottom wall
-	else if (posY > 0.0 && posY < L_WALL_THICKNESS_BOTTOM)
+	if (posY > 0.0 && posY < L_WALL_THICKNESS_BOTTOM)
 	{
 		*normalDirection = eYDirection;
 		(*inwardVector)[*normalDirection] = 1;
@@ -1396,7 +1396,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Top wall
-	else if (posY < GridManager::getInstance()->global_edges[eYMax][0] && posY > GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
+	if (posY < GridManager::getInstance()->global_edges[eYMax][0] && posY > GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
 	{
 		*normalDirection = eYDirection;
 		(*inwardVector)[*normalDirection] = -1;
@@ -1406,7 +1406,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 #if (L_DIMS == 3)
 
 	// Front wall
-	else if (posZ > 0.0 && posZ < L_WALL_THICKNESS_FRONT)
+	if (posZ > 0.0 && posZ < L_WALL_THICKNESS_FRONT)
 	{
 		*normalDirection = eZDirection;
 		(*inwardVector)[*normalDirection] = 1;
@@ -1414,7 +1414,7 @@ bool GridUtils::isWithinDomainWall(double posX, double posY, double posZ,
 	}
 
 	// Back wall
-	else if (posZ < GridManager::getInstance()->global_edges[eZMax][0] && posZ > GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
+	if (posZ < GridManager::getInstance()->global_edges[eZMax][0] && posZ > GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
 	{
 		*normalDirection = eZDirection;
 		(*inwardVector)[*normalDirection] = -1;

@@ -124,7 +124,8 @@ void MpiManager::mpi_init()
 
 	// Broadcast directory name (acquire directory name if not rank 0)
 	MPI_Bcast(path_buffer, path_buffer_size, MPI_CHAR, 0, world_comm);
-	if (my_rank != 0) {
+	if (my_rank != 0)
+	{
 		std::string char_to_str(path_buffer);
 		GridUtils::path_str = char_to_str;
 	}
@@ -133,10 +134,6 @@ void MpiManager::mpi_init()
 	
 	// Open logfile now my_rank has been assigned
 	logout->open( GridUtils::path_str + "/mpi_log_rank" + std::to_string(my_rank) + ".log", std::ios::out );
-
-#else
-
-	logout = nullptr;
 
 #endif	
 
@@ -235,30 +232,32 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 	for (int i = 0; i < num_ranks; i++) msg += std::to_string(cRankSizeZ[i]) + " ";
 	L_INFO(msg, logout); msg.clear();
 #endif
-	
+
 	// Compute required local grid size to pass to grid manager //
 	std::vector<int> local_size;
 
 	// Loop over dimensions
-	for (size_t d = 0; d < L_DIMS; d++) {
+	for (size_t d = 0; d < L_DIMS; d++)
+	{
+		if (dimensions[d] == 1)
+		{
+			// If only 1 rank in this direction local grid is same size a global grid (no halo)
+			local_size.push_back(grid_man->global_size[d][0]);
 
-		if (dimensions[d] == 1) {
-			// If only 1 rank in this direction local grid is same size a global grid and add halo
-			local_size.push_back(grid_man->global_size[d][0] + 2);
-
-		} else {
-
+		}
+		else
+		{
 			// Else, get grids sizes from the arrays and add halo
 			switch (d)
 			{
 			case 0:
-				local_size.push_back( cRankSizeX[my_rank] + 2 );
+				local_size.push_back(cRankSizeX[my_rank] + 2);
 				break;
 			case 1:
-				local_size.push_back( cRankSizeY[my_rank] + 2 );
+				local_size.push_back(cRankSizeY[my_rank] + 2);
 				break;
 			case 2:
-				local_size.push_back( cRankSizeZ[my_rank] + 2 );
+				local_size.push_back(cRankSizeZ[my_rank] + 2);
 				break;
 
 			default:
@@ -359,91 +358,145 @@ void MpiManager::mpi_gridbuild(GridManager* const grid_man)
 		")", logout);
 #endif
 
-	// Now update the halo regions taking into account periodicity
+	/* Now update the halo regions taking into account periodicity.
+	 *
+	 * Note that if we don't want to have a halo in a given direction due to there
+	 * only being one core in that direction and need to avoid Issue #157 then we
+	 * need to set the sender and receiver layers to be outside the world space
+	 * used by LUMA, i.e. < 0.0. */
 
 	// X
-	sender_layer_pos.X[eLeftMin] = rank_core_edge[eXMin][my_rank];
-	sender_layer_pos.X[eLeftMax] = rank_core_edge[eXMin][my_rank] + dh;
-	sender_layer_pos.X[eRightMin] = rank_core_edge[eXMax][my_rank] - dh;
-	sender_layer_pos.X[eRightMax] = rank_core_edge[eXMax][my_rank];
+	if (dimensions[eXDirection] == 1)
+	{
+		sender_layer_pos.X[eLeftMin] = -1.0;
+		sender_layer_pos.X[eLeftMax] = -1.0;
+		sender_layer_pos.X[eRightMin] = -1.0;
+		sender_layer_pos.X[eRightMax] = -1.0;
+		recv_layer_pos.X[eLeftMin] = -1.0;
+		recv_layer_pos.X[eLeftMax] = -1.0;
+		recv_layer_pos.X[eRightMin] = -1.0;
+		recv_layer_pos.X[eRightMax] = -1.0;
+	}
+	else
+	{
+		sender_layer_pos.X[eLeftMin] = rank_core_edge[eXMin][my_rank];
+		sender_layer_pos.X[eLeftMax] = rank_core_edge[eXMin][my_rank] + dh;
+		sender_layer_pos.X[eRightMin] = rank_core_edge[eXMax][my_rank] - dh;
+		sender_layer_pos.X[eRightMax] = rank_core_edge[eXMax][my_rank];
 
-	// Check if need to wrap or not
-	if (sender_layer_pos.X[eLeftMin] - dh < 0.0)
-	{
-		recv_layer_pos.X[eLeftMin] = grid_man->global_edges[eXMax][0] - dh;
-		recv_layer_pos.X[eLeftMax] = grid_man->global_edges[eXMax][0];
+		// Check if need to wrap or not
+		if (sender_layer_pos.X[eLeftMin] - dh < 0.0)
+		{
+			recv_layer_pos.X[eLeftMin] = grid_man->global_edges[eXMax][0] - dh;
+			recv_layer_pos.X[eLeftMax] = grid_man->global_edges[eXMax][0];
+		}
+		else
+		{
+			recv_layer_pos.X[eLeftMin] = sender_layer_pos.X[eLeftMin] - dh;
+			recv_layer_pos.X[eLeftMax] = sender_layer_pos.X[eLeftMin];
+		}
+		if (sender_layer_pos.X[eRightMax] + dh > grid_man->global_edges[eXMax][0])
+		{
+			recv_layer_pos.X[eRightMin] = 0.0;
+			recv_layer_pos.X[eRightMax] = dh;
+		}
+		else
+		{
+			recv_layer_pos.X[eRightMin] = sender_layer_pos.X[eRightMax];
+			recv_layer_pos.X[eRightMax] = sender_layer_pos.X[eRightMax] + dh;
+		}
 	}
-	else
-	{
-		recv_layer_pos.X[eLeftMin] = sender_layer_pos.X[eLeftMin] - dh;
-		recv_layer_pos.X[eLeftMax] = sender_layer_pos.X[eLeftMin];
-	}
-	if (sender_layer_pos.X[eRightMax] + dh > grid_man->global_edges[eXMax][0])
-	{
-		recv_layer_pos.X[eRightMin] = 0.0;
-		recv_layer_pos.X[eRightMax] = dh;
-	}
-	else
-	{
-		recv_layer_pos.X[eRightMin] = sender_layer_pos.X[eRightMax];
-		recv_layer_pos.X[eRightMax] = sender_layer_pos.X[eRightMax] + dh;
-	}
-	
+
 	// Y
-	sender_layer_pos.Y[eLeftMin] = rank_core_edge[eYMin][my_rank];
-	sender_layer_pos.Y[eLeftMax] = rank_core_edge[eYMin][my_rank] + dh;
-	sender_layer_pos.Y[eRightMin] = rank_core_edge[eYMax][my_rank] - dh;
-	sender_layer_pos.Y[eRightMax] = rank_core_edge[eYMax][my_rank];
-	if (sender_layer_pos.Y[eLeftMin] - dh < 0.0)
+	if (dimensions[eYDirection] == 1)
 	{
-		recv_layer_pos.Y[eLeftMin] = grid_man->global_edges[eYMax][0] - dh;
-		recv_layer_pos.Y[eLeftMax] = grid_man->global_edges[eYMax][0];
+		sender_layer_pos.Y[eLeftMin] = -1.0;
+		sender_layer_pos.Y[eLeftMax] = -1.0;
+		sender_layer_pos.Y[eRightMin] = -1.0;
+		sender_layer_pos.Y[eRightMax] = -1.0;
+		recv_layer_pos.Y[eLeftMin] = -1.0;
+		recv_layer_pos.Y[eLeftMax] = -1.0;
+		recv_layer_pos.Y[eRightMin] = -1.0;
+		recv_layer_pos.Y[eRightMax] = -1.0;
 	}
 	else
 	{
-		recv_layer_pos.Y[eLeftMin] = sender_layer_pos.Y[eLeftMin] - dh;
-		recv_layer_pos.Y[eLeftMax] = sender_layer_pos.Y[eLeftMin];
-	}
-	if (sender_layer_pos.Y[eRightMax] + dh > grid_man->global_edges[eYMax][0])
-	{
-		recv_layer_pos.Y[eRightMin] = 0.0;
-		recv_layer_pos.Y[eRightMax] = dh;
-	}
-	else
-	{
-		recv_layer_pos.Y[eRightMin] = sender_layer_pos.Y[eRightMax];
-		recv_layer_pos.Y[eRightMax] = sender_layer_pos.Y[eRightMax] + dh;
+		sender_layer_pos.Y[eLeftMin] = rank_core_edge[eYMin][my_rank];
+		sender_layer_pos.Y[eLeftMax] = rank_core_edge[eYMin][my_rank] + dh;
+		sender_layer_pos.Y[eRightMin] = rank_core_edge[eYMax][my_rank] - dh;
+		sender_layer_pos.Y[eRightMax] = rank_core_edge[eYMax][my_rank];
+		if (sender_layer_pos.Y[eLeftMin] - dh < 0.0)
+		{
+			recv_layer_pos.Y[eLeftMin] = grid_man->global_edges[eYMax][0] - dh;
+			recv_layer_pos.Y[eLeftMax] = grid_man->global_edges[eYMax][0];
+		}
+		else
+		{
+			recv_layer_pos.Y[eLeftMin] = sender_layer_pos.Y[eLeftMin] - dh;
+			recv_layer_pos.Y[eLeftMax] = sender_layer_pos.Y[eLeftMin];
+		}
+		if (sender_layer_pos.Y[eRightMax] + dh > grid_man->global_edges[eYMax][0])
+		{
+			recv_layer_pos.Y[eRightMin] = 0.0;
+			recv_layer_pos.Y[eRightMax] = dh;
+		}
+		else
+		{
+			recv_layer_pos.Y[eRightMin] = sender_layer_pos.Y[eRightMax];
+			recv_layer_pos.Y[eRightMax] = sender_layer_pos.Y[eRightMax] + dh;
+		}
 	}
 
 	// Z
 #if (L_DIMS == 3)
-	sender_layer_pos.Z[eLeftMin] = rank_core_edge[eZMin][my_rank];
-	sender_layer_pos.Z[eLeftMax] = rank_core_edge[eZMin][my_rank] + dh;
-	sender_layer_pos.Z[eRightMin] = rank_core_edge[eZMax][my_rank] - dh;
-	sender_layer_pos.Z[eRightMax] = rank_core_edge[eZMax][my_rank];
-	if (sender_layer_pos.Z[eLeftMin] - dh < 0.0)
+	if (dimensions[eZDirection] == 1)
 	{
-		recv_layer_pos.Z[eLeftMin] = grid_man->global_edges[eZMax][0] - dh;
-		recv_layer_pos.Z[eLeftMax] = grid_man->global_edges[eZMax][0];
+		sender_layer_pos.Z[eLeftMin] = -1.0;
+		sender_layer_pos.Z[eLeftMax] = -1.0;
+		sender_layer_pos.Z[eRightMin] = -1.0;
+		sender_layer_pos.Z[eRightMax] = -1.0;
+		recv_layer_pos.Z[eLeftMin] = -1.0;
+		recv_layer_pos.Z[eLeftMax] = -1.0;
+		recv_layer_pos.Z[eRightMin] = -1.0;
+		recv_layer_pos.Z[eRightMax] = -1.0;
 	}
 	else
 	{
-		recv_layer_pos.Z[eLeftMin] = sender_layer_pos.Z[eLeftMin] - dh;
-		recv_layer_pos.Z[eLeftMax] = sender_layer_pos.Z[eLeftMin];
-	}
-	if (sender_layer_pos.Z[eRightMax] + dh > grid_man->global_edges[eZMax][0])
-	{
-		recv_layer_pos.Z[eRightMin] = 0.0;
-		recv_layer_pos.Z[eRightMax] = dh;
-	}
-	else
-	{
-		recv_layer_pos.Z[eRightMin] = sender_layer_pos.Z[eRightMax];
-		recv_layer_pos.Z[eRightMax] = sender_layer_pos.Z[eRightMax] + dh;
-	}
+		sender_layer_pos.Z[eLeftMin] = rank_core_edge[eZMin][my_rank];
+		sender_layer_pos.Z[eLeftMax] = rank_core_edge[eZMin][my_rank] + dh;
+		sender_layer_pos.Z[eRightMin] = rank_core_edge[eZMax][my_rank] - dh;
+		sender_layer_pos.Z[eRightMax] = rank_core_edge[eZMax][my_rank];
+		if (sender_layer_pos.Z[eLeftMin] - dh < 0.0)
+		{
+			recv_layer_pos.Z[eLeftMin] = grid_man->global_edges[eZMax][0] - dh;
+			recv_layer_pos.Z[eLeftMax] = grid_man->global_edges[eZMax][0];
+		}
+		else
+		{
+			recv_layer_pos.Z[eLeftMin] = sender_layer_pos.Z[eLeftMin] - dh;
+			recv_layer_pos.Z[eLeftMax] = sender_layer_pos.Z[eLeftMin];
+		}
+		if (sender_layer_pos.Z[eRightMax] + dh > grid_man->global_edges[eZMax][0])
+		{
+			recv_layer_pos.Z[eRightMin] = 0.0;
+			recv_layer_pos.Z[eRightMax] = dh;
+		}
+		else
+		{
+			recv_layer_pos.Z[eRightMin] = sender_layer_pos.Z[eRightMax];
+			recv_layer_pos.Z[eRightMax] = sender_layer_pos.Z[eRightMax] + dh;
+		}
+}
 #endif
 
 #ifdef L_MPI_VERBOSE
+	if (dimensions[eXDirection] == 1 || dimensions[eYDirection] == 1
+#if (L_DIMS == 3)
+		|| dimensions[eZDirection] == 1
+#endif
+		)
+		L_WARN("One of the MPI dimensions is 1 so sender and receiver layers in this direction will be set to -1 as they have no meaning in this context.", logout);
+
 	L_INFO("X sender layers are: " +
 		std::to_string(sender_layer_pos.X[eLeftMin]) + " -- " + std::to_string(sender_layer_pos.X[eLeftMax]) + " (min edge) , " +
 		std::to_string(sender_layer_pos.X[eRightMin]) + " -- " + std::to_string(sender_layer_pos.X[eRightMax]) + " (max edge)",
@@ -594,7 +647,8 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	t_start = clock();
 
 	// Loop over directions in Cartesian topology
-	for (int dir = 0; dir < L_MPI_DIRS; dir++) {
+	for (int dir = 0; dir < L_MPI_DIRS; dir++)
+	{
 
 		/* Create a unique tag based on level (< 32), region (< 10) and direction (< 100).
 		 * MPICH limits state that tag value cannot be greater than 32767 */
@@ -771,7 +825,7 @@ void MpiManager::mpi_buffer_size() {
 			buffer_send_info.emplace_back(l, r);
 			buffer_recv_info.emplace_back(l, r);
 
-			/* Not every edge of a sub-grid needs to be communicated.
+			/* Not every edge of a grid needs to be communicated.
 			 * We therefore loop over the appropriate region of the grid and 
 			 * check whether a site lies in the associated sender / receiver 
 			 * layer. If so increment the buffer size counter. */

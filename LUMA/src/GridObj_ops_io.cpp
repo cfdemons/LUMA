@@ -1002,7 +1002,8 @@ int GridObj::io_hdf5(double tval)
 		/***** ATTRIBUTES ******/
 		/***********************/
 
-		if (t == 0) {
+		if (t == 0)
+		{
 
 			// Create 1D attribute buffers
 			int buffer_int_array[L_DIMS];
@@ -1233,7 +1234,6 @@ int GridObj::io_hdf5(double tval)
 
 		// Only write positions and block labels on first time step as these don't change
 		if (t == 0)
-
 		{
 
 			/***********************/

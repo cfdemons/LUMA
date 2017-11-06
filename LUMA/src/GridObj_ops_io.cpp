@@ -444,8 +444,8 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 						file << GridUnits::ulbm2ud(u(i, j, k, v, M_lim, K_lim, L_DIMS), this) << "\t";
 					}
 
-					// rho value divided by dt
-					file << rho(i, j, k, M_lim, K_lim) / dt << "\t";
+					// rho in lbm units (rho does not depend on dt). 
+					file << rho(i, j, k, M_lim, K_lim) << "\t";
 
 					int id = k + j * K_lim + i * K_lim * M_lim;
 					// dimensionless f values
@@ -544,10 +544,8 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 				g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS) = GridUnits::ud2ulbm(u_temp, g);
 			}
 
-			// Read in rho value and convert it to lbm units. I'M NOT SURE OF THIS STEP BUT THIS IS WHAT NILS DOES. 
-			double temp;
-			iss >> temp;
-			g->rho(i, j, k, g->M_lim, g->K_lim) = temp*g->dt;
+			// Read in rho value (it is already written in lbm units, since rho doesn't depend on dt)
+			iss >> g->rho(i, j, k, g->M_lim, g->K_lim);
 
 			// Read in f values and convert them to the new dt
 			for (v = 0; v < L_NUM_VELS; v++) {

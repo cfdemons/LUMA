@@ -341,7 +341,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			if (type == ePressure)
 			{
 				// Extrapolate wall-normal velocity component
-				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u_n, normalVector, 0, i, j, k, normalDirection, L_DIMS);
+				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, normalDirection, L_DIMS);
 			}
 			else if (type == eVelocity)
 			{
@@ -383,7 +383,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			{
 				// Check if tangential velocity and do not extrapolate on recv layer
 				if (d != normalDirection && !GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
-					tmpVelVector[d] = GridUtils::extrapolate(*this, u_n, normalVector, 0, i, j, k, d, L_DIMS);
+					tmpVelVector[d] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, d, L_DIMS);
 			}
 
 			// Update the wall-normal velocity

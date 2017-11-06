@@ -385,6 +385,10 @@ void GridObj::_io_fgaout(int timeStepL0) {
 ///			This routine writes/reads the current rank's particle distribution functions
 ///			in the custom restart file format. If the file already exists, data is appended. 
 ///			IB body data are also written out but no other body information at present. 
+///			It writes the restart data following the procedure in: 
+///			"Physically based Animation of Free Surface Flows with the Lattice Boltzmann Method" by N. Thuerey, 
+///			section 6.1. 
+///			This implementation allows to restart the simulation with a different time step value. 
 ///
 /// \param IO_flag	flag to indicate whether a write or read
 void GridObj::io_restart(eIOFlag IO_flag) {
@@ -435,9 +439,20 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 					// Global Position
 					file << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 
+					// Dimensionless u values
+					for (v = 0; v < L_DIMS; v++) {
+						file << GridUnits::ulbm2ud(u(i, j, k, v, M_lim, K_lim, L_DIMS), this) << "\t";
+					}
+
+					// rho value divided by dt
+					file << rho(i, j, k, M_lim, K_lim) / dt << "\t";
+
+					int id = k + j * K_lim + i * K_lim * M_lim;
 					// dimensionless f values
 					for (v = 0; v < L_NUM_VELS; v++) {
-						file << GridUnits::filbm2fid( f(i,j,k,v,M_lim,K_lim,L_NUM_VELS),this) << "\t";
+						double f_eq = _LBM_equilibrium_opt(id, v);
+						double f_neq_restart = ((f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) - f_eq) * omega) / (f_eq*dt);
+						file << f_neq_restart << "\t";
 					}
 
 					file << std::endl;
@@ -520,20 +535,28 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			i = ijk[0];
 			j = ijk[1];
 			k = ijk[2];
+			int id = k + j * K_lim + i * K_lim * M_lim;
 
-			// Read in f values
-			for (v = 0; v < L_NUM_VELS; v++) {
-				double f_temp;
-				iss >> f_temp;
-				g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = GridUnits::fid2filbm(f_temp, this);
-				g->fNew = g->f;
+			// Read in u values and convert them to lbm units
+			for (v = 0; v < L_DIMS; v++) {
+				double u_temp;
+				iss >> u_temp;
+				g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS) = GridUnits::ud2ulbm(u_temp, g);
 			}
 
-			// Calculate the velocities and densities from the distribution functions
-			// I don't know the cell type, so I will assume it is a fluid so it calculates the macroscopic quantities.
-			int id = k + j * K_lim + i * K_lim * M_lim;
-			_LBM_macro_opt(i, j, k, id, eFluid);
+			// Read in rho value and convert it to lbm units. I'M NOT SURE OF THIS STEP BUT THIS IS WHAT NILS DOES. 
+			double temp;
+			iss >> temp;
+			g->rho(i, j, k, g->M_lim, g->K_lim) = temp*g->dt;
 
+			// Read in f values and convert them to the new dt
+			for (v = 0; v < L_NUM_VELS; v++) {
+				double f_temp;
+				double f_eq = _LBM_equilibrium_opt(id, v);
+				iss >> f_temp;
+				g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = f_eq*(1 + (g->dt*f_temp) / omega);
+				g->fNew(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
+			}
 
 		}
 

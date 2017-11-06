@@ -64,6 +64,18 @@ public:
 	}
 
 	// *****************************************************************************
+	/// \brief	Converts velocity in LBM units to dimensionless units.
+	///
+	/// \param u_lbm			Lattice velocity.
+	/// \param currentGrid		Pointer to the current grid. 
+	/// \returns				velocity in dimensionless units.
+	template <typename T>
+	static double ulbm2ud(T u_lbm, GridObj* currentGrid)
+	{
+		return (u_lbm * currentGrid->dh) / currentGrid->dt;
+	}
+
+	// *****************************************************************************
 	/// \brief	Converts particle distribution in LBM units to dimensionless units.
 	///
 	/// \param fi_lbm			Lattice distribution function.

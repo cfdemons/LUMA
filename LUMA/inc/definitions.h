@@ -170,7 +170,7 @@
 #define L_PHYSICAL_U 3.86		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
-#define L_PHYSICAL_RHO 1000.0		///< Reference density in physical units
+#define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
 
 
 /*

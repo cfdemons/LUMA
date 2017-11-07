@@ -76,7 +76,7 @@
 const double resFactor = 1.0;
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY (static_cast<int>(resFactor*resFactor*1200))					///< How many timesteps before whole grid output

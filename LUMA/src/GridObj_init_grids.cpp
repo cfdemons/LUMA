@@ -988,7 +988,7 @@ void GridObj::LBM_initBoundLab ( )
 				{
 					// Get wall adjusted y value
 					double YPosVal = YPos[j] - 0.5 * L_WALL_THICKNESS_BOTTOM;
-					double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 / L_BLOCK_CHANNEL) + 0.5 * L_WALL_THICKNESS_BOTTOM;
+					double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) - L_SMALL_NUMBER) * (1.0 / L_BLOCK_CHANNEL) + 0.5 * L_WALL_THICKNESS_BOTTOM;
 
 					// Check if still in wall // TODO Check to see if it should be <= or <
 					if (YPosVal <= YPosStart) {
@@ -1325,8 +1325,8 @@ void GridObj::_LBM_initSetInletProfile()
 		uz_in[j] = 0.0;
 
 		// Block channel geometries
-		double R = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 - 1.0 / L_BLOCK_CHANNEL) / 2.0;
-		double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)) * (1.0 / L_BLOCK_CHANNEL);
+		double R = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) - L_SMALL_NUMBER) * (1.0 - 1.0 / L_BLOCK_CHANNEL) / 2.0;
+		double YPosStart = (L_BY - 0.5 * (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP) - L_SMALL_NUMBER) * (1.0 / L_BLOCK_CHANNEL);
 
 		// Get wall adjusted y value
 		double YPosVal = YPos[j] - 0.5 * L_WALL_THICKNESS_BOTTOM;

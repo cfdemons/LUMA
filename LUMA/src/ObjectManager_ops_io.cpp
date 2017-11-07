@@ -535,7 +535,7 @@ void ObjectManager::io_readInGeomConfig() {
 					nElements = static_cast<int>(std::floor(length / g->dh));
 				}
 				else {
-					nElements = static_cast<int>(std::stod(nElementsString));
+					nElements = static_cast<int>(resFactor * std::stod(nElementsString));
 				}
 			}
 

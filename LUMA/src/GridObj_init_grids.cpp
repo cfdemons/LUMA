@@ -951,6 +951,7 @@ void GridObj::LBM_initBoundLab ( )
 	int i, j, k;
 
 	// LEFT WALL //
+#ifdef L_WALL_LEFT
 
 	// Search position vector to see if left hand wall on this rank
 	for (i = 0; i < N_lim; i++)
@@ -969,8 +970,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// RIGHT WALL //
+#ifdef L_WALL_RIGHT
 
 	// Search index vector to see if right hand wall on this rank
 	for (i = 0; i < N_lim; i++)
@@ -988,10 +991,12 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 #if (L_DIMS == 3)
 
 	// FRONT WALL //
+#ifdef L_WALL_FRONT
 
 	for (k = 0; k < K_lim; k++)
 	{
@@ -1007,8 +1012,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// BACK WALL //
+#ifdef L_WALL_BACK
 
 	for (k = 0; k < K_lim; k++)
 	{
@@ -1024,10 +1031,11 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
+#endif
 #endif
 
 	// BOTTOM WALL //
+#ifdef L_WALL_BOTTOM
 
 	for (j = 0; j < M_lim; j++)
 	{
@@ -1043,8 +1051,10 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
+#endif
 
 	// TOP WALL //
+#ifdef L_WALL_TOP
 
 	for (j = 0; j < M_lim; j++)
 	{
@@ -1060,7 +1070,7 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
+#endif
 }
 
 // ****************************************************************************

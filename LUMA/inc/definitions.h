@@ -85,7 +85,7 @@
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -201,13 +201,13 @@
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
-#define L_IBM_ON						///< Turn on IBM
-#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+//#define L_IBM_ON						///< Turn on IBM
+//#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
 #define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
@@ -222,8 +222,8 @@
 */
 
 // BC types (unspecified is periodic)
-#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
-#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
+//#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
+//#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
 #define L_WALL_TOP		eSolid			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain

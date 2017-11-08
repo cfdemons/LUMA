@@ -77,7 +77,7 @@
 
 // Output Options
 #define L_OUT_EVERY 20									///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 20							///< Specific output frequency of body forces
+#define L_OUT_EVERY_INFO 20							///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
@@ -222,8 +222,8 @@
 */
 
 // BC types (unspecified is periodic)
-//#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
-//#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
+#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
+#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
 #define L_WALL_TOP		eSolid			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain

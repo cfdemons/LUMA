@@ -457,10 +457,6 @@ int main( int argc, char* argv[] )
 			objMan->io_vtkFEMWriter(Grids->t);
 #endif
 
-#ifdef L_WRITE_TIP_POSITIONS
-			objMan->io_writeTipPositions(Grids->t);
-#endif
-
 #if (defined L_IBM_ON && defined L_IBBODY_TRACER)
 			*GridUtils::logfile << "Writing out flexible body position..." << endl;
 			objMan->io_writeBodyPosition(Grids->t);
@@ -479,10 +475,15 @@ int main( int argc, char* argv[] )
 		}
 #endif
 
-		// Write out forces of objects
-#if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
-		if (Grids->t % L_OUT_EVERY_FORCES == 0) {
+		// Write out info
+		if (Grids->t % L_OUT_EVERY_INFO == 0) {
 
+#ifdef L_WRITE_TIP_POSITIONS
+			*GridUtils::logfile << "Writing out tip positions" << endl;
+			objMan->io_writeTipPositions(Grids->t);
+#endif
+
+#if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
 			*GridUtils::logfile << "Writing out object lift and drag" << endl;
 			objMan->io_writeForcesOnObjects(Grids->t);
 
@@ -490,8 +491,8 @@ int main( int argc, char* argv[] )
 			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
 			objMan->io_writeLiftDrag();
 #endif
+#endif
 		}
-#endif	
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT

@@ -389,6 +389,11 @@ void GridObj::_io_fgaout(int timeStepL0) {
 ///			"Physically based Animation of Free Surface Flows with the Lattice Boltzmann Method" by N. Thuerey, 
 ///			section 6.1. 
 ///			This implementation allows to restart the simulation with a different time step value. 
+///         The data written for each cell is: 
+///			- Global position 
+///         - Dimensionless velocity
+///         - Density in LBM units
+///         - Time-scaled non equilibrium distribution functions: ((f - f_eq) * omega) / (f_eq*dt)
 ///
 /// \param IO_flag	flag to indicate whether a write or read
 void GridObj::io_restart(eIOFlag IO_flag) {
@@ -448,7 +453,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 					file << rho(i, j, k, M_lim, K_lim) << "\t";
 
 					int id = k + j * K_lim + i * K_lim * M_lim;
-					// dimensionless f values
+					// time - scaled fneq values
 					for (v = 0; v < L_NUM_VELS; v++) {
 						double f_eq = _LBM_equilibrium_opt(id, v);
 						double f_neq_restart = ((f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) - f_eq) * omega) / (f_eq*dt);

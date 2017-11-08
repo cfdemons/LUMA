@@ -112,7 +112,6 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 	int it = 0;
 	int MAXIT = 10;
 	double TOL = 1e-4;
-	bool keepLooping = true;
 
 	// Do the while loop for sub iteration
 	do {
@@ -132,11 +131,7 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 		// Increment counter
 		it++;
 
-		// Check while loop parameters
-		if (res < TOL || it > MAXIT)
-			keepLooping = false;
-
-	} while (keepLooping == true);
+	} while (res > TOL && it < MAXIT);
 
 	// Get time averaged sub-iteration values
 	timeav_subResidual *= (g->t % L_OUT_EVERY);
@@ -979,7 +974,7 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 				velMagDiff = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].markerVel, iBody[ib].markers[m].markerVel_km1));
 
 				// Normalise it
-				velMagDiff = velMagDiff / (iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
+				velMagDiff = velMagDiff / (L_UX0 * iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
 
 				// Get the max difference
 				if (fabs(velMagDiff) > res)

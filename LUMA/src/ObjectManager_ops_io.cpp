@@ -66,33 +66,26 @@ void ObjectManager::io_writeLiftDrag() {
 	// Loop through all bodies
 	for (size_t ib = 0; ib < iBody.size(); ib++) {
 
-		// Only write out if this rank owns some markers
-		if (iBody[ib].validMarkers.size() > 0) {
+		// If owning and flexible then write or if body is rigid and this rank has some markers
+		if ((iBody[ib].isFlexible && iBody[ib].owningRank == rank) || (!iBody[ib].isFlexible && iBody[ib].validMarkers.size() > 0)) {
+
+			// Sort out which markers to write out
+			std::vector<int> validMarkers;
+
+			// If flexible then write out all markers, if rigid only markers on this rank
+			if (iBody[ib].isFlexible && iBody[ib].owningRank == rank)
+				validMarkers = GridUtils::onespace(0, static_cast<int>(iBody[ib].markers.size())-1);
+			else if (!iBody[ib].isFlexible && iBody[ib].validMarkers.size() > 0)
+				validMarkers = iBody[ib].validMarkers;
 
 			// Open file for given time step
 			std::ofstream jout;
 			jout.open(GridUtils::path_str + "/Body_" + std::to_string(iBody[ib].id) + "_LD_rank" + std::to_string(rank) + ".out", std::ios::app);
 			jout.precision(L_OUTPUT_PRECISION);
 
-
-			// If first time step ten write out initial values
-			if (_Grids->t == L_OUT_EVERY_FORCES) {
-
-				// Header
-				jout << "Timestep\tTime (s)\tLift (N)\tDrag (N)" << std::endl;
-
-				// Write out timestep data
-				jout << 0 << "\t" << 0.0;
-
-				// Compute lift and drag
-				for (size_t m = 0; m < iBody[ib].markers.size(); m++) {
-
-					// Write out force on markers
-					for (int dir = 0; dir < L_DIMS; dir++)
-						jout << "\t" << 0.0;
-				}
-				jout << std::endl;
-			}
+			// If first time then write out header
+			if (_Grids->t == 0)
+				jout << "Timestep\tTime (s)\tDrag (N)\tLift (N)" << std::endl;
 
 			// Convert force per volume to force
 #if (L_DIMS == 2)
@@ -105,7 +98,7 @@ void ObjectManager::io_writeLiftDrag() {
 			jout << _Grids->t << "\t" << _Grids->t * _Grids->dt;
 
 			// Compute lift and drag
-			for (auto m : iBody[ib].validMarkers) {
+			for (auto m : validMarkers) {
 
 				// Get volume scaling
 				volWidth = iBody[ib].markers[m].epsilon;

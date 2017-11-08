@@ -354,6 +354,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_WRITE_TIP_POSITIONS
+	*GridUtils::logfile << "Writing out tip positions" << endl;
 	objMan->io_writeTipPositions(Grids->t);
 #endif
 

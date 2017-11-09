@@ -107,6 +107,7 @@ public:
 	static void getEnclosingVoxel(double x, GridObj const * const g, eCartesianDirection dir, int *ijk);
 	static bool isOnTransitionLayer(double pos_x, double pos_y, double pos_z, GridObj const * const grid);			// Is site on any TL to upper
 	static bool isOnTransitionLayer(double position, eCartMinMax edge, GridObj const * const grid);					// Is site on specified TL to upper
+	static bool isWithinDomain(std::vector<double> &position);														// Check if position is within domain bounds
 	static bool isWithinDomainWall(double posX, double posY, double posZ, std::vector<int>* normalVector = nullptr);
 	static bool isWithinDomainWall(double posX, double posY, double posZ,
 		std::vector<int>* normalVector, eCartesianDirection* normalDirection, unsigned int* edgeCount);	// Is site within a wall region

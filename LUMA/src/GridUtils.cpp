@@ -816,17 +816,9 @@ int GridUtils::getRankfromPosition(std::vector<double> &position) {
 	// Get grid manager
 	GridManager *gm = GridManager::getInstance();
 
-	// Check with coarsest grid limits
-	if (position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
-	 || position[eYDirection] < gm->global_edges[eYMin][0] || position[eYDirection] > gm->global_edges[eYMax][0]
-#if (L_DIMS == 3)
-	 ||	position[eZDirection] < gm->global_edges[eZMin][0] || position[eZDirection] > gm->global_edges[eZMax][0]
-#endif
-		) {
-
-		// Position is not witihn global grid limits
+	// Check if position is not witihn global grid limits
+	if (!GridUtils::isWithinDomain(position))
 		L_ERROR("Position is off entire grid hierarchy. Exiting.", GridUtils::logfile);
-	}
 
 	// It is makes it here and serial build then definitely rank 0
 #ifndef L_BUILD_FOR_MPI
@@ -1320,6 +1312,30 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, Grid
 	if (position >= left_edge && position < right_edge) return true;
 	else return false;
 
+}
+
+// *****************************************************************************
+///	\brief	Check if position is within domain bounds
+///
+///	\param	position	position (x, y or z)
+///	\return	boolean answer
+bool GridUtils::isWithinDomain(std::vector<double> &position) {
+
+	// Get grid manager
+	GridManager *gm = GridManager::getInstance();
+
+	// Check with coarsest grid limits
+	if (position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
+	 || position[eYDirection] < gm->global_edges[eYMin][0] || position[eYDirection] > gm->global_edges[eYMax][0]
+#if (L_DIMS == 3)
+	 ||	position[eZDirection] < gm->global_edges[eZMin][0] || position[eZDirection] > gm->global_edges[eZMax][0]
+#endif
+		) {
+		return false;
+	}
+	else {
+		return true;
+	}
 }
 
 // *****************************************************************************

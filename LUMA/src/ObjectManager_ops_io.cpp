@@ -479,15 +479,12 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Need to shift the body if using walls
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
-#if (defined L_WALL_LEFT && L_WALL_LEFT == eSolid)
-			shiftX = L_WALL_THICKNESS_LEFT;
-#endif
-#if (defined L_WALL_BOTTOM && L_WALL_BOTTOM == eSolid)
-			shiftY = L_WALL_THICKNESS_BOTTOM;
-#endif
-#if (defined L_WALL_FRONT && L_WALL_FRONT == eSolid)
-			shiftZ = L_WALL_THICKNESS_FRONT;
-#endif
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> start_position, spacing, angles;
@@ -587,15 +584,12 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Need to shift the body if using walls
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
-#if (defined L_WALL_LEFT && L_WALL_LEFT == eSolid)
-			shiftX = L_WALL_THICKNESS_LEFT;
-#endif
-#if (defined L_WALL_BOTTOM && L_WALL_BOTTOM == eSolid)
-			shiftY = L_WALL_THICKNESS_BOTTOM;
-#endif
-#if (defined L_WALL_FRONT && L_WALL_FRONT == eSolid)
-			shiftZ = L_WALL_THICKNESS_FRONT;
-#endif
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, angles;
@@ -660,15 +654,12 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Need to shift the body if using walls
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
-#if (defined L_WALL_LEFT && L_WALL_LEFT == eSolid)
-			shiftX = L_WALL_THICKNESS_LEFT;
-#endif
-#if (defined L_WALL_BOTTOM && L_WALL_BOTTOM == eSolid)
-			shiftY = L_WALL_THICKNESS_BOTTOM;
-#endif
-#if (defined L_WALL_FRONT && L_WALL_FRONT == eSolid)
-			shiftZ = L_WALL_THICKNESS_FRONT;
-#endif
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, dimensions, angles;
@@ -744,15 +735,12 @@ void ObjectManager::io_readInGeomConfig() {
 
 			// Need to shift the body if using walls
 			double shiftX = 0.0, shiftY = 0.0, shiftZ = 0.0;
-#if (defined L_WALL_LEFT && L_WALL_LEFT == eSolid)
-			shiftX = L_WALL_THICKNESS_LEFT;
-#endif
-#if (defined L_WALL_BOTTOM && L_WALL_BOTTOM == eSolid)
-			shiftY = L_WALL_THICKNESS_BOTTOM;
-#endif
-#if (defined L_WALL_FRONT && L_WALL_FRONT == eSolid)
-			shiftZ = L_WALL_THICKNESS_FRONT;
-#endif
+			if (L_WALL_LEFT == eSolid)
+				shiftX = L_WALL_THICKNESS_LEFT;
+			if (L_WALL_BOTTOM == eSolid)
+				shiftY = L_WALL_THICKNESS_BOTTOM;
+			if (L_WALL_FRONT == eSolid)
+				shiftZ = L_WALL_THICKNESS_FRONT;
 
 			// Sort data
 			std::vector<double> centre_point, angles;

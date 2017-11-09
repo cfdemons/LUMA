@@ -221,7 +221,7 @@
 *******************************************************************************
 */
 
-// BC types (unspecified is periodic)
+// BC types (set to eFluid for periodic)
 #define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
 #define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain

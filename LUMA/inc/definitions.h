@@ -72,19 +72,16 @@
 *******************************************************************************
 */
 
-// Resolution multiplier
-const double resFactor = 1.0;
-
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY (static_cast<int>(resFactor*resFactor*1200))					///< How many timesteps before whole grid output
-#define L_OUT_EVERY_INFO (static_cast<int>(resFactor*resFactor*20))				///< How many timesteps before writing out some info
-#define L_OUT_EVERY_FORCES (static_cast<int>(resFactor*resFactor*1200))			///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 10									///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ 99999999999							///< Frequency of write out of restart file
-#define L_PROBE_OUT_FREQ 99999999999							///< Write out frequency of probe output
+#define L_OUT_EVERY 1200				///< How many timesteps before whole grid output
+#define L_OUT_EVERY_INFO 20				///< How many timesteps before writing out some info
+#define L_OUT_EVERY_FORCES 1200			///< Specific output frequency of body forces
+#define L_OUTPUT_PRECISION 10			///< Precision of output (for text writers)
+#define L_RESTART_OUT_FREQ 99999999999	///< Frequency of write out of restart file
+#define L_PROBE_OUT_FREQ 99999999999	///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -130,7 +127,7 @@ const double resFactor = 1.0;
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS (static_cast<int>(resFactor*resFactor*1200000))		///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1200000		///< Number of time steps to run simulation for
 
 
 /*
@@ -161,9 +158,9 @@ const double resFactor = 1.0;
 */
 
 // Lattice properties
-#define L_DIMS 2													///< Number of dimensions to the problem
-#define L_RESOLUTION (static_cast<int>(resFactor*1000))								///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP (static_cast<double>(0.00005/(resFactor*resFactor)))					///< The timestep in non-dimensional units
+#define L_DIMS 2				///< Number of dimensions to the problem
+#define L_RESOLUTION 1000		///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 5e-5			///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX (2.005 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT) + L_SMALL_NUMBER)		///< End of domain in X (non-dimensional units)

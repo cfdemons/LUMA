@@ -1036,7 +1036,7 @@ int GridObj::io_hdf5(double tval)
 			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute close failed: " << status << std::endl;
 
 			// Write Out Frequency
-			buffer_int = L_OUT_EVERY;
+			buffer_int = L_GRID_OUT_FREQ;
 			attrib_id = H5Acreate(file_id, "OutputFrequency", H5T_NATIVE_INT, attspace, H5P_DEFAULT, H5P_DEFAULT);
 			status = H5Awrite(attrib_id, H5T_NATIVE_INT, &buffer_int);
 			if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Attribute write failed: " << status << std::endl;

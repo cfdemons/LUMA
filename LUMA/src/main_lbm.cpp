@@ -402,7 +402,7 @@ int main( int argc, char* argv[] )
 		// Start clock for timing outer loop
 		t_start = clock();
 #endif
-		if ((Grids->t + 1) % L_OUT_EVERY == 0 && rank == 0)
+		if ((Grids->t + 1) % L_GRID_OUT_FREQ == 0 && rank == 0)
 			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
 
 
@@ -418,7 +418,7 @@ int main( int argc, char* argv[] )
 		///////////////
 
 		// Write out here
-		if (Grids->t % L_OUT_EVERY == 0)
+		if (Grids->t % L_GRID_OUT_FREQ == 0)
 		{
 #ifdef L_BUILD_FOR_MPI
 			MPI_Barrier(mpim->world_comm);
@@ -467,17 +467,17 @@ int main( int argc, char* argv[] )
 
 		// Completion time
 #ifdef L_SHOW_TIME_TO_COMPLETE
-		if (rank == 0 && (Grids->t % L_OUT_EVERY == 0 || Grids->t < 10))
+		if (rank == 0 && (Grids->t % L_GRID_OUT_FREQ == 0 || Grids->t < 10))
 		{
 			int hms[3];
 			GridUnits::secs2hms((L_TOTAL_TIMESTEPS - Grids->t) * outer_loop_time / 1000, &hms[0]);
-			if (Grids->t % L_OUT_EVERY != 0) std::cout << "\r";
+			if (Grids->t % L_GRID_OUT_FREQ != 0) std::cout << "\r";
 			std::cout << " Time to complete approx. " << hms[0] << " [h] " << hms[1] << " [m] " << hms[2] << " [s]     " << std::flush;
 		}
 #endif
 
 		// Write out info
-		if (Grids->t % L_OUT_EVERY_INFO == 0) {
+		if (Grids->t % L_EXTRA_OUT_FREQ == 0) {
 
 #ifdef L_WRITE_TIP_POSITIONS
 			*GridUtils::logfile << "Writing out tip positions" << endl;

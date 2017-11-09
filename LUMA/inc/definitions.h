@@ -76,10 +76,10 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 20									///< How many timesteps before whole grid output
-#define L_OUT_EVERY_INFO 20							///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 20									///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 20							///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ L_GRID_OUT_FREQ					///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
 
 // Types of output

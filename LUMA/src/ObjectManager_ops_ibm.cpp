@@ -134,13 +134,13 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 	} while (res > TOL && it < MAXIT);
 
 	// Get time averaged sub-iteration values
-	timeav_subResidual *= (g->t % L_OUT_EVERY);
+	timeav_subResidual *= (g->t % L_GRID_OUT_FREQ);
 	timeav_subResidual += res;
-	timeav_subResidual /= (g->t % L_OUT_EVERY + 1);
+	timeav_subResidual /= (g->t % L_GRID_OUT_FREQ + 1);
 
-	timeav_subIterations *= (g->t % L_OUT_EVERY);
+	timeav_subIterations *= (g->t % L_GRID_OUT_FREQ);
 	timeav_subIterations += it;
-	timeav_subIterations /= (g->t % L_OUT_EVERY + 1);
+	timeav_subIterations /= (g->t % L_GRID_OUT_FREQ + 1);
 
 	// Set the new start-of-timestep values
 	for (auto ib : idxFEM) {
@@ -161,18 +161,18 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 			}
 
 			// Get time averaged FEM values
-			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_GRID_OUT_FREQ);
 			iBody[ib].fBody->timeav_FEMIterations += iBody[ib].fBody->it;
-			iBody[ib].fBody->timeav_FEMIterations /= (g->t % L_OUT_EVERY + 1);
+			iBody[ib].fBody->timeav_FEMIterations /= (g->t % L_GRID_OUT_FREQ + 1);
 
-			iBody[ib].fBody->timeav_FEMResidual *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMResidual *= (g->t % L_GRID_OUT_FREQ);
 			iBody[ib].fBody->timeav_FEMResidual += iBody[ib].fBody->res;
-			iBody[ib].fBody->timeav_FEMResidual /= (g->t % L_OUT_EVERY + 1);
+			iBody[ib].fBody->timeav_FEMResidual /= (g->t % L_GRID_OUT_FREQ + 1);
 		}
 	}
 
 	// Write out time-averaged iterator loop values
-	if (g->t % L_OUT_EVERY == 0) {
+	if ((g->t + 1) % L_GRID_OUT_FREQ == 0) {
 
 		// Write out
 		*GridUtils::logfile << "Grid " << g->level << ": Sub-iterations taking " << timeav_subIterations <<

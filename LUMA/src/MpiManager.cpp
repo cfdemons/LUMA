@@ -718,13 +718,13 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	Grid->timeav_mpi_overhead /= Grid->t;
 
 #ifdef L_TEXTOUT
-	if (Grid->t % L_OUT_EVERY == 0) {
+	if (Grid->t % L_GRID_OUT_FREQ == 0) {
 		*GridUtils::logfile << "Writing out to <Grids.out>" << std::endl;
 		Grid->io_textout("POST MPI COMMS");
 	}
 #endif
 
-	if (Grid->t % L_OUT_EVERY == 0) {
+	if (Grid->t % L_GRID_OUT_FREQ == 0) {
 		// Performance Data
 		L_INFO("MPI overhead taking an average of " + 
 			std::to_string(Grid->timeav_mpi_overhead * 1000) + "ms", GridUtils::logfile);

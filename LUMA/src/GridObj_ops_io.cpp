@@ -506,7 +506,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		// Counters, sizes and indices
 		int i,j,k,v;
 		double x, y, z;
-		int in_level, in_regnum;
+		double in_level, in_regnum;
 		std::vector<int> ind;
 
 		// Read in one line of file at a time
@@ -526,7 +526,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 
 			// Get grid
 			GridObj *g = nullptr;
-			GridUtils::getGrid(gm->Grids, in_level, in_regnum, g);
+			GridUtils::getGrid(gm->Grids, (int)in_level, (int)in_regnum, g);
 			if (!g) L_ERROR("Could not retrieve grid level " + std::to_string(in_level) + 
 				" region " + std::to_string(in_regnum) + ". Is restart file correct?", GridUtils::logfile);
 

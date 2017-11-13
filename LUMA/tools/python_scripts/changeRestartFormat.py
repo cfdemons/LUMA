@@ -30,6 +30,11 @@ c_opt = np.matrix( [ [ 1, 0, 0 ], [ -1, 0, 0 ], [ 0, 1, 0 ], [ 0, -1, 0 ],[ 0, 0
 cs = 1.0/np.sqrt(3.0)
 w = np.array([1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0, 1.0/18.0,1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0,1.0/3.0])
 
+# Writing format
+format = '%1d\t%1d'
+for i in range(0,(23+dims)):
+	format = format + '\t%1.8e'
+
 def SQ(num):
 	return num*num
 	
@@ -87,7 +92,7 @@ for f in range(0,nproc):
 		newRestart[6+dims+v,:] = fneq
 
 	# write data to new file
-	np.savetxt(foutput + name, newRestart.transpose(), delimiter='\t')
+	np.savetxt(foutput + name, newRestart.transpose(), delimiter='\t', fmt=format)
 	
 
 

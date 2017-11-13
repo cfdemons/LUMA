@@ -1319,23 +1319,21 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, Grid
 ///
 ///	\param	position	position (x, y or z)
 ///	\return	boolean answer
-bool GridUtils::isWithinDomain(std::vector<double> &position) {
+bool GridUtils::isWithinDomain(std::vector<double> &position)
+{
 
 	// Get grid manager
 	GridManager *gm = GridManager::getInstance();
 
 	// Check with coarsest grid limits
-	if (position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
+	if
+	(	position[eXDirection] < gm->global_edges[eXMin][0] || position[eXDirection] > gm->global_edges[eXMax][0]
 	 || position[eYDirection] < gm->global_edges[eYMin][0] || position[eYDirection] > gm->global_edges[eYMax][0]
 #if (L_DIMS == 3)
 	 ||	position[eZDirection] < gm->global_edges[eZMin][0] || position[eZDirection] > gm->global_edges[eZMax][0]
 #endif
-		) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	) return false;
+	else return true;
 }
 
 // *****************************************************************************

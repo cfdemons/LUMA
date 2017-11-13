@@ -146,9 +146,9 @@ int main( int argc, char* argv[] )
 	cout.precision(L_OUTPUT_PRECISION);
 
 	// Output start time to application log
-	*GridUtils::logfile << "LUMA -- Version " << LUMA_VERSION << std::endl;
+	L_INFO("LUMA -- Version " + std::to_string(LUMA_VERSION), GridUtils::logfile);
 	char* time_str = ctime(&curr_time);	// Format start time as string
-    *GridUtils::logfile << "Simulation started at " << time_str;	// Write start time to log
+    L_INFO("Simulation started at " + std::string(time_str), GridUtils::logfile);;	// Write start time to log
 
 	// Create the Grid Manager
 	GridManager *gm = GridManager::getInstance();
@@ -160,8 +160,8 @@ int main( int argc, char* argv[] )
 	// Get time of MPI initialisation
 	MPI_Barrier(mpim->world_comm);
 	secs = clock() - t_start;
-	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
-	*GridUtils::logfile << "MPI Topolgy initialised in "<< mpi_initialise_time << "ms." << std::endl;
+	double mpi_initialise_time = ((double)secs)/CLOCKS_PER_SEC * 1000;
+	L_INFO("MPI Topolgy initialised in " + std::to_string(mpi_initialise_time) + "ms.", GridUtils::logfile);
 #endif
 
 	// Start clock again for next bit of initialisation
@@ -218,7 +218,7 @@ int main( int argc, char* argv[] )
 
 	if (L_NUM_LEVELS != 0) {
 
-		*GridUtils::logfile << "Initialising sub-grids..." << endl;
+		L_INFO("Initialising sub-grids...", GridUtils::logfile);
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
 		/* Loading the initial velocity field from a file is incompatible with subgrids 
@@ -255,11 +255,11 @@ int main( int argc, char* argv[] )
 
 	// Create Object Manager
 	ObjectManager* objMan = ObjectManager::getInstance(Grids);
-	*GridUtils::logfile << "Object Manager Created." << endl;
+	L_INFO("Object Manager Created.", GridUtils::logfile);
 
 	// Read in the geometry config file
 #ifdef L_GEOMETRY_FILE
-	*GridUtils::logfile << "Reading geometry configuration file..." << endl;
+	L_INFO("Reading geometry configuration file...", GridUtils::logfile);
 	objMan->io_readInGeomConfig();
 #endif
 
@@ -293,7 +293,7 @@ int main( int argc, char* argv[] )
 
 	// Reinitialise the bodies (compute support etc.)
 	ObjectManager::getInstance()->ibm_initialise();
-	*GridUtils::logfile << "Reinitialising IB_bodies from restart data." << std::endl;
+	L_INFO("Reinitialising IB_bodies from restart data.", GridUtils::logfile);
 
 #endif
 
@@ -311,8 +311,8 @@ int main( int argc, char* argv[] )
 	MPI_Barrier(mpim->world_comm);
 #endif
 	secs = clock() - t_start;
-	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC*1000;
-	*GridUtils::logfile << "Grid & Object Initialisation completed in "<< obj_initialise_time << "ms." << std::endl;
+	double obj_initialise_time = ((double)secs)/CLOCKS_PER_SEC * 1000;
+	L_INFO("Grid & Object Initialisation completed in " + std::to_string(obj_initialise_time) + "ms.", GridUtils::logfile);
 
 #ifdef L_BUILD_FOR_MPI
 	
@@ -329,32 +329,32 @@ int main( int argc, char* argv[] )
 
 	// Write out t = 0
 #ifdef L_TEXTOUT
-	*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
+	L_INFO("Writing out to <Grids->out>...", GridUtils::logfile);
 	Grids->io_textout("INITIALISATION");	// Do not change this tag!
 #endif
 
 #ifdef L_IO_LITE
-	*GridUtils::logfile << "Writing out to IOLite file..." << endl;
+	L_INFO("Writing out to IOLite file...", GridUtils::logfile);
 	Grids->io_lite(Grids->t, "INITIALISATION");
 #endif
 
 #ifdef L_HDF5_OUTPUT
-	*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+	L_INFO("Writing out to HDF5 file...", GridUtils::logfile);
 	Grids->io_hdf5(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE
-	*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
+	L_INFO("Writing out Bodies to VTK file...", GridUtils::logfile);
 	objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
 #ifdef L_VTK_FEM_WRITE
-	*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+	L_INFO("Writing out FEM to VTK file...", GridUtils::logfile);
 	objMan->io_vtkFEMWriter(Grids->t);
 #endif
 
 #ifdef L_WRITE_TIP_POSITIONS
-	*GridUtils::logfile << "Writing out tip positions" << endl;
+	L_INFO("Writing out tip positions", GridUtils::logfile);
 	objMan->io_writeTipPositions(Grids->t);
 #endif
 
@@ -380,7 +380,7 @@ int main( int argc, char* argv[] )
 	MPI_Barrier(mpim->world_comm);
 #endif
 	
-	*GridUtils::logfile << "Initialising LBM time-stepping..." << std::endl;
+	L_INFO("Initialising LBM time-stepping...", GridUtils::logfile);
 
 	if (rank == 0)
 		std::cout << "Initialisation complete. Starting LBM time-stepping..." << std::endl;
@@ -430,36 +430,36 @@ int main( int argc, char* argv[] )
 				GridUtils::logfile);
 
 #ifdef L_TEXTOUT
-			*GridUtils::logfile << "Writing out to <Grids->out>..." << endl;
+			L_INFO("Writing out to <Grids->out>...", GridUtils::logfile);
 			Grids->io_textout("START OF TIMESTEP");
 #endif
 #ifdef L_IO_FGA
-			*GridUtils::logfile << "Writing out to <.fga>..." << endl;
+			L_INFO("Writing out to <.fga>...", GridUtils::logfile);
 			Grids->io_fgaout();
 #endif
 
 #ifdef L_IO_LITE
-			*GridUtils::logfile << "Writing out to IOLite file..." << endl;
+			L_INFO("Writing out to IOLite file...", GridUtils::logfile);
 			Grids->io_lite(Grids->t,"");
 #endif
 
 #ifdef L_HDF5_OUTPUT
-			*GridUtils::logfile << "Writing out to HDF5 file..." << endl;
+			L_INFO("Writing out to HDF5 file...", GridUtils::logfile);
 			Grids->io_hdf5(Grids->t);
 #endif
 
 #ifdef L_VTK_BODY_WRITE
-			*GridUtils::logfile << "Writing out Bodies to VTK file..." << endl;
+			L_INFO("Writing out Bodies to VTK file...", GridUtils::logfile);
 			objMan->io_vtkBodyWriter(Grids->t);
 #endif
 
 #ifdef L_VTK_FEM_WRITE
-			*GridUtils::logfile << "Writing out FEM to VTK file..." << endl;
+			L_INFO("Writing out FEM to VTK file...", GridUtils::logfile);
 			objMan->io_vtkFEMWriter(Grids->t);
 #endif
 
 #if (defined L_IBM_ON && defined L_IBBODY_TRACER)
-			*GridUtils::logfile << "Writing out flexible body position..." << endl;
+			L_INFO("Writing out flexible body position...", GridUtils::logfile);
 			objMan->io_writeBodyPosition(Grids->t);
 #endif
 
@@ -480,16 +480,16 @@ int main( int argc, char* argv[] )
 		if (Grids->t % L_EXTRA_OUT_FREQ == 0) {
 
 #ifdef L_WRITE_TIP_POSITIONS
-			*GridUtils::logfile << "Writing out tip positions" << endl;
+			L_INFO("Writing out tip positions", GridUtils::logfile);
 			objMan->io_writeTipPositions(Grids->t);
 #endif
 
 #if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
-			*GridUtils::logfile << "Writing out object lift and drag" << endl;
+			L_INFO("Writing out object lift and drag", GridUtils::logfile);
 			objMan->io_writeForcesOnObjects(Grids->t);
 
 #ifdef L_IBM_ON
-			*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
+			L_INFO("Writing out flexible body lift and drag...", GridUtils::logfile);
 			objMan->io_writeLiftDrag();
 #endif
 #endif
@@ -497,7 +497,8 @@ int main( int argc, char* argv[] )
 
 		// Probe output has different frequency
 #ifdef L_PROBE_OUTPUT
-		if (Grids->t % L_PROBE_OUT_FREQ == 0) {
+		if (Grids->t % L_PROBE_OUT_FREQ == 0)
+		{
 
 #ifdef L_BUILD_FOR_MPI
 			for (int n = 0; n < mpim->num_ranks; n++)
@@ -511,7 +512,7 @@ int main( int argc, char* argv[] )
 #endif
 				{
 
-					*GridUtils::logfile << "Probe write out..." << endl;
+					L_INFO("Probe write out...", GridUtils::logfile);
 					Grids->io_probeOutput();
 
 				}
@@ -525,8 +526,8 @@ int main( int argc, char* argv[] )
 		/////////////////////////
 		// Restart File Output //
 		/////////////////////////
-		if (Grids->t % L_RESTART_OUT_FREQ == 0) {
-
+		if (Grids->t % L_RESTART_OUT_FREQ == 0)
+		{
 			// Write out
 			Grids->io_restart(eWrite);
 		}
@@ -626,7 +627,7 @@ int main( int argc, char* argv[] )
 	// Close log file
 	curr_time = time(NULL);			// Current system date/time and string buffer
 	time_str = ctime(&curr_time);	// Format as string
-	*GridUtils::logfile << "Simulation completed at " << time_str << std::endl;		// Write end time to log file
+	L_INFO("Simulation completed at " + std::string(time_str), GridUtils::logfile);		// Write end time to log file
 	logfile.close();
 
 	// Destroy singletons

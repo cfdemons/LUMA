@@ -357,6 +357,12 @@ int main( int argc, char* argv[] )
 	objMan->io_writeTipPositions(Grids->t);
 #endif
 
+	// Write out forces of objects
+#if (defined L_LD_OUT && defined L_GEOMETRY_FILE && defined L_IBM_ON)
+		*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
+		objMan->io_writeLiftDrag();
+#endif
+
 #ifdef L_PROBE_OUTPUT
 #ifdef L_BUILD_FOR_MPI
 	for (int n = 0; n < mpim->num_ranks; n++)

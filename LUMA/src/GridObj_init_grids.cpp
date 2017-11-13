@@ -1038,7 +1038,6 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
 #endif
 
 	// BOTTOM WALL //
@@ -1074,7 +1073,6 @@ void GridObj::LBM_initBoundLab ( )
 			}
 		}
 	}
-
 }
 
 // ****************************************************************************

@@ -76,16 +76,16 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 20									///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 20							///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 20									///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 20							///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ L_GRID_OUT_FREQ					///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT					///< Write out lift and drag (all bodies)
+//#define L_LD_OUT					///< Write out lift and drag (all bodies)
 //#define L_IO_FGA                  ///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -201,13 +201,13 @@
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
 //#define L_IBM_ON						///< Turn on IBM
-#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+//#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
 #define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
@@ -221,7 +221,7 @@
 *******************************************************************************
 */
 
-// BC types (unspecified is periodic)
+// BC types (set to eFluid for periodic)
 #define L_WALL_LEFT		eFluid		///< BC used on the left of the domain
 #define L_WALL_RIGHT	eFluid		///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain

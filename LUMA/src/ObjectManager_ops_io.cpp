@@ -1062,7 +1062,7 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
 
 		// Write out the header (first time step only)
-		if (static_cast<int>(tval) == L_OUT_EVERY_FORCES) fout << "Time,Fx,Fy,Fz" << std::endl;
+		if (static_cast<int>(tval) == L_EXTRA_OUT_FREQ) fout << "Time,Fx,Fy,Fz" << std::endl;
 
 		// Scaled with respect to refinement ratio
 		fout << std::to_string(tval) << ","
@@ -1091,7 +1091,7 @@ void ObjectManager::io_writeForcesOnObjects(double tval) {
 		fout.open(fileName.str().c_str(), std::ios::out | std::ios::app);
 
 		// Write out the header (first time step only)
-		if (static_cast<int>(tval) == L_OUT_EVERY_FORCES) fout << "Time,Fx,Fy,Fz" << std::endl;
+		if (static_cast<int>(tval) == L_EXTRA_OUT_FREQ) fout << "Time,Fx,Fy,Fz" << std::endl;
 
 		// Summation required
 		double bodyForceX = 0.0;

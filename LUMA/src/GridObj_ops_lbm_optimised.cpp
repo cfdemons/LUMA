@@ -158,7 +158,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 	timeav_timestep += ((double)secs) / CLOCKS_PER_SEC;
 	timeav_timestep /= t;
 
-	if (t % L_OUT_EVERY == 0) {
+	if (t % L_GRID_OUT_FREQ == 0) {
 		// Performance data to logfile
 		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
 	}
@@ -295,7 +295,7 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 	double fneq;
 	double Szz = 0, Sxz = 0, Syz = 0;	// Just 3D
 	unsigned int edgeCount = 0;
-	double rampCoefficient = GridUtils::getVelocityRampCoefficient(t * dt);		// Initialise ramp coefficient
+	double rampCoefficient = GridUtils::getVelocityRampCoefficient((t+1) * dt);		// Initialise ramp coefficient
 
 	
 	/*****************************/

@@ -359,7 +359,7 @@ void ObjectManager::toggleDebugStream(GridObj *g)
 {
 	// Only do this if on correct time interval
 	if (g->t == 0 || 
-		(g->t + 1) % static_cast<int>(L_OUT_EVERY_FORCES * (1.0 / g->refinement_ratio)) != 0) return;
+		(g->t + 1) % static_cast<int>(L_EXTRA_OUT_FREQ * (1.0 / g->refinement_ratio)) != 0) return;
 
 	// Open file if not open, close if already open
 	if (!debugstream.is_open())

@@ -112,7 +112,6 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 	int it = 0;
 	int MAXIT = 10;
 	double TOL = 1e-4;
-	bool keepLooping = true;
 
 	// Do the while loop for sub iteration
 	do {
@@ -132,20 +131,16 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 		// Increment counter
 		it++;
 
-		// Check while loop parameters
-		if (res < TOL || it > MAXIT)
-			keepLooping = false;
-
-	} while (keepLooping == true);
+	} while (res > TOL && it < MAXIT);
 
 	// Get time averaged sub-iteration values
-	timeav_subResidual *= (g->t % L_OUT_EVERY);
+	timeav_subResidual *= (g->t % L_GRID_OUT_FREQ);
 	timeav_subResidual += res;
-	timeav_subResidual /= (g->t % L_OUT_EVERY + 1);
+	timeav_subResidual /= (g->t % L_GRID_OUT_FREQ + 1);
 
-	timeav_subIterations *= (g->t % L_OUT_EVERY);
+	timeav_subIterations *= (g->t % L_GRID_OUT_FREQ);
 	timeav_subIterations += it;
-	timeav_subIterations /= (g->t % L_OUT_EVERY + 1);
+	timeav_subIterations /= (g->t % L_GRID_OUT_FREQ + 1);
 
 	// Set the new start-of-timestep values
 	for (auto ib : idxFEM) {
@@ -166,18 +161,18 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 			}
 
 			// Get time averaged FEM values
-			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_GRID_OUT_FREQ);
 			iBody[ib].fBody->timeav_FEMIterations += iBody[ib].fBody->it;
-			iBody[ib].fBody->timeav_FEMIterations /= (g->t % L_OUT_EVERY + 1);
+			iBody[ib].fBody->timeav_FEMIterations /= (g->t % L_GRID_OUT_FREQ + 1);
 
-			iBody[ib].fBody->timeav_FEMResidual *= (g->t % L_OUT_EVERY);
+			iBody[ib].fBody->timeav_FEMResidual *= (g->t % L_GRID_OUT_FREQ);
 			iBody[ib].fBody->timeav_FEMResidual += iBody[ib].fBody->res;
-			iBody[ib].fBody->timeav_FEMResidual /= (g->t % L_OUT_EVERY + 1);
+			iBody[ib].fBody->timeav_FEMResidual /= (g->t % L_GRID_OUT_FREQ + 1);
 		}
 	}
 
 	// Write out time-averaged iterator loop values
-	if (g->t % L_OUT_EVERY == 0) {
+	if ((g->t + 1) % L_GRID_OUT_FREQ == 0) {
 
 		// Write out
 		*GridUtils::logfile << "Grid " << g->level << ": Sub-iterations taking " << timeav_subIterations <<
@@ -979,7 +974,7 @@ double ObjectManager::ibm_checkVelDiff(int level) {
 				velMagDiff = GridUtils::vecnorm(GridUtils::subtract(iBody[ib].markers[m].markerVel, iBody[ib].markers[m].markerVel_km1));
 
 				// Normalise it
-				velMagDiff = velMagDiff / (iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
+				velMagDiff = velMagDiff / (L_UX0 * iBody[ib]._Owner->dt / iBody[ib]._Owner->dh);
 
 				// Get the max difference
 				if (fabs(velMagDiff) > res)

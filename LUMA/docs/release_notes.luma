@@ -1,3 +1,18 @@
+version		=	1.7.0
+
+General		:	Updated compilation instructions.
+				Bug fixes for IBM.
+				Added facility to restart simulation using a different time step along with python utility.
+				Updated logging formatting in the main method ot match new standard.
+				
+Issue #165	:	Fixed issue with incorrect site rejection action for momex.
+Issue #155	:	Fixed bug when activating point cloud debugging features in serial.
+Issue #157	:	Fixed issue with incorrect message passing when using a sinlge core in a given dimension.
+Issue #149	:	Fixed issue with applying regularised BC on corner nodes.
+Issue #161	:	Fixed issue with incorrect writing of forces for IBM bodies in parallel.
+Issue #162	:	Updated terminology for output timers.
+Issue #160	:	Added utility for determining out of domain positions to fix issue with support nodes leaving the domain instead of wrapping.
+
 version 	=	1.6.1
 
 Issue #146	:	Fixed bug in MPI manager initialisation that caused an overrun exception.

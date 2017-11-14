@@ -64,6 +64,42 @@ public:
 	}
 
 	// *****************************************************************************
+	/// \brief	Converts velocity in LBM units to dimensionless units.
+	///
+	/// \param u_lbm			Lattice velocity.
+	/// \param currentGrid		Pointer to the current grid. 
+	/// \returns				velocity in dimensionless units.
+	template <typename T>
+	static double ulbm2ud(T u_lbm, GridObj* currentGrid)
+	{
+		return (u_lbm * currentGrid->dh) / currentGrid->dt;
+	}
+
+	// *****************************************************************************
+	/// \brief	Converts particle distribution in LBM units to dimensionless units.
+	///
+	/// \param fi_lbm			Lattice distribution function.
+	/// \param currentGrid		Pointer to the current grid. 
+	/// \returns				particle distribution in dimensionless units.
+	template <typename T>
+	static double filbm2fid(T fi_lbm, GridObj* currentGrid)
+	{
+		return (fi_lbm * currentGrid->dm * std::pow(currentGrid->dt,3)) / std::pow(currentGrid->dh,6);
+	}
+
+	// *****************************************************************************
+	/// \brief	Converts particle distribution in dimensionless units to LBM units.
+	///
+	/// \param fi_dimensionless	Dimensionless distribution function.
+	/// \param currentGrid		Pointer to the current grid. 
+	/// \returns				Lattice particle distribution. 
+	template <typename T>
+	static double fid2filbm(T fi_dimensionless, GridObj* currentGrid)
+	{
+		return (fi_dimensionless * std::pow(currentGrid->dh, 6)) / (currentGrid->dm * std::pow(currentGrid->dt, 3));
+	}
+
+	// *****************************************************************************
 	/// \brief	Converts length in dimensionless units to LBM units.
 	///
 	/// \param l_dimensionless	Dimensionless length.

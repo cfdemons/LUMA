@@ -73,7 +73,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_GRID_OUT_FREQ 20									///< How many timesteps before whole grid output
@@ -103,18 +103,18 @@
 // Forcing
 #define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 2.986e-4
+#define L_GRAVITY_FORCE 0.0003944
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
-//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
-//#define L_USE_BGKSMAG
-#define L_CSMAG 0.1
+#define L_USE_BGKSMAG
+#define L_CSMAG 0.3
 
 /// Compute the time-averaged values of velocity, density and the velocity products.
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
@@ -159,18 +159,18 @@
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
 #define L_RESOLUTION 20											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.00045											///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.04											///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.5															///< End of domain in X (non-dimensional units)
+#define L_BX 4.0															///< End of domain in X (non-dimensional units)
 #define L_BY (1.0 + (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
+#define L_BZ 4.0															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 3.86		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
-#define L_PHYSICAL_RHO 1000.0		///< Reference density in physical units
+#define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
 
 
 /*
@@ -190,7 +190,7 @@
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 1.0/0.000261	///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 
@@ -232,7 +232,7 @@
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 //#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
-#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
+//#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall

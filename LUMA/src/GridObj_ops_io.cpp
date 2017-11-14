@@ -382,9 +382,18 @@ void GridObj::_io_fgaout(int timeStepL0) {
 // *****************************************************************************
 /// \brief	Restart file read-writer.
 ///
-///			This routine writes/reads the current rank's data in the custom restart 
-///			file format. If the file already exists, data is appended. IB body data
-///			are also written out but no other body information at present. 
+///			This routine writes/reads the current rank's particle distribution functions
+///			in the custom restart file format. If the file already exists, data is appended. 
+///			IB body data are also written out but no other body information at present. 
+///			It writes the restart data following the procedure in: 
+///			"Physically based Animation of Free Surface Flows with the Lattice Boltzmann Method" by N. Thuerey, 
+///			section 6.1. 
+///			This implementation allows to restart the simulation with a different time step value. 
+///         The data written for each cell is: 
+///			- Global position 
+///         - Dimensionless velocity
+///         - Density in LBM units
+///         - Time-scaled non equilibrium distribution functions: ((f - f_eq) * omega) / (f_eq*dt)
 ///
 /// \param IO_flag	flag to indicate whether a write or read
 void GridObj::io_restart(eIOFlag IO_flag) {
@@ -435,18 +444,23 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 					// Global Position
 					file << XPos[i] << "\t" << YPos[j] << "\t" << ZPos[k] << "\t";
 
-					// f values
-					for (v = 0; v < L_NUM_VELS; v++) {
-						file << f(i,j,k,v,M_lim,K_lim,L_NUM_VELS) << "\t";
-					}
-
-					// u values
+					// Dimensionless u values
 					for (v = 0; v < L_DIMS; v++) {
-						file << u(i,j,k,v,M_lim,K_lim,L_DIMS) << "\t";
+						file << GridUnits::ulbm2ud(u(i, j, k, v, M_lim, K_lim, L_DIMS), this) << "\t";
 					}
 
-					// rho value
-					file << rho(i,j,k,M_lim,K_lim) << std::endl;
+					// rho in lbm units (rho does not depend on dt). 
+					file << rho(i, j, k, M_lim, K_lim) << "\t";
+
+					int id = k + j * K_lim + i * K_lim * M_lim;
+					// time - scaled fneq values
+					for (v = 0; v < L_NUM_VELS; v++) {
+						double f_eq = _LBM_equilibrium_opt(id, v);
+						double f_neq_restart = ((f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) - f_eq) * omega) / (f_eq*dt);
+						file << f_neq_restart << "\t";
+					}
+
+					file << std::endl;
 
 				}
 			}
@@ -526,19 +540,26 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 			i = ijk[0];
 			j = ijk[1];
 			k = ijk[2];
+			int id = k + j * K_lim + i * K_lim * M_lim;
 
-			// Read in f values
-			for (v = 0; v < L_NUM_VELS; v++) {
-				iss >> g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
-			}
-
-			// Read in u values
+			// Read in u values and convert them to lbm units
 			for (v = 0; v < L_DIMS; v++) {
-				iss >> g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS);
+				double u_temp;
+				iss >> u_temp;
+				g->u(i, j, k, v, g->M_lim, g->K_lim, L_DIMS) = GridUnits::ud2ulbm(u_temp, g);
 			}
 
-			// Read in rho value
+			// Read in rho value (it is already written in lbm units, since rho doesn't depend on dt)
 			iss >> g->rho(i, j, k, g->M_lim, g->K_lim);
+
+			// Read in f values and convert them to the new dt
+			for (v = 0; v < L_NUM_VELS; v++) {
+				double f_temp;
+				double f_eq = _LBM_equilibrium_opt(id, v);
+				iss >> f_temp;
+				g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = f_eq*(1 + (g->dt*f_temp) / omega);
+				g->fNew(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS) = g->f(i, j, k, v, g->M_lim, g->K_lim, L_NUM_VELS);
+			}
 
 		}
 

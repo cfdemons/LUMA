@@ -102,18 +102,17 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 		// Write position of solid site
 		if (debugstream.is_open())
 			debugstream << std::endl << g->XPos[i] << "," << g->YPos[j] << "," << g->ZPos[k];
-
-		// Declare some local stores
-		double contrib_x, contrib_y, contrib_z;
 #endif
+		// Declare some local stores
+		double contrib_x = 0.0, contrib_y = 0.0, contrib_z = 0.0;
 
 		// Loop over directions from solid site
-		for (int n = 0; n < L_NUM_VELS; n++) {
-
+		for (int n = 0; n < L_NUM_VELS; n++)
+		{
 			// Get incoming direction
 			int n_opp = GridUtils::getOpposite(n);
 
-			// Compute destination coordinates
+			// Compute destination coordinates (does not assume any periodicity)
 			int xdest = i + c[eXDirection][n];
 			int ydest = j + c[eYDirection][n];
 			int zdest = k + c[eZDirection][n];
@@ -138,37 +137,22 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 				 * Multiplication by c unit vector resolves the result in 
 				 * appropriate direction.
 				 */
-				bbbForceOnObjectX +=
-					2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				bbbForceOnObjectY +=
-					2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				bbbForceOnObjectZ +=
-					2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				 // Store contribution in this direction
+				contrib_x += 2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_y += 2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_z += 2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+			}
+			
+			// Add the total contribution of every direction of this site to the body forces
+			bbbForceOnObjectX += contrib_x;
+			bbbForceOnObjectY += contrib_y;
+			bbbForceOnObjectZ += contrib_z;
 
 #ifdef L_MOMEX_DEBUG
-				// Store contribution
-				contrib_x = 2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_y = 2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_z = 2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-
-			}
-			else
-			{
-				// Contributions are zero as do not stream to fluid site
-				contrib_x = 0.0;
-				contrib_y = 0.0;
-				contrib_z = 0.0;
-#endif
-			}
-
-
-#ifdef L_MOMEX_DEBUG
-			// Write contribution to file
+			// Write contribution to file for this site
 			if (debugstream.is_open())
 				debugstream << "," << std::to_string(contrib_x) << "," << std::to_string(contrib_y) << "," << std::to_string(contrib_z);
 #endif
-
-
 		}
 	}
 }

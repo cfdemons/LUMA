@@ -106,6 +106,7 @@ int main( int argc, char* argv[] )
 	// Create version string
 	std::string version_string("Running LUMA -- Version ");
 	version_string += LUMA_VERSION;
+	std::string version_ext(version_string);
 	int rank = GridUtils::safeGetRank();
 
 #ifdef L_BUILD_FOR_MPI
@@ -113,14 +114,14 @@ int main( int argc, char* argv[] )
 	MpiManager* mpim = MpiManager::getInstance();
 
 	// Add parallel build strap
-	version_string += "\n(Parallel Build: " + std::to_string(mpim->num_ranks) + " Processes)";
+	version_ext += "\n(Parallel Build: " + std::to_string(mpim->num_ranks) + " Processes)";
 
 	if (mpim->my_rank == 0)
 
 #else
 
 	// Add serial strap
-	version_string += "\n(Serial Build)";
+	version_ext += "\n(Serial Build)";
 
 	// Create directory in serial mode
 	GridUtils::createOutputDirectory(GridUtils::path_str);
@@ -128,7 +129,7 @@ int main( int argc, char* argv[] )
 #endif
 	{
 		// Print starting string
-		std::cout << version_string << std::endl;
+		std::cout << version_ext << std::endl;
 
 	}
 
@@ -146,7 +147,7 @@ int main( int argc, char* argv[] )
 	cout.precision(L_OUTPUT_PRECISION);
 
 	// Output start time to application log
-	L_INFO("LUMA -- Version " + std::to_string(LUMA_VERSION), GridUtils::logfile);
+	L_INFO(version_string, GridUtils::logfile);
 	char* time_str = ctime(&curr_time);	// Format start time as string
     L_INFO("Simulation started at " + std::string(time_str), GridUtils::logfile);;	// Write start time to log
 

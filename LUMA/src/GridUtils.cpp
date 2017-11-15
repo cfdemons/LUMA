@@ -1779,8 +1779,11 @@ int GridUtils::safeGetRank()
 ///	\returns		a pointer to the sub-grid.
 GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 {
+
 	// Create Grid pointer
 	GridObj * g = nullptr;
+
+#if (L_NUM_LEVELS > 0)
 
 	if (parent->level == 0)
 	{
@@ -1808,6 +1811,9 @@ GridObj* GridUtils::getSubGrid(int i, int j, int k, GridObj * parent)
 	{
 		g = parent->subGrid[0];
 	}
+
+#endif
+
 	return g;
 }
 

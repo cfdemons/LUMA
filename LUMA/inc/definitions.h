@@ -109,7 +109,7 @@
 // Initialisation
 #define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
-#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
+//#define L_RESTARTING						///< Initialise the GridObj with quantities read from a restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION					///< Use KBC collision operator instead of LBGK by default
@@ -159,7 +159,7 @@
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
 #define L_RESOLUTION 20											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.04											///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.004											///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX 4.0															///< End of domain in X (non-dimensional units)

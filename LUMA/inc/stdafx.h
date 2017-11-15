@@ -112,6 +112,10 @@
 // Failure coede
 #define LUMA_FAILED 12345
 
+// String conversion for macros
+#define STRING(s) #s
+#define TOSTRING(s) STRING(s)
+
 /// Error definition
 #define L_ERROR errorfcn	///< Error function shorthand
 /// \brief Fatal Error function.
@@ -128,7 +132,7 @@ inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 #endif
 
 	std::cout << " Error: See Log File" << std::endl;
-	*logfile << "**ERROR**: " << msg << std::endl;
+	*logfile << "ERROR: " << msg << std::endl;
 	logfile->close();
 
 #ifdef L_BUILD_FOR_MPI

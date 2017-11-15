@@ -937,7 +937,7 @@ void MpiManager::mpi_buffer_size() {
 							L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
 								" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
 								" is sending " + std::to_string(bufSendSizesIn[counter]) + 
-								". Expected to receive " + std::to_string(bufr.size[i]), logout);
+								". Expected to receive " + std::to_string(bufr.size[i]), GridUtils::logfile);
 						}						
 					}
 				}
@@ -950,7 +950,7 @@ void MpiManager::mpi_buffer_size() {
 						L_ERROR("L" + std::to_string(l) + "R" + std::to_string(r) + 
 							" -- Mismatch in buffer sizes! Rank " + std::to_string(neighbour_rank[opp_i]) +
 							" is sending " + std::to_string(bufSendSizesIn[counter]) +
-							". Expected to receive 0 as no grid of this L+R on this rank.", logout);
+							". Expected to receive 0 as no grid of this L+R on this rank.", GridUtils::logfile);
 					}
 				}
 

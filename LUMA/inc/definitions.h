@@ -76,8 +76,8 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_OUT_EVERY 20									///< How many timesteps before whole grid output
-#define L_OUT_EVERY_FORCES 20							///< Specific output frequency of body forces
+#define L_OUT_EVERY 8000									///< How many timesteps before whole grid output
+#define L_OUT_EVERY_FORCES 25							///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ L_OUT_EVERY					///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
@@ -126,7 +126,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 40000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 400000			///< Number of time steps to run simulation for
 
 
 /*
@@ -136,13 +136,13 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 5		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 12		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
-#define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
+#define L_MPI_SD_MAX_ITER 1600		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
 //#define L_MPI_TOPOLOGY_REPORT		///< Have the MPI Manager report on different combinations of X Y Z cores
@@ -158,13 +158,23 @@
 
 // Lattice properties
 #define L_DIMS 2													///< Number of dimensions to the problem
-#define L_RESOLUTION 200											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.00045											///< The timestep in non-dimensional units
+#define L_RESOLUTION 25
+
+/*
+*******************************************************************************/
+
+#define LBM_velocity 0.05        ///Fang's definitions
+#define L_TIMESTEP LBM_velocity/L_RESOLUTION*1.0/L_UX0
+
+
+
+
+
 
 // Non-dimensional domain dimensions
-#define L_BX 2.5															///< End of domain in X (non-dimensional units)
-#define L_BY (0.41 + (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))		///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
+#define L_BX 50.0        ///< End of domain in X (non-dimensional units)
+#define L_BY 40.0        ///< End of domain in Y (non-dimensional units)
+#define L_BZ 10.0	     ///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
@@ -181,7 +191,7 @@
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
-#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
+//#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -190,7 +200,7 @@
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0            ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 1000			///< Desired Reynolds number
+#define L_RE 150			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 
@@ -222,16 +232,16 @@
 */
 
 // BC types (unspecified is periodic)
-#define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
-#define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
-#define L_WALL_TOP		eSolid			///< BC used on the top of the domain
+#define L_WALL_LEFT	eVelocity		///< BC used on the left of the domain
+#define L_WALL_RIGHT	eVelocity //ePressure		///< BC used on the right of the domain
+#define L_WALL_BOTTOM	eVelocity			///< BC used on the bottom of the domain
+#define L_WALL_TOP	eVelocity			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
-#define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
+#define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 
 // BC qualifiers
-#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
@@ -249,8 +259,8 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
-#define L_NUM_REGIONS 0		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 //#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
@@ -261,33 +271,172 @@
 #define L_PADDING_Z_MIN (-2.0 * dh)		///< Padding between Z start of each sub-grid and its child edge
 #define L_PADDING_Z_MAX (2.0 * dh)		///< Padding between Z end of each sub-grid and its child edge
 
+
+/*
+*******************************************************************************
+************************ John Definition **************************************
+*******************************************************************************
+*/
+
+/*
+******************************************************************
+Select point to start with refinement
+******************************************************************
+*/
+
+#define StartX  10.0                                    //John's definitions Position 1 level X
+#define LengthX 20.0                                    //John's definitions Size 1 level X 
+#define StartY  10.0                                    //John's definitions Position 1 level Y
+#define LengthY 20.0                                    //John's definitions Size 1 level Y
+#define StartZ   8.0                                   //John's definitions Position 1 level Z
+#define LengthZ  4.0                                   //John's definitions Size 1 level Z
+
+/*
+******************************************************************
+Number of cell consider between each level of refinment  I
+******************************************************************
+*/
+
+#define NumCellsLevOneFrontX   L_RESOLUTION*9.4
+#define NumCellsLevOneBackX    L_RESOLUTION*5.4       //John's definition
+#define NumCellsLevOneBottomY  L_RESOLUTION*9.4       //John's definition
+#define NumCellsLevOneTopY     L_RESOLUTION*9.4       //John's definition
+#define NumCellsLevOneLowZ     L_RESOLUTION*5       //John's definition
+#define NumCellsLevOneHighZ    L_RESOLUTION*5       //John's definition
+
+/*
+******************************************************************
+Uncomment if it is used 2 level of refinement  I
+******************************************************************
+*/
+
+#define StartX1   StartX+(NumCellsLevOneFrontX*(1.0/L_RESOLUTION))           //John's definition                                  
+#define EndX1     (StartX+LengthX)-(NumCellsLevOneBackX*(1.0/L_RESOLUTION))  //John's definition                                 
+#define StartY1   StartY+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))          //John's definition                       
+#define EndY1     (StartY+LengthY)-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))   //John's definition
+#define StartZ1   StartZ+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))             //John's definition                       
+#define EndZ1     (StartZ+LengthZ)-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))  //John's definition
+
+/*
+******************************************************************
+Uncomment if it is used 3 level of refinement  I
+******************************************************************
+*/
+
+//#define StartX2   StartX1+((NumCellsLevOneFrontX/2.0)*(1.0/L_RESOLUTION))       //John's definition                           
+//#define EndX2     EndX1-(NumCellsLevOneBackX*(1.0/L_RESOLUTION))                //John's definition                      
+//#define StartY2   StartY1+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
+//#define EndY2     EndY1-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
+//#define StartZ2   StartZ1+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
+//#define EndZ2     EndZ1-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))                //John's definition
+
+/*
+******************************************************************
+Uncomment if it is used 4 level of refinement  I
+******************************************************************
+*/
+
+//#define StartX3   StartX2+((NumCellsLevOneFrontX/4.0)*(1.0/L_RESOLUTION))       //John's definition                          
+//#define EndX3     EndX2-((NumCellsLevOneBackX)*(1.0/L_RESOLUTION))                //John's definition                      
+//#define StartY3   StartY2+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
+//#define EndY3     EndY2-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
+//#define StartZ3   StartZ2+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
+//#define EndZ3     EndZ2-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))                 //John's definition
+
+/*
+******************************************************************
+Uncomment if it is used 5 level of refinement  I
+******************************************************************
+*/
+
+//#define StartX4   StartX3+((NumCellsLevOneFrontX/8.0)*(1.0/L_RESOLUTION))       //John's definition                          
+//#define EndX4     EndX3-((NumCellsLevOneBackX*3)*(1.0/L_RESOLUTION))                //John's definition                      
+//#define StartY4   StartY3+(NumCellsLevOneBottomY*(1.0/L_RESOLUTION))            //John's definition                        
+//#define EndY4     EndY3-(NumCellsLevOneTopY*(1.0/L_RESOLUTION))                 //John's definition
+//#define StartZ4   StartZ3+(NumCellsLevOneLowZ*(1.0/L_RESOLUTION))               //John's definition                       
+//#define EndZ4     EndZ3-(NumCellsLevOneHighZ*(1.0/L_RESOLUTION))    //John's definition
+
+
+
+
+
+
+
+/*
+*******************************************************************************
+*******************************************************************************
+*******************************************************************************
+*/
+
+
+
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
-static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
-{
-	{ 0.05 }
-};
-static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
-{
-	{ 1.5 }
-};
-static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.03 + L_WALL_THICKNESS_BOTTOM }
-};
-static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.38 + L_WALL_THICKNESS_BOTTOM }
-};
-static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.0 }
-};
-static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.0 }
-};
+/*
+******************************************************************
+Uncomment just if it is used 1 level of refinement  
+******************************************************************
+*/
+//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX}};
+//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX}};
+//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{(StartY)}};
+//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY}};
+//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ}};
+//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ}};
+
+
+/*
+******************************************************************
+Uncomment just if it is used 2 level of refinement  I
+******************************************************************
+*/
+static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1}};
+static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1}};
+static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1}};
+static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1}};
+static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1}};
+static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1}};
+
+/*
+******************************************************************
+Uncomment just if it is used 3 level of refinement  I
+******************************************************************
+*/
+
+//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2}};
+//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2}};
+//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2}};
+//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2}};
+//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2}};
+//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2}};
+
+/*
+******************************************************************
+Uncomment just if it is used 4 level of refinement  I
+******************************************************************
+*/
+//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2},{StartX3}};
+//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2},{EndX3}};
+//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2},{StartY3}};
+//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2},{EndY3}};
+//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2},{StartZ3}};
+//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2},{EndZ3}};
+
+/*
+******************************************************************
+Uncomment just if it is used 5 level of refinement  I
+******************************************************************
+*/
+
+//static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX},{StartX1},{StartX2},{StartX3},{StartX4}};
+//static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartX+LengthX},{EndX1},{EndX2},{EndX3},{EndX4}};
+//static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY},{StartY1},{StartY2},{StartY3},{StartY4}};
+//static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartY+LengthY},{EndY1},{EndY2},{EndY3},{EndY4}};
+//static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ},{StartZ1},{StartZ2},{StartZ3},{StartZ4}};
+//static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {{StartZ+LengthZ},{EndZ1},{EndZ2},{EndZ3},{EndZ4}};
+
+
 
 #endif
 

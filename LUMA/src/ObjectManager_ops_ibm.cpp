@@ -1090,11 +1090,12 @@ void ObjectManager::ibm_universalEpsilonScatter(int level, IBBody &iBodyTmp) {
 
 #ifdef L_BUILD_FOR_MPI
 
-	// Set root rank
-	int rootRank = 0;
-
 	// Get mpi manager instance
 	MpiManager *mpim = MpiManager::getInstance();
+
+	// Set root rank
+	std::vector<int> lev2glob = mpim->mpi_mapRankLevelToWorld(level);
+	int rootRank = lev2glob[0];
 
 	// Gather in the data for all markers in the system
 	mpim->mpi_uniEpsilonCommScatter(level, rootRank, iBodyTmp);

@@ -243,6 +243,10 @@ void GridObj::LBM_initGrid() {
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
 
+	// Can't use regularised boundaries with D3Q27 because of the corners
+#if (defined L_REGULARISED_BOUNDARIES && L_NUM_VELS == 27)
+	L_ERROR("Cannot use regularised boundaries with D3Q27 because of the corner treatment. Exiting.", GridUtils::logfile);
+#endif
 
 	// Add boundary-specific labels
 	LBM_initBoundLab();

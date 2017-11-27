@@ -73,7 +73,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
 #define L_OUT_EVERY 20									///< How many timesteps before whole grid output
@@ -224,8 +224,8 @@
 // BC types (unspecified is periodic)
 #define L_WALL_LEFT		eVelocity		///< BC used on the left of the domain
 #define L_WALL_RIGHT	ePressure		///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
-#define L_WALL_TOP		eSolid			///< BC used on the top of the domain
+#define L_WALL_BOTTOM	eVelocity			///< BC used on the bottom of the domain
+#define L_WALL_TOP		eVelocity			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
 

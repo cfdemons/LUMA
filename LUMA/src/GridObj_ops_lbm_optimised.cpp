@@ -427,8 +427,23 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			)
 			)
 		{
-			fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
-				(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+			// Get dot product and magnitude of velocity direction
+			int dp = 0;
+			double mag = 0.0;
+			for (int d = 0; d < L_DIMS; d++) {
+				dp += c_opt[v][d] * normalVector[d];
+				mag += (static_cast<double>(c_opt[v][d]) * static_cast<double>(c_opt[v][d]));
+			}
+			mag = sqrt(mag);
+
+			// If a buried link then set to feq (plane with normal parallel to normal of boundary)
+			if (dp == 0 && mag > 1.0) {
+				fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v);
+			}
+			else {
+				fNew[v + id * L_NUM_VELS] = _LBM_equilibrium_opt(id, v) +
+					(fNew[GridUtils::getOpposite(v) + id * L_NUM_VELS] - _LBM_equilibrium_opt(id, GridUtils::getOpposite(v)));
+			}
 		}
 
 		// Store off-equilibrium and update stress components

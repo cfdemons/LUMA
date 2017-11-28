@@ -25,10 +25,6 @@
 ///	\param	doSubIterate		flag to switch sub-iterations on
 void ObjectManager::ibm_apply(GridObj *g, bool doSubIterate) {
 
-	// Set post-LBM velocities
-	if (hasFlexibleBodies[g->level])
-		g->u_n = g->u;
-
 	// Interpolate the velocity onto the markers
 	ibm_interpolate(g->level);
 

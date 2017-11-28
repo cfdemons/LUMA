@@ -88,7 +88,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 				// REGULARISED BCs //
 #ifdef L_REGULARISED_BOUNDARIES
 				if (type_local == eVelocity || type_local == ePressure)
-					_LBM_regularised_opt(i, j, k, id, type_local);
+					_LBM_regularised_opt(i, j, k, id, type_local, subcycle);
 #endif
 
 				// MACROSCOPIC //
@@ -99,6 +99,10 @@ void GridObj::LBM_multi_opt(int subcycle)
 			}
 		}
 	}
+
+	// Set post-LBM macros
+	if (objman->hasFlexibleBodies[level])
+		u_n = u;
 
 	// Perform IBM steps (interpolate, force calc, spread and update macro)
 	if (objman->hasIBMBodies[level])
@@ -282,7 +286,8 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 /// \param	k			z-index of current site.
 ///	\param	id			flattened ijk index.
 ///	\param	type		lattice type (assumed to be either velocity or pressure)
-void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
+///	\param	subcycle	number of sub-cycle being performed.
+void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type, int subcycle)
 {
 	// Declarations
 	std::vector<double> tmpVelVector(3, 0);
@@ -328,13 +333,13 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 		{
 			if (type == ePressure)
 			{
-				// Extrapolate wall-normal velocity component
-				tmpVelVector[normalDirection] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, normalDirection, L_DIMS);
+				L_ERROR("Pressure BC not supported at corner/edge site. Exiting.", GridUtils::logfile);
 			}
 			else if (type == eVelocity)
 			{
 				// Extrapolate density value
-				tmpDensity = GridUtils::extrapolate(*this, rho, normalVector, 1, i, j, k);
+				tmpDensity = _LBM_updateAndExtrapolate(subcycle, rho, normalVector, 1, i, j, k);
+
 			}
 			else L_ERROR("Unknown BC type: regularised BC.", GridUtils::logfile);
 		}
@@ -371,7 +376,8 @@ void GridObj::_LBM_regularised_opt(int i, int j, int k, int id, eType type)
 			{
 				// Check if tangential velocity and do not extrapolate on recv layer
 				if (d != normalDirection && !GridUtils::isOnRecvLayer(XPos[i], YPos[j], ZPos[k]))
-					tmpVelVector[d] = GridUtils::extrapolate(*this, u, normalVector, 1, i, j, k, d, L_DIMS);
+					tmpVelVector[d] = _LBM_updateAndExtrapolate(subcycle, u, normalVector, 1, i, j, k, d, L_DIMS);
+
 			}
 
 			// Update the wall-normal velocity
@@ -1303,4 +1309,102 @@ void GridObj::_LBM_resetForces()
 	std::fill(force_xyz.begin(), force_xyz.end(), 0.0);
 #endif
 }
+
+
+// *****************************************************************************
+/// \brief	Method to update macroscopic quantities on the fly and extrapolate from them.
+///
+///	\param	subcycle	number of sub-cycle being performed.
+/// \param	quantity	quantity to search.
+/// \param	direction	direction in which to source extrapolation data.
+///	\param	order		order of extrapolation.
+/// \param	i			target site x index.
+/// \param	j			target site y index.
+/// \param	k			target site z index.
+/// \param	p			target site extra index.
+/// \param	max			extra index max size for flattening.
+///	\returns			extrapolated value.
+double GridObj::_LBM_updateAndExtrapolate(int subcycle, IVector<double>  &quantity,
+		std::vector<int> direction, int order, int i, int j, int k, int p, int max)
+{
+
+	// Get id of current lattice site
+	int id = k + j * K_lim + i * K_lim * M_lim;
+
+	// 0th order extrapolation
+	if (order == 0)
+	{
+		// Get indices of extrapolation site
+		int i1 = i + direction[eXDirection];
+		int j1 = j + direction[eYDirection];
+		int k1 = k + direction[eZDirection];
+
+		// Check if on grid
+		if (GridUtils::isOffGrid(i1, j1, k1, this))
+			L_ERROR("Extrapolation does not have enough available cells.", GridUtils::logfile);
+
+		// Get the ID
+		int id1 = k1 + j1 * K_lim + i1 * K_lim * M_lim;
+
+		// Update macroscopic at this lattice site if it hasn't been done yet
+		if (id1 > id)
+			_LBM_updateInteriorLatticeSite(i1, j1, k1, subcycle);
+
+	}
+
+	// 1st order extrapolation
+	else if (order == 1)
+	{
+		// Get indices of extrapolation sites
+		int i1 = i + direction[eXDirection];
+		int i2 = i1 + direction[eXDirection];
+		int j1 = j + direction[eYDirection];
+		int j2 = j1 + direction[eYDirection];
+		int k1 = k + direction[eZDirection];
+		int k2 = k1 + direction[eZDirection];
+
+		// Check if on grid
+		if (GridUtils::isOffGrid(i1, j1, k1, this) || GridUtils::isOffGrid(i2, j2, k2, this))
+			L_ERROR("Extrapolation does not have enough available cells.", GridUtils::logfile);
+
+		// Get the IDs
+		int id1 = k1 + j1 * K_lim + i1 * K_lim * M_lim;
+		int id2 = k2 + j2 * K_lim + i2 * K_lim * M_lim;
+
+		// Update macroscopic at this lattice site if it hasn't been done yet
+		if (id1 > id)
+			_LBM_updateInteriorLatticeSite(i1, j1, k1, subcycle);
+		if (id2 > id)
+			_LBM_updateInteriorLatticeSite(i2, j2, k2, subcycle);
+
+	}
+	else
+		L_ERROR("Invalid order of extrapolation requested.", GridUtils::logfile);
+
+	// Do the extrapolation and return
+	return GridUtils::extrapolate(*this, quantity, direction, order, i, j, k, p, max);
+}
+
+
+// *****************************************************************************
+/// \brief	Do a stream and update-macro on a single interior lattice site.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+///	\param	subcycle	number of sub-cycle being performed.
+void GridObj::_LBM_updateInteriorLatticeSite(int i, int j, int k, int subcycle)
+{
+
+	// Local index and type
+	int id = k + j * K_lim + i * K_lim * M_lim;
+	eType type_local = LatTyp[id];
+
+	// STREAM //
+	_LBM_stream_opt(i, j, k, id, type_local, subcycle);
+
+	// MACROSCOPIC //
+	_LBM_macro_opt(i, j, k, id, type_local);
+}
+
 // *****************************************************************************

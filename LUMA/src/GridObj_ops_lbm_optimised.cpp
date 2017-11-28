@@ -85,6 +85,12 @@ void GridObj::LBM_multi_opt(int subcycle)
 				// STREAM //
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
 
+				// REGULARISED BCs //
+#ifdef L_REGULARISED_BOUNDARIES
+				if (type_local == eVelocity || type_local == ePressure)
+					_LBM_regularised_opt(i, j, k, id, type_local);
+#endif
+
 				// MACROSCOPIC //
 				_LBM_macro_opt(i, j, k, id, type_local);
 
@@ -108,12 +114,6 @@ void GridObj::LBM_multi_opt(int subcycle)
 				int id = k + j * K_lim + i * K_lim * M_lim;
 				eType type_local = LatTyp[id];
 
-#endif
-
-				// REGULARISED BCs //
-#ifdef L_REGULARISED_BOUNDARIES
-				if (type_local == eVelocity || type_local == ePressure)
-					_LBM_regularised_opt(i, j, k, id, type_local);
 #endif
 
 				// FORCING //

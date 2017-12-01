@@ -136,13 +136,13 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 5		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
 #define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
-#define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
+#define L_MPI_SD_MAX_ITER 1600		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
 //#define L_MPI_TOPOLOGY_REPORT		///< Have the MPI Manager report on different combinations of X Y Z cores
@@ -222,12 +222,12 @@
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT		eFluid		///< BC used on the left of the domain
-#define L_WALL_RIGHT	eFluid		///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
-#define L_WALL_TOP		eSolid			///< BC used on the top of the domain
-#define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
-#define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
+#define L_WALL_LEFT	eFluid			///< BC used on the left of the domain
+#define L_WALL_RIGHT eFluid			///< BC used on the right of the domain
+#define L_WALL_BOTTOM eVelocity		///< BC used on the bottom of the domain
+#define L_WALL_TOP eVelocity		///< BC used on the top of the domain
+#define L_WALL_FRONT eFluid			///< BC used on the front of the domain
+#define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
@@ -249,7 +249,7 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 2		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
@@ -264,32 +264,19 @@
 #if L_NUM_LEVELS != 0
 // Position of each refined region
 
-static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
-{
-	{ 0.05 }
-};
-static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
-{
-	{ 1.5 }
-};
-static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.03 + L_WALL_THICKNESS_BOTTOM }
-};
-static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.38 + L_WALL_THICKNESS_BOTTOM }
-};
-static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.0 }
-};
-static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = 
-{
-	{ 0.0 }
-};
+static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] = {1.0};
+static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] = {2.0};
+static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] = {1.0};
+static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] = {2.0};
+static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] = {1.0};
+static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] = {2.0};
 
 #endif
+
+
+
+
+
 
 
 /*

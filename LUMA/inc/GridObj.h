@@ -169,10 +169,13 @@ private :
 	double _LBM_equilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	bool _LBM_applySpecReflect_opt(int i, int j, int k, int id, int v);
-	void _LBM_regularised_opt(int i, int j, int k, int id, eType type);
+	void _LBM_regularised_opt(int i, int j, int k, int id, eType type, int subcycle);
 	void _LBM_kbcCollide_opt(int id);
 	void _LBM_resetForces();
 	double _LBM_smag(int id, double omega);
+	void _LBM_updateInteriorLatticeSite(int i, int j, int k, int subcycle);
+	double _LBM_updateAndExtrapolate(int subcycle, IVector<double> &quantity,
+			std::vector<int> direction, int order, int i, int j, int k, int p = NULL, int max = 1);
 
 public :
 	void LBM_multi_opt(int subcycle = 0);

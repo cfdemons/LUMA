@@ -4,7 +4,9 @@ General		:	Updated compilation instructions.
 				Bug fixes for IBM.
 				Added facility to restart simulation using a different time step along with python utility.
 				Updated logging formatting in the main method ot match new standard.
-				
+			
+Issue #167	:	Fixed issue with MPI gather error when using parallel IBM.	
+Issue #151	:	Fixed issue with buried links when using regularised BC which was causing density fluctuations at the corners.
 Issue #165	:	Fixed issue with incorrect site rejection action for momex.
 Issue #155	:	Fixed bug when activating point cloud debugging features in serial.
 Issue #157	:	Fixed issue with incorrect message passing when using a sinlge core in a given dimension.

@@ -14,7 +14,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.0RC"
+#define LUMA_VERSION "1.7.1-alpha"
 
 
 // Header guard
@@ -36,9 +36,9 @@
 **************************** DO NOT EDIT!!!!!! ********************************
 *******************************************************************************
 */
-#define L_N static_cast<int>(L_BX * L_RESOLUTION)	///< Number of coarse cells in X-direction
-#define L_M static_cast<int>(L_BY * L_RESOLUTION)	///< Number of coarse cells in Y-direction
-#define L_K static_cast<int>(L_BZ * L_RESOLUTION)	///< Number of coarse cells in Z-direction
+#define L_N static_cast<int>((L_BX) * L_RESOLUTION)	///< Number of coarse cells in X-direction
+#define L_M static_cast<int>((L_BY) * L_RESOLUTION)	///< Number of coarse cells in Y-direction
+#define L_K static_cast<int>((L_BZ) * L_RESOLUTION)	///< Number of coarse cells in Z-direction
 /// Width of a coarse cell in dimensionless units
 #define L_COARSE_SITE_WIDTH (1.0 / static_cast<double>(L_RESOLUTION))
 
@@ -53,7 +53,7 @@
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
 //#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
 //#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
@@ -76,11 +76,11 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Output Options
-#define L_GRID_OUT_FREQ 1	//571								///< How many timesteps before whole grid output
+#define L_GRID_OUT_FREQ 1	//571					///< How many timesteps before whole grid output
 #define L_EXTRA_OUT_FREQ 20							///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 8							///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ L_GRID_OUT_FREQ					///< Frequency of write out of restart file
-#define L_PROBE_OUT_FREQ 1000000						///< Write out frequency of probe output
+#define L_OUTPUT_PRECISION 8						///< Precision of output (for text writers)
+#define L_RESTART_OUT_FREQ L_GRID_OUT_FREQ			///< Frequency of write out of restart file
+#define L_PROBE_OUT_FREQ 1000000					///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE					///< ASCII dump on output
@@ -157,14 +157,14 @@
 */
 
 // Lattice properties
-#define L_DIMS 3													///< Number of dimensions to the problem
-#define L_RESOLUTION 8											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.007											///< The timestep in non-dimensional units
+#define L_DIMS 3							///< Number of dimensions to the problem
+#define L_RESOLUTION 8						///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.007					///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 4.0															///< End of domain in X (non-dimensional units)
-#define L_BY 3.4 + L_COARSE_SITE_WIDTH		///< End of domain in Y (non-dimensional units)
-#define L_BZ 4.0															///< End of domain in Z (non-dimensional units)
+#define L_BX 4.0							///< End of domain in X (non-dimensional units)
+#define L_BY (3.4 + L_COARSE_SITE_WIDTH)	///< End of domain in Y (non-dimensional units)
+#define L_BZ 4.0							///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 3.86		///< Reference velocity of the real fluid to model [m/s]

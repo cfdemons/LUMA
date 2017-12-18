@@ -31,7 +31,6 @@ GridManager* GridManager::me;
 ///			Also executes the auto-sub-grid generation if requested.
 GridManager::GridManager()
 {
-
 	// Store the discrete interpretation of the grid information //
 
 	// Store global sizes and edges for L0 from definitions
@@ -119,36 +118,39 @@ GridManager::GridManager()
 			}
 
 			// Print warnings for grids sizes that are coincident with parent edge
-			if (lev > 1)
+			if (lev > 0)
 			{
+				// Standard prefix
+				const std::string msg = "Level " + std::to_string(lev) + " Region " + std::to_string(reg);
+
 #ifdef L_INIT_VERBOSE
 				if (abs(global_edges[eXMin][idx] - global_edges[eXMin][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " X grid start is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eXMax][idx] - global_edges[eXMax][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " X grid end is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eYMin][idx] - global_edges[eYMin][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " Y grid start is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eYMax][idx] - global_edges[eYMax][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " Y grid end is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eZMin][idx] - global_edges[eZMin][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " Z grid start is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eZMax][idx] - global_edges[eZMax][idx_parent]) < L_SMALL_NUMBER)
-					L_WARN("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is coincident with its parent grid!", GridUtils::logfile);
+					L_WARN(msg + " Z grid end is coincident with its parent grid!", GridUtils::logfile);
 #endif
 
-				// Errors if outside
+				// Errors if outside				
 				if (global_edges[eXMin][idx] < global_edges[eXMin][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid start is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " X grid start is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eXMax][idx] > global_edges[eXMax][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " X grid end is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " X grid end is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eYMin][idx] < global_edges[eYMin][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid start is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " Y grid start is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eYMax][idx] > global_edges[eYMax][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Y grid end is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " Y grid end is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eZMin][idx] < global_edges[eZMin][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid start is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " Z grid start is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eZMax][idx] > global_edges[eZMax][idx_parent])
-					L_ERROR("Level " + std::to_string(lev) + " Region " + std::to_string(reg) + " Z grid end is outside its parent grid!", GridUtils::logfile);
+					L_ERROR(msg + " Z grid end is outside its parent grid!", GridUtils::logfile);
 			}
 
 

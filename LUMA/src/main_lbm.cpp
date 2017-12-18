@@ -156,7 +156,8 @@ int main( int argc, char* argv[] )
 	// Output start time to application log
 	L_INFO(version_string, GridUtils::logfile);
 	char* time_str = ctime(&curr_time);	// Format start time as string
-    L_INFO("Simulation started at " + std::string(time_str), GridUtils::logfile);;	// Write start time to log
+	time_str[strlen(time_str) - 1] = '\0';	// Overwrite extra newline character
+    L_INFO("Simulation started at " + std::string(time_str), GridUtils::logfile);	// Write start time to log
 
 	// Create the Grid Manager
 	GridManager *gm = GridManager::getInstance();

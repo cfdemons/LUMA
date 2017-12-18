@@ -116,8 +116,8 @@ void MpiManager::mpi_init()
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 
 	// Get Cartesian topology info
-	MPI_Comm_rank( world_comm, &my_rank );
-	MPI_Comm_size( world_comm, &num_ranks );
+	MPI_Comm_rank(world_comm, &my_rank);
+	MPI_Comm_size(world_comm, &num_ranks);
 
 	// Store coordinates in the new topology
 	MPI_Cart_coords(world_comm, my_rank, L_DIMS, rank_coords);

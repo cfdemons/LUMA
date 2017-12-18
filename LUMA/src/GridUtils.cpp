@@ -1648,8 +1648,8 @@ void GridUtils::getEnclosingVoxel(double x, double y, double z, GridObj const * 
 void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesianDirection dir, int *ijk) {
 
 	// Declarations
-	int offset, idxLower, idxUpper;
-	double offset_baseline, local_edge;
+	int offset, idxLower, idxUpper, cellsFromRankStart, cellsGridStartToRankStart;
+	double gridStart, rankStart;
 
 	// Get GM instance
 	GridManager *gm = GridManager::getInstance();
@@ -1672,74 +1672,66 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 		idxUpper = eZMax;
 	}
 	
-	// Set offset baseline to grid start edge for serial builds
-	offset_baseline = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
-	local_edge = offset_baseline;
+	// Set serial build defaults
+	gridStart = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
+	rankStart = 0.0;
+	offset = 0;
 
 #ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
 	int rank = GridUtils::safeGetRank();
 
+	// Correct the rankStart value to the value for this rank
+	rankStart = mpim->rank_core_edge[idxLower][rank];
+
 	/* If less than the lower grid core edge but is on the upper halo
-	 * then must be a TL site in a periodically wrapped upper halo. */
-	if (xyz < mpim->rank_core_edge[idxLower][rank] && 
+	* then must be a site in a periodically wrapped upper halo. */
+	if (xyz < mpim->rank_core_edge[idxLower][rank] &&
 		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxUpper)))
 	{
-		// Set to projected position off top of rank core to get correct ijk
-		xyz = mpim->rank_core_edge[idxUpper][rank] + 
-			abs(xyz - gm->global_edges[idxLower][g->level]);
-
-		// Set offset baseline to the upper edge of rank core
-		offset_baseline = mpim->rank_core_edge[idxUpper][rank];
+		// Set position to projection off top of rank edge
+		xyz = std::abs(xyz) + mpim->rank_core_edge[idxUpper][rank];
 	}
 
 	/* If greater than the upper grid core edge but is on the lower halo
-	* then must be a TL site in a periodically wrapped lower halo. */
-	else if (xyz > mpim->rank_core_edge[idxUpper][rank] && 
+	* then must be a site in a periodically wrapped lower halo. */
+	else if (xyz > mpim->rank_core_edge[idxUpper][rank] &&
 		GridUtils::isOnRecvLayer(xyz, static_cast<eCartMinMax>(idxLower)))
 	{
-		// Set to projected position off bottom of rank core to get correct ijk
-		xyz = mpim->rank_core_edge[idxLower][rank] - 
-			abs(xyz - gm->global_edges[idxUpper][g->level]);
-
-		// Set offset baseline to the upper edge of rank core
-		offset_baseline = mpim->rank_core_edge[idxLower][rank];
+		// Set to position to projection off top of rank edge
+		xyz = mpim->rank_core_edge[idxLower][rank] -
+			std::abs(xyz - gm->global_edges[idxUpper][g->level]);
 	}
 
-	// Get local lower edge
-	local_edge = mpim->rank_core_edge[idxLower][rank];
+#endif
+
+	// Compute global cells between point and grid edge
+	cellsFromRankStart = static_cast<int>(
+		std::floor((xyz - rankStart) / g->dh)
+		);
+
+	// Compute global cells between rank edge and grid edge
+	cellsGridStartToRankStart = static_cast<int>(
+		std::round((rankStart - gridStart) / g->dh)
+		);
+
+#ifdef L_BUILD_FOR_MPI
+
+	/* Compute the offset required based on certain conditions */
+
+	// If grid starts on a grid to the left then the offset is at most halo cells
+	if (cellsGridStartToRankStart > static_cast<int>(1.0 / g->refinement_ratio))
+		offset = static_cast<int>(1.0 / g->refinement_ratio);
+	else
+		offset = cellsGridStartToRankStart;
+
+	// If on L0, always add a halo offset of 1 for MPI builds
+	if (g->level == 0) offset = 1;
 
 #endif // L_BUILD_FOR_MPI
 
-	// Compute number of complete cells between point and edge of rank core
-	*ijk = static_cast<int>(
-		std::floor((xyz - local_edge) / g->dh)
-		);
-
-	/* Compute offset from global edge i.e. number of voxels between grid edge and 
-	 * rank edge. We round it as although they are exact (as they are MPIM quantities
-	 * there may be round-off errors which might give an non-zero answer when zero 
-	 * was expected) */
-	offset = static_cast<int>(
-		std::round((local_edge - offset_baseline) / g->dh)
-		);
-
-	/* If the origin is not on the halo but outside this rank to the left then offset
-	 * is at most the width of the halo in voxels. This offset can be negative if the 
-	 * grid starts somewhere on this rank. Does not check though to see whether it is 
-	 * on the grid though and may return indices that are negative if the point is off
-	 * the grid supplied. */
-	if (offset > static_cast<int>(1.0 / g->refinement_ratio))
-		offset = static_cast<int>(1.0 / g->refinement_ratio);
-
-	// If on L0, always add a halo offset of 1 for MPI builds
-#ifdef L_BUILD_FOR_MPI
-	if (g->level == 0)
-		offset = 1;
-#endif
-
 	// Correct the ijk position
-	*ijk += offset;
+	*ijk = cellsFromRankStart + offset;
 
 	return;
 }

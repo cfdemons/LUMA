@@ -178,6 +178,21 @@ inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 	*logfile << "WARNING: " << msg << std::endl;
 }
 
+/// Regular writer
+#define L_DEBUG debugfcn	///< Debug function shorthand
+/// \brief Debug logging function.
+///
+///			Writes string to the supplied logfile.
+///			Inlined since this header is included everywhere.
+///
+///	\param	msg			string to be printed to the log file.
+///	\param	logfile		pointer to the logfile where the message is to be written.
+inline void debugfcn(const std::string &msg, std::ofstream *logfile)
+{
+
+	*logfile << "Debug: " << msg << std::endl;
+}
+
 
 
 /****************************************************/

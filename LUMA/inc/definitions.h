@@ -148,7 +148,7 @@
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
-#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
+//#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
 #define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
@@ -170,7 +170,7 @@
 
 // Non-dimensional domain dimensions
 #define L_BX 4.0				///< End of domain in X (non-dimensional units)
-#define L_BY (3.4 + L_COARSE_SITE_WIDTH)	///< End of domain in Y (non-dimensional units)
+#define L_BY (3.4 + L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)	///< End of domain in Y (non-dimensional units)
 #define L_BZ 4.0				///< End of domain in Z (non-dimensional units)
 
 // Physical velocity

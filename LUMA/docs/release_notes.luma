@@ -1,3 +1,10 @@
+version		=	1.7.1
+
+General		:	Added a debug logging function coloured blue in the log file filter.
+
+Issue #166	:	Added protection for using corrected sizes without parentheses and better checking.
+Issue #170	:	Fixed issue with placement of objects on halos incorrectly when periodically wrapped.
+
 version		=	1.7.0
 
 General		:	Updated compilation instructions.

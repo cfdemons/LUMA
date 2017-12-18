@@ -338,7 +338,7 @@ int main( int argc, char* argv[] )
 
 	// Write out t = 0
 #ifdef L_TEXTOUT
-	L_INFO("Writing out to <Grids->out>...", GridUtils::logfile);
+	L_INFO("Writing out to <Grids.out>...", GridUtils::logfile);
 	Grids->io_textout("INITIALISATION");	// Do not change this tag!
 #endif
 
@@ -445,7 +445,7 @@ int main( int argc, char* argv[] )
 				GridUtils::logfile);
 
 #ifdef L_TEXTOUT
-			L_INFO("Writing out to <Grids->out>...", GridUtils::logfile);
+			L_INFO("Writing out to <Grids.out>...", GridUtils::logfile);
 			Grids->io_textout("START OF TIMESTEP");
 #endif
 #ifdef L_IO_FGA

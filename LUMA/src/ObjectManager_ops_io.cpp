@@ -844,11 +844,21 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 		dCell = g->dh;
 	}
 
-	// Round reference values to complete number of voxels
+	// Round reference values to complete number of voxels as measured from origin
 	double bodyRefX = std::round(geom->bodyRefX / dCell) * dCell;
 	double bodyRefY = std::round(geom->bodyRefY / dCell) * dCell;
 	double bodyRefZ = std::round(geom->bodyRefZ / dCell) * dCell;
 	double bodyLength = std::round(geom->bodyLength / dCell) * dCell;
+
+	// Write the scaled reference data
+#ifdef L_CLOUD_DEBUG
+	std::string msg("Scaled reference values are:");
+	msg += " X = " + std::to_string(bodyRefX);
+	msg += " Y = " + std::to_string(bodyRefY);
+	msg += " Z = " + std::to_string(bodyRefZ);
+	msg += " Length = " + std::to_string(bodyLength);
+	L_DEBUG(msg, GridUtils::logfile);
+#endif
 
 	// Loop over lines in file
 	while (!file.eof()) {
@@ -884,17 +894,15 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 	file.close();
 
 	// Error if no data
-	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty()) {
+	if (_PCpts->x.empty() || _PCpts->y.empty() || _PCpts->z.empty())
 		L_ERROR("Failed to read object data from cloud input file.", GridUtils::logfile);
-	}
-	else {
+	else
 		L_INFO("Successfully acquired object data from cloud input file.", GridUtils::logfile);
-	}
 
 
 	// Rescale coordinates to fit into size required
 #ifdef L_CLOUD_DEBUG
-	*GridUtils::logfile << "Rescaling..." << std::endl;
+	L_DEBUG("Rescaling...", GridUtils::logfile);
 #endif
 
 	double scale_factor;

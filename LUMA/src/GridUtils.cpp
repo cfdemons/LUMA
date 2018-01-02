@@ -1674,7 +1674,7 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 	
 	// Set serial build defaults
 	gridStart = gm->global_edges[idxLower][g->level + g->region_number * L_NUM_LEVELS];
-	rankStart = 0.0;
+	rankStart = gridStart;
 	offset = 0;
 
 #ifdef L_BUILD_FOR_MPI

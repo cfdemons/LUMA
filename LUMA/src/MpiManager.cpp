@@ -670,7 +670,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		////////////////////////////
 
 		// Adjust buffer size
-		for (MpiManager::buffer_struct bufs : buffer_send_info) {
+		for (MpiManager::BufferSizeStruct bufs : buffer_send_info) {
 			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
 				f_buffer_send[dir].resize(bufs.size[dir] * L_NUM_VELS);
 			}
@@ -708,7 +708,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		int opp_dir = mpi_getOpposite(dir);
 		
 		// Resize the receive buffer
-		for (MpiManager::buffer_struct bufr : buffer_recv_info) {
+		for (MpiManager::BufferSizeStruct bufr : buffer_recv_info) {
 			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
 				f_buffer_recv[dir].resize(bufr.size[dir] * L_NUM_VELS);
 			}
@@ -888,7 +888,7 @@ void MpiManager::mpi_buffer_size() {
 				if (l == 0 && r != 0) continue;		// L0 can only be R0
 
 				// Try retireve the buffer size info
-				for (MpiManager::buffer_struct bufs : buffer_send_info)
+				for (MpiManager::BufferSizeStruct bufs : buffer_send_info)
 				{
 					if (bufs.level == l && bufs.region == r)
 					{
@@ -934,7 +934,7 @@ void MpiManager::mpi_buffer_size() {
 				if (l == 0 && r != 0) continue;		// L0 can only be R0
 
 				// Try retireve the buffer size info
-				for (MpiManager::buffer_struct bufr : buffer_recv_info)
+				for (MpiManager::BufferSizeStruct bufr : buffer_recv_info)
 				{
 					if (bufr.level == l && bufr.region == r)
 					{

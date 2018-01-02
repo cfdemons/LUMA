@@ -21,7 +21,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.1-alpha"
+#define LUMA_VERSION "1.7.1"
 
 
 // Header guard
@@ -82,11 +82,14 @@
 // Using MPI?
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
+// Enable OMP support?
+#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
+
 // Output Options
-#define L_GRID_OUT_FREQ 1					///< How many timesteps before whole grid output
+#define L_GRID_OUT_FREQ 50					///< How many timesteps before whole grid output
 #define L_EXTRA_OUT_FREQ 20					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8					///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ L_GRID_OUT_FREQ			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ (10 * L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
 
 // Types of output
@@ -133,7 +136,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 10				///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100				///< Number of time steps to run simulation for
 
 
 /*
@@ -165,7 +168,7 @@
 
 // Lattice properties
 #define L_DIMS 3						///< Number of dimensions to the problem
-#define L_RESOLUTION 8						///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 5						///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.007					///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -220,7 +223,7 @@
 #define L_NB_ALPHA 0.25				///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
 #define L_NB_DELTA 0.5				///< Parameter for Newmark-Beta time integration (0.5 for 2nd order)
 #define L_RELAX 0.5				///< Under-relaxation for FSI coupling
-#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
+//#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
 
 /*
 *******************************************************************************

@@ -149,20 +149,20 @@ public :
 	/// Vector of size num_ranks which indicates how many sub-grids each rank has access to
 	std::vector<int> rankGrids;
 
-	/// \struct layer_edges
+	/// \struct HaloEdgeStruct
 	/// \brief	Structure containing absolute positions of the edges of halos.
 	///
 	///			Sender (inner) and receiver (outer) parts of halo are located 
 	///			using the convention [left_min left_max right_min right_max] 
 	///			for X and similar for Y and Z. Access using the enumerator 
 	///			eEdgeMinMax.
-	struct layer_edges {
+	struct HaloEdgeStruct {
 		double X[4];	///< X limits
 		double Y[4];	///< Y limits
 		double Z[4];	///< Z limits
 	};
-	layer_edges sender_layer_pos;	///< Structure containing sender layer edge positions.
-	layer_edges recv_layer_pos;		///< Structure containing receiver layer edge positions.
+	HaloEdgeStruct sender_layer_pos;	///< Structure containing sender layer edge positions.
+	HaloEdgeStruct recv_layer_pos;		///< Structure containing receiver layer edge positions.
 	
 
 	// Buffer data
@@ -172,28 +172,28 @@ public :
 	MPI_Request send_requests[L_MPI_DIRS];	///< Array of request structures for handles to posted ISends
 	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each ISend
 
-	/// \struct buffer_struct
+	/// \struct BufferSizeStruct
 	/// \brief	Structure storing buffers sizes in each direction for particular grid.
-	struct buffer_struct
+	struct BufferSizeStruct
 	{
 		int size[L_MPI_DIRS];	///< Buffer sizes for each direction
 		int level;				///< Grid level
 		int region;				///< Region number
 
-		buffer_struct(int l, int r) 
+		BufferSizeStruct(int l, int r) 
 			: level(l), region(r){};
 	};
-	std::vector<buffer_struct> buffer_send_info;	///< Vectors of buffer_info structures holding sender layer size info.
-	std::vector<buffer_struct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.
+	std::vector<BufferSizeStruct> buffer_send_info;	///< Vectors of buffer_info structures holding sender layer size info.
+	std::vector<BufferSizeStruct> buffer_recv_info;	///< Vectors of buffer_info structures holding receiver layer size info.
 
 	/// Logfile handle
 	std::ofstream* logout;
 
 	// IBM comm classes
-	std::vector<std::vector<markerCommOwnerSideClass>> markerCommOwnerSide;			///< Owner-side marker-owner comm
-	std::vector<std::vector<markerCommMarkerSideClass>> markerCommMarkerSide;		///< Marker-side marker-owner comm
-	std::vector<std::vector<supportCommMarkerSideClass>> supportCommMarkerSide;		///< Marker-side marker-support comm
-	std::vector<std::vector<supportCommSupportSideClass>> supportCommSupportSide;	///< Support-side marker-support comm
+	std::vector<std::vector<MarkerCommOwnerSideClass>> markerCommOwnerSide;			///< Owner-side marker-owner comm
+	std::vector<std::vector<MarkerCommMarkerSideClass>> markerCommMarkerSide;		///< Marker-side marker-owner comm
+	std::vector<std::vector<SupportCommMarkerSideClass>> supportCommMarkerSide;		///< Marker-side marker-support comm
+	std::vector<std::vector<SupportCommSupportSideClass>> supportCommSupportSide;	///< Support-side marker-support comm
 
 
 

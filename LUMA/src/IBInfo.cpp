@@ -28,7 +28,7 @@
 
 // *****************************************************************************
 ///	\brief	Default constructor for owner-side marker-owner comm class
-markerCommOwnerSideClass::markerCommOwnerSideClass() {
+MarkerCommOwnerSideClass::MarkerCommOwnerSideClass() {
 
 	// Set default values
 	rankComm = 0;
@@ -44,7 +44,7 @@ markerCommOwnerSideClass::markerCommOwnerSideClass() {
 ///	\param	rank	rank to communicate with
 ///	\param	body	global body ID
 ///	\param	marker	marker ID within body
-markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marker) {
+MarkerCommOwnerSideClass::MarkerCommOwnerSideClass(int rank, int body, int marker) {
 
 	// Set values
 	rankComm = rank;
@@ -56,7 +56,7 @@ markerCommOwnerSideClass::markerCommOwnerSideClass(int rank, int body, int marke
 
 // *****************************************************************************
 ///	\brief	Default constructor for marker-side marker-owner comm class
-markerCommMarkerSideClass::markerCommMarkerSideClass() {
+MarkerCommMarkerSideClass::MarkerCommMarkerSideClass() {
 
 	// Set default values
 	rankComm = 0;
@@ -70,7 +70,7 @@ markerCommMarkerSideClass::markerCommMarkerSideClass() {
 ///	\param	rank	rank to communicate with
 ///	\param	body	global body ID
 ///	\param	idx		marker local index within body
-markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx) {
+MarkerCommMarkerSideClass::MarkerCommMarkerSideClass(int rank, int body, int idx) {
 
 	// Set values
 	rankComm = rank;
@@ -86,7 +86,7 @@ markerCommMarkerSideClass::markerCommMarkerSideClass(int rank, int body, int idx
 
 // *****************************************************************************
 ///	\brief	Default constructor for support-side marker-support comm class
-supportCommSupportSideClass::supportCommSupportSideClass() {
+SupportCommSupportSideClass::SupportCommSupportSideClass() {
 
 	// Default values
 	rankComm = 0;
@@ -99,7 +99,7 @@ supportCommSupportSideClass::supportCommSupportSideClass() {
 ///	\param	rankID		rank to communicate with
 ///	\param	body		global body ID
 ///	\param	position	position indices of support point
-supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, std::vector<int> &position) {
+SupportCommSupportSideClass::SupportCommSupportSideClass(int rankID, int body, std::vector<int> &position) {
 
 	// Default values
 	rankComm = rankID;
@@ -112,7 +112,7 @@ supportCommSupportSideClass::supportCommSupportSideClass(int rankID, int body, s
 
 // *****************************************************************************
 ///	\brief	Default constructor for marker-side marker-support comm class
-supportCommMarkerSideClass::supportCommMarkerSideClass() {
+SupportCommMarkerSideClass::SupportCommMarkerSideClass() {
 
 	// Default values
 	bodyID = 0;
@@ -129,7 +129,7 @@ supportCommMarkerSideClass::supportCommMarkerSideClass() {
 ///	\param	body		global body ID
 ///	\param	marker		marker ID within body
 ///	\param	support		support ID within marker
-supportCommMarkerSideClass::supportCommMarkerSideClass(int rankID, int body, int marker, int support) {
+SupportCommMarkerSideClass::SupportCommMarkerSideClass(int rankID, int body, int marker, int support) {
 
 	// Default values
 	bodyID = body;

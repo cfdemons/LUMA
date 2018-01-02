@@ -29,7 +29,7 @@
 /// \brief Owner-side comm class for marker-owner communications
 ///
 ///			Class for arranging marker-owner MPI communication.
-class markerCommOwnerSideClass {
+class MarkerCommOwnerSideClass {
 
 	/************** Friends **************/
 	friend class MpiManager;
@@ -39,10 +39,10 @@ class markerCommOwnerSideClass {
 public:
 
 	/************** Constructors **************/
-	markerCommOwnerSideClass();
+	MarkerCommOwnerSideClass();
 
 	// Custom constructor for creating epsCommOwnerSideClass object
-	markerCommOwnerSideClass(int rank, int body, int marker);
+	MarkerCommOwnerSideClass(int rank, int body, int marker);
 
 private:
 
@@ -57,7 +57,7 @@ private:
 /// \brief Marker-side comm class for marker-owner communications
 ///
 ///			Class for arranging marker-owner MPI communication.
-class markerCommMarkerSideClass {
+class MarkerCommMarkerSideClass {
 
 	/************** Friends **************/
 	friend class MpiManager;
@@ -65,10 +65,10 @@ class markerCommMarkerSideClass {
 public:
 
 	/************** Constructors **************/
-	markerCommMarkerSideClass();
+	MarkerCommMarkerSideClass();
 
 	// Custom constructor for creating epsCommMarkerSideClass object
-	markerCommMarkerSideClass(int rank, int body, int idx);
+	MarkerCommMarkerSideClass(int rank, int body, int idx);
 
 private:
 
@@ -83,15 +83,15 @@ private:
 /// \brief Support-side comm class for marker-support communications
 ///
 ///			Class for arranging marker-support MPI communication.
-class supportCommSupportSideClass {
+class SupportCommSupportSideClass {
 
 public:
 
 	/************** Constructors **************/
-	supportCommSupportSideClass();
+	SupportCommSupportSideClass();
 
 	// Custom constructor for creating supportCommSupportSide object
-	supportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &idx);
+	SupportCommSupportSideClass(int rankID, int bodyID, std::vector<int> &idx);
 
 public:
 
@@ -105,15 +105,15 @@ public:
 /// \brief Marker-side comm class for marker-support communications
 ///
 ///			Class for arranging marker-support MPI communication.
-class supportCommMarkerSideClass {
+class SupportCommMarkerSideClass {
 
 public:
 
 	/************** Constructors **************/
-	supportCommMarkerSideClass();
+	SupportCommMarkerSideClass();
 
 	// Custom constructor for creating supportCommMarkerSide object
-	supportCommMarkerSideClass(int rankID, int body, int marker, int support);
+	SupportCommMarkerSideClass(int rankID, int body, int marker, int support);
 
 public:
 

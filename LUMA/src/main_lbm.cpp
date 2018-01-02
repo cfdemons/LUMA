@@ -23,17 +23,24 @@
 /// \file main_lbm.cpp
 /// \mainpage
 ///
-/// --------------------------------------------------------------
 ///
 /// ------ Lattice Boltzmann @ The University of Manchester ------
 ///
 /// -------------------------- L-U-M-A ---------------------------
 ///
-///  Copyright (C) The University of Manchester 2017
-///  E-mail contact: info@luma.manchester.ac.uk
+/// Copyright 2018 The University of Manchester
 ///
-/// This software is for academic use only and not available for
-/// further distribution commericially or otherwise without written consent.
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.*
 ///
 
 #include "../inc/stdafx.h"			// Precompiled header
@@ -363,7 +370,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_WRITE_TIP_POSITIONS
-	L_INFO("Writing out tip positions", GridUtils::logfile);
+	L_INFO("Writing out tip positions...", GridUtils::logfile);
 	objMan->io_writeTipPositions(Grids->t);
 #endif
 
@@ -393,6 +400,10 @@ int main( int argc, char* argv[] )
 #ifdef L_BUILD_FOR_MPI
 	// Barrier before recording completion of initialisation
 	MPI_Barrier(mpim->world_comm);
+#endif
+
+#ifdef L_ENABLE_OPENMP
+	L_WARN("OpenMP support enabled -- currently experimental!", GridUtils::logfile);
 #endif
 	
 	L_INFO("Initialising LBM time-stepping...", GridUtils::logfile);
@@ -495,12 +506,12 @@ int main( int argc, char* argv[] )
 		if (Grids->t % L_EXTRA_OUT_FREQ == 0) {
 
 #ifdef L_WRITE_TIP_POSITIONS
-			L_INFO("Writing out tip positions", GridUtils::logfile);
+			L_INFO("Writing out tip positions...", GridUtils::logfile);
 			objMan->io_writeTipPositions(Grids->t);
 #endif
 
 #if (defined L_LD_OUT && defined L_GEOMETRY_FILE)
-			L_INFO("Writing out object lift and drag", GridUtils::logfile);
+			L_INFO("Writing out object lift and drag...", GridUtils::logfile);
 			objMan->io_writeForcesOnObjects(Grids->t);
 
 #ifdef L_IBM_ON

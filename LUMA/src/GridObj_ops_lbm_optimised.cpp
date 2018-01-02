@@ -66,6 +66,9 @@ void GridObj::LBM_multi_opt(int subcycle)
 #endif
 
 	// Loop over grid
+#ifdef L_ENABLE_OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = 0; i < N_lim; ++i)
 	{
 		for (int j = 0; j < M_lim; ++j)
@@ -804,7 +807,8 @@ void GridObj::_LBM_macro_opt(int i, int j, int k, int id, eType type_local) {
 #endif
 
 		// Sum to find rho and momentum
-		for (int v = 0; v < L_NUM_VELS; ++v) {
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
 			rho_temp += fNew[v + id * L_NUM_VELS];
 			rhouX_temp += c_opt[v][0] * fNew[v + id * L_NUM_VELS];
 			rhouY_temp += c_opt[v][1] * fNew[v + id * L_NUM_VELS];

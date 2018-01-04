@@ -1027,15 +1027,22 @@ void MpiManager::mpi_dsCommScatter(int level) {
 ///	\param	recvDisps				vector with the relative displacements for the buffers
 void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &recvPositionBuffer, std::vector<int> &recvIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
+	// Get ranks which exist on this level
+	std::vector<int> lev2glob = mpi_mapRankLevelToWorld(iBody->level);
+	std::vector<int> glob2lev = mpi_mapRankWorldToLevel(iBody->level);
+
+	// Get root ID in this communicator
+	int rootRankLev = glob2lev[iBody->owningRank];
+
 	// Get number of markers to be sent
 	int nMarkers = static_cast<int>(iBody->markers.size());
 
 	// Only resize if owning rank
 	if (my_rank == iBody->owningRank)
-		recvSizeBuffer.resize(num_ranks, 0);
+		recvSizeBuffer.resize(lev2glob.size(), 0);
 
 	// Perform gather so that owning rank knows how many markers to receive
-	MPI_Gather(&nMarkers, 1, MPI_INT, &recvSizeBuffer.front(), 1, MPI_INT, iBody->owningRank, world_comm);
+	MPI_Gather(&nMarkers, 1, MPI_INT, &recvSizeBuffer.front(), 1, MPI_INT, rootRankLev, lev_comm[iBody->level]);
 
 	// Now pack current marker IDs into send buffer
 	std::vector<int> sendIDBuffer(nMarkers,0);
@@ -1053,7 +1060,7 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 
 		// Resize vectors
 		recvIDBuffer.resize(std::accumulate(recvSizeBuffer.begin(), recvSizeBuffer.end(), 0), 0);
-		recvDisps.resize(num_ranks, 0);
+		recvDisps.resize(lev2glob.size(), 0);
 
 		// Set the displacements for receive buffer
 		for (int i = 1; i < recvDisps.size(); i++)
@@ -1061,7 +1068,7 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 	}
 
 	// Gather in marker IDs
-	MPI_Gatherv(&sendIDBuffer.front(), nMarkers, MPI_INT, &recvIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, iBody->owningRank, world_comm);
+	MPI_Gatherv(&sendIDBuffer.front(), nMarkers, MPI_INT, &recvIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, rootRankLev, lev_comm[iBody->level]);
 
 	// Get sizes for gather of positions
 	std::vector<int> recvPosSizeBuffer;
@@ -1076,7 +1083,7 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 		recvPositionBuffer.resize(std::accumulate(recvPosSizeBuffer.begin(), recvPosSizeBuffer.end(), 0), 0);
 
 	// Gather in marker IDs
-	MPI_Gatherv(&sendPositionBuffer.front(), 3*nMarkers, MPI_DOUBLE, &recvPositionBuffer.front(), &recvPosSizeBuffer.front(), &recvPosDisps.front(), MPI_DOUBLE, iBody->owningRank, world_comm);
+	MPI_Gatherv(&sendPositionBuffer.front(), 3*nMarkers, MPI_DOUBLE, &recvPositionBuffer.front(), &recvPosSizeBuffer.front(), &recvPosDisps.front(), MPI_DOUBLE, rootRankLev, lev_comm[iBody->level]);
 }
 
 
@@ -1089,6 +1096,12 @@ void MpiManager::mpi_ptCloudMarkerGather(IBBody *iBody, std::vector<double> &rec
 ///	\param	recvDisps				vector with the relative displacements for the buffers
 void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendSortedIDBuffer, std::vector<int> &recvSizeBuffer, std::vector<int> &recvDisps) {
 
+	// Get ranks which exist on this level
+	std::vector<int> glob2lev = mpi_mapRankWorldToLevel(iBody->level);
+
+	// Get root ID in this communicator
+	int rootRankLev = glob2lev[iBody->owningRank];
+
 	// Get number of markers to be sent
 	int nMarkers = static_cast<int>(iBody->markers.size());
 
@@ -1096,7 +1109,7 @@ void MpiManager::mpi_ptCloudMarkerScatter(IBBody *iBody, std::vector<int> &sendS
 	std::vector<int> recvSortedIDBuffer(nMarkers, 0);
 
 	// Scatter to all ranks
-	MPI_Scatterv(&sendSortedIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvSortedIDBuffer.front(), nMarkers, MPI_INT, iBody->owningRank, world_comm);
+	MPI_Scatterv(&sendSortedIDBuffer.front(), &recvSizeBuffer.front(), &recvDisps.front(), MPI_INT, &recvSortedIDBuffer.front(), nMarkers, MPI_INT, rootRankLev, lev_comm[iBody->level]);
 
 	// Unpack into correct place
 	if (my_rank != iBody->owningRank) {

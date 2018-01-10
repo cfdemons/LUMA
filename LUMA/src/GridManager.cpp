@@ -99,8 +99,13 @@ GridManager::GridManager()
 				global_edges[eXMax][idx] = global_edges[eXMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_X_MAX / dh) * dh;
 				global_edges[eYMin][idx] = global_edges[eYMin][idx_parent] + (2.0 * dh) + std::round(L_PADDING_Y_MIN / dh) * dh;
 				global_edges[eYMax][idx] = global_edges[eYMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_Y_MAX / dh) * dh;
+#if (L_DIMS == 3)
 				global_edges[eZMin][idx] = global_edges[eZMin][idx_parent] + (2.0 * dh) + std::round(L_PADDING_Z_MIN / dh) * dh;
 				global_edges[eZMax][idx] = global_edges[eZMax][idx_parent] - (2.0 * dh) - std::round(L_PADDING_Z_MAX / dh) * dh;
+#else
+				global_edges[eZMin][idx] = 0.0;
+				global_edges[eZMax][idx] = 0.0;
+#endif
 
 			}
 			else
@@ -132,10 +137,12 @@ GridManager::GridManager()
 					L_WARN(msg + " Y grid start is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eYMax][idx] - global_edges[eYMax][idx_parent]) < L_SMALL_NUMBER)
 					L_WARN(msg + " Y grid end is coincident with its parent grid!", GridUtils::logfile);
+#if (L_DIMS == 3)
 				if (abs(global_edges[eZMin][idx] - global_edges[eZMin][idx_parent]) < L_SMALL_NUMBER)
 					L_WARN(msg + " Z grid start is coincident with its parent grid!", GridUtils::logfile);
 				if (abs(global_edges[eZMax][idx] - global_edges[eZMax][idx_parent]) < L_SMALL_NUMBER)
 					L_WARN(msg + " Z grid end is coincident with its parent grid!", GridUtils::logfile);
+#endif
 #endif
 
 				// Errors if outside				
@@ -147,10 +154,12 @@ GridManager::GridManager()
 					L_ERROR(msg + " Y grid start is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eYMax][idx] > global_edges[eYMax][idx_parent])
 					L_ERROR(msg + " Y grid end is outside its parent grid!", GridUtils::logfile);
+#if (L_DIMS == 3)
 				if (global_edges[eZMin][idx] < global_edges[eZMin][idx_parent])
 					L_ERROR(msg + " Z grid start is outside its parent grid!", GridUtils::logfile);
 				if (global_edges[eZMax][idx] > global_edges[eZMax][idx_parent])
 					L_ERROR(msg + " Z grid end is outside its parent grid!", GridUtils::logfile);
+#endif
 			}
 
 

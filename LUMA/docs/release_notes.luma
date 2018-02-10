@@ -1,6 +1,6 @@
 version		=	1.7.3a
 
-General		:	
+General		:	Updated makefile to enable OMP directives.
 
 Issue #172	:	Uniform decomposition tries more options before throwing error.
 

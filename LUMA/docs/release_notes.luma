@@ -1,3 +1,9 @@
+version		=	1.7.3a
+
+General		:	
+
+Issue #172	:	Uniform decomposition tries more options before throwing error.
+
 version		=	1.7.2
 
 General		:	Fix for the issue in 2D where sub-grids had a non-zero size and triggered the initialisation warnings.

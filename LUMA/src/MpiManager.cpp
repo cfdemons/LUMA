@@ -1216,11 +1216,19 @@ void MpiManager::mpi_uniformDecompose(int *numCells)
 		// Calculate the size of the last domain
 		cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * dimensions[d] - numCells[d]);
 
-		// Throw an error if cellsInLast domain is <=0
+		// If cellsInLast domain is <=0
 		if (cellsLastDomain[d] <= 0)
 		{
-			L_ERROR("Last core in dir = " + std::to_string(d) +
-				" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
+			// Try using floor instead of ceil
+			cellsInDomains[d] = static_cast<int>(std::floor(static_cast<double>(numCells[d]) / static_cast<double>(dimensions[d])));
+			cellsLastDomain[d] = cellsInDomains[d] - (cellsInDomains[d] * dimensions[d] - numCells[d]);
+
+			// If still na issue then error
+			if (cellsLastDomain[d] <= 0)
+			{
+				L_ERROR("Last core in dir = " + std::to_string(d) +
+					" has 0 or fewer cells. Exiting. Change the number of cores in this direction or adjust resolution of problem.", logout);
+			}
 		}
 	}
 

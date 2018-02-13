@@ -156,13 +156,6 @@ void ObjectManager::ibm_subIterate(GridObj *g) {
 			iBody[ib].fBody->Udot_n = iBody[ib].fBody->Udot;
 			iBody[ib].fBody->Udotdot_n = iBody[ib].fBody->Udotdot;
 
-			// Set elemental values
-			for (size_t el = 0; el < iBody[ib].fBody->elements.size(); el++) {
-				iBody[ib].fBody->elements[el].length_n = iBody[ib].fBody->elements[el].length;
-				iBody[ib].fBody->elements[el].angles_n = iBody[ib].fBody->elements[el].angles;
-				iBody[ib].fBody->elements[el].T_n = iBody[ib].fBody->elements[el].T;
-			}
-
 			// Get time averaged FEM values
 			iBody[ib].fBody->timeav_FEMIterations *= (g->t % L_GRID_OUT_FREQ);
 			iBody[ib].fBody->timeav_FEMIterations += iBody[ib].fBody->it;
@@ -861,7 +854,6 @@ void ObjectManager::ibm_findEpsilon(int level) {
 			}
 
 			// Create vectors
-			std::vector<double> epsilon((*iBodyPtr)[ib].markers.size(), 1.0);
 			std::vector<double> bVector((*iBodyPtr)[ib].markers.size(), 1.0);
 
 			//////////////////
@@ -869,7 +861,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 			//////////////////
 
 			// Solve linear system
-			epsilon = GridUtils::solveLinearSystem(A, bVector);
+			std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
 
 			// Assign epsilon
 			for (size_t m = 0; m < (*iBodyPtr)[ib].markers.size(); m++) {

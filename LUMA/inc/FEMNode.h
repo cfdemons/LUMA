@@ -23,8 +23,6 @@
 #ifndef FEMNODE_H
 #define FEMNODE_H
 
-// Forward declarations
-
 /// \brief	Finite element node class
 ///
 ///			Class for the finite element nodes which are contained within the FEMBody.

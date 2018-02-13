@@ -28,9 +28,6 @@
 #include "FEMNode.h"
 #include "FEMElement.h"
 
-class IBBody;
-class FEMElement;
-
 /// \brief	Finite element body
 ///
 ///			Class for the finite elements body which is contained within the IBBody.

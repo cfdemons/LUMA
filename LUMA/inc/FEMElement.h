@@ -28,9 +28,6 @@
 #include "IBBody.h"
 #include "IBMarker.h"
 
-// Forward declarations
-class FEMBody;
-
 /// \brief	Finite element class
 ///
 ///			Class for the finite elements which are contained within the FEMBody.

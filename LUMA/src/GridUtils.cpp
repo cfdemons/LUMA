@@ -326,7 +326,7 @@ std::vector<double> GridUtils::divide(std::vector<double> vec1, double scalar) {
 
 
 // *****************************************************************************
-///	\brief	Get traspose of matrix
+///	\brief	Get transpose of matrix
 ///
 ///	\param	origMat			original matrx
 ///	\return	transposed matrix
@@ -347,85 +347,42 @@ std::vector<std::vector<double>> GridUtils::matrix_transpose(std::vector<std::ve
 }
 
 
-
-// *****************************************************************************
-///	\brief	Assemble into global matrix
-///
-///	\param	el			element ID
-///	\param	offset		how much to offset each local matrix
-///	\param	localMat	local element matrix
-///	\param	globalMat	global matrix to be assembled
-void GridUtils::assembleGlobalMat(int el, int offset, std::vector<std::vector<double>> &localMat,
-	std::vector<std::vector<double>> &globalMat) {
-
-	// Add the values of the single element matrix to the full system matrix
-	for (size_t i = 0; i < localMat.size(); i++) {
-		for (size_t j = 0; j < localMat[i].size(); j++) {
-			globalMat[i+el*offset][j+el*offset] += localMat[i][j];
-		}
-	}
-}
-
-
-// *****************************************************************************
-///	\brief	Assemble into global vector
-///
-///	\param	el			element ID
-///	\param	offset		how much to offset each local matrix
-///	\param	localMat	local element vector
-///	\param	globalMat	global vector to be assembled
-void GridUtils::assembleGlobalVec(int el, int offset, std::vector<double> &localMat, std::vector<double> &globalMat) {
-
-	// Add the values of the single element matrix to the full system matrix
-	for (size_t i = 0; i < localMat.size(); i++) {
-		globalMat[i+el*offset] += localMat[i];
-	}
-}
-
-
-// *****************************************************************************
-///	\brief	Extract local vector from global vector
-///
-///	\param	el			element ID
-///	\param	offset		how much to offset each local matrix
-///	\param	globalMat	global vector to be extracted from
-///	\param	localMat	local element vector
-void GridUtils::disassembleGlobalVec(int el, int offset, std::vector<double> &globalMat, std::vector<double> &localMat) {
-
-	// Add the values of the single element matrix to the full system matrix
-	for (size_t i = 0; i < localMat.size(); i++) {
-		localMat[i] = globalMat[i+el*offset];
-	}
-}
-
 // *****************************************************************************
 ///	\brief	Solve the linear system A.x = b
 ///
 ///	\param	A		A matrix
 ///	\param	b		b vector (RHS)
 ///	\return	x
-std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b) {
+std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>> &A, std::vector<double> b, int BC) {
 
 	// Set up the correct values
+	char trans = 'T';
 	int dim = static_cast<int>(A.size());
-	int nrhs = 1;
-	int LDA = dim;
-	int LDB = dim;
-	int info;
-	std::vector<int> ipiv(dim, 0);
+	int row = dim - BC;
+	int col = dim - BC;
+	int offset = BC * dim + BC;
+    int nrhs = 1;
+    int LDA = dim;
+    int LDB = dim;
+    int info;
+	std::vector<int> ipiv(row, 0);
 
     // Put A into 1D array
     std::vector<double> a(dim * dim, 0.0);
     for (int i = 0; i < dim; i++) {
     	for (int j = 0; j < dim; j++) {
-    		a[i + j * dim] = A[i][j];
+    		a[i * dim + j] = A[i][j];
     	}
     }
 
     // Factorise and solve
-	dgesv_(&dim, &nrhs, a.data(), &LDA, ipiv.data(), b.data(), &LDB, &info);
+	dgetrf_(&row, &col, a.data() + offset, &LDA, ipiv.data(), &info);
+	dgetrs_(&trans, &row, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);
 
-	// Return
+	// Set return values not included to zero
+	fill(b.begin(), b.begin() + BC, 0.0);
+
+	// Return RHS
 	return b;
 }
 

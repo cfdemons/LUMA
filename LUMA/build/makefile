@@ -2,7 +2,7 @@
 
 # Compiler command
 CC=mpicxx
-CFLAGS=-O3 -std=c++0x -w
+CFLAGS=-O3 -std=c++0x -w -fopenmp
 
 # Executable
 EXE=LUMA

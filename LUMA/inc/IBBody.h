@@ -42,6 +42,7 @@ class IBBody : public Body<IBMarker> {
 	friend class ObjectManager;
 	friend class IBInfo;
 	friend class FEMBody;
+	friend class FEMElement;
 	friend class MpiManager;
 
 public:

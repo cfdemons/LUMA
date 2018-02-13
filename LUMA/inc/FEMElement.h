@@ -23,7 +23,10 @@
 #ifndef FEMELEMENT_H
 #define FEMELEMENT_H
 
-// Forward declarations
+// Includes
+#include "FEMBody.h"
+#include "IBBody.h"
+#include "IBMarker.h"
 
 /// \brief	Finite element class
 ///
@@ -42,7 +45,7 @@ class FEMElement {
 	class FEMChildNodes {
 
 		// Set friend class
-		friend class FEMBody;
+		friend class FEMElement;
 		friend class ObjectManager;
 
 		// Constructor and destructor
@@ -66,11 +69,14 @@ public:
 	~FEMElement();
 
 	// Custom constructor for building FEM body from input parameters
-	FEMElement(int i, int DOFs, double spacing, double height, double depth, std::vector<double> &angles, double density, double E);
+	FEMElement(FEMBody *fPtr, int i, int DOFs, double spacing, double height, double depth, std::vector<double> &angles, double density, double E);
 
 
 	/************** Member Data **************/
 private:
+
+	// Pointer to fBody
+	FEMBody *fPtr;
 
 	// Element ID
 	int ID;											///< Element ID in FEM body
@@ -78,9 +84,7 @@ private:
 	// Geometry properties
 	double length0;									///< Initial length of element
 	double length;									///< Current length of element
-	double length_n;								///< Length of element at start of timestep
 	double angles;									///< Current orientation of element
-	double angles_n;								///< Orientation of element at start of timestep
 	double area;									///< Cross-sectional area of element
 	double I;										///< Second moment areas
 
@@ -90,16 +94,30 @@ private:
 
 	// Transformation matrix
 	std::vector<std::vector<double>> T;				///< Local transformation matrix
-	std::vector<std::vector<double>> T_n;				///< Local transformation matrix
 
 	// Internal forces
 	std::vector<double> F;							///< Vector of internal forces
+
+	// Global DOFs
+	std::vector<int> DOFs;							///< Global DOFs for this element
 
 	// Vector of child IBM nodes which exist along this element
 	std::vector<FEMChildNodes> IBChildNodes;		///< Vector of child IBM nodes which exist along this element
 
 
 	/************** Member Methods **************/
+
+	// Elemental shape functions & matrices
+	std::vector<double> shapeFuns(const std::vector<double> &vec, double zeta);		// Elemental shape functions
+	void loadVector();																// Construct elemental load vector
+	void massMatrix();																// Construct elemental mass matrix
+	void stiffMatrix();																// Construct elemental stiffness matrix
+	void forceVector();																// Construct elemental internal force vector
+
+	// Assembly methods
+	void assembleGlobalMat(const std::vector<double> &localVec, std::vector<double> &globalVec);							// Assemble into global vector
+	void assembleGlobalMat(const std::vector<std::vector<double>> &localMat, std::vector<std::vector<double>> &globalMat);	// Assemble into global matrix
+	std::vector<double> disassembleGlobalMat(const std::vector<double> &globalVec);											// Disassemble global vector
 
 };
 

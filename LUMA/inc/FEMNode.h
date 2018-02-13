@@ -32,6 +32,7 @@ class FEMNode {
 
 	/************** Friends **************/
 	friend class FEMBody;
+	friend class FEMElement;
 	friend class ObjectManager;
 
 	/************** Constructors **************/

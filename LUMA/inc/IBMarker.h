@@ -38,6 +38,7 @@ class IBMarker : public Marker {
 	friend class IBBody;
 	friend class IBInfo;
 	friend class FEMBody;
+	friend class FEMElement;
 
 public:
 

@@ -1,3 +1,7 @@
+version		=	1.7.4
+
+Public #1	:	Fix for momentum exchange giving negative forces when positive expected.
+
 version		=	1.7.3
 
 General		:	Updated makefile to enable OMP directives.

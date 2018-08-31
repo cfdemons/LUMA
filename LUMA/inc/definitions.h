@@ -86,16 +86,16 @@
 #define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
 // Output Options
-#define L_GRID_OUT_FREQ 50					///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 20					///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 500						///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 1						///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 8					///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ (10 * L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
+#define L_RESTART_OUT_FREQ (20*L_GRID_OUT_FREQ)	///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE				///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT				///< Write out lift and drag (all bodies)
+#define L_LD_OUT				///< Write out lift and drag (all bodies)
 //#define L_IO_FGA				///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -113,17 +113,17 @@
 // Forcing
 #define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 0.00589
+#define L_GRAVITY_FORCE 2.986e-4
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW					///< Initialise the domain with no flow
+#define L_NO_FLOW					///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING					///< Initialise the GridObj with quantities read from a restart file
 
 // LBM configuration
 //#define L_USE_KBC_COLLISION				///< Use KBC collision operator instead of LBGK by default
-#define L_USE_BGKSMAG
+//#define L_USE_BGKSMAG
 #define L_CSMAG 0.3
 
 /// Compute the time-averaged values of velocity, density and the velocity products.
@@ -136,7 +136,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100				///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 2000				///< Number of time steps to run simulation for
 
 
 /*
@@ -146,12 +146,12 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
-//#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
+#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
 #define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
@@ -167,20 +167,20 @@
 */
 
 // Lattice properties
-#define L_DIMS 3						///< Number of dimensions to the problem
-#define L_RESOLUTION 5						///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.007					///< The timestep in non-dimensional units
+#define L_DIMS 2							///< Number of dimensions to the problem
+#define L_RESOLUTION 20						///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.25 / L_RESOLUTION		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 4.0				///< End of domain in X (non-dimensional units)
-#define L_BY (3.4 + L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP)	///< End of domain in Y (non-dimensional units)
-#define L_BZ 4.0				///< End of domain in Z (non-dimensional units)
+#define L_BX 3.0				///< End of domain in X (non-dimensional units)
+#define L_BY 1.0				///< End of domain in Y (non-dimensional units)
+#define L_BZ 1.0				///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 3.86		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
-#define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
+#define L_PHYSICAL_RHO 1.225		///< Reference density in physical units
 
 
 /*
@@ -194,13 +194,13 @@
 //#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.2			///< Initial/inlet x-velocity
+#define L_UX0 1.0			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1			///< Initial density. In lattice units. 
 //#define L_NU 0			///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 1.0/0.000261	///< Desired Reynolds number
+#define L_RE 1000	///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 
@@ -232,20 +232,20 @@
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT	eFluid			///< BC used on the left of the domain
-#define L_WALL_RIGHT	eFluid			///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
-#define L_WALL_TOP	eSolid			///< BC used on the top of the domain
+#define L_WALL_LEFT		eVelocity			///< BC used on the left of the domain
+#define L_WALL_RIGHT	eVelocity			///< BC used on the right of the domain
+#define L_WALL_BOTTOM	eVelocity			///< BC used on the bottom of the domain
+#define L_WALL_TOP		eVelocity			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
-#define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
+#define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
 
 // BC qualifiers
 //#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-//#define L_VELOCITY_RAMP 2		///< Defines time in dimensionless units over which to ramp up the inlet velocity
+//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 //#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
-#define L_WALL_THICKNESS_BOTTOM (2.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall
+#define L_WALL_THICKNESS_BOTTOM (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall
 #define L_WALL_THICKNESS_TOP (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of top wall
 #define L_WALL_THICKNESS_LEFT (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of left wall
 #define L_WALL_THICKNESS_RIGHT (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of right wall
@@ -259,15 +259,15 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 3		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 4		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
-//#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
+#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
-#define L_PADDING_X_MIN (-2.0 * dh)		///< Padding between X start of each sub-grid and its child edge
-#define L_PADDING_X_MAX (2.0 * dh)		///< Padding between X end of each sub-grid and its child edge
-#define L_PADDING_Y_MIN (L_BY - 0.1)	///< Padding between Y start of each sub-grid and its child edge
-#define L_PADDING_Y_MAX (0.0 + 0.1)		///< Padding between Y end of each sub-grid and its child edge
+#define L_PADDING_X_MIN 0.1		///< Padding between X start of each sub-grid and its child edge
+#define L_PADDING_X_MAX 0.1		///< Padding between X end of each sub-grid and its child edge
+#define L_PADDING_Y_MIN 0.1		///< Padding between Y start of each sub-grid and its child edge
+#define L_PADDING_Y_MAX 0.1		///< Padding between Y end of each sub-grid and its child edge
 #define L_PADDING_Z_MIN (-2.0 * dh)		///< Padding between Z start of each sub-grid and its child edge
 #define L_PADDING_Z_MAX (2.0 * dh)		///< Padding between Z end of each sub-grid and its child edge
 
@@ -276,27 +276,27 @@
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.0 },{ 0.0 },{ 0.0 }
+	0.1//, 16, 17, 19
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.0 },{ 0.0 },{ 0.0 }
+	2.9//, 24, 23, 22
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ L_COARSE_SITE_WIDTH },{ L_COARSE_SITE_WIDTH },{ L_COARSE_SITE_WIDTH }
+	0.05//, 17, 18, 19
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 2.0 },{ 1.5 },{ 1.25 }
+	0.95//, 23, 22, 21
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.75 },{ 1.0 },{ 1.25 }
+	{ 0.75 }//,{ 1.0 },{ 1.25 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 3.25 },{ 3.0 },{ 2.75 }
+	{ 3.25 }//,{ 3.0 },{ 2.75 }
 };
 
 #endif

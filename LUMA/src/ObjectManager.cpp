@@ -99,67 +99,66 @@ void ObjectManager::computeLiftDrag(int i, int j, int k, GridObj *g) {
 	int M_lim = g->M_lim;
 	int K_lim = g->K_lim;
 
-	// For MPI builds, ignore if part of object is in halo region
+	// For MPI builds, ignore if part of object is in halo region as represented on another rank
 #ifdef L_BUILD_FOR_MPI
 	if (!GridUtils::isOnRecvLayer(g->XPos[i], g->YPos[j], g->ZPos[k]))
 #endif
 	{
 
 #ifdef L_MOMEX_DEBUG
-		// Write position of solid site
+		// Write position of solid site to debugging file
 		if (debugstream.is_open())
 			debugstream << std::endl << g->XPos[i] << "," << g->YPos[j] << "," << g->ZPos[k];
 #endif
-		// Declare some local stores
-		double contrib_x = 0.0, contrib_y = 0.0, contrib_z = 0.0;
-
 		// Loop over directions from solid site
 		for (int n = 0; n < L_NUM_VELS; n++)
 		{
+			// Declare some local stores for this site
+			double contrib_x = 0.0, contrib_y = 0.0, contrib_z = 0.0;
+
 			// Get incoming direction
 			int n_opp = GridUtils::getOpposite(n);
 
 			// Compute destination coordinates (does not assume any periodicity)
-			int xdest = i + c[eXDirection][n];
-			int ydest = j + c[eYDirection][n];
-			int zdest = k + c[eZDirection][n];
+			int xdest = i - c[eXDirection][n_opp];
+			int ydest = j - c[eYDirection][n_opp];
+			int zdest = k - c[eZDirection][n_opp];
 
-			// Reject site on grid edges (like single-cell walls)
-			if (GridUtils::isOffGrid(xdest, ydest, zdest, g)) return;
-
-			// Only apply if streams to a fluid site
-			if (g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
+			// Objects on edges will not get a periodic contribution && only applies to fluid sites
+			if (!GridUtils::isOffGrid(xdest, ydest, zdest, g) &&
+				g->LatTyp(xdest, ydest, zdest, M_lim, K_lim) == eFluid)
 			{
 				/* For HWBB:
 				 *
-				 *	Force = 
-				 *		(pre-stream population toward wall + 
+				 *	Force =
+				 *		(pre-stream population toward wall +
 				 *		post-stream population away from wall)
 				 *
 				 * since population is simply bounced-back, we can write as:
-				 * 
-				 *	Force = 
+				 *
+				 *	Force =
 				 *		(2 * pre-stream population toward wall)
 				 *
-				 * Multiplication by c unit vector resolves the result in 
+				 * Multiplication by c unit vector resolves the result in
 				 * appropriate direction.
 				 */
+
 				 // Store contribution in this direction
-				contrib_x += 2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_y += 2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
-				contrib_z += 2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_x = 2.0 * c[eXDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_y = 2.0 * c[eYDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
+				contrib_z = 2.0 * c[eZDirection][n_opp] * g->f(xdest, ydest, zdest, n_opp, M_lim, K_lim, L_NUM_VELS);
 			}
-			
-			// Add the total contribution of every direction of this site to the body forces
+
+#ifdef L_MOMEX_DEBUG
+			// Write contribution to file for this site for this lattice link
+			if (debugstream.is_open())
+				debugstream << "," << std::to_string(contrib_x) << "," << std::to_string(contrib_y) << "," << std::to_string(contrib_z);
+#endif
+			// Add the contribution of this link to the body forces
 			bbbForceOnObjectX += contrib_x;
 			bbbForceOnObjectY += contrib_y;
 			bbbForceOnObjectZ += contrib_z;
 
-#ifdef L_MOMEX_DEBUG
-			// Write contribution to file for this site
-			if (debugstream.is_open())
-				debugstream << "," << std::to_string(contrib_x) << "," << std::to_string(contrib_y) << "," << std::to_string(contrib_z);
-#endif
 		}
 	}
 }

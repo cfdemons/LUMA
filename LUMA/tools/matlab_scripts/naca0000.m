@@ -1,6 +1,6 @@
 clear
 close all
-res = 400;
+res = 800;
 AR = 2;
 t = 0.12;
 x = 1 - cos(linspace(0,pi / 2,res));
@@ -53,5 +53,5 @@ y_ex = [y_ex; y_end_allow];
 z_ex = [z_ex; z_end_allow];
 
 figure, plot3(x_ex, y_ex, z_ex, '.', 'MarkerSize',2), axis equal
-stlwrite(['naca00' num2str(t * 100) '_2D.stl'], x, y, ones(size(x)));
-dlmwrite(['naca00' num2str(t * 100) '_3D_points.in'], [x_ex y_ex z_ex], 'Delimiter','\t');
+dlmwrite(['naca00' num2str(t * 100) '_2D.pointcloud'], [x y ones(size(x))], 'Delimiter', '\t');
+dlmwrite(['naca00' num2str(t * 100) '_3D.pointcloud'], [x_ex y_ex z_ex], 'Delimiter', '\t');

@@ -821,7 +821,7 @@ void ObjectManager::io_readInCloud(PCpts*& _PCpts, GeomPacked *geom)
 
 	// Handle failure to open
 	if (!file.is_open())
-		L_ERROR("Error opening cloud input file. Exiting.", GridUtils::logfile);
+		L_ERROR("Error opening cloud input file: " + geom->fileName + ". Exiting.", GridUtils::logfile);
 
 	// If the level is set to -1 then object can span levels
 	if (geom->onGridLev < 0)

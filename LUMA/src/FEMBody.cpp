@@ -23,6 +23,7 @@
 #include "../inc/stdafx.h"
 #include "../inc/FEMBody.h"
 #include "../inc/IBMarker.h"
+#include "../inc/IBBody.h"
 
 // *****************************************************************************
 /// \brief	Default constructor for FEM body

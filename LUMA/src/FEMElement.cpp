@@ -22,7 +22,9 @@
 
 #include "../inc/stdafx.h"
 #include "../inc/FEMElement.h"
-
+#include "../inc/FEMBody.h"
+#include "../inc/IBBody.h"
+#include "../inc/IBMarker.h"
 
 // *****************************************************************************
 ///	\brief	Default constructor for finite element class

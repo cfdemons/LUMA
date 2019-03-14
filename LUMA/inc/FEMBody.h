@@ -24,7 +24,7 @@
 #define FEMBODY_H
 
 // Forward declarations
-#include "IBBody.h"
+class IBBody;
 #include "FEMNode.h"
 #include "FEMElement.h"
 

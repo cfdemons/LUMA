@@ -23,10 +23,10 @@
 #ifndef FEMELEMENT_H
 #define FEMELEMENT_H
 
-// Includes
-#include "FEMBody.h"
-#include "IBBody.h"
-#include "IBMarker.h"
+// Forward declarations
+class FEMBody;
+class IBBody;
+class IBMarker;
 
 /// \brief	Finite element class
 ///

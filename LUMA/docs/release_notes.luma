@@ -1,3 +1,7 @@
+version		=	1.7.5
+
+Public #2	:	Fixed build issue due to header conflicts.
+
 version		=	1.7.4
 
 Public #1	:	Fix for momentum exchange giving negative forces when positive expected.

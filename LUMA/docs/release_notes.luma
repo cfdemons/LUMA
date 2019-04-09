@@ -1,3 +1,7 @@
+version		=	1.7.6
+
+Public #3	:	Updated makefile and building wiki instructions.
+
 version		=	1.7.5
 
 Public #2	:	Fixed build issue due to header conflicts.

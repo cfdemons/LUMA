@@ -22,14 +22,20 @@ INC=-I$(HDF5_HOME)/include
 LIB=-L$(HDF5_HOME)/lib -lhdf5 -llapack
 
 # Build LUMA
-$(EXE): $(OBJS)
+$(EXE): objs
 	$(CC) $(CFLAGS) -o $@ $^ $(LIB)
 
 
 # Build object files
+.PHONY: objs
+objs: outdir $(OBJS)
 $(OBJS): ${ODIR}/%.o : ${SDIR}/%.cpp
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
+# Create output directory
+.PHONY: outdir
+outdir:
+	mkdir -p $(ODIR)
 
 # Clean the project
 .PHONY: clean

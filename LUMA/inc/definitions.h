@@ -21,7 +21,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.5"
+#define LUMA_VERSION "1.7.6"
 
 
 // Header guard
@@ -83,7 +83,7 @@
 #define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Enable OMP support?
-#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
+//#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
 // Output Options
 #define L_GRID_OUT_FREQ 500						///< How many timesteps before whole grid output
@@ -95,7 +95,7 @@
 // Types of output
 //#define L_IO_LITE				///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-#define L_LD_OUT				///< Write out lift and drag (all bodies)
+//#define L_LD_OUT				///< Write out lift and drag (all bodies)
 //#define L_IO_FGA				///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -111,7 +111,7 @@
 #define L_PROBE_MAX_Z 0.0					///< End position of probe array in Z direction
 
 // Forcing
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 2.986e-4
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
@@ -147,7 +147,7 @@
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
@@ -211,7 +211,7 @@
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
@@ -259,9 +259,9 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 4		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
-#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
+//#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
 #define L_PADDING_X_MIN 0.1		///< Padding between X start of each sub-grid and its child edge
@@ -276,27 +276,27 @@
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	0.1//, 16, 17, 19
+	{ 0.1 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	2.9//, 24, 23, 22
+	{ 2.9 }
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	0.05//, 17, 18, 19
+	{ 0.05 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	0.95//, 23, 22, 21
+	{ 0.95 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.75 }//,{ 1.0 },{ 1.25 }
+	{ 0.75 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 3.25 }//,{ 3.0 },{ 2.75 }
+	{ 3.25 }
 };
 
 #endif

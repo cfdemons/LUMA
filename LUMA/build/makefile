@@ -23,7 +23,7 @@ LIB=-L$(HDF5_HOME)/lib -lhdf5 -llapack
 
 # Build LUMA
 $(EXE): objs
-	$(CC) $(CFLAGS) -o $@ $^ $(LIB)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIB)
 
 
 # Build object files

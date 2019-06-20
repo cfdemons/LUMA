@@ -1,3 +1,7 @@
+version		=	1.7.7
+
+Public #4	:	Fixed issue resulting in a crash and out of range exception when a single process was used in MPI builds in combination with grid refinement.
+
 version		=	1.7.6
 
 Public #3	:	Updated makefile and building wiki instructions.

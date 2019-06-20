@@ -1210,6 +1210,11 @@ bool GridUtils::isOnTransitionLayer(double pos_x, double pos_y, double pos_z, Gr
 /// \return	boolean answer.
 bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, GridObj const * grid)
 {
+	// TODO: REMOVE THIS
+	L_INFO("Checking if site with position " + std::to_string(position) + 
+		": Edge " + std::to_string(edge) + 
+		": Level " + std::to_string(grid->level) + " is on TL",
+		logfile);
 
 	// L0 has no TL so always return false
 	if (grid->level == 0) return false;
@@ -1273,8 +1278,20 @@ bool GridUtils::isOnTransitionLayer(double position, enum eCartMinMax edge, Grid
 		L_ERROR("Invalid direction specified in GridUtils::isOnTL(). Exiting.", logfile);
 	}
 
-	if (position >= left_edge && position < right_edge) return true;
-	else return false;
+	if (position >= left_edge && position < right_edge)
+	{
+		// TODO: REMOVE THIS
+		L_INFO("Site with position " +  std::to_string(position) + " is ON TL", logfile);
+		
+		return true;
+	}
+	else
+	{
+		// TODO: REMOVE THIS
+		L_INFO("Site with position " + std::to_string(position) + " is NOT ON TL", logfile);
+		
+		return false;
+	}
 
 }
 
@@ -1682,8 +1699,8 @@ void GridUtils::getEnclosingVoxel(double xyz, GridObj const * const g, eCartesia
 	else
 		offset = cellsGridStartToRankStart;
 
-	// If on L0, always add a halo offset of 1 for MPI builds
-	if (g->level == 0) offset = 1;
+	// If on L0, always add a halo offset of 1 for MPI builds unless only using a single process in that direction
+	if (g->level == 0 && mpim->dimensions[dir] > 1) offset = 1;
 
 #endif // L_BUILD_FOR_MPI
 

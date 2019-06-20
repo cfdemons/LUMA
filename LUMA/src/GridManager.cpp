@@ -578,7 +578,6 @@ bool GridManager::createWritableDataStore(GridObj const * const targetGrid)
 
 }
 
-
 #if defined L_HDF_DEBUG
 		*GridUtils::logfile << "After TL shifting, local writable indices are: " << std::endl <<
 			"i = " << p_data->i_start << " - " << p_data->i_end << std::endl <<

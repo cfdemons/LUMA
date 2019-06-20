@@ -605,7 +605,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsX[eMinimum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "X: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "X: Starts on this rank @ " << pGrid.XPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -635,7 +635,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsX[eMaximum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "X: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "X: Ends on this rank @ " << pGrid.XPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -668,27 +668,28 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	/* If start and finish on same process then we test to see if sites are next
 	* to each other and coalesce the TL edges. */
 
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position) &&
-		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position2))
-	{
-
-		// Check sites are next to each other in space
-		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER
-			|| gm->periodic_flags[eXDirection][gm_idx])
-		{
-			// Set as if middle of complete block
-			CoarseLimsX[eMinimum] = 0;
-			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
-
-			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
-			gm->subgrid_tlayer_key[eXMin][gm_idx - 1] = false;
-			gm->subgrid_tlayer_key[eXMax][gm_idx - 1] = false;
-
-#ifdef L_INIT_VERBOSE
-			*GridUtils::logfile << "X: Periodically wrapped and joined" << std::endl;
-#endif
-		}
-	}
+	// TODO: Possible that this can be set incorrectly if the grid has no core and grid is coalesced incorrectly
+//	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eXDirection, &loc, &pGrid, &position) &&
+//		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eXDirection, &loc, &pGrid, &position2))
+//	{
+//
+//		// Check sites are next to each other in space
+//		if (abs(pGrid.XPos[position] - pGrid.XPos[position2]) - pGrid.dh < L_SMALL_NUMBER
+//			|| gm->periodic_flags[eXDirection][gm_idx])
+//		{
+//			// Set as if middle of complete block
+//			CoarseLimsX[eMinimum] = 0;
+//			CoarseLimsX[eMaximum] = pGrid.N_lim - 1;
+//
+//			// Tell mpim that TL doesn't exist so HDF5 writer does not try to exclude valid sites
+//			gm->subgrid_tlayer_key[eXMin][gm_idx - 1] = false;
+//			gm->subgrid_tlayer_key[eXMax][gm_idx - 1] = false;
+//
+//#ifdef L_INIT_VERBOSE
+//			*GridUtils::logfile << "X: Periodically wrapped and joined" << std::endl;
+//#endif
+//		}
+//	}
 
 	// If they do not start and end on the same process we still need to update the TL keys 
 	if (gm->periodic_flags[eXDirection][gm_idx])
@@ -714,7 +715,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsY[eMinimum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "Y: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "Y: Starts on this rank @ " << pGrid.YPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -734,7 +735,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsY[eMaximum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "Y: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "Y: Ends on this rank @ " << pGrid.YPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -757,7 +758,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	}
 #endif
 
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
+	/*if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eYDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eYDirection, &loc, &pGrid, &position2))
 	{
 		if (abs(pGrid.YPos[position] - pGrid.YPos[position2]) - pGrid.dh < L_SMALL_NUMBER
@@ -772,7 +773,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 			*GridUtils::logfile << "Y: Periodically wrapped and joined" << std::endl;
 #endif
 		}
-	}
+	}*/
 	if (gm->periodic_flags[eYDirection][gm_idx])
 	{
 		gm->subgrid_tlayer_key[eYMin][gm_idx - 1] = false;
@@ -797,7 +798,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsZ[eMinimum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "Z: Starts on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "Z: Starts on this rank @ " << pGrid.ZPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -817,7 +818,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 		CoarseLimsZ[eMaximum] = position;
 
 #ifdef L_INIT_VERBOSE
-		*GridUtils::logfile << "Z: Ends on this rank @ local " << position << " Loc = " << loc << std::endl;
+		*GridUtils::logfile << "Z: Ends on this rank @ " << pGrid.ZPos[position] << ", local idx " << position << ", Loc = " << loc << std::endl;
 #endif
 	}
 
@@ -840,7 +841,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 	}
 #endif
 
-	if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
+	/*if (GridUtils::isOnThisRank(subgrid_start_voxel_centre, eZDirection, &loc, &pGrid, &position) &&
 		GridUtils::isOnThisRank(subgrid_end_voxel_centre, eZDirection, &loc, &pGrid, &position2))
 	{
 		if (abs(pGrid.ZPos[position] - pGrid.ZPos[position2]) - pGrid.dh < L_SMALL_NUMBER
@@ -855,7 +856,7 @@ void GridObj::LBM_initGridToGridMappings(GridObj& pGrid)
 			*GridUtils::logfile << "Z: Periodically wrapped and joined" << std::endl;
 #endif
 		}
-	}
+	}*/
 	if (gm->periodic_flags[eZDirection][gm_idx])
 	{
 		gm->subgrid_tlayer_key[eZMin][gm_idx - 1] = false;
@@ -902,7 +903,7 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 {
 
 #ifdef L_INIT_VERBOSE
-	*GridUtils::logfile << "Building position vector for grid level " << level << ", region " << region_number << ", direction " << dir << "...";
+	*GridUtils::logfile << "Building position vector for grid level " << level << ", region " << region_number << ", direction " << dir << "..." << std::endl;
 #endif
 
 	GridManager *gm = GridManager::getInstance();
@@ -942,6 +943,15 @@ void GridObj::LBM_initPositionVector(double start_pos, double end_pos, eCartesia
 	// Get limits of the grid for wrap around of positions
 	double start_lim = gm->global_edges[start_idx][gm_idx];
 	double end_lim = gm->global_edges[end_idx][gm_idx];
+
+#ifdef L_INIT_VERBOSE
+	L_INFO("Required Size = " + std::to_string(req_size) + 
+		", Start limit = " + std::to_string(start_lim) + 
+		", Start position = " + std::to_string(start_pos) +
+		", End limit = " + std::to_string(end_lim) +
+		", End position = " + std::to_string(end_pos),
+		GridUtils::logfile);
+#endif
 
 	// Construct one at a time taking into account periodicity if necessary
 	arr->push_back(start_pos);

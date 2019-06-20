@@ -21,7 +21,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.6"
+#define LUMA_VERSION "1.7.7"
 
 
 // Header guard
@@ -111,9 +111,8 @@
 #define L_PROBE_MAX_Z 0.0					///< End position of probe array in Z direction
 
 // Forcing
-//#define L_GRAVITY_ON						///< Turn on gravity force
-/// Expression for the gravity force in dimensionless units
-#define L_GRAVITY_FORCE 2.986e-4
+#define L_GRAVITY_ON						///< Turn on gravity force
+#define L_GRAVITY_FORCE 2.986e-4			///< Expression for the gravity force in dimensionless units
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
@@ -147,11 +146,11 @@
 
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 1		///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
 
 // Decomposition strategy
-#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
+//#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
 #define L_MPI_SD_MAX_ITER 1000		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
@@ -167,12 +166,12 @@
 */
 
 // Lattice properties
-#define L_DIMS 2							///< Number of dimensions to the problem
-#define L_RESOLUTION 20						///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.25 / L_RESOLUTION		///< The timestep in non-dimensional units
+#define L_DIMS 3							///< Number of dimensions to the problem
+#define L_RESOLUTION 10						///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.1 / L_RESOLUTION		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 3.0				///< End of domain in X (non-dimensional units)
+#define L_BX 5.0				///< End of domain in X (non-dimensional units)
 #define L_BY 1.0				///< End of domain in Y (non-dimensional units)
 #define L_BZ 1.0				///< End of domain in Z (non-dimensional units)
 
@@ -232,10 +231,10 @@
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT		eVelocity			///< BC used on the left of the domain
-#define L_WALL_RIGHT	eVelocity			///< BC used on the right of the domain
-#define L_WALL_BOTTOM	eVelocity			///< BC used on the bottom of the domain
-#define L_WALL_TOP		eVelocity			///< BC used on the top of the domain
+#define L_WALL_LEFT		eFluid			///< BC used on the left of the domain
+#define L_WALL_RIGHT	eFluid			///< BC used on the right of the domain
+#define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
+#define L_WALL_TOP		eSolid			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
 
@@ -259,9 +258,9 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
-//#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
+#define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 
 // Auto-sub-grid configuration (if you want coincident edges then set to (-2.0 * dh))
 #define L_PADDING_X_MIN 0.1		///< Padding between X start of each sub-grid and its child edge
@@ -276,7 +275,7 @@
 
 static double cRefStartX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.1 }
+	{ .1 }
 };
 static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
@@ -284,19 +283,19 @@ static double cRefEndX[L_NUM_LEVELS][L_NUM_REGIONS] =
 };
 static double cRefStartY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.05 }
+	{ .05 }
 };
 static double cRefEndY[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.95 }
+	{ .95 }
 };
 static double cRefStartZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 0.75 }
+	{ 0.05 }
 };
 static double cRefEndZ[L_NUM_LEVELS][L_NUM_REGIONS] =
 {
-	{ 3.25 }
+	{ 0.95 }
 };
 
 #endif

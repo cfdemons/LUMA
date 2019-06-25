@@ -364,7 +364,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
     int nrhs = 1;
     int LDA = dim;
     int LDB = dim;
-    int info;
+    int info = -1;
 	std::vector<int> ipiv(row, 0);
 
     // Put A into 1D array
@@ -390,7 +390,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
 		<< ipiv.size() << std::endl;
 
 	dgetrf_(&row, &col, a.data() + offset, &LDA, ipiv.data(), &info);
-
+	
 	std::cout << "AFTER SOLVER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 	dgetrs_(&trans, &row, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);

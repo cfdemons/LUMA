@@ -876,15 +876,15 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #endif
 
 			// Solve linear system
-			//std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
-			std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
+			std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
+			//std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
 
 			// Assign epsilon
 #ifdef L_IBM_DEBUG
 			L_INFO("Updating epsilon for IBBody ID: " + std::to_string(iBodyPtr->at(ib).id), GridUtils::logfile);
 #endif
 			for (size_t m = 0; m < (*iBodyPtr)[ib].markers.size(); m++) {
-				(*iBodyPtr)[ib].markers[m].epsilon = epsilon[m];
+				//(*iBodyPtr)[ib].markers[m].epsilon = epsilon[m];
 			}
 		}
 	}

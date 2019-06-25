@@ -7,7 +7,7 @@ CC=mpicxx -O3 -std=c++0x -w
 VTK_VER=6.2
 
 # HDF5 paths
-DIR_HDF5=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+DIR_HDF5=${HDF5_HOME}
 INC_HDF5=-I${DIR_HDF5}/include
 LIBPATH_HDF5=-L${DIR_HDF5}/lib
 LIB_HDF5=-lhdf5
@@ -19,10 +19,10 @@ LIB_VTK=-lvtkFiltersCore-$(VTK_VER) -lvtkIOLegacy-$(VTK_VER) -lvtkIOCore-$(VTK_V
 
 
 # Location of source, header and object files
-SDIR=.
+SDIR=./src
 HDIR=.
 ODIR=.
-TDIR=ThirdParty
+TDIR=$(SDIR)/ThirdParty
 
 
 # List of header files

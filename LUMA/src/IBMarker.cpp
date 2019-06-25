@@ -28,7 +28,7 @@
 // *****************************************************************************
 ///	\brief	Default constructor for immersed boundary marker
 IBMarker::IBMarker() {
-
+	
 	// Initialise all values to zero
 	epsilon = 0.0;
 	local_area = 1.0;

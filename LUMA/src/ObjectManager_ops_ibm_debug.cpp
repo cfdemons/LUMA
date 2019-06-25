@@ -143,9 +143,15 @@ void ObjectManager::ibm_debug_interpVel(int ib) {
 
 		// Loop through markers
 		for (auto m : iBody[ib].validMarkers) {
-			predout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].interpMom[eXDirection] / iBody[ib].markers[m].interpRho << "\t" <<
-														  iBody[ib].markers[m].interpMom[eYDirection] / iBody[ib].markers[m].interpRho << "\t" <<
-														  iBody[ib].markers[m].interpMom[eZDirection] / iBody[ib].markers[m].interpRho << std::endl;
+			predout << iBody[ib].markers[m].id << "\t" 
+				<< iBody[ib].markers[m].interpMom[eXDirection] / iBody[ib].markers[m].interpRho << "\t" 
+				<< iBody[ib].markers[m].interpMom[eYDirection] / iBody[ib].markers[m].interpRho << "\t"
+#if (L_DIMS == 3)
+				<< iBody[ib].markers[m].interpMom[eZDirection] / iBody[ib].markers[m].interpRho
+#else
+				<< "0.0"
+#endif
+				<< std::endl;
 		}
 		predout << std::endl;
 		predout.close();
@@ -172,7 +178,13 @@ void ObjectManager::ibm_debug_markerForce(int ib) {
 
 		// Loop through markers
 		for (auto m : iBody[ib].validMarkers) {
-			forceout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << "\t" << iBody[ib].markers[m].force_xyz[eZDirection] << std::endl;
+			forceout << iBody[ib].markers[m].id << "\t" << iBody[ib].markers[m].force_xyz[eXDirection] << "\t" << iBody[ib].markers[m].force_xyz[eYDirection] << "\t"
+#if (L_DIMS == 3)
+				<< iBody[ib].markers[m].force_xyz[eZDirection]
+#else
+				<< "0"
+#endif
+				<< std::endl;
 		}
 		forceout << std::endl;
 		forceout.close();

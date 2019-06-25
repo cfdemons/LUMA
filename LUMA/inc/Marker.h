@@ -73,18 +73,24 @@ public:
 
 		// Get the i, j, and k for the closest voxel to markers
 		std::vector<int> ijk;
-		GridUtils::getEnclosingVoxel(x, y, z, body_owner, &ijk);
-		supp_i.push_back(ijk[0]);
-		supp_j.push_back(ijk[1]);
-		supp_k.push_back(ijk[2]);
+		eLocationOnRank loc = eNone;
+		bool onRank = GridUtils::isOnThisRank(x, y, z, &loc, body_owner, &ijk);
 
-		// Get the x-position of the support marker
-		supp_x.push_back(body_owner->XPos[ijk[eXDirection]]);
-		supp_y.push_back(body_owner->YPos[ijk[eYDirection]]);
-		supp_z.push_back(body_owner->ZPos[ijk[eZDirection]]);
+		// Only add the support point information if the marker is on the current rank core
+		if (onRank && loc == eCore)
+		{
+			supp_i.push_back(ijk[0]);
+			supp_j.push_back(ijk[1]);
+			supp_k.push_back(ijk[2]);
 
-		// Set rank of first support marker and marker ID in body
-		support_rank.push_back(GridUtils::safeGetRank());
+			// Get the position of the support point
+			supp_x.push_back(body_owner->XPos[ijk[eXDirection]]);
+			supp_y.push_back(body_owner->YPos[ijk[eYDirection]]);
+			supp_z.push_back(body_owner->ZPos[ijk[eZDirection]]);
+
+			// Set rank of this centre support point and marker ID in body
+			support_rank.push_back(GridUtils::safeGetRank());
+		}
 		id = markerID;
 	}
 

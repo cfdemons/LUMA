@@ -792,9 +792,6 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
-	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	std::cout << "BEFORE " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
-
 	// Loop through all iBodys this rank owns
 	for (size_t ib = 0; ib < (*iBodyPtr).size(); ib++) {
 		if ((*iBodyPtr)[ib].owningRank == rank && (*iBodyPtr)[ib].level == level && (*iBodyPtr)[ib].markers.size() > 0) {
@@ -884,13 +881,10 @@ void ObjectManager::ibm_findEpsilon(int level) {
 			L_INFO("Updating epsilon for IBBody ID: " + std::to_string(iBodyPtr->at(ib).id), GridUtils::logfile);
 #endif
 			for (size_t m = 0; m < (*iBodyPtr)[ib].markers.size(); m++) {
-				//(*iBodyPtr)[ib].markers[m].epsilon = epsilon[m];
+				(*iBodyPtr)[ib].markers[m].epsilon = epsilon[m];
 			}
 		}
 	}
-
-	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	std::cout << "AFTER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 #ifdef L_UNIVERSAL_EPSILON_CALC
 

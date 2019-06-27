@@ -21,7 +21,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.7"
+#define LUMA_VERSION "1.7.8"
 
 
 // Header guard
@@ -59,10 +59,10 @@
 
 //#define L_MEGA_DEBUG				///< Debug F, Feq, Macroscopic all in one file -- Warning: Heavy IO which kills performance
 //#define L_INC_RECV_LAYER			///< Flag to include writing out receiver layer sites in MPI builds
-#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
-#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
+//#define L_INIT_VERBOSE			///< Write out initialisation information such as refinement mappings
+//#define L_MPI_VERBOSE				///< Write out the buffers used by MPI plus more setup data
 //#define L_MPI_WRITE_LOAD_BALANCE	///< Write out the load balancing information based on active cell count
-#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
+//#define L_IBM_DEBUG				///< Write IBM body and matrix data out to text files
 //#define L_IBBODY_TRACER			///< Write out IBBody positions
 //#define L_BFL_DEBUG				///< Write out BFL marker positions and Q values out to files
 //#define L_CLOUD_DEBUG				///< Write out to a file the cloud that has been read in
@@ -84,6 +84,9 @@
 
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
+
+// Use LAPACK for IBM?
+//#define L_USE_LAPACK					///< Enable the use of LAPACK for solving matrix equations
 
 // Output Options
 #define L_GRID_OUT_FREQ 20						///< How many timesteps before whole grid output
@@ -145,9 +148,9 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction
 
 // Decomposition strategy
 //#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing

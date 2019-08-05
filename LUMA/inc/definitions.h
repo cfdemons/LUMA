@@ -80,7 +80,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
@@ -89,8 +89,8 @@
 //#define L_USE_LAPACK					///< Enable the use of LAPACK for solving matrix equations
 
 // Output Options
-#define L_GRID_OUT_FREQ 20						///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 20						///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 1						///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 1						///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (L_GRID_OUT_FREQ)	///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
@@ -138,7 +138,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 60000				///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000				///< Number of time steps to run simulation for
 
 
 /*

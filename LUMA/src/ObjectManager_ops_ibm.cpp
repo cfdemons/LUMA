@@ -314,11 +314,20 @@ void ObjectManager::ibm_findSupport(int ib) {
 		std::vector<int> ijk;
 		GridUtils::getEnclosingVoxel(x, y, z, iBody[ib]._Owner, &ijk);
 
-
 		// Set indices
 		inear = ijk[eXDirection];
 		jnear = ijk[eYDirection];
 		knear = ijk[eZDirection];
+
+		// Check to see whether the structural sim has crashed
+		if (inear < 0 || jnear < 0 || knear < 0 ||
+			inear >= iBody[ib]._Owner->N_lim ||
+			jnear >= iBody[ib]._Owner->M_lim ||
+			knear >= iBody[ib]._Owner->K_lim)
+		{
+			L_ERROR("Body " + std::to_string(ib) + " is no-longer inside the domain! Simulation has likely crashed.",
+				GridUtils::logfile);
+		}
 
 		// Insert into support
 		iBody[ib].markers[m].supp_i.push_back(inear);

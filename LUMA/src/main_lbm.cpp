@@ -280,11 +280,13 @@ int main( int argc, char* argv[] )
 #endif
 
 #if (defined L_IBM_ON && !defined L_RESTARTING)
-
+	
 	/* Initialise the bodies (compute support etc.) using initial body positions
 	 * and compute support from supplied grid. Only attempts to initialise IBM bodies
 	 * in this way. */
+	L_INFO("Initialising IBM...", GridUtils::logfile);
 	objMan->ibm_initialise();
+	L_INFO("IBM Initialisation Complete.", GridUtils::logfile);
 
 #endif
 

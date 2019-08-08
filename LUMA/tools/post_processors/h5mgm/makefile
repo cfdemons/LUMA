@@ -26,12 +26,12 @@ TDIR=$(SDIR)/ThirdParty
 
 
 # List of header files
-DEPS = h5mgm.h
+DEPS = $(SDIR)/h5mgm.h
 TDEPS = $(TDIR)/vtkCleanUnstructuredGrid.h
 
 
 # List of object files
-OBJ = h5mgm.o
+OBJ = $(SDIR)/h5mgm.o
 TOBJ = $(TDIR)/vtkCleanUnstructuredGrid.o
 
 

@@ -21,7 +21,7 @@
 */
 
 /// LUMA version
-#define LUMA_VERSION "1.7.7"
+#define LUMA_VERSION "1.7.8"
 
 
 // Header guard
@@ -80,22 +80,25 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
+// Use LAPACK for IBM?
+//#define L_USE_LAPACK					///< Enable the use of LAPACK for solving matrix equations
+
 // Output Options
-#define L_GRID_OUT_FREQ 500						///< How many timesteps before whole grid output
+#define L_GRID_OUT_FREQ 1						///< How many timesteps before whole grid output
 #define L_EXTRA_OUT_FREQ 1						///< Specific output frequency of body forces
-#define L_OUTPUT_PRECISION 8					///< Precision of output (for text writers)
-#define L_RESTART_OUT_FREQ (20*L_GRID_OUT_FREQ)	///< Frequency of write out of restart file
+#define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
+#define L_RESTART_OUT_FREQ (L_GRID_OUT_FREQ)	///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
 
 // Types of output
 //#define L_IO_LITE				///< ASCII dump on output
 #define L_HDF5_OUTPUT				///< HDF5 dump on output
-//#define L_LD_OUT				///< Write out lift and drag (all bodies)
+#define L_LD_OUT				///< Write out lift and drag (all bodies)
 //#define L_IO_FGA				///< Write the components of the macroscopic velocity in a .fga file. (To be used in Unreal Engine 4).
 //#define L_PROBE_OUTPUT			///< Write out probe data
 
@@ -111,7 +114,7 @@
 #define L_PROBE_MAX_Z 0.0					///< End position of probe array in Z direction
 
 // Forcing
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 #define L_GRAVITY_FORCE 2.986e-4			///< Expression for the gravity force in dimensionless units
 #define L_GRAVITY_DIRECTION eXDirection		///< Gravity direction (specify using enumeration)
 
@@ -135,7 +138,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 2000				///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 1000				///< Number of time steps to run simulation for
 
 
 /*
@@ -147,7 +150,7 @@
 // MPI Data
 #define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction.
+#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction
 
 // Decomposition strategy
 //#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
@@ -166,13 +169,13 @@
 */
 
 // Lattice properties
-#define L_DIMS 3							///< Number of dimensions to the problem
-#define L_RESOLUTION 10						///< Number of coarse lattice sites per unit length
+#define L_DIMS 2							///< Number of dimensions to the problem
+#define L_RESOLUTION 200						///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.1 / L_RESOLUTION		///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 5.0				///< End of domain in X (non-dimensional units)
-#define L_BY 1.0				///< End of domain in Y (non-dimensional units)
+#define L_BX (2.2 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))				///< End of domain in X (non-dimensional units)
+#define L_BY (0.41 + (L_WALL_THICKNESS_BOTTOM + L_WALL_THICKNESS_TOP))				///< End of domain in Y (non-dimensional units)
 #define L_BZ 1.0				///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -190,7 +193,7 @@
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE		///< Use an inlet profile
-//#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
+#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -210,19 +213,19 @@
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
-//#define L_IBM_ON				///< Turn on IBM
+#define L_IBM_ON				///< Turn on IBM
 //#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
 #define L_NB_ALPHA 0.25				///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
 #define L_NB_DELTA 0.5				///< Parameter for Newmark-Beta time integration (0.5 for 2nd order)
-#define L_RELAX 0.5				///< Under-relaxation for FSI coupling
-//#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
+#define L_RELAX 1.0				///< Under-relaxation for FSI coupling
+#define L_WRITE_TIP_POSITIONS			///< Turn on writing out filament tip positions (only works on flexible filaments)
 
 /*
 *******************************************************************************
@@ -231,17 +234,17 @@
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT		eFluid			///< BC used on the left of the domain
-#define L_WALL_RIGHT	eFluid			///< BC used on the right of the domain
+#define L_WALL_LEFT		eVelocity			///< BC used on the left of the domain
+#define L_WALL_RIGHT	ePressure			///< BC used on the right of the domain
 #define L_WALL_BOTTOM	eSolid			///< BC used on the bottom of the domain
 #define L_WALL_TOP		eSolid			///< BC used on the top of the domain
 #define L_WALL_FRONT	eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK		eFluid			///< BC used on the bottom of the domain
 
 // BC qualifiers
-//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
-//#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
+#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // General
 #define L_WALL_THICKNESS_BOTTOM (1.0 * L_COARSE_SITE_WIDTH)	///< Thickness of wall
@@ -258,7 +261,7 @@
 *******************************************************************************
 */
 
-#define L_NUM_LEVELS 1		///< Levels of refinement (0 = coarse grid only)
+#define L_NUM_LEVELS 0		///< Levels of refinement (0 = coarse grid only)
 #define L_NUM_REGIONS 1		///< Number of refined regions (can be arbitrary if L_NUM_LEVELS = 0)
 #define L_AUTO_SUBGRIDS		///< Activate auto sub-grid generation using the padding parameters below
 

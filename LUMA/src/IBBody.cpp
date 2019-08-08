@@ -57,7 +57,6 @@ IBBody::~IBBody(void)
 ///	\param	moveProperty	movable body flag passed on by the constructor
 void IBBody::initialise(eMoveableType moveProperty)
 {
-
 	// Set local grid spacing
 	dh = _Owner->dh;
 
@@ -80,7 +79,7 @@ void IBBody::initialise(eMoveableType moveProperty)
 
 	// Get rank
 	int rank = GridUtils::safeGetRank();
-
+	
 	// Delete markers which exist off rank
 	if (rank != owningRank) {
 		*GridUtils::logfile << "Deleting IB markers which exist on receiver layer..." << std::endl;

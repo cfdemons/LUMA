@@ -34,7 +34,7 @@ void ObjectManager::ibm_apply(GridObj *g, bool doSubIterate) {
 
 	// Interpolate the velocity onto the markers
 	ibm_interpolate(g->level);
-
+	
 	// Compute force
 	ibm_computeForce(g->level);
 
@@ -202,6 +202,7 @@ void ObjectManager::ibm_initialise() {
 #endif
 
 				// Find support points for IBM marker
+				L_INFO("Computing IBM support stencils...", GridUtils::logfile);
 				ibm_findSupport(ib);
 
 				// Write out info for support site
@@ -221,15 +222,18 @@ void ObjectManager::ibm_initialise() {
 
 	// Build helper classes for MPI comms
 #ifdef L_BUILD_FOR_MPI
+	L_INFO("Building IBM communicators...", GridUtils::logfile);
 	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_updateMPIComms(lev);
 #endif
 
 	// Compute ds
+	L_INFO("Computing marker spacing...", GridUtils::logfile);
 	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_computeDs(lev);
 
 	// Find epsilon for the body
+	L_INFO("Computing epsilon...", GridUtils::logfile);
 	for (int lev = 0; lev < (levToLoop+1); lev++)
 		ibm_findEpsilon(lev);
 
@@ -238,6 +242,7 @@ void ObjectManager::ibm_initialise() {
 	for (int ib = 0; ib < iBody.size(); ib++)
 		ibm_debug_epsilon(ib);
 #endif
+
 }
 
 
@@ -272,7 +277,7 @@ double ObjectManager::ibm_deltaKernel(double radius, double dilation) {
 ///
 ///	\param	ib			body index
 void ObjectManager::ibm_findSupport(int ib) {
-
+	
 #ifdef L_BUILD_FOR_MPI
 	MpiManager *mpim = MpiManager::getInstance();
 	int estimated_rank_offset[3] = { 0, 0, 0 };
@@ -314,6 +319,16 @@ void ObjectManager::ibm_findSupport(int ib) {
 		jnear = ijk[eYDirection];
 		knear = ijk[eZDirection];
 
+		// Check to see whether the structural sim has crashed
+		if (inear < 0 || jnear < 0 || knear < 0 ||
+			inear >= iBody[ib]._Owner->N_lim ||
+			jnear >= iBody[ib]._Owner->M_lim ||
+			knear >= iBody[ib]._Owner->K_lim)
+		{
+			L_ERROR("Body " + std::to_string(ib) + " is no-longer inside the domain! Simulation has likely crashed.",
+				GridUtils::logfile);
+		}
+
 		// Insert into support
 		iBody[ib].markers[m].supp_i.push_back(inear);
 		iBody[ib].markers[m].supp_j.push_back(jnear);
@@ -330,7 +345,6 @@ void ObjectManager::ibm_findSupport(int ib) {
 		iBody[ib].markers[m].supp_x.push_back(nearpos[eXDirection]);
 		iBody[ib].markers[m].supp_y.push_back(nearpos[eYDirection]);
 		iBody[ib].markers[m].supp_z.push_back(nearpos[eZDirection]);
-
 
 		// Get the deltaval for the first support point
 		ibm_initialiseSupport(ib, m, nearpos);
@@ -559,8 +573,6 @@ void ObjectManager::ibm_interpolate(int level) {
 			}
 		}
 	}
-
-
 
 	// Pass the necessary values between ranks
 #ifdef L_BUILD_FOR_MPI
@@ -808,6 +820,9 @@ void ObjectManager::ibm_findEpsilon(int level) {
 			// Initialise 2D std vector with zeros
 			std::vector< std::vector<double> > A((*iBodyPtr)[ib].markers.size(), std::vector<double>((*iBodyPtr)[ib].markers.size(), 0.0));
 
+#ifdef L_IBM_DEBUG
+			L_INFO("Building coefficient matrix for IBBody ID: " + std::to_string(iBodyPtr->at(ib).id), GridUtils::logfile);
+#endif
 
 			// Loop over support of marker I and integrate delta value multiplied by delta value of marker J.
 			for (size_t I = 0; I < (*iBodyPtr)[ib].markers.size(); I++) {
@@ -860,10 +875,20 @@ void ObjectManager::ibm_findEpsilon(int level) {
 			// Solve system //
 			//////////////////
 
+#ifdef L_IBM_DEBUG
+			L_INFO("Solving linear system for IBBody ID: " + std::to_string(iBodyPtr->at(ib).id)
+				+ ", A size = " + std::to_string(A.at(0).size()) + " x " + std::to_string(A.size())
+				+ ", b size = " + std::to_string(bVector.size()), GridUtils::logfile);
+#endif
+
 			// Solve linear system
 			std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
+			//std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
 
 			// Assign epsilon
+#ifdef L_IBM_DEBUG
+			L_INFO("Updating epsilon for IBBody ID: " + std::to_string(iBodyPtr->at(ib).id), GridUtils::logfile);
+#endif
 			for (size_t m = 0; m < (*iBodyPtr)[ib].markers.size(); m++) {
 				(*iBodyPtr)[ib].markers[m].epsilon = epsilon[m];
 			}
@@ -878,6 +903,9 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #else
 	#ifdef L_BUILD_FOR_MPI
 
+#ifdef L_IBM_DEBUG
+	L_INFO("Scattering epsilon values...", GridUtils::logfile);
+#endif
 		// Perform MPI communication and insert correct epsilon values
 		mpim->mpi_epsilonCommScatter(level);
 	#endif

@@ -358,31 +358,103 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
 	// Set up the correct values
 	char trans = 'T';
 	int dim = static_cast<int>(A.size());
-	int row = dim - BC;
-	int col = dim - BC;
+	int numRows = dim - BC;
+	int numCols = dim - BC;
 	int offset = BC * dim + BC;
     int nrhs = 1;
     int LDA = dim;
     int LDB = dim;
-    int info;
-	std::vector<int> ipiv(row, 0);
+    int info = -1;
+	std::vector<int> ipiv(numRows, 0);
 
-    // Put A into 1D array
-    std::vector<double> a(dim * dim, 0.0);
-    for (int i = 0; i < dim; i++) {
-    	for (int j = 0; j < dim; j++) {
-    		a[i * dim + j] = A[i][j];
-    	}
-    }
+#ifdef L_USE_LAPACK
 
-    // Factorise and solve
-	dgetrf_(&row, &col, a.data() + offset, &LDA, ipiv.data(), &info);
-	dgetrs_(&trans, &row, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);
+	// Factorise and solve
+#ifdef L_IBM_DEBUG
+	L_INFO("Calling LAPACK for solution...", GridUtils::logfile);
+#endif
+
+	// Put A into 1D array
+	std::vector<double> a(dim * dim, 0.0);
+	for (int i = 0; i < dim; i++) {
+		for (int j = 0; j < dim; j++) {
+			a[i * dim + j] = A[i][j];
+		}
+	}
+
+	dgetrf_(&numRows, &numCols, a.data() + offset, &LDA, ipiv.data(), &info);
+	dgetrs_(&trans, &numRows, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);
+
+#ifdef L_IBM_DEBUG
+	L_INFO("...solution complete.", GridUtils::logfile);
+#endif
 
 	// Set return values not included to zero
 	fill(b.begin(), b.begin() + BC, 0.0);
 
-	// Return RHS
+#else
+
+	// Implement my own Gauss-Jordan Solver -- not fast but what you gonna do when LAPACK fails you? //
+
+	// Create the augmented matrix ignoring the BC entries
+	std::vector<double> augmat(numRows * (numCols + 1), 0.0);
+	for (int row = 0; row < numRows; row++)
+	{
+		for (int col = 0; col < numCols + 1; col++)
+		{
+			// Add the RHS if the last column of the augmat
+			if (col == numCols) augmat[col + row * (numCols + 1)] = b[row + BC];
+			else augmat[col + row * (numCols + 1)] = A[row + BC][col + BC];
+		}		
+	}
+
+	// Gaussian Elimination on Lower Triangle
+	for (int row = 0; row < numRows - 1; row++)
+	{
+		for (int otherrow = row + 1; otherrow < numRows; otherrow++)
+		{
+			// Skip if already zero
+			if (abs(augmat[row + row * (numCols + 1)]) < L_SMALL_NUMBER) continue;
+
+			// Compute multiplier
+			double m = augmat[row + otherrow * (numCols + 1)] / augmat[row + row * (numCols + 1)];
+
+			// Update the row
+			for (int col = 0; col < numCols + 1; col++)
+			{
+				augmat[col + otherrow * (numCols + 1)] -= augmat[col + row * (numCols + 1)] * m;
+			}
+		}
+	}
+
+	// Gaussian Elimination on Upper Triangle
+	for (int row = numRows - 1; row > 0; row--)
+	{
+		for (int otherrow = row - 1; otherrow > -1; otherrow--)
+		{
+			// Skip if already zero
+			if (abs(augmat[row + row * (numCols + 1)]) < L_SMALL_NUMBER) continue;
+
+			// Compute multiplier
+			double m = augmat[row + otherrow * (numCols + 1)] / augmat[row + row * (numCols + 1)];
+
+			// Update the row
+			for (int col = 0; col < numCols + 1; col++)
+			{
+				augmat[col + otherrow * (numCols + 1)] -= augmat[col + row * (numCols + 1)] * m;
+			}
+		}
+	}
+
+	// Extract the solution and put it in the original b vector
+	for (int row = 0; row < numRows; row++)
+	{
+		b[row + BC] = augmat[numCols + row * (numCols + 1)] / augmat[row + row * (numCols + 1)];
+	}
+
+#endif
+
+	// Return RHS which now contains solution
 	return b;
 }
 

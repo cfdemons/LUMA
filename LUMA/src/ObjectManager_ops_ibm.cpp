@@ -793,7 +793,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	int rank = GridUtils::safeGetRank();
 
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	std::cout << "BEFORE " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
+	//std::cout << "BEFORE " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 	// Loop through all iBodys this rank owns
 	for (size_t ib = 0; ib < (*iBodyPtr).size(); ib++) {
@@ -876,8 +876,8 @@ void ObjectManager::ibm_findEpsilon(int level) {
 #endif
 
 			// Solve linear system
-			//std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
-			std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
+			std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
+			//std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
 
 			// Assign epsilon
 #ifdef L_IBM_DEBUG
@@ -890,7 +890,7 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	}
 
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	std::cout << "AFTER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
+	//std::cout << "AFTER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 #ifdef L_UNIVERSAL_EPSILON_CALC
 

@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -590,7 +590,7 @@ void ObjectManager::io_readInGeomConfig() {
 				shiftY = L_WALL_THICKNESS_BOTTOM;
 			if (L_WALL_FRONT == eSolid)
 				shiftZ = L_WALL_THICKNESS_FRONT;
-
+			
 			// Sort data
 			std::vector<double> centre_point, angles;
 			centre_point.push_back(centreX + shiftX);
@@ -610,7 +610,7 @@ void ObjectManager::io_readInGeomConfig() {
 			// Get grid pointer
 			GridObj* g = NULL;
 			GridUtils::getGrid(_Grids, lev, reg, g);
-
+			
 			// If rank has grid
 			if (g != NULL) {
 
@@ -791,8 +791,12 @@ void ObjectManager::io_readInGeomConfig() {
 	}
 	file.close();
 
+	L_INFO("Finalising bodies...", GridUtils::logfile);
+
 	// Do some more IBM setup required after reading all bodies
 	ibm_finaliseReadIn(iBodyID);
+
+	L_INFO("Finalising Complete.", GridUtils::logfile);
 }
 
 

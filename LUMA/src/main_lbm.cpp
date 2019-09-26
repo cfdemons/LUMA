@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 ///
 /// -------------------------- L-U-M-A ---------------------------
 ///
-/// Copyright 2018 The University of Manchester
+/// Copyright 2019 The University of Manchester
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -280,11 +280,13 @@ int main( int argc, char* argv[] )
 #endif
 
 #if (defined L_IBM_ON && !defined L_RESTARTING)
-
+	
 	/* Initialise the bodies (compute support etc.) using initial body positions
 	 * and compute support from supplied grid. Only attempts to initialise IBM bodies
 	 * in this way. */
+	L_INFO("Initialising IBM...", GridUtils::logfile);
 	objMan->ibm_initialise();
+	L_INFO("IBM Initialisation Complete.", GridUtils::logfile);
 
 #endif
 

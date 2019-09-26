@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -364,7 +364,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
     int nrhs = 1;
     int LDA = dim;
     int LDB = dim;
-    int info;
+    int info = -1;
 	std::vector<int> ipiv(row, 0);
 
     // Put A into 1D array
@@ -376,8 +376,16 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
     }
 
     // Factorise and solve
+#ifdef L_IBM_DEBUG
+	L_INFO("Calling LAPACK for solution...", GridUtils::logfile);
+#endif
+
 	dgetrf_(&row, &col, a.data() + offset, &LDA, ipiv.data(), &info);
 	dgetrs_(&trans, &row, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);
+
+#ifdef L_IBM_DEBUG
+	L_INFO("...solution complete.", GridUtils::logfile);
+#endif
 
 	// Set return values not included to zero
 	fill(b.begin(), b.begin() + BC, 0.0);

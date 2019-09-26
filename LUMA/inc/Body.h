@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -197,7 +197,6 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &start_positi
 template <typename MarkerType>
 Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, double radius)
 {
-
 	// Set the body base class parameters from constructor inputs
 	this->_Owner = g;
 	this->id = bodyID;
@@ -229,20 +228,22 @@ Body<MarkerType>::Body(GridObj* g, int bodyID, std::vector<double> &centre, doub
 		addMarker(centre[0] + (cos(phi)*r * radius), y*radius + centre[1], centre[2] + (sin(phi)*r*radius), k);
 	}
 #else
-
+	
 	// Build circle (2D)
 	int numMarkers = static_cast<int>(std::floor(2.0 * L_PI * radius / g->dh));
 	std::vector<double> theta = GridUtils::linspace(0.0, 2.0 * L_PI - (2.0 * L_PI / static_cast<double>(numMarkers)), numMarkers);
+	
 	for (size_t i = 1; i < theta.size(); i++) {
 
 		// Add Lagrange marker to body
 		addMarker(	centre[0] + radius * cos(theta[i]),
 					centre[1] + radius * sin(theta[i]),
 					centre[2],
-					static_cast<int>(i-1) );
+					static_cast<int>(i)-1 );
 	}
 #endif
 
+	
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 

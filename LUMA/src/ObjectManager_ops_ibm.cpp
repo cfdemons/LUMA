@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -802,7 +802,6 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	int rank = GridUtils::safeGetRank();
 
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	//std::cout << "BEFORE " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 	// Loop through all iBodys this rank owns
 	for (size_t ib = 0; ib < (*iBodyPtr).size(); ib++) {
@@ -886,7 +885,6 @@ void ObjectManager::ibm_findEpsilon(int level) {
 
 			// Solve linear system
 			std::vector<double> epsilon = GridUtils::solveLinearSystem(A, bVector);
-			//std::vector<double> epsilon(bVector.size(), 1.0);	// FUDGE
 
 			// Assign epsilon
 #ifdef L_IBM_DEBUG
@@ -899,7 +897,6 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	}
 
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
-	//std::cout << "AFTER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
 
 #ifdef L_UNIVERSAL_EPSILON_CALC
 

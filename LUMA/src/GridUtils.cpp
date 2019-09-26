@@ -5,7 +5,7 @@
 *
 * -------------------------- L-U-M-A ---------------------------
 *
-* Copyright 2018 The University of Manchester
+* Copyright 2019 The University of Manchester
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -380,19 +380,7 @@ std::vector<double> GridUtils::solveLinearSystem(std::vector<std::vector<double>
 	L_INFO("Calling LAPACK for solution...", GridUtils::logfile);
 #endif
 
-	//std::cout << "BEFORE SOLVER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
-
-	/*std::cout << row << ","
-		<< col << ","
-		<< a.size() << ","
-		<< offset << ","
-		<< LDA << ","
-		<< ipiv.size() << std::endl;*/
-
 	dgetrf_(&row, &col, a.data() + offset, &LDA, ipiv.data(), &info);
-
-	//std::cout << "AFTER SOLVER " << MpiManager::getInstance()->my_rank << std::endl; // DEBUG
-
 	dgetrs_(&trans, &row, &nrhs, a.data() + offset, &LDA, ipiv.data(), b.data() + BC, &LDB, &info);
 
 #ifdef L_IBM_DEBUG

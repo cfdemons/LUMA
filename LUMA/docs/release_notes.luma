@@ -1,3 +1,7 @@
+version		=	1.7.9
+
+Public #10	:	Fixed issue with epsilon calculation code using MPI commands in serial build mode.
+
 version		=	1.7.8
 
 Public #8	:	Reorganisation of some build files and updated copyright.

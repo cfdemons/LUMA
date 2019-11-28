@@ -801,7 +801,9 @@ void ObjectManager::ibm_findEpsilon(int level) {
 	// Get rank
 	int rank = GridUtils::safeGetRank();
 
+#ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
+#endif
 
 	// Loop through all iBodys this rank owns
 	for (size_t ib = 0; ib < (*iBodyPtr).size(); ib++) {
@@ -896,7 +898,9 @@ void ObjectManager::ibm_findEpsilon(int level) {
 		}
 	}
 
+#ifdef L_BUILD_FOR_MPI
 	MPI_Barrier(MpiManager::getInstance()->world_comm);
+#endif
 
 #ifdef L_UNIVERSAL_EPSILON_CALC
 

@@ -80,7 +80,7 @@
 */
 
 // Using MPI?
-#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
@@ -169,7 +169,7 @@
 // Lattice properties
 #define L_DIMS 2													///< Number of dimensions to the problem
 #define L_RESOLUTION 200											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.0005										///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.00005										///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
 #define L_BX (2.5 + 0.5*(L_WALL_THICKNESS_LEFT + L_WALL_THICKNESS_RIGHT))															///< End of domain in X (non-dimensional units)
@@ -217,7 +217,7 @@
 
 // IBM //
 #define L_IBM_ON						///< Turn on IBM
-#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
+//#define L_UNIVERSAL_EPSILON_CALC		///< Do universal epsilon calculation (should be used if supports from different bodies overlap)
 
 // FEM //
 #define L_NB_ALPHA 0.25					///< Parameter for Newmark-Beta time integration (0.25 for 2nd order)
@@ -234,8 +234,8 @@
 // BC types (set to eFluid for periodic)
 #define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
 #define L_WALL_RIGHT ePressure			///< BC used on the right of the domain
-#define L_WALL_BOTTOM eVelocity		///< BC used on the bottom of the domain
-#define L_WALL_TOP eVelocity		///< BC used on the top of the domain
+#define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
+#define L_WALL_TOP eSolid		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 

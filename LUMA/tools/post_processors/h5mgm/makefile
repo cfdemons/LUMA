@@ -34,6 +34,7 @@ TDEPS = $(TDIR)/vtkCleanUnstructuredGrid.h
 OBJ = $(SDIR)/h5mgm.o
 TOBJ = $(TDIR)/vtkCleanUnstructuredGrid.o
 
+all: h5mgm
 
 # Compile the source files into object files
 $(TDIR)/%.o: $(TDIR)/%.cpp $(TEPS)

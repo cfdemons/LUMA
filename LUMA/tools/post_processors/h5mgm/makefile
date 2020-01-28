@@ -31,7 +31,7 @@ TDEPS = $(TDIR)/vtkCleanUnstructuredGrid.h
 
 
 # List of object files
-OBJ = $(SDIR)/h5mgm.o
+OBJ = $(ODIR)/h5mgm.o
 TOBJ = $(TDIR)/vtkCleanUnstructuredGrid.o
 
 all: h5mgm

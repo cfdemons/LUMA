@@ -21,6 +21,10 @@ OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 INC=-I$(HDF5_HOME)/include
 LIB=-L$(HDF5_HOME)/lib -lhdf5 -llapack
 
+ifneq (${LAPACK_DIR},)
+LIB += -L$(LAPACK_DIR)
+endif
+
 # Build LUMA
 $(EXE): objs
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIB)

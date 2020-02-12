@@ -113,6 +113,26 @@ void MpiManager::mpi_init()
 	MPI_periodic[1] = true;
 	MPI_periodic[2] = true;
 
+	// Check total number of cores in the topology is the same as
+	// the number of ranks in the initial MPI_COMM_WORLD
+	// communicator
+	int initial_num_ranks = -1;
+	int initial_my_rank = -1;
+	int total_cores = 0;
+	MPI_Comm_size(MPI_COMM_WORLD, &initial_num_ranks);
+	MPI_Comm_rank(MPI_COMM_WORLD, &initial_my_rank);
+	for (int i = 0; i < L_DIMS; i++) {
+	  total_cores += dimensions[i];
+	}
+	if (total_cores != initial_num_ranks) {
+	  if (initial_my_rank == 0) {
+	    std::cerr << "ERROR: The total number of cores (" + std::to_string(total_cores)+") in the MPI topology defined by L_MPI_<d>CORES for a "+
+	      std::to_string((int) L_DIMS)+"D simulation in definitions.h is not equal to the number of MPI ranks ("+
+	      std::to_string(initial_num_ranks)+") specified in the mpirun command." << std::endl;
+	  }
+	  abort();
+	}
+
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 
 	// Get Cartesian topology info

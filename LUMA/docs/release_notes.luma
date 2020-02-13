@@ -1,3 +1,7 @@
+version		=	1.7.10
+
+General		:	Added runtime check of MPI dimensions to aid debugging.
+
 version		=	1.7.9
 
 Public #10	:	Fixed issue with epsilon calculation code using MPI commands in serial build mode.

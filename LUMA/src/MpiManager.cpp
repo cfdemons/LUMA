@@ -118,11 +118,11 @@ void MpiManager::mpi_init()
 	// communicator
 	int initial_num_ranks = -1;
 	int initial_my_rank = -1;
-	int total_cores = 0;
+	int total_cores = 1;
 	MPI_Comm_size(MPI_COMM_WORLD, &initial_num_ranks);
 	MPI_Comm_rank(MPI_COMM_WORLD, &initial_my_rank);
 	for (int i = 0; i < L_DIMS; i++) {
-	  total_cores += dimensions[i];
+	  total_cores *= dimensions[i];
 	}
 	if (total_cores != initial_num_ranks) {
 	  if (initial_my_rank == 0) {

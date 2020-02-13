@@ -1,3 +1,7 @@
+version		=	1.7.11
+
+General		:	Fixed issue with last fix.
+
 version		=	1.7.10
 
 General		:	Added runtime check of MPI dimensions to aid debugging.

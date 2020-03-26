@@ -91,6 +91,7 @@ enum eType
 	eBFL,					///< Site containing a BFL marker
 	eVelocity,				///< Velocity boundary
 	ePressure,				///< Pressure boundary
+	eExtrapolateRight,
 	eSlip					///< Slip boundary
 };
 

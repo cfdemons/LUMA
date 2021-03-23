@@ -34,6 +34,7 @@ TDEPS = $(TDIR)/vtkCleanUnstructuredGrid.h
 OBJ = $(ODIR)/h5mgm.o
 TOBJ = $(TDIR)/vtkCleanUnstructuredGrid.o
 
+.PHONY: all
 all: h5mgm
 
 # Compile the source files into object files

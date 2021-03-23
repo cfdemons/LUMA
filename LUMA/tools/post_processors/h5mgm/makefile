@@ -1,5 +1,8 @@
 # Makefile for merge tool (will probably need to edit compiler commands and paths for specific machine and install)
 
+# Disable implicit rules
+.SUFFIXES:
+
 # Compiler command
 CC=mpicxx -O3 -std=c++0x -w
 

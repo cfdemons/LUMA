@@ -1,5 +1,8 @@
 # Makefile for merge tool (will probably need to edit compiler commands and paths for specific machine and install)
 
+# Disable implicit rules
+.SUFFIXES:
+
 # Compiler command
 CC=mpicxx -O3 -std=c++0x -w
 
@@ -31,9 +34,11 @@ TDEPS = $(TDIR)/vtkCleanUnstructuredGrid.h
 
 
 # List of object files
-OBJ = $(SDIR)/h5mgm.o
+OBJ = $(ODIR)/h5mgm.o
 TOBJ = $(TDIR)/vtkCleanUnstructuredGrid.o
 
+.PHONY: all
+all: h5mgm
 
 # Compile the source files into object files
 $(TDIR)/%.o: $(TDIR)/%.cpp $(TEPS)

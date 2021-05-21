@@ -1,7 +1,9 @@
 # LUMA Makefile
 
 # Compiler command
-CC=mpicxx
+ifeq (${CC},)
+   CC=mpicxx
+endif
 CFLAGS=-O3 -std=c++0x -w -fopenmp
 
 # Executable
@@ -19,7 +21,10 @@ OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 
 # Include and library file
 INC=-I$(HDF5_HOME)/include
-LIB=-L$(HDF5_HOME)/lib -lhdf5 -llapack
+LIBDIR=-L$(HDF5_HOME)/lib
+ifeq (${LIB},)
+   LIB=-lhdf5 -llapack
+endif
 
 ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)
@@ -27,7 +32,7 @@ endif
 
 # Build LUMA
 $(EXE): objs
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIB)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBDIR) $(LIB)
 
 
 # Build object files

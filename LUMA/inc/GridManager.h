@@ -37,6 +37,8 @@ class GridManager
 	friend class GridUtils;
 	friend class GridObj;
 
+	friend class PLEAdapter;
+
 public:
 	/// Number of active cells in the calculation
 	long activeCellCount;

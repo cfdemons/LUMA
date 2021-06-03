@@ -26,6 +26,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 #ifdef _WIN32
 	#include <Windows.h>
@@ -50,7 +51,7 @@
 // Static variables
 static bool bQuiet = false;
 static bool bLoud = false;
-static ofstream logfile;
+static std::ofstream logfile;
 static bool bCutSolid = false;
 static bool bLegacy = false;
 static bool bSorter = false;

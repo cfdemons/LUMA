@@ -1,3 +1,12 @@
+version		=	1.7.12
+
+Issue #194	:	Added ExtrapolateRight boundary condition
+Issue #196	:	Fix problems in h5mgm makefile
+Issue #201	:	Use MPICXX instead of CC to specify compiler in makefile
+
+PR #198		:	Fix problems with #includes in h5mgm.h
+PR #197		:	Add Archer2 configuration files
+
 version		=	1.7.11
 
 General		:	Fixed issue with last fix.

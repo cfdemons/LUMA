@@ -242,6 +242,14 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
 		}
 
+		// EXTRAPOLATERIGHT
+		else if (src_type_local == eExtrapolateRight)
+		{
+			// F value is 2 to the left of the src site
+			fNew[v + id * L_NUM_VELS] =
+				f[v + (src_id - 2 * (K_lim * M_lim)) * L_NUM_VELS];
+		}
+
 		// VELOCITY BC (forced equilbirium)
 #ifndef L_REGULARISED_BOUNDARIES
 		else if (src_type_local == eVelocity)

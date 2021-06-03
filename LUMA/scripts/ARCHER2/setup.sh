@@ -2,5 +2,5 @@
 
 module load cray-hdf5-parallel
 
-export CC="cc"
+export MPICXX="cc"
 export LIB="-lhdf5 -lstdc++"

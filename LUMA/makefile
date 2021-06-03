@@ -1,8 +1,8 @@
 # LUMA Makefile
 
 # Compiler command
-ifeq (${CC},)
-   CC=mpicxx
+ifeq (${MPICXX},)
+   MPICXX=mpicxx
 endif
 CFLAGS=-O3 -std=c++0x -w -fopenmp
 
@@ -32,14 +32,14 @@ endif
 
 # Build LUMA
 $(EXE): objs
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBDIR) $(LIB)
+	$(MPICXX) $(CFLAGS) -o $@ $(OBJS) $(LIBDIR) $(LIB)
 
 
 # Build object files
 .PHONY: objs
 objs: outdir $(OBJS)
 $(OBJS): ${ODIR}/%.o : ${SDIR}/%.cpp
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(MPICXX) $(CFLAGS) $(INC) -c -o $@ $<
 
 # Create output directory
 .PHONY: outdir

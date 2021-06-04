@@ -129,6 +129,9 @@
 /// Compute the time-averaged values of velocity, density and the velocity products.
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
+// Couple using PLE
+#define L_ACTIVATE_PLE        ///< LUMA runs coupled to another code using PLE
+
 
 /*
 *******************************************************************************

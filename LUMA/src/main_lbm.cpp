@@ -49,6 +49,10 @@
 #include "../inc/ObjectManager.h"	// Object manager class definition
 #include "../inc/PCpts.h"			// Point cloud class
 
+#ifdef L_ACTIVATE_PLE
+#include "../inc/PLEAdapter.h"
+#endif
+
 using namespace std;	// Use the standard namespace
 
 // Static variable declarations
@@ -81,6 +85,7 @@ int main( int argc, char* argv[] )
 
 	// Usual initialise
 	MPI_Init(&argc, &argv);
+
 
 #endif
 
@@ -317,6 +322,22 @@ int main( int argc, char* argv[] )
 
 #endif
 
+	/*
+	****************************************************************************
+	*************************** INITIALISE PLE ***************************
+	****************************************************************************
+	*/
+
+#ifdef L_ACTIVATE_PLE
+
+	// Create an instance of PLEAdapter
+	// TODO: Make PLEAdapter a singleton like MPIManager and GridManager
+	PLEAdapter ple;
+
+	// Initialise the adapter
+	ple.init("./input/PLEConfig.yml", Grids->dt, gm);
+
+#endif
 
 	/*
 	****************************************************************************

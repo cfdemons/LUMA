@@ -221,7 +221,7 @@ void MpiManager::mpi_init()
 ///
 ///			Method to decompose the domain and identify local grid sizes.
 ///			Parameters defined here are used in GridObj construction.
-///			Grid manager must have been initialised before calleing this hence the
+///			Grid manager must have been initialised before calling this hence the
 ///			requirement to have it as a non-null input parameter.
 ///
 ///	\param	grid_man	Pointer to an initialised grid manager.

@@ -21,10 +21,8 @@
 * limitations under the License.*
 */
 
-#include "PLEAdapter.h"
-#include "PLEInterface.h"
 #include <iostream>
-#include "..\inc\PLEAdapter.h"
+#include "../inc/PLEAdapter.h"
 
 bool PLEAdapter::PLESynchronise()
 {

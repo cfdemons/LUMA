@@ -173,7 +173,7 @@ void PLEAdapter::teardown()
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
 	std::vector<ple_locator_t*> locators_;
-	std::cout << "Finalizing the preCICE solver interface..." << std::endl;
+	std::cout << "Finalizing the PLE interface..." << std::endl;
 
 
     if (NULL != pleSets_)

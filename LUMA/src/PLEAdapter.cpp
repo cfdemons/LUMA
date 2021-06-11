@@ -36,15 +36,15 @@ void PLEAdapter::init(std::string adapterConfigFileName, double timestepSolver, 
 	adapterConfigFileName_ = adapterConfigFileName;
 	LUMAGrid_ = lumaGrid;
 
-	// Do MPI initialisation. See in what part of the code LUMA does it, because it will have
-	// to be modified to call this function or something like this
-
     return;
 }
 
 bool PLEAdapter::configFileRead()
 {
 	//Read the configuration file //
+
+	// Hardcoded for the moment
+	participantName_ = "../LUMA";
 
 	/*std::cout << "Reading the adapter's YAML configuration file " << adapterConfigFileName_ << "..." << std::endl;
 
@@ -126,6 +126,17 @@ bool PLEAdapter::configure()
     //Create a PLE locator for each PLE interface in the configuration file. 
 	// ple_locator_set_mesh. Do I need PLEInterface? Or just a vector of ple_locators? 
 	// I'll start with just a vector of PLE locators
+
+	// Read PLE adapter configuration file. 
+	configFileRead(); 
+
+	// Configure MPI and PLE
+	int app_num = ple_coupling_mpi_name_to_id(MPI_COMM_WORLD, participantName_.c_str());
+	std::cout << app_num << std::endl;
+
+	
+
+
 
   return true;
 }

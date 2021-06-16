@@ -47,10 +47,10 @@ void GridObj::LBM_multi_opt(int subcycle)
 		for (int i = 0; i < 2; ++i)
 			sg->LBM_multi_opt(i);
 	}
-
+/******************************What's the manager instance***********************************************************/
 	// Get object manager instance
 	ObjectManager *objman = ObjectManager::getInstance();
-
+/******************************May not use in natural convection, no object inside flow field************************/
 	// If IBM is on then reset the forces
 #ifdef L_IBM_ON
 	if (objman->hasIBMBodies[level])
@@ -78,7 +78,9 @@ void GridObj::LBM_multi_opt(int subcycle)
 				// Local index and type
 				int id = k + j * K_lim + i * K_lim * M_lim;
 				eType type_local = LatTyp[id];
-
+				// Temperature local index and type
+				eTType ttype_local = LatTTyp[id];
+/******************************************do not undersatnd this two parts, seem need not modify*************************/
 				// MOMENTUM EXCHANGE //
 #ifdef L_LD_OUT
 				if (type_local == eSolid)
@@ -93,53 +95,35 @@ void GridObj::LBM_multi_opt(int subcycle)
 					|| type_local == eVelocity
 #endif
 					) continue;
-
-				// STREAM //
+/********************************************************************************************************************/
+				// STREAM IN VELOCITY FILED//
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
-
+				// STREAM IN TEMPERATURE FIELD //
+				_LBM_tstream_opt(i, j, k, id, ttype_local, subcycle);
+/*************************According to known boundary to update the boundary unknown population???********************/
 				// REGULARISED BCs //
 #ifdef L_REGULARISED_BOUNDARIES
 				if (type_local == eVelocity || type_local == ePressure)
 					_LBM_regularised_opt(i, j, k, id, type_local, subcycle);
-#endif
+				
+				// Isothermal BC refer to Gong et al paper, wait add links
+				if (ttype_local==eIsothermal)
+					// Do not forget define _LBM_tregularised_opt dunction and add to head file
+					_LBM_tregularised_opt(i, j, k, id, ttype_local, subcycle);
 
-				// MACROSCOPIC //
+#endif
+/********************************************************************************************************************/
+				// MACROSCOPIC IN VELOCITY FIELD //
 				_LBM_macro_opt(i, j, k, id, type_local);
+				// MACROSCOPIC IN TEMPERATURE FIELD //
+				_LBM_tmacro_opt(i, j, k, id, ttype_local);
 
-				// If IBM is on then split loop and perform IBM step
-#ifdef L_IBM_ON
-			}
-		}
-	}
-
-	// Set post-LBM macros
-	if (objman->hasFlexibleBodies[level])
-		u_n = u;
-
-	// Perform IBM steps (interpolate, force calc, spread and update macro)
-	if (objman->hasIBMBodies[level])
-		objman->ibm_apply(this, true);
-
-
-	// Loop over grid
-	for (int i = 0; i < N_lim; ++i)
-	{
-		for (int j = 0; j < M_lim; ++j)
-		{
-			for (int k = 0; k < K_lim; ++k)
-			{
-				// Local index and type
-				int id = k + j * K_lim + i * K_lim * M_lim;
-				eType type_local = LatTyp[id];
-
-#endif
-
-				// FORCING //
-#if (defined L_IBM_ON || defined L_GRAVITY_ON)
+				// If IBM is on then split loop and perform IBM stepForce in collision, rememeber to add force
 				// Do not force solid sites
 				if (type_local != eSolid)
 					_LBM_forceGrid_opt(id);
-#endif
+#endif	//***Chech this crossponds #if, if not, you may delete by mistake****//
+/************************************Force in collision, rememeber to add force*********************************/
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) // Do not collide on UpperTL
 				{ 
@@ -147,7 +131,10 @@ void GridObj::LBM_multi_opt(int subcycle)
 #ifdef L_USE_KBC_COLLISION
 					_LBM_kbcCollide_opt(id);
 #else
-					_LBM_collide_opt(id);
+					{
+						_LBM_collide_opt(id);	//	Density field collision
+						_LBM_tcollide_opt(id);	//	Temperature field collision
+					}
 #endif
 				}
 
@@ -156,7 +143,8 @@ void GridObj::LBM_multi_opt(int subcycle)
 	}
 
 	// Swap distributions
-	f.swap(fNew);
+	f.swap(fNew);	// Density field swap distribution
+	g.swap(gNew);	// Temperature field swap distribution
 
 #ifdef L_MOMEX_DEBUG
 	if (level == objman->bbbOnGridLevel && region_number == objman->bbbOnGridReg)
@@ -195,7 +183,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 
 // *****************************************************************************
-/// \brief	Optimised stream operation.
+/// \brief	Optimised stream operation in density field.
 ///
 /// \param	i	x-index of current site.
 /// \param	j	y-index of current site.
@@ -220,7 +208,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		// Source id and type
 		int src_id = src_z + src_y * K_lim + src_x * K_lim * M_lim;
 		src_type_local = LatTyp[src_id];
-
+/******************************What's BFL BC???****************************************************************/
 		// BFL BOUNCEBACK
 		if (type_local == eBFL || src_type_local == eBFL)
 		{
@@ -294,6 +282,57 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 
 	}
 
+}
+
+// *****************************************************************************
+/// \brief	Stream operation in temperature field.
+///
+/// \param	i	x-index of current site.
+/// \param	j	y-index of current site.
+/// \param	k	z-index of current site.
+///	\param	id	flattened ijk index.
+///	\param	ttype_local	type of current site.
+///	\param	subcycle	number of sub-cycle being performed.
+void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, int subcycle)
+{
+	// Local value to save multiple loads in temperature field
+	eTType src_ttype_local;
+
+	// Loop over temperature field
+	for (int v = 0; v < L_NUM_VELS; ++v)
+	{
+		// Get indicies for source site (periodic by default)
+		int src_x = (i - c_opt[v][0] + N_lim) % N_lim;
+		int src_y = (j - c_opt[v][1] + M_lim) % M_lim;
+		int src_z = (k - c_opt[v][2] + K_lim) % K_lim;
+
+		// Source id and type
+		int src_id = src_z + src_y * K_lim + src_x * K_lim * M_lim;
+		src_ttype_local = LatTTyp[src_id];
+
+		// Aidabat boundary
+		// !!! ATTENTION: Below adiabat BC should be optimised further!!!//
+		if (ttype_local == eAdiabat)
+		{
+			gNew[v + id * L_NUM_VELS] =
+				g[GridUtils::getOpposite(v) + id * L_NUM_VELS];
+		}
+		
+		/* //!!! ATTENTION:	At begin stage, do not consider this condition!!!//
+		*	else if (ttype_local == CHF)
+		*	{
+		*
+		*	}
+		*/
+
+
+		// Perodic boundary and regular stream
+		else
+		{
+			// Pull population from source site
+			gNew[v + id * L_NUM_VELS] = g[v + src_id * L_NUM_VELS];
+		}
+	}
 }
 
 // *****************************************************************************
@@ -701,6 +740,51 @@ double GridObj::_LBM_equilibrium_opt(int id, int v) {
 
 	// Compute f^eq
 	return rho[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
+
+}
+
+// *****************************************************************************
+/// \brief	temperature equilibrium calculation.
+///
+///			Computes the temperature equilibrium distribution in direction supplied at the 
+///			given lattice site and returns the value.
+///
+/// \param id	flattened ijk index.
+/// \param v	lattice direction.
+/// \return		equilibrium function.
+double GridObj::_LBM_Tequilibrium_opt(int id, int v) {
+
+	// Declare intermediate values A and B
+	double A, B;
+
+	// Compute the parts of the expansion for feq
+/*  ****This part should be check in future when use 3D thermal simulation, the next endif remove comment****
+#if (L_DIMS == 3)
+	
+	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
+		(c_opt[v][1] * u[1 + id * L_DIMS]) +
+		(c_opt[v][2] * u[2 + id * L_DIMS]);
+
+	B = (SQ(c_opt[v][0]) - SQ(cs)) * SQ(u[0 + id * L_DIMS]) +
+		(SQ(c_opt[v][1]) - SQ(cs)) * SQ(u[1 + id * L_DIMS]) +
+		(SQ(c_opt[v][2]) - SQ(cs)) * SQ(u[2 + id * L_DIMS]) +
+		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS] +
+		2 * c_opt[v][0] * c_opt[v][2] * u[0 + id * L_DIMS] * u[2 + id * L_DIMS] +
+		2 * c_opt[v][1] * c_opt[v][2] * u[1 + id * L_DIMS] * u[2 + id * L_DIMS];
+	
+#else
+*/
+	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
+		(c_opt[v][1] * u[1 + id * L_DIMS]);
+
+	B = (SQ(c_opt[v][0]) - SQ(cs)) * SQ(u[0 + id * L_DIMS]) +
+		(SQ(c_opt[v][1]) - SQ(cs)) * SQ(u[1 + id * L_DIMS]) +
+		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS];
+//#endif
+
+
+	// Compute f^eq
+	return T[id] * w[v] * ( 1.0 + (A / SQ(cs)) + (B / (2.0 * SQ(cs)*SQ(cs)) ) );
 
 }
 

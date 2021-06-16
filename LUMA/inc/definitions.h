@@ -85,6 +85,9 @@
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
+// Enable temperature field?
+#define L_TEMPERATURE                   ///< Enable calculation of temperature field
+
 // Output Options
 #define L_GRID_OUT_FREQ 20					///< How many timesteps before whole grid output
 #define L_EXTRA_OUT_FREQ 20					///< Specific output frequency of body forces
@@ -203,6 +206,17 @@
 #define L_RE 1000			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
+// Thermal data in lattice units
+#define L_TFLUID 0.5        ///< Intial main flow field temperature except BC
+#define L_TBC_LEFT 1        ///< Initial left temperature. In latice units.
+#define L_TBC_RIGHT 0       ///< Initial right temperature.
+//#define L_TBC_BOTTOM 0    ///< Initial bottom temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_TBC_TOP 0       ///< Initial top temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_TBC_FRONT 0     ///< Initial front temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_TBC_BACK 0      ///< Initial back temperature.*** If not defined, boundary T set to L_TFluid ***
+
+//#define L_ALPHA 0.028     ///< Thermal diffusive, if not defined, alpha calculate accorfing Pr number
+#define L_PR 0.71			///< Desired Prandtl number, which combined Re can used to define thermal diffusive (alpha)
 
 /*
 *******************************************************************************
@@ -238,6 +252,20 @@
 #define L_WALL_TOP eSolid		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
+
+// BC types for temperature field
+/* There are three temperature boundary conditions
+ * (1) eIsothermal represent isothermal boundary condition
+ * (2) eAdiabat represent adiabatic boundary condition
+ * (3) eCHF represent constant heat flux boundary condition ********ADD LATER**********
+ * In addition, eTFluid is set to periodic boundary
+*/
+#define L_TWALL_LEFT eIsothermal         ///< Temperature BC used on the left of the domain
+#define L_TWALL_RIGHT eIsothermal        ///< Temperature BC used on the right of the domain 
+#define L_TWALL_BOTTOM eAdiabat          ///< Temperature BC used on the bottom of the domain 
+#define L_TWALL_TOP eAdiabat             ///< Temperature BC used on the top of the domain 
+#define L_TWALL_FRONT eTFluid            ///< Temperature BC used on the front of the domain 
+#define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
 #define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)

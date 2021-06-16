@@ -30,6 +30,7 @@ using namespace std;
 
 // ****************************************************************************
 /// \brief	Method to initialise the lattice velocity.
+// test
 ///
 ///			If the L_NO_FLOW macro is defined, velocity set to zero everywhere.
 ///			If L_INIT_VELOCITY_FROM_FILE defined, velocity read from file.
@@ -38,7 +39,7 @@ void GridObj::LBM_initVelocity()
 {
 
 	// Setup the inlet profile data on this grid
-	_LBM_initSetInletProfile();
+	_LBM_initSetInletProfile();  //**what's this???
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
 
@@ -143,11 +144,50 @@ void GridObj::LBM_initRho() {
 			for (int k = 0; k < K_lim; k++) {
 
 				// Uniform Density
-				rho(i,j,k,M_lim,K_lim) = L_RHOIN;
+				rho(i,j,k,M_lim,K_lim) = L_RHOIN;		//**why use M_lim and K_lim this two parameters? where difine rho()
 			}
 		}
 	}
+}
 
+// ****************************************************************************
+/// \brief	Method to initialise the lattice temperature.
+void GridObj::LBM_initTemperature(){
+
+	// Loop over grid
+	for (int i = 0; i < N_lim; i++) {
+		for (int j = 0; j < M_lim; j++) {		
+			for (int k = 0; k < K_lim; k++) {
+
+				if (LatTyp(i, j, k, M_lim, K_lim) == eIsothermal)	//isothermal wall condition
+				{
+#ifdef L_TBC_LEFT
+					T(0,j,k,M_lim,K_lim) = L_TBC_LEFT;				//define left boundary temperature
+#endif
+#ifdef L_TBC_RIGHT
+					T(N_lim-1,j,k,M_lim,K_lim) = L_TBC_RIGHT;		//define right boundary temperature
+#endif
+#ifdef L_TBC_BOTTOM
+					T(i,0,k,M_lim,K_lim) = L_TBC_BOTTOM;			//define bottom boundary temperature
+#endif
+#ifdef L_TBC_TOP
+					T(i,M_lim,k,M_lim,K_lim) = L_TBC_TOP;			//define top boundary temperature
+#endif
+#ifdef L_TBC_L_TBC_FRONT
+					T(i,j,0,M_lim,K_lim) = L_TBC_L_TBC_FRONT;		//define front boundary temperature
+#endif
+#ifdef L_TBC_BACK
+					T(i,j,K_lim-1,M_lim,K_lim) = L_TBC_BACK;		//define right back temperature
+#endif		
+				}
+				else
+				{
+					T(i,j,k,M_lim,K_lim) = L_TFLUID;
+				}
+			}
+		}
+	}
+	
 }
 
 // ****************************************************************************
@@ -260,9 +300,13 @@ void GridObj::LBM_initGrid() {
 
 	// Define TYPING MATRICES
 	LatTyp.resize(N_lim * M_lim * K_lim);
+	// Define TYPING MATRICES for temperature field
+	LatTTyp.resize(N_lim * M_lim * K_lim);
 
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
+	// Label as coarse site for temperature
+	//std::fill(LatTyp.begin(), LatTyp.end(), eTFluid);
 
 	// Can't use regularised boundaries with D3Q27 because of the corners
 #if (defined L_REGULARISED_BOUNDARIES && L_NUM_VELS == 27)
@@ -288,6 +332,10 @@ void GridObj::LBM_initGrid() {
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
+	// Temperature field
+	T.resize(N_lim * M_lim * K_lim);
+	LBM_initTemperature();
+
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
 	force_xyz.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
@@ -304,6 +352,7 @@ void GridObj::LBM_initGrid() {
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
 	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
+	T_timeav.resize(N_lim * M_lim * K_lim, 0.0);						//***Defined but not use***
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
@@ -311,6 +360,11 @@ void GridObj::LBM_initGrid() {
 	feq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 
+	//Initialise LO temperature POPULATION matrics(g, geq, gNEW)
+	//***Temperature pupolation LB, the speed is same as density population***
+	g.resize(N_lim * M_lim * K_lim * L_NUM_VELS);						
+	geq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
+	gNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++)
@@ -319,29 +373,41 @@ void GridObj::LBM_initGrid() {
 		{
 			for (int k = 0; k < K_lim; k++)
 			{
-				for (int v = 0; v < L_NUM_VELS; v++)
+				for (int v = 0; v < L_NUM_VELS; v++)	//***v represents the lattice velocity***
 				{
 					// Initialise f to feq
 					f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
 						_LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
-
+					g(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
+						_LBM_Tequilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
 				}
 			}
 		}
 	}
 	feq = f; // Make feq = feq too
 	fNew = f;
+	geq = g;
+	gNew = g;
 
-
+// kimematic viscosity nu according defined or interior calculation
 #ifdef L_NU
 	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
 	nu = GridUnits::nud2nulbm(1.0 / static_cast<double>(L_RE), this);
 #endif
 
+// Thermal diffusive alpha based on defined or calculation
+#ifdef L_ALPHA
+	alpha = L_ALPHA;
+#else
+	alpha = nu / L_PR;
+#endif
+
 	// Relaxation frequency on L0
 	// Assign relaxation frequency using lattice viscosity
 	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
+	// Assign T distribution relaxation frequency using lattice thermal diffusivity 
+	omegaT = 1.0 / ( (alpha / SQ(cs)) + 0.5 );
 
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
@@ -354,6 +420,7 @@ void GridObj::LBM_initGrid() {
 	if (omega >= 2.0)
 		L_ERROR("LBM relaxation frequency omega too large. Change L_TIMESTEP or L_RESOLUTION. Exiting.", GridUtils::logfile);
 #endif
+	///*****The area if add the check the omegaT*******
 
 	// Check if there are incompressibility issues and warn the user if so
 	if (uref > (0.17 * cs))
@@ -445,13 +512,17 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 
 	
 	// Generate TYPING MATRICES
-
 	// Resize
 	LatTyp.resize(N_lim * M_lim * K_lim);
+	// Gererate temperature field TYPING MATRICES
+	// Resize
+	LatTTyp.resize(N_lim * M_lim * K_lim);
 
 	// Default labelling of coarse
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
-	
+	//Default labelling og coarse for temperature field
+	std::fill(LatTTyp.begin(), LatTTyp.end(), eTFluid);
+
 	// Call refined labelling routine passing parent grid
 	LBM_initRefinedLab(pGrid);
 
@@ -471,6 +542,10 @@ void GridObj::LBM_initSubGrid (GridObj& pGrid)
 	// Density
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
+	
+	//Temperature
+	T.resize(N_lim * M_lim * K_lim);
+	LBM_initTemperature();
 
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)

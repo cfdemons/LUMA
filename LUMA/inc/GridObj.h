@@ -84,15 +84,24 @@ private :
 	IVector<double> u_n;			///< Macropscopic velocity components at start of current time step
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
+	
+	//Vector nodal properties used in Temperature field
+	IVector<double> g;				///< Temperature distribution functions
+	IVector<double> geq;			///< Temperature distribution functions
+	IVector<double> gNew;			///< Copy of temperature distribution functions
 
 	// Scalar nodal properties
 	// Flattened 3D arrays (i,j,k)
 	IVector<double> rho;			///< Macroscopic density
+	IVector<double> T;				///< Macropscopic temperature
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)
 	IVector<double> ui_timeav;		///< Time-averaged velocity at each grid point (i,j,k,L_DIMS)
 	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_DIMS-3)
+	
+	//Temperature field parameters
+	IVector<double> T_timeav;		///< Time-averaged temperature at each grid poiny (i,j,k)
 
 	// Grid scale parameter
 	double refinement_ratio;	///< Equivalent to (1 / pow(2, level))
@@ -101,7 +110,8 @@ private :
 public :
 
 	IVector<eType> LatTyp;			///< Flattened 3D array of site labels
-
+	IVector<eTType> LatTTyp;		///< Flattened 3D array of site labels for temperature field
+	
 	// Grid Scalars
 	double dh;						///< Dimensionless lattice spacing (same for x, y and z)
 	int region_number;				///< Region number
@@ -109,10 +119,14 @@ public :
 	double dt;						///< Dimensionless time step size
 	double dm;						///< Dimensionless mass reference
 	int t;							///< Number of completed iterations on this level
-	double nu;						///< Kinematic viscosity (in lattice units)
+	double nu;						///< Kinematic viscosity (in lattic units)
 	double omega;					///< Relaxation frequency
 	double gravity;					///< Gravity force
 	double uref;					///< Reference velocity
+
+	double omegaT;					///< Temperature distribution relaxation frequency
+	double alpha;					///< Temperature thermal diffusivity
+	double T_ref;					///< Reference temperature
 
 	// Timing variables
 	double timeav_mpi_overhead;		///< Time-averaged time of MPI communication
@@ -134,6 +148,7 @@ public :
 	// Initialisation functions
 	void LBM_initVelocity();		// Initialise the velocity field
 	void LBM_initRho();				// Initialise the density field
+	void LBM_initTemperature();		// Initialise the temperature field
 	void LBM_initGrid();			// Grid initialiser
 	void LBM_initSubGrid(GridObj& pGrid);				// Initialise subgrid with all quantities
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
@@ -168,12 +183,14 @@ private :
 											// Engine 4 VectorField object.
 	// Private optimised LBM functions
 	void _LBM_stream_opt(int i, int j, int k, int id, eType type_local, int subcycle);
+	void _LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, int subcycle);
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
 	void _LBM_collide_opt(int id);
 	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
+	double _LBM_Tequilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	bool _LBM_applySpecReflect_opt(int i, int j, int k, int id, int v);
 	void _LBM_regularised_opt(int i, int j, int k, int id, eType type, int subcycle);

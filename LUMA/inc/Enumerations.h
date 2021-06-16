@@ -95,6 +95,16 @@ enum eType
 	eExtrapolateRight			///< Extrapolation boundary
 };
 
+/// \enum eTType
+/// \brief Lattice typing labels in temperature field
+enum eTType
+{
+	eIsothermal, ///< Isothermal boundary
+	eAdiabat,	 ///< Adiabat boundary
+	eCHF,		 ///< Constant heat flux boundary
+	eTFluid		 ///< Thermal fluid site
+};
+
 /// \enum eWallLocation
 /// \brief Enumeration to describe locations in terms of domain walls.
 enum eWallLocation

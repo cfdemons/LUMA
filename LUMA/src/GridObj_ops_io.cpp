@@ -1133,10 +1133,24 @@ int GridObj::io_hdf5(double tval)
 		status = H5Dclose(dataset_id); // Close dataset
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 
+		// WRITE LATTYP
+		variable_name = time_string + "/LatTTyp";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, this, &LatTTyp[0], H5T_NATIVE_INT, TL_present, TL_thickness, &minEdges[0], p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
 		// WRITE RHO
 		variable_name = time_string + "/Rho";
 		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, this, &rho[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, &minEdges[0], p_data);
+		status = H5Dclose(dataset_id); // Close dataset
+		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
+
+		// WRITE TEMPERATURE
+		variable_name = time_string + "/Temperature";
+		dataset_id = H5Dcreate(file_id, variable_name.c_str(), H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		hdf5_writeDataSet(memspace, filespace, dataset_id, eScalar, this, &T[0], H5T_NATIVE_DOUBLE, TL_present, TL_thickness, &minEdges[0], p_data);
 		status = H5Dclose(dataset_id); // Close dataset
 		if (status != 0) *GridUtils::logfile << "HDF5 ERROR: Close dataset failed: " << status << std::endl;
 

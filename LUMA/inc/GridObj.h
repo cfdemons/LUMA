@@ -101,7 +101,7 @@ private :
 	IVector<double> uiuj_timeav;	///< Time-averaged velocity products at each grid point (i,j,k,3*L_DIMS-3)
 	
 	//Temperature field parameters
-	IVector<double> T_timeav;		///< Time-averaged temperature at each grid poiny (i,j,k)
+	IVector<double> t_timeav;		///< Time-averaged temperature at each grid poiny (i,j,k)
 
 	// Grid scale parameter
 	double refinement_ratio;	///< Equivalent to (1 / pow(2, level))
@@ -124,7 +124,7 @@ public :
 	double gravity;					///< Gravity force
 	double uref;					///< Reference velocity
 
-	double omegaT;					///< Temperature distribution relaxation frequency
+	double t_omega;					///< Temperature distribution relaxation frequency
 	double alpha;					///< Temperature thermal diffusivity
 	double T_ref;					///< Reference temperature
 
@@ -187,10 +187,12 @@ private :
 	void _LBM_coalesce_opt(int i, int j, int k, int id, int v);
 	void _LBM_explode_opt(int id, int v, int src_x, int src_y, int src_z);
 	void _LBM_collide_opt(int id);
+	void _LBM_tcollide_opt(int id);
 	void _LBM_macro_opt(int i, int j, int k, int id, eType type_local);
+	void _LBM_tmacro_opt(int i, int j, int k, int id, eTType ttype_local);
 	void _LBM_forceGrid_opt(int id);
 	double _LBM_equilibrium_opt(int id, int v);
-	double _LBM_Tequilibrium_opt(int id, int v);
+	double _LBM_tequilibrium_opt(int id, int v);
 	bool _LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, int src_x, int src_y, int src_z);
 	bool _LBM_applySpecReflect_opt(int i, int j, int k, int id, int v);
 	void _LBM_regularised_opt(int i, int j, int k, int id, eType type, int subcycle);

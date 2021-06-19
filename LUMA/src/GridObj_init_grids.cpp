@@ -352,7 +352,7 @@ void GridObj::LBM_initGrid() {
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
 	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
-	T_timeav.resize(N_lim * M_lim * K_lim, 0.0);						//***Defined but not use***
+	t_timeav.resize(N_lim * M_lim * K_lim, 0.0);						//***Defined but not use***
 
 
 	// Initialise L0 POPULATION matrices (f, feq)
@@ -379,7 +379,7 @@ void GridObj::LBM_initGrid() {
 					f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
 						_LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
 					g(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
-						_LBM_Tequilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
+						_LBM_tequilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
 				}
 			}
 		}
@@ -407,7 +407,7 @@ void GridObj::LBM_initGrid() {
 	// Assign relaxation frequency using lattice viscosity
 	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
 	// Assign T distribution relaxation frequency using lattice thermal diffusivity 
-	omegaT = 1.0 / ( (alpha / SQ(cs)) + 0.5 );
+	t_omega = 1.0 / ( (alpha / SQ(cs)) + 0.5 );
 
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );

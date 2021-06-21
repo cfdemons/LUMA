@@ -154,8 +154,10 @@ public :
 	void LBM_initGridToGridMappings(GridObj& pGrid);	// Initialise refinement mappings
 	void LBM_initPositionVector(double start_pos, double end_pos, eCartesianDirection dir);	// Initialise position vector
 	void LBM_initBoundLab();					// Initialise labels for walls
-	void LBM_initRefinedLab(GridObj& pGrid);	// Initialise labels for refined regions
+	void LBM_tinitBoundLab();					// Initialise labels for walls in temperature field
+	void LBM_initRefinedLab(GridObj &pGrid);							// Initialise labels for refined regions
 	eType LBM_setBCPrecedence(eType currentBC, eType desiredBC);		// Determine BC based on any existing BC
+	eTType LBM_setTBCPrecedence(eTType currentBC, eTType desiredBC);	// Determine temperature BC based on any existing BC
 
 	// LBM operations
 	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator

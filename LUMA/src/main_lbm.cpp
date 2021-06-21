@@ -218,9 +218,9 @@ int main( int argc, char* argv[] )
 	L_INFO("Lattice Mach number " + std::to_string(Grids->uref / cs), GridUtils::logfile);
 	// Reynolds Number
 #ifdef L_NU
-#if L_NU != 0
+//#if L_NU != 0
 	L_INFO("Reynolds Number = " + std::to_string(1.0 / L_NU), GridUtils::logfile);
-#endif
+//#endif
 #else
 	L_INFO("Reynolds Number = " + std::to_string(L_RE), GridUtils::logfile);
 #endif

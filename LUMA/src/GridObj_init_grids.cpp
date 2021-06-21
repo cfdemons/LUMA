@@ -38,8 +38,8 @@ using namespace std;
 void GridObj::LBM_initVelocity()
 {
 
-	// Setup the inlet profile data on this grid
-	_LBM_initSetInletProfile();  //**what's this???
+	// Setup the inlet profile data on this grid/************************************Force in collision, rememeber to add force*********************************/
+	_LBM_initSetInletProfile();
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
 
@@ -144,13 +144,12 @@ void GridObj::LBM_initRho() {
 			for (int k = 0; k < K_lim; k++) {
 
 				// Uniform Density
-				rho(i,j,k,M_lim,K_lim) = L_RHOIN;		//**why use M_lim and K_lim this two parameters? where difine rho()
+				rho(i,j,k,M_lim,K_lim) = L_RHOIN;
 			}
 		}
 	}
 }
 
-// ****************************************************************************
 /// \brief	Method to initialise the lattice temperature.
 void GridObj::LBM_initTemperature(){
 
@@ -159,7 +158,7 @@ void GridObj::LBM_initTemperature(){
 		for (int j = 0; j < M_lim; j++) {		
 			for (int k = 0; k < K_lim; k++) {
 
-				if (LatTyp(i, j, k, M_lim, K_lim) == eIsothermal)	//isothermal wall condition
+				if (LatTTyp(i, j, k, M_lim, K_lim) == eIsothermal)	//isothermal wall condition
 				{
 #ifdef L_TBC_LEFT
 					T(0,j,k,M_lim,K_lim) = L_TBC_LEFT;				//define left boundary temperature
@@ -300,13 +299,17 @@ void GridObj::LBM_initGrid() {
 
 	// Define TYPING MATRICES
 	LatTyp.resize(N_lim * M_lim * K_lim);
-	// Define TYPING MATRICES for temperature field
-	LatTTyp.resize(N_lim * M_lim * K_lim);
 
 	// Label as coarse site
 	std::fill(LatTyp.begin(), LatTyp.end(), eFluid);
+
+#ifdef L_TEMPERATURE
+	// Define TYPING MATRICES for temperature field
+	LatTTyp.resize(N_lim * M_lim * K_lim);
+
 	// Label as coarse site for temperature
-	//std::fill(LatTyp.begin(), LatTyp.end(), eTFluid);
+	std::fill(LatTTyp.begin(), LatTTyp.end(), eTFluid);
+#endif
 
 	// Can't use regularised boundaries with D3Q27 because of the corners
 #if (defined L_REGULARISED_BOUNDARIES && L_NUM_VELS == 27)
@@ -315,6 +318,11 @@ void GridObj::LBM_initGrid() {
 
 	// Add boundary-specific labels
 	LBM_initBoundLab();
+
+#ifdef L_TEMPERATURE
+	//	Add temperature-specific lables
+	LBM_tinitBoundLab();
+#endif
 
 	// Initialise L0 MACROSCOPIC quantities
 
@@ -332,9 +340,11 @@ void GridObj::LBM_initGrid() {
 	rho.resize(N_lim * M_lim * K_lim);
 	LBM_initRho();
 
+#ifdef L_TEMPERATURE
 	// Temperature field
 	T.resize(N_lim * M_lim * K_lim);
 	LBM_initTemperature();
+#endif
 
 #if (defined L_GRAVITY_ON || defined L_IBM_ON)
 	// Cartesian force vector
@@ -342,8 +352,13 @@ void GridObj::LBM_initGrid() {
 
 	// Initialise with gravity
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
-		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
 
+	// Not sure, remember to check
+#ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
+	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = 0.0;
+#else
+		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
+#endif
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
 #endif
@@ -352,19 +367,23 @@ void GridObj::LBM_initGrid() {
 	rho_timeav.resize(N_lim * M_lim * K_lim, 0.0);
 	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
+#ifdef L_TEMPERATURE
 	t_timeav.resize(N_lim * M_lim * K_lim, 0.0);						//***Defined but not use***
-
+#endif
 
 	// Initialise L0 POPULATION matrices (f, feq)
 	f.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	feq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	fNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 
-	//Initialise LO temperature POPULATION matrics(g, geq, gNEW)
-	//***Temperature pupolation LB, the speed is same as density population***
+#ifdef L_TEMPERATURE
+	// Initialise LO temperature POPULATION matrics(g, geq, gNEW)
+	// Current, the speed in temperature field is same as that in density population
+	// can set speed difference in future by using L_TNUM_VELS
 	g.resize(N_lim * M_lim * K_lim * L_NUM_VELS);						
 	geq.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
 	gNew.resize(N_lim * M_lim * K_lim * L_NUM_VELS);
+#endif
 
 	// Loop over grid
 	for (int i = 0; i < N_lim; i++)
@@ -373,41 +392,47 @@ void GridObj::LBM_initGrid() {
 		{
 			for (int k = 0; k < K_lim; k++)
 			{
-				for (int v = 0; v < L_NUM_VELS; v++)	//***v represents the lattice velocity***
+				for (int v = 0; v < L_NUM_VELS; v++)
 				{
 					// Initialise f to feq
 					f(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
 						_LBM_equilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
+#ifdef L_TEMPERATURE
 					g(i, j, k, v, M_lim, K_lim, L_NUM_VELS) = 
 						_LBM_tequilibrium_opt(k + j * K_lim + i * M_lim * K_lim, v);
+#endif
 				}
 			}
 		}
 	}
 	feq = f; // Make feq = feq too
 	fNew = f;
+#ifdef L_TEMPERATURE
 	geq = g;
 	gNew = g;
+#endif
 
 // kimematic viscosity nu according defined or interior calculation
 #ifdef L_NU
-	nu = GridUnits::nud2nulbm(L_NU, this);
+	nu = L_NU;
+	//GridUnits::nud2nulbm(L_NU, this);
 #else
 	nu = GridUnits::nud2nulbm(1.0 / static_cast<double>(L_RE), this);
 #endif
+	// Relaxation frequency on L0
+	// Assign relaxation frequency using lattice viscosity
+	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
 
+#ifdef L_TEMPERATURE
 // Thermal diffusive alpha based on defined or calculation
 #ifdef L_ALPHA
 	alpha = L_ALPHA;
 #else
 	alpha = nu / L_PR;
 #endif
-
-	// Relaxation frequency on L0
-	// Assign relaxation frequency using lattice viscosity
-	omega = 1.0 / ( (nu / SQ(cs)) + 0.5 );
 	// Assign T distribution relaxation frequency using lattice thermal diffusivity 
 	t_omega = 1.0 / ( (alpha / SQ(cs)) + 0.5 );
+#endif
 
 	/* Above is valid for L0 only when dh = 1 -- general expression is:
 	 * omega = 1 / ( ( (nu * dt) / (pow(cs,2)*pow(dh,2)) ) + .5 );
@@ -1171,6 +1196,128 @@ void GridObj::LBM_initBoundLab ( )
 	}
 }
 
+#ifdef L_TEMPERATURE
+// ****************************************************************************
+/// \brief	Method to initialise temperature wall and object labels on L0.
+///
+///	
+void GridObj::LBM_tinitBoundLab ( )
+{
+	// Declarations
+	int i, j, k;
+
+	// LEFT WALL //
+
+	// Search position vector to see if left hand wall on this rank
+	for (i = 0; i < N_lim; i++)
+	{
+		// Wall found
+		if (XPos[i] <= L_WALL_THICKNESS_LEFT)
+		{
+			// Label boundary
+			for (j = 0; j < M_lim; j++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_LEFT);
+				}
+			}
+		}
+	}
+
+	// RIGHT WALL //
+
+	// Search index vector to see if right hand wall on this rank
+	for (i = 0; i < N_lim; i++)
+	{
+		if (XPos[i] >= GridManager::getInstance()->global_edges[eXMax][0] - L_WALL_THICKNESS_RIGHT)
+		{
+			// Label boundary
+			for (j = 0; j < M_lim; j++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_RIGHT);
+				}
+			}
+		}
+	}
+
+#if (L_DIMS == 3)
+
+	// FRONT WALL //
+
+	for (k = 0; k < K_lim; k++)
+	{
+		if (ZPos[k] <= L_WALL_THICKNESS_FRONT)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (j = 0; j < M_lim; j++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_FRONT);
+				}
+			}
+		}
+	}
+
+	// BACK WALL //
+
+	for (k = 0; k < K_lim; k++)
+	{
+		if (ZPos[k] >= GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (j = 0; j < M_lim; j++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_BACK);
+				}
+			}
+		}
+	}
+#endif
+
+	// BOTTOM WALL //
+
+	for (j = 0; j < M_lim; j++)
+	{
+		if (YPos[j] <= L_WALL_THICKNESS_BOTTOM)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_BOTTOM);
+				}
+			}
+		}
+	}
+
+	// TOP WALL //
+
+	for (j = 0; j < M_lim; j++)
+	{
+		if (YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
+		{
+			for (i = 0; i < N_lim; i++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setTBCPrecedence(LatTTyp(i, j, k, M_lim, K_lim), L_TWALL_TOP);
+				}
+			}
+		}
+	}
+}
+#endif
+
 // ****************************************************************************
 /// \brief	Method to initialise all labels on sub-grids.
 ///
@@ -1451,4 +1598,18 @@ eType GridObj::LBM_setBCPrecedence(eType currentBC, eType desiredBC)
 	else return desiredBC;
 }
 
+// *****************************************************************************
+/// \brief	Used to preserve the precedence of Temperature BCs during labelling.
+///			You can undersatnd as when boundary confilict, precedence set it as 
+/// 		what kind of boundary condition.
+///			2D confliction is cornor pints, 3D confliction is edage.
+///			Wait to check when add other boundary condition
+///	\param	currentBC	BC type already assigned to given site.
+/// \param	desiredBC	new BC type for a given site.
+/// \returns			permitted BC type for given site.
+eTType GridObj::LBM_setTBCPrecedence(eTType currentBC, eTType desiredBC)
+{
+	if (currentBC == eAdiabat || desiredBC == eAdiabat) return eAdiabat;
+	else return desiredBC;
+}
 // ***************************************************************************************************

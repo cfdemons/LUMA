@@ -79,8 +79,10 @@ void GridObj::LBM_multi_opt(int subcycle)
 				int id = k + j * K_lim + i * K_lim * M_lim;
 				eType type_local = LatTyp[id];
 
+#ifdef L_TEMPERATURE
 				// Temperature local index and type
 				eTType ttype_local = LatTTyp[id];
+#endif
 
 				// MOMENTUM EXCHANGE //
 #ifdef L_LD_OUT
@@ -99,19 +101,23 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 				// STREAM IN VELOCITY FILED//
 				_LBM_stream_opt(i, j, k, id, type_local, subcycle);
+#ifdef L_TEMPERATURE
 				// STREAM IN TEMPERATURE FIELD //
 				_LBM_tstream_opt(i, j, k, id, ttype_local, subcycle);
+#endif
 				// REGULARISED BCs //
 #ifdef L_REGULARISED_BOUNDARIES
 				if (type_local == eVelocity || type_local == ePressure)
 					_LBM_regularised_opt(i, j, k, id, type_local, subcycle);
 #endif
-/********************************************************************************************************************/
+
 				// MACROSCOPIC IN VELOCITY FIELD //
 				_LBM_macro_opt(i, j, k, id, type_local);
+
+#ifdef L_TEMPERATURE
 				// MACROSCOPIC IN TEMPERATURE FIELD //
 				_LBM_tmacro_opt(i, j, k, id, ttype_local);
-
+#endif
 				// If IBM is on then split loop and perform IBM step
 #ifdef L_IBM_ON
 			}
@@ -146,7 +152,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 				if (type_local != eSolid)
 					_LBM_forceGrid_opt(id);
 #endif
-/************************************Force in collision, rememeber to add force*********************************/
+
 				// COLLIDE //
 				if (type_local != eTransitionToCoarser) // Do not collide on UpperTL
 				{ 
@@ -156,7 +162,9 @@ void GridObj::LBM_multi_opt(int subcycle)
 #else
 					{
 						_LBM_collide_opt(id);	//	Density field collision
+#ifdef L_TEMPERATURE
 						_LBM_tcollide_opt(id);	//	Temperature field collision
+#endif
 					}
 #endif
 				}
@@ -380,7 +388,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			
 			if (c_opt[v][eXDirection] > 0)
 			{
-				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eXDirection];
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection];
 				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
 				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
 			}
@@ -404,7 +412,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 		{
 			if (c_opt[v][eXDirection] < 0)
 			{
-				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eXDirection];
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection];
 				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
 				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
 			}
@@ -696,7 +704,6 @@ bool GridObj::_LBM_applySpecReflect_opt(int i, int j, int k, int id, int v)
 	return false;
 }
 
-/************This is used to situation that concatin subgrid******************/
 // *****************************************************************************
 /// \brief	Optimised coalesce operation.
 ///
@@ -752,7 +759,6 @@ void GridObj::_LBM_coalesce_opt(int i, int j, int k, int id, int v) {
 
 }
 
-/************This is used to situation that concatin subgrid******************/
 // *****************************************************************************
 /// \brief	Optimised explode operation.
 ///
@@ -1132,7 +1138,7 @@ void GridObj::_LBM_tmacro_opt(int i, int j, int k, int id, eTType ttype_local){
 			T_temp += gNew[v + id * L_NUM_VELS];
 
 		// Assign temperature
-		rho[id] = T_temp;
+		T[id] = T_temp;
 
 	}	
 }
@@ -1179,7 +1185,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 		// Need to be optimised, and set characteristic length as 
 		T_ref = L_TFLUID;
 		double gbeta = L_RA * nu * alpha / N_lim / N_lim / N_lim;
-		for (size_t v = 0; v < L_NUM_VELS; v++)
+		for (size_t v = 0; v < L_NUM_VELS; v++)		//int changed from size_t
 		{
 			force_i[v + id * L_NUM_VELS] = 3. * w[v] * gbeta * (T[id] - T_ref) * c_opt[v][2] * rho[id];
 		}

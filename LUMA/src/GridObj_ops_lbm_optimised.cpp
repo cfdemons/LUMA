@@ -359,13 +359,6 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 		
 	}
 
-	/* //!!! ATTENTION:	Currently, do not consider this condition!!!//
-	*	else if (ttype_local == CHF)
-	*	{
-	*
-	*	}
-	*/
-
 	// Isothermal BC refer to Gong et al paper, wait to add links
 	// Current, set isothermal at left and right boundary not at inside
 	// Now, not fully understand the density boundary condition
@@ -1128,7 +1121,7 @@ void GridObj::_LBM_tmacro_opt(int i, int j, int k, int id, eTType ttype_local){
 
 	// Do not update adiabatic boundary condition due to density field do not
 	// calculate the density in solid point(just aligned with density field)
-	if (ttype_local == eTFluid || ttype_local == eIsothermal)
+	if (ttype_local == eTFluid )//|| ttype_local == eIsothermal)
 	{
 
 		// Reset
@@ -1182,13 +1175,12 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	*/
 
 #ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
-		// Need to be optimised, and set characteristic length as 
-		T_ref = L_TFLUID;
-		double gbeta = L_RA * nu * alpha / N_lim / N_lim / N_lim;
-		for (size_t v = 0; v < L_NUM_VELS; v++)		//int changed from size_t
-		{
-			force_i[v + id * L_NUM_VELS] = 3. * w[v] * gbeta * (T[id] - T_ref) * c_opt[v][2] * rho[id];
-		}
+		// Need to be optimised, and set characteristic length as
+	double gbeta = L_RA *nu *alpha / N_lim / N_lim / N_lim;
+	for (size_t v = 0; v < L_NUM_VELS; v++) //int changed from size_t
+	{
+		force_i[v + id * L_NUM_VELS] = 3.0 * w[v] * gbeta * (T[id] - L_TREF) * rho[id] * c_opt[v][1];
+	}
 #else
 	// Declarations
 	double lambda_v, beta_v;

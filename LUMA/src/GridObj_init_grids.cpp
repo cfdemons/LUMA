@@ -38,7 +38,7 @@ using namespace std;
 void GridObj::LBM_initVelocity()
 {
 
-	// Setup the inlet profile data on this grid/************************************Force in collision, rememeber to add force*********************************/
+	// Setup the inlet profile data on this grid
 	_LBM_initSetInletProfile();
 
 #ifdef L_INIT_VELOCITY_FROM_FILE
@@ -414,8 +414,7 @@ void GridObj::LBM_initGrid() {
 
 // kimematic viscosity nu according defined or interior calculation
 #ifdef L_NU
-	nu = L_NU;
-	//GridUnits::nud2nulbm(L_NU, this);
+	nu = GridUnits::nud2nulbm(L_NU, this);
 #else
 	nu = GridUnits::nud2nulbm(1.0 / static_cast<double>(L_RE), this);
 #endif

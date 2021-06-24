@@ -181,6 +181,7 @@ int main(int argc, char* argv[])
 	double dx;
 	std::string VAR;
 	int* LatTyp = nullptr;
+	int* LatTTyp = nullptr;
 	double *dummy_d = nullptr;
 	int *dummy_i = nullptr;
 
@@ -269,6 +270,7 @@ int main(int argc, char* argv[])
 		
 	// Status indicator
 	size_t res = 0;
+	size_t tres = 0;
 
 	std::cout << "Building mesh..." << std::endl;
 
@@ -307,6 +309,13 @@ int main(int argc, char* argv[])
 			// Allocate space for LatTyp data
 			int *Type = (int*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(int));
 			if (Type == NULL) {
+				writeInfo("Not enough Memory!!!!", eFatal);
+				exit(EXIT_FAILURE);
+			};
+
+			// Allocate sapce for LatTyp data
+			int *TType = (int*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(int));
+			if (TType == NULL) {
 				writeInfo("Not enough Memory!!!!", eFatal);
 				exit(EXIT_FAILURE);
 			}
@@ -362,6 +371,35 @@ int main(int argc, char* argv[])
 				}
 			}
 
+			// Open, read into buffers information required for mesh definition and close input datasets
+			status = readDataset("/LatTTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, TType);
+			if (status != 0)
+			{
+				writeInfo("Typing matrix read failed -- exiting early.", eFatal);
+				exit(EARLY_EXIT);
+			}
+			status = readDataset("/XPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, X);
+			if (status != 0)
+			{
+				writeInfo("X position vector read failed -- exiting early.", eFatal);
+				exit(EARLY_EXIT);
+			}
+			status = readDataset("/YPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Y);
+			if (status != 0)
+			{
+				writeInfo("Y position vector read failed -- exiting early.", eFatal);
+				exit(EARLY_EXIT);
+			}
+			if (dimensions_p == 3) {
+				status = readDataset("/ZPos", TIME_STRING, input_fid, input_sid, H5T_NATIVE_DOUBLE, Z);
+				if (status != 0)
+				{
+					writeInfo("Z position vector read failed -- exiting early.", eFatal);
+					exit(EARLY_EXIT);
+				}
+			}
+
+
 			// Loop over grid sites
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
@@ -372,6 +410,7 @@ int main(int argc, char* argv[])
 
 				// Ignore list
 				if (isOnIgnoreList(static_cast<eType>(Type[c]))) continue;
+				//if (isOnIgnoreList(static_cast<eTType>(TType[c]))) continue;
 
 				local_point_count++;
 
@@ -413,6 +452,7 @@ int main(int argc, char* argv[])
 			if (status != 0) writeInfo("Cannot close input file!", eHDF);
 
 			// Free memory
+			free(TType);
 			free(Type);
 			free(X);
 			free(Y);
@@ -548,6 +588,32 @@ int main(int argc, char* argv[])
 			UzUz_TimeAv->SetName("UzUz_TimeAv");
 			status = addDataToGrid("/UzUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UzUz_TimeAv);
 		}
+		// Add data for temperature
+		vtkSmartPointer<vtkIntArray> LatTTyp = vtkSmartPointer<vtkIntArray>::New();
+		LatTTyp->Allocate(unstructuredGrid->GetNumberOfCells());
+		LatTTyp->SetName("LatTTyp");
+		status = addDataToGrid("/LatTTyp", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, LatTTyp);
+		
+		// If no typing matrix then assume the time step is not available and exit
+		if (status == DATASET_READ_FAIL)
+		{
+			writeInfo("Couldn't find time step " + std::to_string(t) + ". Read failed -- exiting early.", eFatal);
+			exit(EARLY_EXIT);
+		}
+
+		// MPI block data always read from Time_0
+		if (mpi_flag)
+		{
+			vtkSmartPointer<vtkIntArray> Block = vtkSmartPointer<vtkIntArray>::New();
+			Block->Allocate(unstructuredGrid->GetNumberOfCells());
+			Block->SetName("MpiBlockNumber");
+			status = addDataToGrid("/MpiBlock", "/Time_0", levels, regions, gridsize, unstructuredGrid, dummy_i, H5T_NATIVE_INT, Block);
+		}
+
+		vtkSmartPointer<vtkDoubleArray> TArray = vtkSmartPointer<vtkDoubleArray>::New();
+		TArray->Allocate(unstructuredGrid->GetNumberOfCells());
+		TArray->SetName("Temperature");
+		status = addDataToGrid("/Temperature", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, TArray);
 
 		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
@@ -587,7 +653,9 @@ int main(int argc, char* argv[])
 
 		// Free the memory used (forces destructor call)
 		LatTyp = NULL;
+		LatTTyp = NULL;
 		RhoArray = NULL;
+		TArray = NULL;
 		Rho_TimeAv = NULL;
 		Ux = NULL;
 		Uy = NULL;

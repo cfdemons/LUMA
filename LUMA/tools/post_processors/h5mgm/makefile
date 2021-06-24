@@ -7,7 +7,7 @@
 CC=mpicxx -O3 -std=c++0x -w
 
 # VTK Version
-VTK_VER=6.2
+VTK_VER=9.0
 
 # HDF5 paths
 DIR_HDF5=${HDF5_HOME}
@@ -16,8 +16,8 @@ LIBPATH_HDF5=-L${DIR_HDF5}/lib
 LIB_HDF5=-lhdf5
 
 # VTK paths
-INC_VTK=-I/usr/include/vtk-$(VTK_VER)
-LIBPATH_VTK=-L/usr/lib/x86_64-linux-gnu
+INC_VTK=-I/usr/local/include/vtk-$(VTK_VER) 
+LIBPATH_VTK=-L/usr/local/lib/x86_64-linux-gnu
 LIB_VTK=-lvtkFiltersCore-$(VTK_VER) -lvtkIOLegacy-$(VTK_VER) -lvtkIOCore-$(VTK_VER) -lvtkCommonExecutionModel-$(VTK_VER) -lvtkCommonDataModel-$(VTK_VER) -lvtkCommonCore-$(VTK_VER) -lvtkIOXML-$(VTK_VER)
 
 

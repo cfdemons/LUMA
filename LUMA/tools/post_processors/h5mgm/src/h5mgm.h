@@ -84,6 +84,16 @@ enum eType
 	eSlip					///< Slip boundary
 };
 
+/// \enum eTType
+/// \brief Lattice typing labels in temperature field
+enum eTType
+{
+	eIsothermal, ///< Isothermal boundary
+	eAdiabat,	 ///< Adiabat boundary
+	eCHF,		 ///< Constant heat flux boundary
+	eTFluid		 ///< Thermal fluid site
+};
+
 // Error enumeration
 enum eError
 {

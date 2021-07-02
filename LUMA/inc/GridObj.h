@@ -126,7 +126,6 @@ public :
 
 	double t_omega;					///< Temperature distribution relaxation frequency
 	double alpha;					///< Temperature thermal diffusivity
-	double T_ref;					///< Reference temperature
 
 	// Timing variables
 	double timeav_mpi_overhead;		///< Time-averaged time of MPI communication

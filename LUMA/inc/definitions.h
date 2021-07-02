@@ -203,7 +203,7 @@
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
-#define L_RHOIN 1.0			///< Initial density. In lattice units.
+#define L_RHOIN 6.0			///< Initial density. In lattice units.
 
 //#define L_NU 0.02          ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
 #define L_RE 250			///< Desired Reynolds number
@@ -211,7 +211,7 @@
 
 // Thermal data in lattice units
 #define L_TREF 0.5          ///< Reference temperature. In lattice unit
-#define L_TFLUID 0          ///< Intial main flow field temperature except BC, also is T_ref
+#define L_TFLUID 0.5        ///< Intial main flow field temperature except BC, also is T_ref
 #define L_TBC_LEFT 1        ///< Initial left temperature. In latice units.
 #define L_TBC_RIGHT 0       ///< Initial right temperature.
 //#define L_TBC_BOTTOM 0    ///< Initial bottom temperature.*** If not defined, boundary T set to L_TFluid ***
@@ -222,7 +222,7 @@
 
 //#define L_ALPHA 0.028     ///< Thermal diffusive, if not defined, alpha calculate accorfing Pr number
 #define L_PR 0.71			///< Desired Prandtl number, which combined Re can used to define thermal diffusive (alpha)
-#define L_RA 100000.0       ///< Desired Rayleigh number
+#define L_RA 1000000.0       ///< Desired Rayleigh number
 /*
 *******************************************************************************
 ****************************** Object Management ******************************

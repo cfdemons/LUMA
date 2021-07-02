@@ -124,6 +124,9 @@ void MpiManager::mpi_init()
 	for (int i = 0; i < L_DIMS; i++) {
 	  total_cores *= dimensions[i];
 	}
+	// If coupled with PLE, the total_cores will be less than than the initial_num_ranks, 
+	// since initial_num_ranks contains the ranks that the coupled code is using
+#ifndef L_ACTIVATE_PLE
 	if (total_cores != initial_num_ranks) {
 	  if (initial_my_rank == 0) {
 	    std::cerr << "ERROR: The total number of cores (" + std::to_string(total_cores)+") in the MPI topology defined by L_MPI_<d>CORES for a "+
@@ -132,6 +135,7 @@ void MpiManager::mpi_init()
 	  }
 	  abort();
 	}
+#endif
 
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 

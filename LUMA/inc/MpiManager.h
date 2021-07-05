@@ -122,6 +122,11 @@ public :
 	std::vector<int> cRankSizeY;
 	/// Number of sites in Z direction for each custom rank.
 	std::vector<int> cRankSizeZ;
+
+#ifdef L_ACTIVATE_PLE
+	// Code for LUMA processes. 
+	int appNum;
+#endif
 	
 	/// Communicators for sub-grid / region combinations
 #if (L_NUM_LEVELS > 0)

@@ -23,6 +23,10 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 
+#ifdef L_ACTIVATE_PLE
+#include "ple_coupling.h"
+#endif
+
 // Static declarations
 MpiManager* MpiManager::me;
 
@@ -137,7 +141,16 @@ void MpiManager::mpi_init()
 	}
 #endif
 
+#ifdef L_ACTIVATE_PLE
+	appNum = ple_coupling_mpi_name_to_id(MPI_COMM_WORLD, "LUMA");
+	std::cout << appNum << std::endl;
+#endif
+
+
+
+	std::cout << "Hello before MPI_CART_create" << std::endl;
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
+	std::cout << "Hello after MPI_CART_create" << std::endl;
 
 	// Get Cartesian topology info
 	MPI_Comm_rank(world_comm, &my_rank);

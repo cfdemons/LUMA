@@ -31,10 +31,11 @@ bool PLEAdapter::PLESynchronise()
 	return false;
 }
 
-void PLEAdapter::init(std::string adapterConfigFileName, double timestepSolver, GridManager* lumaGrid)
+void PLEAdapter::init(std::string adapterConfigFileName, double timestepSolver, GridManager* lumaGrid, MpiManager* lumaMpi)
 {
 	adapterConfigFileName_ = adapterConfigFileName;
 	LUMAGrid_ = lumaGrid;
+	lumaMpi_ = lumaMpi;
 
     return;
 }
@@ -44,7 +45,7 @@ bool PLEAdapter::configFileRead()
 	//Read the configuration file //
 
 	// Hardcoded for the moment
-	participantName_ = "../LUMA";
+	participantName_ = "LUMA";
 
 	/*std::cout << "Reading the adapter's YAML configuration file " << adapterConfigFileName_ << "..." << std::endl;
 
@@ -129,13 +130,6 @@ bool PLEAdapter::configure()
 
 	// Read PLE adapter configuration file. 
 	configFileRead(); 
-
-	// Configure MPI and PLE
-	int app_num = ple_coupling_mpi_name_to_id(MPI_COMM_WORLD, participantName_.c_str());
-	std::cout << app_num << std::endl;
-
-	
-
 
 
   return true;

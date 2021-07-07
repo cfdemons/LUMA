@@ -30,6 +30,7 @@
 //#endif
 
 #include "GridManager.h"
+#include "MpiManager.h"
 //#include "InOutData.h"
 
 // Other header files
@@ -89,6 +90,9 @@ private:
 	// I think that to be able to use any of this I'll have to make this class a friend of GridObj or GridManager
 	GridManager * LUMAGrid_;
 
+	// PLEAdapter also needs access to LUMA's MPI configuration
+	MpiManager* lumaMpi_;
+
     //- Solver interface initialized
     bool PLEInitialized_ = false;
 
@@ -138,7 +142,7 @@ private:
 public:
 
         //- Constructor
-	    void init(std::string adapterConfigFileName, double timestepSolver, GridManager* lumaGrid);
+	    void init(std::string adapterConfigFileName, double timestepSolver, GridManager* lumaGrid, MpiManager* lumaMpi);
 
         //- Setup the adapter's configuration
 		bool configure();

@@ -335,7 +335,7 @@ int main( int argc, char* argv[] )
 	PLEAdapter ple;
 
 	// Initialise the adapter
-	ple.init("./input/PLEConfig.yml", Grids->dt, gm);
+	ple.init("./input/PLEConfig.yml",Grids->dt, gm, mpim);
 	ple.configure();
 
 #endif

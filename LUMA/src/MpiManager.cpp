@@ -58,8 +58,10 @@ MpiManager::MpiManager()
 	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
 	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));	
 
+	std::cout << "hello before mpi_init" << std::endl;
 	// Initialise the manager, grid information and topology
 	mpi_init();
+	std::cout << "hello after mpi_init" << std::endl;
 
 	// Resize the IBM-MPI helper classes for each grid level
 	markerCommOwnerSide.resize(L_NUM_LEVELS+1);
@@ -85,7 +87,11 @@ MpiManager::~MpiManager(void)
 /// Instance creator
 MpiManager* MpiManager::getInstance() {
 
-	if (!me) me = new MpiManager();	// Private construction
+	if (!me)
+	{
+		std::cout << "MPI manager doesn't exist already" << std::endl;
+		me = new MpiManager();	// Private construction
+	}
 	return me;						// Return pointer to new object
 
 }
@@ -141,16 +147,31 @@ void MpiManager::mpi_init()
 	}
 #endif
 
+// If using PLE create an extra MPI communicator that takes all the LUMA processes
 #ifdef L_ACTIVATE_PLE
+
+	//TODO: Should this be somehow part of PLEAdapter?
 	appNum = ple_coupling_mpi_name_to_id(MPI_COMM_WORLD, "LUMA");
-	std::cout << appNum << std::endl;
-#endif
 
+	if (appNum > -1)
+	{
+		// Create communicator for the LUMA processes. 
+		MPI_Comm_split(MPI_COMM_WORLD, appNum, initial_my_rank, &ple_comm);
 
+		// Create the cartesian group split from the ple communicator
+		MPI_Cart_create(ple_comm, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 
-	std::cout << "Hello before MPI_CART_create" << std::endl;
+	}
+	else
+	{
+		L_ERROR("PLE coupling is activated but other coupled codes are not detected. Comment L_ACTIVATE_PLE to run LUMA on its own.", logout);
+	}
+
+#else // Use the cartesian communicator split from MPI_COMM_WORLD.
+
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
-	std::cout << "Hello after MPI_CART_create" << std::endl;
+
+#endif
 
 	// Get Cartesian topology info
 	MPI_Comm_rank(world_comm, &my_rank);

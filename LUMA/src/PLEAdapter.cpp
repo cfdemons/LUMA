@@ -183,6 +183,8 @@ void PLEAdapter::finalize()
 void PLEAdapter::teardown()
 {
    
+	ple_coupling_mpi_set_destroy(&pleSets_);
+	
 	ple_coupling_mpi_set_t * pleSets_ = NULL;
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 

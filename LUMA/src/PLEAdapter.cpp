@@ -131,6 +131,15 @@ bool PLEAdapter::configure()
 	// Read PLE adapter configuration file. 
 	configFileRead(); 
 
+	// Create a ple coupling set
+	// flag is syncronised, so 0. 
+	int ple_coupling_flag = 0;
+	std::string app_type = "LUMA";
+	std::string app_name = "LEFT"; // Name of the domain. It is in the mpi command line, or I can also write it in the config file?
+								   // I think it is better to read from mpi command line so that there is only one config file. I don't like it but it is 
+	                               // what CS does.
+	pleSets_ = ple_coupling_mpi_set_create(ple_coupling_flag, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
+
 
   return true;
 }

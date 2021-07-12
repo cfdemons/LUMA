@@ -83,6 +83,9 @@ private:
 
     //- PLE data
     ple_coupling_mpi_set_t * pleSets_ = NULL;
+	
+	//- Sync flag
+	int pleCouplingFlag_ = 0;
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
 	std::vector<ple_locator_t*> locators_; 
@@ -98,8 +101,8 @@ private:
 
     // Timesteps
 
-        //- Timestep dictated by preCICE
-        //T timestepPrecice_;
+        //- Coupling time step
+        double couplingTimeStep_;
 
         //- Timestep used by the solver
         //T timestepSolver_;
@@ -136,9 +139,6 @@ private:
     //  memory in a proper way. Called by the destructor.
     void teardown();
 
-	//- Syncronise the coupled solvers
-	bool PLESynchronise();
-
 public:
 
         //- Constructor
@@ -152,6 +152,9 @@ public:
 
 		//- Finalize and destroy preCICE
 		void finalize();
+
+		//- Syncronise the coupled solvers
+		bool synchronise(int flags);
 
         //- Destructor
         ~PLEAdapter();

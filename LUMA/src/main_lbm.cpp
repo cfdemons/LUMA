@@ -443,6 +443,12 @@ int main( int argc, char* argv[] )
 	*/
 	do {
 
+		// Synchronise PLE applications before next time step starts
+		// TODO: I suppose I don't have to synchronise if LUMA is subcycling, so then I have to pass the don't syncronise flag?
+#ifdef L_ACTIVATE_PLE
+		bool hi = ple.synchronise(0);
+#endif
+
 		// Synchronise MPI processes before next time step starts
 #ifdef L_BUILD_FOR_MPI
 		MPI_Barrier(mpim->world_comm);

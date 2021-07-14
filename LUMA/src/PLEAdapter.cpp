@@ -124,7 +124,7 @@ bool PLEAdapter::synchronise(int flags)
 			if (L_TOTAL_TIMESTEPS > LUMAGrid_->Grids->dt)
 			{
 				ai = ple_coupling_mpi_set_get_info(pleSets_ , i);
-				L_INFO("Application " + ai.app_name + " (" + ai.app_type + ") requested calculation stop.", GridUtils::logfile);
+				L_INFO("Application " + std::string(ai.app_name) + " (" + std::string(ai.app_type) + ") requested calculation stop.", GridUtils::logfile);
 				
 				//TODO: This sets the current time step to the maximum number of time steps. The simulation should stop. 
 				LUMAGrid_->Grids->t = L_TOTAL_TIMESTEPS;
@@ -141,7 +141,7 @@ bool PLEAdapter::synchronise(int flags)
 		else if (!(app_status[i] & PLE_COUPLING_NEW_ITERATION))
 		{
 			ai = ple_coupling_mpi_set_get_info(pleSets_, i);
-			L_ERROR("Application " + ai.app_name + " (" + ai.app_type + ") synchronized with status flag " +
+			L_ERROR("Application " + std::string(ai.app_name) + " (" + std::string(ai.app_type) + ") synchronized with status flag " +
 				     std::to_string(app_status[i]) + " which does not specify a known behavior.", GridUtils::logfile);
 		}
 
@@ -149,7 +149,7 @@ bool PLEAdapter::synchronise(int flags)
 			if (L_TOTAL_TIMESTEPS > LUMAGrid_->Grids->t + 1)
 			{
 				ai = ple_coupling_mpi_set_get_info(pleSets_, i);
-				L_INFO("Application " + ai.app_name + " (" + ai.app_type + ") requested last iteration.", GridUtils::logfile);
+				L_INFO("Application " + std::string(ai.app_name) + " (" + std::string(ai.app_type) + ") requested last iteration.", GridUtils::logfile);
 				LUMAGrid_->Grids->t = L_TOTAL_TIMESTEPS -1;
 			}
 		}

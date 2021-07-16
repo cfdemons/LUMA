@@ -696,6 +696,7 @@ int main( int argc, char* argv[] )
 
 #ifdef L_BUILD_FOR_MPI
 	// Finalise MPI
+	MPI_Barrier(MPI_COMM_WORLD);
 	MPI_Finalize();
 #endif
 

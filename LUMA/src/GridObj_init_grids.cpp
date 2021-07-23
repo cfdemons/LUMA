@@ -172,7 +172,7 @@ void GridObj::LBM_initTemperature(){
 #ifdef L_TBC_TOP
 					T(i,M_lim,k,M_lim,K_lim) = L_TBC_TOP;			//define top boundary temperature
 #endif
-#ifdef L_TBC_L_TBC_FRONT
+#ifdef L_TBC_FRONT
 					T(i,j,0,M_lim,K_lim) = L_TBC_L_TBC_FRONT;		//define front boundary temperature
 #endif
 #ifdef L_TBC_BACK
@@ -368,7 +368,7 @@ void GridObj::LBM_initGrid() {
 	ui_timeav.resize(N_lim * M_lim * K_lim * L_DIMS, 0.0);
 	uiuj_timeav.resize(N_lim * M_lim * K_lim * (3 * L_DIMS - 3), 0.0);
 #ifdef L_TEMPERATURE
-	t_timeav.resize(N_lim * M_lim * K_lim, 0.0);						//***Defined but not use***
+	t_timeav.resize(N_lim * M_lim * K_lim, 0.0);						
 #endif
 
 	// Initialise L0 POPULATION matrices (f, feq)
@@ -444,7 +444,6 @@ void GridObj::LBM_initGrid() {
 	if (omega >= 2.0)
 		L_ERROR("LBM relaxation frequency omega too large. Change L_TIMESTEP or L_RESOLUTION. Exiting.", GridUtils::logfile);
 #endif
-	///*****The area if add the check the omegaT*******
 
 	// Check if there are incompressibility issues and warn the user if so
 	if (uref > (0.17 * cs))

@@ -360,13 +360,15 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 	}
 
 	// Isothermal BC refer to Gong et al paper, wait to add links
-	// Current, set isothermal at left and right boundary not at inside
-	// Now, not fully understand the density boundary condition
-	// Set left boundary isothermal, 2D 
+	// Set left boundary isothermal
 	if (ttype_local == eIsothermal && i == 0)
 	{
 
- 		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS];
+		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
 		double gNew_temp = 0.0;		
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{
@@ -381,7 +383,11 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			
 			if (c_opt[v][eXDirection] > 0)
 			{
-				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection];
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
 				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
 				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
 			}
@@ -391,7 +397,11 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 	if (ttype_local == eIsothermal && i == N_lim-1)
 	{
 
- 		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS];
+ 		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
 		double gNew_temp = 0.0;		
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{
@@ -405,7 +415,11 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 		{
 			if (c_opt[v][eXDirection] < 0)
 			{
-				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection];
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
 				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
 				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
 			}
@@ -836,7 +850,6 @@ double GridObj::_LBM_tequilibrium_opt(int id, int v) {
 	double A, B;
 
 	// Compute the parts of the expansion for feq
-/*  ****This part should be check in future when use 3D thermal simulation, the next endif remove comment****
 #if (L_DIMS == 3)
 	
 	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
@@ -851,14 +864,14 @@ double GridObj::_LBM_tequilibrium_opt(int id, int v) {
 		2 * c_opt[v][1] * c_opt[v][2] * u[1 + id * L_DIMS] * u[2 + id * L_DIMS];
 	
 #else
-*/
+
 	A = (c_opt[v][0] * u[0 + id * L_DIMS]) +
 		(c_opt[v][1] * u[1 + id * L_DIMS]);
 
 	B = (SQ(c_opt[v][0]) - SQ(cs)) * SQ(u[0 + id * L_DIMS]) +
 		(SQ(c_opt[v][1]) - SQ(cs)) * SQ(u[1 + id * L_DIMS]) +
 		2 * c_opt[v][0] * c_opt[v][1] * u[0 + id * L_DIMS] * u[1 + id * L_DIMS];
-//#endif
+#endif
 
 
 	// Compute f^eq
@@ -1340,7 +1353,7 @@ bool GridObj::_LBM_applyBFL_opt(int id, int src_id, int v, int i, int j, int k, 
 	return true;
 
 }
-/***********Current do not use KBC collision***********************************/
+
 // *****************************************************************************
 /// \brief	Optimised KBC collision operator.
 ///

@@ -173,7 +173,7 @@
 
 // Lattice properties
 #define L_DIMS 2													///< Number of dimensions to the problem
-#define L_RESOLUTION 400											///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 100											///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.00005										///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
@@ -187,6 +187,18 @@
 // Reference density	
 #define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
 
+// Physical temperature difference
+#define L_PHYSICAL_THIGH 303.15   ///< High temperature in physical units [K]
+#define L_PHYSICAL_TLOW 293.15    ///< Low temperature in physical units [K]
+
+// Temperature initialization in physical units
+#define L_PHYSICAL_TFLUID 298.15          ///< Intial main flow field temperature except BC [K]
+#define L_PHYSICAL_TBC_LEFT 293.15        ///< Initial left temperature.[K]
+#define L_PHYSICAL_TBC_RIGHT 303.15       ///< Initial right temperature.
+//#define L_PHYSICAL_TBC_BOTTOM 298.15    ///< Initial bottom temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_PHYSICAL_TBC_TOP 298.15       ///< Initial top temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_PHYSICAL_TBC_FRONT 298.15     ///< Initial front temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_PHYSICAL_TBC_BACK 298.15      ///< Initial back temperature.*** If not defined, boundary T set to L_TFluid ***
 
 /*
 *******************************************************************************
@@ -209,16 +221,8 @@
 #define L_RE 50			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
-// Thermal data in lattice units
-#define L_TREF 0.5          ///< Reference temperature. In lattice unit
-#define L_TFLUID 0.5        ///< Intial main flow field temperature except BC, also is T_ref
-#define L_TBC_LEFT 0.0        ///< Initial left temperature. In latice units.
-#define L_TBC_RIGHT 1.0       ///< Initial right temperature.
-//#define L_TBC_BOTTOM 0.5    ///< Initial bottom temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_TBC_TOP 0.5       ///< Initial top temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_TBC_FRONT 0.5     ///< Initial front temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_TBC_BACK 0.5      ///< Initial back temperature.*** If not defined, boundary T set to L_TFluid ***
-
+#define L_TDIFF 1.0     ///< Set high and low temperature difference in lattice units, unless special purpose, set as 1.0
+#define L_TREF 0.0     ///< Set reference temperature in lattice units, correcponding to lowe temperature
 
 //#define L_ALPHA 0.028     ///< Thermal diffusive, if not defined, alpha calculate accorfing Pr number
 #define L_PR 0.71			///< Desired Prandtl number, which combined Re can used to define thermal diffusive (alpha)

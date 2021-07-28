@@ -160,28 +160,28 @@ void GridObj::LBM_initTemperature(){
 
 				if (LatTTyp(i, j, k, M_lim, K_lim) == eIsothermal)	//isothermal wall condition
 				{
-#ifdef L_TBC_LEFT
-					T(0,j,k,M_lim,K_lim) = L_TBC_LEFT;				//define left boundary temperature
+#ifdef L_PHYSICAL_TBC_LEFT
+					T(0,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT);				//define left boundary temperature
 #endif
-#ifdef L_TBC_RIGHT
-					T(N_lim-1,j,k,M_lim,K_lim) = L_TBC_RIGHT;		//define right boundary temperature
+#ifdef L_PHYSICAL_TBC_RIGHT
+					T(N_lim-1,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT);		//define right boundary temperature
 #endif
-#ifdef L_TBC_BOTTOM
-					T(i,0,k,M_lim,K_lim) = L_TBC_BOTTOM;			//define bottom boundary temperature
+#ifdef L_PHYSICAL_TBC_BOTTOM
+					T(i,0,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BOTTOM);			//define bottom boundary temperature
 #endif
-#ifdef L_TBC_TOP
-					T(i,M_lim,k,M_lim,K_lim) = L_TBC_TOP;			//define top boundary temperature
+#ifdef L_PHYSICAL_TBC_TOP
+					T(i,M_lim,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP);			//define top boundary temperature
 #endif
-#ifdef L_TBC_FRONT
-					T(i,j,0,M_lim,K_lim) = L_TBC_L_TBC_FRONT;		//define front boundary temperature
+#ifdef L_PHYSICAL_TBC_FRONT
+					T(i,j,0,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT);		//define front boundary temperature
 #endif
-#ifdef L_TBC_BACK
-					T(i,j,K_lim-1,M_lim,K_lim) = L_TBC_BACK;		//define right back temperature
+#ifdef L_PHYSICAL_TBC_BACK
+					T(i,j,K_lim-1,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK);		//define right back temperature
 #endif		
 				}
 				else
 				{
-					T(i,j,k,M_lim,K_lim) = L_TFLUID;
+					T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TFLUID);
 				}
 			}
 		}

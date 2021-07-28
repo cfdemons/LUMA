@@ -59,6 +59,17 @@ public:
 	}
 	
 	// *****************************************************************************
+	/// \brief	Temperature in physical units to temperature in lattice units.
+	///
+	/// \param t_phycial	Physical temperature
+	/// \returns 			Lattice temperature
+	template <typename T>
+	static double tphys2lat(T t_phycial)
+	{
+		return (t_phycial - L_PHYSICAL_TLOW) * L_TDIFF / (L_PHYSICAL_THIGH- L_PHYSICAL_TLOW) + L_TREF;
+	}
+
+	// *****************************************************************************
 	/// \brief	Converts velocity in dimensionless units to LBM units.
 	///
 	/// \param u_dimensionless	Dimensionless velocity.

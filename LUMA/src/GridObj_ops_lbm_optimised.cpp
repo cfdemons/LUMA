@@ -375,7 +375,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if (c_opt[v][eXDirection] <= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (L_TBC_LEFT - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT) - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
 					u[0 + id * L_DIMS] * u[0 + id * L_DIMS]);
 
 		for (int v = 0; v < L_NUM_VELS; ++v)
@@ -408,7 +408,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if (c_opt[v][eXDirection] >= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (L_TBC_RIGHT - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT) - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
 					u[0 + id * L_DIMS] * u[0 + id * L_DIMS]);
 
 		for (int v = 0; v < L_NUM_VELS; ++v)
@@ -1192,7 +1192,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	double gbeta = L_RA *nu *alpha / N_lim / N_lim / N_lim;
 	for (size_t v = 0; v < L_NUM_VELS; v++) //int changed from size_t
 	{
-		force_i[v + id * L_NUM_VELS] = 3.0 * w[v] * gbeta * (T[id] - L_TREF) * rho[id] * c_opt[v][1];
+		force_i[v + id * L_NUM_VELS] = 3.0 * w[v] * gbeta * (T[id] - GridUnits::tphys2lat(L_PHYSICAL_TFLUID)) * rho[id] * c_opt[v][1];
 	}
 #else
 	// Declarations

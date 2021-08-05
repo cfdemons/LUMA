@@ -269,7 +269,31 @@ bool PLEAdapter::configure()
 	                               // what CS does.
 	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
 
-	// TODO: Do I need MPI barrier after this?
+	numApps_ = ple_coupling_mpi_set_n_apps(pleSets_);
+	appID_ = ple_coupling_mpi_set_get_app_id(pleSets_);
+
+	int local_range[2] = { -1, -1 };
+	int distant_range[2] = { -1, -1 };
+
+	// Search for the MPI ranks of CS. 
+	for (int i = 0; i < numApps_; i++)
+	{
+		ple_coupling_mpi_set_info_t ai = ple_coupling_mpi_set_get_info(pleSets_, i);
+		//std::cout << " LUMA: App ID " << std::string(ai.app_type) << std::endl;
+		if (std::string(ai.app_type).find("Code_Saturne") != std::string::npos)
+		{
+			CSRootRank_ = ai.root_rank;
+			CSNumRanks_ = ai.n_ranks;
+			CSAppID_ = i;
+		}
+	}
+
+	// Create the intercommunicator between LUMA and Code Saturne
+	ple_coupling_mpi_intracomm_create(MPI_COMM_WORLD, lumaMpi_->ple_comm, CSRootRank_, &mpiCS_, local_range, distant_range);
+
+	std::cout << "I've created the PLE intracomm!" << std::endl;
+
+
 
   return true;
 }

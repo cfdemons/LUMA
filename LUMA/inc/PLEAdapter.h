@@ -78,6 +78,15 @@ private:
         //- preCICE configuration file name
         //std::string preciceConfigFilename_;
 
+		//- Number of coupled apps
+		int numApps_;
+
+		//- PLE app ID
+		int appID_;
+
+		//- PLE app ID for CS
+		int CSAppID_;
+
     //- Interfaces
    // std::vector<PLEInterface *> interfaces_;
 
@@ -95,6 +104,22 @@ private:
 
 	// PLEAdapter also needs access to LUMA's MPI configuration
 	MpiManager* lumaMpi_;
+
+	// MPI intercommunicator with Code Saturne
+	MPI_Comm mpiCS_;
+
+	// LUMA root MPI rank
+	//int lumaRootRank_;
+
+	// Number of MPI ranks for LUMA
+	//int lumaNumRanks_;
+
+	// CS root MPI rank
+	int CSRootRank_;
+
+	// Number of MPI ranks for CS
+	int CSNumRanks_;
+
 
     //- Solver interface initialized
     bool PLEInitialized_ = false;

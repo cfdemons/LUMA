@@ -276,22 +276,34 @@ bool PLEAdapter::configure()
 	int distant_range[2] = { -1, -1 };
 
 	// Search for the MPI ranks of CS. 
+	// Stop if you find more than one CS instance in the MPI call. 
+	int CSNum = 0;
 	for (int i = 0; i < numApps_; i++)
 	{
 		ple_coupling_mpi_set_info_t ai = ple_coupling_mpi_set_get_info(pleSets_, i);
 		//std::cout << " LUMA: App ID " << std::string(ai.app_type) << std::endl;
 		if (std::string(ai.app_type).find("Code_Saturne") != std::string::npos)
 		{
-			CSRootRank_ = ai.root_rank;
-			CSNumRanks_ = ai.n_ranks;
-			CSAppID_ = i;
+			if (CSNum < 1)
+			{ 
+				CSRootRank_ = ai.root_rank;
+				CSNumRanks_ = ai.n_ranks;
+				CSAppID_ = i;
+				CSNum++;
+			}
+			else
+			{
+				L_ERROR("Multiple instances of Code_Saturne found. LUMA is only programmed to be coupled with a single Code Saturne instance.", GridUtils::logfile);
+			}
+			
 		}
 	}
 
 	// Create the intercommunicator between LUMA and Code Saturne
+	// I'm only initialising one CS 
 	ple_coupling_mpi_intracomm_create(MPI_COMM_WORLD, lumaMpi_->ple_comm, CSRootRank_, &mpiCS_, local_range, distant_range);
 
-	std::cout << "I've created the PLE intracomm!" << std::endl;
+	std::cout << "LUMA: I've created the PLE intracomm!" << std::endl;
 
 
 

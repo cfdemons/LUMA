@@ -354,11 +354,11 @@ void GridObj::LBM_initGrid() {
 	for (int id = 0; id < N_lim * M_lim * K_lim; ++id)
 
 	// Not sure, remember to check
-#ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
+/* #ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = 0.0;
-#else
+#else */
 		force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = rho[id] * gravity * refinement_ratio;
-#endif
+/* #endif */
 	// Lattice force vector
 	force_i.resize(N_lim * M_lim * K_lim * L_NUM_VELS, 0.0);
 #endif

@@ -226,7 +226,7 @@
 
 //#define L_ALPHA 0.028     ///< Thermal diffusive, if not defined, alpha calculate accorfing Pr number
 #define L_PR 0.71			///< Desired Prandtl number, which combined Re can used to define thermal diffusive (alpha)
-#define L_RA 10000.0       ///< Desired Rayleigh number
+#define L_RA 1000.0       ///< Desired Rayleigh number
 /*
 *******************************************************************************
 ****************************** Object Management ******************************

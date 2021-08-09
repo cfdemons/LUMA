@@ -342,9 +342,9 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 	src_ttype_local = LatTTyp[src_id];
 
 
-		// Aidabat boundary
-		// !!! ATTENTION: Below adiabat BC should be optimised further!!!//
-		// This place need add v range, and consider differenct area use different boundary
+	// Aidabat boundary
+	// For adiabatic boundary, we consider Wang's paper, https://doi.org/10.1016/j.camwa.2012.07.001
+	// This place need to set v direction, and consider differenct area use different boundary
 		if (src_ttype_local == eAdiabat)
 		{
 			gNew[v + id * L_NUM_VELS] =
@@ -359,7 +359,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 		
 	}
 
-	// Isothermal BC refer to Gong et al paper, wait to add links
+	// Isothermal BC refer to Gong et al paper
 	// Set left boundary isothermal
 	if (ttype_local == eIsothermal && i == 0)
 	{
@@ -1187,16 +1187,23 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 
 	*/
 
-#ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
+/* #ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
 		// Need to be optimised, and set characteristic length as
 	double gbeta = L_RA *nu *alpha / N_lim / N_lim / N_lim;
 	for (size_t v = 0; v < L_NUM_VELS; v++) //int changed from size_t
 	{
 		force_i[v + id * L_NUM_VELS] = 3.0 * w[v] * gbeta * (T[id] - GridUnits::tphys2lat(L_PHYSICAL_TFLUID)) * rho[id] * c_opt[v][1];
 	}
-#else
+#else */
 	// Declarations
-	double lambda_v, beta_v;
+	double lambda_v, beta_v, beta_force, result_force;
+	
+#ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
+	// When using Boussinesq assumption, the resultant force is changed because bouyant force change with temperature
+	// In Boussinesq, the force used in Luan's paper is considered here. https://doi.org/10.1002/fld.2685
+	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = (T[id] - GridUnits::tphys2lat(L_PHYSICAL_TFLUID))
+													* L_RA * nu * alpha / N_lim / N_lim / N_lim / L_TDIFF;
+#endif	
 
 	// Reset the lattice forces
 	memset(&force_i[id * L_NUM_VELS], 0, sizeof(double) * L_NUM_VELS);
@@ -1211,6 +1218,18 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 		// Compute the lattice forces based on Guo's forcing scheme
 		lambda_v = (1 - 0.5 * omega) * (w[v] / (cs*cs));
 
+#ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
+		beta_force = 0.0;
+		result_force = 0.0;
+		for (int d = 0; d < L_DIMS; d++)
+		{
+
+			beta_force += c_opt[v][d] * force_xyz[d + id * L_DIMS];
+		// Compute the reslutant force square
+			result_force += force_xyz[d + id * L_DIMS] * force_xyz[d + id * L_DIMS];
+		}
+		force_i[v + id * L_NUM_VELS] = rho[id] * (beta_force + beta_force * beta_force * (1 / (cs * cs)) - result_force);
+#else
 		// Dot product (sum over d dimensions)
 		for (int d = 0; d < L_DIMS; d++) {
 			beta_v += (c_opt[v][d] * u[d + id * L_DIMS]);
@@ -1222,12 +1241,12 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 			force_i[v + id * L_NUM_VELS] += force_xyz[d + id * L_DIMS] * 
 				(c_opt[v][d] * (1 + beta_v) - u[d + id * L_DIMS]);
 		}
-
+#endif
 		// Multiply by lambda_v
 		force_i[v + id * L_NUM_VELS] *= lambda_v;
 
 	}
-#endif
+/* #endif */
 }
 
 /*********************Current do not consider BFL******************************/

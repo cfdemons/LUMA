@@ -80,7 +80,7 @@
 */
 
 // Using MPI?
-//#define L_BUILD_FOR_MPI				///< Enable MPI features in build
+#define L_BUILD_FOR_MPI				///< Enable MPI features in build
 
 // Enable OMP support?
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
@@ -151,7 +151,7 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 4		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 

@@ -102,7 +102,8 @@ enum eTType
 	eIsothermal, ///< Isothermal boundary
 	eAdiabat,	 ///< Adiabat boundary
 	eCHF,		 ///< Constant heat flux boundary
-	eTFluid		 ///< Thermal fluid site
+	eTFluid,	 ///< Temperature field site
+	eTRefined	 ///< Temperature field site which is represented on a finer grid
 };
 
 /// \enum eWallLocation

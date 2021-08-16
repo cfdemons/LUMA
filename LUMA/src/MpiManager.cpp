@@ -53,7 +53,10 @@ MpiManager::MpiManager()
 	// Resize buffer arrays based on number of MPI directions
 	f_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
 	f_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));	
-
+#ifdef L_TEMPERATURE
+	g_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
+	g_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
+#endif
 	// Initialise the manager, grid information and topology
 	mpi_init();
 
@@ -613,6 +616,16 @@ void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 		rankout << f_buffer_recv[dir][v] << std::endl;
 	}
 
+#ifdef L_TEMPERATURE
+	rankout << "g_buffer_send is of size " << g_buffer_send[dir].size() << " with values: " << std::endl;
+	for (size_t v = 0; v < g_buffer_send[dir].size(); v++) {
+		rankout << g_buffer_send[dir][v] << std::endl;
+	}
+
+	rankout << "g_buffer_recv is of size " << g_buffer_recv[dir].size() << " with values: " << std::endl;
+	for (size_t v = 0; v < g_buffer_recv[dir].size(); v++) {
+		rankout << g_buffer_recv[dir][v] << std::endl;
+#endif
 	rankout.close();
 
 	return;
@@ -633,8 +646,11 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	// Wall clock variables
 	clock_t t_start, t_end, secs;
 
-	// Tag
+	// Tag for flow field and passive scalar field
 	int TAG;
+#ifdef L_TEMPERATURE
+	int TAG_T;
+#endif
 	int send_count = 0;
 
 	// Get grid object
@@ -681,8 +697,16 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		 * MPICH limits state that tag value cannot be greater than 32767 */
 		TAG = ((Grid->level + 1) * 1000) + ((Grid->region_number + 1) * 100) + dir;
 
+#ifdef L_TEMPERATURE	
+		// !!!Tag for passive scalar, set minus which is to distinguish the above term. 
+		TAG_T=((Grid->level + 1) * 1000) - ((Grid->region_number + 1) * 100) + dir;
+#endif
+
 #ifdef L_MPI_VERBOSE
 		*logout << "Processing Message with Tag --> " << TAG << std::endl;
+#ifdef L_TEMPERATURE
+		*logout << "Processing Message with Tag for passive scalar--> " << TAG_T << std::endl;
+#endif
 #endif
 
 		////////////////////////////
@@ -693,15 +717,21 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		for (MpiManager::BufferSizeStruct bufs : buffer_send_info) {
 			if (bufs.level == Grid->level && bufs.region == Grid->region_number) {
 				f_buffer_send[dir].resize(bufs.size[dir] * L_NUM_VELS);
+#ifdef L_TEMPERATURE
+				g_buffer_send[dir].resize(bufs.size[dir] * L_NUM_VELS);
+#endif
 			}
 		}
 
 		// Only pack and send if required
-		if (f_buffer_send[dir].size()) {
+		if (f_buffer_send[dir].size()
+#ifdef L_TEMPERATURE
+		&& g_buffer_send[dir].size()
+#endif	
+		) {
 
 			// Pass direction and Grid by reference and pack if required
-			mpi_buffer_pack( dir, Grid );
-		
+			mpi_buffer_pack( dir, Grid );	
 
 			///////////////
 			// Post Send //
@@ -713,10 +743,20 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			*logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -->  Posting Send for " << f_buffer_send[dir].size() / L_NUM_VELS
 								<< " sites to Rank " << neighbour_rank[dir] << " with tag " << TAG << "." << std::endl;
+			// Information for passive scalar field
+#ifdef L_TEMPERATURE
+			*logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+								<< " -->  Posting Send for " << g_buffer_send[dir].size() / L_NUM_VELS
+								<< " sites to Rank " << neighbour_rank[dir] << " with tag " << TAG_T << "." << std::endl;
+#endif
 #endif
 			// Post send message to message queue and log request handle in array
 			MPI_Isend( &f_buffer_send[dir].front(), static_cast<int>(f_buffer_send[dir].size()), MPI_DOUBLE, neighbour_rank[dir], 
 				TAG, world_comm, &send_requests[send_count-1] );
+#ifdef L_TEMPERATURE
+			MPI_Isend( &g_buffer_send[dir].front(), static_cast<int>(g_buffer_send[dir].size()), MPI_DOUBLE, neighbour_rank[dir], 
+				TAG_T, world_comm, &send_requests_t[send_count-1] );
+#endif
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Direction " << dir << " --> Send Posted." << std::endl;
@@ -731,6 +771,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		for (MpiManager::BufferSizeStruct bufr : buffer_recv_info) {
 			if (bufr.level == Grid->level && bufr.region == Grid->region_number) {
 				f_buffer_recv[dir].resize(bufr.size[dir] * L_NUM_VELS);
+#ifdef L_TEMPERATURE
+				g_buffer_recv[dir].resize(bufr.size[dir] * L_NUM_VELS);
+#endif
 			}
 		}
 
@@ -739,17 +782,31 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 		// Fetch Message //
 		///////////////////
 
-		if (f_buffer_recv[dir].size()) {
+		if (f_buffer_recv[dir].size()
+#ifdef L_TEMPERATURE
+			&& g_buffer_recv[dir].size()
+#endif
+		) {
 
 #ifdef L_MPI_VERBOSE
 			*logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
 								<< " -->  Fetching message for " << f_buffer_recv[dir].size() / L_NUM_VELS	
 								<< " sites from Rank " << neighbour_rank[opp_dir] << " with tag " << TAG << "." << std::endl;
+#ifdef L_TEMPERATURE
+			*logout << "L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir 
+								<< " -->  Fetching message for " << g_buffer_recv[dir].size() / L_NUM_VELS	
+								<< " sites from Rank " << neighbour_rank[opp_dir] << " with tag " << TAG_T << "." << std::endl;
+#endif
 #endif
 
 			// Use a blocking receive call if required
 			MPI_Recv( &f_buffer_recv[dir].front(), static_cast<int>(f_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
 				TAG, world_comm, &recv_stat );
+#ifdef L_TEMPERATURE
+			// Use a blocking receive call for passive scalar if required
+			MPI_Recv( &g_buffer_recv[dir].front(), static_cast<int>(g_buffer_recv[dir].size()), MPI_DOUBLE, neighbour_rank[opp_dir], 
+				TAG_T, world_comm, &recv_stat_t );
+#endif
 
 #ifdef L_MPI_VERBOSE
 			*logout << "Direction " << dir << " --> Received." << std::endl;
@@ -770,6 +827,11 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 			<< " -- Sent " << f_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir]
 			<< ": Received " << f_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
 
+#ifdef L_TEMPERATURE
+		*logout << "SUMMARY for L" << Grid->level << "R" << Grid->region_number << " -- Direction " << dir
+			<< " -- Sent " << g_buffer_send[dir].size() / L_NUM_VELS << " to " << neighbour_rank[dir]
+			<< ": Received " << g_buffer_recv[dir].size() / L_NUM_VELS << " from " << neighbour_rank[opp_dir] << std::endl;
+#endif
 		// Write out buffers
 		std::string filename = GridUtils::path_str + "/mpiBuffer_Rank" + std::to_string(my_rank) + "_Dir" + std::to_string(dir) + ".out";
 		mpi_writeout_buf(filename, dir);
@@ -787,7 +849,9 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 	 * Note that calls to this command destroy the handles once complete so
 	 * do not need to clear the array afterward. */
 	MPI_Waitall(send_count,send_requests,send_stat);
-
+#ifdef L_TEMPERATURE
+	MPI_Waitall(send_count,send_requests_t,send_stat_t);
+#endif
 
 	// Print Time of MPI comms
 	t_end = clock();

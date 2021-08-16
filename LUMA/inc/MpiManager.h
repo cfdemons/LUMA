@@ -168,10 +168,18 @@ public :
 	// Buffer data
 	std::vector< std::vector<double>> f_buffer_send;	///< Array of resizeable outgoing buffers used for data transfer
 	std::vector< std::vector<double>> f_buffer_recv;	///< Array of resizeable incoming buffers used for data transfer
+#ifdef L_TEMPERATURE
+	std::vector<std::vector<double>>  g_buffer_send;	///< Array of resizeable outgoing buffers used for passive scalar date transfer
+	std::vector< std::vector<double>> g_buffer_recv;	///< Array of resizeable incoming buffers used for passive scalar date transfer
+#endif
 	MPI_Status recv_stat;					///< Status structure for Receive return information
 	MPI_Request send_requests[L_MPI_DIRS];	///< Array of request structures for handles to posted ISends
 	MPI_Status send_stat[L_MPI_DIRS];		///< Array of statuses for each ISend
-
+#ifdef L_TEMPERATURE
+	MPI_Status recv_stat_t;					///< Status structure for Receive return information in passive scalar field
+	MPI_Request send_requests_t[L_MPI_DIRS];///< Array of request structures for handles to posted ISends in passive scalar field
+	MPI_Status send_stat_t[L_MPI_DIRS];		///< Array of statuses for each ISend in passive scalar field
+#endif
 	/// \struct BufferSizeStruct
 	/// \brief	Structure storing buffers sizes in each direction for particular grid.
 	struct BufferSizeStruct

@@ -31,6 +31,7 @@
 
 #include "GridManager.h"
 #include "MpiManager.h"
+#include "PLEInterface.h"
 //#include "InOutData.h"
 
 // Other header files
@@ -62,7 +63,7 @@ private:
     std::vector<struct InterfaceConfig> interfacesConfig_;
 
 	//- Data to exchange with GASCANS
-	//InOutData<T>* exchangeData_;
+	InOutData<T>* exchangeData_;
 
     // Configuration parameters used in the Adapter
 
@@ -88,7 +89,7 @@ private:
 		int CSAppID_;
 
     //- Interfaces
-   // std::vector<PLEInterface *> interfaces_;
+    std::vector<PLEInterface *> interfaces_;
 
     //- PLE data
     ple_coupling_mpi_set_t * pleSets_ = NULL;
@@ -97,7 +98,7 @@ private:
 	int pleCouplingFlag_ = 0;
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
-	std::vector<ple_locator_t*> locators_; 
+	//std::vector<ple_locator_t*> locators_; 
 
 	// I think that to be able to use any of this I'll have to make this class a friend of GridObj or GridManager
 	GridManager * LUMAGrid_;

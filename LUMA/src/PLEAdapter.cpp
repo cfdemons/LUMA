@@ -305,6 +305,59 @@ bool PLEAdapter::configure()
 
 	std::cout << "LUMA: I've created the PLE intracomm!" << std::endl;
 
+	// Create the interfaces
+	std::cout << "LUMA: Creating PLE interfaces..." << std::endl;
+	for (int i = 0; i < interfacesConfig_.size(); i++)
+	{
+		// Create the data storage for the interface
+		// Precice doesn't need to know the offset between LUMA coordinates and world coordinates for the moment. 
+		// coordFileName is in world coordinates. I'm not sure about this coordFileName with PLE coupling. 
+		//exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
+
+		// Create space for the data to be written / read for the current repo. 
+		for (int j = 0; j < interfacesConfig_.at(i).readData.size(); j++)
+		{
+			if ((interfacesConfig_.at(i).readData.at(j).find("v") != std::string::npos) || (interfacesConfig_.at(i).readData.at(j).find("V") != std::string::npos))
+			{
+				exchangeData_->getRepo(i).initialiseVectorData(interfacesConfig_.at(i).readData.at(j));
+			}
+			else if ((interfacesConfig_.at(i).readData.at(j).find("t") != std::string::npos) || (interfacesConfig_.at(i).readData.at(j).find("T") != std::string::npos))
+			{
+				exchangeData_->getRepo(i).initialiseScalarData(interfacesConfig_.at(i).readData.at(j));
+			}
+			else
+			{
+				L_ERROR("Data type for " + interfacesConfig_.at(i).readData.at(j) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
+		for (int j = 0; j < interfacesConfig_.at(i).writeData.size(); j++)
+		{
+			if ((interfacesConfig_.at(i).writeData.at(j).find("v") != std::string::npos) || (interfacesConfig_.at(i).writeData.at(j).find("V") != std::string::npos) )
+			{
+				exchangeData_->getRepo(i).initialiseVectorData(interfacesConfig_.at(i).writeData.at(j));
+			}
+			else if ((interfacesConfig_.at(i).writeData.at(j).find("t") != std::string::npos) || (interfacesConfig_.at(i).writeData.at(j).find("T") != std::string::npos))
+			{
+				exchangeData_->getRepo(i).initialiseScalarData(interfacesConfig_.at(i).writeData.at(j));
+			}
+			else
+			{
+				L_ERROR("Data type for " + interfacesConfig_.at(i).writeData.at(j) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
+
+		// Create the PLE interface
+		PLEInterface * pinterface = new PLEInterface(*precice_,
+			interfacesConfig_.at(i).meshName,
+			interfacesConfig_.at(i).readData,
+			interfacesConfig_.at(i).writeData,
+			exchangeData_->getRepo(i));
+		interfaces_.push_back(pinterface);
+		std::cout << "Interface created on mesh" << interfacesConfig_.at(i).meshName << std::endl;
+
+	}
+
+
 
 
   return true;

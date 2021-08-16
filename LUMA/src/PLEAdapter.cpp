@@ -253,6 +253,15 @@ bool PLEAdapter::configFileRead()
     return true;
 }
 
+void PLEAdapter::addPLELocator()
+{
+	//-  Create PLE locator
+	locators_.push_back(ple_locator_create(mpiCS_, CSNumRanks_, CSRootRank_));
+
+	//- Call PLE locator set mesh
+
+}
+
 bool PLEAdapter::configure()
 {
     //Create a PLE locator for each PLE interface in the configuration file. 
@@ -312,7 +321,7 @@ bool PLEAdapter::configure()
 		// Create the data storage for the interface
 		// Precice doesn't need to know the offset between LUMA coordinates and world coordinates for the moment. 
 		// coordFileName is in world coordinates. I'm not sure about this coordFileName with PLE coupling. 
-		//exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
+		exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
 
 		// Create space for the data to be written / read for the current repo. 
 		for (int j = 0; j < interfacesConfig_.at(i).readData.size(); j++)
@@ -346,13 +355,9 @@ bool PLEAdapter::configure()
 			}
 		}
 
-		// Create the PLE interface
-		PLEInterface * pinterface = new PLEInterface(*precice_,
-			interfacesConfig_.at(i).meshName,
-			interfacesConfig_.at(i).readData,
-			interfacesConfig_.at(i).writeData,
-			exchangeData_->getRepo(i));
-		interfaces_.push_back(pinterface);
+		// Create and configure the PLE locator
+		addPLELocator();
+
 		std::cout << "Interface created on mesh" << interfacesConfig_.at(i).meshName << std::endl;
 
 	}

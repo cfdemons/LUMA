@@ -54,7 +54,7 @@ private:
     struct InterfaceConfig
     {
         std::string meshName;
-		//std::string coordFileName;
+		std::string coordFileName;
         std::vector<std::string> writeData;
         std::vector<std::string> readData;
     };
@@ -89,7 +89,10 @@ private:
 		int CSAppID_;
 
     //- Interfaces
-    std::vector<PLEInterface *> interfaces_;
+    //std::vector<PLEInterface *> interfaces_;
+
+	//- PLE locators
+	std::vector<ple_locator_t *> locators_;
 
     //- PLE data
     ple_coupling_mpi_set_t * pleSets_ = NULL;
@@ -137,6 +140,9 @@ private:
 
         //- Read the adapter's configuration file
         bool configFileRead();
+
+		//- Create and configure PLE locator
+		void addPLELocator();
 
         //- Check the adapter's configuration file
        // bool configFileCheck();

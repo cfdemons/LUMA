@@ -1523,6 +1523,47 @@ void GridUtils::readVelocityFromFile(std::string path_str, std::vector<double>& 
 
 }
 
+void GridUtils::readLine(std::ifstream & f, std::string & line)
+{
+	if (!std::getline(f, line, '\n'))
+	{
+		std::perror("Error while reading file");
+		L_ERROR("Error when reading file ", GridUtils::logfile);
+	}
+}
+
+void GridUtils::checkHeader(const std::string & headerContent, const std::string & line, const std::string & fileName)
+{
+	std::istringstream headerss, liness;	// Buffer stream to store characters
+	liness.str(line);	// Put line in the buffer
+	liness.seekg(0);		// Reset buffer position to start of buffer
+	std::string word;
+
+	headerss.str(headerContent);	// Put line in the buffer
+	headerss.seekg(0);		// Reset buffer position to start of buffer
+	std::string wordHeader;
+
+	while (liness >> word)
+	{
+		// Read the next string in the header
+		headerss >> wordHeader;
+
+		// Check that it is the same as the corresponding position of headerContent. If it's not, issue an error. 
+		if (word.compare(wordHeader) != 0)
+		{
+			L_ERROR("The word " + word + " is not recognised as part of the header of " + fileName +
+				" or is in the wrong position.\n The variables in the file should be " + headerContent, GridUtils::logfile);
+		}
+	}
+
+	// Check that the header doesn't contain extra values
+	if (!headerss.eof())
+	{
+		L_ERROR("The header of " + fileName + " is shorter than expected."
+			".\n The variables in the file should be " + headerContent, logfile);
+	}
+}
+
 // ****************************************************************************
 /// \brief	Tests whether a site is on a given grid.
 /// \param	i	local i-index.

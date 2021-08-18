@@ -71,6 +71,7 @@
 #include <valarray>
 #include <assert.h>
 #include <functional>
+#include <map>
 
 // Check OS is Windows or not
 #ifdef _WIN32

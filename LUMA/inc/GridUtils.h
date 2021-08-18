@@ -56,6 +56,9 @@ public:
 	// IO utilities
 	static void createOutputDirectory(std::string path_str);		// Output directory creator
 	static void readVelocityFromFile(std::string path_str, std::vector<double>& x_coord, std::vector<double>& y_coord, std::vector<double>& z_coord, std::vector<double>& ux, std::vector<double>& uy, std::vector<double>& uz);  //Reads coordinates and velocity data from file_name. Stores the coordinates of each point in the vectors x, y and z and the velocity components in the vectors ux, uy and uz. It expects the file to have a column for uz even with L_DIMS = 2 
+	static void readLine(std::ifstream &f, std::string &line);
+	// Checks that line contains the strings in headerContent in the same order as in headerContent. Writes an error message and stops the simulation if not. 
+	static void checkHeader(const std::string &headerContent, const std::string &line, const std::string &fileName);
 
 	// Mathematical and numbering utilities
 	static std::vector<int> onespace(int min, int max);						// Function: onespace

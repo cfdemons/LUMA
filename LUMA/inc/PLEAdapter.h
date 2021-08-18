@@ -31,8 +31,8 @@
 
 #include "GridManager.h"
 #include "MpiManager.h"
-#include "PLEInterface.h"
-//#include "InOutData.h"
+//#include "PLEInterface.h"
+#include "../inc/InOutData.h"
 
 // Other header files
 // YAML reader - Used to read the adapter's configuration file.
@@ -63,7 +63,7 @@ private:
     std::vector<struct InterfaceConfig> interfacesConfig_;
 
 	//- Data to exchange with GASCANS
-	InOutData<T>* exchangeData_;
+	InOutData* exchangeData_;
 
     // Configuration parameters used in the Adapter
 

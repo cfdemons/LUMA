@@ -20,8 +20,9 @@
 * limitations under the License.*
 */
 
-#include "InOutData.h"
+#include "../inc/InOutData.h"
 #include "stddef.h"
+#include <memory>
 
 InOutData::InOutData()
 {

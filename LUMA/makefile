@@ -2,10 +2,10 @@
 
 # Compiler command
 CC=mpicxx
-CFLAGS=-O3 -std=c++0x -w -fopenmp
+CFLAGS=-O3 -std=c++14 -w -fopenmp
 
 # Executable
-EXE=LUMA
+EXE=../../LUMA
 
 # Location of source, header and object files
 DIR=./

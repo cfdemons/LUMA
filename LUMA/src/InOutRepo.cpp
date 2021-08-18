@@ -237,7 +237,7 @@ bool InOutRepo::addDummyData(const std::vector<std::string>& variables)
 
 			double a = coordinates_[2];
 			double b = coordinates_[3*(numDataPoints_ -1) + 1];
-			double p = static_cast<T>(0.5) * (a + b);
+			double p = 0.5 * (a + b);
 			double q = b - p;
 
 			int ind = 0;

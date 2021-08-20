@@ -255,9 +255,11 @@ bool PLEAdapter::configFileRead()
 
 void PLEAdapter::addPLELocator()
 {
+	std::cout << "LUMA: Hello before PLE locator creation. " << std::endl;
 	//-  Create PLE locator
 	locators_.push_back(ple_locator_create(mpiCS_, CSNumRanks_, CSRootRank_));
 
+	std::cout << "LUMA: PLE locator created. " << std::endl;
 	//- Call PLE locator set mesh
 
 }
@@ -286,7 +288,7 @@ bool PLEAdapter::configure()
 	CS_inlet_position.position.push_back(0.0);
 	CS_inlet_position.position.push_back(0.0);
 
-	CS_inlet_position.readData.push_back(" ");
+	//CS_inlet_position.readData.push_back(" "); // LUMA is not reading anything from CS, so readData is empty.
 	CS_inlet_position.writeData.push_back("v");
 
 	interfacesConfig_.push_back(CS_inlet_position);
@@ -332,49 +334,56 @@ bool PLEAdapter::configure()
 
 	// Create the interfaces
 	std::cout << "LUMA: Creating PLE interfaces..." << std::endl;
-	for (int i = 0; i < interfacesConfig_.size(); i++)
+	int i = 0;
+	for (auto interfaceI = interfacesConfig_.begin(); interfaceI != interfacesConfig_.end(); ++interfaceI)
 	{
+
 		// Create the data storage for the interface
 		// Precice doesn't need to know the offset between LUMA coordinates and world coordinates for the moment. 
 		// coordFileName is in world coordinates. I'm not sure about this coordFileName with PLE coupling. 
-		exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
+		//exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
+		exchangeData_->addRepo(interfaceI->dimensions.at(0), interfaceI->dimensions.at(1), interfaceI->dimensions.at(2),
+							   interfaceI->position.at(0), interfaceI->position.at(1), interfaceI->position.at(2),
+							   LUMAGrid_->Grids->dh);
 
 		// Create space for the data to be written / read for the current repo. 
-		for (int j = 0; j < interfacesConfig_.at(i).readData.size(); j++)
+		for (auto readJ = interfaceI->readData.begin(); readJ != interfaceI->readData.end(); ++readJ)
 		{
-			if ((interfacesConfig_.at(i).readData.at(j).find("v") != std::string::npos) || (interfacesConfig_.at(i).readData.at(j).find("V") != std::string::npos))
+			if ((readJ->find("v") != std::string::npos) || (readJ->find("V") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseVectorData(interfacesConfig_.at(i).readData.at(j));
+				exchangeData_->getRepo(i).initialiseVectorData(*readJ);
 			}
-			else if ((interfacesConfig_.at(i).readData.at(j).find("t") != std::string::npos) || (interfacesConfig_.at(i).readData.at(j).find("T") != std::string::npos))
+			else if ((readJ->find("t") != std::string::npos) || (readJ->find("T") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseScalarData(interfacesConfig_.at(i).readData.at(j));
+				exchangeData_->getRepo(i).initialiseScalarData(*readJ);
 			}
 			else
 			{
-				L_ERROR("Data type for " + interfacesConfig_.at(i).readData.at(j) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+				L_ERROR("Data type for " + *readJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
-		for (int j = 0; j < interfacesConfig_.at(i).writeData.size(); j++)
+		for (auto writeJ = interfaceI->writeData.begin(); writeJ != interfaceI->writeData.end(); ++writeJ)
 		{
-			if ((interfacesConfig_.at(i).writeData.at(j).find("v") != std::string::npos) || (interfacesConfig_.at(i).writeData.at(j).find("V") != std::string::npos) )
+			if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos) )
 			{
-				exchangeData_->getRepo(i).initialiseVectorData(interfacesConfig_.at(i).writeData.at(j));
+				exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
 			}
-			else if ((interfacesConfig_.at(i).writeData.at(j).find("t") != std::string::npos) || (interfacesConfig_.at(i).writeData.at(j).find("T") != std::string::npos))
+			else if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseScalarData(interfacesConfig_.at(i).writeData.at(j));
+				exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
 			}
 			else
 			{
-				L_ERROR("Data type for " + interfacesConfig_.at(i).writeData.at(j) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+				L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
 
 		// Create and configure the PLE locator
 		addPLELocator();
 
-		std::cout << "Interface created on mesh" << interfacesConfig_.at(i).meshName << std::endl;
+		std::cout << "Interface created on mesh" << interfaceI->meshName << std::endl;
+
+		i++;
 
 	}
 

@@ -330,6 +330,10 @@ int main( int argc, char* argv[] )
 
 #ifdef L_ACTIVATE_PLE
 
+#if (L_NUM_LEVELS > 0)
+	L_ERROR("PLE coupling with mesh refinement not implemented yet.", GridUtils::logfile);
+#endif
+
 	// Create an instance of PLEAdapter
 	// TODO: Make PLEAdapter a singleton like MPIManager and GridManager
 	PLEAdapter ple;

@@ -57,6 +57,8 @@ private:
 		std::string coordFileName;
         std::vector<std::string> writeData;
         std::vector<std::string> readData;
+		std::vector<int> dimensions;
+		std::vector<double> position;
     };
 
     //- Configuration interfaces

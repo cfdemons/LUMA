@@ -271,11 +271,27 @@ bool PLEAdapter::configure()
 	// Read PLE adapter configuration file. 
 	configFileRead(); 
 
-	// Create a ple coupling set
+	// ** DEBUG!!!! This data should be read from the Config file but I hard code it here just to test. **//
 	std::string app_type = "LUMA";
 	std::string app_name = "LEFT"; // Name of the domain. It is in the mpi command line, or I can also write it in the config file?
 								   // I think it is better to read from mpi command line so that there is only one config file. I don't like it but it is 
 	                               // what CS does.
+	InterfaceConfig CS_inlet_position;
+	CS_inlet_position.dimensions.push_back(1); 
+	CS_inlet_position.dimensions.push_back(20);
+	CS_inlet_position.dimensions.push_back(10);
+
+	CS_inlet_position.meshName = "CS_inlet";
+	CS_inlet_position.position.push_back(1.5);
+	CS_inlet_position.position.push_back(0.0);
+	CS_inlet_position.position.push_back(0.0);
+
+	CS_inlet_position.readData.push_back(" ");
+	CS_inlet_position.writeData.push_back("v");
+
+	interfacesConfig_.push_back(CS_inlet_position);
+
+
 	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
 
 	numApps_ = ple_coupling_mpi_set_n_apps(pleSets_);

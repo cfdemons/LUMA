@@ -171,6 +171,12 @@ void PLEAdapter::init(std::string adapterConfigFileName, double timestepSolver, 
     return;
 }
 
+ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, double tolerance, double extents[])
+{
+
+	return ple_lnum_t();
+}
+
 bool PLEAdapter::configFileRead()
 {
 	//Read the configuration file //
@@ -253,14 +259,51 @@ bool PLEAdapter::configFileRead()
     return true;
 }
 
-void PLEAdapter::addPLELocator()
+void PLEAdapter::addPLELocator(int i)
 {
 	std::cout << "LUMA: Hello before PLE locator creation. " << std::endl;
-	//-  Create PLE locator
-	locators_.push_back(ple_locator_create(mpiCS_, CSNumRanks_, CSRootRank_));
+
+	if ((i == (coordinates_.size() - 1)) && (i == locators_.size()))  // If this locators_ position doesn't contain any data yet but has a corresponding coordinates.
+	{
+		L_INFO("Creating the PLE locator number " + std::to_string(i), GridUtils::logfile);
+
+		//-  Create PLE locator
+		locators_.push_back(ple_locator_create(mpiCS_, CSNumRanks_, CSRootRank_));
+	}
+	else if ((i < coordinates_.size()) && (i < locators_.size()))  // If this locators_ position exists
+	{
+		L_WARN("Regenerating the ple_locator in position " + std::to_string(i), GridUtils::logfile);
+		locators_.at(i) = ple_locator_create(mpiCS_, CSNumRanks_, CSRootRank_);
+	}
+	else
+	{
+		L_ERROR("PLE locator number " + std::to_string(i) + " can't be created without associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
+	}
 
 	std::cout << "LUMA: PLE locator created. " << std::endl;
+
+	int locator_options[PLE_LOCATOR_N_OPTIONS];
+	locator_options[PLE_LOCATOR_NUMBERING] = 1;
+
+
+	// NOTE: I'm not sure if I'll need this vector outside this function. So I'll create it as a local variable for the moment. 
+	std::vector<float> lumaToCSdist;
+	lumaToCSdist.resize(coordinates_.at(i).size() / 3.0);
+
 	//- Call PLE locator set mesh
+	ple_locator_set_mesh(locators_.at(i),
+		LUMAGrid_->Grids,
+		locator_options,
+		0.,
+		tolerance_,
+		L_DIMS,
+		coordinates_.at(i).size / 3.0,
+		NULL,
+		NULL,
+		coordinates_.at(i).data(),
+		lumaToCSdist.data(),
+		meshExtents,
+		pointInMesh);
 
 }
 
@@ -278,6 +321,8 @@ bool PLEAdapter::configure()
 	std::string app_name = "LEFT"; // Name of the domain. It is in the mpi command line, or I can also write it in the config file?
 								   // I think it is better to read from mpi command line so that there is only one config file. I don't like it but it is 
 	                               // what CS does.
+	double tolerance = 0.01;
+	tolerance_ = tolerance;
 	InterfaceConfig CS_inlet_position;
 	CS_inlet_position.dimensions.push_back(1); 
 	CS_inlet_position.dimensions.push_back(20);
@@ -522,6 +567,8 @@ void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, doub
 	{
 		L_ERROR("The PLE locator vector index " + std::to_string(i) + " is bigger than the size of the PLE locator vector. ", GridUtils::logfile);
 	}
+
+
 
 
 	/*numDataPoints_ = coordinates_.size() / 3;

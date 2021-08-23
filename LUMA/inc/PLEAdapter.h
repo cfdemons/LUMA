@@ -61,6 +61,9 @@ private:
 		std::vector<double> position;
     };
 
+	//- Tolerance in percentage for the location of points
+	double tolerance_;
+
     //- Configuration interfaces
     std::vector<struct InterfaceConfig> interfacesConfig_;
 
@@ -95,6 +98,9 @@ private:
 
 	//- PLE locators
 	std::vector<ple_locator_t *> locators_;
+
+	//- PLE locators functions
+	ple_lnum_t meshExtents(const void *mesh, ple_lnum_t n_max_extents, double tolerance, double extents[]);
 
 	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
 	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
@@ -149,7 +155,7 @@ private:
         bool configFileRead();
 
 		//- Create and configure PLE locator
-		void addPLELocator();
+		void addPLELocator(int i);
 
         //- Check the adapter's configuration file
        // bool configFileCheck();

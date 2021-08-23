@@ -335,42 +335,59 @@ bool PLEAdapter::configure()
 	// Create the interfaces
 	std::cout << "LUMA: Creating PLE interfaces..." << std::endl;
 	int i = 0;
-	for (auto interfaceI = interfacesConfig_.begin(); interfaceI != interfacesConfig_.end(); ++interfaceI)
+	for (int i = 0; i < interfacesConfig_.size(); i++)
 	{
+		std::cout << "LUMA: I'm in the interface loop! " << std::endl;
 
 		// Create the data storage for the interface
 		// Precice doesn't need to know the offset between LUMA coordinates and world coordinates for the moment. 
 		// coordFileName is in world coordinates. I'm not sure about this coordFileName with PLE coupling. 
 		//exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
-		exchangeData_->addRepo(interfaceI->dimensions.at(0), interfaceI->dimensions.at(1), interfaceI->dimensions.at(2),
-							   interfaceI->position.at(0), interfaceI->position.at(1), interfaceI->position.at(2),
-							   LUMAGrid_->Grids->dh);
+		//exchangeData_->addRepo(interfaceI->dimensions.at(0), interfaceI->dimensions.at(1), interfaceI->dimensions.at(2),
+		//					   interfaceI->position.at(0), interfaceI->position.at(1), interfaceI->position.at(2),
+		//					   LUMAGrid_->Grids->dh);
+		
+		// Create the coordinates for this interface
+		setCoordinates(interfacesConfig_.at(i).dimensions.at(0), interfacesConfig_.at(i).dimensions.at(1), interfacesConfig_.at(i).dimensions.at(2),
+			interfacesConfig_.at(i).position.at(0), interfacesConfig_.at(i).position.at(1), interfacesConfig_.at(i).position.at(2),
+			LUMAGrid_->Grids->dh, i);
+
+		/*exchangeData_->addRepo(interfacesConfig_.at(i).dimensions.at(0), interfacesConfig_.at(i).dimensions.at(1), interfacesConfig_.at(i).dimensions.at(2),
+			interfacesConfig_.at(i).position.at(0), interfacesConfig_.at(i).position.at(1), interfacesConfig_.at(i).position.at(2),
+			LUMAGrid_->Grids->dh);*/
+
+
+		std::cout << "LUMA: I've created the repo! " << std::endl;
 
 		// Create space for the data to be written / read for the current repo. 
-		for (auto readJ = interfaceI->readData.begin(); readJ != interfaceI->readData.end(); ++readJ)
+		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
 		{
 			if ((readJ->find("v") != std::string::npos) || (readJ->find("V") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseVectorData(*readJ);
+				std::cout << "LUMA: " << *readJ << std::endl;
+				initialiseVectorData(*readJ, 0.0, i);
 			}
 			else if ((readJ->find("t") != std::string::npos) || (readJ->find("T") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseScalarData(*readJ);
+				//exchangeData_->getRepo(i).initialiseScalarData(*readJ);
+				initialiseScalarData(*readJ, 0.0, i);
 			}
 			else
 			{
 				L_ERROR("Data type for " + *readJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
-		for (auto writeJ = interfaceI->writeData.begin(); writeJ != interfaceI->writeData.end(); ++writeJ)
+		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
 		{
 			if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos) )
 			{
-				exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
+				//exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
+				initialiseVectorData(*writeJ, 0.0, i);
 			}
 			else if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
 			{
-				exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
+				//exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
+				initialiseScalarData(*writeJ, 0.0, i);
 			}
 			else
 			{
@@ -378,10 +395,12 @@ bool PLEAdapter::configure()
 			}
 		}
 
+		std::cout << "LUMA: Creating PLE adapter.." << std::endl;
+
 		// Create and configure the PLE locator
 		addPLELocator();
 
-		std::cout << "Interface created on mesh" << interfaceI->meshName << std::endl;
+		std::cout << "Interface created on mesh" << interfacesConfig_.at(i).meshName << std::endl;
 
 		i++;
 
@@ -461,6 +480,111 @@ void PLEAdapter::teardown()
     }
     
     return;
+}
+
+void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int i)
+{
+	/*if (numDataPoints_ > 0)
+	{
+		L_ERROR("This InOutRepo already contains a coordinates vector", GridUtils::logfile);
+	}*/
+
+	double x0 = x;
+	double y0 = y;
+	double z0 = z;
+
+	std::vector<double> coord;
+
+	// Fill in the coordinates vector. C style ordering
+	for (int i = 0; i < Nx; i++)
+	{
+		for (int j = 0; j < Ny; j++)
+		{
+			for (int k = 0; k < Nz; k++)
+			{
+				coord.push_back(x0 + i * dx + dx / static_cast<double>(2.0));
+				coord.push_back(y0 + j * dx + dx / static_cast<double>(2.0));
+				coord.push_back(z0 + k * dx + dx / static_cast<double>(2.0));
+			}
+		}
+	}
+
+	if (i == coordinates_.size())
+	{
+		coordinates_.push_back(coord);
+	}
+	else if (i < coordinates_.size())
+	{
+		L_INFO("Updating the PLE coupling coordinates for position " + std::to_string(i), GridUtils::logfile);
+		coordinates_.at(i) = coord;
+	}
+	else
+	{
+		L_ERROR("The PLE locator vector index " + std::to_string(i) + " is bigger than the size of the PLE locator vector. ", GridUtils::logfile);
+	}
+
+
+	/*numDataPoints_ = coordinates_.size() / 3;
+
+	// Fill in the ordered data.
+	numX_ = Nx;
+	numY_ = Ny;
+	numZ_ = Nz;
+	C_ = true;
+	ordered_ = true;
+	dx_ = dx;*/
+}
+
+void PLEAdapter::initialiseVectorData(std::string name, double initValue, int i)
+{
+	// Allocate new arrays
+	std::map<std::string, std::vector<double>> tempMap;
+	std::vector<double> temp;
+	temp.resize(coordinates_.at(i).size(),initValue);
+	tempMap[name] = temp;
+
+	if ((i == (coordinates_.size() - 1)) && (i == vectorData_.size()))  // If this vectorData_ position doesn't contain any data yet but has a corresponding coordinates.
+	{
+		L_INFO("Creating a new vectorData_storage for " + name + " at position " + std::to_string(i), GridUtils::logfile);
+		vectorData_.push_back(tempMap);
+	}
+	else if ((i < coordinates_.size()) && (i < vectorData_.size()))  // If this vectorData_ position exists
+	{
+		L_INFO("Adding " + name + " to vectorData storage at position " + std::to_string(i), GridUtils::logfile);
+		vectorData_.at(i)[name] = temp;
+	}
+	else   // If this vectorData_ position is bigger than the size of the coordinates_ and vectorData_ vectors. 
+	{
+		L_ERROR("This vectorData doesn't have associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
+	}
+
+	std::cout << "LUMA: HI! numDataPoints = " << coordinates_.at(i).size() << std::endl;
+}
+
+void PLEAdapter::initialiseScalarData(std::string name, double initValue, int i)
+{
+	// Allocate new arrays
+	std::map<std::string, std::vector<double>> tempMap;
+	std::vector<double> temp;
+	temp.resize(coordinates_.at(i).size() / 3.0, initValue);
+	tempMap[name] = temp;
+
+	if ((i == (coordinates_.size() - 1)) && (i == scalarData_.size()))  // If this scalarData_ position doesn't contain any data yet but has a corresponding coordinates.
+	{
+		L_INFO("Creating a new scalarData_storage for " + name + " at position " + std::to_string(i), GridUtils::logfile);
+		scalarData_.push_back(tempMap);
+	}
+	else if ((i < coordinates_.size()) && (i < scalarData_.size()))  // If this scalarData_ position exists
+	{
+		L_INFO("Adding " + name + " to scalarData storage at position " + std::to_string(i), GridUtils::logfile);
+		scalarData_.at(i)[name] = temp;
+	}
+	else   // If this scalarData_ position is bigger than the size of the coordinates_ and vectorData_ vectors. 
+	{
+		L_ERROR("This scalarData_ doesn't have associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
+	}
+
+	std::cout << "LUMA: HI! numDataPoints = " << coordinates_.at(i).size() << std::endl;
 }
 
 PLEAdapter::~PLEAdapter()

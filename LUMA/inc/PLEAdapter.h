@@ -96,14 +96,19 @@ private:
 	//- PLE locators
 	std::vector<ple_locator_t *> locators_;
 
+	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
+	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
+	std::vector<std::map<std::string, std::vector<double>>> vectorData_;
+	std::vector<std::map<std::string, std::vector<double>>> scalarData_;
+
+
     //- PLE data
     ple_coupling_mpi_set_t * pleSets_ = NULL;
 	
 	//- Sync flag
 	int pleCouplingFlag_ = 0;
 
-	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
-	//std::vector<ple_locator_t*> locators_; 
+
 
 	// I think that to be able to use any of this I'll have to make this class a friend of GridObj or GridManager
 	GridManager * LUMAGrid_;
@@ -172,6 +177,12 @@ private:
     //- Destroy the PLE interface and delete the allocated
     //  memory in a proper way. Called by the destructor.
     void teardown();
+
+
+	//- Data handling
+	void setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int i);
+	void initialiseVectorData(std::string name, double initValue, int i);
+	void initialiseScalarData(std::string name, double initValue, int i);
 
 public:
 

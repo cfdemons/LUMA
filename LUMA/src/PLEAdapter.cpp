@@ -174,7 +174,52 @@ void PLEAdapter::init(std::string adapterConfigFileName, double timestepSolver, 
 ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, double tolerance, double extents[])
 {
 
-	return ple_lnum_t();
+	if (mesh == NULL)
+		return 0;
+
+	// In query mode, return maximum extents available  (currently limited to 1)
+	if (n_max_extents < 0)
+		return 1;
+
+	// Calculate the mesh extents for the current rank
+	MpiManager *mpim = MpiManager::getInstance();
+	int rank = GridUtils::safeGetRank();
+
+	extents[0] = mpim->rank_core_edge[eXMin][rank];
+	extents[1] = mpim->rank_core_edge[eYMin][rank];
+
+#if (L_DIMS == 3)
+	extents[2] = mpim->rank_core_edge[eZMin][rank];
+	extents[3] = mpim->rank_core_edge[eXMax][rank];
+	extents[4] = mpim->rank_core_edge[eYMax][rank];
+	extents[5] = mpim->rank_core_edge[eZMax][rank];
+#else
+	extents[2] = mpim->rank_core_edge[eXMax][rank];
+	extents[3] = mpim->rank_core_edge[eYMax][rank];
+#endif
+
+	// Add tolerance to the mesh extents. As done by fvm_nodal_extract.c , _elt_extents_finalize in Code_Saturne
+	double delta[3];
+	for (int i = 0; i < L_DIMS; i++)
+		delta[i] = (extents[i + L_DIMS] - extents[i]) * tolerance;
+
+	for (int i = 0; i < L_DIMS; i++)
+	{
+		extents[i] = extents[i] - delta[i];
+		extents[i + L_DIMS] = extents[i + L_DIMS] + delta[i];
+	}
+	
+	// DEBUGGG!!
+	for (int i = 0; i < L_DIMS*2; i++)
+	{
+		std::cout << "LUMA: extents " + std::to_string(i) + " = " + std::to_string(extents[i]) << std::endl;
+	}
+
+	return 1;
+}
+
+void PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
+{
 }
 
 bool PLEAdapter::configFileRead()
@@ -297,13 +342,13 @@ void PLEAdapter::addPLELocator(int i)
 		0.,
 		tolerance_,
 		L_DIMS,
-		coordinates_.at(i).size / 3.0,
+		coordinates_.at(i).size() / 3.0,
 		NULL,
 		NULL,
 		coordinates_.at(i).data(),
 		lumaToCSdist.data(),
-		meshExtents,
-		pointInMesh);
+		&meshExtents,
+		&pointInMesh);
 
 }
 
@@ -443,7 +488,7 @@ bool PLEAdapter::configure()
 		std::cout << "LUMA: Creating PLE adapter.." << std::endl;
 
 		// Create and configure the PLE locator
-		addPLELocator();
+		addPLELocator(i);
 
 		std::cout << "Interface created on mesh" << interfacesConfig_.at(i).meshName << std::endl;
 

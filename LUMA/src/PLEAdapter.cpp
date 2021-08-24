@@ -220,6 +220,50 @@ ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, 
 
 void PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
 {
+	for (int p = 0; p < n_points; p++)
+	{
+		eLocationOnRank loc;
+		std::vector<int> pos = { -1, -1, -1 };
+		// Check that the point is not in the sending or receiving layers. (I think we don't want the point to be in a sending or receiving halo). 
+		if (GridUtils::isOnThisRank(static_cast<double>(point_coords[3 * p]), 
+			                        static_cast<double>(point_coords[3*p+1]), 
+			                        static_cast<double>(point_coords[3*p+2]),
+			                        &loc, static_cast<const GridObj*>(mesh), &pos))
+		{
+			// If the point is in the receiving halo, it is counted as unlocated. 
+			if (loc == eHalo)
+			{
+				location[p] = -1;
+				distance[p] = -1;
+			}
+			else if (loc == eCore) // Point is in the core of the rank's meshes, including the sending halo. 
+			{
+				// Pos is the local rank's cell index. I think it returns the index in the grid you pass it. And that is a global index in that grid
+				// the indexes in pos go from 0 to Nx (where Nd are the total number of cells in that grid in the d direction, d = x,y,z).
+				// ATTENTION! From what Yvan told me I understand that the indices in location should be local to the current rank but I'm not sure
+				// how to get them with LUMA. I will leave it like this for the moment because I'm not sure LUMA will be able to work with local rank indices. 
+
+				// Flatten the index returned by inOnThisRank
+				int id = pos[2] + pos[1] * static_cast<const GridObj*>(mesh)->K_lim + pos[0] * static_cast<const GridObj*>(mesh)->K_lim * static_cast<const GridObj*>(mesh)->M_lim;
+				location[p] = id;
+
+				// TODO: To fill the distance array I have to get the global coordinates of id and then calculate the absolute distance between them
+				// and the coordinates in point_coords. I think it is just XPos[pos[0]], YPos[pos[1]], ZPos[pos[2]]. Check that the distance is <1 if inside the cell. 
+
+
+				// TODO: I have to see what to do with the tolerance. Check what CS does. 
+			}
+			else
+			{
+				L_ERROR("Trying to locate a point from PLE mesh. The point is in the mesh but its location is eNone", GridUtils::logfile);
+			}
+		}
+		else // If the point is not in the current rank, set the distance to -1 and the index of the point
+		{
+			location[p] = -1;
+			distance[p] = -1;
+		}
+	}
 }
 
 bool PLEAdapter::configFileRead()

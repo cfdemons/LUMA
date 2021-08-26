@@ -59,6 +59,7 @@ private:
         std::vector<std::string> readData;
 		std::vector<int> dimensions;
 		std::vector<double> position;
+		std::vector<double> offset;
     };
 
 	//- Tolerance in percentage for the location of points
@@ -87,7 +88,7 @@ private:
 		//- Number of coupled apps
 		int numApps_;
 
-		//- PLE app ID
+		//- PLE app ID for LUMA
 		int appID_;
 
 		//- PLE app ID for CS
@@ -113,15 +114,20 @@ private:
 
 	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
 	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
+													// They are in the local LUMA coordinate system. LUMA_coord = World_coord - offset_
 	std::vector<std::map<std::string, std::vector<double>>> vectorData_;
 	std::vector<std::map<std::string, std::vector<double>>> scalarData_;
+	std::vector<std::vector<double>> offset_; // Offset between the start of LUMA mesh and the start of the world coordinate system. 
+	                                          // The world coordinate system is the same for LUMA and Code Saturne. 
+
+	void exchangeMessage(const std::string &messageToSend, std::string *messageReceived);
 
 
     //- PLE data
     ple_coupling_mpi_set_t * pleSets_ = NULL;
 	
 	//- Sync flag
-	int pleCouplingFlag_ = 0;
+	int pleCouplingFlag_ = 0;  // Syncrhonised
 
 
 
@@ -145,6 +151,9 @@ private:
 
 	// Number of MPI ranks for CS
 	int CSNumRanks_;
+
+	// LUMA-CS coupling tag
+	const int  csLumaCouplingTag_ = 'C' + 'S' + '_' + 'C' + 'O' + 'U' + 'P' + 'L' + 'I' + 'N' + 'G';
 
 
     //- Solver interface initialized
@@ -202,10 +211,16 @@ private:
 public:
 
         //- Constructor
+		PLEAdapter();
+
+	    //- Initialise
 	    void init(std::string adapterConfigFileName, double timestepSolver, GridManager* lumaGrid, MpiManager* lumaMpi);
 
         //- Setup the adapter's configuration
 		bool configure();
+
+		//- Set synchronisation flag
+		void setSyncFlag(int flag);
 
         //- Called at each time step. Returns the data to exchange with LUMIS. 
         void execute();

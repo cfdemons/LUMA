@@ -86,7 +86,6 @@
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
 // Enable temperature field?
-// Wait to add this term in code
 #define L_TEMPERATURE                   ///< Enable calculation of temperature field
 
 // Output Options
@@ -277,9 +276,9 @@
 #define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
-//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
-//#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
+#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+#define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // Current setting thickness in temperature field is as same as that in density field 
 // General

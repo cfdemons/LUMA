@@ -625,6 +625,7 @@ void MpiManager::mpi_writeout_buf( std::string filename, int dir ) {
 	rankout << "g_buffer_recv is of size " << g_buffer_recv[dir].size() << " with values: " << std::endl;
 	for (size_t v = 0; v < g_buffer_recv[dir].size(); v++) {
 		rankout << g_buffer_recv[dir][v] << std::endl;
+	}
 #endif
 	rankout.close();
 

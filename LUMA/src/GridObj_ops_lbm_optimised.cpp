@@ -1187,14 +1187,6 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 
 	*/
 
-/* #ifdef L_BOUSSINESQ_APPROXIMATION_FORCE
-		// Need to be optimised, and set characteristic length as
-	double gbeta = L_RA *nu *alpha / N_lim / N_lim / N_lim;
-	for (size_t v = 0; v < L_NUM_VELS; v++) //int changed from size_t
-	{
-		force_i[v + id * L_NUM_VELS] = 3.0 * w[v] * gbeta * (T[id] - GridUnits::tphys2lat(L_PHYSICAL_TFLUID)) * rho[id] * c_opt[v][1];
-	}
-#else */
 	// Declarations
 	double lambda_v, beta_v, beta_force, result_force;
 	
@@ -1246,7 +1238,6 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 		force_i[v + id * L_NUM_VELS] *= lambda_v;
 
 	}
-/* #endif */
 }
 
 /*********************Current do not consider BFL******************************/

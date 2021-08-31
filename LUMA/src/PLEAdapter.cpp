@@ -513,8 +513,6 @@ void PLEAdapter::addPLELocator(int i)
 	}
 
 
-
-
 }
 
 /*----------------------------------------------------------------------------*/
@@ -675,66 +673,75 @@ bool PLEAdapter::configure()
 
 		std::cout << "LUMA: I've created the repo! " << std::endl;
 
-		// If the current rank has any information to exchange
-		//if (coordinates_.at(i).size() > 2)
-		//{
-			L_INFO("I'm creating the locators!", GridUtils::logfile);
+		L_INFO("I'm creating the locators!", GridUtils::logfile);
 
-			// Create space for the data to be written / read for the current repo. 
-			for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
+		// Create space for the data to be written / read for the current repo. 
+		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
+		{
+			if ((readJ->find("v") != std::string::npos) || (readJ->find("V") != std::string::npos))
 			{
-				if ((readJ->find("v") != std::string::npos) || (readJ->find("V") != std::string::npos))
-				{
-					std::cout << "LUMA: " << *readJ << std::endl;
-					initialiseVectorData(*readJ, 0.0, i);
-				}
-				else if ((readJ->find("t") != std::string::npos) || (readJ->find("T") != std::string::npos))
-				{
-					//exchangeData_->getRepo(i).initialiseScalarData(*readJ);
-					initialiseScalarData(*readJ, 0.0, i);
-				}
-				else
-				{
-					L_ERROR("Data type for " + *readJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
-				}
+				std::cout << "LUMA: " << *readJ << std::endl;
+				initialiseVectorData(*readJ, 0.0, i);
 			}
-			for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
+			else if ((readJ->find("t") != std::string::npos) || (readJ->find("T") != std::string::npos))
 			{
-				if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
-				{
-					//exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
-					L_INFO("Ready to intialise velocity data", GridUtils::logfile);
-					initialiseVectorData(*writeJ, 0.0, i);
-				}
-				else if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
-				{
-					//exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
-					initialiseScalarData(*writeJ, 0.0, i);
-				}
-				else
-				{
-					L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
-				}
+				//exchangeData_->getRepo(i).initialiseScalarData(*readJ);
+				initialiseScalarData(*readJ, 0.0, i);
 			}
+			else
+			{
+				L_ERROR("Data type for " + *readJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
+		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
+		{
+			if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
+			{
+				//exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
+				L_INFO("Ready to intialise velocity data", GridUtils::logfile);
+				initialiseVectorData(*writeJ, 0.0, i);
+			}
+			else if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
+			{
+				//exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
+				initialiseScalarData(*writeJ, 0.0, i);
+			}
+			else
+			{
+				L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
 
-			L_INFO("Creating PLE adapter..", GridUtils::logfile);
+		L_INFO("Creating PLE adapter..", GridUtils::logfile);
 
-			// Create and configure the PLE locator
-			addPLELocator(i);
+		// Create and configure the PLE locator
+		addPLELocator(i);
 
-			L_INFO("Interface created on mesh" + interfacesConfig_.at(i).meshName, GridUtils::logfile);
-		//}
+		//L_INFO("Interface created on mesh" + interfacesConfig_.at(i).meshName, GridUtils::logfile);
+
+		// Synchronise with CS after location
+		std::string messageToSend, messageReceived;
+		messageToSend = "coupling:start";
+
+		exchangeMessage(messageToSend, &messageReceived);
+		if (messageReceived.find("coupling:error:location") != std::string::npos)
+		{
+			L_WARN("Messge received from Code_Saturne: " + messageReceived + " indicates meshes have not been matche correctly. \n " +
+				" The calculation will not run.", GridUtils::logfile);
+
+			// Stop coupling
+			setSyncFlag(PLE_COUPLING_STOP);
+
+		}
+		else
+		{
+			L_INFO(" Mesh located for Code_Saturne mesh " + interfacesConfig_.at(i).meshName, GridUtils::logfile);
+		}
 
 	}
 
-	// Synchronise with CS (should be in a separate function maybe). 
-	std::string messageToSend, messageReceived;
-	messageToSend = "coupling:start";
-	exchangeMessage(messageToSend, &messageReceived);
-	if (messageReceived.find("coupling:error:location"))
-	{
-		L_ERROR("Coupling error", GridUtils::logfile);
-	}
+
+
 
 
   return true;
@@ -823,28 +830,21 @@ void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, doub
 
 	std::vector<double> coord;
 
-	if (GridUtils::safeGetRank() == 1)
+	// Fill in the coordinates vector. C style ordering
+	for (int i = 0; i < Nx; i++)
 	{
-		// Fill in the coordinates vector. C style ordering
-		for (int i = 0; i < Nx; i++)
+		for (int j = 0; j < Ny; j++)
 		{
-			for (int j = 0; j < Ny; j++)
+			for (int k = 0; k < Nz; k++)
 			{
-				for (int k = 0; k < Nz; k++)
-				{
-					coord.push_back(x0 + i * dx + dx / static_cast<double>(2.0));
-					coord.push_back(y0 + j * dx + dx / static_cast<double>(2.0));
-					coord.push_back(z0 + k * dx + dx / static_cast<double>(2.0));
-				}
+				coord.push_back(x0 + i * dx + dx / static_cast<double>(2.0));
+				L_INFO("Mesh coordinates: x " + std::to_string(coord.back()), GridUtils::logfile);
+
+				coord.push_back(y0 + j * dx + dx / static_cast<double>(2.0));
+				coord.push_back(z0 + k * dx + dx / static_cast<double>(2.0));
 			}
 		}
 	}
-	else
-	{
-		coord.push_back(-200);
-	}
-
-	//L_INFO(std::to_string(coord.size()), GridUtils::logfile);
 
 	if (i == coordinates_.size())
 	{

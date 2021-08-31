@@ -262,7 +262,7 @@ void PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 				// and the coordinates in point_coords. I think it is just XPos[pos[0]], YPos[pos[1]], ZPos[pos[2]]. Then divide it by dx and this should be smaller than 1
 				distance[p] = GridUtils::vecnorm(point_coords[3 * p] - grid->XPos.at(pos[0]),
 					point_coords[3 * p + 1] - grid->YPos.at(pos[1]),
-					point_coords[3 * p + 2] - grid->ZPos.at(pos[2])) / grid->dh;
+					point_coords[3 * p + 2] - grid->ZPos.at(pos[2]));// / grid->dh;
 				
 				if (distance[p] > 1)
 				{

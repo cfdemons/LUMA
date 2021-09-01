@@ -512,6 +512,16 @@ void PLEAdapter::addPLELocator(int i)
 
 	}
 
+	// If the CS mesh is a boundary, CS wants to know the luma_to_cs_dist
+	// TODO: It will always be a boundary in CS, so this will be done for all cases. But I should put something to check. 
+	ple_locator_exchange_point_var(locators_.at(i),
+		NULL,
+		lumaToCSdist.data(),
+		NULL,
+		sizeof(float),
+		1,
+		1);
+
 
 }
 

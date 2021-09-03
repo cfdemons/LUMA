@@ -567,6 +567,67 @@ void PLEAdapter::setSyncFlag(int flag)
 	pleCouplingFlag_ = flag | stop_mask;
 }
 
+void PLEAdapter::sendData()
+{
+	// For all the interfaces
+	for (int i = 0; i < interfacesConfig_.size(); i++)
+	{
+		// Check which ones have data to write to PLE
+		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
+		{
+			// Get the number of coupled points and their LUMA cell id
+			double nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
+			double* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
+
+			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
+			// pointInMesh should do the check for nested grids too to store the correct indices in IDCoupledPoints. 
+			// I think there is a function in GridUtils that returns the finest grid in a position.
+			// But what if the coupled surface takes more than one grid level?
+			// Then I'll have to get the grid for each point in the surface...
+			GridObj* currentGrid = LUMAGrid_->Grids;
+
+			if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
+			{
+				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// So it is OK to directly access the temperature array. Well, this version of LUMA has no temperature...
+
+				// TODO: Implement this when the LUMA version with temperature is ready. 
+
+				
+			}
+			else if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
+			{
+				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// So it is OK to directly access the velocity array. 
+				// For the moment the interpolation is just nearest neighbour. 
+				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<double> send_id(IDCoupledPoints);  //TODO! FIX THIS! HOW TO GO FROM DOUBLE* TO VECTOR.
+
+				for (int c = 0; c < nCoupledPoints; c++)
+				{
+					currentGrid->coupling_extractData("v", send_id, send_v);
+				}
+				
+	
+			}
+			else
+			{
+				L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
+	}
+
+
+	
+	// Extract the data to send from the LUMA grid. 
+
+
+}
+
+void PLEAdapter::receiveData()
+{
+}
+
 bool PLEAdapter::configure()
 {
     //Create a PLE locator for each PLE interface in the configuration file. 
@@ -757,19 +818,6 @@ bool PLEAdapter::configure()
   return true;
 }
 
-
-void PLEAdapter::execute()
-{
-    // The solver has already solved the equations for this timestep.
-    // Now call the adapter's methods to perform the coupling.
-
-    // Perform the exchange of information
-	// ple_locator_get_n_dist_points()
-	// ple_locator_get_dist_locations() 
-	// .... (see power point and recorded video). 
-
-
-}
 
 // I don't really know if I need this. Because I don't think PLE has a finalise function
 void PLEAdapter::finalize()

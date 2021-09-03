@@ -222,8 +222,11 @@ public:
 		//- Set synchronisation flag
 		void setSyncFlag(int flag);
 
-        //- Called at each time step. Returns the data to exchange with LUMIS. 
-        void execute();
+        //- Reads data from the LUMA grid and sends it to Code_Saturne
+        void sendData();
+
+		//- Reads data received from PLE (Code_Saturne) and incorporates it to the LUMA grid. 
+		void receiveData();
 
 		//- Finalize and destroy preCICE
 		void finalize();

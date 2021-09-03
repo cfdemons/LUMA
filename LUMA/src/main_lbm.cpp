@@ -451,6 +451,9 @@ int main( int argc, char* argv[] )
 		// TODO: I suppose I don't have to synchronise if LUMA is subcycling, so then I have to pass the don't syncronise flag?
 #ifdef L_ACTIVATE_PLE
 		bool hi = ple.synchronise(0);
+
+		// Read data from PLE into LUMA.
+		ple.receiveData();
 #endif
 
 		// Synchronise MPI processes before next time step starts
@@ -465,12 +468,17 @@ int main( int argc, char* argv[] )
 		if ((Grids->t + 1) % L_GRID_OUT_FREQ == 0 && rank == 0)
 			std::cout << "\rTime Step " << Grids->t + 1 << " of " << L_TOTAL_TIMESTEPS << " ------>" << std::flush;
 
-
 		///////////////////////
 		// Launch LBM Kernel //
 		///////////////////////
 
 		Grids->LBM_multi_opt();		// Launch LBM kernel on top-level grid
+
+#ifdef L_ACTIVATE_PLE
+		// Read data from LUMA and send it to PLE. 
+		ple.sendData();
+#endif
+
 
 
 		///////////////

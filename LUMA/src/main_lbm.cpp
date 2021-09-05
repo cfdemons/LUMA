@@ -450,7 +450,7 @@ int main( int argc, char* argv[] )
 		// Synchronise PLE applications before next time step starts
 		// TODO: I suppose I don't have to synchronise if LUMA is subcycling, so then I have to pass the don't syncronise flag?
 #ifdef L_ACTIVATE_PLE
-		bool hi = ple.synchronise(0);
+		ple.synchronise(0);
 
 		// Read data from PLE into LUMA.
 		ple.receiveData();
@@ -475,11 +475,12 @@ int main( int argc, char* argv[] )
 		Grids->LBM_multi_opt();		// Launch LBM kernel on top-level grid
 
 #ifdef L_ACTIVATE_PLE
+		// Make sure all the LUMA processes have gone through the LUMA loop
+		MPI_Barrier(mpim->world_comm);
+
 		// Read data from LUMA and send it to PLE. 
 		ple.sendData();
 #endif
-
-
 
 		///////////////
 		// Write Out //

@@ -576,7 +576,7 @@ void PLEAdapter::sendData()
 		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
 		{
 			// Get the number of coupled points and their LUMA cell id
-			double nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
+			size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
 			double* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
 
 			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
@@ -595,20 +595,29 @@ void PLEAdapter::sendData()
 
 				
 			}
+			else if ((writeJ->find("rho") != std::string::npos) || (writeJ->find("RHO") != std::string::npos))
+			{
+				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// For the moment the interpolation is just nearest neighbour. 
+				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<double> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+
+				currentGrid->coupling_extractData("rho", send_id, send_v);
+
+				ple_locator_exchange_point_var(locators_.at(i), send_v, NULL, NULL, sizeof(double), 1, 0);
+
+			}
 			else if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// So it is OK to directly access the velocity array. 
 				// For the moment the interpolation is just nearest neighbour. 
 				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
-				std::vector<double> send_id(IDCoupledPoints);  //TODO! FIX THIS! HOW TO GO FROM DOUBLE* TO VECTOR.
+				std::vector<double> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);  
 
-				for (int c = 0; c < nCoupledPoints; c++)
-				{
-					currentGrid->coupling_extractData("v", send_id, send_v);
-				}
+				currentGrid->coupling_extractData("v", send_id, send_v);
+
+				ple_locator_exchange_point_var(locators_.at(i), send_v, NULL, NULL, sizeof(double), 3, 0);
 				
-	
 			}
 			else
 			{

@@ -40,7 +40,7 @@ using namespace std;
 /// \param cellIDs	Cell indices at which to overwrite the data. The indices are local to the current grid and process.
 /// \param data		Data to write in the cellIDs indices. 
 // TODO: add an option to interpolate the data.
-void GridObj::coupling_addData(std::string name, std::vector<double>& cellIDs, std::vector<double>& data)
+void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs, const std::vector<double>& data)
 {
 	// Check that cellIDs and data are the same size and that the size is > 0
 	if ((cellIDs.size() == 0) || (cellIDs.size() != data.size()))
@@ -85,7 +85,7 @@ void GridObj::coupling_addData(std::string name, std::vector<double>& cellIDs, s
 /// \param cellIDs	Cell indices at which to extract the field data. The indices are local to the current grid and process.
 /// \param data		Vector in which to store the data. 
 // TODO: add an option to interpolate the data.
-void GridObj::coupling_extractData(std::string name, std::vector<double>& cellIDs, std::vector<double>& data)
+void GridObj::coupling_extractData(std::string name, const std::vector<int>& cellIDs, std::vector<double>& data)
 {
 	// Resise the vector data to the size of cellIDs
 	data.resize(cellIDs.size());

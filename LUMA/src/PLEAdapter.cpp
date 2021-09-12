@@ -606,6 +606,8 @@ void PLEAdapter::sendData()
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
 
+				// TODO: Implement unity conversion from LUMA density to Code_Saturne pressure 
+
 			}
 			else if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
 			{
@@ -616,7 +618,17 @@ void PLEAdapter::sendData()
 
 				currentGrid->coupling_extractData("v", send_id, send_v);
 
+				//for (int ii = 0; ii < nCoupledPoints; ii++)
+				//	L_INFO("Velocity sent: id " + std::to_string(IDCoupledPoints[ii]) +
+				//		" x: " + std::to_string(send_v[3 * ii]) +
+				//		" y: " + std::to_string(send_v[3 * ii + 1]) +
+				//		" z: " + std::to_string(send_v[3 * ii + 2]), GridUtils::logfile);
+
+				// Convert send_v from LUMA units to CS units. 
+				GridUnits::ulbm2ud(send_v, LUMAGrid_->Grids);
+
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 3, 0);
+
 				
 			}
 			else

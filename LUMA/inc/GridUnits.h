@@ -57,7 +57,8 @@ public:
 	{
 		return (u_lattice * currentGrid->dh * L_PHYSICAL_U) / currentGrid->dt;
 	}
-	
+
+
 	// *****************************************************************************
 	/// \brief	Converts velocity in dimensionless units to LBM units.
 	///
@@ -80,6 +81,13 @@ public:
 	static double ulbm2ud(T u_lbm, GridObj* currentGrid)
 	{
 		return (u_lbm * currentGrid->dh) / currentGrid->dt;
+	}
+
+	template <typename T>
+	static void ulbm2ud(std::vector<T>& u_lbm, GridObj* currentGrid)
+	{
+		for (int i = 0; i < u_lbm.size(); i++)
+			u_lbm[i] =  (u_lbm[i] * currentGrid->dh) / currentGrid->dt;
 	}
 
 	// *****************************************************************************

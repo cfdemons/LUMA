@@ -87,12 +87,11 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 // TODO: add an option to interpolate the data.
 void GridObj::coupling_extractData(std::string name, const std::vector<int>& cellIDs, std::vector<double>& data)
 {
-	// Resise the vector data to the size of cellIDs
-	data.resize(cellIDs.size());
-
 	// Chek which data to add. 
 	if ((name.find("v") != std::string::npos) || (name.find("V") != std::string::npos))
 	{
+		// Resise the vector data to the size of cellIDs (vector data)
+		data.resize(cellIDs.size() * L_DIMS);
 		for (int i = 0; i < cellIDs.size(); i++)
 		{
 			data[0 + i * L_DIMS] = u[0 + cellIDs[i] * L_DIMS];
@@ -104,6 +103,8 @@ void GridObj::coupling_extractData(std::string name, const std::vector<int>& cel
 	}
 	else if ((name.find("rho") != std::string::npos) || (name.find("RHO") != std::string::npos))
 	{
+		// Resise the vector data to the size of cellIDs
+		data.resize(cellIDs.size());
 		for (int i = 0; i < cellIDs.size(); i++)
 		{
 			data[i] = rho[cellIDs[i]];

@@ -173,7 +173,8 @@
 // Lattice properties
 #define L_DIMS 2													///< Number of dimensions to the problem
 #define L_RESOLUTION 100											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.00005										///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.00005										    ///< The timestep in non-dimensional units
+#define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
 
 // Non-dimensional domain dimensions
 #define L_BX 1.0															///< End of domain in X (non-dimensional units)
@@ -190,14 +191,14 @@
 #define L_PHYSICAL_THIGH 303.15   ///< High temperature in physical units [K]
 #define L_PHYSICAL_TLOW 293.15    ///< Low temperature in physical units [K]
 
-// Temperature initialization in physical units
+// Temperature initialization in physical units. If not defined boundary T, default L_TFluid
 #define L_PHYSICAL_TFLUID 298.15          ///< Intial main flow field temperature except BC [K]
 #define L_PHYSICAL_TBC_LEFT 293.15        ///< Initial left temperature.[K]
 #define L_PHYSICAL_TBC_RIGHT 303.15       ///< Initial right temperature.
-//#define L_PHYSICAL_TBC_BOTTOM 298.15    ///< Initial bottom temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_PHYSICAL_TBC_TOP 298.15       ///< Initial top temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_PHYSICAL_TBC_FRONT 298.15     ///< Initial front temperature.*** If not defined, boundary T set to L_TFluid ***
-//#define L_PHYSICAL_TBC_BACK 298.15      ///< Initial back temperature.*** If not defined, boundary T set to L_TFluid ***
+//#define L_PHYSICAL_TBC_BOTTOM 293.15    ///< Initial bottom temperature.
+//#define L_PHYSICAL_TBC_TOP 303.15       ///< Initial top temperature.
+//#define L_PHYSICAL_TBC_FRONT 298.15     ///< Initial front temperature.
+//#define L_PHYSICAL_TBC_BACK 298.15      ///< Initial back temperature.
 
 /*
 *******************************************************************************
@@ -225,7 +226,7 @@
 
 //#define L_ALPHA 0.028     ///< Thermal diffusive, if not defined, alpha calculate accorfing Pr number
 #define L_PR 0.71			///< Desired Prandtl number, which combined Re can used to define thermal diffusive (alpha)
-#define L_RA 1000.0       ///< Desired Rayleigh number
+#define L_RA 100000.0       ///< Desired Rayleigh number
 /*
 *******************************************************************************
 ****************************** Object Management ******************************

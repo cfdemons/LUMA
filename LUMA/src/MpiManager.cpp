@@ -700,7 +700,7 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 
 #ifdef L_TEMPERATURE	
 		// !!!Tag for passive scalar, set minus which is to distinguish the above term. 
-		TAG_T=((Grid->level + 1) * 1000) - ((Grid->region_number + 1) * 100) + dir;
+		TAG_T=((Grid->level + 1) * 1000) + ((Grid->region_number + 1) * 100) + dir+1;
 #endif
 
 #ifdef L_MPI_VERBOSE

@@ -157,27 +157,31 @@ void GridObj::LBM_initTemperature(){
 	for (int i = 0; i < N_lim; i++) {
 		for (int j = 0; j < M_lim; j++) {		
 			for (int k = 0; k < K_lim; k++) {
-
-				if (LatTTyp(i, j, k, M_lim, K_lim) == eIsothermal)	//isothermal wall condition
-				{
-#ifdef L_PHYSICAL_TBC_LEFT
-					T(0,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT);				//define left boundary temperature
+				if (LatTTyp(i, j, k, M_lim, K_lim) == eIsothermal){
+ #ifdef L_PHYSICAL_TBC_LEFT
+					if (XPos[i] <= L_WALL_THICKNESS_LEFT)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT);
 #endif
 #ifdef L_PHYSICAL_TBC_RIGHT
-					T(N_lim-1,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT);		//define right boundary temperature
+					if (XPos[i] >= GridManager::getInstance()->global_edges[eXMax][0] - L_WALL_THICKNESS_RIGHT)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT);
 #endif
 #ifdef L_PHYSICAL_TBC_BOTTOM
-					T(i,0,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BOTTOM);			//define bottom boundary temperature
+					if (YPos[j] <= L_WALL_THICKNESS_BOTTOM)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BOTTOM);
 #endif
 #ifdef L_PHYSICAL_TBC_TOP
-					T(i,M_lim,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP);			//define top boundary temperature
+					if (YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP);
 #endif
 #ifdef L_PHYSICAL_TBC_FRONT
-					T(i,j,0,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT);		//define front boundary temperature
+					if (ZPos[k] <= L_WALL_THICKNESS_FRONT)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT);
 #endif
 #ifdef L_PHYSICAL_TBC_BACK
-					T(i,j,K_lim-1,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK);		//define right back temperature
-#endif		
+					if (ZPos[k] >= GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
+						T(i,j,k,M_lim,K_lim) = GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK);
+#endif
 				}
 				else
 				{

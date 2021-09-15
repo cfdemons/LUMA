@@ -359,9 +359,11 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 		
 	}
 
-	// Isothermal BC refer to Gong et al paper
-	// Set left boundary isothermal
-	if (ttype_local == eIsothermal && i == 0)
+	// Isothermal BC refer to Gong et al paper https://doi.org/10.1016/j.ijheatmasstransfer.2014.08.092
+	// In further coding, the below should be written a function, and call function here.
+	// Set left boundary isothermal boundary
+#ifdef L_PHYSICAL_TBC_LEFT
+	if (ttype_local == eIsothermal && XPos[i] <= L_WALL_THICKNESS_LEFT)
 	{
 
 		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS]
@@ -393,8 +395,11 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			}
 		} 
 	}
-	// Set right boundary isothermal, 2D 
-	if (ttype_local == eIsothermal && i == N_lim-1)
+#endif
+
+#ifdef L_PHYSICAL_TBC_RIGHT
+	// Set right boundary isothermal boundary
+	if (ttype_local == eIsothermal && XPos[i] >= GridManager::getInstance()->global_edges[eXMax][0] - L_WALL_THICKNESS_RIGHT)
 	{
 
  		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] * u[1 + id * L_DIMS]
@@ -425,6 +430,139 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			}
 		} 
 	}
+#endif
+
+#ifdef L_PHYSICAL_TBC_BOTTOM
+	// Set bottom boundary isothermal boundary
+	if (ttype_local == eIsothermal && YPos[j] <= L_WALL_THICKNESS_BOTTOM)
+	{
+		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] + u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+ u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
+		double gNew_temp = 0.0;
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eYDirection] <= 0)
+				gNew_temp += gNew[v + id * L_NUM_VELS];
+		}
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_BOTTOM) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eYDirection] > 0)
+			{
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+ u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
+				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
+				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
+			}
+		}
+	}
+#endif
+
+#ifdef L_PHYSICAL_TBC_TOP
+	// Set top boundary isothermal boundary
+	if (ttype_local == eIsothermal && YPos[j] >= GridManager::getInstance()->global_edges[eYMax][0] - L_WALL_THICKNESS_TOP)
+	{
+		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] + u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+ u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
+		double gNew_temp = 0.0;
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eYDirection] >= 0)
+				gNew_temp += gNew[v + id * L_NUM_VELS];
+		}
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eYDirection] < 0)
+			{
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+ u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
+				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
+				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
+			}
+		}
+	}
+#endif
+
+#ifdef L_PHYSICAL_TBC_FRONT
+	// Set front boundary isothermal boundary
+	if (ttype_local == eIsothermal && ZPos[k] <= L_WALL_THICKNESS_FRONT)
+	{
+		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] + u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+ u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
+		double gNew_temp = 0.0;
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eZDirection] >= 0)
+				gNew_temp += gNew[v + id * L_NUM_VELS];
+		}
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eZDirection] < 0)
+			{
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+ u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
+				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
+				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
+			}
+		}
+	}
+#endif
+
+#ifdef L_PHYSICAL_TBC_BACK
+	// Set top boundary isothermal boundary
+	if (ttype_local == eIsothermal && ZPos[k] >= GridManager::getInstance()->global_edges[eZMax][0] - L_WALL_THICKNESS_BACK)
+	{
+		double gNew_uu = u[0 + id * L_DIMS] * u[0 + id * L_DIMS] + u[1 + id * L_DIMS] + u[1 + id * L_DIMS]
+#if (L_DIMS == 3)
+		+ u[2 + id * L_DIMS] * u[2 + id * L_DIMS]
+#endif
+		;
+		double gNew_temp = 0.0;
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eZDirection] <= 0)
+				gNew_temp += gNew[v + id * L_NUM_VELS];
+		}
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
+		for (int v = 0; v < L_NUM_VELS; ++v)
+		{
+			if(c_opt[v][eZDirection] > 0)
+			{
+				double gNew_eu = u[0 + id * L_DIMS] * c_opt[v][eXDirection] + u[1 + id * L_DIMS] * c_opt[v][eYDirection]
+#if (L_DIMS == 3)
+				+ u[2 + id * L_DIMS] * c_opt[v][eZDirection]
+#endif
+				;
+				double gNew_m = 1.0 + gNew_eu / SQ(cs) + gNew_eu * gNew_eu / SQ(cs) / SQ(cs) / 2.0 - gNew_uu / SQ(cs) / 2.0;
+				gNew[v + id * L_NUM_VELS] = w[v] * gNew_temp * gNew_m;
+			}
+		}
+	}
+#endif
 }
 
 // *****************************************************************************
@@ -1194,7 +1332,7 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	// When using Boussinesq assumption, the resultant force is changed because bouyant force change with temperature
 	// In Boussinesq, the force used in Luan's paper is considered here. https://doi.org/10.1002/fld.2685
 	force_xyz[L_GRAVITY_DIRECTION + id * L_DIMS] = (T[id] - GridUnits::tphys2lat(L_PHYSICAL_TFLUID))
-													* L_RA * nu * alpha / N_lim / N_lim / N_lim / L_TDIFF;
+													* L_RA * nu * alpha / L_CH_LENGTH / L_CH_LENGTH / L_CH_LENGTH / L_TDIFF;
 #endif	
 
 	// Reset the lattice forces
@@ -1240,7 +1378,6 @@ void GridObj::_LBM_forceGrid_opt(int id) {
 	}
 }
 
-/*********************Current do not consider BFL******************************/
 // *****************************************************************************
 /// \brief	Optimised BFL application.
 ///

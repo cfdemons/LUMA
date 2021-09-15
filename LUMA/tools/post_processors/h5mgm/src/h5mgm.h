@@ -91,7 +91,8 @@ enum eTType
 	eIsothermal, ///< Isothermal boundary
 	eAdiabat,	 ///< Adiabat boundary
 	eCHF,		 ///< Constant heat flux boundary
-	eTFluid		 ///< Thermal fluid site
+	eTFluid,		 ///< Thermal fluid site
+	eTRefined	 ///< Temperature field site which is represented on a finer grid
 };
 
 // Error enumeration

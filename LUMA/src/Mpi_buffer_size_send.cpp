@@ -90,7 +90,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],eYMax) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMin))
@@ -117,7 +121,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
 								(!GridUtils::isOnRecvLayer(g->YPos[j],eYMax) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMin))
@@ -143,7 +151,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
@@ -169,7 +181,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
@@ -195,7 +211,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) &&
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
@@ -222,7 +242,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) &&
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
@@ -248,7 +272,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMin) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMax)
@@ -274,7 +302,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (k = 0; k < K_lim; k++) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if (  GridUtils::isOnSenderLayer(g->XPos[i],eXMax) && 
 								GridUtils::isOnSenderLayer(g->YPos[j],eYMin)
@@ -305,7 +337,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -328,7 +364,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -351,7 +391,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -374,7 +418,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -397,7 +445,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
@@ -420,7 +472,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -443,7 +499,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
@@ -466,7 +526,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -489,7 +553,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
@@ -512,7 +580,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -535,7 +607,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -558,7 +634,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(!GridUtils::isOnRecvLayer(g->YPos[j],eYMin) && !GridUtils::isOnRecvLayer(g->YPos[j],eYMax)) &&
@@ -581,7 +661,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -604,7 +688,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
@@ -627,7 +715,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -650,7 +742,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (!GridUtils::isOnRecvLayer(g->XPos[i],eXMin) && !GridUtils::isOnRecvLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&
@@ -673,7 +769,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_back) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMax)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMin)) &&
@@ -696,7 +796,11 @@ void MpiManager::mpi_buffer_size_send(GridObj* const g) {
 					for (range_k_front) {
 
 						// Check conditions for sender
-						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined)	// Do not pass refined sites as zero anyway
+						if (g->LatTyp(i,j,k,M_lim,K_lim) != eRefined
+#ifdef L_TEMPERATURE
+						&& (g->LatTTyp(i,j,k,M_lim,K_lim) != eTRefined)
+#endif
+						)	// Do not pass refined sites as zero anyway
 						{
 							if ( (GridUtils::isOnSenderLayer(g->XPos[i],eXMin)) && 
 									(GridUtils::isOnSenderLayer(g->YPos[j],eYMax)) &&

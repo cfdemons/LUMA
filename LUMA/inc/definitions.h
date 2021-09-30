@@ -171,7 +171,7 @@
 */
 
 // Lattice properties
-#define L_DIMS 2													///< Number of dimensions to the problem
+#define L_DIMS 3													///< Number of dimensions to the problem
 #define L_RESOLUTION 100											///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.00005										    ///< The timestep in non-dimensional units
 #define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
@@ -179,7 +179,7 @@
 // Non-dimensional domain dimensions
 #define L_BX 1.0															///< End of domain in X (non-dimensional units)
 #define L_BY 1.0		                                                    ///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
+#define L_BZ 0.2															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
@@ -197,8 +197,8 @@
 #define L_PHYSICAL_TBC_RIGHT 303.15       ///< Initial right temperature.
 //#define L_PHYSICAL_TBC_BOTTOM 293.15    ///< Initial bottom temperature.
 //#define L_PHYSICAL_TBC_TOP 303.15       ///< Initial top temperature.
-//#define L_PHYSICAL_TBC_FRONT 298.15     ///< Initial front temperature.
-//#define L_PHYSICAL_TBC_BACK 298.15      ///< Initial back temperature.
+//#define L_PHYSICAL_TBC_FRONT 293.15     ///< Initial front temperature.
+//#define L_PHYSICAL_TBC_BACK 303.15      ///< Initial back temperature.
 
 /*
 *******************************************************************************

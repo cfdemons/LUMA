@@ -413,7 +413,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if (c_opt[v][eXDirection] >= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT) - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_RIGHT) - gNew_temp) / (1.0 - 3.0 * u[0 + id * L_DIMS] + 3.0 * 
 					u[0 + id * L_DIMS] * u[0 + id * L_DIMS]);
 
 		for (int v = 0; v < L_NUM_VELS; ++v)
@@ -480,7 +480,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if(c_opt[v][eYDirection] >= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_TOP) -gNew_temp) / (1.0 - 3.0 * u[1 + id * L_DIMS] + 3.0 *
 					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{
@@ -513,8 +513,8 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if(c_opt[v][eZDirection] >= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
-					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_FRONT) -gNew_temp) / (1.0 + 3.0 * u[2 + id * L_DIMS] + 3.0 *
+					u[2 + id * L_DIMS] * u[2 + id * L_DIMS]);
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{
 			if(c_opt[v][eZDirection] < 0)
@@ -546,7 +546,7 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if(c_opt[v][eZDirection] <= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK) -gNew_temp) / (1.0 + 3.0 * u[1 + id * L_DIMS] + 3.0 *
+		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_BACK) -gNew_temp) / (1.0 - 3.0 * u[1 + id * L_DIMS] + 3.0 *
 					u[1 + id * L_DIMS] * u[1 + id * L_DIMS]);
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{

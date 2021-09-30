@@ -1607,6 +1607,8 @@ eType GridObj::LBM_setBCPrecedence(eType currentBC, eType desiredBC)
 eTType GridObj::LBM_setTBCPrecedence(eTType currentBC, eTType desiredBC)
 {
 	if (currentBC == eAdiabat || desiredBC == eAdiabat) return eAdiabat;
-	else return desiredBC;
+	else if(currentBC == eIsothermal)	return eIsothermal;
+	else
+		return desiredBC;
 }
 // ***************************************************************************************************

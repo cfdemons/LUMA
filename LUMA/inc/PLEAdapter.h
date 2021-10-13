@@ -59,7 +59,6 @@ private:
         std::vector<std::string> readData;
 		std::vector<int> dimensions;
 		std::vector<double> position;
-		std::vector<double> offset;
     };
 
 	//- Tolerance in percentage for the location of points
@@ -69,7 +68,7 @@ private:
     std::vector<struct InterfaceConfig> interfacesConfig_;
 
 	//- Data to exchange with GASCANS
-	InOutData* exchangeData_;
+	//InOutData* exchangeData_;
 
     // Configuration parameters used in the Adapter
 
@@ -117,7 +116,7 @@ private:
 													// They are in the local LUMA coordinate system. LUMA_coord = World_coord - offset_
 	std::vector<std::map<std::string, std::vector<double>>> vectorData_;
 	std::vector<std::map<std::string, std::vector<double>>> scalarData_;
-	std::vector<std::vector<double>> offset_; // Offset between the start of LUMA mesh and the start of the world coordinate system. 
+	std::vector<double> offset_; // Offset between the start of LUMA mesh and the start of the world coordinate system. 
 	                                          // The world coordinate system is the same for LUMA and Code Saturne. 
 
 	void exchangeMessage(const std::string &messageToSend, std::string *messageReceived);

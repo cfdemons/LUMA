@@ -355,82 +355,47 @@ void PLEAdapter::exchangeMessage(const std::string &messageToSend, std::string *
 
 bool PLEAdapter::configFileRead()
 {
-	//Read the configuration file //
+	//Read the data from definitions.h //
+	
+	participantName_ = L_PLE_PARTICIPANT_NAME;
+	//std::string app_type = "LUMA";
+	//std::string app_name = "LEFT"; // Name of the domain. It is in the mpi command line, or I can also write it in the config file?
+								   // I think it is better to read from mpi command line so that there is only one config file. I don't like it but it is 
+								   // what CS does.
+	tolerance_ = 0.0; // LUMA isOnRank(...) doesn't work with tolerance.
 
-	// Hardcoded for the moment
-	participantName_ = "LUMA";
+	offset_.push_back(L_PLE_OFFSET_X);
+	offset_.push_back(L_PLE_OFFSET_Y);
+	offset_.push_back(L_PLE_OFFSET_Z);
 
-	/*std::cout << "Reading the adapter's YAML configuration file " << adapterConfigFileName_ << "..." << std::endl;
+	// NOTE: This might be different if using grid refinement!!
+	int dh = LUMAGrid_->Grids->dh;
 
-    if (!configFileCheck()) return false;
+	for (int i = 0; i < L_PLE_INTERFACES; i++)
+	{
+		InterfaceConfig pleInt;
 
-    // Load the YAML file
-    YAML::Node adapterConfig_ = YAML::LoadFile(adapterConfigFileName_);
+		pleInt.meshName = pleName[i];
 
-    // Read the preCICE participant name
-    participantName_ = adapterConfig_["participant"].as<std::string>();
-    std::cout << "  participant : " << participantName_ << std::endl;
+		pleInt.position.push_back(plePosX[i]);
+		pleInt.position.push_back(plePosY[i]);
+		pleInt.position.push_back(plePosZ[i]);
 
-    // Read the preCICE configuration file name
-    preciceConfigFilename_ = adapterConfig_["precice-config-file"].as<std::string>();
-	std::cout << "  precice-config-file : " << preciceConfigFilename_ << std::endl;
+		pleInt.dimensions.push_back(static_cast<int>(pleSizeX[i]/dh));
+		pleInt.dimensions.push_back(static_cast<int>(pleSizeY[i] / dh));
+		pleInt.dimensions.push_back(static_cast<int>(pleSizeZ[i] / dh));
 
-    YAML::Node adapterConfigInterfaces = adapterConfig_["interfaces"];
-    std::cout << "  interfaces : " << std::endl;
-    for (int i = 0; i < adapterConfigInterfaces.size(); i++)
-    {
-        struct InterfaceConfig interfaceConfig;
-        interfaceConfig.meshName = adapterConfigInterfaces[i]["mesh"].as<std::string>();
-        std::cout << "  - mesh      : " << interfaceConfig.meshName << std::endl;
+		for (char const &c : pleRead[i])
+		{
+			pleInt.readData.push_back(std::to_string(c));
+		}
+		for (char const &c : pleWrite[i])
+		{
+			pleInt.writeData.push_back(std::to_string(c));
+		}
 
-		interfaceConfig.coordFileName = adapterConfigInterfaces[i]["coordFileName"].as<std::string>();
-		std::cout << "  - coordinate file Name      : " << interfaceConfig.coordFileName << std::endl;
-
-        if (adapterConfigInterfaces[i]["write-data"])
-        {
-            std::cout << "    write-data : " << std::endl;
-            if (adapterConfigInterfaces[i]["write-data"].size() > 0)
-            {
-                for (int j = 0; j < adapterConfigInterfaces[i]["write-data"].size(); j++)
-                {
-                    interfaceConfig.writeData.push_back(adapterConfigInterfaces[i]["write-data"][j].as<std::string>());
-                    std::cout << "      " << interfaceConfig.writeData[j] << std::endl;
-                }
-            }
-            else
-            {
-                interfaceConfig.writeData.push_back(adapterConfigInterfaces[i]["write-data"].as<std::string>());
-                std::cout << "      " << interfaceConfig.writeData[i] << std::endl;
-            }
-        }
-
-        if (adapterConfigInterfaces[i]["read-data"])
-        {
-            std::cout << "    read-data : " << std::endl;
-            if (adapterConfigInterfaces[i]["read-data"].size() > 0)
-            {
-                for (int j = 0; j < adapterConfigInterfaces[i]["read-data"].size(); j++)
-                {
-                    interfaceConfig.readData.push_back(adapterConfigInterfaces[i]["read-data"][j].as<std::string>());
-                    std::cout << "      " << interfaceConfig.readData[j] << std::endl;
-                }
-            }
-            else
-            {
-                interfaceConfig.readData.push_back(adapterConfigInterfaces[i]["read-data"].as<std::string>());
-                std::cout << "      " << interfaceConfig.readData[i] << std::endl;
-            }
-        }
-
-        interfacesConfig_.push_back(interfaceConfig);
-    }
-
-    // Set the subcyclingAllowed_ switch
-    if (adapterConfig_["subcycling"])
-    {
-        subcyclingAllowed_ = adapterConfig_["subcycling"].as<bool>();
-    }
-    std::cout << "    subcycling : " << subcyclingAllowed_ << std::endl;*/
+		interfacesConfig_.push_back(pleInt);
+	}
 
     return true;
 }
@@ -655,35 +620,8 @@ bool PLEAdapter::configure()
 	// ple_locator_set_mesh. Do I need PLEInterface? Or just a vector of ple_locators? 
 	// I'll start with just a vector of PLE locators
 
-	// Read PLE adapter configuration file. 
+	// Read PLE adapter configuration file.  
 	configFileRead(); 
-
-	// ** DEBUG!!!! This data should be read from the Config file but I hard code it here just to test. **//
-	std::string app_type = "LUMA";
-	std::string app_name = "LEFT"; // Name of the domain. It is in the mpi command line, or I can also write it in the config file?
-								   // I think it is better to read from mpi command line so that there is only one config file. I don't like it but it is 
-	                               // what CS does.
-	double tolerance = 0.0;  // LUMA isOnRank(...) doesn't work with tolerance. 
-	tolerance_ = tolerance;
-	InterfaceConfig CS_inlet_position;
-	CS_inlet_position.dimensions.push_back(1); 
-	CS_inlet_position.dimensions.push_back(20);
-	CS_inlet_position.dimensions.push_back(10);
-
-	CS_inlet_position.meshName = "CS_inlet";
-	CS_inlet_position.position.push_back(1.5);
-	CS_inlet_position.position.push_back(0.0);
-	CS_inlet_position.position.push_back(0.0);
-
-	CS_inlet_position.offset.push_back(0.0);
-	CS_inlet_position.offset.push_back(0.0);
-	CS_inlet_position.offset.push_back(0.0);
-
-	//CS_inlet_position.readData.push_back(" "); // LUMA is not reading anything from CS, so readData is empty.
-	CS_inlet_position.writeData.push_back("v");
-
-	interfacesConfig_.push_back(CS_inlet_position);
-
 
 	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
 
@@ -736,26 +674,12 @@ bool PLEAdapter::configure()
 	{
 		std::cout << "LUMA: I'm in the interface loop! " << std::endl;
 
-		// Create the data storage for the interface
-		// Precice doesn't need to know the offset between LUMA coordinates and world coordinates for the moment. 
-		// coordFileName is in world coordinates. I'm not sure about this coordFileName with PLE coupling. 
-		//exchangeData_->addRepo(interfacesConfig_.at(i).coordFileName, 0, 0, 0);
-		//exchangeData_->addRepo(interfaceI->dimensions.at(0), interfaceI->dimensions.at(1), interfaceI->dimensions.at(2),
-		//					   interfaceI->position.at(0), interfaceI->position.at(1), interfaceI->position.at(2),
-		//					   LUMAGrid_->Grids->dh);
-
-		// Save the offset between world and LUMA coordinates
-		std::vector<double> off;
-		for (int j = 0; j < L_DIMS; j++)
-			off.push_back(interfacesConfig_.at(i).offset.at(j));
-		offset_.push_back(off);
-		
 		setCoordinates(interfacesConfig_.at(i).dimensions.at(0),
 		   interfacesConfig_.at(i).dimensions.at(1),
 		   interfacesConfig_.at(i).dimensions.at(2),
-		   interfacesConfig_.at(i).position.at(0) - off.at(0),
-		   interfacesConfig_.at(i).position.at(1) - off.at(1),
-		   interfacesConfig_.at(i).position.at(2) - off.at(2),
+		   interfacesConfig_.at(i).position.at(0) + offset_.at(0),
+		   interfacesConfig_.at(i).position.at(1) + offset_.at(1),
+		   interfacesConfig_.at(i).position.at(2) + offset_.at(2),
 		   LUMAGrid_->Grids->dh, i);
 		
 

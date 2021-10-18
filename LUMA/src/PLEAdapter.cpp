@@ -80,10 +80,10 @@ bool PLEAdapter::synchronise(int flags)
 
 	ple_coupling_mpi_set_synchronize(pleSets_, sync_flags, LUMAGrid_->Grids->dt);
 
-	printf("CS: Hi after ple synchronise. \n");
+	printf("LUMA: Hi after ple synchronise. \n");
 
 	app_status = ple_coupling_mpi_set_get_status(pleSets_);
-	
+
 	app_ts = ple_coupling_mpi_set_get_timestep(pleSets_);
 
 	/* Check if we should use the smallest time step */
@@ -381,18 +381,24 @@ bool PLEAdapter::configFileRead()
 		pleInt.position.push_back(plePosY[i]);
 		pleInt.position.push_back(plePosZ[i]);
 
-		pleInt.dimensions.push_back(static_cast<int>(pleSizeX[i]/dh));
+		pleInt.dimensions.push_back(static_cast<int>(pleSizeX[i] / dh));
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeY[i] / dh));
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeZ[i] / dh));
 
-		for (char const &c : pleRead[i])
+		std::cout << " Read data " << pleRead[i] << " Write data " << pleWrite[i] << std::endl;
+		
+		for (char const c : pleRead[i])
 		{
-			pleInt.readData.push_back(std::to_string(c));
+			std::cout << c << std::endl;
+			pleInt.readData.push_back(c);
 		}
-		for (char const &c : pleWrite[i])
+		for (int c = 0; c < pleWrite[i].size(); c++)
 		{
-			pleInt.writeData.push_back(std::to_string(c));
+			std::cout << pleWrite[i][c] << std::endl;
+			pleInt.writeData.push_back(pleWrite[i][c]);
 		}
+
+		std::cout << "ple Write data " <<  pleInt.writeData[0] << std::endl;
 
 		interfacesConfig_.push_back(pleInt);
 	}
@@ -551,7 +557,7 @@ void PLEAdapter::sendData()
 			// Then I'll have to get the grid for each point in the surface...
 			GridObj* currentGrid = LUMAGrid_->Grids;
 
-			if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
+			if ((*writeJ == 't') || (*writeJ == 'T'))
 			{
 				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// So it is OK to directly access the temperature array. Well, this version of LUMA has no temperature...
@@ -560,7 +566,7 @@ void PLEAdapter::sendData()
 
 				
 			}
-			else if ((writeJ->find("rho") != std::string::npos) || (writeJ->find("RHO") != std::string::npos))
+			else if ((*writeJ == 'r') || (*writeJ == 'R'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// For the moment the interpolation is just nearest neighbour. 
@@ -574,7 +580,7 @@ void PLEAdapter::sendData()
 				// TODO: Implement unity conversion from LUMA density to Code_Saturne pressure 
 
 			}
-			else if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
+			else if ((*writeJ == 'v') || (*writeJ == 'V'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// For the moment the interpolation is just nearest neighbour. 
@@ -589,6 +595,8 @@ void PLEAdapter::sendData()
 				//		" y: " + std::to_string(send_v[3 * ii + 1]) +
 				//		" z: " + std::to_string(send_v[3 * ii + 2]), GridUtils::logfile);
 
+				std::cout << "LUMA send_v size " << std::to_string(send_v.size()) << " coupled points " << std::to_string(nCoupledPoints) << std::endl;
+
 				// Convert send_v from LUMA units to CS units. 
 				GridUnits::ulbm2ud(send_v, LUMAGrid_->Grids);
 
@@ -598,7 +606,7 @@ void PLEAdapter::sendData()
 			}
 			else
 			{
-				L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+				L_ERROR("Data type for " + std::to_string(*writeJ) + " not recognised. The data to transfer to/from PLE has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
 	}
@@ -622,6 +630,7 @@ bool PLEAdapter::configure()
 
 	// Read PLE adapter configuration file.  
 	configFileRead(); 
+	std::cout << "I've read the configuration file. " << std::endl;
 
 	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
 
@@ -694,37 +703,37 @@ bool PLEAdapter::configure()
 		// Create space for the data to be written / read for the current repo. 
 		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
 		{
-			if ((readJ->find("v") != std::string::npos) || (readJ->find("V") != std::string::npos))
+			if ((*readJ == 'v') || (*readJ == 'V'))
 			{
-				std::cout << "LUMA: " << *readJ << std::endl;
-				initialiseVectorData(*readJ, 0.0, i);
+				std::cout << "LUMA: " << std::to_string(*readJ) << std::endl;
+				initialiseVectorData("v", 0.0, i);
 			}
-			else if ((readJ->find("t") != std::string::npos) || (readJ->find("T") != std::string::npos))
+			else if ((*readJ == 't') || (*readJ == 'T'))
 			{
 				//exchangeData_->getRepo(i).initialiseScalarData(*readJ);
-				initialiseScalarData(*readJ, 0.0, i);
+				initialiseScalarData("t", 0.0, i);
 			}
 			else
 			{
-				L_ERROR("Data type for " + *readJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+				L_ERROR("Data type for " + std::to_string(*readJ) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
 		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
 		{
-			if ((writeJ->find("v") != std::string::npos) || (writeJ->find("V") != std::string::npos))
+			if ((*writeJ == 'v') || (*writeJ == 'V'))
 			{
 				//exchangeData_->getRepo(i).initialiseVectorData(*writeJ);
 				L_INFO("Ready to intialise velocity data", GridUtils::logfile);
-				initialiseVectorData(*writeJ, 0.0, i);
+				initialiseVectorData("v", 0.0, i);
 			}
-			else if ((writeJ->find("t") != std::string::npos) || (writeJ->find("T") != std::string::npos))
+			else if ((*writeJ == 't') || (*writeJ == 'T'))
 			{
 				//exchangeData_->getRepo(i).initialiseScalarData(*writeJ);
-				initialiseScalarData(*writeJ, 0.0, i);
+				initialiseScalarData("t", 0.0, i);
 			}
 			else
 			{
-				L_ERROR("Data type for " + *writeJ + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+				L_ERROR("Data type for " + std::to_string(*writeJ) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
 

@@ -55,8 +55,8 @@ private:
     {
         std::string meshName;
 		std::string coordFileName;
-        std::vector<std::string> writeData;
-        std::vector<std::string> readData;
+        std::vector<char> writeData;
+        std::vector<char> readData;
 		std::vector<int> dimensions;
 		std::vector<double> position;
     };

@@ -385,6 +385,7 @@ bool PLEAdapter::configFileRead()
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeY[i] / dh));
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeZ[i] / dh));
 
+//??? Why reading is different from writting?
 		std::cout << " Read data " << pleRead[i] << " Write data " << pleWrite[i] << std::endl;
 		
 		for (char const c : pleRead[i])
@@ -682,7 +683,7 @@ bool PLEAdapter::configure()
 	for (int i = 0; i < interfacesConfig_.size(); i++)
 	{
 		std::cout << "LUMA: I'm in the interface loop! " << std::endl;
-
+		// get inside grids information to send PLE
 		setCoordinates(interfacesConfig_.at(i).dimensions.at(0),
 		   interfacesConfig_.at(i).dimensions.at(1),
 		   interfacesConfig_.at(i).dimensions.at(2),

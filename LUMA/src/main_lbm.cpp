@@ -49,7 +49,7 @@
 #include "../inc/ObjectManager.h"	// Object manager class definition
 #include "../inc/PCpts.h"			// Point cloud class
 
-#ifdef L_ACTIVATE_PLE
+#ifdef L_ACTIVATE_PLE	//
 #include "../inc/PLEAdapter.h"
 #endif
 
@@ -328,7 +328,7 @@ int main( int argc, char* argv[] )
 	****************************************************************************
 	*/
 
-#ifdef L_ACTIVATE_PLE
+#ifdef L_ACTIVATE_PLE //
 
 #if (L_NUM_LEVELS > 0)
 	L_ERROR("PLE coupling with mesh refinement not implemented yet.", GridUtils::logfile);
@@ -339,7 +339,7 @@ int main( int argc, char* argv[] )
 	PLEAdapter ple;
 
 	// Initialise the adapter
-	ple.init("./input/PLEConfig.yml",Grids->dt, gm, mpim);
+	ple.init("./input/PLEConfig.yml",Grids->dt, gm, mpim);	//??
 	ple.configure();
 
 #endif
@@ -449,7 +449,7 @@ int main( int argc, char* argv[] )
 
 		// Synchronise PLE applications before next time step starts
 		// TODO: I suppose I don't have to synchronise if LUMA is subcycling, so then I have to pass the don't syncronise flag?
-#ifdef L_ACTIVATE_PLE
+#ifdef L_ACTIVATE_PLE//
 		ple.synchronise(0);
 
 		// Read data from PLE into LUMA.
@@ -474,7 +474,7 @@ int main( int argc, char* argv[] )
 
 		Grids->LBM_multi_opt();		// Launch LBM kernel on top-level grid
 
-#ifdef L_ACTIVATE_PLE
+#ifdef L_ACTIVATE_PLE   //
 		// Make sure all the LUMA processes have gone through the LUMA loop
 		MPI_Barrier(mpim->world_comm);
 

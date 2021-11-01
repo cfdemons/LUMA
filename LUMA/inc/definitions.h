@@ -145,7 +145,7 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 1		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 1     ///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 
@@ -188,7 +188,7 @@
 */
 
 #define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
-#define L_PLE_PARTICIPANT_NAME "LUMA"   ///< Name of this LUMA instance
+#define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
 #define L_PLE_OFFSET_Y (-1.0/L_RESOLUTION)
 #define L_PLE_OFFSET_Z 0.0
@@ -198,12 +198,12 @@
 static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet" };
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = { 5.0 }; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = { 1.5 }; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
-static double pleSizeX[L_PLE_INTERFACES] = { (-1.0 / L_RESOLUTION) }; ///< X component 
+static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION) }; ///< X component 
 static double pleSizeY[L_PLE_INTERFACES] = { 2.0 }; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component 
 

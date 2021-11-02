@@ -69,7 +69,13 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 			rho[cellIDs[i]] = data[i];
 		}
 	}
-	// Add temperature when ready
+	else if ((name.find("temperature") != std::string::npos) || (name.find("TEMPERATURE") != std::string::npos))
+	{
+		for (int i = 0; i < cellIDs.size(); i++)
+		{
+			T[cellIDs[i]] = data[i];
+		}
+	}
 	else
 	{
 		L_ERROR(" LUMA tried to read in external data but LUMA doesn't contain a solved variable called " + name, GridUtils::logfile);
@@ -110,7 +116,17 @@ void GridObj::coupling_extractData(std::string name, const std::vector<int>& cel
 			data[i] = rho[cellIDs[i]];
 		}
 	}
-	// Add temperature when ready
+	else if((name.find("temperature") != std::string::npos) || (name.find("TEMPERATURE") != std::string::npos))
+	{
+		
+		// Resise the scalar data to the size of cellIDs
+		data.resize(cellIDs.size());
+		for (int i = 0; i < cellIDs.size(); i++)
+		{
+			data[i] = T[cellIDs[i]];
+		}
+	
+	}
 	else
 	{
 		L_ERROR(" LUMA tried to read in external data but LUMA doesn't contain a solved variable called " + name, GridUtils::logfile);

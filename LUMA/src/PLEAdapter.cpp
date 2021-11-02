@@ -561,8 +561,13 @@ void PLEAdapter::sendData()
 			if ((*writeJ == 't') || (*writeJ == 'T'))
 			{
 				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// So it is OK to directly access the temperature array. Well, this version of LUMA has no temperature...
+				// So it is OK to directly access the temperature array.
+				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
+				currentGrid->coupling_extractData("temperature", send_id, send_v);
+
+				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
 				// TODO: Implement this when the LUMA version with temperature is ready. 
 
 				

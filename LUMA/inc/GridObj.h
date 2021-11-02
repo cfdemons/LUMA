@@ -81,7 +81,7 @@ private :
 	IVector<double> feq;			///< Equilibrium distribution functions
 	IVector<double> fNew;			///< Copy of distribution functions
 	IVector<double> u;				///< Macropscopic velocity components
-	IVector<double> u_n;			///< Macropscopic velocity components at start of current time step
+	IVector<double> u_n;			///< Macropscopic velocity components at start of current time step (IBM)
 	IVector<double> force_xyz;		///< Macroscopic body force components
 	IVector<double> force_i;		///< Mesoscopic body force components
 	
@@ -158,6 +158,13 @@ public :
 	eType LBM_setBCPrecedence(eType currentBC, eType desiredBC);		// Determine BC based on any existing BC
 	eTType LBM_setTBCPrecedence(eTType currentBC, eTType desiredBC);	// Determine temperature BC based on any existing BC
 
+	// External coupling functions
+	// NOTE: I will have to think about doing an addVelociy, addDensity, addTemperature. If the coupling is through multiple grids I might
+	        // have to continuously call this function for one value at a time. The conditional that selects the variable to read might slow down 
+	        // the code significally. 
+	void coupling_addData(std::string name, std::vector<double> &cellIDs, std::vector<double> &data);   // Adds the data in "data" at the positions of "cellIDs" in the LUMA variable "name" 
+	void coupling_extractData(std::string name, std::vector<double> &cellIDs, std::vector<double> &data);   // Writes the data in the LUMA variable "name" in the positions of "cellIDs" to the "data" vector
+
 	// LBM operations
 	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator
 	void LBM_macro(int i, int j, int k);
@@ -165,6 +172,10 @@ public :
 
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
+
+	// Coupling class
+	void coupling_addData(std::string name, const std::vector<int> &cellIDs, const std::vector<double> &data);
+	void coupling_extractData(std::string name, const std::vector<int> &cellIDs, std::vector<double> &data);
 
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file

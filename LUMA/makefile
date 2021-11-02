@@ -1,13 +1,18 @@
 # LUMA Makefile
 
 # Compiler command
+<<<<<<< HEAD
 ifeq (${MPICXX},)
    MPICXX=mpicxx
 endif
 CFLAGS=-O3 -std=c++0x -w -fopenmp
+=======
+CC=mpicxx
+CFLAGS=-O3 -std=c++14 -w -fopenmp
+>>>>>>> CodeSaturne
 
 # Executable
-EXE=LUMA
+EXE=./LUMA
 
 # Location of source, header and object files
 DIR=./
@@ -20,11 +25,17 @@ SRCS:=$(wildcard $(SDIR)/*.cpp)
 OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 
 # Include and library file
+<<<<<<< HEAD
 INC=-I$(HDF5_HOME)/include
 LIBDIR=-L$(HDF5_HOME)/lib
 ifeq (${LIB},)
    LIB=-lhdf5 -llapack
 endif
+=======
+INC=-I$(HDF5_HOME)/include -I$ /home/p62934yz/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/include/
+LIB=-L$(HDF5_HOME)/lib -L/home/p62934yz/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/lib/ -lhdf5 -llapack -lple
+
+>>>>>>> CodeSaturne
 
 ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)

@@ -23,6 +23,10 @@
 #include "../inc/stdafx.h"
 #include "../inc/GridObj.h"
 
+#ifdef L_ACTIVATE_PLE
+#include "ple_coupling.h"
+#endif
+
 // Static declarations
 MpiManager* MpiManager::me;
 
@@ -57,8 +61,11 @@ MpiManager::MpiManager()
 	g_buffer_send.resize(L_MPI_DIRS, std::vector<double>(0));
 	g_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
 #endif
+
+	std::cout << "hello before mpi_init" << std::endl;
 	// Initialise the manager, grid information and topology
 	mpi_init();
+	std::cout << "hello after mpi_init" << std::endl;
 
 	// Resize the IBM-MPI helper classes for each grid level
 	markerCommOwnerSide.resize(L_NUM_LEVELS+1);
@@ -84,7 +91,11 @@ MpiManager::~MpiManager(void)
 /// Instance creator
 MpiManager* MpiManager::getInstance() {
 
-	if (!me) me = new MpiManager();	// Private construction
+	if (!me)
+	{
+		std::cout << "MPI manager doesn't exist already" << std::endl;
+		me = new MpiManager();	// Private construction
+	}
 	return me;						// Return pointer to new object
 
 }
@@ -127,6 +138,9 @@ void MpiManager::mpi_init()
 	for (int i = 0; i < L_DIMS; i++) {
 	  total_cores *= dimensions[i];
 	}
+	// If coupled with PLE, the total_cores will be less than than the initial_num_ranks, 
+	// since initial_num_ranks contains the ranks that the coupled code is using
+#ifndef L_ACTIVATE_PLE
 	if (total_cores != initial_num_ranks) {
 	  if (initial_my_rank == 0) {
 	    std::cerr << "ERROR: The total number of cores (" + std::to_string(total_cores)+") in the MPI topology defined by L_MPI_<d>CORES for a "+
@@ -135,8 +149,33 @@ void MpiManager::mpi_init()
 	  }
 	  abort();
 	}
+#endif
+
+// If using PLE create an extra MPI communicator that takes all the LUMA processes
+#ifdef L_ACTIVATE_PLE
+
+	//TODO: Should this be somehow part of PLEAdapter?
+	appNum = ple_coupling_mpi_name_to_id(MPI_COMM_WORLD, "LUMA");
+
+	if (appNum > -1)
+	{
+		// Create communicator for the LUMA processes. 
+		MPI_Comm_split(MPI_COMM_WORLD, appNum, initial_my_rank, &ple_comm);
+
+		// Create the cartesian group split from the ple communicator
+		MPI_Cart_create(ple_comm, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
+
+	}
+	else
+	{
+		L_ERROR("PLE coupling is activated but other coupled codes are not detected. Comment L_ACTIVATE_PLE to run LUMA on its own.", logout);
+	}
+
+#else // Use the cartesian communicator split from MPI_COMM_WORLD.
 
 	MPI_Cart_create(MPI_COMM_WORLD, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
+
+#endif
 
 	// Get Cartesian topology info
 	MPI_Comm_rank(world_comm, &my_rank);
@@ -224,7 +263,7 @@ void MpiManager::mpi_init()
 ///
 ///			Method to decompose the domain and identify local grid sizes.
 ///			Parameters defined here are used in GridObj construction.
-///			Grid manager must have been initialised before calleing this hence the
+///			Grid manager must have been initialised before calling this hence the
 ///			requirement to have it as a non-null input parameter.
 ///
 ///	\param	grid_man	Pointer to an initialised grid manager.

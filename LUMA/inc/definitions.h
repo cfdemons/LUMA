@@ -89,8 +89,8 @@
 #define L_TEMPERATURE                   ///< Enable calculation of temperature field
 
 // Output Options
-#define L_GRID_OUT_FREQ 10000					///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 10000					///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 1					///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 1					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (100*L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
@@ -121,7 +121,7 @@
 #define L_GRAVITY_DIRECTION eYDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-#define L_NO_FLOW							///< Initialise the domain with no flow
+//#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING					///< Initialise the GridObj with quantities read from a restart file
 
@@ -133,14 +133,13 @@
 /// Compute the time-averaged values of velocity, density and the velocity products.
 //#define L_COMPUTE_TIME_AVERAGED_QUANTITIES
 
-
 /*
 *******************************************************************************
 ******************************** Time data ************************************
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
 
 
 /*
@@ -150,12 +149,12 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2		///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
+#define L_MPI_XCORES 1		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_YCORES 1     ///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 
 // Decomposition strategy
-#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
+//#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing
 #define L_MPI_SD_MAX_ITER 1600		///< Max number of iterations to be used for smart decomposition algorithm
 
 // Topology report
@@ -199,6 +198,42 @@
 //#define L_PHYSICAL_TBC_TOP 303.15       ///< Initial top temperature.
 //#define L_PHYSICAL_TBC_FRONT 293.15     ///< Initial front temperature.
 //#define L_PHYSICAL_TBC_BACK 303.15      ///< Initial back temperature.
+
+
+
+/*
+*******************************************************************************
+****************************** Couple using PLE **********************************
+*******************************************************************************
+*/
+
+#define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
+#define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
+#define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
+#define L_PLE_OFFSET_Y (-1.0/L_RESOLUTION)
+#define L_PLE_OFFSET_Z 0.0
+#define L_PLE_INTERFACES 1              ///< Number of coupled planes in this instance of LUMA
+
+// Name of each PLE interface in the LUMA domain. 
+static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet" };
+
+// Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
+static double plePosX[L_PLE_INTERFACES] = { 1.5 }; ///< X component 
+static double plePosY[L_PLE_INTERFACES] = { 0.0 }; ///< Y component 
+static double plePosZ[L_PLE_INTERFACES] = { 0.0 }; ///< Z component 
+
+// Size of each PLE interface in the LUMA domain. In dimensionless units. 
+static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION) }; ///< X component 
+static double pleSizeY[L_PLE_INTERFACES] = { 2.0 }; ///< Y component 
+static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component 
+
+// Data to read from PLE for each interface. "v" = velocity, "r" = density
+static std::string pleRead[L_PLE_INTERFACES] = { "" };
+
+// Data to write to PLE for each interface. "v" = velocity, "r" = density
+static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
+
+
 
 /*
 *******************************************************************************
@@ -277,8 +312,8 @@
 #define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
-#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // Current setting thickness in temperature field is as same as that in density field 

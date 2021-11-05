@@ -87,7 +87,7 @@
 
 // Output Options
 #define L_GRID_OUT_FREQ 1					///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 1					///< Specific output frequency of body forces
+#define L_EXTRA_OUT_FREQ 100					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (100*L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
@@ -135,7 +135,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 10					///< Number of time steps to run simulation for
 
 
 /*
@@ -145,7 +145,7 @@
 */
 
 // MPI Data
-#define L_MPI_XCORES 2		///< Number of MPI ranks to divide domain into in X direction
+#define L_MPI_XCORES 1		///< Number of MPI ranks to divide domain into in X direction
 #define L_MPI_YCORES 1     ///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 
@@ -171,9 +171,9 @@
 #define L_TIMESTEP 0.005										///< The timestep in non-dimensional units
 
 // Non-dimensional domain dimensions
-#define L_BX 2.0 															///< End of domain in X (non-dimensional units)
-#define L_BY 2.0 															///< End of domain in Y (non-dimensional units)
-#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
+#define L_BX 7.0 															///< End of domain in X (non-dimensional units)
+#define L_BY (2.0 + 2*1.0/L_RESOLUTION) 															///< End of domain in Y (non-dimensional units)
+#define L_BZ 8.0															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
@@ -188,30 +188,30 @@
 */
 
 #define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
-#define L_PLE_PARTICIPANT_NAME "LUMA"   ///< Name of this LUMA instance
+#define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
 #define L_PLE_OFFSET_Y (-1.0/L_RESOLUTION)
 #define L_PLE_OFFSET_Z 0.0
-#define L_PLE_INTERFACES 1              ///< Number of coupled planes in this instance of LUMA
+#define L_PLE_INTERFACES 2              ///< Number of coupled planes in this instance of LUMA
 
 // Name of each PLE interface in the LUMA domain. 
-static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet" };
+static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet", "LUMA_outlet" };
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = { 5.0 }; ///< X component 
-static double plePosY[L_PLE_INTERFACES] = { 0.0 }; ///< Y component 
-static double plePosZ[L_PLE_INTERFACES] = { 0.0 }; ///< Z component 
+static double plePosX[L_PLE_INTERFACES] = { 5.0, (7.0-2.0/L_RESOLUTION) }; ///< X component 
+static double plePosY[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Y component 
+static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
-static double pleSizeX[L_PLE_INTERFACES] = { (-1.0 / L_RESOLUTION) }; ///< X component 
-static double pleSizeY[L_PLE_INTERFACES] = { 2.0 }; ///< Y component 
-static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component 
+static double pleSizeX[L_PLE_INTERFACES] = { (-1.0 / L_RESOLUTION), (-1.0 / L_RESOLUTION) }; ///< X component 
+static double pleSizeY[L_PLE_INTERFACES] = { 2.0, 2.0 }; ///< Y component 
+static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component 
 
 // Data to read from PLE for each interface. "v" = velocity, "r" = density
-static std::string pleRead[L_PLE_INTERFACES] = { "" };
+static std::string pleRead[L_PLE_INTERFACES] = { "", "v"};
 
 // Data to write to PLE for each interface. "v" = velocity, "r" = density
-static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
+static std::string pleWrite[L_PLE_INTERFACES] = { "v", ""};
 
 
 
@@ -223,7 +223,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
-//#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
+#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -243,8 +243,8 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
 */
 
 // General //
-//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
@@ -265,9 +265,9 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
 
 // BC types (set to eFluid for periodic)
 #define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
-#define L_WALL_RIGHT eVelocity			///< BC used on the right of the domain
-#define L_WALL_BOTTOM eFluid		///< BC used on the bottom of the domain
-#define L_WALL_TOP eFluid		///< BC used on the top of the domain
+#define L_WALL_RIGHT eExtrapolateRight			///< BC used on the right of the domain
+#define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
+#define L_WALL_TOP eSolid		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 

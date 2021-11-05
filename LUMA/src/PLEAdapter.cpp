@@ -540,6 +540,11 @@ void PLEAdapter::setSyncFlag(int flag)
 
 void PLEAdapter::sendData()
 {
+	//NOTE: The data is not interpolated before being sent, is interpolated only on receive. 
+	// LUMA sends the data from the LUMA cells that are closest to the CS cells. 
+	// When CS receives the data, it interpolates it to the actual positions of the CS cells because CS has the distance between each
+	// CS and LUMA cell. 
+	
 	// For all the interfaces
 	for (int i = 0; i < interfacesConfig_.size(); i++)
 	{
@@ -569,8 +574,7 @@ void PLEAdapter::sendData()
 			else if ((*writeJ == 'r') || (*writeJ == 'R'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// For the moment the interpolation is just nearest neighbour. 
-				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<double> send_v(nCoupledPoints, 0.0);
 				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
 				currentGrid->coupling_extractData("rho", send_id, send_v);
@@ -583,7 +587,6 @@ void PLEAdapter::sendData()
 			else if ((*writeJ == 'v') || (*writeJ == 'V'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// For the moment the interpolation is just nearest neighbour. 
 				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
 				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);  
 
@@ -598,9 +601,9 @@ void PLEAdapter::sendData()
 				std::cout << "LUMA send_v size " << std::to_string(send_v.size()) << " coupled points " << std::to_string(nCoupledPoints) << std::endl;
 
 				// Convert send_v from LUMA units to CS units. 
-				GridUnits::ulbm2ud(send_v, LUMAGrid_->Grids);
+				GridUnits::ulbm2ud(send_v, currentGrid);
 
-				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 3, 0);
+				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), L_DIMS, 0);
 
 				
 			}
@@ -620,6 +623,77 @@ void PLEAdapter::sendData()
 
 void PLEAdapter::receiveData()
 {
+
+	// For all the interfaces
+	for (int i = 0; i < interfacesConfig_.size(); i++)
+	{
+		// Check which ones have data to read from PLE
+		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
+		{
+
+			// Get the number of coupled points and their LUMA cell id
+			size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
+			const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
+
+			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
+			// pointInMesh should do the check for nested grids too to store the correct indices in IDCoupledPoints. 
+			// I think there is a function in GridUtils that returns the finest grid in a position.
+			// But what if the coupled surface takes more than one grid level?
+			// Then I'll have to get the grid for each point in the surface...
+			GridObj* currentGrid = LUMAGrid_->Grids;
+
+			// Receive the data from CS
+			if ((*readJ == 't') || (*readJ == 'T'))
+			{
+				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// So it is OK to directly access the temperature array. Well, this version of LUMA has no temperature...
+
+				// TODO: Implement this when the LUMA version with temperature is ready. 
+
+
+			}
+			else if ((*readJ == 'r') || (*readJ == 'R'))
+			{
+				// Create containers for the received data
+				std::vector<double> received_r(nCoupledPoints, 0.0);
+				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+
+				// Receive the data from CS
+				ple_locator_exchange_point_var(locators_.at(i), NULL, received_r.data(), NULL, sizeof(double), 1, 0);
+				
+				// Introduce the received density to the LUMA grid. 
+				// The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// For the moment the interpolation is just nearest neighbour. 
+				currentGrid->coupling_addData("rho", received_id, received_r);
+		
+
+				// TODO: Implement unity conversion from LUMA density to Code_Saturne pressure 
+
+			}
+			else if ((*readJ == 'v') || (*readJ == 'V'))
+			{
+				// Create containers for the received data
+				std::vector<double> received_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+
+				// Receive the data from CS
+				ple_locator_exchange_point_var(locators_.at(i), NULL, received_v.data(), NULL, sizeof(double), 3, 0);
+
+				// Convert received_v from CS units to LUMA units. 
+				GridUnits::ud2ulbm(received_v, currentGrid);
+
+				// Introduce the received velocity to the LUMA grid. 
+				// The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// For the moment the interpolation is just nearest neighbour. 
+				currentGrid->coupling_addData("v", received_id, received_v);
+
+			}
+			else
+			{
+				L_ERROR("Data type for " + std::to_string(*readJ) + " not recognised. The data to transfer to/from PLE has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
+			}
+		}
+	}
 }
 
 bool PLEAdapter::configure()

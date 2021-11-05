@@ -71,6 +71,13 @@ public:
 		return (u_dimensionless * currentGrid->dt) / currentGrid->dh;
 	}
 
+	template <typename T>
+	static double ud2ulbm(std::vector<T>& u_dimensionless, GridObj* currentGrid)
+	{
+		for (int i = 0; i < u_dimensionless.size(); i++)
+			u_dimensionless[i] = (u_dimensionless[i] * currentGrid->dt) / currentGrid->dh;
+	}
+
 	// *****************************************************************************
 	/// \brief	Converts velocity in LBM units to dimensionless units.
 	///

@@ -42,17 +42,17 @@ using namespace std;
 // TODO: add an option to interpolate the data.
 void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs, const std::vector<double>& data)
 {
-	// Check that cellIDs and data are the same size and that the size is > 0
-	if ((cellIDs.size() == 0) || (cellIDs.size() != data.size()))
-	{
-		L_ERROR("LUMA tried to read in external data but the data vector and cellID vector sizes do not match. Data name " + 
-			 name + " cell ID size: " + std::to_string(cellIDs.size()) +
-			"data size: " + std::to_string(data.size()), GridUtils::logfile);
-	}
-
 	// Chek which data to add. 
 	if ((name.find("v") != std::string::npos) || (name.find("V") != std::string::npos))
 	{
+		// Check that cellIDs and data are the same size and that the size is > 0
+		if ((cellIDs.size() == 0) || (cellIDs.size() != data.size()/L_DIMS))
+		{
+			L_ERROR("LUMA tried to read in external data but the data vector and cellID vector sizes do not match. Data name " +
+				name + " cell ID size: " + std::to_string(cellIDs.size()) +
+				"data size: " + std::to_string(data.size()), GridUtils::logfile);
+		}
+
 		for (int i = 0; i < cellIDs.size(); i++)
 		{
 			u[0 + cellIDs[i] * L_DIMS] = data[0 + i * L_DIMS];
@@ -64,6 +64,14 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 	}
 	else if ((name.find("rho") != std::string::npos) || (name.find("RHO") != std::string::npos))
 	{
+		// Check that cellIDs and data are the same size and that the size is > 0
+		if ((cellIDs.size() == 0) || (cellIDs.size() != data.size()))
+		{
+			L_ERROR("LUMA tried to read in external data but the data vector and cellID vector sizes do not match. Data name " +
+				name + " cell ID size: " + std::to_string(cellIDs.size()) +
+				"data size: " + std::to_string(data.size()), GridUtils::logfile);
+		}
+
 		for (int i = 0; i < cellIDs.size(); i++)
 		{
 			rho[cellIDs[i]] = data[i];

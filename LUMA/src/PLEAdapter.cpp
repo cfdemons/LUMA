@@ -398,10 +398,11 @@ bool PLEAdapter::configFileRead()
 			pleInt.writeData.push_back(pleWrite[i][c]);
 		}
 
-		std::cout << "ple Write data " <<  pleInt.writeData[0] << std::endl;
-
 		interfacesConfig_.push_back(pleInt);
 	}
+
+	//std::cout << "ple Write data " << interfacesConfig_[0].writeData[0] << std::endl;
+	//std::cout << "ple Read data " << interfacesConfig_[1].readData[0] << std::endl;
 
     return true;
 }

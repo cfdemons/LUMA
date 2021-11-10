@@ -207,6 +207,9 @@ static double pleSizeX[L_PLE_INTERFACES] = { (-1.0 / L_RESOLUTION), (-1.0 / L_RE
 static double pleSizeY[L_PLE_INTERFACES] = { 2.0, 2.0 }; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component 
 
+// Is the interface a boundary in Code_Saturne?
+static bool csBoundary[L_PLE_INTERFACES] = { true, false };
+
 // Data to read from PLE for each interface. "v" = velocity, "r" = density
 static std::string pleRead[L_PLE_INTERFACES] = { "", "v"};
 

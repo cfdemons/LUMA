@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 400					///< Number of time steps to run simulation for
 
 
 /*
@@ -176,7 +176,7 @@
 #define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
 
 // Non-dimensional domain dimensions
-#define L_BX 1.0															///< End of domain in X (non-dimensional units)
+#define L_BX 0.6															///< End of domain in X (non-dimensional units)
 #define L_BY 1.0		                                                    ///< End of domain in Y (non-dimensional units)
 #define L_BZ 0.2															///< End of domain in Z (non-dimensional units)
 
@@ -192,8 +192,8 @@
 
 // Temperature initialization in physical units. If not defined boundary T, default L_TFluid
 #define L_PHYSICAL_TFLUID 298.15          ///< Intial main flow field temperature except BC [K]
-#define L_PHYSICAL_TBC_LEFT 293.15        ///< Initial left temperature.[K]
-#define L_PHYSICAL_TBC_RIGHT 303.15       ///< Initial right temperature.
+#define L_PHYSICAL_TBC_LEFT 303.15        ///< Initial left temperature.[K]
+#define L_PHYSICAL_TBC_RIGHT 293.15       ///< Initial right temperature.
 //#define L_PHYSICAL_TBC_BOTTOM 293.15    ///< Initial bottom temperature.
 //#define L_PHYSICAL_TBC_TOP 303.15       ///< Initial top temperature.
 //#define L_PHYSICAL_TBC_FRONT 293.15     ///< Initial front temperature.
@@ -218,20 +218,20 @@
 static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet" };
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = { 1.5 }; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = { 0.4 }; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
 static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION) }; ///< X component 
-static double pleSizeY[L_PLE_INTERFACES] = { 2.0 }; ///< Y component 
+static double pleSizeY[L_PLE_INTERFACES] = { 1.0 }; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component 
 
 // Data to read from PLE for each interface. "v" = velocity, "r" = density
 static std::string pleRead[L_PLE_INTERFACES] = { "" };
 
 // Data to write to PLE for each interface. "v" = velocity, "r" = density
-static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
+static std::string pleWrite[L_PLE_INTERFACES] = { "vt" };  /*! ATTENTION: {"vrt"}*/
 
 
 
@@ -305,7 +305,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v" };
  * In addition, eTFluid is set to periodic boundary
 */
 #define L_TWALL_LEFT eIsothermal         ///< Temperature BC used on the left of the domain
-#define L_TWALL_RIGHT eIsothermal        ///< Temperature BC used on the right of the domain 
+#define L_TWALL_RIGHT eAdiabat        ///< Temperature BC used on the right of the domain 
 #define L_TWALL_BOTTOM eAdiabat          ///< Temperature BC used on the bottom of the domain 
 #define L_TWALL_TOP eAdiabat             ///< Temperature BC used on the top of the domain 
 #define L_TWALL_FRONT eTFluid            ///< Temperature BC used on the front of the domain 

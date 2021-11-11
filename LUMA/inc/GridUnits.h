@@ -71,6 +71,25 @@ public:
 	}
 
 	// *****************************************************************************
+	/// \brief	Temperature in lattice units to in physical units.
+	///
+	/// \param t_lattice	Physical temperature
+	/// \returns 			Lattice temperature
+	template <typename T>
+	static void tlat2phys(std::vector<T>& t_lattice)
+	{
+		for (int i = 0; i < t_lattice.size();i++)
+			t_lattice[i] = (t_lattice[i] - L_TREF) * (L_PHYSICAL_THIGH - L_PHYSICAL_TLOW) / L_TDIFF + L_PHYSICAL_TLOW;
+	}
+
+/*  template <typename T>
+	static void ulbm2ud(std::vector<T>& u_lbm, GridObj* currentGrid)
+	{
+		for (int i = 0; i < u_lbm.size(); i++)
+			u_lbm[i] =  (u_lbm[i] * currentGrid->dh) / currentGrid->dt;
+	} */
+
+	// *****************************************************************************
 	/// \brief	Converts velocity in dimensionless units to LBM units.
 	///
 	/// \param u_dimensionless	Dimensionless velocity.

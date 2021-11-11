@@ -566,6 +566,9 @@ void PLEAdapter::sendData()
 				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
 				currentGrid->coupling_extractData("temperature", send_id, send_v);
+				
+				//I think I should add the unit conversion from lattice units(used in LUMA) to physical units(used in CS)
+				GridUnits::tlat2phys(send_v);
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
 				// TODO: Implement this when the LUMA version with temperature is ready. 

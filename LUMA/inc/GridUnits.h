@@ -72,10 +72,10 @@ public:
 	}
 
 	template <typename T>
-	static double ud2ulbm(std::vector<T>& u_dimensionless, GridObj* currentGrid)
+	static void ud2ulbm(std::vector<T>& u_d, GridObj* currentGrid)
 	{
-		for (int i = 0; i < u_dimensionless.size(); i++)
-			u_dimensionless[i] = (u_dimensionless[i] * currentGrid->dt) / currentGrid->dh;
+		for (int i = 0; i < u_d.size(); i++)
+			u_d[i] = (u_d[i] * currentGrid->dt) / currentGrid->dh;
 	}
 
 	// *****************************************************************************

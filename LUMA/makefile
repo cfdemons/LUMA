@@ -1,12 +1,11 @@
 # LUMA Makefile
 
+CS_INSTALL=/home/martacamps/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64
+
 # Compiler command
-#CC=mpicxx
-#CFLAGS=-O3 -std=c++14 -w -fopenmp
-ifeq (${MPICXX},)
-   MPICXX=mpicxx
-endif
+CC=mpicxx
 CFLAGS=-O3 -std=c++14 -w -fopenmp
+
 # Executable
 EXE=./LUMA
 
@@ -21,9 +20,8 @@ SRCS:=$(wildcard $(SDIR)/*.cpp)
 OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 
 # Include and library file
-INC=-I$(HDF5_HOME)/include -I$ /home/p62934yz/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/include/
-LIB=-L$(HDF5_HOME)/lib -L/home/p62934yz/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/lib/ -lhdf5 -llapack -lple
-
+INC=-I$(HDF5_HOME)/include -I$ /home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/include
+LIB=-L$(HDF5_HOME)/lib -L$ /home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/lib/ -lhdf5 -llapack -lple
 
 ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)
@@ -31,14 +29,14 @@ endif
 
 # Build LUMA
 $(EXE): objs
-	$(MPICXX) $(CFLAGS) -o $@ $(OBJS) $(LIBDIR) $(LIB)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIB)
 
 
 # Build object files
 .PHONY: objs
 objs: outdir $(OBJS)
 $(OBJS): ${ODIR}/%.o : ${SDIR}/%.cpp
-	$(MPICXX) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 # Create output directory
 .PHONY: outdir

@@ -562,7 +562,7 @@ void PLEAdapter::sendData()
 			{
 				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// So it is OK to directly access the temperature array.
-				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<double> send_v(nCoupledPoints, 0.0);
 				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
 				currentGrid->coupling_extractData("temperature", send_id, send_v);
@@ -579,7 +579,7 @@ void PLEAdapter::sendData()
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// For the moment the interpolation is just nearest neighbour. 
-				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
+				std::vector<double> send_v(nCoupledPoints, 0.0);
 				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
 				currentGrid->coupling_extractData("rho", send_id, send_v);

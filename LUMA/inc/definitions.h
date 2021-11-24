@@ -172,7 +172,7 @@
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
 #define L_RESOLUTION 100											///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.00005										    ///< The timestep in non-dimensional units
+#define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
 #define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
 
 // Non-dimensional domain dimensions

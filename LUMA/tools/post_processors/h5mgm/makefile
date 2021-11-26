@@ -7,7 +7,7 @@
 CC=mpicxx -O3 -std=c++0x -w
 
 # VTK Version
-VTK_VER=9.0
+VTK_VER=9.1
 
 # HDF5 paths
 DIR_HDF5=${HDF5_HOME}

@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 400					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
 
 
 /*
@@ -171,14 +171,14 @@
 
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
-#define L_RESOLUTION 100											///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 10											///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
 #define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
 
 // Non-dimensional domain dimensions
-#define L_BX 0.6															///< End of domain in X (non-dimensional units)
-#define L_BY 1.0		                                                    ///< End of domain in Y (non-dimensional units)
-#define L_BZ 0.2															///< End of domain in Z (non-dimensional units)
+#define L_BX 2.0															///< End of domain in X (non-dimensional units)
+#define L_BY 2.0		                                                    ///< End of domain in Y (non-dimensional units)
+#define L_BZ 1.0															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
@@ -218,12 +218,12 @@
 static std::string pleName[L_PLE_INTERFACES] = { "CS_inlet" };
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = { 0.4 }; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = { 1.5 }; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
-static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION) }; ///< X component 
+static double pleSizeX[L_PLE_INTERFACES] = { (-1.0 / L_RESOLUTION) }; ///< X component 
 static double pleSizeY[L_PLE_INTERFACES] = { 1.0 }; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component 
 
@@ -231,7 +231,7 @@ static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component
 static std::string pleRead[L_PLE_INTERFACES] = { "" };
 
 // Data to write to PLE for each interface. "v" = velocity, "r" = density
-static std::string pleWrite[L_PLE_INTERFACES] = { "vt" };  /*! ATTENTION: {"vrt"}*/
+static std::string pleWrite[L_PLE_INTERFACES] = { "t" };  /*! ATTENTION: {"vrt"}*/
 
 
 

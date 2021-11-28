@@ -369,7 +369,7 @@ bool PLEAdapter::configFileRead()
 	offset_.push_back(L_PLE_OFFSET_Z);
 
 	// NOTE: This might be different if using grid refinement!!
-	int dh = LUMAGrid_->Grids->dh;
+	double dh = LUMAGrid_->Grids->dh;
 
 	for (int i = 0; i < L_PLE_INTERFACES; i++)
 	{

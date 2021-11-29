@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include "IVector.h"
+#include "GridUnits.h"
 
 /// \brief	Grid class.
 ///
@@ -94,6 +95,7 @@ private :
 	// Flattened 3D arrays (i,j,k)
 	IVector<double> rho;			///< Macroscopic density
 	IVector<double> T;				///< Macropscopic temperature
+	IVector<double> T_out;			///< Output hdf5 macropscopic temperature 
 
 	// Time averaged statistics
 	IVector<double> rho_timeav;		///< Time-averaged density at each grid point (i,j,k)

@@ -61,7 +61,7 @@ public:
 
 	// *****************************************************************************
 	/// \brief	Temperature in physical units to temperature in lattice units.
-	///
+	/// \brief 	Used to input to convert real unit to lattice units 
 	/// \param t_phycial	Physical temperature
 	/// \returns 			Lattice temperature
 	template <typename T>
@@ -70,8 +70,19 @@ public:
 		return (t_phycial - L_PHYSICAL_TLOW) * L_TDIFF / (L_PHYSICAL_THIGH- L_PHYSICAL_TLOW) + L_TREF;
 	}
 
+ 	/// \brief	Temperature in lattice units to in physical units. This is single function
+	/// \brief	Used to output to convert real temperature units to lattice units
+	/// \param t_lattice	Physical temperature
+	/// \returns 			Lattice temperature
+	template <typename T>
+	static double tlat2phys1(T t_lattice)
+	{
+		return	(t_lattice - L_TREF) * (L_PHYSICAL_THIGH - L_PHYSICAL_TLOW) / L_TDIFF + L_PHYSICAL_TLOW;
+	} 	
+
+
 	// *****************************************************************************
-	/// \brief	Temperature in lattice units to in physical units.
+	/// \brief	Temperature in lattice units to in physical units. This is array function used for coupling(can delete)
 	///
 	/// \param t_lattice	Physical temperature
 	/// \returns 			Lattice temperature
@@ -81,13 +92,6 @@ public:
 		for (int i = 0; i < t_lattice.size();i++)
 			t_lattice[i] = (t_lattice[i] - L_TREF) * (L_PHYSICAL_THIGH - L_PHYSICAL_TLOW) / L_TDIFF + L_PHYSICAL_TLOW;
 	}
-
-/*  template <typename T>
-	static void ulbm2ud(std::vector<T>& u_lbm, GridObj* currentGrid)
-	{
-		for (int i = 0; i < u_lbm.size(); i++)
-			u_lbm[i] =  (u_lbm[i] * currentGrid->dh) / currentGrid->dt;
-	} */
 
 	// *****************************************************************************
 	/// \brief	Converts velocity in dimensionless units to LBM units.

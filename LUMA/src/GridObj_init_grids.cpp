@@ -347,6 +347,8 @@ void GridObj::LBM_initGrid() {
 #ifdef L_TEMPERATURE
 	// Temperature field
 	T.resize(N_lim * M_lim * K_lim);
+	T_out.resize(N_lim * M_lim * K_lim);
+
 	LBM_initTemperature();
 #endif
 

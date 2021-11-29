@@ -191,7 +191,7 @@
 #define L_PHYSICAL_TLOW 293.15    ///< Low temperature in physical units [K]
 
 // Temperature initialization in physical units. If not defined boundary T, default L_TFluid
-#define L_PHYSICAL_TFLUID 298.15          ///< Intial main flow field temperature except BC [K]
+#define L_PHYSICAL_TFLUID 293.15          ///< Intial main flow field temperature except BC [K]
 #define L_PHYSICAL_TBC_LEFT 303.15        ///< Initial left temperature.[K]
 #define L_PHYSICAL_TBC_RIGHT 293.15       ///< Initial right temperature.
 //#define L_PHYSICAL_TBC_BOTTOM 293.15    ///< Initial bottom temperature.
@@ -231,7 +231,7 @@ static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ }; ///< Z component
 static std::string pleRead[L_PLE_INTERFACES] = { "" };
 
 // Data to write to PLE for each interface. "v" = velocity, "r" = density
-static std::string pleWrite[L_PLE_INTERFACES] = { "t" };  /*! ATTENTION: {"vrt"}*/
+static std::string pleWrite[L_PLE_INTERFACES] = { "vt" };  /*! ATTENTION: {"vrt"}*/
 
 
 

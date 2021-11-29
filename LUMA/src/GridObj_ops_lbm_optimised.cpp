@@ -1283,6 +1283,7 @@ void GridObj::_LBM_tmacro_opt(int i, int j, int k, int id, eTType ttype_local){
 
 		// Assign temperature
 		T[id] = T_temp;
+		T_out[id] = GridUnits::tlat2phys1(T_temp);
 
 	}	
 }

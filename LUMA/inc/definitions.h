@@ -190,14 +190,14 @@
 #define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
 #define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
-#define L_PLE_OFFSET_Y (-1.0/L_RESOLUTION)
+#define L_PLE_OFFSET_Y (1.0/L_RESOLUTION)
 #define L_PLE_OFFSET_Z 0.0
 #define L_PLE_INTERFACES 2              ///< Number of coupled planes in this instance of LUMA
 
 // Name of each PLE interface in the LUMA domain. 
 static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"};
 
-// Position of each PLE interface in the LUMA domain. In dimensionless units and LUMA coordinate system. 
+// Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system. 
 static double plePosX[L_PLE_INTERFACES] = {5.0, (7.0 - 2.0 / L_RESOLUTION)}; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 

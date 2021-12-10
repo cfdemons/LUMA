@@ -86,7 +86,7 @@
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
 // Output Options
-#define L_GRID_OUT_FREQ 1					///< How many timesteps before whole grid output
+#define L_GRID_OUT_FREQ 10					///< How many timesteps before whole grid output
 #define L_EXTRA_OUT_FREQ 100					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (100*L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
@@ -135,7 +135,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 10					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 100					///< Number of time steps to run simulation for
 
 
 /*
@@ -198,7 +198,7 @@
 static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"};
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = {5.0, (7.0 - 2.0 / L_RESOLUTION)}; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = {5.0, 6.9}; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 
 
@@ -211,7 +211,7 @@ static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component
 static bool csBoundary[L_PLE_INTERFACES] = { true, false };
 
 // Data to read from PLE for each interface. "v" = velocity, "r" = density
-static std::string pleRead[L_PLE_INTERFACES] = { "", "v"};
+static std::string pleRead[L_PLE_INTERFACES] = { "", "v" };
 
 // Data to write to PLE for each interface. "v" = velocity, "r" = density
 static std::string pleWrite[L_PLE_INTERFACES] = { "v", ""};
@@ -288,7 +288,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 
 // BC types (set to eFluid for periodic)
 #define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
-#define L_WALL_RIGHT eExtrapolateRight			///< BC used on the right of the domain
+#define L_WALL_RIGHT eVelocity			///< BC used on the right of the domain
 #define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
 #define L_WALL_TOP eSolid		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain

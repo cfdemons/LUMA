@@ -27,7 +27,6 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
-
 #ifdef _WIN32
 	#include <Windows.h>
 #endif

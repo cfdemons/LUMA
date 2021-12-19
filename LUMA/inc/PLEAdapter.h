@@ -112,8 +112,10 @@ private:
 
 
 	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
-	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
+	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data in this rank. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
 													// They are in the local LUMA coordinate system. LUMA_coord = World_coord - offset_
+	std::vector<std::vector<int>> ids_;  // LUMA IDs of the cells in the coordinates_ vector
+
 	std::vector<std::map<std::string, std::vector<double>>> vectorData_;
 	std::vector<std::map<std::string, std::vector<double>>> scalarData_;
 	std::vector<double> offset_; // Offset between the start of LUMA mesh and the start of the world coordinate system. 
@@ -203,7 +205,10 @@ private:
 
 
 	//- Data handling
-	void setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int i);
+	void setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int inter_id);
+	
+	
+	
 	void initialiseVectorData(std::string name, double initValue, int i);
 	void initialiseScalarData(std::string name, double initValue, int i);
 

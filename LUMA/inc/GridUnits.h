@@ -109,7 +109,7 @@ public:
 	static void ud2ulbm(std::vector<T>& u_d, GridObj* currentGrid)
 	{
 		for (int i = 0; i < u_d.size(); i++)
-		u_d[i] = (u_d[i] * currentGrid->dt) / currentGrid->dh;
+			u_d[i] = (u_d[i] * currentGrid->dt) / currentGrid->dh;
 	}
 
 	// *****************************************************************************

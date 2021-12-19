@@ -16,7 +16,11 @@ LIBPATH_HDF5=-L${DIR_HDF5}/lib
 LIB_HDF5=-lhdf5
 
 # VTK paths
+<<<<<<< HEAD
 INC_VTK=-I/usr/local/include/vtk-$(VTK_VER) 
+=======
+INC_VTK=-I/usr/local/include/vtk-$(VTK_VER)
+>>>>>>> CodeSaturne
 LIBPATH_VTK=-L/usr/local/lib/x86_64-linux-gnu
 LIB_VTK=-lvtkFiltersCore-$(VTK_VER) -lvtkIOLegacy-$(VTK_VER) -lvtkIOCore-$(VTK_VER) -lvtkCommonExecutionModel-$(VTK_VER) -lvtkCommonDataModel-$(VTK_VER) -lvtkCommonCore-$(VTK_VER) -lvtkIOXML-$(VTK_VER)
 

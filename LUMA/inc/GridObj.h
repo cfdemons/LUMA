@@ -164,8 +164,8 @@ public :
 	// NOTE: I will have to think about doing an addVelociy, addDensity, addTemperature. If the coupling is through multiple grids I might
 	        // have to continuously call this function for one value at a time. The conditional that selects the variable to read might slow down 
 	        // the code significally. 
-	void coupling_addData(std::string name, std::vector<double> &cellIDs, std::vector<double> &data);   // Adds the data in "data" at the positions of "cellIDs" in the LUMA variable "name" 
-	void coupling_extractData(std::string name, std::vector<double> &cellIDs, std::vector<double> &data);   // Writes the data in the LUMA variable "name" in the positions of "cellIDs" to the "data" vector
+	void coupling_addData(std::string name, const std::vector<int> &cellIDs, const std::vector<double> &data);   // Adds the data in "data" at the positions of "cellIDs" in the LUMA variable "name" 
+	void coupling_extractData(std::string name, const std::vector<int> &cellIDs, std::vector<double> &data);   // Writes the data in the LUMA variable "name" in the positions of "cellIDs" to the "data" vector
 
 	// LBM operations
 	DEPRECATED void LBM_kbcCollide(int i, int j, int k, IVector<double>& f_new);		// KBC collision operator

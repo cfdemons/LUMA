@@ -175,10 +175,6 @@ public :
 	// Multi-grid operations
 	void LBM_addSubGrid(int RegionNumber);				// Add and initialise subgrid structure for a given region number
 
-	// Coupling class
-	void coupling_addData(std::string name, const std::vector<int> &cellIDs, const std::vector<double> &data);
-	void coupling_extractData(std::string name, const std::vector<int> &cellIDs, std::vector<double> &data);
-
 	// IO methods
 	void io_textout(std::string output_tag);	// Writes out the contents of the class as well as any subgrids to a text file
 	void io_fgaout();							// Wrapper for _io_fgaout with 2/3D checking 

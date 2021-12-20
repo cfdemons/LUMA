@@ -86,7 +86,7 @@
 //#define L_ENABLE_OPENMP				///< Enable OpenMP features (experimental)
 
 // Enable temperature field?
-#define L_TEMPERATURE                   ///< Enable calculation of temperature field
+//#define L_TEMPERATURE                   ///< Enable calculation of temperature field
 
 // Output Options
 #define L_GRID_OUT_FREQ 10					///< How many timesteps before whole grid output
@@ -292,7 +292,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 */
 
 // General //
-#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
+//#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
 //#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 

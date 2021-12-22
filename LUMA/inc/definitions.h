@@ -114,7 +114,7 @@
 #define L_PROBE_MAX_Z 0.0					///< End position of probe array in Z direction
 
 // Forcing
-#define L_GRAVITY_ON						///< Turn on gravity force
+//#define L_GRAVITY_ON						///< Turn on gravity force
 #define L_BOUSSINESQ_APPROXIMATION_FORCE    ///< Boussinesq approximation
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 0.0003944
@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 100					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
 
 
 /*
@@ -184,7 +184,7 @@
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
-#define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
+#define L_PHYSICAL_RHO 1000.0		///< Reference density in physical units
 
 // Physical temperature difference
 #define L_PHYSICAL_THIGH 303.15   ///< High temperature in physical units [K]
@@ -269,14 +269,14 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
-#define L_UX0 0.0			///< Initial/inlet x-velocity
+#define L_UX0 1.0			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1.0			///< Initial density. In lattice units.
 
 //#define L_NU 0.02          ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 50			///< Desired Reynolds number
+#define L_RE 150			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 #define L_TDIFF 1.0     ///< Set high and low temperature difference in lattice units, unless special purpose, set as 1.0
@@ -335,7 +335,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
-//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 //#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 

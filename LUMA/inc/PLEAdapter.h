@@ -113,6 +113,7 @@ private:
 
 	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
 	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data in this rank. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
+													// I think the format: {(x0,y0,z0,x1,y1,z1...,xn,yn,zn),(x0,y0,z0,x1,y1,z1...,xn,yn,zn),...}
 													// They are in the local LUMA coordinate system. LUMA_coord = World_coord - offset_
 	std::vector<std::vector<int>> ids_;  // LUMA IDs of the cells in the coordinates_ vector
 

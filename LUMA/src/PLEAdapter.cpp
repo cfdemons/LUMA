@@ -586,7 +586,6 @@ void PLEAdapter::sendData()
 				GridUnits::tlat2phys(send_v);
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
-				// TODO: Implement this when the LUMA version with temperature is ready. 
 
 				
 			}
@@ -621,6 +620,14 @@ void PLEAdapter::sendData()
 
 				// Convert send_v from LUMA units to CS units. 
 				GridUnits::ulbm2ud(send_v, currentGrid);
+
+				//Calculate the flow rate to send CS in real units
+				double flowrate = 0.;
+				for (int ii = 0; ii < nCoupledPoints; ii++)
+				{
+					flowrate += send_v[3 * ii] * 0.01 * 0.01;
+				}
+				std::cout << "****** The flowrate send to CS in real units: ******" << flowrate << std::endl;
 
 				std::cout << "LUMA: velocity in CS units " << std::to_string(send_v[4]) << std::endl;
 
@@ -677,12 +684,22 @@ void PLEAdapter::receiveData()
 			// Receive the data from CS
 			if ((*readJ == 't') || (*readJ == 'T'))
 			{
-				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// So it is OK to directly access the temperature array. Well, this version of LUMA has no temperature...
+				// Extract temperature to the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
+				// So it is OK to directly access the temperature array.
+				std::vector<double> received_t(nCoupledPoints, 0.0);
+				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+				
+				std::cout << "LUMA: Ready to receive temperature. "  << nCoupledPoints << " "  << received_t[nCoupledPoints*L_DIMS-1] << " " << received_t.size() << std::endl;
 
-				// TODO: Implement this when the LUMA version with temperature is ready. 
+				// Receive the data from CS
+				ple_locator_exchange_point_var(locators_.at(i), NULL, received_t.data(), NULL, sizeof(double), 1, 0);
 
+				//Covert received_t from CS units to LUMA units
 
+				GridUnits::tphys2lat(received_t);
+
+				// Introduce the received temperature to the LUMA grid.
+				currentGrid->coupling_addData("temperature", received_id, received_t);
 			}
 			else if ((*readJ == 'r') || (*readJ == 'R'))
 			{
@@ -714,8 +731,16 @@ void PLEAdapter::receiveData()
 				ple_locator_exchange_point_var(locators_.at(i), NULL, received_v.data(), NULL, sizeof(double), 3, 0);
 
 				std::cout << "LUMA: Velocity received. " << received_v[nCoupledPoints * L_DIMS - 1] << " " << received_v.size() << std::endl;
+				
+				// Test the velocity reveived from the CS
+				double flowrate = 0.;
+				for (int ii = 0; ii < nCoupledPoints; ii++)
+				{
+					flowrate += received_v[ii * L_DIMS] * 0.01 * 0.01;
+				}
+				std::cout<< "++++++ The flowrate received from CS in real units: ++++++" << flowrate << std::endl;
 
-				// Convert received_v from CS units to LUMA units. 
+				// Convert received_v from CS units to LUMA units.
 				GridUnits::ud2ulbm(received_v, currentGrid);
 
 				std::cout << "LUMA: Velocity converted to LUMA units. " << received_v[nCoupledPoints * L_DIMS - 1] << std::endl;

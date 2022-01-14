@@ -89,8 +89,8 @@
 //#define L_TEMPERATURE                   ///< Enable calculation of temperature field
 
 // Output Options
-#define L_GRID_OUT_FREQ 10					///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 100					///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 1000					///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 1000					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (100*L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
@@ -115,7 +115,7 @@
 
 // Forcing
 //#define L_GRAVITY_ON						///< Turn on gravity force
-#define L_BOUSSINESQ_APPROXIMATION_FORCE    ///< Boussinesq approximation
+//#define L_BOUSSINESQ_APPROXIMATION_FORCE    ///< Boussinesq approximation
 /// Expression for the gravity force in dimensionless units
 #define L_GRAVITY_FORCE 0.0003944
 #define L_GRAVITY_DIRECTION eYDirection		///< Gravity direction (specify using enumeration)
@@ -171,20 +171,21 @@
 
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
-#define L_RESOLUTION 10											///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 100											    ///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
-#define L_CH_LENGTH L_N                                             ///< Define the characteristic length (used in force term) 
+#define L_CH_LENGTH (L_M- 2.*1.0/L_RESOLUTION)                      ///< Define the characteristic length (used in force term)
+                                                                    ///< -2 when couple with CS
 
 // Non-dimensional domain dimensions
-#define L_BX 7.0 															///< End of domain in X (non-dimensional units)
-#define L_BY (2.0 + 2*1.0/L_RESOLUTION) 															///< End of domain in Y (non-dimensional units)
-#define L_BZ 8.0															///< End of domain in Z (non-dimensional units)
+#define L_BX 0.55															///< End of domain in X (non-dimensional units)
+#define L_BY (1.0 + 2.*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
+#define L_BZ 0.2															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 0.1		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
-#define L_PHYSICAL_RHO 1000.0		///< Reference density in physical units
+#define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
 
 // Physical temperature difference
 #define L_PHYSICAL_THIGH 303.15   ///< High temperature in physical units [K]
@@ -208,6 +209,7 @@
 */
 
 #define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
+                                        ///< When you comment this line, you must remove the PLEAdapter.h and .cpp form scr file, otherwise broken
 #define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
 #define L_PLE_OFFSET_Y (1.0/L_RESOLUTION)
@@ -218,13 +220,13 @@
 static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"};
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = {5.0, 6.9}; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = {0.45, 0.54}; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
 static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION), (1.0 / L_RESOLUTION) }; ///< X component 
-static double pleSizeY[L_PLE_INTERFACES] = { 2.0, 2.0 }; ///< Y component 
+static double pleSizeY[L_PLE_INTERFACES] = { 1.0, 1.0 }; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component 
 
 // Is the interface a boundary in Code_Saturne?
@@ -266,7 +268,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 
 // Fluid data in lattice units
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
-#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
+//#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here
 #define L_UX0 1.0			///< Initial/inlet x-velocity
@@ -276,7 +278,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_RHOIN 1.0			///< Initial density. In lattice units.
 
 //#define L_NU 0.02          ///< Dimensionless kinematic viscosity L_NU = 1/Re. Comment it to use L_RE instead.
-#define L_RE 150			///< Desired Reynolds number
+#define L_RE 1000			///< Desired Reynolds number
 //#define L_REYNOLDS_RAMP 1000	///< Defines over how many time steps to ramp the Reynolds number
 
 #define L_TDIFF 1.0     ///< Set high and low temperature difference in lattice units, unless special purpose, set as 1.0
@@ -313,10 +315,10 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
-#define L_WALL_RIGHT eVelocity			///< BC used on the right of the domain
+#define L_WALL_LEFT	eSolid			///< BC used on the left of the domain
+#define L_WALL_RIGHT eSolid			///< BC used on the right of the domain
 #define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
-#define L_WALL_TOP eSolid		///< BC used on the top of the domain
+#define L_WALL_TOP eVelocity		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 
@@ -328,7 +330,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
  * In addition, eTFluid is set to periodic boundary
 */
 #define L_TWALL_LEFT eIsothermal         ///< Temperature BC used on the left of the domain
-#define L_TWALL_RIGHT eAdiabat        ///< Temperature BC used on the right of the domain 
+#define L_TWALL_RIGHT eIsothermal        ///< Temperature BC used on the right of the domain 
 #define L_TWALL_BOTTOM eAdiabat          ///< Temperature BC used on the bottom of the domain 
 #define L_TWALL_TOP eAdiabat             ///< Temperature BC used on the top of the domain 
 #define L_TWALL_FRONT eTFluid            ///< Temperature BC used on the front of the domain 
@@ -336,7 +338,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 
 // BC qualifiers
 #define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
-//#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
+#define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 
 // Current setting thickness in temperature field is as same as that in density field 

@@ -15,6 +15,7 @@
 
 #include "VelocitySorter.h"
 #include "ThirdParty/vtkCleanUnstructuredGrid.h"
+#include "../../../../inc/definitions.h"
 
 // Method to construct a 3D polyhedron out of faces and add to an unstructured grid
 size_t addCell(vtkSmartPointer<vtkPoints> global_pts,
@@ -181,7 +182,9 @@ int main(int argc, char* argv[])
 	double dx;
 	std::string VAR;
 	int* LatTyp = nullptr;
+#ifdef L_TEMPERATURE
 	int* LatTTyp = nullptr;
+#endif
 	double *dummy_d = nullptr;
 	int *dummy_i = nullptr;
 
@@ -270,8 +273,9 @@ int main(int argc, char* argv[])
 		
 	// Status indicator
 	size_t res = 0;
+#ifdef L_TEMPERATURE
 	size_t tres = 0;
-
+#endif
 	std::cout << "Building mesh..." << std::endl;
 
 	// Loop 1 to get mesh details
@@ -311,14 +315,15 @@ int main(int argc, char* argv[])
 			if (Type == NULL) {
 				writeInfo("Not enough Memory!!!!", eFatal);
 				exit(EXIT_FAILURE);
-			};
-
+			}
+#ifdef L_TEMPERATURE
 			// Allocate sapce for LatTyp data
 			int *TType = (int*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(int));
 			if (TType == NULL) {
 				writeInfo("Not enough Memory!!!!", eFatal);
 				exit(EXIT_FAILURE);
 			}
+#endif
 
 			// Allocate space for X, Y, Z coordinates
 			double *X = (double*)malloc((gridsize[0] * gridsize[1] * gridsize[2]) * sizeof(double));
@@ -371,6 +376,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
+#ifdef L_TEMPERATURE
 			// Open, read into buffers information required for mesh definition and close input datasets
 			status = readDataset("/LatTTyp", TIME_STRING, input_fid, input_sid, H5T_NATIVE_INT, TType);
 			if (status != 0)
@@ -399,7 +405,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-
+#endif
 			// Loop over grid sites
 			for (int c = 0; c < gridsize[0] * gridsize[1] * gridsize[2]; c++) {
 
@@ -452,7 +458,9 @@ int main(int argc, char* argv[])
 			if (status != 0) writeInfo("Cannot close input file!", eHDF);
 
 			// Free memory
+#ifdef L_TEMPERATURE
 			free(TType);
+#endif
 			free(Type);
 			free(X);
 			free(Y);
@@ -588,6 +596,7 @@ int main(int argc, char* argv[])
 			UzUz_TimeAv->SetName("UzUz_TimeAv");
 			status = addDataToGrid("/UzUz_TimeAv", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, UzUz_TimeAv);
 		}
+#ifdef L_TEMPERATURE
 		// Add data for temperature
 		vtkSmartPointer<vtkIntArray> LatTTyp = vtkSmartPointer<vtkIntArray>::New();
 		LatTTyp->Allocate(unstructuredGrid->GetNumberOfCells());
@@ -614,7 +623,7 @@ int main(int argc, char* argv[])
 		TArray->Allocate(unstructuredGrid->GetNumberOfCells());
 		TArray->SetName("Temperature");
 		status = addDataToGrid("/Temperature", TIME_STRING, levels, regions, gridsize, unstructuredGrid, dummy_d, H5T_NATIVE_DOUBLE, TArray);
-
+#endif
 		// Otherwise, must be simply a missing dataset so continue to next time step
 		TIME_STRING = "/Time_" + std::to_string(t + out_every);
 
@@ -653,9 +662,13 @@ int main(int argc, char* argv[])
 
 		// Free the memory used (forces destructor call)
 		LatTyp = NULL;
+#ifdef L_TEMPERATURE
 		LatTTyp = NULL;
+#endif
 		RhoArray = NULL;
+#ifdef L_TEMPERATURE
 		TArray = NULL;
+#endif
 		Rho_TimeAv = NULL;
 		Ux = NULL;
 		Uy = NULL;

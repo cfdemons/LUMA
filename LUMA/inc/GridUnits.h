@@ -69,7 +69,17 @@ public:
 	{
 		return (t_phycial - L_PHYSICAL_TLOW) * L_TDIFF / (L_PHYSICAL_THIGH- L_PHYSICAL_TLOW) + L_TREF;
 	}
+	// *****************************************************************************
+	/// \brief	Temperature in physical units to lattice units. This is array function used for coupling
+	///
+	template <typename T>
+	static void tphys2lat(std::vector<T>& t_physical)
+	{
+		for (int i = 0; i < t_physical.size();i++)
+			t_physical[i]=(t_physical[i]-L_PHYSICAL_TLOW) * L_TDIFF / (L_PHYSICAL_THIGH- L_PHYSICAL_TLOW) + L_TREF;
+	}
 
+	// *****************************************************************************
  	/// \brief	Temperature in lattice units to in physical units. This is single function
 	/// \brief	Used to output to convert real temperature units to lattice units
 	/// \param t_lattice	Physical temperature
@@ -78,14 +88,10 @@ public:
 	static double tlat2phys1(T t_lattice)
 	{
 		return	(t_lattice - L_TREF) * (L_PHYSICAL_THIGH - L_PHYSICAL_TLOW) / L_TDIFF + L_PHYSICAL_TLOW;
-	} 	
-
-
+	}	
 	// *****************************************************************************
-	/// \brief	Temperature in lattice units to in physical units. This is array function used for coupling(can delete)
-	///
-	/// \param t_lattice	Physical temperature
-	/// \returns 			Lattice temperature
+	/// \brief	Temperature in lattice units to in physical units. This is array function used for coupling
+	
 	template <typename T>
 	static void tlat2phys(std::vector<T>& t_lattice)
 	{

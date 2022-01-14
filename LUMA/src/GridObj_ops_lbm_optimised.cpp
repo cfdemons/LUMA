@@ -377,8 +377,13 @@ void GridObj::_LBM_tstream_opt(int i, int j, int k, int id, eTType ttype_local, 
 			if (c_opt[v][eXDirection] <= 0)
 				gNew_temp += gNew[v + id * L_NUM_VELS];
 		}
-		gNew_temp = 6.0 * (GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT) - gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * 
-					u[0 + id * L_DIMS] * u[0 + id * L_DIMS]);
+		gNew_temp = 6.0 * (
+#ifdef L_ACTIVATE_PLE
+		T[id]
+#else
+		GridUnits::tphys2lat(L_PHYSICAL_TBC_LEFT)
+#endif
+ 		- gNew_temp) / (1.0 + 3.0 * u[0 + id * L_DIMS] + 3.0 * u[0 + id * L_DIMS] * u[0 + id * L_DIMS]);
 
 		for (int v = 0; v < L_NUM_VELS; ++v)
 		{

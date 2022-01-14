@@ -43,6 +43,8 @@
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkPointData.h"
 
+#include "../../../../inc/definitions.h"
+
 #define DATASET_READ_FAIL -321
 #define EARLY_EXIT 998
 #define H5MGM_OUTPUT_PATH "./postprocessedoutput"

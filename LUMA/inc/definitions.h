@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 2000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 20000					///< Number of time steps to run simulation for
 
 
 /*
@@ -178,8 +178,8 @@
 
 // Non-dimensional domain dimensions
 #define L_BX 0.55															///< End of domain in X (non-dimensional units)
-#define L_BY (1.0 + 2.*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
-#define L_BZ 0.2															///< End of domain in Z (non-dimensional units)
+#define L_BY (1.0 + 1.*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
+#define L_BZ 0.05															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 0.1		///< Reference velocity of the real fluid to model [m/s]
@@ -270,7 +270,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 //#define L_USE_INLET_PROFILE	///< Use an inlet profile
 //#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
-// If not using an inlet profile, specify values or expressions here
+// If not using an inlet profile, specify values or expressions here (dimensionless value or physical value)
 #define L_UX0 1.0			///< Initial/inlet x-velocity
 #define L_UY0 0.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
@@ -316,7 +316,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 
 // BC types (set to eFluid for periodic)
 #define L_WALL_LEFT	eSolid			///< BC used on the left of the domain
-#define L_WALL_RIGHT eSolid			///< BC used on the right of the domain
+#define L_WALL_RIGHT eCoupling			///< BC used on the right of the domain
 #define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
 #define L_WALL_TOP eVelocity		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
@@ -337,7 +337,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
-#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 #define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 

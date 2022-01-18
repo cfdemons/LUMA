@@ -260,7 +260,12 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
 		}
-
+		// COUPLING BC USING EQUILIBRIUM SCHEME
+		else if(type_local == eCoupling)
+		{
+			fNew[v + id * L_NUM_VELS] =
+				_LBM_equilibrium_opt(id, v);
+		}
 		// EXTRAPOLATERIGHT
 		else if (src_type_local == eExtrapolateRight)
 		{

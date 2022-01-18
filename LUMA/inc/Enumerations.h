@@ -92,7 +92,8 @@ enum eType
 	eVelocity,				///< Velocity boundary
 	ePressure,				///< Pressure boundary
 	eSlip,					///< Slip boundary
-	eExtrapolateRight			///< Extrapolation boundary
+	eExtrapolateRight,			///< Extrapolation boundary
+	eCoupling				///< Coupling boundary condition
 };
 
 /// \enum eTType

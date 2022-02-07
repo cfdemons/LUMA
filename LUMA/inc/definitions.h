@@ -121,7 +121,7 @@
 #define L_GRAVITY_DIRECTION eYDirection		///< Gravity direction (specify using enumeration)
 
 // Initialisation
-//#define L_NO_FLOW							///< Initialise the domain with no flow
+#define L_NO_FLOW							///< Initialise the domain with no flow
 //#define L_INIT_VELOCITY_FROM_FILE			///< Read initial velocity from file
 //#define L_RESTARTING					///< Initialise the GridObj with quantities read from a restart file
 
@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 20000					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 15001					///< Number of time steps to run simulation for
 
 
 /*
@@ -171,18 +171,18 @@
 
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
-#define L_RESOLUTION 100											    ///< Number of coarse lattice sites per unit length
-#define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
+#define L_RESOLUTION 200											    ///< Number of coarse lattice sites per unit length
+#define L_TIMESTEP 0.0025										    ///< The timestep in non-dimensional units
 #define L_CH_LENGTH (L_M- 2.*1.0/L_RESOLUTION)                      ///< Define the characteristic length (used in force term)
                                                                     ///< -2 when couple with CS
 
 // Non-dimensional domain dimensions
-#define L_BX 0.55															///< End of domain in X (non-dimensional units)
-#define L_BY (1.0 + 1.*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
-#define L_BZ 0.05															///< End of domain in Z (non-dimensional units)
+#define L_BX 0.6															///< End of domain in X (non-dimensional units)
+#define L_BY (1.0 + 2.0*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
+#define L_BZ 0.025															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
-#define L_PHYSICAL_U 0.1		///< Reference velocity of the real fluid to model [m/s]
+#define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]
 
 // Reference density	
 #define L_PHYSICAL_RHO 1.0		///< Reference density in physical units
@@ -220,13 +220,13 @@
 static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"};
 
 // Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = {0.45, 0.54}; ///< X component 
+static double plePosX[L_PLE_INTERFACES] = {0.395, 0.595}; ///< X component 
 static double plePosY[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Y component 
 static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
 static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION), (1.0 / L_RESOLUTION) }; ///< X component 
-static double pleSizeY[L_PLE_INTERFACES] = { 1.0, 1.0 }; ///< Y component 
+static double pleSizeY[L_PLE_INTERFACES] = { 1.0, 1.0}; ///< Y component 
 static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component 
 
 // Is the interface a boundary in Code_Saturne?
@@ -271,8 +271,8 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 //#define L_PARABOLIC_INLET		///< Use analytical parabolic inlet profile
 
 // If not using an inlet profile, specify values or expressions here (dimensionless value or physical value)
-#define L_UX0 1.0			///< Initial/inlet x-velocity
-#define L_UY0 0.0			///< Initial/inlet y-velocity
+#define L_UX0 0.0			///< Initial/inlet x-velocity
+#define L_UY0 1.0			///< Initial/inlet y-velocity
 #define L_UZ0 0.0			///< Initial/inlet z-velocity
 
 #define L_RHOIN 1.0			///< Initial density. In lattice units.
@@ -295,7 +295,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 
 // General //
 //#define L_GEOMETRY_FILE					///< If defined LUMA will read for geometry config file
-//#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
+#define L_VTK_BODY_WRITE				///< Write out the bodies to a VTK file
 //#define L_VTK_FEM_WRITE				///< Write out the FEM bodies to a VTK file
 
 // IBM //
@@ -315,10 +315,10 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 */
 
 // BC types (set to eFluid for periodic)
-#define L_WALL_LEFT	eSolid			///< BC used on the left of the domain
+#define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
 #define L_WALL_RIGHT eCoupling			///< BC used on the right of the domain
 #define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
-#define L_WALL_TOP eVelocity		///< BC used on the top of the domain
+#define L_WALL_TOP eSolid		///< BC used on the top of the domain
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 
@@ -337,7 +337,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_TWALL_BACK eTFluid             ///< Temperature BC used on the back of the domain 
 
 // BC qualifiers
-//#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
+#define L_REGULARISED_BOUNDARIES	///< Specify the velocity and pressure BCs to be regularised (Latt & Chopard)
 #define L_VELOCITY_RAMP 2			///< Defines time in dimensionless units over which to ramp up the inlet velocity
 #define L_PRESSURE_DELTA 0.0		///< Sets a desired pressure fluctuation away from L_RHOIN for a pressure boundary
 

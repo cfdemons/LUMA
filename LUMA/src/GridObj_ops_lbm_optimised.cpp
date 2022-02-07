@@ -113,7 +113,6 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 				// MACROSCOPIC IN VELOCITY FIELD //
 				_LBM_macro_opt(i, j, k, id, type_local);
-
 #ifdef L_TEMPERATURE
 				// MACROSCOPIC IN TEMPERATURE FIELD //
 				_LBM_tmacro_opt(i, j, k, id, ttype_local);
@@ -265,6 +264,7 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		{
 			fNew[v + id * L_NUM_VELS] =
 				_LBM_equilibrium_opt(id, v);
+/* 			std::cout << id << ", " << u[id* L_DIMS+0] << std::endl; */
 		}
 		// EXTRAPOLATERIGHT
 		else if (src_type_local == eExtrapolateRight)

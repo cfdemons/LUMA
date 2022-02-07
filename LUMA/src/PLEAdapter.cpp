@@ -214,10 +214,10 @@ ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, 
 	}
 	
 	// DEBUGGG!!
-	for (int i = 0; i < L_DIMS*2; i++)
+/* 	for (int i = 0; i < L_DIMS*2; i++)
 	{
 		std::cout << "LUMA: extents " + std::to_string(i) + " = " + std::to_string(extents[i]) << std::endl;
-	}
+	} */
 
 	return 1;
 }
@@ -389,17 +389,16 @@ bool PLEAdapter::configFileRead()
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeY[i] / dh));
 		pleInt.dimensions.push_back(static_cast<int>(pleSizeZ[i] / dh));
 
-//??? Why reading is different from writting?
 		std::cout << " Read data " << pleRead[i] << " Write data " << pleWrite[i] << std::endl;
 		
 		for (char const c : pleRead[i])
 		{
-			std::cout << c << std::endl;
+			//std::cout << c << std::endl;
 			pleInt.readData.push_back(c);
 		}
 		for (int c = 0; c < pleWrite[i].size(); c++)
 		{
-			std::cout << pleWrite[i][c] << std::endl;
+			//std::cout << pleWrite[i][c] << std::endl;
 			pleInt.writeData.push_back(pleWrite[i][c]);
 		}
 
@@ -416,7 +415,7 @@ bool PLEAdapter::configFileRead()
 
 void PLEAdapter::addPLELocator(int i)
 {
-	std::cout << "LUMA: Hello before PLE locator creation. " << std::endl;
+	//std::cout << "LUMA: Hello before PLE locator creation. " << std::endl;
 
 	if ((i == (coordinates_.size() - 1)) && (i == locators_.size()))  // If this locators_ position doesn't contain any data yet but has a corresponding coordinates.
 	{
@@ -435,7 +434,7 @@ void PLEAdapter::addPLELocator(int i)
 		L_ERROR("PLE locator number " + std::to_string(i) + " can't be created without associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
 	}
 
-	std::cout << "LUMA: PLE locator created. " << std::endl;
+	//std::cout << "LUMA: PLE locator created. " << std::endl;
 
 	int locator_options[PLE_LOCATOR_N_OPTIONS];
 	locator_options[PLE_LOCATOR_NUMBERING] = 1;
@@ -616,7 +615,7 @@ void PLEAdapter::sendData()
 				//		" y: " + std::to_string(send_v[3 * ii + 1]) +
 				//		" z: " + std::to_string(send_v[3 * ii + 2]), GridUtils::logfile);
 
-				std::cout << "LUMA send_v size " << std::to_string(send_v.size()) << " coupled points " << std::to_string(nCoupledPoints) << std::endl;
+				//std::cout << "LUMA send_v size " << std::to_string(send_v.size()) << " coupled points " << std::to_string(nCoupledPoints) << std::endl;
 
 				// Convert send_v from LUMA units to CS units. 
 				GridUnits::ulbm2ud(send_v, currentGrid);
@@ -627,9 +626,9 @@ void PLEAdapter::sendData()
 				{
 					flowrate += send_v[3 * ii] * 0.01 * 0.01;
 				}
-				std::cout << "****** The flowrate send to CS in real units: ******" << flowrate << std::endl;
+				//std::cout << "****** The flowrate send to CS in real units: ******" << flowrate << std::endl;
 
-				std::cout << "LUMA: velocity in CS units " << std::to_string(send_v[4]) << std::endl;
+				//std::cout << "LUMA: velocity in CS units " << std::to_string(send_v[4]) << std::endl;
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), L_DIMS, 0);
 
@@ -689,7 +688,7 @@ void PLEAdapter::receiveData()
 				std::vector<double> received_t(nCoupledPoints, 0.0);
 				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 				
-				std::cout << "LUMA: Ready to receive temperature. "  << nCoupledPoints << " "  << received_t[nCoupledPoints*L_DIMS-1] << " " << received_t.size() << std::endl;
+				//std::cout << "LUMA: Ready to receive temperature. "  << nCoupledPoints << " "  << received_t[nCoupledPoints*L_DIMS-1] << " " << received_t.size() << std::endl;
 
 				// Receive the data from CS
 				ple_locator_exchange_point_var(locators_.at(i), NULL, received_t.data(), NULL, sizeof(double), 1, 0);
@@ -725,32 +724,33 @@ void PLEAdapter::receiveData()
 				std::vector<double> received_v(nCoupledPoints * L_DIMS, 0.0);
 				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
-				std::cout << "LUMA: Ready to receive velocity. "  << nCoupledPoints << " "  << received_v[nCoupledPoints*L_DIMS-1] << " " << received_v.size() << std::endl;
+				//std::cout << "LUMA: Ready to receive velocity. "  << nCoupledPoints << " "  << received_v[nCoupledPoints*L_DIMS-1] << " " << received_v.size() << std::endl;
 
 				// Receive the data from CS
 				ple_locator_exchange_point_var(locators_.at(i), NULL, received_v.data(), NULL, sizeof(double), 3, 0);
 
-				std::cout << "LUMA: Velocity received. " << received_v[nCoupledPoints * L_DIMS - 1] << " " << received_v.size() << std::endl;
+				//std::cout << "LUMA: Velocity received. " << received_v[nCoupledPoints * L_DIMS - 1] << " " << received_v.size() << std::endl;
 				
 				// Test the velocity reveived from the CS
 				double flowrate = 0.;
 				for (int ii = 0; ii < nCoupledPoints; ii++)
 				{
 					flowrate += received_v[ii * L_DIMS] * 0.01 * 0.01;
+					//std::cout << received_v[ii * L_DIMS] << " ";
 				}
-				std::cout<< "++++++ The flowrate received from CS in real units: ++++++" << flowrate << std::endl;
+				//std::cout<< "++++++ The flowrate received from CS in real units: ++++++" << flowrate << std::endl;
 
 				// Convert received_v from CS units to LUMA units.
 				GridUnits::ud2ulbm(received_v, currentGrid);
 
-				std::cout << "LUMA: Velocity converted to LUMA units. " << received_v[nCoupledPoints * L_DIMS - 1] << std::endl;
+				//std::cout << "LUMA: Velocity converted to LUMA units. " << received_v[nCoupledPoints * L_DIMS - 1] << std::endl;
 
 				// Introduce the received velocity to the LUMA grid. 
 				// The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// For the moment the interpolation is just nearest neighbour. 
 				currentGrid->coupling_addData("v", received_id, received_v);
 				
-				std::cout << "LUMA: Velocity added to LUMA mesh." << std::endl;
+				//std::cout << "LUMA: Velocity added to LUMA mesh." << std::endl;
 			}
 			else
 			{

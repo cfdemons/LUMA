@@ -461,7 +461,7 @@ void PLEAdapter::addPLELocator(int i)
 
 	for (int l = 0; l < coordinates_.at(i).size() / 3.0; l++)
 	{
-		L_INFO("LUMA to CS dist " + std::to_string(lumaToCSdist.at(i)), GridUtils::logfile);
+		L_INFO("LUMA to CS dist " + std::to_string(lumaToCSdist.at(l)), GridUtils::logfile);
 	}
 
 	//- Check that all points are effectively located

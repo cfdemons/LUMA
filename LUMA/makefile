@@ -1,6 +1,6 @@
 # LUMA Makefile
 
-CS_INSTALL=/home/martacamps/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64
+CS_INSTALL=/home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64
 
 # Compiler command
 CC=mpicxx
@@ -20,8 +20,8 @@ SRCS:=$(wildcard $(SDIR)/*.cpp)
 OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 
 # Include and library file
-INC=-I$(HDF5_HOME)/include -I$ /home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/include
-LIB=-L$(HDF5_HOME)/lib -L$ /home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64/lib/ -lhdf5 -llapack -lple
+INC=-I$(HDF5_HOME)/include -I$ $(CS_INSTALL)/include
+LIB=-L$(HDF5_HOME)/lib -L$ $(CS_INSTALL)/lib/ -lhdf5 -llapack -lple
 
 ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)

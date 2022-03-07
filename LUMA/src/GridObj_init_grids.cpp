@@ -1084,27 +1084,6 @@ void GridObj::LBM_initBoundLab ( )
 	// Declarations
 	int i, j, k;
 
-	// LEFT WALL //
-
-	// Search position vector to see if left hand wall on this rank
-	for (i = 0; i < N_lim; i++)
-	{
-		// Wall found
-		if (XPos[i] <= L_WALL_THICKNESS_LEFT)
-		{
-			// Label boundary
-			for (j = 0; j < M_lim; j++)
-			{
-				for (k = 0; k < K_lim; k++)
-				{
-					LatTyp(i, j, k, M_lim, K_lim) = 
-						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_LEFT);
-				}
-			}
-		}
-	}
-
-
 #if (L_DIMS == 3)
 
 	// FRONT WALL //
@@ -1190,6 +1169,26 @@ void GridObj::LBM_initBoundLab ( )
 				{
 					LatTyp(i, j, k, M_lim, K_lim) = 
 						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_RIGHT);
+				}
+			}
+		}
+	}
+
+	// LEFT WALL //
+
+	// Search position vector to see if left hand wall on this rank
+	for (i = 0; i < N_lim; i++)
+	{
+		// Wall found
+		if (XPos[i] <= L_WALL_THICKNESS_LEFT)
+		{
+			// Label boundary
+			for (j = 0; j < M_lim; j++)
+			{
+				for (k = 0; k < K_lim; k++)
+				{
+					LatTyp(i, j, k, M_lim, K_lim) = 
+						LBM_setBCPrecedence(LatTyp(i, j, k, M_lim, K_lim), L_WALL_LEFT);
 				}
 			}
 		}

@@ -96,6 +96,18 @@ enum eType
 	eCoupling				///< Coupling boundary condition
 };
 
+/// \enum eTowards
+/// \brief CS mesh towards LUMA mesh movement, apply to face coupling
+enum eTowards
+{
+	eXpos,
+	eXneg,
+	eYpos,
+	eYneg,
+	eZpos,
+	eZneg
+};
+
 /// \enum eTType
 /// \brief Lattice typing labels in temperature field
 enum eTType

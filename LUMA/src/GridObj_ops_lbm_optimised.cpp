@@ -264,7 +264,6 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 		{
 			fNew[v + id * L_NUM_VELS] =
 				_LBM_equilibrium_opt(src_id, v);
-/* 			std::cout << id << ", " << u[id* L_DIMS+0] << std::endl; */
 		}
 		// EXTRAPOLATERIGHT
 		else if (src_type_local == eExtrapolateRight)

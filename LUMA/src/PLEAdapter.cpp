@@ -222,21 +222,166 @@ ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, 
 	return 1;
 }
 
-void PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
+/// This function is used to mapping from defined values to LUMA mesh
+std::map<int, eTowards> PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[], int inter_id, int en)
 {
 	const GridObj* grid = static_cast<const GridObj*>(mesh);
-
+	std::map<int, eTowards> temp_positionID;
 	L_INFO("Number of points to locate " + std::to_string(n_points), GridUtils::logfile);
-
+	
 	for (int p = 0; p < n_points; p++)
 	{
 		// Set the point coordinates in the LUMA coordinate system
-		double px = point_coords[3 * p] + L_PLE_OFFSET_X;
-		double py = point_coords[3 * p + 1] + L_PLE_OFFSET_Y;
-		double pz = point_coords[3 * p + 2 ] + L_PLE_OFFSET_Z;
+		double px, py, pz;
 
+		px = point_coords[3 * p] + L_PLE_OFFSET_X;
+		py = point_coords[3 * p + 1] + L_PLE_OFFSET_Y;
+		pz = point_coords[3 * p + 2 ] + L_PLE_OFFSET_Z;
 
+		eLocationOnRank loc;
+		std::vector<int> pos = { -1, -1, -1 };
+		// Check that the point is not in the sending or receiving layers. (I think we don't want the point to be in a sending or receiving halo). 
+		if (GridUtils::isOnThisRank(px, py, pz, &loc, grid, &pos))
+		{
+			// If the point is in the receiving halo, it is counted as unlocated. 
+			if (loc == eHalo)
+			{
+				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) +  " " + std::to_string(py) + " " + std::to_string(pz) + " is in the halo of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+				location[p] = -1;
+				distance[p] = -1;
+			}
+			else if (loc == eCore) // Point is in the core of the rank's meshes, including the sending halo. 
+			{
+				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is inside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
 
+				// Flatten the index returned by inOnThisRank
+				int id = pos[2] + pos[1] * grid->K_lim + pos[0] * grid->K_lim * grid->M_lim;
+				location[p] = id;
+
+				// Established the map between ID and interpolation direction
+				if (!pleName[inter_id].compare("CS_inlet"))	// compare function: If is CS_inlet, return false //Only map for face unit
+				{
+					temp_positionID[id]=pleOffset[en];					
+				}
+
+				// TODO: To fill the distance array I have to get the LUMA coordinates of id and then calculate the absolute distance between them
+				// and the coordinates in point_coords. I think it is just XPos[pos[0]], YPos[pos[1]], ZPos[pos[2]]. Then divide it by dx and this should be smaller than 1
+				distance[p] = GridUtils::vecnorm(px - grid->XPos.at(pos[0]),
+					py - grid->YPos.at(pos[1]),
+					pz - grid->ZPos.at(pos[2]));// / grid->dh;
+				
+				if (distance[p] > 1)
+				{
+					L_ERROR("The distance between PLE point with coordinates x = " + std::to_string(px) +
+						" y = " + std::to_string(py) +
+						" z = " + std::to_string(pz) +
+						" and the LUMA mesh position x = " + std::to_string(grid->XPos.at(pos[0])) +
+						" y = " + std::to_string(grid->YPos.at(pos[1])) +
+						" z = " + std::to_string(grid->ZPos.at(pos[2])) +
+						" is " + std::to_string(distance[p]) + "which is bigger than 1. But the point should be inside the cell",
+						GridUtils::logfile);
+				}
+				// WARNING: The LUMA search functions are not prepared to work with tolerance. So I think I will set all the LUMA tolerances to 0. 
+			}
+			else
+			{
+				L_ERROR("Trying to locate a point from PLE mesh. The point is in the mesh but its location is eNone", GridUtils::logfile);
+			}
+		}
+		else // If the point is not in the current rank, set the distance to -1 and the index of the point
+		{
+			location[p] = -1;
+			distance[p] = -1;
+
+			L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates "+ std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is outside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+		}
+
+		L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " distance " + std::to_string(distance[p]), GridUtils::logfile);
+	}
+	return temp_positionID;
+}
+
+/// This function is used to establish mapping from CS to LUMA
+void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
+{
+	const GridObj* grid = static_cast<const GridObj*>(mesh);
+	L_INFO("Number of points to locate " + std::to_string(n_points), GridUtils::logfile);
+	for (int p = 0; p < n_points; p++)
+	{
+		double px, py, pz;
+		// Set the point coordinates in the LUMA coordinate system
+		px = point_coords[3 * p + 0] + L_PLE_OFFSET_X;
+		py = point_coords[3 * p + 1] + L_PLE_OFFSET_Y;
+		pz = point_coords[3 * p + 2] + L_PLE_OFFSET_Z;
+
+		for (int face = 0; face < L_PLE_INTERFACES; face++)
+		{
+			// ! When pleName the first value is CS_inlet
+			if (pleName[face].compare("CS_inlet")) // Result is same, return 0, else return 1
+				continue;
+
+			for (int ii = 0; ii < L_COUPLING_ENTITY; ii++)
+			{
+				double xdist, ydist, zdist;
+				// Based on the properity, judge if CS return point is located on face
+				xdist = abs(point_coords[3 * p] - plePosX[face][ii]) * (double) L_RESOLUTION;
+				ydist = abs(point_coords[3 * p + 1] - plePosY[face][ii]) * (double) L_RESOLUTION;
+				zdist = abs(point_coords[3 * p + 2] - plePosZ[face][ii]) * (double) L_RESOLUTION;
+				
+				if(pleOffset[ii] == eXneg)
+					xdist -= 1.0;
+				if(pleOffset[ii] == eYneg)
+					ydist -= 1.0;
+				if(pleOffset[ii] == eZneg)
+					zdist -= 1.0;
+				
+				// Error are supposed as 0.1 lattcie
+				if (xdist < 0.1)
+				{
+					switch (pleOffset[ii])
+					{
+						case eXpos:
+							px += 0.3 / L_RESOLUTION;
+							break;
+						case eXneg:
+							px -= 0.3 / L_RESOLUTION;
+							break;
+						default:
+							break;
+					}
+				}
+
+				else if (ydist < 0.1)
+				{
+					switch(pleOffset[ii])
+					{
+						case eYpos:
+							py += 0.3 / L_RESOLUTION;
+							break;
+						case eYneg:
+							py -= 0.3 / L_RESOLUTION;
+							break;
+						default:
+							break;
+					}
+				}
+
+				else if (zdist < 0.1)
+				{
+					switch(pleOffset[ii])
+					{
+						case eZpos:
+							pz += 0.3 / L_RESOLUTION;
+							break;
+						case eZneg:
+							pz -= 0.3 / L_RESOLUTION;
+							break;
+						default:
+							break;
+					}
+			    }
+			}
+		}
 		eLocationOnRank loc;
 		std::vector<int> pos = { -1, -1, -1 };
 		// Check that the point is not in the sending or receiving layers. (I think we don't want the point to be in a sending or receiving halo). 
@@ -279,10 +424,8 @@ void PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 						" is " + std::to_string(distance[p]) + "which is bigger than 1. But the point should be inside the cell",
 						GridUtils::logfile);
 				}
-
 				// WARNING: The LUMA search functions are not prepared to work with tolerance. So I think I will set all the LUMA tolerances to 0. 
 				// It should work. 
-
 			}
 			else
 			{
@@ -334,7 +477,6 @@ void PLEAdapter::exchangeMessage(const std::string &messageToSend, std::string *
 					CSRootRank_, csLumaCouplingTag_,
 					mpiCS_);
 			}
-
 		}
 		else if (messageReceived != NULL) 
 		{
@@ -374,6 +516,8 @@ bool PLEAdapter::configFileRead()
 
 	// NOTE: This might be different if using grid refinement!!
 	double dh = LUMAGrid_->Grids->dh;
+	// These variables are used to reduce the type transfer problem (double->int)
+	double sizex, sizey, sizez;
 
 	for (int i = 0; i < L_PLE_INTERFACES; i++)
 	{
@@ -381,35 +525,36 @@ bool PLEAdapter::configFileRead()
 
 		pleInt.meshName = pleName[i];
 
-		pleInt.position.push_back(plePosX[i]);
-		pleInt.position.push_back(plePosY[i]);
-		pleInt.position.push_back(plePosZ[i]);
+		for (int j = 0; j < L_COUPLING_ENTITY; j++)
+		{
+			pleInt.position.push_back(plePosX[i][j]);
+			pleInt.position.push_back(plePosY[i][j]);
+			pleInt.position.push_back(plePosZ[i][j]);
 
-		pleInt.dimensions.push_back(static_cast<int>(pleSizeX[i] / dh));
-		pleInt.dimensions.push_back(static_cast<int>(pleSizeY[i] / dh));
-		pleInt.dimensions.push_back(static_cast<int>(pleSizeZ[i] / dh));
+			sizex = pleSizeX[i][j] * (1.0 / dh);
+			sizey = pleSizeY[i][j] * (1.0 / dh);
+			sizez = pleSizeZ[i][j] * (1.0 / dh);
 
+			pleInt.dimensions.push_back(static_cast<int>(sizex));
+			pleInt.dimensions.push_back(static_cast<int>(sizey));
+			pleInt.dimensions.push_back(static_cast<int>(sizez));
+		}
 		std::cout << " Read data " << pleRead[i] << " Write data " << pleWrite[i] << std::endl;
 		
 		for (char const c : pleRead[i])
 		{
-			//std::cout << c << std::endl;
 			pleInt.readData.push_back(c);
 		}
 		for (int c = 0; c < pleWrite[i].size(); c++)
 		{
-			//std::cout << pleWrite[i][c] << std::endl;
 			pleInt.writeData.push_back(pleWrite[i][c]);
 		}
 
-		L_INFO("Interface " + std::to_string(i) + " dx= " + std::to_string(dh) + " Size x " + std::to_string(pleSizeX[i]) + " Nx= " + std::to_string(pleInt.dimensions.at(0)), GridUtils::logfile);
+		/* REMEMBER: to correct this logfile term.pleSizeX[i]*/
+		// L_INFO("Interface " + std::to_string(i) + " dx= " + std::to_string(dh) + " Size x " + std::to_string(pleSizeX[i]) + " Nx= " + std::to_string(pleInt.dimensions.at(0)), GridUtils::logfile);
 
 		interfacesConfig_.push_back(pleInt);
 	}
-
-	//std::cout << "ple Write data " << interfacesConfig_[0].writeData[0] << std::endl;
-	//std::cout << "ple Read data " << interfacesConfig_[1].readData[0] << std::endl;
-
     return true;
 }
 
@@ -451,19 +596,79 @@ void PLEAdapter::addPLELocator(int i)
 		0.,
 		tolerance_,
 		L_DIMS,
-		coordinates_.at(i).size() / 3.0,
+		coordinates_.at(i).size() / L_DIMS,
 		NULL,
 		NULL,
 		coordinates_.at(i).data(),
 		lumaToCSdist.data(),
 		&meshExtents,
-		&pointInMesh);
-
-	for (int l = 0; l < coordinates_.at(i).size() / 3.0; l++)
+		&pointInMeshMapping);
+	
+	for (int l = 0; l < coordinates_.at(i).size() / L_DIMS; l++)
 	{
 		L_INFO("LUMA to CS dist " + std::to_string(lumaToCSdist.at(l)), GridUtils::logfile);
 	}
 
+	std::cout << "*-*-*-*-*-I am testing the location form the local mesh*-*-*-*-*-*-*-*-*" << std::endl;
+	for (int ii = 0; ii < coordinates_.at(i).size()/L_DIMS;ii++)
+	{
+		std::cout << coordinates_.at(i)[ii] << " ";
+	}
+
+	std::cout << "*-*-*-*-*-I am testing the location form the distant mesh*-*-*-*-*-*-*-*-*" << std::endl;
+	size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
+	const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
+	for (int ii = 0; ii < nCoupledPoints;ii++)
+	{
+		std::cout << IDCoupledPoints[ii] << " ";
+	}
+	
+	// This is used to obtaine the neighbour position to interpolate
+	if (!pleName[i].compare("CS_inlet"))	// compare function: If is CS_inlet, return false
+	{
+		//const GridObj* grid;
+		
+		int num_xdiff =  (int)(L_BY*L_RESOLUTION*L_BZ*L_RESOLUTION);
+		int num_ydiff =  (int)(L_BZ*L_RESOLUTION);
+		int num_zdiff =  1;
+
+		size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
+		const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
+
+		std::vector<int> send_id_diff(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+
+		for (int ii = 0; ii < nCoupledPoints; ii++)
+		{
+		//std::cout << positionID_.at(IDCoupledPoints[ii])<<std::endl;
+
+			switch(positionID_.at(IDCoupledPoints[ii]))
+			{
+				//std::cout << positionID_.at(IDCoupledPoints[ii]) << " ";
+				case eXneg:
+					send_id_diff[ii] += num_xdiff;
+					break;
+				case eXpos:
+					send_id_diff[ii] -= num_xdiff;
+					break;
+				case eYneg:
+					send_id_diff[ii] += num_ydiff;
+					break;
+				case eYpos:
+					send_id_diff[ii] -= num_ydiff;
+					break;
+				case eZneg:
+					send_id_diff[ii] += num_zdiff;
+					break;
+				case eZpos:
+					send_id_diff[ii] -= num_zdiff;
+					break;
+				default:
+					break;
+			}
+		}
+		send_id_diff_.resize(nCoupledPoints);
+		send_id_diff_ = send_id_diff;
+	}
 	//- Check that all points are effectively located
 	ple_lnum_t nExterior = ple_locator_get_n_exterior(locators_.at(i));
 
@@ -501,9 +706,6 @@ void PLEAdapter::addPLELocator(int i)
 			1,
 			1);
 	}
-	
-
-
 }
 
 /*----------------------------------------------------------------------------*/
@@ -561,12 +763,14 @@ void PLEAdapter::sendData()
 		// Check which ones have data to write to PLE
 		for (auto writeJ = interfacesConfig_.at(i).writeData.begin(); writeJ != interfacesConfig_.at(i).writeData.end(); ++writeJ)
 		{
-			// Get the number of coupled points and their LUMA cell id
-			size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
-			const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
-
-			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
-			// pointInMesh should do the check for nested grids too to store the correct indices in IDCoupledPoints. 
+			// Get the number of coupled points and their CS cell/face id
+			size_t nCoupledPoints_dist = ple_locator_get_n_dist_points(locators_.at(i));
+			const int* IDCoupledPoints_dist = ple_locator_get_dist_locations(locators_.at(i));
+/*  			std::cout << "------------------------------------------------------------- " << std::endl;
+			for (int i = 0; i < 500; i++)
+				std::cout << IDCoupledPoints_dist[i] << " ";  */
+			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from.
+			// pointInMesh should do the check for nested grids too to store the correct indices in IDCoupledPoints.
 			// I think there is a function in GridUtils that returns the finest grid in a position.
 			// But what if the coupled surface takes more than one grid level?
 			// Then I'll have to get the grid for each point in the surface...
@@ -576,25 +780,23 @@ void PLEAdapter::sendData()
 			{
 				// Extract temperature from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
 				// So it is OK to directly access the temperature array.
-				std::vector<double> send_v(nCoupledPoints, 0.0);
-				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+				std::vector<double> send_v(nCoupledPoints_dist * L_DIMS, 0.0);
+				std::vector<int> send_id(IDCoupledPoints_dist, IDCoupledPoints_dist + nCoupledPoints_dist);
 
-				currentGrid->coupling_extractData("temperature", send_id, send_v);
+				currentGrid->coupling_extractData("temperature", send_id, send_id_diff_,send_v);
 				
 				//I think I should add the unit conversion from lattice units(used in LUMA) to physical units(used in CS)
 				GridUnits::tlat2phys(send_v);
 
-				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
-
-				
+				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);				
 			}
 			else if ((*writeJ == 'r') || (*writeJ == 'R'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				std::vector<double> send_v(nCoupledPoints, 0.0);
-				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
+				std::vector<double> send_v(nCoupledPoints_dist, 0.0);
+				std::vector<int> send_id(IDCoupledPoints_dist, IDCoupledPoints_dist + nCoupledPoints_dist);
 
-				currentGrid->coupling_extractData("rho", send_id, send_v);
+				currentGrid->coupling_extractData("rho", send_id, send_id_diff_,send_v);
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);
 
@@ -604,10 +806,10 @@ void PLEAdapter::sendData()
 			else if ((*writeJ == 'v') || (*writeJ == 'V'))
 			{
 				// Extract velocity from the LUMA grid. The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				std::vector<double> send_v(nCoupledPoints * L_DIMS, 0.0);
-				std::vector<int> send_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);  
+				std::vector<double> send_v(nCoupledPoints_dist * L_DIMS, 0.0);
+				std::vector<int> send_id(IDCoupledPoints_dist, IDCoupledPoints_dist + nCoupledPoints_dist);
 
-				currentGrid->coupling_extractData("v", send_id, send_v);
+				currentGrid->coupling_extractData("v", send_id, send_id_diff_, send_v); //send_id_diff_
 
 				//for (int ii = 0; ii < nCoupledPoints; ii++)
 				//	L_INFO("Velocity sent: id " + std::to_string(IDCoupledPoints[ii]) +
@@ -620,9 +822,11 @@ void PLEAdapter::sendData()
 				// Convert send_v from LUMA units to CS units. 
 				GridUnits::ulbm2ud(send_v, currentGrid);
 
+				//PLEAdapter::coordLUMA2CS((double *)pleSizeX, (double *)pleSizeY, (double *)pleSizeZ, 1, L_COUPLING_ENTITY, "v", send_v);
+
 				//Calculate the flow rate to send CS in real units
 				double flowrate = 0.;
-				for (int ii = 0; ii < nCoupledPoints; ii++)
+				for (int ii = 0; ii < nCoupledPoints_dist; ii++)
 				{
 					flowrate += send_v[3 * ii] * 0.01 * 0.01;
 				}
@@ -663,14 +867,13 @@ void PLEAdapter::receiveData()
 
 			// Get the number of coupled points and their LUMA cell id
 			//size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
-			//const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
-
+			//const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));	
 			size_t nCoupledPoints = ids_.at(i).size();
 
 			L_INFO("Number of interior points " + std::to_string(nCoupledPoints), GridUtils::logfile);
 
 			const int* IDCoupledPoints = ids_.at(i).data();
-
+			std::cout << nCoupledPoints << " " << *IDCoupledPoints << " " << std::endl;
 			//L_INFO("Number of interior points " + std::to_string(nCoupledPoints) + " ID of second point " + std::to_string(IDCoupledPoints[1]), GridUtils::logfile);
 
 			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
@@ -724,13 +927,9 @@ void PLEAdapter::receiveData()
 				std::vector<double> received_v(nCoupledPoints * L_DIMS, 0.0);
 				std::vector<int> received_id(IDCoupledPoints, IDCoupledPoints + nCoupledPoints);
 
-				//std::cout << "LUMA: Ready to receive velocity. "  << nCoupledPoints << " "  << received_v[nCoupledPoints*L_DIMS-1] << " " << received_v.size() << std::endl;
-
 				// Receive the data from CS
 				ple_locator_exchange_point_var(locators_.at(i), NULL, received_v.data(), NULL, sizeof(double), 3, 0);
 
-				//std::cout << "LUMA: Velocity received. " << received_v[nCoupledPoints * L_DIMS - 1] << " " << received_v.size() << std::endl;
-				
 				// Test the velocity reveived from the CS
 				double flowrate = 0.;
 				for (int ii = 0; ii < nCoupledPoints; ii++)
@@ -738,16 +937,10 @@ void PLEAdapter::receiveData()
 					flowrate += received_v[ii * L_DIMS] * 0.01 * 0.01;
 					//std::cout << received_v[ii * L_DIMS] << " ";
 				}
-				//std::cout<< "++++++ The flowrate received from CS in real units: ++++++" << flowrate << std::endl;
-
 				// Convert received_v from CS units to LUMA units.
 				GridUnits::ud2ulbm(received_v, currentGrid);
-
-				//std::cout << "LUMA: Velocity converted to LUMA units. " << received_v[nCoupledPoints * L_DIMS - 1] << std::endl;
-
 				// Introduce the received velocity to the LUMA grid. 
 				// The IDs in IDCoupledPoints should be safe because are given by PLEAdapter::pointInMesh()
-				// For the moment the interpolation is just nearest neighbour. 
 				currentGrid->coupling_addData("v", received_id, received_v);
 				
 				//std::cout << "LUMA: Velocity added to LUMA mesh." << std::endl;
@@ -821,14 +1014,7 @@ bool PLEAdapter::configure()
 	{
 
 		// Set coordinates in the global coordinate system (same coord system as Code_Saturne)
-		setCoordinates(interfacesConfig_.at(i).dimensions.at(0),
-		   interfacesConfig_.at(i).dimensions.at(1),
-		   interfacesConfig_.at(i).dimensions.at(2),
-		   interfacesConfig_.at(i).position.at(0),
-		   interfacesConfig_.at(i).position.at(1),
-		   interfacesConfig_.at(i).position.at(2),
-		   LUMAGrid_->Grids->dh, i);
-		
+		setCoordinates(interfacesConfig_.at(i).dimensions, interfacesConfig_.at(i).position, LUMAGrid_->Grids->dh, i);
 
 		/*exchangeData_->addRepo(interfacesConfig_.at(i).dimensions.at(0), interfacesConfig_.at(i).dimensions.at(1), interfacesConfig_.at(i).dimensions.at(2),
 			interfacesConfig_.at(i).position.at(0), interfacesConfig_.at(i).position.at(1), interfacesConfig_.at(i).position.at(2),
@@ -965,7 +1151,7 @@ void PLEAdapter::teardown()
     return;
 }
 
-void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int inter_id)
+void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0, double dx, int inter_id)
 {
 	/*if (numDataPoints_ > 0)
 	{
@@ -973,15 +1159,10 @@ void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, doub
 	}*/
 
 	L_INFO("I'm in setCoordinates", GridUtils::logfile);
-
-	double x0 = x;
-	double y0 = y;
-	double z0 = z;
+	std::map<int, eTowards> temp_positionID;
 
 	std::vector<double> coord;
 	std::vector<int> id;
-
-
 	std::vector<double> temp_coord;
 	std::vector<int> location;
 	std::vector<float> dist;
@@ -991,37 +1172,44 @@ void PLEAdapter::setCoordinates(int Nx, int Ny, int Nz, double x, double y, doub
 	dist.resize(1);
 	dummy.resize(1);
 
-	L_INFO("Nx = " + std::to_string(Nx) + " Ny = " + std::to_string(Ny) + " Nz = " + std::to_string(Nz) , GridUtils::logfile);
-
-	// Fill in the coordinates vector. C style ordering
-	for (int i = 0; i < Nx; i++)
+	for (int en = 0; en < L_COUPLING_ENTITY; en++)
 	{
-		for (int j = 0; j < Ny; j++)
+		L_INFO("Nx[" + std::to_string(en) + "]=" + std::to_string(Nxyz.at(L_DIMS*en+0)) + " Ny["+ std::to_string(en) +"]=" + std::to_string(Nxyz.at(L_DIMS*en+1)) 
+				+ " Nz["+ std::to_string(en) + "]=" + std::to_string(Nxyz.at(L_DIMS*en+2)), GridUtils::logfile);
+
+
+		// Fill in the coordinates vector. C style ordering
+		for (int i = 0; i < Nxyz.at(L_DIMS*en+0); i++)
 		{
-			for (int k = 0; k < Nz; k++)
+			for (int j = 0; j < Nxyz.at(L_DIMS*en+1); j++)
 			{
-				temp_coord[0] = x0 + i * dx + dx / static_cast<double>(2.0);
-				temp_coord[1] = y0 + j * dx + dx / static_cast<double>(2.0);
-				temp_coord[2] = z0 + k * dx + dx / static_cast<double>(2.0);
-
-				// Check if temp_coord is in the current rank and store its LUMA mesh ID. 
-				pointInMesh(LUMAGrid_->Grids, 0, 0, 1, temp_coord.data(), dummy.data(), location.data(), dist.data());
-
-				// Add the coordinates and the ID to the coordinates and ID arrays if they are in the mesh for the current rank. 
-				if (location.at(0) != -1)
+				for (int k = 0; k < Nxyz.at(L_DIMS*en+2); k++)
 				{
-					for (int d = 0; d < L_DIMS; d++)
-						coord.push_back(temp_coord.at(d));
-					id.push_back(location.at(0));
+					// Define on the cell/face center
+					temp_coord[0] = xyz0.at(L_DIMS * en + 0) + i * dx + dx / static_cast<double>(2.0);
+					temp_coord[1] = xyz0.at(L_DIMS * en + 1) + j * dx + dx / static_cast<double>(2.0);
+					temp_coord[2] = xyz0.at(L_DIMS * en + 2) + k * dx + dx / static_cast<double>(2.0);
 
-					L_INFO("Cell ID " + std::to_string(id.back()), GridUtils::logfile);
+					// Check if temp_coord is in the current rank and store its LUMA mesh ID. 
+					temp_positionID=pointInMesh(LUMAGrid_->Grids, 0, 0, 1, temp_coord.data(), dummy.data(), location.data(), dist.data(), inter_id, en);
+					
+					// Create the id and position mapping
+					for(auto& imap:temp_positionID)
+					{
+						positionID_[imap.first] = imap.second;
+					}
+
+					// Add the coordinates and the ID to the coordinates and ID arrays if they are in the mesh for the current rank. 
+					if (location.at(0) != -1)
+					{
+						for (int d = 0; d < L_DIMS; d++)
+							coord.push_back(temp_coord.at(d));
+						id.push_back(location.at(0));
+
+						L_INFO("Cell ID " + std::to_string(id.back()), GridUtils::logfile);
+					}
+					L_INFO("Coord z: " + std::to_string(coord.back()), GridUtils::logfile);
 				}
-
-
-				//coord.push_back(x0 + i * dx + dx / static_cast<double>(2.0));
-				L_INFO("Coord z: " + std::to_string(coord.back()), GridUtils::logfile);
-				//coord.push_back(y0 + j * dx + dx / static_cast<double>(2.0));
-				//coord.push_back(z0 + k * dx + dx / static_cast<double>(2.0));
 			}
 		}
 	}
@@ -1106,4 +1294,3 @@ PLEAdapter::~PLEAdapter()
 
     return;
 }
-

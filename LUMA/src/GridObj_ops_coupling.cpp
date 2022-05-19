@@ -30,7 +30,6 @@ streaming and macroscopic calulcation.
 #include "../inc/ObjectManager.h"
 
 using namespace std;
-
 // *****************************************************************************
 /// \brief	Add an external data array to the LUMA flow fields.
 ///
@@ -52,21 +51,16 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 				name + " cell ID size: " + std::to_string(cellIDs.size()) +
 				"data size: " + std::to_string(data.size()), GridUtils::logfile);
 		}
-		// Wait to change the x, y and z range to enable different top and bottom BC 
-		int i = 0;
-		for (int z = 0; z < (int)(L_BZ*L_RESOLUTION); z++)
-			for (int y = 0; y < (int)(L_BY*L_RESOLUTION); y++)
-			{
-				// At present, the top and bottom is solid BC, so they are ignored when coupling calculation
-				if(y == ((int)(L_BY * L_RESOLUTION) -1) || y == 0)
-					continue;
-				int id = (int)(plePosX[1]* L_RESOLUTION) *(int) (L_BY*L_RESOLUTION) * (int)(L_BZ*L_RESOLUTION)  + y * (int)(L_BZ*L_RESOLUTION) + z;
-				u[0 + id * L_DIMS] = data[0 + i * L_DIMS];
-				u[1 + id * L_DIMS] = data[1 + i * L_DIMS];
-				u[2 + id * L_DIMS] = data[2 + i * L_DIMS];
-				i=i+1;
-			}
-	}
+		std::cout << "This is id from addData" << std::endl;
+		for (int i = 0; i < cellIDs.size(); i++)
+		{
+			u[0 + cellIDs[i] * L_DIMS] = data[0 + i * L_DIMS];
+			u[1 + cellIDs[i] * L_DIMS] = data[1 + i * L_DIMS];
+#if (L_DIMS == 3)
+			u[2 + cellIDs[i] * L_DIMS] = data[2 + i * L_DIMS];
+#endif
+		}
+	} 
 	else if ((name.find("rho") != std::string::npos) || (name.find("RHO") != std::string::npos))
 	{
 		// Check that cellIDs and data are the same size and that the size is > 0
@@ -104,34 +98,22 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 /// \param cellIDs	Cell indices at which to extract the field data. The indices are local to the current grid and process.
 /// \param data		Vector in which to store the data. 
 // TODO: add an option to interpolate the data.
-void GridObj::coupling_extractData(std::string name, const std::vector<int>& cellIDs, std::vector<double>& data)
+void GridObj::coupling_extractData(std::string name, const std::vector<int>& cellIDs, const std::vector<int> cellIDs_diff, std::vector<double>& data)
 {
 	// Chek which data to add. 
 	if ((name.find("v") != std::string::npos) || (name.find("V") != std::string::npos))
 	{
 		// Resise the vector data to the size of cellIDs (vector data)
-/* 		data.resize(cellIDs.size() * L_DIMS);
-		for (int i = 0; i < cellIDs.size(); i++)
+		data.resize(cellIDs.size() * L_DIMS);
+ 		for (int i = 0; i < cellIDs.size(); i++)
 		{
-			data[0 + i * L_DIMS] = u[0 + cellIDs[i] * L_DIMS];
-			data[1 + i * L_DIMS] = u[1 + cellIDs[i] * L_DIMS];
+			data[0 + i * L_DIMS] = (u[0 + cellIDs[i] * L_DIMS]+u[0 + cellIDs_diff[i] * L_DIMS])/2.0;
+			data[1 + i * L_DIMS] = (u[1 + cellIDs[i] * L_DIMS]+u[1 + cellIDs_diff[i] * L_DIMS])/2.0;
 #if (L_DIMS == 3)
-			data[2 + i * L_DIMS] = u[2 + cellIDs[i] * L_DIMS];
+			data[2 + i * L_DIMS] = (u[2 + cellIDs[i] * L_DIMS]+u[2 + cellIDs_diff[i] * L_DIMS])/2.0;
 #endif
-		} */
-
-	int i = 0;
-		for (int z = 0; z < (int) (L_BZ*L_RESOLUTION); z++)
-			for (int y = 0; y < (int)(L_BY*L_RESOLUTION); y++)
-			{
-				if(y ==  ((int)(L_BY * L_RESOLUTION) -1) || y == 0)
-					continue;
-				int id = (int)(plePosX[0]*L_RESOLUTION) * (int)(L_BY*L_RESOLUTION) * (int)(L_BZ*L_RESOLUTION)  + y * (int)(L_BZ*L_RESOLUTION) + z;
-				data[0 + i * L_DIMS] = u[0 + id * L_DIMS];
-				data[1 + i * L_DIMS] = u[1 + id * L_DIMS];
-				data[2 + i * L_DIMS] = u[2 + id * L_DIMS];
-				i=i+1;
-			}
+			//std::cout << cellIDs[i] << " " << cellIDs_diff[i]<<" ";
+		} 
 	}
 	else if ((name.find("rho") != std::string::npos) || (name.find("RHO") != std::string::npos))
 	{

@@ -285,7 +285,7 @@ void ObjectManager::addBouncebackObject(GeomPacked *geom, PCpts *_PCpts)
 						g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
 						g->u(ijk[0], ijk[1], ijk[2], 1, g->M_lim, g->K_lim, L_DIMS) = 0.0;
 #if (L_DIMS == 3)
-						g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;
+						g->u(ijk[0], ijk[1], ijk[2], 0, g->M_lim, g->K_lim, L_DIMS) = 0.0;	// here, 0 set here is right?
 #endif
 						g->rho(ijk[0], ijk[1], ijk[2], g->M_lim, g->K_lim) = L_RHOIN;
 

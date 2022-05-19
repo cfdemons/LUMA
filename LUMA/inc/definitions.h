@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 20001					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 15001					///< Number of time steps to run simulation for
 
 
 /*
@@ -173,12 +173,12 @@
 #define L_DIMS 3													///< Number of dimensions to the problem
 #define L_RESOLUTION 100											    ///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
-#define L_CH_LENGTH (L_M- 2.*1.0/L_RESOLUTION)                      ///< Define the characteristic length (used in force term)
+#define L_CH_LENGTH (L_M - 2.*1.0/L_RESOLUTION)                      ///< Define the characteristic length (used in force term)
                                                                     ///< -2 when couple with CS
 
 // Non-dimensional domain dimensions
-#define L_BX 0.55															///< End of domain in X (non-dimensional units)
-#define L_BY (1.0 + 2.0*1.0/L_RESOLUTION) 									///< End of domain in Y (non-dimensional units)
+#define L_BX 0.55//0.6															///< End of domain in X (non-dimensional units)
+#define L_BY (1.0+2.0/L_RESOLUTION) //(0.6 + 1.0/L_RESOLUTION) 					///< End of domain in Y (non-dimensional units)
 #define L_BZ 0.05															///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
@@ -200,8 +200,6 @@
 //#define L_PHYSICAL_TBC_FRONT 293.15     ///< Initial front temperature.
 //#define L_PHYSICAL_TBC_BACK 303.15      ///< Initial back temperature.
 
-
-
 /*
 *******************************************************************************
 ****************************** Couple using PLE **********************************
@@ -212,25 +210,32 @@
                                         ///< When you comment this line, you must remove the PLEAdapter.h and .cpp form scr file, otherwise broken
 #define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
-#define L_PLE_OFFSET_Y (1.0/L_RESOLUTION)
+#define L_PLE_OFFSET_Y 0.0             
 #define L_PLE_OFFSET_Z 0.0
+// For two-way coupling, there are two interface
 #define L_PLE_INTERFACES 2              ///< Number of coupled planes in this instance of LUMA
+// Define how may coupling entity for each coupling interface
+#define L_COUPLING_ENTITY 1             //2
 
 // Name of each PLE interface in the LUMA domain. 
-static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"};
+static std::string pleName[L_PLE_INTERFACES] = {"CS_inlet", "LUMA_outlet"}; //CS_inlet", "LUMA_outlet
 
-// Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system. 
-static double plePosX[L_PLE_INTERFACES] = { 0.44, 0.54}; ///< X component 0.44, 0.59    // 0.0, 0.09
-static double plePosY[L_PLE_INTERFACES] = { 0.01, 0.01}; ///< Y component 
-static double plePosZ[L_PLE_INTERFACES] = { 0.0, 0.0 }; ///< Z component 
+// Position of each PLE interface in the LUMA domain. In dimensionless units and global coordinate system.
+// Set in this way is to corespond the above PLE interface name and the below interface judgement
+static double plePosX[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{0.44}, {0.54}};
+static double plePosY[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{0.01}, {0.01}};
+static double plePosZ[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{0.0},  {0.0}};
+
+// Coulple with CS face causes small offset to match LUMA mesh
+static eTowards pleOffset[L_COUPLING_ENTITY] = {eXneg};
 
 // Size of each PLE interface in the LUMA domain. In dimensionless units. 
-static double pleSizeX[L_PLE_INTERFACES] = { (1.0 / L_RESOLUTION), (1.0 / L_RESOLUTION) }; ///< X component 
-static double pleSizeY[L_PLE_INTERFACES] = { 1.0, 1.0}; ///< Y component 
-static double pleSizeZ[L_PLE_INTERFACES] = { L_BZ, L_BZ }; ///< Z component 
+static double pleSizeX[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{(1.0/L_RESOLUTION)}, {(1.0 / L_RESOLUTION)}}; 
+static double pleSizeY[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{1.0}, {1.0}};
+static double pleSizeZ[L_PLE_INTERFACES][L_COUPLING_ENTITY] = {{L_BZ},{L_BZ}};
 
 // Is the interface a boundary in Code_Saturne?
-static bool csBoundary[L_PLE_INTERFACES] = { true, false };
+static bool csBoundary[L_PLE_INTERFACES] = {true, false};
 
 // Data to read from PLE for each interface. "v" = velocity, "r" = density
 static std::string pleRead[L_PLE_INTERFACES] = { "", "v" };
@@ -318,7 +323,7 @@ static std::string pleWrite[L_PLE_INTERFACES] = { "v"};*/
 #define L_WALL_LEFT	eVelocity			///< BC used on the left of the domain
 #define L_WALL_RIGHT eCoupling			///< BC used on the right of the domain
 #define L_WALL_BOTTOM eSolid		///< BC used on the bottom of the domain
-#define L_WALL_TOP eSolid		///< BC used on the top of the domain
+#define L_WALL_TOP eSolid		///< BC used on the top of the domain //eCoupling
 #define L_WALL_FRONT eFluid			///< BC used on the front of the domain
 #define L_WALL_BACK	eFluid			///< BC used on the bottom of the domain
 

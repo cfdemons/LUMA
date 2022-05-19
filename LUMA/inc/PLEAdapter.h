@@ -98,18 +98,29 @@ private:
 
 	//- PLE locators
 	std::vector<ple_locator_t *> locators_;
+	std::vector<int> send_id_diff_;
 
 	//- PLE locators functions
 	static ple_lnum_t meshExtents(const void *mesh, ple_lnum_t n_max_extents, double tolerance, double extents[]);
-	static void pointInMesh(const void *mesh,
+	std::map<int, eTowards> pointInMesh(const void *mesh,
 		float tolerance_base,
 		float tolerance_fraction,
 		ple_lnum_t n_points,
 		const ple_coord_t point_coords[],
 		const int point_tag[],
 		ple_lnum_t location[],
-		float distance[]);
+		float distance[],
+		int inter_id,
+		int en);
 
+	static void pointInMeshMapping(const void *mesh,
+								   float tolerance_base,
+								   float tolerance_fraction,
+								   ple_lnum_t n_points,
+								   const ple_coord_t point_coords[],
+								   const int point_tag[],
+								   ple_lnum_t location[],
+								   float distance[]);
 
 	//- Data. Each position in the vector corresponds to a locator in the locators vector. 
 	std::vector<std::vector<double>> coordinates_;  // Coordinates of the data in this rank. Format (x0,y0,z0,x1,y1,z1...,xn,yn,zn)
@@ -121,7 +132,7 @@ private:
 	std::vector<std::map<std::string, std::vector<double>>> scalarData_;
 	std::vector<double> offset_; // Offset between the start of LUMA mesh and the start of the world coordinate system. 
 	                                          // The world coordinate system is the same for LUMA and Code Saturne. 
-
+	std::map<int, eTowards> positionID_;
 	void exchangeMessage(const std::string &messageToSend, std::string *messageReceived);
 
 
@@ -206,7 +217,7 @@ private:
 
 
 	//- Data handling
-	void setCoordinates(int Nx, int Ny, int Nz, double x, double y, double z, double dx, int inter_id);
+	void setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0, double dx, int inter_id);
 	
 	
 	
@@ -227,8 +238,8 @@ public:
 		//- Set synchronisation flag
 		void setSyncFlag(int flag);
 
-        //- Reads data from the LUMA grid and sends it to Code_Saturne
-        void sendData();
+		//- Reads data from the LUMA grid and sends it to Code_Saturne
+		void sendData();
 
 		//- Reads data received from PLE (Code_Saturne) and incorporates it to the LUMA grid. 
 		void receiveData();

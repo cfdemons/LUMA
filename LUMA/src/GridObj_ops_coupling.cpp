@@ -107,10 +107,10 @@ void GridObj::coupling_extractData(std::string name, const std::vector<int>& cel
 		data.resize(cellIDs.size() * L_DIMS);
  		for (int i = 0; i < cellIDs.size(); i++)
 		{
-			data[0 + i * L_DIMS] = (u[0 + cellIDs[i] * L_DIMS]+u[0 + cellIDs_diff[i] * L_DIMS])/2.0;
-			data[1 + i * L_DIMS] = (u[1 + cellIDs[i] * L_DIMS]+u[1 + cellIDs_diff[i] * L_DIMS])/2.0;
+			data[0 + i * L_DIMS] = (u[0 + cellIDs[i] * L_DIMS]+u[0 + cellIDs_diff[i] * L_DIMS])/2.0; //u[0 + cellIDs[i] * L_DIMS]; //
+			data[1 + i * L_DIMS] = (u[1 + cellIDs[i] * L_DIMS]+u[1 + cellIDs_diff[i] * L_DIMS])/2.0; //u[1 + cellIDs[i] * L_DIMS]; //
 #if (L_DIMS == 3)
-			data[2 + i * L_DIMS] = (u[2 + cellIDs[i] * L_DIMS]+u[2 + cellIDs_diff[i] * L_DIMS])/2.0;
+			data[2 + i * L_DIMS] = (u[2 + cellIDs[i] * L_DIMS]+u[2 + cellIDs_diff[i] * L_DIMS])/2.0; //u[2 + cellIDs[i] * L_DIMS]; //
 #endif
 			//std::cout << cellIDs[i] << " " << cellIDs_diff[i]<<" ";
 		} 

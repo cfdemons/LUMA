@@ -102,7 +102,7 @@ private:
 
 	//- PLE locators functions
 	static ple_lnum_t meshExtents(const void *mesh, ple_lnum_t n_max_extents, double tolerance, double extents[]);
-	std::map<int, eTowards> pointInMesh(const void *mesh,
+	bool pointInMesh(const void *mesh,
 		float tolerance_base,
 		float tolerance_fraction,
 		ple_lnum_t n_points,
@@ -110,8 +110,7 @@ private:
 		const int point_tag[],
 		ple_lnum_t location[],
 		float distance[],
-		int inter_id,
-		int en);
+		int inter_id);
 
 	static void pointInMeshMapping(const void *mesh,
 								   float tolerance_base,

@@ -338,8 +338,10 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 	}
 
+#ifdef L_temperature
 	for (int v = 0; v < L_NUM_VELS; v++) {
 		temperature_temp += g(i, j, k, v, M_lim, K_lim, L_NUM_VELS);
 	}
 	T(i,j,k,M_lim,K_lim) = temperature_temp;
+#endif
 }

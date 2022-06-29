@@ -89,8 +89,8 @@
 //#define L_TEMPERATURE                   ///< Enable calculation of temperature field
 
 // Output Options
-#define L_GRID_OUT_FREQ 200					///< How many timesteps before whole grid output
-#define L_EXTRA_OUT_FREQ 200					///< Specific output frequency of body forces
+#define L_GRID_OUT_FREQ 1000					///< How many timesteps before whole grid output
+#define L_EXTRA_OUT_FREQ 1000					///< Specific output frequency of body forces
 #define L_OUTPUT_PRECISION 10					///< Precision of output (for text writers)
 #define L_RESTART_OUT_FREQ (100*L_GRID_OUT_FREQ)			///< Frequency of write out of restart file
 #define L_PROBE_OUT_FREQ 1000000				///< Write out frequency of probe output
@@ -139,7 +139,7 @@
 *******************************************************************************
 */
 
-#define L_TOTAL_TIMESTEPS 15001					///< Number of time steps to run simulation for
+#define L_TOTAL_TIMESTEPS 10001					///< Number of time steps to run simulation for
 
 
 /*
@@ -150,7 +150,7 @@
 
 // MPI Data
 #define L_MPI_XCORES 1		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 1     ///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_YCORES 2     ///< Number of MPI ranks to divide domain into in Y direction
 #define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 
 // Decomposition strategy
@@ -171,15 +171,15 @@
 
 // Lattice properties
 #define L_DIMS 3													///< Number of dimensions to the problem
-#define L_RESOLUTION 100											    ///< Number of coarse lattice sites per unit length
+#define L_RESOLUTION 100										    ///< Number of coarse lattice sites per unit length
 #define L_TIMESTEP 0.005										    ///< The timestep in non-dimensional units
-#define L_CH_LENGTH (L_M - 2.*1.0/L_RESOLUTION)                      ///< Define the characteristic length (used in force term)
+#define L_CH_LENGTH (L_M - 2.*1.0/L_RESOLUTION)                     ///< Define the characteristic length (used in force term)
                                                                     ///< -2 when couple with CS
 
 // Non-dimensional domain dimensions
-#define L_BX 0.55//0.6															///< End of domain in X (non-dimensional units)
-#define L_BY (1.0+2.0/L_RESOLUTION) //(0.6 + 1.0/L_RESOLUTION) 					///< End of domain in Y (non-dimensional units)
-#define L_BZ 0.05															///< End of domain in Z (non-dimensional units)
+#define L_BX 0.55   												///< End of domain in X (non-dimensional units)
+#define L_BY (1.0+2.0/L_RESOLUTION)              					///< End of domain in Y (non-dimensional units)
+#define L_BZ 0.05					    							///< End of domain in Z (non-dimensional units)
 
 // Physical velocity
 #define L_PHYSICAL_U 1.0		///< Reference velocity of the real fluid to model [m/s]

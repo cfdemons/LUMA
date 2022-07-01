@@ -150,8 +150,8 @@
 
 // MPI Data
 #define L_MPI_XCORES 1		///< Number of MPI ranks to divide domain into in X direction
-#define L_MPI_YCORES 2     ///< Number of MPI ranks to divide domain into in Y direction
-#define L_MPI_ZCORES 1		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
+#define L_MPI_YCORES 1     ///< Number of MPI ranks to divide domain into in Y direction
+#define L_MPI_ZCORES 2		///< Number of MPI ranks to divide domain into in Z direction (ignored if L_DIMS = 2)
 
 // Decomposition strategy
 //#define L_MPI_SMART_DECOMPOSE		///< Use smart decomposition to improve load balancing

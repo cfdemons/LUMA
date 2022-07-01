@@ -28,9 +28,7 @@ bool PLEAdapter::synchronise(int flags)
 {
 
 	//Synchronise the coupled solvers by calling ple_coupling_mpi_set_synchronise
-
 	int i;
-
 	int sync_flags = 0;
 	int stop_mask = pleCouplingFlag_ & PLE_COUPLING_STOP;
 	int leader_id = -1;
@@ -48,7 +46,6 @@ bool PLEAdapter::synchronise(int flags)
 	ple_coupling_mpi_set_info_t ai;
 
 	/* Set synchronization flag */
-
 	app_status = ple_coupling_mpi_set_get_status(pleSets_);
 
 	sync_flags = app_status[app_id];
@@ -77,13 +74,10 @@ bool PLEAdapter::synchronise(int flags)
 	/* Synchronize applications */
 
 	printf("LUMA: Hi before ple synchronise. \n");
-
 	ple_coupling_mpi_set_synchronize(pleSets_, sync_flags, LUMAGrid_->Grids->dt);
-
 	printf("LUMA: Hi after ple synchronise. \n");
 
 	app_status = ple_coupling_mpi_set_get_status(pleSets_);
-
 	app_ts = ple_coupling_mpi_set_get_timestep(pleSets_);
 
 	/* Check if we should use the smallest time step */
@@ -91,7 +85,6 @@ bool PLEAdapter::synchronise(int flags)
 	//	ts_min = LUMAGrid_->Grids->dt;
 
 	/* Loop on applications */
-
 	for (i = 0; i < n_apps; i++) {
 
 		if (app_status[i] & PLE_COUPLING_NO_SYNC)
@@ -118,7 +111,6 @@ bool PLEAdapter::synchronise(int flags)
 		}*/
 
 		/* Handle time stepping behavior */
-
 		if (app_status[i] & PLE_COUPLING_STOP)
 		{
 			if (L_TOTAL_TIMESTEPS > LUMAGrid_->Grids->dt)
@@ -212,17 +204,11 @@ ple_lnum_t PLEAdapter::meshExtents(const void * mesh, ple_lnum_t n_max_extents, 
 		extents[i] = extents[i] - delta[i];
 		extents[i + L_DIMS] = extents[i + L_DIMS] + delta[i];
 	}
-	
-	// DEBUGGG!!
-/* 	for (int i = 0; i < L_DIMS*2; i++)
-	{
-		std::cout << "LUMA: extents " + std::to_string(i) + " = " + std::to_string(extents[i]) << std::endl;
-	} */
 
 	return 1;
 }
 
-/// This function is used to mapping from defined values to LUMA mesh
+// This function is used to mapping from defined values to LUMA mesh
 bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[], int inter_id)
 {
 	const GridObj* grid = static_cast<const GridObj*>(mesh);
@@ -233,7 +219,6 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 	{
 		// Set the point coordinates in the LUMA coordinate system
 		double px, py, pz;
-
 		px = point_coords[3 * p] + L_PLE_OFFSET_X;
 		py = point_coords[3 * p + 1] + L_PLE_OFFSET_Y;
 		pz = point_coords[3 * p + 2 ] + L_PLE_OFFSET_Z;
@@ -295,7 +280,7 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 	return incells;
 }
 
-/// This function is used to establish mapping from CS to LUMA
+/// This function is used to establish mapping from CS mesh to LUMA mesh
 void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
 {
 	const GridObj* grid = static_cast<const GridObj*>(mesh);
@@ -636,11 +621,8 @@ void PLEAdapter::addPLELocator(int i)
 
 		for (int ii = 0; ii < nCoupledPoints; ii++)
 		{
-		//std::cout << positionID_.at(IDCoupledPoints[ii])<<std::endl;
-
 			switch(positionID_.at(IDCoupledPoints[ii]))
 			{
-				//std::cout << positionID_.at(IDCoupledPoints[ii]) << " ";
 				case eXneg:
 					send_id_diff[ii] += num_xdiff;
 					break;
@@ -779,7 +761,7 @@ void PLEAdapter::sendData()
 
 				currentGrid->coupling_extractData("temperature", send_id, send_id_diff_,send_v);
 				
-				//I think I should add the unit conversion from lattice units(used in LUMA) to physical units(used in CS)
+				//Units conversion from LUMA to CS
 				GridUnits::tlat2phys(send_v);
 
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), 1, 0);				
@@ -805,7 +787,7 @@ void PLEAdapter::sendData()
 
 				currentGrid->coupling_extractData("v", send_id, send_id_diff_, send_v); //send_id_diff_
 
-				// Convert send_v from LUMA units to CS units. 
+				// Unit conversion from LUMA units to CS units. 
 				GridUnits::ulbm2ud(send_v, currentGrid);
 				ple_locator_exchange_point_var(locators_.at(i), send_v.data(), NULL, NULL, sizeof(double), L_DIMS, 0);
 			}
@@ -815,7 +797,6 @@ void PLEAdapter::sendData()
 			}
 		}
 	}	
-	// Extract the data to send from the LUMA grid. 
 }
 
 void PLEAdapter::receiveData()
@@ -832,8 +813,6 @@ void PLEAdapter::receiveData()
 			L_INFO("LUMA: interface " + std::to_string(i) + " has data from PLE.", GridUtils::logfile);
 
 			// Get the number of coupled points and their LUMA cell id
-			//size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
-			//const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));	
 			size_t nCoupledPoints = ids_.at(i).size();
 
 			L_INFO("Number of interior points " + std::to_string(nCoupledPoints), GridUtils::logfile);
@@ -914,29 +893,19 @@ void PLEAdapter::receiveData()
 
 bool PLEAdapter::configure()
 {
-    //Create a PLE locator for each PLE interface in the configuration file. 
-	// ple_locator_set_mesh. Do I need PLEInterface? Or just a vector of ple_locators? 
-	// I'll start with just a vector of PLE locators
-
 	// Read PLE adapter configuration file.  
 	configFileRead(); 
 	std::cout << "I've read the configuration file. " << std::endl;
 
-	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->ple_comm);  //or lumaMpi_->world_comm?
-
+	// Used for LUMA inter MPI communication
+	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->world_comm);
 	numApps_ = ple_coupling_mpi_set_n_apps(pleSets_);
 	appID_ = ple_coupling_mpi_set_get_app_id(pleSets_);
-	//ple_coupling_mpi_set_info_t me = ple_coupling_mpi_set_get_info(pleSets_, appID_);
-	//lumaRootRank_ = me.root_rank;
-	//lumaNumRanks_ = me.n_ranks;
-	//if(GridUtils::safeGetRank() < 1)
-	//	L_INFO("LUMA root rank: " + std::to_string(lumaRootRank_) + ". Number of ranks for LUMA: " + std::to_string(lumaNumRanks_), GridUtils::logfile);
 
 	int local_range[2] = { -1, -1 };
 	int distant_range[2] = { -1, -1 };
 
 	// Search for the MPI ranks of CS. 
-	// Stop if you find more than one CS instance in the MPI call. 
 	int CSNum = 0;
 	for (int i = 0; i < numApps_; i++)
 	{
@@ -961,9 +930,7 @@ bool PLEAdapter::configure()
 	}
 
 	// Create the intercommunicator between LUMA and Code Saturne
-	// I'm only initialising one CS 
 	ple_coupling_mpi_intracomm_create(MPI_COMM_WORLD, lumaMpi_->ple_comm, CSRootRank_, &mpiCS_, local_range, distant_range);
-
 	std::cout << "LUMA: I've created the PLE intracomm!" << std::endl;
 
 	// Create the interfaces
@@ -974,12 +941,6 @@ bool PLEAdapter::configure()
 
 		// Set coordinates in the global coordinate system (same coord system as Code_Saturne)
 		setCoordinates(interfacesConfig_.at(i).dimensions, interfacesConfig_.at(i).position, LUMAGrid_->Grids->dh, i);
-
-		/*exchangeData_->addRepo(interfacesConfig_.at(i).dimensions.at(0), interfacesConfig_.at(i).dimensions.at(1), interfacesConfig_.at(i).dimensions.at(2),
-			interfacesConfig_.at(i).position.at(0), interfacesConfig_.at(i).position.at(1), interfacesConfig_.at(i).position.at(2),
-			LUMAGrid_->Grids->dh);*/
-
-		L_INFO("I'm creating the locators!", GridUtils::logfile);
 
 		// Create space for the data to be written / read for the current repo. 
 		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
@@ -1017,13 +978,18 @@ bool PLEAdapter::configure()
 				L_ERROR("Data type for " + std::to_string(*writeJ) + " not recognised. Data in .yml configuration file has to contain v or V for velocity and t or T for temperature.", GridUtils::logfile);
 			}
 		}
+		
+		if (coordinates_.at(i).size() == 0)
+		{
+			// Stop data receive from CS in some LUMA rank
+			(interfacesConfig_.at(i).readData).clear();
+			// Stop send data to CS in some LUMA rank
+			(interfacesConfig_.at(i).writeData).clear();
+		}
 
+		// Create and configure the PLE locator		
 		L_INFO("Creating PLE adapter..", GridUtils::logfile);
-
-		// Create and configure the PLE locator
 		addPLELocator(i);
-
-		//L_INFO("Interface created on mesh" + interfacesConfig_.at(i).meshName, GridUtils::logfile);
 
 		// Synchronise with CS after location
 		std::string messageToSend, messageReceived;
@@ -1037,19 +1003,12 @@ bool PLEAdapter::configure()
 
 			// Stop coupling
 			setSyncFlag(PLE_COUPLING_STOP);
-
 		}
 		else
 		{
 			L_INFO(" Mesh located for Code_Saturne mesh " + interfacesConfig_.at(i).meshName, GridUtils::logfile);
 		}
-
 	}
-
-
-
-
-
   return true;
 }
 
@@ -1059,9 +1018,8 @@ void PLEAdapter::finalize()
 {
     if (NULL != pleSets_ )
     {
-	
         // Finalize the preCICE solver interface
-       // precice_->finalize();
+        // precice_->finalize();
 
         PLEInitialized_ = false;
 
@@ -1072,7 +1030,6 @@ void PLEAdapter::finalize()
     {
 		std::cout << "Could not finalize PLE." << std::endl;
     }
-
     return;
 }
 
@@ -1080,13 +1037,11 @@ void PLEAdapter::teardown()
 {
    
 	ple_coupling_mpi_set_destroy(&pleSets_);
-	
 	ple_coupling_mpi_set_t * pleSets_ = NULL;
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
 	std::vector<ple_locator_t*> locators_;
 	std::cout << "Finalizing the PLE interface..." << std::endl;
-
 
     if (NULL != pleSets_)
     {
@@ -1112,11 +1067,6 @@ void PLEAdapter::teardown()
 
 void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0, double dx, int inter_id)
 {
-	/*if (numDataPoints_ > 0)
-	{
-		L_ERROR("This InOutRepo already contains a coordinates vector", GridUtils::logfile);
-	}*/
-
 	L_INFO("I'm in setCoordinates", GridUtils::logfile);
 
 	std::vector<double> coord;
@@ -1135,7 +1085,6 @@ void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0,
 	{
 		L_INFO("Nx[" + std::to_string(en) + "]=" + std::to_string(Nxyz.at(L_DIMS*en+0)) + " Ny["+ std::to_string(en) +"]=" + std::to_string(Nxyz.at(L_DIMS*en+1)) 
 				+ " Nz["+ std::to_string(en) + "]=" + std::to_string(Nxyz.at(L_DIMS*en+2)), GridUtils::logfile);
-
 
 		// Fill in the coordinates vector. C style ordering
 		for (int i = 0; i < Nxyz.at(L_DIMS*en+0); i++)
@@ -1190,7 +1139,6 @@ void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0,
 	}
 
 	L_INFO("LUMA mesh size " + std::to_string(coordinates_.at(inter_id).size()), GridUtils::logfile);
-
 }
 
 void PLEAdapter::initialiseVectorData(std::string name, double initValue, int i)

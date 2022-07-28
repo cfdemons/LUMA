@@ -59,6 +59,11 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 #if (L_DIMS == 3)
 			u[2 + cellIDs[i] * L_DIMS] = data[2 + i * L_DIMS];
 #endif
+			for (int v = 0; v < L_NUM_VELS; ++v)
+			{
+				f[v + cellIDs[i] * L_NUM_VELS] =
+					_LBM_equilibrium_opt(cellIDs[i], v);
+			}
 		}
 	} 
 	else if ((name.find("rho") != std::string::npos) || (name.find("RHO") != std::string::npos))

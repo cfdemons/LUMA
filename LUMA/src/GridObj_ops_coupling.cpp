@@ -33,7 +33,7 @@ using namespace std;
 // *****************************************************************************
 /// \brief	Add an external data array to the LUMA flow fields.
 ///
-///			Overwrites a LUMA macroscopic field at set locations with the values provided
+///			Overwrites a LUMA macroscopic field at set locations with the values provided and recalculates the populations
 ///
 /// \param name		Name of the field. 
 /// \param cellIDs	Cell indices at which to overwrite the data. The indices are local to the current grid and process.

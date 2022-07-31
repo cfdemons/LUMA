@@ -43,6 +43,8 @@
 /// limitations under the License.*
 ///
 
+#include <unistd.h>
+
 #include "../inc/stdafx.h"			// Precompiled header
 #include "../inc/GridObj.h"			// Grid class definition
 #include "../inc/GridManager.h"		// Grid manager class definition
@@ -76,6 +78,7 @@ int main( int argc, char* argv[] )
 #endif
 
 
+
 	/*
 	****************************************************************************
 	****************************** MPI INITIALISE ******************************
@@ -89,6 +92,15 @@ int main( int argc, char* argv[] )
 
 
 #endif
+
+        // {
+        //   volatile int i = 0;
+        //   printf("PID %d ready for attach\n", getpid());
+        //   fflush(stdout);
+        //   while (0 == i)
+        //     sleep(5);
+        // }
+
 
 	// Reset the refined region z-limits if only 2D -- must be done before initialising the MPI manager
 #if (L_DIMS != 3 && L_NUM_LEVELS)

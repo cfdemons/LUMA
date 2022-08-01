@@ -43,6 +43,7 @@
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkPointData.h"
 
+#include "../../../../inc/Enumerations.h"
 #include "../../../../inc/definitions.h"
 
 #define DATASET_READ_FAIL -321
@@ -71,30 +72,6 @@ const int e2[2][4] =
 	{ -1,  1, -1, 1 }
 };
 
-// Typing enumeration from LUMA
-enum eType
-{
-	eSolid,					///< Rigid, solid site with no-slip BC
-	eFluid,					///< Fluid site
-	eRefined,				///< Fluid site which is represented on a finer grid
-	eTransitionToCoarser,	///< Fluid site coupled to a coarser grid
-	eTransitionToFiner,		///< Fluid site coupled to a finer grid
-	eBFL,					///< Site containing a BFL marker
-	eVelocity,				///< Velocity boundary
-	eExtrapolation,			///< Extrapolation (outlet) site
-	eSlip					///< Slip boundary
-};
-
-/// \enum eTType
-/// \brief Lattice typing labels in temperature field
-enum eTType
-{
-	eIsothermal, ///< Isothermal boundary
-	eAdiabat,	 ///< Adiabat boundary
-	eCHF,		 ///< Constant heat flux boundary
-	eTFluid,		 ///< Thermal fluid site
-	eTRefined	 ///< Temperature field site which is represented on a finer grid
-};
 
 // Error enumeration
 enum eError

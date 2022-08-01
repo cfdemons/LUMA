@@ -21,6 +21,10 @@
 * limitations under the License.*
 */
 
+#include "../inc/stdafx.h"
+
+#ifdef L_ACTIVATE_PLE
+
 #include <iostream>
 #include "../inc/PLEAdapter.h"
 
@@ -1201,3 +1205,5 @@ PLEAdapter::~PLEAdapter()
 
     return;
 }
+
+#endif // L_ACTIVATE_PLE

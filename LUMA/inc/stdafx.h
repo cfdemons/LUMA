@@ -154,6 +154,7 @@ namespace std {
 ///	\param	logfile		pointer to the logfile where the message is to be written.
 inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 {
+	assert(logfile);
 #ifdef L_BUILD_FOR_MPI
 	std::cout << "Rank " + std::to_string(MpiManager::getInstance()->my_rank);
 #endif
@@ -180,6 +181,7 @@ inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 inline void infofcn(const std::string &msg, std::ofstream *logfile)
 {
 
+	assert(logfile);
 	*logfile << "Info: " << msg << std::endl;
 }
 
@@ -195,6 +197,7 @@ inline void infofcn(const std::string &msg, std::ofstream *logfile)
 inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 {
 
+	assert(logfile);
 	*logfile << "WARNING: " << msg << std::endl;
 }
 
@@ -210,6 +213,7 @@ inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 inline void debugfcn(const std::string &msg, std::ofstream *logfile)
 {
 
+	assert(logfile);
 	*logfile << "Debug: " << msg << std::endl;
 }
 

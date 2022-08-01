@@ -29,7 +29,7 @@ endif
 
 # Build LUMA
 $(EXE): objs
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIB)
+	$(CC) $(CFLAGS) -rdynamic -o $@ $(OBJS) $(LIB)
 
 
 # Build object files

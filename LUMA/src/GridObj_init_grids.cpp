@@ -1594,6 +1594,7 @@ eType GridObj::LBM_setBCPrecedence(eType currentBC, eType desiredBC)
 {
 	if (currentBC == eSolid || desiredBC == eSolid) return eSolid;
 	else if (currentBC == eVelocity) return eVelocity;
+	else if (currentBC == eCoupling) return eCoupling;
 	else return desiredBC;
 }
 

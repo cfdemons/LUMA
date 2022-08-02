@@ -93,7 +93,7 @@ void GridObj::LBM_multi_opt(int subcycle)
 				}
 #endif
 				// IGNORE THESE SITES //
-				if (type_local == eRefined || type_local == eSolid
+				if (type_local == eRefined || type_local == eSolid || type_local == eCoupling
 #ifndef L_REGULARISED_BOUNDARIES
 					|| type_local == eVelocity
 #endif
@@ -258,12 +258,6 @@ void GridObj::_LBM_stream_opt(int i, int j, int k, int id, eType type_local, int
 			// F value is its opposite (HWBB)
 			fNew[v + id * L_NUM_VELS] =
 				f[GridUtils::getOpposite(v) + id * L_NUM_VELS];
-		}
-		// COUPLING BC USING EQUILIBRIUM SCHEME
-		else if(src_type_local == eCoupling)
-		{
-			fNew[v + id * L_NUM_VELS] =
-				_LBM_equilibrium_opt(src_id, v);
 		}
 		// EXTRAPOLATERIGHT
 		else if (src_type_local == eExtrapolateRight)

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# This script will run LUMA under gdb and print a backtrace when LUMA
+# exits.  The LUMA executable should be available on the PATH.
+exec gdb -batch -ex "run" -ex "bt" -ex "quit" --args LUMA "${@}"

@@ -25,7 +25,6 @@
 
 #include "stdafx.h"
 #include "IVector.h"
-#include "GridUnits.h"
 
 /// \brief	Grid class.
 ///

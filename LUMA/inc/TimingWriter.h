@@ -30,16 +30,17 @@ class TimingWriter
 {
 public:
 
-  TimingWriter(const std::string outdir, double dt)
+  TimingWriter(const std::string outdir, double dt, int total_timesteps)
     : outfile(outdir+"/timing.txt"),
       dt(dt),
+      total_timesteps(total_timesteps),
       t_start(std::chrono::steady_clock::now()),
       t(0),
       runtime_s(0),
       speed(0),
       average_speed(0) {
     std::ofstream   os(outfile, std::ofstream::app);
-    os << "timestep\tphysical_time\truntime[s]\taverage_speed_h[physical_time/h]" << std::endl;
+    os << "timestep\tphysical_time\truntime[s]\taverage_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
     writeTimingData();
   }
 
@@ -53,22 +54,31 @@ public:
     runtime_s = duration.count();
     speed = (runtime_s - previous_runtime_s) / ((t - previous_t) * dt);
     average_speed = (t * dt) / runtime_s;
+    runtime_remaining_h = (total_timesteps - t) * dt / average_speed / 3600;
   }
 
   void writeTimingData() {
     std::ofstream   os(outfile, std::ofstream::app);
-    os << t << "\t" << t * dt << "\t" << runtime_s << "\t" << average_speed*3600 << std::endl;
+    os << 
+      t << "\t" << 
+      t * dt << "\t" << 
+      runtime_s << "\t" << 
+      average_speed*3600 << "\t" <<
+      runtime_remaining_h <<
+      std::endl;
   }
 
 private:
   std::string outfile;
   double dt;
+  int total_timesteps;
   std::chrono::time_point<std::chrono::steady_clock> t_start;
 
   int t;
   double runtime_s;
   double speed;
   double average_speed;
+  double runtime_remaining_h;
 };
 
 #endif

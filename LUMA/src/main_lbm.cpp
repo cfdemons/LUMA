@@ -48,6 +48,7 @@
 #include "../inc/GridManager.h"		// Grid manager class definition
 #include "../inc/ObjectManager.h"	// Object manager class definition
 #include "../inc/PCpts.h"			// Point cloud class
+#include "../inc/TimingWriter.h"	// Timing data writer class definition
 
 #ifdef L_ACTIVATE_PLE	//
 #include "../inc/PLEAdapter.h"
@@ -433,6 +434,10 @@ int main( int argc, char* argv[] )
 #ifdef L_ENABLE_OPENMP
 	L_WARN("OpenMP support enabled -- currently experimental!", GridUtils::logfile);
 #endif
+
+#ifdef L_WRITE_TIMING_DATA
+		TimingWriter timingWriter(GridUtils::path_str);
+#endif
 	
 	L_INFO("Initialising LBM time-stepping...", GridUtils::logfile);
 
@@ -553,6 +558,15 @@ int main( int argc, char* argv[] )
 			GridUnits::secs2hms((L_TOTAL_TIMESTEPS - Grids->t) * outer_loop_time / 1000, &hms[0]);
 			if (Grids->t % L_GRID_OUT_FREQ != 0) std::cout << "\r";
 			std::cout << " Time to complete approx. " << hms[0] << " [h] " << hms[1] << " [m] " << hms[2] << " [s]     " << std::flush;
+		}
+#endif
+
+		// Timing data
+		timingWriter.recordTimingData(Grids->t);
+#ifdef L_WRITE_TIMING_DATA
+		if (rank == 0 && (Grids->t % L_TIMING_OUT_FREQ == 0))
+		{
+			timingWriter.writeTimingData();
 		}
 #endif
 

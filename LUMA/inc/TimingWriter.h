@@ -84,7 +84,7 @@ class TimingWriter
 {
 public:
 
-	TimingWriter(const std::string outdir, double dt, int total_timesteps)
+	TimingWriter(const std::string outdir, double dt, int total_timesteps, int averaging_window)
 		: outfile(outdir+"/timing.txt"),
 		  dt(dt),
 		  total_timesteps(total_timesteps),
@@ -93,7 +93,7 @@ public:
 		  runtime_s(0),
 		  speed(0),
 		  average_speed(0),
-		  history(10) {
+		  history(averaging_window) {
 		std::ofstream   os(outfile, std::ofstream::app);
 		os << "timestep\tphysical_time\truntime[s]\tspeed[physical_time/h]\taverage_speed[physical_time/h]\tmoving_average_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
 		writeTimingData();

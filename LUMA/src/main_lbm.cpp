@@ -436,7 +436,8 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef L_WRITE_TIMING_DATA
-		TimingWriter timingWriter(GridUtils::path_str, Grids->dt, L_TOTAL_TIMESTEPS);
+		TimingWriter timingWriter(GridUtils::path_str, Grids->dt, L_TOTAL_TIMESTEPS,
+								  L_TIMING_AVERAGING_WINDOW_TIMESTEPS);
 #endif
 	
 	L_INFO("Initialising LBM time-stepping...", GridUtils::logfile);

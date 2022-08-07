@@ -26,7 +26,7 @@
 #include <chrono>
 #include <fstream>
 #include <limits>
-
+#include <vector>
 
 struct TimingPoint
 {
@@ -85,7 +85,7 @@ class TimingWriter
 {
 public:
 
-	TimingWriter(const std::string outdir, double dt, int total_timesteps, int averaging_window)
+	TimingWriter(const std::string &outdir, double dt, int total_timesteps, int averaging_window)
 		: outfile(outdir+"/timing.txt"),
 		  dt(dt),
 		  total_timesteps(total_timesteps),

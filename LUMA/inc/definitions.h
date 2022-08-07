@@ -71,7 +71,9 @@
 //#define L_TEXTOUT					///< Verbose ASCII output of grid information
 //#define L_MOMEX_DEBUG				///< Debug momentum exchange by writing out F contributions verbosely
 #define L_SHOW_TIME_TO_COMPLETE		///< Write the estimated time to completion to the terminal
-
+//#define L_WRITE_TIMING_DATA			///< Write timing information to a file timing.txt
+//#define L_TIMING_AVERAGING_WINDOW_TIMESTEPS	///< Number of timesteps to use when averaging speed
+//#define L_TIMING_OUT_FREQ			///< Write out frequency of timing data (does not affect timing computations)
 
 /*
 *******************************************************************************

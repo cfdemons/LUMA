@@ -25,6 +25,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <limits>
 
 
 struct TimingPoint
@@ -93,6 +94,8 @@ public:
 		  runtime_s(0),
 		  speed(0),
 		  average_speed(0),
+		  moving_average_speed(0),
+		  runtime_remaining_h(std::numeric_limits<double>::quiet_NaN()),
 		  history(averaging_window) {
 		std::ofstream   os(outfile, std::ofstream::app);
 		os << "timestep\tphysical_time\truntime[s]\tspeed[physical_time/h]\taverage_speed[physical_time/h]\tmoving_average_speed[physical_time/h]\truntime_remaining[h]" << std::endl;

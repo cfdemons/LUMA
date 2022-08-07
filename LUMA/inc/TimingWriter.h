@@ -35,7 +35,7 @@ struct TimingPoint
 
 class TimingHistory
 {
-  public:
+public:
 
 	TimingHistory(int len) : len(len) {
 		points.resize(len);
@@ -70,7 +70,7 @@ class TimingHistory
 		return points.at(iOldest);
 	}
 
-  private:
+private:
 	int iNewest = -1;
 	int iOldest = -1;
 	int len;
@@ -84,71 +84,71 @@ class TimingWriter
 {
 public:
 
-  TimingWriter(const std::string outdir, double dt, int total_timesteps)
-    : outfile(outdir+"/timing.txt"),
-      dt(dt),
-      total_timesteps(total_timesteps),
-      t_start(std::chrono::steady_clock::now()),
-      t(0),
-      runtime_s(0),
-      speed(0),
-      average_speed(0),
-	  history(10) {
-    std::ofstream   os(outfile, std::ofstream::app);
-    os << "timestep\tphysical_time\truntime[s]\tspeed[physical_time/h]\taverage_speed[physical_time/h]\tmoving_average_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
-    writeTimingData();
-	history.addPoint(TimingPoint{0, 0});
-  }
+	TimingWriter(const std::string outdir, double dt, int total_timesteps)
+		: outfile(outdir+"/timing.txt"),
+		  dt(dt),
+		  total_timesteps(total_timesteps),
+		  t_start(std::chrono::steady_clock::now()),
+		  t(0),
+		  runtime_s(0),
+		  speed(0),
+		  average_speed(0),
+		  history(10) {
+		std::ofstream   os(outfile, std::ofstream::app);
+		os << "timestep\tphysical_time\truntime[s]\tspeed[physical_time/h]\taverage_speed[physical_time/h]\tmoving_average_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
+		writeTimingData();
+		history.addPoint(TimingPoint{0, 0});
+	}
 
-  void recordTimingData(int t) {
-    double previous_runtime_s = runtime_s;
-    int previous_t = this->t;
-    auto t_now = std::chrono::steady_clock::now();
-    std::chrono::duration<double> duration = t_now - t_start;
+	void recordTimingData(int t) {
+		double previous_runtime_s = runtime_s;
+		int previous_t = this->t;
+		auto t_now = std::chrono::steady_clock::now();
+		std::chrono::duration<double> duration = t_now - t_start;
 
-    this->t = t;
-    runtime_s = duration.count();
-	history.addPoint(TimingPoint{t, runtime_s});
+		this->t = t;
+		runtime_s = duration.count();
+		history.addPoint(TimingPoint{t, runtime_s});
 
-    speed = ((t - previous_t) * dt) / (runtime_s - previous_runtime_s);
-    average_speed = (t * dt) / runtime_s;
+		speed = ((t - previous_t) * dt) / (runtime_s - previous_runtime_s);
+		average_speed = (t * dt) / runtime_s;
 	
-	TimingPoint hNewest = history.getNewest();
-	TimingPoint hOldest = history.getOldest();
+		TimingPoint hNewest = history.getNewest();
+		TimingPoint hOldest = history.getOldest();
 
-	moving_average_speed = dt * (hNewest.t - hOldest.t) /
-		(hNewest.runtime - hOldest.runtime);
+		moving_average_speed = dt * (hNewest.t - hOldest.t) /
+			(hNewest.runtime - hOldest.runtime);
 
-    runtime_remaining_h = (total_timesteps - t) * dt / moving_average_speed / 3600;
-  }
+		runtime_remaining_h = (total_timesteps - t) * dt / moving_average_speed / 3600;
+	}
 
-  void writeTimingData() {
-    std::ofstream   os(outfile, std::ofstream::app);
-    os << 
-      t << "\t" << 
-      t * dt << "\t" << 
-      runtime_s << "\t" << 
-      speed*3600 << "\t" <<
-      average_speed*3600 << "\t" <<
-      moving_average_speed*3600 << "\t" <<
-      runtime_remaining_h <<
-      std::endl;
-  }
+	void writeTimingData() {
+		std::ofstream   os(outfile, std::ofstream::app);
+		os << 
+			t << "\t" << 
+			t * dt << "\t" << 
+			runtime_s << "\t" << 
+			speed*3600 << "\t" <<
+			average_speed*3600 << "\t" <<
+			moving_average_speed*3600 << "\t" <<
+			runtime_remaining_h <<
+			std::endl;
+	}
 
 private:
-  std::string outfile;
-  double dt;
-  int total_timesteps;
-  std::chrono::time_point<std::chrono::steady_clock> t_start;
+	std::string outfile;
+	double dt;
+	int total_timesteps;
+	std::chrono::time_point<std::chrono::steady_clock> t_start;
 
-  int t;
-  double runtime_s;
-  double speed;
-  double average_speed;
-  double moving_average_speed;
-  double runtime_remaining_h;
+	int t;
+	double runtime_s;
+	double speed;
+	double average_speed;
+	double moving_average_speed;
+	double runtime_remaining_h;
 
-  TimingHistory history;
+	TimingHistory history;
 };
 
 #endif

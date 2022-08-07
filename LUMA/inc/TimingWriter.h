@@ -26,6 +26,60 @@
 #include <chrono>
 #include <fstream>
 
+
+struct TimingPoint
+{
+	int t;
+	double runtime;
+};
+
+class TimingHistory
+{
+  public:
+
+	TimingHistory(int len) : len(len) {
+		points.resize(len);
+	}
+
+	void addPoint(const TimingPoint &point) {
+		if (used == 0) {
+			iNewest = 0;
+			iOldest = 0;
+			points.at(iNewest) = point;
+			used++;
+		} else if (used < len) {
+			iNewest++;
+			points.at(iNewest) = point;
+			used++;
+		} else if (used == len) {
+			iNewest = (iNewest + 1) % len;
+			iOldest = (iOldest + 1) % len;
+			points.at(iNewest) = point;
+		} else {
+			throw std::range_error("TimingHistory::addPoint: used out of range");
+		}
+	}
+
+	TimingPoint &getNewest() {
+		assert(used > 0);
+		return points.at(iNewest);
+	}
+
+	TimingPoint &getOldest() {
+		assert(used > 0);
+		return points.at(iOldest);
+	}
+
+  private:
+	int iNewest = -1;
+	int iOldest = -1;
+	int len;
+	int used = 0;
+	std::vector<TimingPoint> points;
+};
+
+
+
 class TimingWriter
 {
 public:
@@ -38,10 +92,12 @@ public:
       t(0),
       runtime_s(0),
       speed(0),
-      average_speed(0) {
+      average_speed(0),
+	  history(10) {
     std::ofstream   os(outfile, std::ofstream::app);
-    os << "timestep\tphysical_time\truntime[s]\taverage_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
+    os << "timestep\tphysical_time\truntime[s]\tspeed[physical_time/h]\taverage_speed[physical_time/h]\tmoving_average_speed[physical_time/h]\truntime_remaining[h]" << std::endl;
     writeTimingData();
+	history.addPoint(TimingPoint{0, 0});
   }
 
   void recordTimingData(int t) {
@@ -52,9 +108,18 @@ public:
 
     this->t = t;
     runtime_s = duration.count();
-    speed = (runtime_s - previous_runtime_s) / ((t - previous_t) * dt);
+	history.addPoint(TimingPoint{t, runtime_s});
+
+    speed = ((t - previous_t) * dt) / (runtime_s - previous_runtime_s);
     average_speed = (t * dt) / runtime_s;
-    runtime_remaining_h = (total_timesteps - t) * dt / average_speed / 3600;
+	
+	TimingPoint hNewest = history.getNewest();
+	TimingPoint hOldest = history.getOldest();
+
+	moving_average_speed = dt * (hNewest.t - hOldest.t) /
+		(hNewest.runtime - hOldest.runtime);
+
+    runtime_remaining_h = (total_timesteps - t) * dt / moving_average_speed / 3600;
   }
 
   void writeTimingData() {
@@ -63,7 +128,9 @@ public:
       t << "\t" << 
       t * dt << "\t" << 
       runtime_s << "\t" << 
+      speed*3600 << "\t" <<
       average_speed*3600 << "\t" <<
+      moving_average_speed*3600 << "\t" <<
       runtime_remaining_h <<
       std::endl;
   }
@@ -78,7 +145,10 @@ private:
   double runtime_s;
   double speed;
   double average_speed;
+  double moving_average_speed;
   double runtime_remaining_h;
+
+  TimingHistory history;
 };
 
 #endif

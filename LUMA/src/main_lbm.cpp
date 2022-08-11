@@ -563,8 +563,8 @@ int main( int argc, char* argv[] )
 #endif
 
 		// Timing data
-		timingWriter.recordTimingData(Grids->t);
 #ifdef L_WRITE_TIMING_DATA
+		timingWriter.recordTimingData(Grids->t);
 		if (rank == 0 && (Grids->t % L_TIMING_OUT_FREQ == 0))
 		{
 			timingWriter.writeTimingData();

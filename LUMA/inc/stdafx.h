@@ -90,6 +90,25 @@
 #include <stdio.h>
 
 
+#include <memory>
+#ifndef __cpp_lib_make_unique
+// See
+// https://stackoverflow.com/questions/17902405/how-to-implement-make-unique-function-in-c11.
+// This is available since C++14, but it is desirable to support
+// CentOS 7 which ships with the ancient gcc 4.8.5 which only has
+// C++11.  If we decide to drop support for CentOS 7, we can change to
+// requiring C++14, and drop this additional definition.
+namespace std {
+  template<typename T, typename... Args>
+  std::unique_ptr<T> make_unique(Args&&... args)
+  {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+}
+#endif
+
+
+
 /****************************************************/
 // Enumerations //
 /****************************************************/

@@ -300,7 +300,12 @@ void GridObj::LBM_macro( int i, int j, int k ) {
 
 		// Velocity BC update themselves prior to collision
 
-	} else {
+	}else if (LatTyp(i,j,k,M_lim,K_lim) == eCoupling) {
+
+		// Coupling BC update themselves prior to collision
+
+	} 
+	else {
 
 		// Any other of type of site compute both density and velocity from populations
 		rho_temp = 0.0; fux_temp = 0.0; fuy_temp = 0.0; fuz_temp = 0.0;

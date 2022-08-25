@@ -162,9 +162,31 @@ void MpiManager::mpi_init()
 		// Create communicator for the LUMA processes. 
 		MPI_Comm_split(MPI_COMM_WORLD, appNum, initial_my_rank, &ple_comm);
 
+		if (ple_comm == MPI_COMM_NULL) {
+			std::cerr << "MPI_Comm_split returned a communicator MPI_COMM_NULL" << std::endl;
+			abort();
+		}
+
+		int ple_rank, ple_num_ranks;
+		MPI_Comm_rank(ple_comm, &ple_rank);
+		MPI_Comm_size(ple_comm, &ple_num_ranks);
+
+		if (total_cores != ple_num_ranks) {
+			if (ple_rank == 0) {
+				std::cerr << "ERROR: The total number of cores (" + std::to_string(total_cores)+") in the MPI topology defined by L_MPI_<d>CORES for a "+
+					std::to_string((int) L_DIMS)+"D simulation in definitions.h is not equal to the number of MPI ranks ("+
+					std::to_string(ple_num_ranks)+") specified in the mpirun command." << std::endl;
+			}
+			abort();
+		}
+
 		// Create the cartesian group split from the ple communicator
 		MPI_Cart_create(ple_comm, L_DIMS, &dimensions[0], &MPI_periodic[0], MPI_reorder, &world_comm);
 
+		if (world_comm == MPI_COMM_NULL) {
+			std::cerr << "MPI_Cart_create returned a communicator MPI_COMM_NULL" << std::endl;
+			abort();
+		}
 	}
 	else
 	{

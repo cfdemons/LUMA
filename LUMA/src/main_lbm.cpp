@@ -577,7 +577,20 @@ int main( int argc, char* argv[] )
 		{
 			timingWriter.writeTimingData();
 		}
-#endif
+
+		if (rank == 0)
+		{
+#ifdef L_CACHE_TIMING_DATA_TIMESTEPS
+			if (Grids->t % L_CACHE_TIMING_DATA_TIMESTEPS == 0)
+			{
+				timingWriter.flushOutputCache();
+			}
+
+#else
+			timingWriter.flushOutputCache();
+#endif  // L_CACHE_TIMING_DATA_TIMESTEPS
+		}
+#endif  // L_WRITE_TIMING_DATA
 
 		// Write out info
 		if (Grids->t % L_EXTRA_OUT_FREQ == 0) {
@@ -726,6 +739,15 @@ int main( int argc, char* argv[] )
 	// END TIMINGS FILE //
 #endif
 
+// Flush timing data cache in case the last flush was not the last timestep
+#ifdef L_WRITE_TIMING_DATA
+#ifdef L_CACHE_TIMING_DATA_TIMESTEPS
+		if (rank == 0)
+		{
+			timingWriter.flushOutputCache();
+		}
+#endif
+#endif
 
 	// Close log file
 	curr_time = time(NULL);			// Current system date/time and string buffer

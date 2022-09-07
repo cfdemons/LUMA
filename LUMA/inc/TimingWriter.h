@@ -129,8 +129,7 @@ public:
 	}
 
 	void writeTimingData() {
-		std::ofstream   os(outfile, std::ofstream::app);
-		os << 
+		cached_output <<
 			t << "\t" << 
 			t * dt << "\t" << 
 			runtime_s << "\t" << 
@@ -141,8 +140,16 @@ public:
 			std::endl;
 	}
 
+	void flushOutputCache() {
+		std::ofstream ofs(outfile, std::ofstream::app);
+
+		ofs << cached_output.str();
+		cached_output.str("");
+	}
+
 private:
 	std::string outfile;
+	std::stringstream cached_output;
 	double dt;
 	int total_timesteps;
 	std::chrono::time_point<std::chrono::steady_clock> t_start;

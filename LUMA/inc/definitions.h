@@ -74,6 +74,7 @@
 //#define L_WRITE_TIMING_DATA			///< Write timing information to a file timing.txt
 //#define L_TIMING_AVERAGING_WINDOW_TIMESTEPS	///< Number of timesteps to use when averaging speed
 //#define L_TIMING_OUT_FREQ			///< Write out frequency of timing data (does not affect timing computations)
+//#define L_CACHE_TIMING_DATA_TIMESTEPS 1000  ///< Cache timing data and only write it every so many timesteps
 
 /*
 *******************************************************************************

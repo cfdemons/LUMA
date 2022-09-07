@@ -505,12 +505,7 @@ int main( int argc, char* argv[] )
 		// Launch LBM Kernel //
 		///////////////////////
 
-		L_INFO("Hello before LUMA kernel", GridUtils::logfile);
-
 		Grids->LBM_multi_opt();		// Launch LBM kernel on top-level grid
-
-		L_INFO("Hello after LUMA kernel", GridUtils::logfile);
-
 
 		///////////////
 		// Write Out //

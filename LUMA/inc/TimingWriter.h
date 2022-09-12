@@ -132,8 +132,13 @@ public:
 		TimingPoint hNewest = history.getNewest();
 		TimingPoint hOldest = history.getOldest();
 
-		moving_average_speed = dt * (hNewest.t - hOldest.t) /
-			(hNewest.runtime - hOldest.runtime);
+		if (hNewest.t > hOldest.t) {
+			moving_average_speed = dt * (hNewest.t - hOldest.t) /
+				(hNewest.runtime - hOldest.runtime);
+		} else {
+			// Averaging window (and history) is of size 1; i.e. no averaging
+			moving_average_speed = speed; // TODO: figure out why we need a special case here
+		}
 
 		runtime_remaining_h = (total_timesteps - t) * dt / moving_average_speed / 3600;
 	}

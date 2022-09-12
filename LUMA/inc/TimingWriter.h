@@ -73,6 +73,10 @@ public:
 		return points.at(iOldest);
 	}
 
+	size_t size() {
+		return points.size();
+	}
+
 private:
 	int iNewest = -1;
 	int iOldest = -1;
@@ -116,6 +120,10 @@ public:
 
 		this->t = t;
 		runtime_s = duration.count();
+		if (history.size() > 0 && history.getNewest().t == t) {
+			throw std::invalid_argument("Duplicate point added in recordTimingData");
+		}
+
 		history.addPoint(TimingPoint{t, runtime_s});
 
 		speed = ((t - previous_t) * dt) / (runtime_s - previous_runtime_s);

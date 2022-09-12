@@ -35,6 +35,13 @@
 ///	\param	subcycle	sub-cycle to be performed if called from a subgrid.
 void GridObj::LBM_multi_opt(int subcycle)
 {
+	// MPI COMMUNICATION //
+#ifdef L_BUILD_FOR_MPI
+
+	// Launch communication on this grid by passing its level and region number
+	MpiManager::getInstance()->mpi_communicate(level, region_number);
+
+#endif
 
 #ifdef L_REYNOLDS_RAMP
 	// Update the Reynolds number if ramping up
@@ -200,15 +207,6 @@ void GridObj::LBM_multi_opt(int subcycle)
           if (GridUtils::logfile)
             *GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
 	}
-
-	// MPI COMMUNICATION //
-#ifdef L_BUILD_FOR_MPI
-
-	// Launch communication on this grid by passing its level and region number
-	MpiManager::getInstance()->mpi_communicate(level, region_number);
-
-#endif
-
 }
 
 

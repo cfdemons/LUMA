@@ -947,7 +947,10 @@ void MpiManager::mpi_communicate(int lev, int reg) {
 ///			rank, both sender and receiver. Must be called post-initialisation.
 void MpiManager::mpi_buffer_size() {
 
-	*GridUtils::logfile << "Pre-computing buffer sizes for MPI...";
+	if (GridUtils::logfile)
+	{
+		*GridUtils::logfile << "Pre-computing buffer sizes for MPI...";
+	}
 
 	/* For each grid in the hierarchy find communicating edges and store the buffer size.
 	 * The data are arranged:
@@ -1007,7 +1010,8 @@ void MpiManager::mpi_buffer_size() {
 		}
 	}
 
-	*GridUtils::logfile << "Complete." << std::endl;
+	if (GridUtils::logfile)
+          *GridUtils::logfile << "Complete." << std::endl;
 
 #ifdef L_MPI_VERBOSE
 	/* Historically, there have been cases of MPI hangs due to buffer
@@ -1233,7 +1237,8 @@ int MpiManager::mpi_buildCommunicators(GridManager* const grid_man) {
 		}
 	}
 
-	*GridUtils::logfile << "Communicator build complete. Status = " << status << std::endl;
+        if (GridUtils::logfile)
+          *GridUtils::logfile << "Communicator build complete. Status = " << status << std::endl;
 
 	return status;
 }

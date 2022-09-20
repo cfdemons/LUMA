@@ -75,6 +75,7 @@
 //#define L_TIMING_AVERAGING_WINDOW_TIMESTEPS	///< Number of timesteps to use when averaging speed
 //#define L_TIMING_OUT_FREQ			///< Write out frequency of timing data (does not affect timing computations)
 //#define L_CACHE_TIMING_DATA_TIMESTEPS 1000  ///< Cache timing data and only write it every so many timesteps
+//#define L_SUPPRESS_PARALLEL_LOGS              ///< Don't write out log files on rank > 0 when running under MPI
 
 /*
 *******************************************************************************

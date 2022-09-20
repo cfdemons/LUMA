@@ -167,13 +167,28 @@ int main( int argc, char* argv[] )
 
 	// Create application log file
 	std::ofstream logfile;
-	logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".log", std::ios::out);
-	GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
 
-	// TODO: Handle case when logfile doesn't open correctly
-	if (!logfile.is_open()) {
-		std::cout << "Logfile didn't open" << std::endl;
-	}
+        bool enablelog;
+
+#ifdef L_SUPPRESS_PARALLEL_LOGS
+        enablelog = (rank == 0);
+#else
+        enablelog = true;
+#endif
+
+        if (enablelog)
+        {
+          logfile.open(GridUtils::path_str + "/log_rank" + std::to_string(rank) + ".log", std::ios::out);
+          GridUtils::logfile = &logfile;	// Pass logfile reference to GridUtils class
+          // TODO: Handle case when logfile doesn't open correctly
+          if (!logfile.is_open()) {
+            std::cout << "Logfile didn't open" << std::endl;
+          }
+        }
+        else
+        {
+          GridUtils::logfile = 0;
+        }
 
 	// Fix output format to screen
 	cout.precision(L_OUTPUT_PRECISION);
@@ -220,12 +235,15 @@ int main( int argc, char* argv[] )
 	L_INFO("L0 Grid size = " + std::to_string(L_N) + "x" + std::to_string(L_M) + "x" + std::to_string(L_K), GridUtils::logfile);
 #ifdef L_BUILD_FOR_MPI
 	L_INFO("MPI size = " + std::to_string(L_MPI_XCORES) + "x" + std::to_string(L_MPI_YCORES) + "x" + std::to_string(L_MPI_ZCORES), GridUtils::logfile);
-	*GridUtils::logfile << "Coordinates on rank " << mpim->my_rank << " are (";
-	for (size_t d = 0; d < L_DIMS; d++)
-	{
-		*GridUtils::logfile << "\t" << mpim->rank_coords[d];
-	}
-	*GridUtils::logfile << "\t)" << std::endl;
+        if (GridUtils::logfile)
+        {
+          *GridUtils::logfile << "Coordinates on rank " << mpim->my_rank << " are (";
+          for (size_t d = 0; d < L_DIMS; d++)
+          {
+            *GridUtils::logfile << "\t" << mpim->rank_coords[d];
+          }
+          *GridUtils::logfile << "\t)" << std::endl;
+        }
 #endif
 	L_INFO("Number of time steps to run = " + std::to_string(L_TOTAL_TIMESTEPS), GridUtils::logfile);
 	L_INFO("Grid spacing = " + std::to_string(Grids->dh), GridUtils::logfile);
@@ -417,7 +435,10 @@ int main( int argc, char* argv[] )
 
 	// Write out forces of objects
 #if (defined L_LD_OUT && defined L_GEOMETRY_FILE && defined L_IBM_ON)
+        if (GridUtils::logfile)
+        {
 		*GridUtils::logfile << "Writing out flexible body lift and drag..." << endl;
+        }
 		objMan->io_writeLiftDrag();
 #endif
 

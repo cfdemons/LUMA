@@ -181,8 +181,8 @@ inline void errorfcn(const std::string &msg, std::ofstream *logfile)
 inline void infofcn(const std::string &msg, std::ofstream *logfile)
 {
 
-	assert(logfile);
-	*logfile << "Info: " << msg << std::endl;
+	if (logfile)
+		*logfile << "Info: " << msg << std::endl;
 }
 
 /// Regular writer
@@ -197,8 +197,8 @@ inline void infofcn(const std::string &msg, std::ofstream *logfile)
 inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 {
 
-	assert(logfile);
-	*logfile << "WARNING: " << msg << std::endl;
+	if (logfile)
+		*logfile << "WARNING: " << msg << std::endl;
 }
 
 /// Regular writer
@@ -213,8 +213,8 @@ inline void warnfcn(const std::string &msg, std::ofstream *logfile)
 inline void debugfcn(const std::string &msg, std::ofstream *logfile)
 {
 
-	assert(logfile);
-	*logfile << "Debug: " << msg << std::endl;
+	if (logfile)
+		*logfile << "Debug: " << msg << std::endl;
 }
 
 

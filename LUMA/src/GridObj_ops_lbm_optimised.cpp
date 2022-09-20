@@ -197,7 +197,8 @@ void GridObj::LBM_multi_opt(int subcycle)
 
 	if (t % L_GRID_OUT_FREQ == 0) {
 		// Performance data to logfile
-		*GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
+          if (GridUtils::logfile)
+            *GridUtils::logfile << "Grid " << level << ": Time stepping taking an average of " << timeav_timestep * 1000 << "ms" << std::endl;
 	}
 
 	// MPI COMMUNICATION //

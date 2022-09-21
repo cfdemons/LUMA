@@ -500,17 +500,23 @@ int main( int argc, char* argv[] )
 
 		ple.synchronise(0);
 
+#ifdef L_PLE_DEBUG
 		L_INFO("Hello after ple synchronise", GridUtils::logfile);
+#endif
 
 		// Read data from PLE into LUMA.
 		ple.receiveData();
 
+#ifdef L_PLE_DEBUG
 		L_INFO("Hello after ple receiveData", GridUtils::logfile);
+#endif
 
 		// Read data from LUMA and send it to PLE. 
 		ple.sendData();
 
+#ifdef L_PLE_DEBUG
 		L_INFO("Hello after sending data to PLE", GridUtils::logfile);
+#endif
 
 
 #endif

@@ -62,10 +62,14 @@ MpiManager::MpiManager()
 	g_buffer_recv.resize(L_MPI_DIRS, std::vector<double>(0));
 #endif
 
+#ifdef L_PLE_DEBUG
 	std::cout << "hello before mpi_init" << std::endl;
+#endif
 	// Initialise the manager, grid information and topology
 	mpi_init();
+#ifdef L_PLE_DEBUG
 	std::cout << "hello after mpi_init" << std::endl;
+#endif
 
 	// Resize the IBM-MPI helper classes for each grid level
 	markerCommOwnerSide.resize(L_NUM_LEVELS+1);
@@ -93,7 +97,9 @@ MpiManager* MpiManager::getInstance() {
 
 	if (!me)
 	{
+#ifdef L_PLE_DEBUG
 		std::cout << "MPI manager doesn't exist already" << std::endl;
+#endif
 		me = new MpiManager();	// Private construction
 	}
 	return me;						// Return pointer to new object

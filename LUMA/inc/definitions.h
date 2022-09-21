@@ -212,6 +212,8 @@
 
 #define L_ACTIVATE_PLE                  ///< LUMA runs coupled to another code using PLE
                                         ///< When you comment this line, you must remove the PLEAdapter.h and .cpp form scr file, otherwise broken
+#define PLE_DEBUG                       ///<Output verbose debugging info for PLE coupling
+
 #define L_PLE_PARTICIPANT_NAME "LEFT"   ///< Name of this LUMA instance
 #define L_PLE_OFFSET_X 0.0              ///< Offset between the coordinate system of the coupled code and LUMA
 #define L_PLE_OFFSET_Y 0.0             

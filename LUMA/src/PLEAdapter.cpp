@@ -77,9 +77,13 @@ bool PLEAdapter::synchronise(int flags)
 
 	/* Synchronize applications */
 
+#ifdef L_PLE_DEBUG
 	printf("LUMA: Hi before ple synchronise. \n");
+#endif
 	ple_coupling_mpi_set_synchronize(pleSets_, sync_flags, LUMAGrid_->Grids->dt);
+#ifdef L_PLE_DEBUG
 	printf("LUMA: Hi after ple synchronise. \n");
+#endif
 
 	app_status = ple_coupling_mpi_set_get_status(pleSets_);
 	app_ts = ple_coupling_mpi_set_get_timestep(pleSets_);
@@ -595,13 +599,18 @@ void PLEAdapter::addPLELocator(int i)
 		L_INFO("LUMA to CS dist " + std::to_string(lumaToCSdist.at(l)), GridUtils::logfile);
 	}
 	
+#ifdef L_PLE_DEBUG
 	std::cout << "*-*-*-*-*-I am testing the location from the local mesh*-*-*-*-*-*-*-*-*" << std::endl;
+#endif
+
 	for (int ii = 0; ii < coordinates_.at(i).size()/L_DIMS;ii++)
 	{
 		std::cout << coordinates_.at(i)[ii] << " ";
 	}
 
+#ifdef L_PLE_DEBUG
 	std::cout << "*-*-*-*-*-I am testing the location form the distant mesh*-*-*-*-*-*-*-*-*" << std::endl;
+#endif
 	size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
 	const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
 	for (int ii = 0; ii < nCoupledPoints;ii++)
@@ -809,20 +818,28 @@ void PLEAdapter::receiveData()
 	// For all the interfaces
 	for (int i = 0; i < interfacesConfig_.size(); i++)
 	{
+#ifdef L_PLE_DEBUG
 		L_INFO("LUMA: interface " + std::to_string(i) , GridUtils::logfile);
+#endif
 
 		// Check which ones have data to read from PLE
 		for (auto readJ = interfacesConfig_.at(i).readData.begin(); readJ != interfacesConfig_.at(i).readData.end(); ++readJ)
 		{
+#ifdef L_PLE_DEBUG
 			L_INFO("LUMA: interface " + std::to_string(i) + " has data from PLE.", GridUtils::logfile);
+#endif
 
 			// Get the number of coupled points and their LUMA cell id
 			size_t nCoupledPoints = ids_.at(i).size();
 
+#ifdef L_PLE_DEBUG
 			L_INFO("Number of interior points " + std::to_string(nCoupledPoints), GridUtils::logfile);
+#endif
 
 			const int* IDCoupledPoints = ids_.at(i).data();
+#ifdef L_PLE_DEBUG
 			std::cout << nCoupledPoints << " " << *IDCoupledPoints << " " << std::endl;
+#endif
 			//L_INFO("Number of interior points " + std::to_string(nCoupledPoints) + " ID of second point " + std::to_string(IDCoupledPoints[1]), GridUtils::logfile);
 
 			// TODO: Check for nested grids and return the correct grid to get the LUMA variables from. 
@@ -899,7 +916,9 @@ bool PLEAdapter::configure()
 {
 	// Read PLE adapter configuration file.  
 	configFileRead(); 
+#ifdef L_PLE_DEBUG
 	std::cout << "I've read the configuration file. " << std::endl;
+#endif
 
 	// Used for LUMA inter MPI communication
 	pleSets_ = ple_coupling_mpi_set_create(pleCouplingFlag_, "LUMA", "LEFT", MPI_COMM_WORLD, lumaMpi_->world_comm);
@@ -935,10 +954,14 @@ bool PLEAdapter::configure()
 
 	// Create the intercommunicator between LUMA and Code Saturne
 	ple_coupling_mpi_intracomm_create(MPI_COMM_WORLD, lumaMpi_->ple_comm, CSRootRank_, &mpiCS_, local_range, distant_range);
+#ifdef L_PLE_DEBUG
 	std::cout << "LUMA: I've created the PLE intracomm!" << std::endl;
+#endif
 
 	// Create the interfaces
+#ifdef L_PLE_DEBUG
 	std::cout << "LUMA: Creating PLE interfaces..." << std::endl;
+#endif
 	int i = 0;
 	for (int i = 0; i < interfacesConfig_.size(); i++)
 	{
@@ -951,7 +974,9 @@ bool PLEAdapter::configure()
 		{
 			if ((*readJ == 'v') || (*readJ == 'V'))
 			{
+#ifdef L_PLE_DEBUG
 				std::cout << "LUMA: " << std::to_string(*readJ) << std::endl;
+#endif
 				initialiseVectorData("v", 0.0, i);
 			}
 			else if ((*readJ == 't') || (*readJ == 'T'))
@@ -1045,11 +1070,15 @@ void PLEAdapter::teardown()
 
 	//- PLE locator arrays (one locator for each coupled mesh with PLE). 
 	std::vector<ple_locator_t*> locators_;
+#ifdef L_PLE_DEBUG
 	std::cout << "Finalizing the PLE interface..." << std::endl;
+#endif
 
     if (NULL != pleSets_)
     {
+#ifdef L_PLE_DEBUG
         std::cout << "Destroying the PLE sets..." << std::endl;
+#endif
         delete pleSets_;
         pleSets_ = NULL;
     }
@@ -1057,7 +1086,9 @@ void PLEAdapter::teardown()
     // Delete the PLE locators
     if (locators_.size() > 0)
     {
+#ifdef L_PLE_DEBUG
         std::cout << "Deleting PLE locators..." << std::endl;
+#endif
         for (int i = 0; i < locators_.size(); i++)
         {
 			locators_.at(i) = ple_locator_destroy(locators_.at(i));
@@ -1170,7 +1201,9 @@ void PLEAdapter::initialiseVectorData(std::string name, double initValue, int i)
 		L_ERROR("This vectorData doesn't have associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
 	}
 
+#ifdef L_PLE_DEBUG
 	std::cout << "LUMA: HI! numDataPoints = " << coordinates_.at(i).size() << std::endl;
+#endif
 }
 
 void PLEAdapter::initialiseScalarData(std::string name, double initValue, int i)

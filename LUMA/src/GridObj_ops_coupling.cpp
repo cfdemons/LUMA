@@ -51,7 +51,9 @@ void GridObj::coupling_addData(std::string name, const std::vector<int>& cellIDs
 				name + " cell ID size: " + std::to_string(cellIDs.size()) +
 				"data size: " + std::to_string(data.size()), GridUtils::logfile);
 		}
+#ifdef PLE_DEBUG
 		std::cout << "This is id from addData" << std::endl;
+#endif
 		for (int i = 0; i < cellIDs.size(); i++)
 		{
 			u[0 + cellIDs[i] * L_DIMS] = data[0 + i * L_DIMS];

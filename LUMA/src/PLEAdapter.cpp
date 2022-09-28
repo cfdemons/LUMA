@@ -221,7 +221,9 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 {
 	const GridObj* grid = static_cast<const GridObj*>(mesh);
 	bool incells = false;
+#ifdef PLE_DEBUG
 	L_INFO("Number of points to locate " + std::to_string(n_points), GridUtils::logfile);
+#endif
 	
 	for (int p = 0; p < n_points; p++)
 	{
@@ -239,13 +241,17 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 			// If the point is in the receiving halo, it is counted as unlocated. 
 			if (loc == eHalo)
 			{
+#ifdef PLE_DEBUG
 				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) +  " " + std::to_string(py) + " " + std::to_string(pz) + " is in the halo of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 				location[p] = -1;
 				distance[p] = -1;
 			}
 			else if (loc == eCore) // Point is in the core of the rank's meshes, including the sending halo. 
 			{
+#ifdef PLE_DEBUG
 				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is inside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 
 				// Flatten the index returned by inOnThisRank
 				int id = pos[2] + pos[1] * grid->K_lim + pos[0] * grid->K_lim * grid->M_lim;
@@ -280,10 +286,14 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 			location[p] = -1;
 			distance[p] = -1;
 
+#ifdef PLE_DEBUG
 			L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates "+ std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is outside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 		}
 
+#ifdef PLE_DEBUG
 		L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " distance " + std::to_string(distance[p]), GridUtils::logfile);
+#endif
 	}
 	return incells;
 }
@@ -292,7 +302,9 @@ bool PLEAdapter::pointInMesh(const void * mesh, float tolerance_base, float tole
 void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, float tolerance_fraction, ple_lnum_t n_points, const ple_coord_t point_coords[], const int point_tag[], ple_lnum_t location[], float distance[])
 {
 	const GridObj* grid = static_cast<const GridObj*>(mesh);
+#ifdef PLE_DEBUG
 	L_INFO("Number of points to locate " + std::to_string(n_points), GridUtils::logfile);
+#endif
 	for (int p = 0; p < n_points; p++)
 	{
 		double px, py, pz;
@@ -377,7 +389,9 @@ void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, flo
 			// If the point is in the receiving halo, it is counted as unlocated. 
 			if (loc == eHalo)
 			{
+#ifdef PLE_DEBUG
 				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) +  " " + std::to_string(py) + " " + std::to_string(pz) + " is in the halo of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 				location[p] = -1;
 				distance[p] = -1;
 				continue;
@@ -389,7 +403,9 @@ void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, flo
 				// ATTENTION! From what Yvan told me I understand that the indices in location should be local to the current rank but I'm not sure
 				// how to get them with LUMA. I will leave it like this for the moment because I'm not sure LUMA will be able to work with local rank indices. 
 
+#ifdef PLE_DEBUG
 				L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is inside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 
 				// Flatten the index returned by inOnThisRank
 				int id = pos[2] + pos[1] * grid->K_lim + pos[0] * grid->K_lim * grid->M_lim;
@@ -427,11 +443,15 @@ void PLEAdapter::pointInMeshMapping(const void * mesh, float tolerance_base, flo
 			location[p] = -1;
 			distance[p] = -1;
 
+#ifdef PLE_DEBUG
 			L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates "+ std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " is outside the mesh of rank " + std::to_string(GridUtils::safeGetRank()), GridUtils::logfile);
+#endif
 			continue;
 		}
 
+#ifdef PLE_DEBUG
 		L_INFO("LUMA: Point " + std::to_string(p) + " with coordinates " + std::to_string(px) + " " + std::to_string(py) + " " + std::to_string(pz) + " distance " + std::to_string(distance[p]), GridUtils::logfile);
+#endif
 	}
 }
 
@@ -530,8 +550,9 @@ bool PLEAdapter::configFileRead()
 			pleInt.dimensions.push_back(static_cast<int>(sizey));
 			pleInt.dimensions.push_back(static_cast<int>(sizez));
 		}
+#ifdef L_PLE_DEBUG
 		std::cout << " Read data " << pleRead[i] << " Write data " << pleWrite[i] << std::endl;
-		
+#endif		
 		for (char const c : pleRead[i])
 		{
 			pleInt.readData.push_back(c);
@@ -594,29 +615,33 @@ void PLEAdapter::addPLELocator(int i)
 		&meshExtents,
 		&pointInMeshMapping);
 	
+#ifdef PLE_DEBUG
 	for (int l = 0; l < coordinates_.at(i).size() / L_DIMS; l++)
 	{
 		L_INFO("LUMA to CS dist " + std::to_string(lumaToCSdist.at(l)), GridUtils::logfile);
 	}
+#endif
 	
 #ifdef L_PLE_DEBUG
 	std::cout << "*-*-*-*-*-I am testing the location from the local mesh*-*-*-*-*-*-*-*-*" << std::endl;
-#endif
 
 	for (int ii = 0; ii < coordinates_.at(i).size()/L_DIMS;ii++)
 	{
 		std::cout << coordinates_.at(i)[ii] << " ";
 	}
+#endif
 
 #ifdef L_PLE_DEBUG
 	std::cout << "*-*-*-*-*-I am testing the location form the distant mesh*-*-*-*-*-*-*-*-*" << std::endl;
 #endif
 	size_t nCoupledPoints = ple_locator_get_n_dist_points(locators_.at(i));
 	const int* IDCoupledPoints = ple_locator_get_dist_locations(locators_.at(i));
+#ifdef L_PLE_DEBUG
 	for (int ii = 0; ii < nCoupledPoints;ii++)
 	{
 		std::cout << IDCoupledPoints[ii] << " ";
 	}
+#endif
 	
 	// This is used to obtaine the neighbour position to interpolate
 	if (!pleName[i].compare("CS_inlet"))	// compare function: If is CS_inlet, return false
@@ -1149,9 +1174,13 @@ void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0,
 							coord.push_back(temp_coord.at(d));
 						id.push_back(location.at(0));
 
+#ifdef PLE_DEBUG
 						L_INFO("Cell ID " + std::to_string(id.back()), GridUtils::logfile);
+#endif
 					}
+#ifdef PLE_DEBUG
 					L_INFO("Coord z: " + std::to_string(coord.back()), GridUtils::logfile);
+#endif
 				}
 			}
 		}
@@ -1164,7 +1193,9 @@ void PLEAdapter::setCoordinates(std::vector<int> Nxyz, std::vector<double> xyz0,
 	}
 	else if (inter_id < coordinates_.size())
 	{
+#ifdef PLE_DEBUG
 		L_INFO("Updating the PLE coupling coordinates for position " + std::to_string(inter_id), GridUtils::logfile);
+#endif
 		coordinates_.at(inter_id) = coord;
 		ids_.at(inter_id) = id;
 	}
@@ -1229,7 +1260,9 @@ void PLEAdapter::initialiseScalarData(std::string name, double initValue, int i)
 		L_ERROR("This scalarData_ doesn't have associated coordinates. Please initialise the coordinates vector before initialising flow data", GridUtils::logfile);
 	}
 
+#ifdef L_PLE_DEBUG
 	std::cout << "LUMA: HI! numDataPoints = " << coordinates_.at(i).size() << std::endl;
+#endif
 }
 
 PLEAdapter::~PLEAdapter()

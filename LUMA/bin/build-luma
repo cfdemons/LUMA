@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Build a LUMA executable from a definitions.h file
+
+set -eu
+
+defsfile="$1"
+destexe="$2"
+
+tmpdir=$(mktemp -d -t luma-XXXXXXXXXX)
+mkdir $tmpdir/inc
+mkdir $tmpdir/obj
+
+trap "rm -rf $tmpdir" EXIT
+
+cp $defsfile $tmpdir/inc
+
+CODE_SATURNE_DIR=/work/ecseaa28/ecseaa28/hinderec/staging/cs-luma/Code_Saturne
+
+lumadir=$(dirname $(dirname ${BASH_SOURCE}))
+
+make -C $lumadir -B -j 8 \
+     CS_INSTALL=$CODE_SATURNE_DIR \
+     CC=CC \
+     CFLAGS="-O3 -std=c++11 -w -fopenmp -g -Wl,-rpath,$CODE_SATURNE_DIR/lib" \
+     LAPACK_LIBS=-lsci_gnu \
+     EXE=$(readlink -f $destexe) \
+     ODIR=$tmpdir/obj \
+     HDF5_HOME=/opt/cray/pe/hdf5-parallel/1.12.0.3/crayclang/9.1 \
+     INC="-I/opt/cray/pe/hdf5-parallel/1.12.0.3/crayclang/9.1/include -I$tmpdir/inc -I$CODE_SATURNE_DIR/include" 
+
+rm -rf $tmpdir

@@ -4,7 +4,7 @@ CS_INSTALL=/home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64
 
 # Compiler command
 CC=mpicxx
-CFLAGS=-O3 -std=c++14 -w -fopenmp $(CFLAGS_EXTRAS)
+CFLAGS=-O3 -std=c++14 -w -fopenmp -Wl,-rpath,$(CS_INSTALL)/lib $(CFLAGS_EXTRAS)
 
 # Executable
 EXE=./LUMA

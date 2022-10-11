@@ -29,6 +29,10 @@ ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)
 endif
 
+ifneq (${MAKEDEFS},)
+include $(MAKEDEFS)
+endif
+
 # Build LUMA
 $(EXE): objs
 	$(CC) $(CFLAGS) -rdynamic -o $@ $(OBJS) $(LIB)

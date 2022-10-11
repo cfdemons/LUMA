@@ -22,7 +22,7 @@ OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 LAPACK_LIBS := -llapack
 
 # Include and library file
-INC=-I$(HDF5_HOME)/include -I$ $(CS_INSTALL)/include $(INC_EXTRAS)
+INC=-I$(HDF5_HOME)/include -I$ $(CS_INSTALL)/include $(INC_EXTRAS) $(INC_DEFINITIONS)
 LIB=-L$(HDF5_HOME)/lib -L$ $(CS_INSTALL)/lib/ -lhdf5 $(LAPACK_LIBS) -lple $(LIB_EXTRAS)
 
 ifneq (${LAPACK_DIR},)

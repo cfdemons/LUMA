@@ -4,7 +4,7 @@ CS_INSTALL=/home/yang/Code_Saturne/7.0.2/code_saturne-7.0.2/arch/Linux_x86_64
 
 # Compiler command
 CC=mpicxx
-CFLAGS=-O3 -std=c++14 -w -fopenmp
+CFLAGS=-O3 -std=c++14 -w -fopenmp $(CFLAGS_EXTRAS)
 
 # Executable
 EXE=./LUMA
@@ -22,8 +22,8 @@ OBJS:=$(addprefix $(ODIR)/,$(notdir $(SRCS:.cpp=.o)))
 LAPACK_LIBS := -llapack
 
 # Include and library file
-INC=-I$(HDF5_HOME)/include -I$ $(CS_INSTALL)/include
-LIB=-L$(HDF5_HOME)/lib -L$ $(CS_INSTALL)/lib/ -lhdf5 $(LAPACK_LIBS) -lple
+INC=-I$(HDF5_HOME)/include -I$ $(CS_INSTALL)/include $(INC_EXTRAS)
+LIB=-L$(HDF5_HOME)/lib -L$ $(CS_INSTALL)/lib/ -lhdf5 $(LAPACK_LIBS) -lple $(LIB_EXTRAS)
 
 ifneq (${LAPACK_DIR},)
 LIB += -L$(LAPACK_DIR)

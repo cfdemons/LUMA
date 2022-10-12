@@ -3,13 +3,34 @@
 # Build a LUMA executable from a definitions.h file
 
 set -eu
+set -x
+lumadir=$(dirname $(dirname ${BASH_SOURCE}))
 
-defsfile="$1"
-makedefsfile="$2"
-destexe="$3"
+# Parse arguments
+while [ $# -gt 0 ]; do
+    if [[ $1 =~ --.* ]]; then
+        case "$1" in
+            --make-defs-file)
+                makedefsfile="$2"
+                shift 2
+                ;;
+            --*)
+                echo "Unrecognized option $1" >&2
+                exit 1
+                ;;
+        esac
+    else
+        args+=($1)
+        shift
+    fi
+done
 
-shift 3
-makeargs="${@}"
+defsfile="${args[0]}"
+destexe="${args[1]}"
+extramakeargs=("${args[@]:2}")   # TODO: handle case where this is empty
+
+echo "args =" "${args[@]}"
+echo "extramakeargs =" "${extramakeargs[@]}"
 
 tmpdir=$(mktemp -d -t luma-XXXXXXXXXX)
 mkdir $tmpdir/inc
@@ -19,13 +40,27 @@ trap "rm -rf $tmpdir" EXIT
 
 cp $defsfile $tmpdir/inc
 
-lumadir=$(dirname $(dirname ${BASH_SOURCE}))
+if [ -z "${makedefsfile+1}" ]; then
+    if [ -r $lumadir/etc/luma.defs ]; then
+        makedefsfile=$lumadir/etc/luma.defs
+    fi
+fi
 
-make -C $lumadir -B -j 8 \
-     MAKEDEFS="$(readlink -f $makedefsfile)" \
-     EXE=$(readlink -f $destexe) \
-     ODIR=$tmpdir/obj \
-     INC_DEFINITIONS="-I$tmpdir/inc" \
-     $makeargs
+makeargs=(
+    -C "$lumadir"
+    -B
+    -j 8
+    EXE=$(readlink -f $destexe)
+    ODIR=$tmpdir/obj
+    INC_DEFINITIONS="-I$tmpdir/inc"
+)
+
+if [ -n "${makedefsfile+1}" ]; then
+    makeargs+=(MAKEDEFS="$(readlink -f $makedefsfile)")
+fi
+
+makeargs+=("${extramakeargs[@]}")
+
+make "${makeargs[@]}"
 
 rm -rf $tmpdir

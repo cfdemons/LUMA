@@ -3,7 +3,7 @@
 # Build a LUMA executable from a definitions.h file
 
 set -eu
-set -x
+
 lumadir=$(dirname $(dirname ${BASH_SOURCE}))
 
 # Parse arguments

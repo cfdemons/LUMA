@@ -524,6 +524,7 @@ void GridObj::io_restart(eIOFlag IO_flag) {
 		{
 
 			// Get line and put in buffer
+			iss.clear();
 			std::getline(file,line_in,'\n');
 			iss.str(line_in);
 			iss.seekg(0); // Reset buffer position to start of buffer

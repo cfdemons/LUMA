@@ -12,4 +12,6 @@ To start working on a feature:
 6) Mark the issue as resolved.  
 7) Register a pull request into the pre-release branch so our development team can discuss the changes and run tests before merging.    
 8) Once merged, we will mark the issue as closed.
-9) Wiki release notes are updated from the release notes in the *./docs/* notes by the development team when a release is pushed to the master.    
+9) Wiki release notes are updated from the release notes in the *./docs/* notes by the development team when a release is pushed to the master.
+
+test change
